@@ -11,16 +11,31 @@ xmlns:cmf="http://myfaces.sourceforge.net/tld/myfaces_ext_0_9.tld">
     <f:view>
         <wf:workspace_page>
                <h:form id="uploadForm" name="uploadForm" enctype="multipart/form-data">
+               <f:verbatim><br/></f:verbatim>
+                    <h:outputText value="Select a file to upload : "/>
                  <cmf:inputFileUpload id="fileupload"
-                                       accept="image/*"
-                                       value="#{WebDAVUploaderBean.upFile}"
+                                       accept="*"
+                                       value="#{WebDAVUploadBean.uploadFile}"
                                        storage="file"
                                        styleClass="fileUploadInput"
                                        required="true"/>
-                    <h:outputText value="and give it a name: "/>
-                    <h:inputText value="#{WebDAVUploaderBean.name}"/>
-                    <h:commandButton value="Upload" action="#{WebDAVUploaderBean.upload}"/>
+                <f:verbatim><br/></f:verbatim>
+                    <h:outputText value="and give it a name (optional) : "/>
+                    <h:inputText value="#{WebDAVUploadBean.fileName}"/>
+                    <f:verbatim><br/></f:verbatim>
+                    <h:outputText value="and select the folder to upload to (optional) : "/>
+                     <h:inputText value="#{WebDAVUploadBean.uploadFilePath}"/>
+                    <h:commandButton value="Upload" action="#{WebDAVUploadBean.upload}"/>
+                
+                <f:verbatim><br/></f:verbatim>
+                <h:outputLink id="filelink" value="#{WebDAVUploadBean.downloadPath}" target="_new">
+                <f:verbatim>Click here to get the file</f:verbatim>
+                </h:outputLink>
+                <f:verbatim><br/></f:verbatim>
+                <h:graphicImage id="imagePreview" value="#{WebDAVUploadBean.imagePath}"/>
+                
                 </h:form>
+                
             </wf:workspace_page>
     </f:view>
 </jsp:root>
