@@ -9,6 +9,7 @@ version="1.2">
 <jsf:view>
         <wf:workspace_page>
                 <html:form>
+			<wf:simpledocumentsview/>
                 </html:form>
         </wf:workspace_page>
 </jsf:view>
