@@ -54,7 +54,24 @@ public abstract class ContentBlock extends IWBaseComponent {
 	public void refreshList() {
 		WFUtil.invoke("WebDAVListBean","refresh");
 	}
-	
+
+	public WebdavExtendedResource getWebdavExentededResource(String path) {
+		try {
+			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
+			return ss.getWebdavResource(path.replaceFirst(ss.getWebdavServerURI(), ""));
+		} catch (IBOLookupException e) {
+			e.printStackTrace();
+		} catch (UnavailableIWContext e) {
+			e.printStackTrace();
+		} catch (HttpException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 	public void encodeBegin(FacesContext context) throws IOException {
 		String webDavPath = (String) this.getAttributes().get("path");
