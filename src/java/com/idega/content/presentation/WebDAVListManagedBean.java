@@ -64,6 +64,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		UIColumn col0 = new UIColumn();
 		HtmlGraphicImage icon = new HtmlGraphicImage();
 		icon.setValueBinding("url", WFUtil.createValueBinding("#{"+var+".iconURL}"));
+		icon.setHeight("32");// sizes that make sense 16/32/64/128
 		HtmlCommandLink iconLink = new HtmlCommandLink();
 		iconLink.setId(P_ID+"_L");
 		WFUtil.addParameterVB(iconLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
