@@ -196,10 +196,10 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 		int vColumn = 1;
 		vTable.add(getBundle().getLocalizedText("version"), vColumn, vRow);
 		vTable.add(getBundle().getLocalizedText("download"), ++vColumn, vRow);
-		vTable.add(getBundle().getLocalizedText("user"), ++vColumn, vRow);
+		vTable.add(getBundle().getLocalizedText("created_by"), ++vColumn, vRow);
 		vTable.add(getBundle().getLocalizedText("comment"), ++vColumn, vRow);
-		vTable.add(getBundle().getLocalizedText("checkout"), ++vColumn, vRow);
-		vTable.add(getBundle().getLocalizedText("checkin"), ++vColumn, vRow);
+//		vTable.add(getBundle().getLocalizedText("checkout"), ++vColumn, vRow);
+//		vTable.add(getBundle().getLocalizedText("checkin"), ++vColumn, vRow);
 		vTable.add(getBundle().getLocalizedText("last_modified"), ++vColumn, vRow);
 
 		
@@ -221,7 +221,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 				String versionName = version.getVersionName();
 								
 				vTable.add(WFUtil.getText(versionName,"wf_listtext"), ++vColumn, vRow);
-				DownloadLink versionPath = new DownloadLink("Download");
+				DownloadLink versionPath = new DownloadLink(getBundle().getLocalizedString("download"));
 				
 				versionPath.setId("dl_"+vRow);
 				versionPath.setStyleClass("wf_listlink");
@@ -235,9 +235,19 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 				//versionPath.getChildren().add(WFUtil.getText("Download/View"));
 				vTable.add(versionPath, ++vColumn, vRow);
 				vTable.add(WFUtil.getText(version.getCreatorDisplayName(),"wf_listtext"), ++vColumn, vRow);
-				vTable.add(WFUtil.getText(version.getComment(),"wf_listtext"), ++vColumn, vRow);
-				vTable.add(WFUtil.getText(version.getCheckedOut(),"wf_listtext"), ++vColumn, vRow);
-				vTable.add(WFUtil.getText(version.getCheckedIn(),"wf_listtext"), ++vColumn, vRow);
+				
+				String tComment = version.getComment();
+				HtmlOutputText comment = new HtmlOutputText();
+				comment.setStyleClass("wf_listtext");
+				if ("INITIAL VERSION.".equals(tComment)) {
+					getBundle().getLocalizedUIComponent("initial_version", comment);
+				} else {
+					comment.setValue(tComment);
+				}
+				vTable.add(comment, ++vColumn, vRow);
+//				vTable.add(WFUtil.getText(version.getComment(),"wf_listtext"), ++vColumn, vRow);
+//				vTable.add(WFUtil.getText(version.getCheckedOut(),"wf_listtext"), ++vColumn, vRow);
+//				vTable.add(WFUtil.getText(version.getCheckedIn(),"wf_listtext"), ++vColumn, vRow);
 				vTable.add(WFUtil.getText(version.getLastModified(),"wf_listtext"), ++vColumn, vRow);
 			}
 		}
