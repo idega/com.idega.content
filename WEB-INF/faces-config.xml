@@ -32,7 +32,7 @@
     </managed-bean>
     <managed-bean>
         <managed-bean-name>WebDAVBean</managed-bean-name>
-        <managed-bean-class>documentmanagementprototype2.WebDAVBean</managed-bean-class>
+        <managed-bean-class>com.idega.content.data.WebDAVBean</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
     <managed-bean>
