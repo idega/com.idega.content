@@ -231,7 +231,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 	}
 
 	private WebDAVBean[] getDirectoryListing(WebdavExtendedResource headResource, String webDAVServletURL)	throws IOException, HttpException {
-		
+		System.out.println("---------ENCODING IS:  " + System.getProperty("file.encoding")+"  ---------------");
 		WebdavResources resources = headResource.listWithDeltaV();//headResource.getChildResources();
 		Enumeration enumer = resources.getResources();
 		Vector v = new Vector();
@@ -257,7 +257,17 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 			resource = (WebdavExtendedResource) enumer.nextElement();
 			if (!resource.getDisplayName().startsWith(".")) {
 				bean = new WebDAVBean(resource);
-				url = resource.getPath();
+				String decoded = resource.getDecodedPath();
+				String encoded = resource.getEncodedPath();
+				String path = resource.getPath();
+				String name = resource.getName();
+
+				System.out.println("decoded: "+decoded);
+				System.out.println("encoded: "+encoded);
+				System.out.println("path: "+path);
+				System.out.println("name: "+name);
+				
+				url = resource.getEncodedPath();
 				url = url.replaceFirst(webDAVServletURL, "");
 				bean.setWebDavHttpURL(url);
 //				bean.setParentList(this);

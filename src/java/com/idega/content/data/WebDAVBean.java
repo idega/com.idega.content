@@ -78,7 +78,7 @@ public class WebDAVBean extends Object {
 			setModifiedDate(resource.getGetLastModified());
 			setMime(resource.getGetContentType());
 			setCreationDate(resource.getCreationDate());
-			setWebDavHttpURL(resource.getPath());
+			setWebDavHttpURL(resource.getEncodedPath());
 			setVersion(VersionHelper.getLatestVersion(resource));
 			setIsLocked(resource.isLocked());
 			setCheckedOutString(resource.getCheckedOut());

@@ -38,7 +38,7 @@ public class WebDAVFileDetails extends ContentBlock {
 			table.add(WFUtil.getText("Document details"));
 				
 			HtmlOutputLink link = new HtmlOutputLink();
-			link.setValue(resource.getPath());
+			link.setValue(resource.getEncodedPath());
 			link.setStyleClass("wf_listlink");
 			link.setId(getId() + "_dl");
 			link.getChildren().add(WFUtil.getText("Download/View"));
