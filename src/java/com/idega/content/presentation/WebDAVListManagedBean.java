@@ -13,6 +13,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIParameter;
 import javax.faces.component.html.HtmlCommandLink;
 import javax.faces.component.html.HtmlGraphicImage;
+import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
@@ -68,6 +69,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	private String iconTheme = null;
 	private boolean showFolders = true;
 	private Collection columnsToHide = null;
+	private boolean useVersionControl = true;
 	
 	private int startPage = -1;
 	private int rows = -1;
@@ -136,7 +138,19 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	private boolean showColumn(String columnName) {
 		return (columnsToHide == null || !columnsToHide.contains(columnName));
 	}
-
+	
+	public void setUseVersionControl(Boolean useVersionControl) {
+		this.useVersionControl = useVersionControl.booleanValue();
+		if (!this.useVersionControl) {
+			if (columnsToHide == null) {
+				columnsToHide = new Vector();
+			}
+			columnsToHide.add(COLUMN_VERSION);
+			columnsToHide.add(COLUMN_LOCK);
+			columnsToHide.add(COLUMN_CHECKOUT);
+		}
+	}
+	
 	public void refresh(UIComponent comp) {
 		ContentBlock block = null;
 		while (comp != null && block == null) {
@@ -165,6 +179,11 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			}
 		}
 		v.setEventHandled(true);
+		
+		if (comp.getAttributes().get(ContentViewer.PARAMETER_ACTION) != null) {
+			v.setRenderFlags((String) comp.getAttributes().get(ContentViewer.PARAMETER_ACTION) ); 
+		}
+
 		
 		boolean isFolder = true;
 		
@@ -199,7 +218,8 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	//			WFList parentList = (WFList) parent;
 				if (isFolder) {
 					this.setClickedFilePath(null);
-	//				this.updateDataModel(new Integer(parentList.getFirst()), new Integer(parentList.getRows()));
+					clickedFileName = null;
+//					this.updateDataModel(new Integer(parentList.getFirst()), new Integer(parentList.getRows()));
 				} else {
 					this.setClickedFilePath(webDAVPath);
 					int index = webDAVPath.lastIndexOf("/");
@@ -213,6 +233,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			v.setCurrentFolderPath(webDAVPath);
 			v.setCurrentFileName(getClickedFileName());
 		}
+		
 	}
 
 	private WFList getWFListParent(UIComponent comp) {
@@ -273,16 +294,56 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			nameSortLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
 			nameSortLink.setId(P_ID+"_sortName");
 			col.setHeader(nameSortLink);
-			HtmlCommandLink nameLink = new HtmlCommandLink();
-			nameLink.setId(P_ID);
+
+			//NameLink for file
+			HtmlOutputLink nameLink = new HtmlOutputLink();
+			nameLink.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".encodedURL}"));
+			nameLink.setId(P_ID+"_fi");
 			nameLink.setStyleClass("wf_listlink");
-			nameLink.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".name}"));
-			WFUtil.addParameterVB(nameLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
-			WFUtil.addParameterVB(nameLink, PARAMETER_IS_FOLDER, var + ".isCollection");
-			nameLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
-			col.getChildren().add(nameLink);
+			nameLink.getChildren().add(WFUtil.getTextVB(var + ".name"));
+			nameLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isFile}"));
 			
+			//NameLink for folder
+			HtmlCommandLink nameFolderLink = new HtmlCommandLink();
+			nameFolderLink.setId(P_ID);
+			nameFolderLink.setStyleClass("wf_listlink");
+			nameFolderLink.setValueBinding("value", WFUtil.createValueBinding("#{"+var + ".name}"));
+			nameFolderLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isCollection}"));
+			WFUtil.addParameterVB(nameFolderLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
+			WFUtil.addParameterVB(nameFolderLink, PARAMETER_IS_FOLDER, var + ".isCollection");
+			nameFolderLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
+			
+			// DetailLink
+			HtmlCommandLink nameDetailsLink = new HtmlCommandLink();
+			nameDetailsLink.setId(P_ID+"_det");
+			nameDetailsLink.setStyleClass("content_viewer_file_details");
+			nameDetailsLink.getChildren().add(WFUtil.getText("     "));
+			nameDetailsLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isFile}"));
+			WFUtil.addParameterVB(nameDetailsLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
+			WFUtil.addParameterVB(nameDetailsLink, PARAMETER_IS_FOLDER, var + ".isCollection");
+			nameDetailsLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
+
+			// PreviewLink
+			HtmlCommandLink namePreviewLink = new HtmlCommandLink();
+			namePreviewLink.setId(P_ID+"_det");
+			namePreviewLink.setStyleClass("content_viewer_file_preview");
+			namePreviewLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.PREVIEW);
+			namePreviewLink.getChildren().add(WFUtil.getText("     "));
+			namePreviewLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isFile}"));
+			WFUtil.addParameterVB(namePreviewLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
+			WFUtil.addParameterVB(namePreviewLink, PARAMETER_IS_FOLDER, var + ".isCollection");
+			namePreviewLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
+
+			
+			col.getChildren().add(nameLink);
+			col.getChildren().add(nameFolderLink);
 			columns.add(col);
+			
+			UIColumn col2 = new UIColumn();
+			col2.getChildren().add(nameDetailsLink);
+			col2.getChildren().add(WFUtil.getText(" ", "wf_listlink"));
+			col2.getChildren().add(namePreviewLink);
+			columns.add(col2);
 		}
 		
 //		UIColumn col2 = new UIColumn();
