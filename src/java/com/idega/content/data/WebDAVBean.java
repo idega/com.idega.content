@@ -14,17 +14,14 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Vector;
-
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.WebdavResources;
-
 import com.idega.business.IBOLookup;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.file.business.FileIconSupplier;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
-import com.idega.slide.util.VersionHelper;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.FileUtil;
 
@@ -97,7 +94,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
 			setMime(resource.getGetContentType());
 			setCreationDate(resource.getCreationDate());
 			setWebDavHttpURL(resource.getPath());
-			setVersion(VersionHelper.getLatestVersion(resource));
+			setVersion(resource.getVersionName());
 			setIsLocked(resource.isLocked());
 			setCheckedOutString(resource.getCheckedOut());
 			setComment(resource.getComment());
