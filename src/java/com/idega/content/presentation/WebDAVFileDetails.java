@@ -3,26 +3,17 @@
  */
 package com.idega.content.presentation;
 
-import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Set;
 
 import javax.faces.component.html.HtmlOutputLink;
-import javax.faces.component.html.HtmlPanelGrid;
 
-import net.sourceforge.myfaces.component.html.ext.HtmlPanelGroup;
-
-import org.apache.commons.httpclient.HttpException;
+import org.apache.webdav.lib.BaseProperty;
+import org.apache.webdav.lib.ResponseEntity;
 import org.apache.webdav.lib.WebdavResource;
-import org.apache.webdav.lib.WebdavResources;
 
-import com.idega.business.IBOLookup;
-import com.idega.presentation.IWContext;
-import com.idega.slide.authentication.AuthenticationBusiness;
-import com.idega.slide.business.IWSlideSession;
-import com.idega.slide.util.PropertyParser;
+import com.idega.presentation.Table;
 import com.idega.slide.util.VersionHelper;
+import com.idega.util.Timer;
 import com.idega.webface.WFUtil;
 
 /**
@@ -35,49 +26,82 @@ public class WebDAVFileDetails extends ContentBlock {
 
 		WebdavResource resource = getWebdavResource();
 		
-		HtmlPanelGrid grid = new HtmlPanelGrid();
-		grid.setId(this.getId()+"_grid");
-		grid.setBorder(2);
-		grid.setColumns(2);
-		grid.getFacets().put("header", WFUtil.getText("Document Details"));
-
+		Table table = new Table();
+		table.setId(this.getId()+"-table");
+		int row = 1;
+		table.mergeCells(1, row, 2, row);
+		table.add(WFUtil.getText("Document details"));
 		
 		if (resource != null) {
-			grid.getChildren().add(WFUtil.getText(resource.getName()));
 			HtmlOutputLink link = new HtmlOutputLink();
 			link.setValue(resource.getPath());
 			link.getChildren().add(WFUtil.getText("Download/View"));
-			grid.getChildren().add(link);
 
-				WebdavResources rs = VersionHelper.getAllVersions(resource);
-				Enumeration rsEnum = rs.getResources();
-
-				HtmlPanelGroup group = new HtmlPanelGroup();
-				group.setId(grid.getId()+"_ver_g");
-				HtmlPanelGrid versionGrid = new HtmlPanelGrid();
-				versionGrid.setStyleClass("wf_listtable");
-				versionGrid.setHeaderClass("wf_listheading");
-				versionGrid.setRowClasses("wf_listoddrow,wf_listevenrow");
-				versionGrid.setColumns(2);
-				versionGrid.setId(grid.getId()+"_ver");
-				versionGrid.getFacets().put("header", WFUtil.getText("Version history"));
-				group.getChildren().add(versionGrid);
-//						grid.getFacets().put("footer", group);
-
-				grid.getChildren().add(group);
-				
-				while (rsEnum.hasMoreElements()) {
-					WebdavResource enumR = (WebdavResource) rsEnum.nextElement();
-					
-					versionGrid.getChildren().add(WFUtil.getText(enumR.getDisplayName()));
-					versionGrid.getChildren().add(WFUtil.getText(enumR.getName()));
+			++row;
+			table.add(WFUtil.getText(resource.getName()), 1, row);
+			table.add(link, 2, row);
+			
+			
+			Timer timer = new Timer();
+			timer.start();
+			
+			Table vTable = new Table();
+			int vRow = 1;
+			
+			Enumeration enumer = VersionHelper.getAllVersions(resource);
+			while (enumer.hasMoreElements()) {
+				ResponseEntity element = (ResponseEntity) enumer.nextElement();
+				Enumeration props = element.getProperties();
+				++vRow;
+				while (props.hasMoreElements()) {
+					BaseProperty prop = (BaseProperty) props.nextElement();
+					String propName = prop.getLocalName();
+					int colToAdd = 1;
+					String textToAdd = "";
+					if (propName.equals(VersionHelper.PROPERTY_VERSION_NAME)) { // Version number
+						colToAdd = 2;
+						textToAdd = prop.getPropertyAsString();
+					} else if (propName.equals(VersionHelper.PROPERTY_CREATOR_DISPLAYNAME)) { 
+						colToAdd = 3;
+						textToAdd = prop.getPropertyAsString();
+						if (textToAdd.equals("unauthenticated")) {
+							textToAdd = "NONE";
+						}
+					} else if (propName.equals(VersionHelper.PROPERTY_VERSION_COMMENT)) {
+						colToAdd = 4;
+						textToAdd = prop.getPropertyAsString();
+					}
+					vTable.add(textToAdd, colToAdd, vRow);
 				}
+			}
+			timer.stop();
+			++vRow;
+			vTable.add("Creation time", 3, vRow);
+			vTable.add(timer.getTimeString(), 4, vRow);
 
-			this.getChildren().add(grid);
+			++row;
+			table.mergeCells(1, row, 2, row);
+			table.add(vTable, 1, row);
+				
+			this.getChildren().add(table);
+			
 		} 
 		
 	}
 	
+
+	
+	
+//	WebdavResources rs = VersionHelper.getAllVersions(resource);
+//	Enumeration rsEnum = rs.getResources();
+//
+//
+//	while (rsEnum.hasMoreElements()) {
+//		WebdavResource enumR = (WebdavResource) rsEnum.nextElement();
+//		
+//		versionGrid.getChildren().add(WFUtil.getText(enumR.getDisplayName()));
+//		versionGrid.getChildren().add(WFUtil.getText(enumR.getName()));
+//	}
 
 
 }
