@@ -1,0 +1,33 @@
+
+/*** idegaWeb Content CSS classes ***/
+
+.content_viewer_new_folder {
+	width: 16px;
+	height: 14px;
+	background: url(../images/newfolder.gif);
+}
+
+.content_viewer_details {
+	width: 16px;
+	height: 16px;
+	background: url(../images/details.jpg);
+}
+
+.content_viewer_preview {
+	width: 16px;
+	height: 16px;
+	background: url(../images/preview.jpg);
+}
+
+.content_viewer_document_list {
+	width: 16px;
+	height: 16px;
+	background: url(../images/list.jpg);
+}
+
+.content_viewer_permissions {
+	width: 16px;
+	height: 16px;
+	background: url(../images/permissions.gif);
+}
+
