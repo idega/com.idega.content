@@ -154,9 +154,6 @@ public class WebDAVUploadBean{
 		
 	}
 	
-	
-	
-    protected static final String WEBDAV_SERVLET_URI = "/servlet/webdav";
 	/**
 	 * @return Returns the downloadPath.
 	 */
