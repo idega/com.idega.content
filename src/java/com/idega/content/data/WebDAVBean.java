@@ -244,7 +244,8 @@ public class WebDAVBean extends Object implements ICTreeNode {
 				WebdavExtendedResource resource = ss.getWebdavResource(getWebDavUrl().replaceFirst(ss.getWebdavServerURI(), ""));
 				this.me = resource;
 			} catch (Exception e) {
-				e.printStackTrace();
+//				e.printStackTrace();
+				setName("Error getting resource ("+getWebDavUrl()+")");
 			}
 		}
 		return me;
@@ -256,18 +257,23 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	public Collection getChildren() {
 		try {
 			if (children == null) {
-				WebdavResources resources = getMe().getChildResources();
-	  		Enumeration enumer = resources.getResources();
-	  		children = new Vector();
-	  		childrenCount = 0; 
-	  		while (enumer.hasMoreElements()) {
-	  			WebdavExtendedResource element = (WebdavExtendedResource) enumer.nextElement();
-	  			if (element.isCollection()) {
-	  				WebDAVBean bean = new WebDAVBean(element);
-	    			children.add(bean);
-	    			++childrenCount;
-	  			}
-	  		}
+				if (getMe() != null) {
+					WebdavResources resources = getMe().getChildResources();
+		  		Enumeration enumer = resources.getResources();
+		  		children = new Vector();
+		  		childrenCount = 0; 
+		  		while (enumer.hasMoreElements()) {
+		  			WebdavExtendedResource element = (WebdavExtendedResource) enumer.nextElement();
+		  			if (element.isCollection()) {
+		  				WebDAVBean bean = new WebDAVBean(element);
+		    			children.add(bean);
+		    			++childrenCount;
+		  			}
+		  		}
+				} else { 
+					children = new Vector();
+					childrenCount = 0;
+				}
 			} 
 			return children;
 		} catch (HttpException e) {
@@ -316,6 +322,9 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	 * @see com.idega.core.data.ICTreeNode#getIndex(com.idega.core.data.ICTreeNode)
 	 */
 	public int getIndex(ICTreeNode node) {
+		if (children == null) {
+			getChildren();
+		}
 		return children.indexOf(node);
 	}
 
@@ -325,12 +334,16 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	public ICTreeNode getParentNode() {
 		if (parent == null) {
 			try {
-				String url = getMe().getParentPath();
-				IWContext iwc = IWContext.getInstance();
-				IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(iwc, IWSlideSession.class);
-				url = url.replaceFirst(ss.getWebdavServerURI(), "");
-				WebdavExtendedResource selectedNode = ss.getWebdavResource(url);
-				parent = new WebDAVBean(selectedNode);
+				if (getMe() != null) {
+					String url = getMe().getParentPath();
+					IWContext iwc = IWContext.getInstance();
+					IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(iwc, IWSlideSession.class);
+					url = url.replaceFirst(ss.getWebdavServerURI(), "");
+					WebdavExtendedResource selectedNode = ss.getWebdavResource(url);
+					parent = new WebDAVBean(selectedNode);
+				} else {
+					parent = null;
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
