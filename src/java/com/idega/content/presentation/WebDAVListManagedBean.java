@@ -327,6 +327,8 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			// PreviewLink
 			HtmlCommandLink namePreviewLink = new HtmlCommandLink();
 			namePreviewLink.setId(P_ID+"_pre");
+			namePreviewLink.setValueBinding("alt", ContentViewer.getBundle().getValueBinding("preview"));
+			//"document_details"
 			namePreviewLink.setStyleClass("content_viewer_file_preview");
 			namePreviewLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.PREVIEW);
 			namePreviewLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isFile}"));
@@ -339,8 +341,11 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			col.getChildren().add(nameFolderLink);
 			
 			UIColumn col2 = new UIColumn();
+			HtmlOutputText emptyText = WFUtil.getText(" ", "wf_listtext");
+			emptyText.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isCollection}"));
 			col2.getChildren().add(namePreviewLink);
 			col2.getChildren().add(nameDetailsLink);
+			col2.getChildren().add(emptyText);
 
 			columns.add(col);
 			columns.add(col2);
@@ -401,9 +406,13 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			lock.setId(P_ID+"_lock");
 			lock.setHeight(imageSize);// sizes that make sense 16/32/64/128
 
+			HtmlOutputText emptyText = WFUtil.getText(" ", "wf_listtext");
+			emptyText.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isUnlocked}"));
+
 			UIColumn col6 = new UIColumn();
 			col6.setHeader(ContentBlock.getBundle().getLocalizedText("lock"));
 			col6.getChildren().add(lock);
+			col6.getChildren().add(emptyText);
 			
 			columns.add(col6);
 		}
@@ -415,6 +424,10 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			checkedOut.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".checkedOut}"));
 			checkedOut.setStyleClass("wf_listtext");
 			col7.getChildren().add(checkedOut);
+			
+			HtmlOutputText emptyText = WFUtil.getText(" ", "wf_listtext");
+//			emptyText.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isCollection}"));
+			col7.getChildren().add(emptyText);
 			
 			columns.add(col7);
 		}
