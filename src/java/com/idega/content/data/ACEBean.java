@@ -1,5 +1,5 @@
 /*
- * $Id: ACEBean.java,v 1.3 2005/01/18 17:44:31 gummi Exp $
+ * $Id: ACEBean.java,v 1.4 2005/03/10 14:38:43 gummi Exp $
  * Created on 3.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -26,10 +26,10 @@ import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
  * 
- *  Last modified: $Date: 2005/01/18 17:44:31 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/03/10 14:38:43 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class ACEBean implements WFEditableListDataBean {
 
@@ -43,7 +43,7 @@ public class ACEBean implements WFEditableListDataBean {
 	private static final int ARRAYINDEX_READ_ACE = 3;
 	private static final int ARRAYINDEX_WRITE_ACE = 4;
 	private static final String[] PROPERTY_NAMES = new String[] {"all","read","write","read_acl","write_acl"};
-	private static final Privilege[] PRIVILEGES = new Privilege[] {IWSlideConstants.PRIVILEGE_ALL,IWSlideConstants.PRIVILEGE_READ,IWSlideConstants.PRIVILEGE_WRITE,IWSlideConstants.PRIVILEGE_READ,IWSlideConstants.PRIVILEGE_WRITE_ACL};
+	private static final Privilege[] PRIVILEGES = new Privilege[] {IWSlideConstants.PRIVILEGE_ALL,IWSlideConstants.PRIVILEGE_READ,IWSlideConstants.PRIVILEGE_WRITE,IWSlideConstants.PRIVILEGE_READ_ACL,IWSlideConstants.PRIVILEGE_WRITE_ACL};
 	private String[] privligeInitialValue;
 	private String[] inheritedFrom;
 	private boolean[] isInherited;
