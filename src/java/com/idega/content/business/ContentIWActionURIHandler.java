@@ -1,5 +1,5 @@
 /*
- * $Id: ContentIWActionURIHandler.java,v 1.1 2005/02/28 13:35:25 eiki Exp $
+ * $Id: ContentIWActionURIHandler.java,v 1.2 2005/03/08 18:29:41 gummi Exp $
  * Created on Jan 31, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -19,11 +19,11 @@ import com.idega.core.uri.IWActionURIHandler;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/28 13:35:25 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/03/08 18:29:41 $ by $Author: gummi $
  * 
  * An IWActionURIHandler handler that handles uri's to documents (webdav)
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ContentIWActionURIHandler extends DefaultIWActionURIHandler implements IWActionURIHandler {
 
@@ -38,8 +38,15 @@ public class ContentIWActionURIHandler extends DefaultIWActionURIHandler impleme
 	 * @see com.idega.core.uri.IWActionURIHandler#canHandleIWActionURI(com.idega.core.uri.IWActionURI)
 	 */
 	public boolean canHandleIWActionURI(IWActionURI uri) {
+		if(getHandlerIdentifier().equals(uri.getHandlerIdentifier())){
+			return true;
+		}
 		//Todo get webservleturi
 		return uri.toString().indexOf("/content/files/")>=0;
+	}
+	
+	public String getHandlerIdentifier(){
+		return "content";
 	}
 	
 	/* (non-Javadoc)
