@@ -63,6 +63,10 @@ English=English
 Swedish=Swedish
 Icelandic=Icelandic
 
+en=English
+sv=Swedish
+is=Icelandic
+
 category_public_news=Public news
 category_business_news=Business news
 category_company_info=Company info
