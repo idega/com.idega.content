@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.7 2005/01/20 14:03:17 eiki Exp $
+ * $Id: ContentSearch.java,v 1.8 2005/01/21 19:32:20 eiki Exp $
  * Created on Jan 17, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -47,12 +46,12 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- *  Last modified: $Date: 2005/01/20 14:03:17 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/01/21 19:32:20 $ by $Author: eiki $
  * This class implements the Searchplugin interface and can therefore be used in a Search block (com.idega.core.search)<br>
  *  for searching contents and properties (metadata) of the files in the iwfile system.
  * To use it simply register this class as a iw.searchable component in a bundle.
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class ContentSearch implements SearchPlugin {
 
@@ -210,11 +209,12 @@ public class ContentSearch implements SearchPlugin {
 
 	protected void executeSearch(List results, String servletMapping, SearchMethod method, HttpClient client) throws IOException, HttpException {
 		int state = client.executeMethod(method);
-		System.out.println("State: " + state);
-		Header[] headers = method.getResponseHeaders();
-		for (int i = 0; i < headers.length; i++) {
-			System.out.println(headers[i].toString());
-		}
+		//todo remove
+		System.out.println("DASL Search result state: " + state);
+//		Header[] headers = method.getResponseHeaders();
+//		for (int i = 0; i < headers.length; i++) {
+//			System.out.println(headers[i].toString());
+//		}
 		Enumeration enum = method.getAllResponseURLs();
 		
 		while (enum.hasMoreElements()) {
