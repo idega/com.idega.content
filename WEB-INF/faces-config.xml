@@ -5,6 +5,11 @@
   "http://java.sun.com/dtd/web-facesconfig_1_0.dtd">
 
 <faces-config>
+	<component>
+		<component-type>WebDAVList<component-type>
+		<component-class>com.idega.content.presentation.WebDAVList</component-class>
+	</component>
+	
     <managed-bean>
         <managed-bean-name>SessionBean1</managed-bean-name>
         <managed-bean-class>documentmanagementprototype2.SessionBean1</managed-bean-class>
@@ -13,6 +18,11 @@
     <managed-bean>
         <managed-bean-name>listDocuments2</managed-bean-name>
         <managed-bean-class>documentmanagementprototype2.listDocuments2</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>WebDAVBean</managed-bean-name>
+        <managed-bean-class>documentmanagementprototype2.WebDAVBean</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
     <managed-bean>
@@ -25,7 +35,12 @@
         <managed-bean-class>documentmanagementprototype2.folderTree</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
-        <managed-bean>
+    <managed-bean>
+    		<managed-bean-name>webDavList</managed-bean-name>
+        <managed-bean-class>com.idega.content.presentation.WebDAVListManagedBean</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
         <managed-bean-name>WebDAVUploadBean</managed-bean-name>
         <managed-bean-class>com.idega.content.business.WebDAVUploadBean</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
