@@ -70,7 +70,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		col0.setHeader(WFUtil.getText("Icon"));		
 		HtmlGraphicImage icon = new HtmlGraphicImage();
 		//icon.setUrl("/open.gif");
-		icon.setValueBinding("url", WFUtil.createValueBinding(var+".iconUrl"));
+		icon.setValueBinding("value", WFUtil.createValueBinding("#{"+var+".iconURL}"));
 		col0.getChildren().add(icon);
 		
 		UIColumn col = new UIColumn();

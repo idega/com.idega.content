@@ -1,6 +1,9 @@
 package com.idega.content.business;
 
 import java.io.IOException;
+import java.util.Map;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
 import net.sourceforge.myfaces.custom.fileupload.UploadedFile;
 import com.idega.business.IBOLookup;
 import com.idega.presentation.IWContext;
@@ -34,6 +37,9 @@ public class WebDAVUploadBean{
 	}
 	
 	public String getUploadFilePath(){
+		if(!uploadFolderPath.endsWith("/")){
+			uploadFolderPath+="/";
+		}
 		return uploadFolderPath;
 	}
 
@@ -43,44 +49,48 @@ public class WebDAVUploadBean{
 
 	public String upload() throws IOException{
 		
-		IWContext iwc = IWContext.getInstance();
+		if(uploadFile!=null){
+			IWContext iwc = IWContext.getInstance();
+			Map parameters = ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest()).getParameterMap();
+			uploadFolderPath = ((String[])parameters.get("uploadForm:uploadPath"))[0];
+			
+			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 		
-		IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-		IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+			System.out.println("webdavServerURL = "+service.getWebdavServerURL());
+			System.out.println("webdavServletURL = "+service.getWebdavServerURI());
 	
-		System.out.println("webdavServerURL = "+service.getWebdavServerURL());
-		System.out.println("webdavServletURL = "+service.getWebdavServerURI());
-
-		WebdavRootResource rootResource = session.getWebdavRootResource();
-		String filePath = service.getWebdavServerURI()+getUploadFilePath();
-		String uploadName = uploadFile.getName();
-		String contentType = uploadFile.getContentType();
-		String fileName = uploadName;
-		if(!"".equals(name)){
-			fileName = name;
-			int lastDot = uploadName.lastIndexOf(".");
-			if(lastDot>0){
-				//just add the suffix if it is missing
-				String suffix = uploadName.substring(lastDot);
-				if(!fileName.endsWith(suffix)){
-					fileName+=suffix;
+			WebdavRootResource rootResource = session.getWebdavRootResource();
+			String filePath = service.getWebdavServerURI()+getUploadFilePath();
+			String uploadName = uploadFile.getName();
+			String contentType = uploadFile.getContentType();
+			String fileName = uploadName;
+			if(!"".equals(name)){
+				fileName = name;
+				int lastDot = uploadName.lastIndexOf(".");
+				if(lastDot>0){
+					//just add the suffix if it is missing
+					String suffix = uploadName.substring(lastDot);
+					if(!fileName.endsWith(suffix)){
+						fileName+=suffix;
+					}
 				}
 			}
+			
+			downloadPath = filePath+fileName;
+			String contextUri = iwc.getIWMainApplication().getApplicationContextURI();
+			if(contentType!=null && contentType.startsWith("image")){
+				imagePath = downloadPath.substring(downloadPath.indexOf(contextUri)+contextUri.length());
+			}
+			
+			
+			
+			boolean success = rootResource.mkcolMethod(filePath);
+			System.out.println("Creating folder success "+success);
+			success = rootResource.putMethod(filePath+fileName,uploadFile.getInputStream());
+			System.out.println("Uploading file success "+success);
+		
 		}
-		
-		downloadPath = filePath+fileName;
-		String contextUri = iwc.getIWMainApplication().getApplicationContextURI();
-		if(contentType!=null && contentType.startsWith("image")){
-			imagePath = downloadPath.substring(downloadPath.indexOf(contextUri)+contextUri.length());
-		}
-		
-		
-		
-		boolean success = rootResource.mkcolMethod(filePath);
-		System.out.println("Creating folder success "+success);
-		success = rootResource.putMethod(filePath+fileName,uploadFile.getInputStream());
-		System.out.println("Uploading file success "+success);
-		
 		
 		return "ok";
 

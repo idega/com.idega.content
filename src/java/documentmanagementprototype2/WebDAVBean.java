@@ -154,6 +154,9 @@ public class WebDAVBean extends Object {
     }
     
 	public String getIconURL() {
+		if(iconURL==null){
+			iconURL = "/idegaweb/bundles/com.idega.core.bundle/resources/icfileicons/ui/iw/application_vnd.iw-folder_open.gif";
+		}
 		return iconURL;
 	}
 	
