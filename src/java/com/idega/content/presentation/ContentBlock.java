@@ -28,6 +28,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 	public static final String IW_BUNDLE_IDENTIFIER = "com.idega.content";
 
 	private static IWBundle bundle = null;
+	private IWSlideSession slideSession;
 
 	protected abstract void initializeContent();
 
@@ -73,6 +74,21 @@ public abstract class ContentBlock extends IWBaseComponent {
 		}
 		return null;
 	}
+
+	protected IWSlideSession getIWSlideSession() {
+		if (slideSession == null) {
+			try {
+				slideSession = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
+			}
+			catch (IBOLookupException e) {
+				e.printStackTrace();
+			}
+			catch (UnavailableIWContext e) {
+				e.printStackTrace();
+			}
+		}
+		return slideSession;
+	}
 	
 	public void encodeBegin(FacesContext context) throws IOException {
 		String webDavPath = (String) this.getAttributes().get("path");
@@ -87,9 +103,8 @@ public abstract class ContentBlock extends IWBaseComponent {
 			path = (String) WFUtil.invoke(webDavPath);
 		}
 		try {
-			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
 			WebdavExtendedResource oldRes = resource;
-			WebdavExtendedResource newRes = ss.getWebdavResource(path);
+			WebdavExtendedResource newRes = getIWSlideSession().getWebdavResource(path);
 			if (oldRes == null || oldRes.getName().equals(newRes.getName())) {
 				if ((!useFolders() && !newRes.isCollection() ) || (useFolders() && newRes.isCollection())) {
 					resource = newRes;
