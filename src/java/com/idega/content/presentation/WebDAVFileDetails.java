@@ -46,16 +46,17 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 		
 		WebdavExtendedResource resource = getWebdavExtendedResource();
 		String userName = null;
-		try {
-			// Making sure all properties are set
-			resource.setProperties();
-			userName = getIWSlideSession().getUserFullName();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
 		
 		if (resource != null) {
+			try {
+				// Making sure all properties are set
+				resource.setProperties();
+				userName = getIWSlideSession().getUserFullName();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+
 			String resourceName = resource.getDisplayName();
 			int row = 1;
 			
