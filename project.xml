@@ -1,5 +1,5 @@
 <project>
-    <extend>../com.idega.core.bundle/base-project.xml</extend>
+    <extend>${base.project.dir}/base-project.xmlend>
     <name>idegaWeb Content</name>
     <artifactId>com.idega.content</artifactId>
     <currentVersion>0.5-SNAPSHOT</currentVersion>
