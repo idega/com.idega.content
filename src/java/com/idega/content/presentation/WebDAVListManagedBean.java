@@ -37,7 +37,9 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 	private static final String PARAMETER_WEB_DAV_URL = "wdurl";
 	private static final String PARAMETER_IS_FOLDER = "isf";
 	
-	private String webDAVPath = "/";
+	private String clickedFilePath;
+	
+	private String webDAVPath = "";
 	private ActionListener actionListener;
 
 	public WebDAVListManagedBean() {
@@ -57,7 +59,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 				
 		HtmlCommandLink l = new HtmlCommandLink();
 		l.setId(P_ID);
-		l.setImmediate(true);
+//		l.setImmediate(true);
 		l.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".name}"));
 		WFUtil.addParameterVB(l, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 		WFUtil.addParameterVB(l, PARAMETER_IS_FOLDER, var + ".isCollection");
@@ -126,7 +128,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 			IWUserContext iwuc = IWContext.getInstance();			
 			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(iwuc, IWSlideSession.class);
 			if(webDAVPath == null){ 
-				webDAVPath = "/";
+				webDAVPath = "";
 			}
 
 			if (ss.getExistence(webDAVPath)) {
@@ -207,6 +209,22 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 	public void setWebDAVPath(String path) {
 		this.webDAVPath = path;
 	}
+	
+	public String getWebDAVPath() {
+		return webDAVPath;
+	}
+	
+	public boolean getIsClickedFile() {
+		return (getClickedFilePath() != null && !("".equals(getClickedFilePath()))  );
+	}
+	
+	public void setClickedFilePath(String path) {
+		this.clickedFilePath = path;
+	}
+	
+	public String getClickedFilePath() {
+		return clickedFilePath;
+	}
 
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
 		UIComponent comp = actionEvent.getComponent();
@@ -240,9 +258,10 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		if (parent != null) {
 			WFList parentList = (WFList) parent;
 			if (isFolder) {
+				this.setClickedFilePath(null);
 				this.updateDataModel(new Integer(parentList.getFirst()), new Integer(parentList.getRows()));
 			} else {
-				System.out.println("File clicked = "+webDAVPath);
+				this.setClickedFilePath(webDAVPath);
 			}
 		}
 	}
