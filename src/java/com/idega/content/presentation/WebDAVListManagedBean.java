@@ -5,6 +5,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+
 import javax.faces.component.UIColumn;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
@@ -16,8 +17,10 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import javax.faces.model.DataModel;
+
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.WebdavResources;
+
 import com.idega.business.IBOLookup;
 import com.idega.content.data.WebDAVBean;
 import com.idega.idegaweb.IWMainApplication;
@@ -82,6 +85,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		col0.getChildren().add(iconLink);
 		
 		UIColumn col = new UIColumn();
+		col.setHeader(ContentBlock.getBundle().getLocalizedText("name"));
 		HtmlCommandLink nameLink = new HtmlCommandLink();
 		nameLink.setId(P_ID);
 		nameLink.setStyleClass("wf_listlink");
@@ -89,29 +93,28 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		WFUtil.addParameterVB(nameLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 		WFUtil.addParameterVB(nameLink, PARAMETER_IS_FOLDER, var + ".isCollection");
 		nameLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
-		col.setHeader(WFUtil.getText("Name"));
 		col.getChildren().add(nameLink);
 		
 		UIColumn col2 = new UIColumn();
-		col2.setHeader(WFUtil.getText("Created"));
+		col2.setHeader(ContentBlock.getBundle().getLocalizedText("created"));
 		HtmlOutputText creation = WFUtil.getTextVB(var + ".creationDate");
 		creation.setStyleClass("wf_listtext");
 		col2.getChildren().add(creation);
 		
 		UIColumn col3 = new UIColumn();
-		col3.setHeader(WFUtil.getText("Size"));
+		col3.setHeader(ContentBlock.getBundle().getLocalizedText("size"));
 		HtmlOutputText size = WFUtil.getTextVB(var + ".length");
 		size.setStyleClass("wf_listtext");
 		col3.getChildren().add(size);
 		
 		UIColumn col4 = new UIColumn();
-		col4.setHeader(WFUtil.getText("Mime type"));
+		col4.setHeader(ContentBlock.getBundle().getLocalizedText("mime_type"));
 		HtmlOutputText mime = WFUtil.getTextVB(var + ".mime");
 		mime.setStyleClass("wf_listtext");
 		col4.getChildren().add(mime);
 		
 		UIColumn col5 = new UIColumn();
-		col5.setHeader(WFUtil.getText("Version"));
+		col5.setHeader(ContentBlock.getBundle().getLocalizedText("version"));
 		HtmlOutputText version = WFUtil.getTextVB(var + ".version");
 		version.setStyleClass("wf_listtext");
 		col5.getChildren().add(version);
@@ -123,23 +126,24 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		lock.setHeight("16");// sizes that make sense 16/32/64/128
 
 		UIColumn col6 = new UIColumn();
-		col6.setHeader(WFUtil.getText("Lock"));
+		col6.setHeader(ContentBlock.getBundle().getLocalizedText("lock"));
 		col6.getChildren().add(lock);
 		
 		UIColumn col7 = new UIColumn();
-		col7.setHeader(WFUtil.getText("Checked-out"));
+		col7.setHeader(ContentBlock.getBundle().getLocalizedText("checked_out"));
 		HtmlOutputText checkedOut = WFUtil.getTextVB(var + ".comment");
 		checkedOut.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".checkedOut}"));
 		checkedOut.setStyleClass("wf_listtext");
 		col7.getChildren().add(checkedOut);
 		
 		UIColumn col8 = new UIColumn();
-		col8.setHeader(WFUtil.getText("Last modified"));
+		col8.setHeader(ContentBlock.getBundle().getLocalizedText("last_modified"));
 		HtmlOutputText modifiedDate = WFUtil.getTextVB(var + ".modifiedDate");
 		modifiedDate.setStyleClass("wf_listtext");
 		col8.getChildren().add(modifiedDate);
 		
 		
+
 
 		//return new UIColumn[] { col0, col, col2, col3, col4, col5, col6 ,col7};
 		return new UIColumn[] { col0, col, col3, col5, col6 , col7, col8};
