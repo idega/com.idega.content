@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadata.java,v 1.9 2005/03/17 17:34:08 joakim Exp $
+ * $Id: WebDAVMetadata.java,v 1.10 2005/03/18 16:12:34 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -21,6 +21,7 @@ import javax.faces.component.UIInput;
 import javax.faces.component.UISelectItems;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlInputText;
+import javax.faces.component.html.HtmlOutputText;
 import javax.faces.component.html.HtmlSelectBooleanCheckbox;
 import javax.faces.component.html.HtmlSelectOneMenu;
 import javax.faces.context.FacesContext;
@@ -28,12 +29,12 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import javax.faces.model.SelectItem;
-import net.sourceforge.myfaces.component.html.ext.HtmlOutputText;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.bean.ManagedContentBeans;
+import com.idega.content.business.CategoryUtil;
 import com.idega.content.business.MetadataUtil;
 import com.idega.content.business.WebDAVMetadataResource;
 import com.idega.content.data.MetadataValueBean;
@@ -50,12 +51,12 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2005/03/17 17:34:08 $ by $Author: joakim $
+ * Last modified: $Date: 2005/03/18 16:12:34 $ by $Author: joakim $
  * 
  * Display the UI for adding metadata type - values to a file.
  *
  * @author Joakim Johnson
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	
@@ -63,6 +64,7 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	private static final String NEW_VALUES_ID = "newValueID";
 	private static final String DROPDOWN_ID = "dropdownID";
 	private static final String ADD_ID = "addID";
+	private static final String ADD_CATEGORY_ID = "addCategoryID";
 	private static final String RESOURCE_PATH = "resourcePath";
 	private String resourcePath = "";
 	private static final String METADATA_LIST_BEAN = "MetadataList";
@@ -104,6 +106,8 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 		mainContainer.add(getMetadataTable(resourcePath));
 		mainContainer.add(localizer.getHeaderTextVB("categories"));
 		mainContainer.add(getCategoriesTable(resourcePath));
+		mainContainer.add(getAddCategoryContainer());
+
 		return mainContainer;
 	}
 	
@@ -116,9 +120,6 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	public Table getMetadataTable(String resourcePath) {
 		WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
 		
-//		Timer timer = new Timer();
-//		timer.start();
-
 		//Create the table
 		Table metadataTable = new Table(3,2);
 		metadataTable.setId(metadataTable.getId() + "_ver");
@@ -237,6 +238,37 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 		
 		return categoriesTable;
 	}
+	
+	/**
+	 * <p> Returns a container with add category UI</p>
+	 * @return WFContainer
+	 */
+	private WFContainer getAddCategoryContainer() {
+		WFContainer container = new WFContainer();
+		WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
+		HtmlOutputText addText = localizer.getTextVB("add_category");
+		container.add(addText);
+		
+		HtmlInputText newCategoryInput = new HtmlInputText();
+		newCategoryInput.setSize(40);
+		newCategoryInput.setId(ADD_CATEGORY_ID);
+		container.add(newCategoryInput);
+
+		HtmlCommandButton addCategoryButton = localizer.getButtonVB(ADD_ID, "save", this);
+//		HtmlCommandButton addCategoryButton = localizer.getButtonVB(ADD_ID, "save", new ActionListener() {
+//			public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
+//				UIComponent comp = actionEvent.getComponent();
+////				HtmlInputText newValueInput = (HtmlInputText) actionEvent.getComponent().getParent().findComponent(NEW_VALUES_ID);
+//				HtmlInputText newCategoryInput = (HtmlInputText) comp.getParent().findComponent(ADD_CATEGORY_ID);
+//
+//				CategoryUtil.addCategory(newCategoryInput.getValue().toString());
+//			}
+//		});
+//		addCategoryButton.getAttributes().put(RESOURCE_PATH,resourcePath);
+		container.add(addCategoryButton);
+
+		return container;
+	}
 
 	/**
 	 * Will add the specified type - value as a property to the selected resource.
@@ -244,8 +276,16 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
 		UIComponent comp = actionEvent.getComponent();
 		resourcePath = (String)comp.getAttributes().get(RESOURCE_PATH);
+		if(null==resourcePath) {
+//			UIComponent comp = actionEvent.getComponent();
+//			HtmlInputText newValueInput = (HtmlInputText) actionEvent.getComponent().getParent().findComponent(NEW_VALUES_ID);
+			HtmlInputText newCategoryInput = (HtmlInputText) comp.getParent().findComponent(ADD_CATEGORY_ID);
+
+			CategoryUtil.addCategory(newCategoryInput.getValue().toString());
+			return;
+		}
 		HtmlInputText newValueInput = (HtmlInputText) actionEvent.getComponent().getParent().findComponent(NEW_VALUES_ID);
-		UIInput dropdown = (UIInput) actionEvent.getComponent().getParent().findComponent(DROPDOWN_ID);
+		UIInput dropdown = (UIInput) comp.getParent().findComponent(DROPDOWN_ID);
 		String val = "";
 		String type = "";
 		if(null!=dropdown) {
