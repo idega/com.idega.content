@@ -5,18 +5,14 @@ package com.idega.content.presentation;
 
 import java.util.Iterator;
 import java.util.List;
-
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
-import javax.faces.component.html.HtmlCommandLink;
 import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
-
 import org.apache.webdav.lib.WebdavResource;
-
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.DownloadLink;
@@ -96,10 +92,8 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			lockToggler.setId(getId()+"_lockTogg");
 			lockToggler.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
 			if (resource.isLocked()) {
-				//lockToggler.getChildren().add( WFUtil.getText("Change to unlocked"));
 				lockToggler.setValue("Unlock");
 			} else {
-				//lockToggler.getChildren().add( WFUtil.getText("Change to locked"));
 				lockToggler.setValue("Lock");
 			}
 			
@@ -116,15 +110,17 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 				table.add(WFUtil.getText("Checked out ("+resource.getCheckedOut()+")","wf_listtext"), 2, row);
 			}
 			table.add(WFUtil.getText("  - "), 2, row);
-			HtmlCommandLink checker = new HtmlCommandLink();
+			
+			
+			HtmlCommandButton checker = new HtmlCommandButton();
 			checker.setId(getId()+"_check");
 			checker.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
 			if (resource.getCheckedOut() == null) {
-				checker.getChildren().add( WFUtil.getText("Check out"));
+				checker.setValue("Check out");
 				checker.getAttributes().put(ACTION, ACTION_CHECK_OUT);
 			} else {
 				// Checka if current user has file checked out, or not...
-				checker.getChildren().add( WFUtil.getText("Change to Locked"));
+				checker.setValue("Check in/uncheck something...");
 			}
 			checker.setStyleClass("wf_listlink");
 			checker.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
