@@ -231,7 +231,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 	}
 
 	private WebDAVBean[] getDirectoryListing(WebdavExtendedResource headResource, String webDAVServletURL)	throws IOException, HttpException {
-		System.out.println("---------ENCODING IS:  " + System.getProperty("file.encoding")+"  ---------------");
+//		System.out.println("---------ENCODING IS:  " + System.getProperty("file.encoding")+"  ---------------");
 		//System.setProperty("file.encoding","ISO-8859-1");
 		WebdavResources resources = headResource.listWithDeltaV();//headResource.getChildResources();
 		Enumeration enumer = resources.getResources();
@@ -341,7 +341,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		
 		WFList parent = getWFListParent(comp);
 		
-		if (parent != null) {
+		if (webDAVPath != null && parent != null) {
 			WFList parentList = (WFList) parent;
 			if (isFolder) {
 				this.setClickedFilePath(null);
