@@ -617,16 +617,21 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	
 	public String getCurrentResourceName() {
 		if (currentResourceName == null) {
-			if (rootFolder == null) {
-				currentResourceName = "";
-				int index = currentFolderPath.lastIndexOf("/");
-				try {
-					if (index >= 0 && !currentFolderPath.equals("/")) {
-						currentResourceName = " ("+currentFolderPath.substring(index+1)+")";
-					}
-				} catch (ArrayIndexOutOfBoundsException e) {
-					currentResourceName = "";
+			currentResourceName = "";
+			String tmp = null;
+			if (rootFolder != null) {
+				tmp = currentFolderPath.replaceAll(rootFolder, "");
+			} else {
+				tmp = currentFolderPath;
+			}
+			int index = tmp.lastIndexOf("/");
+			try {
+				if (index >= 0 && !tmp.equals("/")) {
+
+					currentResourceName = " ("+tmp.substring(index+1)+")";
 				}
+			} catch (ArrayIndexOutOfBoundsException e) {
+				currentResourceName = "";
 			}
 		}
 		return currentResourceName;
