@@ -21,10 +21,7 @@ import com.idega.webface.WFUtil;
 public class WebDAVFolderCreation extends ContentBlock implements ActionListener {
 
 	private static final String PARAMETER_RESOURCE_PATH = "prp";
-	
-	private boolean folderCreated = false;
-	private String errorMessage = null;
-	
+		
 	protected void initializeContent() {
 		WebdavExtendedResource res = getWebdavExtendedResource();
 		
@@ -38,6 +35,11 @@ public class WebDAVFolderCreation extends ContentBlock implements ActionListener
 		folderName.setId(this.getId()+"_inpN");
 		folderName.setValueBinding("value", WFUtil.createValueBinding("#{webdavfoldercreationbean.folderName}"));
 		
+		Boolean folderCreated = (Boolean) WFUtil.invoke("webdavfoldercreationbean", "getFolderCreated");
+		String errorMessage = (String) WFUtil.invoke("webdavfoldercreationbean", "getErrorMessage");
+		if (folderCreated == null) {
+			folderCreated = new Boolean(false);
+		}
 		if (errorMessage != null) {
 			HtmlOutputText txt = getBundle().getLocalizedText("folder_creation_failed");
 			txt.setStyleClass("wf_listtext");
@@ -45,7 +47,11 @@ public class WebDAVFolderCreation extends ContentBlock implements ActionListener
 			table.add(txt, 1, row);
 			table.add(WFUtil.getText(" = "+errorMessage, "wf_listtext"), 1, row);
 			table.mergeCells(1, row, 2, row);
-		} else if (folderCreated) {
+		} else if (folderCreated.booleanValue()) {
+			ContentViewer viewer = (ContentViewer) getParent().getParent();
+			viewer.setRenderFlags(ContentViewer.LIST);
+			folderName.setDisabled(true);
+
 			HtmlOutputText txt = getBundle().getLocalizedText("folder_created");
 			txt.setStyleClass("wf_listtext");
 
@@ -76,11 +82,17 @@ public class WebDAVFolderCreation extends ContentBlock implements ActionListener
 				}
 				name = parentPath+name;
 				WebdavExtendedResource parent = getWebdavExentededResource(parentPath);
-				folderCreated = parent.mkcolMethod(name);
+				boolean folderCreated = parent.mkcolMethod(name);
+				String errorMessage = null;
 				if (!folderCreated) {
 					errorMessage = parent.getStatusMessage();
+					WFUtil.invoke("webdavfoldercreationbean", "setErrorMessage", errorMessage, String.class);
 				} else {
 					super.refreshList();
+					WFUtil.invoke("webdavfoldercreationbean", "setFolderCreated", new Boolean(folderCreated), Boolean.class);
+//					ContentViewer viewer = (ContentViewer) getParent().getParent();
+//					viewer.getFacet(ContentViewer.NEW_FOLDER).setRendered(false);
+//					viewer.setRenderFlags(ContentViewer.LIST);
 					ValueBinding vb = WFUtil.createValueBinding("#{webdavfoldercreationbean.folderName}");
 					vb.setValue(FacesContext.getCurrentInstance(), "");
 				}
