@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.4 2005/03/08 18:33:12 gummi Exp $
+ * $Id: ContentItemToolbar.java,v 1.5 2005/03/11 17:03:05 gummi Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -27,10 +27,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/08 18:33:12 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/03/11 17:03:05 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
@@ -59,12 +59,15 @@ public class ContentItemToolbar extends WFToolbar {
 	}
 	
 	public HtmlOutputLink addToolbarButton(String action, String url, String menuItemId){
-		HtmlOutputLink link = new HtmlOutputLink();
+		ContentItemToolbarButton link = new ContentItemToolbarButton();
 		link.setValue(url);
 		link.setId(menuItemId);
 		link.getChildren().add(WFUtil.getText(action)); //TMP
 		addToActionMap(action,menuItemId);
 		this.setMenuItem(menuItemId,link);
+		
+		link.setResourcePath(getResourcePath());
+		link.setAction(action);
 		
 		return link;
 	}
@@ -100,11 +103,14 @@ public class ContentItemToolbar extends WFToolbar {
 		Set s = getActions().keySet();
 		for (Iterator iter = s.iterator(); iter.hasNext();) {
 			String action = (String) iter.next();
-			HtmlOutputLink link = getToolbarButton(action);
+			ContentItemToolbarButton link = (ContentItemToolbarButton)getToolbarButton(action);
 			if(link==null){
 				addToolbarButton(action);
 			} else {
 				link.setValue(getActionURL(action,getResourcePath(),getActionHandlerIdentifier()));
+				
+				link.setResourcePath(getResourcePath());
+				link.setAction(action);
 			}
 		}
 	}
