@@ -1,5 +1,5 @@
 /*
- * $Id: CaseListBean.java,v 1.1 2005/02/07 10:59:41 gummi Exp $
+ * $Id: CaseListBean.java,v 1.2 2005/03/03 04:57:44 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -26,10 +26,10 @@ import com.idega.webface.model.WFDataModel;
 /**
  * Bean for content item case list rows.   
  * <p>
- * Last modified: $Date: 2005/02/07 10:59:41 $ by $Author: gummi $
+ * Last modified: $Date: 2005/03/03 04:57:44 $ by $Author: tryggvil $
  *
  * @author Anders Lindman
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 
 public class CaseListBean implements WFListBean, Serializable {
@@ -157,7 +157,8 @@ public class CaseListBean implements WFListBean, Serializable {
 		if (_dataModel == null) {
 			_dataModel = new WFDataModel();
 		}
-		int availableRows = testDescriptions.length;
+		int availableRows=0;
+		/*int availableRows = testDescriptions.length;
 		int nrOfRows = rows.intValue();
 		if (nrOfRows == 0) {
 			nrOfRows = availableRows;
@@ -169,7 +170,7 @@ public class CaseListBean implements WFListBean, Serializable {
 		for (int i = start.intValue(); i < maxRow; i++) {
 			CaseListBean c = new CaseListBean(String.valueOf(i), testDescriptions[i], testCreated[i], testLastModified[i], testAuthors[i], testStatus[i]);
 			_dataModel.set(c, i);
-		}
+		}*/
 		_dataModel.setRowCount(availableRows);
 	}
 	
