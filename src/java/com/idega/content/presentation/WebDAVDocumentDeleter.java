@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVDocumentDeleter.java,v 1.2 2004/12/31 02:50:06 gimmi Exp $
+ * $Id: WebDAVDocumentDeleter.java,v 1.3 2005/01/13 15:55:25 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -23,10 +23,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2004/12/31 02:50:06 $ by $Author: gimmi $
+ *  Last modified: $Date: 2005/01/13 15:55:25 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class WebDAVDocumentDeleter extends ContentBlock implements ActionListener {
 
@@ -91,21 +91,25 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 		if (ACTION_YES.equals(action)) {
 
 			WebdavExtendedResource res = super.getWebdavExentededResource(path);
-			String parentPath = res.getParentPath();
+//			String parentPath = res.getParentPath();
 			Boolean wasFolder = new Boolean(res.isCollection());
 			Boolean deleted = null;
 			try {
-				WFUtil.invoke("WebDAVListBean", "setWebDAVPath", parentPath.replaceFirst(getIWSlideSession().getWebdavServerURI(), ""));
+				super.refreshList();
+				WFUtil.invoke("WebDAVListBean", "setWebDAVPath", path.replaceFirst(getIWSlideSession().getWebdavServerURI(), ""));
 				WFUtil.invoke("WebDAVListBean","setClickedFilePath", null, String.class);
 				res.deleteMethod();
 				deleted = new Boolean(true);
-				super.refreshList();
 			}
 			catch (HttpException e) {
 				deleted = new Boolean(false);
 				e.printStackTrace();
 			}
 			catch (IOException e) {
+				deleted = new Boolean(false);
+				e.printStackTrace();
+			}
+			catch (Exception e) {
 				deleted = new Boolean(false);
 				e.printStackTrace();
 			}
