@@ -20,6 +20,11 @@
 		<component-class>com.idega.content.presentation.ContentViewer</component-class>
 	</component>
 	
+	<component>
+		<component-type>ContentItemListViewer</component-type>
+		<component-class>com.idega.content.presentation.ContentItemListViewer</component-class>
+	</component>
+	
     <managed-bean>
         <managed-bean-name>SessionBean1</managed-bean-name>
         <managed-bean-class>documentmanagementprototype2.SessionBean1</managed-bean-class>
@@ -126,10 +131,30 @@
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
 
+	<managed-bean>
+		<managed-bean-name>caseListBean</managed-bean-name>
+		<managed-bean-class>com.idega.content.bean.CaseListBean</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
+	</managed-bean>
+	
+	<managed-bean>
+		<managed-bean-name>relatedItemsListBean</managed-bean-name>
+		<managed-bean-class>com.idega.content.bean.CaseListBean</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
+	</managed-bean>
+
     <!--  converters -->
     <converter>
         <converter-for-class>com.idega.util.IWTimestamp</converter-for-class>
         <converter-class>com.idega.webface.convert.WFTimestampConverter</converter-class>
     </converter>
+
+	<render-kit>
+	     <renderer>
+	          <component-family>iw_content</component-family>
+	          <renderer-type>content_list_viewer</renderer-type>
+	          <renderer-class>com.idega.content.renderkit.ContentListViewerRenderer</renderer-class>
+	     </renderer>
+	</render-kit>
     
 </faces-config>

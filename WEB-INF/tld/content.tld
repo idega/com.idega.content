@@ -101,4 +101,24 @@
 		</attribute>
 	</tag>
 	
+	<tag>
+		<name>ContentItemListViewer</name>
+		<tag-class>com.idega.content.presentation.ContentItemListViewerTag</tag-class>
+		<attribute>
+			<name>id</name>
+			<required>true</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>beanIdentifier</name>
+			<required>true</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>resourcePath</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+	</tag>
+	
 </taglib>
