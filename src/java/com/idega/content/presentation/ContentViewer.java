@@ -1,10 +1,12 @@
 package com.idega.content.presentation;
 
 import java.io.IOException;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.ActionListener;
 
 import com.idega.business.IBOLookup;
 import com.idega.idegaweb.IWBundle;
@@ -20,7 +22,7 @@ import com.idega.webface.WFUtil;
 /**
  * @author gimmi
  */
-public class ContentViewer extends WFBlock {
+public class ContentViewer extends WFBlock implements ActionListener{
 
 	public static final String PARAMETER_ROOT_FOLDER = "cv_prt";
 	
@@ -81,6 +83,9 @@ public class ContentViewer extends WFBlock {
 		preview.setRendered(renderWebDAVFilePreview);
 		preview.setId(getId()+"_preview");
 		
+		WebDAVFolderCreation folder = new WebDAVFolderCreation();
+		folder.setRendered(renderWebDAVNewFolder);
+		folder.setId(getId()+"_folder");
 //		getFacets().put(BAR, bar);
 //		getChildren().add(bar);
 //		super.setToolbar(bar);
@@ -88,6 +93,7 @@ public class ContentViewer extends WFBlock {
 		getFacets().put(LIST, list);
 		getFacets().put(FILE_DETAILS, details);
 		getFacets().put(PREVIEW, preview);
+		getFacets().put(NEW_FOLDER, folder);
 //		getChildren().add(list);
 //		getChildren().add(details);
 	}
@@ -157,6 +163,12 @@ public class ContentViewer extends WFBlock {
 		if (preview != null) {
 			preview.setRendered(renderWebDAVFilePreview);
 			renderChild(context, preview);
+		}
+		
+		UIComponent folder = getFacet(NEW_FOLDER);
+		if (folder != null) {
+			folder.setRendered(renderWebDAVNewFolder);
+			renderChild(context, folder);
 		}
 		
 		
