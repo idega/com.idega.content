@@ -1,5 +1,5 @@
 <project>
-    <extend>${base.project.dir}/base-project.xmlend>
+    <extend>${base.project.dir}/base-project.xml</extend>
     <name>idegaWeb Content</name>
     <artifactId>com.idega.content</artifactId>
     <currentVersion>0.5-SNAPSHOT</currentVersion>
