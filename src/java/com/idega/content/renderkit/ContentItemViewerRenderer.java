@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewerRenderer.java,v 1.1 2005/02/21 16:12:45 gummi Exp $
+ * $Id: ContentItemViewerRenderer.java,v 1.2 2005/03/05 18:45:56 gummi Exp $
  * Created on 16.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -19,10 +19,10 @@ import com.idega.webface.renderkit.ContainerRenderer;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/21 16:12:45 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/03/05 18:45:56 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ContentItemViewerRenderer extends ContainerRenderer {
 	
@@ -50,7 +50,7 @@ public class ContentItemViewerRenderer extends ContainerRenderer {
 		
 		renderDetailsCommand(ctx,viewer);
 		
-		if(renderToolbarAbove){
+		if(!renderToolbarAbove){
 			renderToolbar(ctx,viewer);
 		}
 		

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItem.java,v 1.3 2005/03/01 11:22:30 gummi Exp $
+ * $Id: ContentItem.java,v 1.4 2005/03/05 18:45:56 gummi Exp $
  * Created on 28.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -15,10 +15,10 @@ import java.util.List;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/01 11:22:30 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/03/05 18:45:56 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public interface ContentItem {
 	public Object getValue(String fieldName);
@@ -31,5 +31,7 @@ public interface ContentItem {
 	public String getResourcePath();
 	
 	public Boolean getRendered();
+	
+	public String[] getToolbarActions();
 	
 }

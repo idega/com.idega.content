@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.5 2005/03/01 11:22:30 gummi Exp $
+ * $Id: ContentItemViewer.java,v 1.6 2005/03/05 18:45:56 gummi Exp $
  * Created on 26.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -23,6 +23,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 import com.idega.content.bean.ContentItem;
 import com.idega.content.business.ContentUtil;
+import com.idega.core.uri.IWActionURIManager;
 import com.idega.presentation.IWContext;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFUtil;
@@ -30,10 +31,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/01 11:22:30 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/03/05 18:45:56 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class ContentItemViewer extends WFContainer {
 	
@@ -185,6 +186,19 @@ public class ContentItemViewer extends WFContainer {
 		String attr[] = getViewerFieldNames();
 		for (int i = 0; i < attr.length; i++) {
 			initializeComponent(attr[i]);
+		}
+		initializeToolbar();
+	}
+
+	/**
+	 * 
+	 */
+	protected void initializeToolbar() {
+		ContentItem item = getContentItem();
+		if(item!=null){
+			ContentItemToolbar toolbar = new ContentItemToolbar();
+			toolbar.setToolbarActions(item.getToolbarActions());
+			this.setToolbar(toolbar);		
 		}
 	}
 
@@ -377,7 +391,10 @@ public class ContentItemViewer extends WFContainer {
 			}
 		}
 		updateDetailsCommand();
+		updateToolbar();
 	}
+
+
 
 	public void processDecodes(FacesContext context){
 		super.processDecodes(context);
@@ -498,6 +515,16 @@ public class ContentItemViewer extends WFContainer {
 		}
 	}
 	
+	/**
+	 * 
+	 */
+	public void updateToolbar() {
+		ContentItemToolbar toolbar = (ContentItemToolbar)getViewerFacet(FACET_TOOLBAR);
+		if(toolbar!=null){
+			toolbar.setResourcePath(getResourcePath());
+		}
+	}
+	
 	public void setFooter(UIComponent footer){
 		setViewerFacet(FACET_ITEM_FOOTER, footer);
     }
@@ -574,5 +601,18 @@ public class ContentItemViewer extends WFContainer {
 	 */
 	public void setResourcePath(String resourcePath) {
 		this.resourcePath = resourcePath;
+	}
+	
+	public String[] getToolbarActions(){
+		ContentItem item = getContentItem();
+		if(item!=null){
+			return item.getToolbarActions();
+		} else {
+			return null;
+		}
+	}
+	
+	public String getActionURIPath(String action) {
+		return IWActionURIManager.getInstance().getActionURIPrefixWithContext(action,getResourcePath());
 	}
 }

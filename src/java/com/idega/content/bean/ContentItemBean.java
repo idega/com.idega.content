@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.4 2005/03/02 15:08:07 joakim Exp $
+ * $Id: ContentItemBean.java,v 1.5 2005/03/05 18:45:56 gummi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -49,10 +49,10 @@ import com.idega.webface.WFUtil;
 /**
  * Bean for idegaWeb content items.   
  * <p>
- * Last modified: $Date: 2005/03/02 15:08:07 $ by $Author: joakim $
+ * Last modified: $Date: 2005/03/05 18:45:56 $ by $Author: gummi $
  *
  * @author Anders Lindman
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 
 public abstract class ContentItemBean implements Serializable, ICFile, ContentItem {
@@ -87,6 +87,9 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	public final static String FIELDNAME_RESOURCE_PATH = "resource_path";
 	private Boolean doRender = Boolean.TRUE;
 
+	private final static String[] ACTION_ARRAY = new String[] {"preview","edit"};
+	
+	
 	/**
 	 * Default constructor.
 	 */
@@ -254,7 +257,9 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	 * 
 	 */
 	
-	
+	public String[] getToolbarActions(){
+		return ACTION_ARRAY;
+	}
 	/**
 	 *Sets the item field with the specified key. 
 	 */
@@ -503,6 +508,7 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	 * @throws IOException
 	 */
 	public boolean load(String path) throws Exception{
+//		System.out.print("["+this.toString()+"]:");
 //		System.out.println("Attempting to load path "+path);
 		clear();
 		IWUserContext iwuc = IWContext.getInstance();
@@ -522,6 +528,8 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 			}
 			
 			returner = load(webdavResource);
+//			System.out.print("["+this.toString()+"]:");
+//			System.out.println("Load "+((returner)?"":"not")+" successful of path "+path);
 		}catch(HttpException e) {
 			if(e.getReasonCode()==WebdavStatus.SC_NOT_FOUND) {
 				setRendered(false);
