@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataListManagedBean.java,v 1.8 2005/03/09 15:47:18 eiki Exp $
+ * $Id: MetadataListManagedBean.java,v 1.9 2005/03/17 17:33:30 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -38,11 +38,12 @@ import com.idega.webface.bean.WFListBean;
 
 /**
  * 
- * Last modified: $Date: 2005/03/09 15:47:18 $ by $Author: eiki $
+ * Last modified: $Date: 2005/03/17 17:33:30 $ by $Author: joakim $
  * Displays all the metadata types and values for the specified resource
+ * Typically followed by WebDavMetadata in presentation to enable addeing metadata
  *
  * @author Joakim Johnson
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class MetadataListManagedBean extends AbstractWFEditableListManagedBean implements WFListBean, ActionListener {
 
@@ -62,6 +63,9 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 		resourcePath = path;
 	}
 
+	/**
+	 * Deleting metadata settings
+	 */
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
 		System.out.println("MetadataList action");
 		UIComponent comp = actionEvent.getComponent();
@@ -98,10 +102,6 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 		} catch (NullPointerException ex) {
 			ex.printStackTrace();
 		}
-//		UIComponent tmp = comp.getParent();
-//		while ( tmp != null) {
-//			tmp = tmp.getParent();
-//		}
 	}
 
 	/* (non-Javadoc)
@@ -117,15 +117,12 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 			ret = resource.getMetadata(resourcePath);
 		}
 		catch (IBOLookupException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ret;
@@ -175,7 +172,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	private UIComponent getTypeUIComponent(String var) {
 		UIColumn typeCol = new UIColumn();
 		typeCol.setHeader(ContentBlock.getBundle().getLocalizedText("type"));
-		//TODO This probably has to be localized
+
 		HtmlOutputText creation = WFUtil.getTextVB(var + ".localizedType");
 		creation.setStyleClass("wf_listtext");
 		typeCol.getChildren().add(creation);
