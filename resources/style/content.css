@@ -31,6 +31,18 @@
 	background: url(../images/permissions.gif);
 }
 
+.content_viewer_file_details {
+	width: 16px;
+	height: 16px;
+	background: url(../images/details.jpg) no-repeat;
+}
+
+.content_viewer_file_preview {
+	width: 16px;
+	height: 16px;
+	background: url(../images/preview.jpg) no-repeat;
+}
+
 .content_file_preview{
 }
 
