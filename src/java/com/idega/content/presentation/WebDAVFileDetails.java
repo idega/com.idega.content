@@ -14,7 +14,6 @@ import javax.faces.component.html.HtmlOutputText;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
-import org.apache.webdav.lib.WebdavResource;
 import com.idega.business.IBOLookup;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
@@ -49,7 +48,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 		String userName = null;
 		try {
 			// Making sure all properties are set
-			resource.listWithDeltaV();
+			resource.setProperties();
 			userName = getIWSlideSession().getUserFullName();
 		}
 		catch (IOException e) {
@@ -161,7 +160,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 		}
 	}
 
-	protected Table getVersionReportTable(WebdavResource resource) {
+	protected Table getVersionReportTable(WebdavExtendedResource resource) {
 		Timer timer = new Timer();
 		timer.start();
 		List versions = VersionHelper.getAllVersions(resource);
