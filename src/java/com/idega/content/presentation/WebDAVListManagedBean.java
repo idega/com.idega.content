@@ -62,6 +62,21 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		return webDAVPath;
 	}
 	
+	public String getVirtualWebDAVPath() {
+		if (rootPath != null) {
+			int index = rootPath.lastIndexOf("/");
+			if (index > -1) {
+				String pre = rootPath.substring(0, index);
+				String virtualWebDAVPath = webDAVPath.replaceFirst(pre, "");
+				return virtualWebDAVPath;
+			} else {
+				return webDAVPath;
+			}
+		} else {
+			return webDAVPath;
+		}
+	}
+	
 	public boolean getIsClickedFile() {
 		return (getClickedFilePath() != null && !("".equals(getClickedFilePath()))  );
 	}
@@ -79,23 +94,37 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	}
 
 	public void setStartFolder(String start) {
+		if (start != null && "".equals(start)) {
+			start = null;
+		}
 		this.startPath = start;
 	}
 	
 	public void setRootFolder(String root) {
+		if (root != null && "".equals(root)) {
+			root = null;
+		}
 		this.rootPath = root;
 	}
 
-	/**
-	 * @deprecated No longer needed since session is not request
-	 */
 	public void refresh() {
-		
-		//updateDataModel(new Integer(startPage), new Integer(rows));
+		updateDataModel(new Integer(startPage), new Integer(rows));
 	}
 	
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
 		UIComponent comp = actionEvent.getComponent();
+		
+		ContentViewer v = null;
+		UIComponent tmp = comp.getParent();
+		while ( tmp != null && v == null) {
+			if (tmp instanceof ContentViewer) {
+				v = (ContentViewer) tmp;
+			}
+			else {
+				tmp = tmp.getParent();
+			}
+		}
+		v.setEventHandled(true);
 		
 		boolean isFolder = true;
 		if (comp instanceof UICommand) {
