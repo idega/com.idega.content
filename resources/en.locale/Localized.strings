@@ -115,3 +115,10 @@ comment=Comment
 checkout=Checkout
 checkin=Checkin
 last_modified=Last modified
+
+select_a_file_to_upload=Select a file to upload
+give_it_a_name_optional=and give it a name (optional)
+version_comment=and a version comment (optional)
+select_folder_optional=and select the folder to upload to (optional)
+click_to_get_the_file=Click here to get the file
+create=Create
