@@ -5,15 +5,13 @@ package com.idega.content.presentation;
 
 import java.util.Iterator;
 import java.util.List;
-
 import javax.faces.component.html.HtmlOutputLink;
-
 import org.apache.webdav.lib.WebdavResource;
-
 import com.idega.presentation.Table;
 import com.idega.presentation.text.DownloadLink;
 import com.idega.slide.util.VersionHelper;
 import com.idega.slide.util.WebdavResourceVersion;
+import com.idega.util.FileUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.Timer;
 import com.idega.webface.WFUtil;
@@ -36,107 +34,117 @@ public class WebDAVFileDetails extends ContentBlock {
 			String resourceName = resource.getName();
 			HtmlOutputLink link = new HtmlOutputLink();
 			link.setValue(resource.getPath());
+			link.setStyleClass("wf_listlink");
 			link.setId(getId() + "_dl");
 			link.getChildren().add(WFUtil.getText("Download/View"));
 			++row;
 			table.add(WFUtil.getText("Document name"), 1, row);
-			table.add(WFUtil.getText(resourceName), 2, row);
+			table.add(WFUtil.getText(resourceName,"wf_listtext"), 2, row);
 			
 			++row;
 			table.add(link, 2, row);
 			
 			++row;
 			table.add(WFUtil.getText("Size"), 1, row);
-			table.add(WFUtil.getText(Long.toString(resource.getGetContentLength())), 2, row);
+			table.add(WFUtil.getText(FileUtil.getHumanReadableSize(resource.getGetContentLength()),"wf_listtext"), 2, row);
 
 			++row;
 			table.add(WFUtil.getText("Content type"), 1, row);
-			table.add(WFUtil.getText(resource.getGetContentType()), 2, row);
+			table.add(WFUtil.getText(resource.getGetContentType(),"wf_listtext"), 2, row);
 
 			++row;
 			table.add(WFUtil.getText("Creation date"), 1, row);
-			table.add(WFUtil.getText(new IWTimestamp(resource.getCreationDate()).toString()), 2, row);
+			table.add(WFUtil.getText(new IWTimestamp(resource.getCreationDate()).toString(),"wf_listtext"), 2, row);
 			
 			++row;
 			table.add(WFUtil.getText("Modification date"), 1, row);
-			table.add(WFUtil.getText(new IWTimestamp(resource.getGetLastModified()).toString()), 2, row);
+			table.add(WFUtil.getText(new IWTimestamp(resource.getGetLastModified()).toString(),"wf_listtext"), 2, row);
 
 //			++row;
 //			table.add(WFUtil.getText("Http URL"), 1, row);
-//			table.add(WFUtil.getText(resource.getHttpURL().toString()), 2, row);
+//			table.add(WFUtil.getText(resource.getHttpURL().toString(),"wf_listtext"), 2, row);
 			
 			++row;
 			table.add(WFUtil.getText("Owner"), 1, row);
-			table.add(WFUtil.getText(resource.getOwner()), 2, row);
+			table.add(WFUtil.getText(resource.getOwner(),"wf_listtext"), 2, row);
 
 			++row;
 			table.add(WFUtil.getText("Etag"), 1, row);
-			table.add(WFUtil.getText(resource.getGetEtag()), 2, row);
-			
-			Timer timer = new Timer();
-			timer.start();
-			
-			
-			List versions = VersionHelper.getAllVersions(resource);
-			Table vTable = new Table(8,versions.size()+1);
-			vTable.setId(table.getId() + "_ver");
-			//setListStyleClass("wf_list");
-			vTable.setRowStyleClass(1,"wf_listheading");
-			vTable.setStyleClass("wf_listtable");
-			//vTable.setHeaderClass("wf_listheading");
-			
-			int vRow = 1;
-			int vColumn = 1;
-			vTable.add("Version", vColumn, vRow);
-			vTable.add("Download", ++vColumn, vRow);
-			vTable.add("User", ++vColumn, vRow);
-			vTable.add("Comment", ++vColumn, vRow);
-			vTable.add("Checkout", ++vColumn, vRow);
-			vTable.add("Checkin", ++vColumn, vRow);
-			vTable.add("Last modified", ++vColumn, vRow);
+			table.add(WFUtil.getText(resource.getGetEtag(),"wf_listtext"), 2, row);
 
+			Table vTable = getVersionReportTable(resource);
 			
-			if (!versions.isEmpty()) {
-				Iterator iter = versions.iterator();
-				while (iter.hasNext()) {
-					vColumn = 0;
-					WebdavResourceVersion version = (WebdavResourceVersion) iter.next();
-					++vRow;
-				
-					if(vRow%2==0){
-						vTable.setRowStyleClass(vRow,"wf_listevenrow");
-					}
-					else{
-						vTable.setRowStyleClass(vRow,"wf_listoddrow");
-					}
-					
-					
-					//vTable.add(resourceName, 1, vRow);
-					String versionName = version.getVersionName();
-					vTable.add(versionName, ++vColumn, vRow);
-					DownloadLink versionPath = new DownloadLink("Download");
-					versionPath.setId("dl_"+vRow);
-					String url = version.getURL();
-					versionPath.setRelativeFilePath(url);
-					//so we have a sensable name for the file!
-					versionPath.setAlternativeFileName("v"+versionName.replace('.','_')+"-"+resourceName);
-					//versionPath.getChildren().add(WFUtil.getText("Download/View"));
-					vTable.add(versionPath, ++vColumn, vRow);
-					vTable.add(version.getCreatorDisplayName(), ++vColumn, vRow);
-					vTable.add(version.getComment(), ++vColumn, vRow);
-					vTable.add(version.getCheckedOut(), ++vColumn, vRow);
-					vTable.add(version.getCheckedIn(), ++vColumn, vRow);
-					vTable.add(version.getLastModified(), ++vColumn, vRow);
-				}
-			}
-			timer.stop();
-			++vRow;
-			vTable.add("Creation time", 3, vRow);
-			vTable.add(timer.getTimeString(), 4, vRow);
 			++row;
 			table.mergeCells(1, row, 2, row);
 			table.add(vTable, 1, row);
 			this.getChildren().add(table);
 		}
+	}
+
+	protected Table getVersionReportTable(WebdavResource resource) {
+		Timer timer = new Timer();
+		timer.start();
+		List versions = VersionHelper.getAllVersions(resource);
+		Table vTable = new Table(8,versions.size()+1);
+		vTable.setId(vTable.getId() + "_ver");
+		//setListStyleClass("wf_list");
+		vTable.setRowStyleClass(1,"wf_listheading");
+		vTable.setStyleClass("wf_listtable");
+		//vTable.setHeaderClass("wf_listheading");
+		
+		int vRow = 1;
+		int vColumn = 1;
+		vTable.add("Version", vColumn, vRow);
+		vTable.add("Download", ++vColumn, vRow);
+		vTable.add("User", ++vColumn, vRow);
+		vTable.add("Comment", ++vColumn, vRow);
+		vTable.add("Checkout", ++vColumn, vRow);
+		vTable.add("Checkin", ++vColumn, vRow);
+		vTable.add("Last modified", ++vColumn, vRow);
+
+		
+		if (!versions.isEmpty()) {
+			Iterator iter = versions.iterator();
+			while (iter.hasNext()) {
+				vColumn = 0;
+				WebdavResourceVersion version = (WebdavResourceVersion) iter.next();
+				++vRow;
+			
+				if(vRow%2==0){
+					vTable.setRowStyleClass(vRow,"wf_listevenrow");
+				}
+				else{
+					vTable.setRowStyleClass(vRow,"wf_listoddrow");
+				}
+				
+				
+				//vTable.add(resourceName, 1, vRow);
+				String versionName = version.getVersionName();
+								
+				vTable.add(WFUtil.getText(versionName,"wf_listtext"), ++vColumn, vRow);
+				DownloadLink versionPath = new DownloadLink("Download");
+				versionPath.setId("dl_"+vRow);
+				versionPath.setStyleClass("wf_listlink");
+				String url = version.getURL();
+				versionPath.setRelativeFilePath(url);
+				//so we have a sensable name for the file!
+				versionPath.setAlternativeFileName("v"+versionName.replace('.','_')+"-"+resource.getName());
+				//versionPath.getChildren().add(WFUtil.getText("Download/View"));
+				vTable.add(versionPath, ++vColumn, vRow);
+				vTable.add(WFUtil.getText(version.getCreatorDisplayName(),"wf_listtext"), ++vColumn, vRow);
+				vTable.add(WFUtil.getText(version.getComment(),"wf_listtext"), ++vColumn, vRow);
+				vTable.add(WFUtil.getText(version.getCheckedOut(),"wf_listtext"), ++vColumn, vRow);
+				vTable.add(WFUtil.getText(version.getCheckedIn(),"wf_listtext"), ++vColumn, vRow);
+				vTable.add(WFUtil.getText(version.getLastModified(),"wf_listtext"), ++vColumn, vRow);
+			}
+		}
+		
+		++vRow;
+		vTable.add("Creation time", 3, vRow);
+		vTable.add(timer.getTimeString(), 4, vRow);
+		
+		timer.stop();
+		
+		return vTable;
 	}
 }

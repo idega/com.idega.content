@@ -11,6 +11,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIParameter;
 import javax.faces.component.html.HtmlCommandLink;
 import javax.faces.component.html.HtmlGraphicImage;
+import javax.faces.component.html.HtmlOutputText;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
@@ -69,21 +70,21 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		HtmlGraphicImage icon = new HtmlGraphicImage();
 		icon.setValueBinding("url", WFUtil.createValueBinding("#{"+var+".iconURL}"));
 		icon.setId(P_ID+"_I");
-		icon.setHeight("16");// sizes that make sense 16/32/64/128
+		icon.setHeight("32");// sizes that make sense 16/32/64/128
 
 		HtmlCommandLink iconLink = new HtmlCommandLink();
 		iconLink.setId(P_ID+"_L");
+		
 		WFUtil.addParameterVB(iconLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 		WFUtil.addParameterVB(iconLink, PARAMETER_IS_FOLDER, var + ".isCollection");
 		iconLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
-		
 		iconLink.getChildren().add(icon);
-		
 		col0.getChildren().add(iconLink);
 		
 		UIColumn col = new UIColumn();
 		HtmlCommandLink nameLink = new HtmlCommandLink();
 		nameLink.setId(P_ID);
+		nameLink.setStyleClass("wf_listlink");
 		nameLink.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".name}"));
 		WFUtil.addParameterVB(nameLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 		WFUtil.addParameterVB(nameLink, PARAMETER_IS_FOLDER, var + ".isCollection");
@@ -93,26 +94,33 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		
 		UIColumn col2 = new UIColumn();
 		col2.setHeader(WFUtil.getText("Created"));
-		col2.getChildren().add(WFUtil.getTextVB(var + ".creationDate"));
+		HtmlOutputText creation = WFUtil.getTextVB(var + ".creationDate");
+		creation.setStyleClass("wf_listtext");
+		col2.getChildren().add(creation);
 		
 		UIColumn col3 = new UIColumn();
 		col3.setHeader(WFUtil.getText("Size"));
-		col3.getChildren().add(WFUtil.getTextVB(var + ".length"));
+		HtmlOutputText size = WFUtil.getTextVB(var + ".length");
+		size.setStyleClass("wf_listtext");
+		col3.getChildren().add(size);
 		
 		UIColumn col4 = new UIColumn();
 		col4.setHeader(WFUtil.getText("Mime type"));
-		col4.getChildren().add(WFUtil.getTextVB(var + ".mime"));
+		HtmlOutputText mime = WFUtil.getTextVB(var + ".mime");
+		mime.setStyleClass("wf_listtext");
+		col4.getChildren().add(mime);
 		
 		UIColumn col5 = new UIColumn();
 		col5.setHeader(WFUtil.getText("Version"));
-		col5.getChildren().add(WFUtil.getTextVB(var + ".version"));
-		
+		HtmlOutputText version = WFUtil.getTextVB(var + ".version");
+		version.setStyleClass("wf_listtext");
+		col5.getChildren().add(version);
 		
 		HtmlGraphicImage lock = new HtmlGraphicImage();
 		lock.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isLocked}"));
 		lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/locked.gif");
 		lock.setId(P_ID+"_lock");
-		lock.setHeight("18");// sizes that make sense 16/32/64/128
+		lock.setHeight("32");// sizes that make sense 16/32/64/128
 
 		UIColumn col6 = new UIColumn();
 		col6.setHeader(WFUtil.getText("Lock"));
@@ -120,7 +128,9 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		
 		UIColumn col7 = new UIColumn();
 		col7.setHeader(WFUtil.getText("Last modified"));
-		col7.getChildren().add(WFUtil.getTextVB(var + ".modifiedDate"));
+		HtmlOutputText modifiedDate = WFUtil.getTextVB(var + ".modifiedDate");
+		modifiedDate.setStyleClass("wf_listtext");
+		col7.getChildren().add(modifiedDate);
 
 		//return new UIColumn[] { col0, col, col2, col3, col4, col5, col6 ,col7};
 		return new UIColumn[] { col0, col, col3, col5, col6 ,col7};
