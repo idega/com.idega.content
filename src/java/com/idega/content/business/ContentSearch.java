@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.9 2005/01/31 10:19:28 eiki Exp $
+ * $Id: ContentSearch.java,v 1.10 2005/02/06 16:25:18 laddi Exp $
  * Created on Jan 17, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -46,12 +46,12 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- *  Last modified: $Date: 2005/01/31 10:19:28 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/02/06 16:25:18 $ by $Author: laddi $
  * This class implements the Searchplugin interface and can therefore be used in a Search block (com.idega.core.search)<br>
  *  for searching contents and properties (metadata) of the files in the iwfile system.
  * To use it simply register this class as a iw.searchable component in a bundle.
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class ContentSearch implements SearchPlugin {
 
@@ -215,10 +215,10 @@ public class ContentSearch implements SearchPlugin {
 //		for (int i = 0; i < headers.length; i++) {
 //			System.out.println(headers[i].toString());
 //		}
-		Enumeration enum = method.getAllResponseURLs();
+		Enumeration enumerator = method.getAllResponseURLs();
 		
-		while (enum.hasMoreElements()) {
-			String fileURI = (String) enum.nextElement();
+		while (enumerator.hasMoreElements()) {
+			String fileURI = (String) enumerator.nextElement();
 			if(!fileURI.equalsIgnoreCase(servletMapping)){
 				BasicSearchResult result = new BasicSearchResult();
 				

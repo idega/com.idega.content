@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadataResourceBean.java,v 1.1 2005/01/28 13:52:21 joakim Exp $
+ * $Id: WebDAVMetadataResourceBean.java,v 1.2 2005/02/06 16:25:47 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -29,10 +29,10 @@ import com.idega.slide.util.WebdavRootResource;
 
 /**
  * 
- * Last modified: $Date: 2005/01/28 13:52:21 $ by $Author: joakim $
+ * Last modified: $Date: 2005/02/06 16:25:47 $ by $Author: laddi $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class WebDAVMetadataResourceBean extends IBOSessionBean 
 implements WebDAVMetadataResource
@@ -102,11 +102,11 @@ implements WebDAVMetadataResource
 		while(iter.hasNext()) {
 			String type = (String)iter.next();
 
-			Enumeration enum = rootResource.propfindMethod(filePath,new PropertyName("DAV",type).toString());
+			Enumeration enumerator = rootResource.propfindMethod(filePath,new PropertyName("DAV",type).toString());
 
 			StringBuffer value = new StringBuffer();
-			while(enum.hasMoreElements()) {
-				value.append(enum.nextElement());
+			while(enumerator.hasMoreElements()) {
+				value.append(enumerator.nextElement());
 			}
 //				System.out.println("Value is "+value);
 			if(value.length()>0) {
