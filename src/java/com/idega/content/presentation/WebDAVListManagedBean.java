@@ -32,6 +32,7 @@ import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.webface.WFList;
 import com.idega.webface.WFUtil;
 import com.idega.webface.bean.WFListBean;
+import com.idega.webface.convert.WFTimestampConverter;
 import com.idega.webface.model.WFDataModel;
 
 /**
@@ -317,6 +318,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			HtmlCommandLink nameDetailsLink = new HtmlCommandLink();
 			nameDetailsLink.setId(P_ID+"_det");
 			nameDetailsLink.setStyleClass("content_viewer_file_details");
+			nameDetailsLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.FILE_DETAILS);
 			nameDetailsLink.getChildren().add(WFUtil.getText("     "));
 			nameDetailsLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isFile}"));
 			WFUtil.addParameterVB(nameDetailsLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
@@ -325,7 +327,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 
 			// PreviewLink
 			HtmlCommandLink namePreviewLink = new HtmlCommandLink();
-			namePreviewLink.setId(P_ID+"_det");
+			namePreviewLink.setId(P_ID+"_pre");
 			namePreviewLink.setStyleClass("content_viewer_file_preview");
 			namePreviewLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.PREVIEW);
 			namePreviewLink.getChildren().add(WFUtil.getText("     "));
@@ -436,8 +438,9 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			modSortLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
 			modSortLink.setId(P_ID+"_sortMod");
 			col8.setHeader(modSortLink);
-			HtmlOutputText modifiedDate = WFUtil.getTextVB(var + ".modifiedDate");
+			HtmlOutputText modifiedDate = WFUtil.getTextVB(var + ".modifiedDateLong");
 			modifiedDate.setStyleClass("wf_listtext");
+			modifiedDate.setConverter(new WFTimestampConverter());
 			col8.getChildren().add(modifiedDate);
 			
 			columns.add(col8);

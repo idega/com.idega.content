@@ -6,6 +6,7 @@ package com.idega.content.presentation;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlGraphicImage;
@@ -86,11 +87,13 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			table.add(getText("content_type"), 1, ++row);
 			table.add(WFUtil.getText(resource.getGetContentType(),"wf_listtext"), 2, row);
 			
+			Locale locale = IWContext.getInstance().getCurrentLocale();
+			
 			table.add(getText("creation_date"), 1, ++row);
-			table.add(WFUtil.getText(new IWTimestamp(resource.getCreationDateString()).toString(),"wf_listtext"), 2, row);
+			table.add(WFUtil.getText(new IWTimestamp(resource.getCreationDateString()).getLocaleDateAndTime(locale, IWTimestamp.MEDIUM, IWTimestamp.MEDIUM),"wf_listtext"), 2, row);
 			
 			table.add(getText("modification_date"), 1, ++row);
-			table.add(WFUtil.getText(new IWTimestamp(resource.getGetLastModified()).toString(),"wf_listtext"), 2, row);
+			table.add(WFUtil.getText(new IWTimestamp(resource.getGetLastModified()).getLocaleDateAndTime(locale, IWTimestamp.MEDIUM, IWTimestamp.MEDIUM),"wf_listtext"), 2, row);
 			if (detailed) {
 				
 				if (useVersionControl) {
@@ -199,6 +202,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 	}
 
 	protected Table getVersionReportTable(WebdavExtendedResource resource) {
+		Locale locale = IWContext.getInstance().getCurrentLocale();
 		Timer timer = new Timer();
 		timer.start();
 		List versions = VersionHelper.getAllVersions(resource);
@@ -263,7 +267,8 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 //				vTable.add(WFUtil.getText(version.getComment(),"wf_listtext"), ++vColumn, vRow);
 				vTable.add(WFUtil.getText(version.getCheckedOut(),"wf_listtext"), ++vColumn, vRow);
 				vTable.add(WFUtil.getText(version.getCheckedIn(),"wf_listtext"), ++vColumn, vRow);
-				vTable.add(WFUtil.getText(version.getLastModified(),"wf_listtext"), ++vColumn, vRow);
+//				vTable.add(WFUtil.getText(version.getLastModified(),"wf_listtext"), ++vColumn, vRow);
+				vTable.add(WFUtil.getText(new IWTimestamp(resource.getGetLastModified()).getLocaleDateAndTime(locale, IWTimestamp.MEDIUM, IWTimestamp.MEDIUM),"wf_listtext"), ++vColumn, vRow);
 			}
 		}
 		

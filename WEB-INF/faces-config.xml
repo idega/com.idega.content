@@ -125,5 +125,11 @@
         <managed-bean-class>com.idega.content.presentation.MetadataListManagedBean</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
+
+    <!--  converters -->
+    <converter>
+        <converter-for-class>com.idega.util.IWTimestamp</converter-for-class>
+        <converter-class>com.idega.webface.convert.WFTimestampConverter</converter-class>
+    </converter>
     
 </faces-config>
