@@ -8,7 +8,22 @@ package com.idega.content.data;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Vector;
+
+import org.apache.commons.httpclient.HttpException;
+import org.apache.webdav.lib.WebdavResources;
+
+import com.idega.business.IBOLookup;
+import com.idega.core.data.ICTreeNode;
 import com.idega.core.file.business.FileIconSupplier;
+import com.idega.idegaweb.IWApplicationContext;
+import com.idega.presentation.IWContext;
+import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.VersionHelper;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.FileUtil;
@@ -16,7 +31,7 @@ import com.idega.util.FileUtil;
 /**
  * @author Roar
  */
-public class WebDAVBean extends Object {
+public class WebDAVBean extends Object implements ICTreeNode {
     
     public static final String PROP_ID = "id";
     public static final String PROP_NAME = "name";
@@ -45,24 +60,27 @@ public class WebDAVBean extends Object {
     private boolean isCheckedOut = false;
     private String checkedOutString = null;
     private String comment = null;
-    
+
 	/**
 	 * @return Returns the isCheckedOut.
 	 */
 	public boolean isCheckedOut() {
 		return isCheckedOut;
 	}
-	/**
-	 * @param isCheckedOut The isCheckedOut to set.
-	 */
-	public void setCheckedOut(boolean isCheckedOut) {
-		this.isCheckedOut = isCheckedOut;
-	}
+	    
+    private WebdavExtendedResource me;
+    private ICTreeNode parent;
+    private Collection siblings;
+    private int siblingCount = 0;
+    private Vector children;
+    private int childrenCount = 0;
+    
+    private static int idCounter = 1;
+    
     public WebDAVBean() {
     	
     	propertySupport = new PropertyChangeSupport(this);
-	    setId((int)Math.round(Math.random())*1000);
-  		
+	    setId((int) (Math.random()*1000));
     }
    
     public WebDAVBean(String name) {
@@ -84,18 +102,7 @@ public class WebDAVBean extends Object {
 			setCheckedOutString(resource.getCheckedOut());
 			setComment(resource.getComment());
     }
-    
-    
-    /**
-	 * @param checkedOut
-	 */
-	private void setCheckedOutString(String checkedOut) {
-		if(checkedOut!=null && !"".equals(checkedOut)){
-			setCheckedOut(true);
-			checkedOutString = checkedOut;
-		}
-		
-	}
+        
 	public int getId() {
         return id;
     }
@@ -228,6 +235,151 @@ public class WebDAVBean extends Object {
 	public void setIsLocked(boolean isLocked) {
 		this.isLocked = isLocked;
 	}
+	
+	private WebdavExtendedResource getMe() {
+		if (me == null) {
+			try {
+				IWContext iwc = IWContext.getInstance();
+				IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(iwc, IWSlideSession.class);
+				WebdavExtendedResource resource = ss.getWebdavResource(getWebDavUrl().replaceFirst(ss.getWebdavServerURI(), ""));
+				this.me = resource;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return me;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.core.data.ICTreeNode#getChildren()
+	 */
+	public Collection getChildren() {
+		try {
+			if (children == null) {
+				WebdavResources resources = getMe().getChildResources();
+	  		Enumeration enumer = resources.getResources();
+	  		children = new Vector();
+	  		childrenCount = 0; 
+	  		while (enumer.hasMoreElements()) {
+	  			WebdavExtendedResource element = (WebdavExtendedResource) enumer.nextElement();
+	  			if (element.isCollection()) {
+	  				WebDAVBean bean = new WebDAVBean(element);
+	    			children.add(bean);
+	    			++childrenCount;
+	  			}
+	  		}
+			} 
+			return children;
+		} catch (HttpException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.core.data.ICTreeNode#getChildrenIterator()
+	 */
+	public Iterator getChildrenIterator() {
+		return getChildren().iterator();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.core.data.ICTreeNode#getAllowsChildren()
+	 */
+	public boolean getAllowsChildren() {
+		return isCollection;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.core.data.ICTreeNode#getChildAtIndex(int)
+	 */
+	public ICTreeNode getChildAtIndex(int childIndex) {
+		if (children == null) {
+			getChildren();
+		}
+		return (ICTreeNode) children.get(childIndex);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.core.data.ICTreeNode#getChildCount()
+	 */
+	public int getChildCount() {
+		if (children == null) {
+			getChildren();
+		}
+		return childrenCount;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.core.data.ICTreeNode#getIndex(com.idega.core.data.ICTreeNode)
+	 */
+	public int getIndex(ICTreeNode node) {
+		return children.indexOf(node);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.core.data.ICTreeNode#getParentNode()
+	 */
+	public ICTreeNode getParentNode() {
+		if (parent == null) {
+			try {
+				String url = getMe().getParentPath();
+				IWContext iwc = IWContext.getInstance();
+				IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(iwc, IWSlideSession.class);
+				url = url.replaceFirst(ss.getWebdavServerURI(), "");
+				WebdavExtendedResource selectedNode = ss.getWebdavResource(url);
+				parent = new WebDAVBean(selectedNode);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return parent;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.core.data.ICTreeNode#isLeaf()
+	 */
+	public boolean isLeaf() {
+		return !getIsCollection();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.core.data.ICTreeNode#getNodeName()
+	 */
+	public String getNodeName() {
+		return getName();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.core.data.ICTreeNode#getNodeName(java.util.Locale)
+	 */
+	public String getNodeName(Locale locale) {
+		return getName();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.core.data.ICTreeNode#getNodeName(java.util.Locale, com.idega.idegaweb.IWApplicationContext)
+	 */
+	public String getNodeName(Locale locale, IWApplicationContext iwac) {
+		return getName();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.core.data.ICTreeNode#getNodeID()
+	 */
+	public int getNodeID() {
+		return id;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.core.data.ICTreeNode#getSiblingCount()
+	 */
+	public int getSiblingCount() {
+		return siblingCount;
+	}
+
 	/**
 	 * @return Returns the comment.
 	 */
@@ -249,9 +401,28 @@ public class WebDAVBean extends Object {
 		this.comment = comment;
 	}
 	/**
+	 * @param isCheckedOut The isCheckedOut to set.
+	 */
+	public void setCheckedOut(boolean isCheckedOut) {
+		this.isCheckedOut = isCheckedOut;
+	}
+	
+	/**
 	 * @return Returns the checkedOutString.
 	 */
 	public String getCheckedOutString() {
 		return checkedOutString;
 	}
+	
+    /**
+	 * @param checkedOut
+	 */
+	private void setCheckedOutString(String checkedOut) {
+		if(checkedOut!=null && !"".equals(checkedOut)){
+			setCheckedOut(true);
+			checkedOutString = checkedOut;
+		}
+		
+	}
+
 }
