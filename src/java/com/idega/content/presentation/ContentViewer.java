@@ -69,20 +69,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	
 	public void initializeContent() {	
 
-		Boolean useUserHomeFolder = (Boolean) this.getAttributes().get("useUserHomeFolder");
-		if (useUserHomeFolder != null && useUserHomeFolder.booleanValue()) {
-			try {
-				rootFolder = super.getIWSlideSession().getUserHomeFolder();
-			}
-			catch (RemoteException e) {
-				e.printStackTrace();
-			}
-		}
-		
 		String startFolder = (String) this.getAttributes().get("startFolder");
-		if (rootFolder == null) {
-			rootFolder = (String) this.getAttributes().get("rootFolder");
-		}
 		
 		String iconTheme = (String) this.getAttributes().get("iconTheme");
 //		rootFolder ="/files/shared";
@@ -92,7 +79,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 
 		tb.addTitleText(getBundle().getLocalizedText("document_list"));
 		tb.addTitleText(" (");
-		tb.addTitleText(getCurrentResourcePath());
+		tb.addTitleText(getCurrentResourceVirtualPath());
 //		tb.addTitleText("WebDAVListBean.virtualWebDAVPath", true);
 //		tb.addTitleText("WebDAVListBean.webDAVPath", true);
 		tb.addTitleText(")");
@@ -142,7 +129,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WFTitlebar folderBar = new WFTitlebar();
 		folderBar.addTitleText(getBundle().getLocalizedText("create_a_folder"));
 		folderBar.addTitleText(" (");
-		folderBar.addTitleText(getCurrentResourcePath());
+		folderBar.addTitleText(getCurrentResourceVirtualPath());
 		folderBar.addTitleText(")");
 		folderBlock.setTitlebar(folderBar);
 		folderBlock.setToolbar(new WFToolbar());
@@ -155,7 +142,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WFTitlebar uploadBar = new WFTitlebar();
 		uploadBar.addTitleText(getBundle().getLocalizedText("upload"));
 		uploadBar.addTitleText(" (");
-		uploadBar.addTitleText(getCurrentResourcePath());
+		uploadBar.addTitleText(getCurrentResourceVirtualPath());
 		uploadBar.addTitleText(")");
 		uploadBlock.setTitlebar(uploadBar);
 		uploadBlock.setToolbar(new WFToolbar());
@@ -186,7 +173,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WFTitlebar permissionsBar = new WFTitlebar();
 		permissionsBar.addTitleText(getBundle().getLocalizedText("permissions"));
 		permissionsBar.addTitleText(" (");
-		permissionsBar.addTitleText(getCurrentResourcePath());
+		permissionsBar.addTitleText(getCurrentResourceVirtualPath());
 		permissionsBar.addTitleText(")");
 		permissionsBlock.setTitlebar(permissionsBar);
 		permissionsBlock.setToolbar(getToolbar());
@@ -210,8 +197,25 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	}
 	
 	public void encodeBegin(FacesContext context) throws IOException {
+		Boolean useUserHomeFolder = (Boolean) this.getAttributes().get("useUserHomeFolder");
+		if (useUserHomeFolder != null && useUserHomeFolder.booleanValue()) {
+			try {
+				rootFolder = super.getIWSlideSession().getUserHomeFolder();
+			}
+			catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		if (rootFolder == null) {
+			rootFolder = (String) this.getAttributes().get("rootFolder");
+		}
+
 		if (!eventHandled) {
 			WFUtil.invoke("WebDAVListBean", "setClickedFilePath", null, String.class);
+			WFUtil.invoke("WebDAVListBean", "setWebDAVPath", rootFolder, String.class);
+			WFUtil.invoke("WebDAVListBean", "setRootFolder", rootFolder, String.class);
+			System.out.println("Setting webDAVPAth to "+rootFolder);
 		}
 		
 		Boolean fileSelected = (Boolean) WFUtil.invoke("WebDAVListBean", "getIsClickedFile");
@@ -565,6 +569,21 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			return path+(("/".equals(path.substring(path.length()-1)))?"":"/")+fileName;
 		} else {
 			return path;
+		}
+	}
+	
+	public String getCurrentResourceVirtualPath() {
+		if (rootFolder != null) {
+			int index = rootFolder.lastIndexOf("/");
+			if (index > -1) {
+				String pre = rootFolder.substring(0, index);
+				String virtualWebDAVPath = getCurrentFolderPath().replaceFirst(pre, "");
+				return virtualWebDAVPath;
+			} else {
+				return getCurrentFolderPath();
+			}
+		} else {
+			return getCurrentFolderPath();
 		}
 	}
 }
