@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.2 2004/12/31 04:01:51 eiki Exp $
+ * $Id: WebDAVUpload.java,v 1.3 2005/01/13 15:53:35 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -14,6 +14,7 @@ import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.component.html.HtmlOutputText;
+import javax.faces.event.ActionEvent;
 import net.sourceforge.myfaces.custom.fileupload.HtmlInputFileUpload;
 import com.idega.presentation.Table;
 import com.idega.webface.WFContainer;
@@ -22,10 +23,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2004/12/31 04:01:51 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/01/13 15:53:35 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class WebDAVUpload extends ContentBlock {
 
@@ -77,7 +78,7 @@ public class WebDAVUpload extends ContentBlock {
 		HtmlCommandButton upload = new HtmlCommandButton();
 		upload.setId(getId()+"_uploadCmd");
 		upload.setStyleClass("wf_webdav_upload_button");
-		upload.setAction(WFUtil.createMethodBinding("#{WebDAVUploadBean.upload}", null));
+		upload.setActionListener(WFUtil.createMethodBinding("#{WebDAVUploadBean.upload}", new Class[]{ActionEvent.class}));
 		getBundle().getLocalizedUIComponent("upload", upload);
 		
 //		form.getChildren().add("<br>");

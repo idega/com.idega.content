@@ -1,6 +1,8 @@
 package com.idega.content.business;
 
 import java.io.IOException;
+import javax.faces.component.UIComponent;
+import javax.faces.event.ActionEvent;
 import net.sourceforge.myfaces.custom.fileupload.UploadedFile;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.PropertyName;
@@ -57,7 +59,7 @@ public class WebDAVUploadBean{
 		this.uploadFolderPath = uploadFolderPath;
 	}
 
-	public String upload() throws IOException{
+	public String upload(ActionEvent event) throws IOException{
 		
 		if(uploadFile!=null){
 			IWContext iwc = IWContext.getInstance();
@@ -120,7 +122,7 @@ public class WebDAVUploadBean{
 					rootResource.proppatchMethod(filePath+fileName,new PropertyName("DAV:","comment"),comment,true);
 					
 				}
-				WFUtil.invoke("WebDAVListBean","refresh");
+				WFUtil.invoke("WebDAVListBean","refresh", event.getSource(), UIComponent.class);
 			}
 			else{
 				System.err.println("Error code :"+rootResource.getStatusMessage()+", message: "+rootResource.getStatusMessage());
