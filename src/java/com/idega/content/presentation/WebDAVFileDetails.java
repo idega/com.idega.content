@@ -41,12 +41,21 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 	private static String ACTION_CHECK_OUT = "checkout";
 	private static String ACTION_CHECK_IN = "checkin";
 	private static String ACTION_UNCHECK_OUT = "uncheckout";
+	private static String METADATA_BEAN = "MetadataList";
 	
 	private static final String PARAMETER_RESOURCE_PATH = "wfd_prp";
 	private boolean detailed = true;
 	private boolean useVersionControl = true;
 	
 	protected void initializeContent() {
+
+		//For Metadata
+		String resourcePath = getCurrentResourcePath();
+		if(resourcePath!=null){
+			WFUtil.invoke(METADATA_BEAN, "setResourcePath", resourcePath);
+		} else {
+			System.err.println("[WARNING]["+getClass().getName()+"]: resource path can not be restored for managed beans");
+		}
 
 		WebdavExtendedResource resource = getWebdavExtendedResource();
 		String userName = null;
@@ -337,6 +346,15 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 		Object values[] = (Object[]) state;
 		super.restoreState(ctx, values[0]);
 		detailed = ((Boolean) values[1]).booleanValue();
+
+		//For Metadata
+		String resourcePath = getCurrentResourcePath();
+		if(resourcePath!=null){
+			WFUtil.invoke(METADATA_BEAN, "setResourcePath", resourcePath);
+		} else {
+			System.err.println("[WARNING]["+getClass().getName()+"]: resource path can not be restored for managed beans");
+		}
+
 		useVersionControl = ((Boolean) values[2]).booleanValue();
 	}	
 }
