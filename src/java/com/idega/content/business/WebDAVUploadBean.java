@@ -63,7 +63,7 @@ public class WebDAVUploadBean{
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 			String filePath = service.getWebdavServerURI()+getUploadFilePath();
 			String uploadName = uploadFile.getName();
-			String contentType = uploadFile.getContentType();
+			//String contentType = uploadFile.getContentType();
 			String fileName = uploadName;
 			if(!"".equals(name)){
 				fileName = name;
@@ -84,10 +84,7 @@ public class WebDAVUploadBean{
 			System.out.println("Uploading file success "+success);
 			
 			downloadPath = filePath+fileName;
-			String contextUri = iwc.getIWMainApplication().getApplicationContextURI();
-			if(success && (contentType!=null && contentType.startsWith("image")) ){
-				imagePath = downloadPath.substring(downloadPath.indexOf(contextUri)+contextUri.length());
-			}
+			imagePath = iwc.getIWMainApplication().getURIFromURL(downloadPath);	
 			
 			if(success){
 				WFUtil.invoke("WebDAVListBean","refresh");
