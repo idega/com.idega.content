@@ -3,6 +3,7 @@
  */
 package com.idega.content.presentation;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import javax.faces.component.UIComponent;
@@ -14,9 +15,12 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import org.apache.webdav.lib.WebdavResource;
+import com.idega.business.IBOLookup;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.DownloadLink;
+import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.VersionHelper;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.slide.util.WebdavResourceVersion;
@@ -42,6 +46,15 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 	protected void initializeContent() {
 		
 		WebdavExtendedResource resource = getWebdavExtendedResource();
+		String userName = null;
+		try {
+			// Making sure all properties are set
+			resource.listWithDeltaV();
+			userName = getIWSlideSession().getUserFullName();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		if (resource != null) {
 			String resourceName = resource.getDisplayName();
@@ -108,25 +121,29 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 
 
 			table.add(getText("checkout_status"), 1, ++row);
-			if (resource.getCheckedOut() == null) {
+			String checkedOut = resource.getCheckedOut();
+			if (checkedOut == null || "".equals(checkedOut)) {
 				table.add(getText("not_checked_out", "wf_listtext"), 2, row);
 			} else {
 				table.add(getText("checked_out", "wf_listtext"), 2, row);
-				table.add(WFUtil.getText(" ("+resource.getCheckedOut()+")","wf_listtext"), 2, row);
+				table.add(WFUtil.getText(" ("+checkedOut.substring(checkedOut.lastIndexOf("/")+1)+")","wf_listtext"), 2, row);
 			}
 			table.add(WFUtil.getText("  - "), 2, row);
-			
 			
 			HtmlCommandButton checker = new HtmlCommandButton();
 			checker.setId(getId()+"_check");
 			checker.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
-			if (resource.getCheckedOut() == null) {
+			if (checkedOut == null || "".equals(checkedOut)) {
 				getBundle().getLocalizedUIComponent("check_out", checker);
 //				checker.setValue("Check out");
 				checker.getAttributes().put(ACTION, ACTION_CHECK_OUT);
-			} else {
+			} else if (VersionHelper.hasUserCheckedOutResource(resource, userName)) {
 				// Checka if current user has file checked out, or not...
 //				getBundle().getLocalizedUIComponent("check_out", checker);
+				getBundle().getLocalizedUIComponent("uncheck_out", checker);
+//			checker.setValue("Check out");
+			checker.getAttributes().put(ACTION, ACTION_UNCHECK_OUT);
+			} else {
 				checker.setValue("Check in/uncheck something...");
 			}
 			checker.setStyleClass("wf_listlink");
@@ -228,19 +245,24 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 		String action = (String) comp.getAttributes().get(ACTION);
 		String path = (String) comp.getAttributes().get(PARAMETER_RESOURCE_PATH);
 		WebdavExtendedResource res = getWebdavExentededResource(path);
-		if (ACTION_TOGGLE_LOCK.equals(action)) {
-			if (res != null) {
-				toggleLock(res);
+		try {
+			if (ACTION_TOGGLE_LOCK.equals(action)) {
+				if (res != null) {
+					toggleLock(res);
+				}
+			} else if (ACTION_CHECK_OUT.equals(action)) {
+				IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(), IWSlideSession.class);
+				VersionHelper.checkOut(res, ss.getUserFullName());
+				refreshList();
+			} else if (ACTION_CHECK_IN.equals(action)) {
+				VersionHelper.checkIn(res);
+				refreshList();
+			} else if (ACTION_UNCHECK_OUT.equals(action)) {
+				VersionHelper.unCheckOut(res);
+				refreshList();
 			}
-		} else if (ACTION_CHECK_OUT.equals(action)) {
-			VersionHelper.checkOut(res);
-			refreshList();
-		} else if (ACTION_CHECK_IN.equals(action)) {
-			VersionHelper.checkIn(res);
-			refreshList();
-		} else if (ACTION_UNCHECK_OUT.equals(action)) {
-			VersionHelper.unCheckOut(res);
-			refreshList();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }
