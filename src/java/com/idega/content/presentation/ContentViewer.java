@@ -314,42 +314,52 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	public WFToolbar getToolbar() {
 		WFToolbar bar = new WFToolbar();
 		
-		WFToolbarButton list = new WFToolbarButton("/images/list.jpg",getBundle());
+		WFToolbarButton list = new WFToolbarButton();
+//		WFToolbarButton list = new WFToolbarButton("/images/list.jpg",getBundle());
 		list.getAttributes().put(PARAMETER_ACTION, LIST);
 		list.setId(getId()+"_btnList");
+		list.setStyleClass("content_viewer_document_list");
 		list.setToolTip(getBundle().getLocalizedString("document_list"));
 //		list.setToolTip("Document List");
 		list.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 //		list.setValueBinding("rendered", WFUtil.createValueBinding("#{contentviewerbean.renderListLink}"));
 		list.setRendered(renderListLink);
 
-		WFToolbarButton details = new WFToolbarButton("/images/details.jpg",getBundle());
+		WFToolbarButton details = new WFToolbarButton();
+//		WFToolbarButton details = new WFToolbarButton("/images/details.jpg",getBundle());
 		details.getAttributes().put(PARAMETER_ACTION, FILE_DETAILS);
+		details.setStyleClass("content_viewer_details");
 		details.setId(getId()+"_btnDetails");
 //		details.setToolTip("Document Details");
 		details.setToolTip(getBundle().getLocalizedString("document_details"));
 		details.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		details.setRendered(renderDetailsLink);
 
-		WFToolbarButton preview = new WFToolbarButton("/images/preview.jpg",getBundle());
+		WFToolbarButton preview = new WFToolbarButton();
+//		WFToolbarButton preview = new WFToolbarButton("/images/preview.jpg",getBundle());
 		preview.getAttributes().put(PARAMETER_ACTION, PREVIEW);
 		preview.setId(getId()+"_btnPreview");
+		preview.setStyleClass("content_viewer_preview");
 		preview.setToolTip(getBundle().getLocalizedString("preview"));
 //		preview.setToolTip("Preview");
 		preview.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		preview.setRendered(renderPreviewLink);
 		
-		WFToolbarButton newFolder = new WFToolbarButton("/images/newfolder.gif",getBundle());
+		WFToolbarButton newFolder = new WFToolbarButton();
+//		WFToolbarButton newFolder = new WFToolbarButton("/images/newfolder.gif",getBundle());
 		newFolder.getAttributes().put(PARAMETER_ACTION, NEW_FOLDER);
 		newFolder.setId(getId()+"_btnNewFolder");
+		newFolder.setStyleClass("content_viewer_new_folder");
 		newFolder.setToolTip(getBundle().getLocalizedString("create_a_folder"));
 		//newFolder.setToolTip("New Folder");
 		newFolder.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		newFolder.setRendered(renderNewFolderLink);
 
-		WFToolbarButton permissions = new WFToolbarButton("/images/permissions.gif",getBundle());
+		WFToolbarButton permissions = new WFToolbarButton();
+//		WFToolbarButton permissions = new WFToolbarButton("/images/permissions.gif",getBundle());
 		permissions.getAttributes().put(PARAMETER_ACTION, PERMISSIONS);
 		permissions.setId(getId()+"_btnPermissions");
+		permissions.setStyleClass("content_viewer_permissions");
 //		permissions.setToolTip("Permissions");
 		permissions.setToolTip(getBundle().getLocalizedString("permissions"));
 		permissions.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
