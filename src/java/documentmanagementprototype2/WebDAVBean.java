@@ -22,7 +22,7 @@ public class WebDAVBean extends Object {
     public static final String PROP_CREATION_DATE = "cre_date";
     public static final String PROP_MIME = "mime";
     public static final String PROP_WEB_DAV_URL = "webdav_url";
-    public static final String PROP_PARENT_LIST = "par_list";
+    public static final String PROP_ICON_URL = "icon_url";
     
     private int id;
     private String name;
@@ -32,6 +32,7 @@ public class WebDAVBean extends Object {
     private String creationDate;
     private String mime;
     private String webDavUrl;
+    private String iconURL;
     
     private PropertyChangeSupport propertySupport;
     
@@ -139,7 +140,7 @@ public class WebDAVBean extends Object {
     }
     
     public void setWebDavHttpURL(String webDavUrl) {
-    	String oldValue = webDavUrl;
+    	String oldValue = this.webDavUrl;
     	this.webDavUrl = webDavUrl;
     	propertySupport.firePropertyChange(PROP_WEB_DAV_URL, oldValue, webDavUrl);
     }    
@@ -152,4 +153,14 @@ public class WebDAVBean extends Object {
         propertySupport.removePropertyChangeListener(listener);
     }
     
+	public String getIconURL() {
+		return iconURL;
+	}
+	
+	
+	public void setIconURL(String iconURL) {
+  	String oldValue = this.iconURL;
+  	this.iconURL = iconURL;
+  	propertySupport.firePropertyChange(PROP_ICON_URL, oldValue, iconURL);
+	}
 }
