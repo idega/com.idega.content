@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataListManagedBean.java,v 1.3 2005/01/17 17:03:42 gimmi Exp $
+ * $Id: MetadataListManagedBean.java,v 1.4 2005/01/18 14:07:02 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -12,7 +12,6 @@ package com.idega.content.presentation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
 import javax.faces.component.UIColumn;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
@@ -26,6 +25,7 @@ import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
 import com.idega.content.data.MetadataValueBean;
 import com.idega.presentation.IWContext;
+import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavRootResource;
 import com.idega.webface.WFResourceUtil;
@@ -37,69 +37,29 @@ import com.idega.webface.bean.WFListBean;
 
 /**
  * 
- * Last modified: $Date: 2005/01/17 17:03:42 $ by $Author: gimmi $
+ * Last modified: $Date: 2005/01/18 14:07:02 $ by $Author: joakim $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class MetadataListManagedBean extends AbstractWFEditableListManagedBean implements WFListBean, ActionListener {
 
 	protected String[] componentIDToken = new String[] { "type", "Values", "Button" };
 	protected String[] localizationKey = new String[] { "type", "values", "" };
 
-	private static final String P_ID = "wb_list";
-	private static final String PARAMETER_WEB_DAV_URL = "wdurl";
-	private static final String PARAMETER_IS_FOLDER = "isf";
+	private String resourcePath = null;
 	
-	private String clickedFilePath;
-	private String clickedFileName;
-	
-	private String webDAVPath = "";
 	private String rootPath = null;
-	private String startPath = null;
-	
-	private int startPage = -1;
-	private int rows = -1;
+
 	private static WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
 
 	public MetadataListManagedBean() {
 	}
-/*
-	public UIColumn[] createColumns(String var) {
-		UIColumn typeCol = new UIColumn();
-		typeCol.setHeader(ContentBlock.getBundle().getLocalizedText("type"));
-		HtmlOutputText creation = WFUtil.getTextVB(var + ".type");
-		creation.setStyleClass("wf_listtext");
-		typeCol.getChildren().add(creation);
-		
-		UIColumn valuesCol = new UIColumn();
-		valuesCol.setHeader(ContentBlock.getBundle().getLocalizedText("size"));
-		HtmlOutputText size = WFUtil.getTextVB(var + ".length");
-		size.setStyleClass("wf_listtext");
-		valuesCol.getChildren().add(size);
-		
-		UIColumn buttonCol = new UIColumn();
-//		buttonCol.setHeader(ContentBlock.getBundle().getLocalizedText("delete"));
-		HtmlCommandLink delLink = new HtmlCommandLink();
-		delLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isReal}"));
-		delLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.DELETE);
-		WFUtil.addParameterVB(delLink, ContentViewer.PATH_TO_DELETE, var+".webDavUrl");
-//		delLink.getAttributes().put(ContentViewer.PATH_TO_DELETE, WFUtil.invoke(var, "getWebDavUrl"));
-		delLink.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
-		delLink.setId(P_ID+"_delLink");
-		HtmlGraphicImage delete = new HtmlGraphicImage();
-		delete.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/delete.gif");
-		delete.setId(P_ID+"_delete");
-//		delete.setHeight(imageSize);// sizes that make sense 16/32/64/128
-		delLink.getChildren().add(delete);
-		
-		buttonCol.getChildren().add(delLink);
 
-
-		//return new UIColumn[] { col0, col, col2, col3, col4, col5, col6 ,col7};
-		return new UIColumn[] { typeCol, valuesCol, buttonCol};
+	public void setResourcePath(String path){
+		resourcePath = path;
 	}
-*/
+	
 	private MetadataValueBean[] getMetadata() {
 		MetadataValueBean[] data;
 		ArrayList arrayList = new ArrayList();
@@ -108,58 +68,35 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 
 			IWContext iwc = IWContext.getInstance();
 			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-//			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 	
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 			//TODO (JJ) have to fetch the filepath
-			String filePath = "";
-			Iterator iter = WebDAVMetadata.metadataType.iterator();
+			String filePath = resourcePath;
 			
-			while(iter.hasNext()) {
-				String type = (String)iter.next();
-				Enumeration enumer = rootResource.propfindMethod(filePath,new PropertyName("DAV:",type).toString());
+//			IWUserContext iwuc = IWContext.getInstance();
+//	    	String root = iwuc.getApplicationContext().getIWMainApplication().getApplicationContextURI();
+
+			System.out.println("Resource path is "+service.getWebdavServerURI()+filePath+" # of metadata types:"+WebDAVMetadata.metadataType.length);
+			rootResource.proppatchMethod(service.getWebdavServerURI()+filePath,new PropertyName("DAV:","keywords").toString(),"Test",true);
+			for(int i=0;i<WebDAVMetadata.metadataType.length;i++) {
+				String type = WebDAVMetadata.metadataType[i];
+				System.out.println("Type is "+type);
+				
+
+				Enumeration enum = rootResource.propfindMethod(service.getWebdavServerURI()+filePath,new PropertyName("DAV:",type).toString());
 	
-				String value = "";
-				while(enumer.hasMoreElements()) {
-					value = value+enumer.nextElement();
+				StringBuffer value = new StringBuffer();
+				while(enum.hasMoreElements()) {
+					value.append(enum.nextElement());
 				}
-				MetadataValueBean mvb = new MetadataValueBean(type, value,"delete");
+				System.out.println("Value is "+value);
+				MetadataValueBean mvb = new MetadataValueBean(type, value.toString(),"delete");
 				arrayList.add(mvb);
 			}
 			data = (MetadataValueBean[])arrayList.toArray(new MetadataValueBean[0]);
 			
-			//Test
-			data = new MetadataValueBean[] {new MetadataValueBean()};
-			
-
-/*			
-			IWUserContext iwuc = IWContext.getInstance();			
-			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(iwuc, IWSlideSession.class);
-			if (startPath != null && startPath.equals("/")) {
-				startPath = "";
-			}
-			if (rootPath != null && rootPath.equals("/")) {
-				rootPath = "";
-			}
-			
-			
-			if (startPath != null) {
-				webDAVPath = startPath;
-				startPath = null;
-			} else if(webDAVPath == null){
-				webDAVPath = "";
-			}
-			
-			if (rootPath != null && webDAVPath.indexOf(rootPath) == -1) {
-				webDAVPath = rootPath;
-			}
-			
-			if (ss.getExistence(webDAVPath)) {
-				data = getDirectoryListing(ss.getWebdavResource(webDAVPath), ss.getWebdavServerURI());
-			} else {
-				data = new WebDAVBean[] { new WebDAVBean("Resource does not exist") };
-			}
-*/		} catch (HttpException ex) {
+		} catch (HttpException ex) {
 			System.out.println("[HTTPException]:"+ex.getMessage());
 			System.out.println("[HTTPException]:"+ex.getReason());
 			System.out.println("[HTTPException]:"+ex.getReasonCode());
@@ -178,50 +115,6 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 		}
 		return data;
 	}
-/*
-	private WebDAVBean[] getDirectoryListing(WebdavExtendedResource headResource, String webDAVServletURL)	throws IOException, HttpException {
-		WebdavResources resources = headResource.listWithDeltaV();//headResource.getChildResources();
-		Enumeration enumer = resources.getResources();
-		Vector v = new Vector();
-		WebDAVBean bean;
-		WebdavExtendedResource resource;
-		String url;
-		if (webDAVPath != null && !"".equals(webDAVPath) && !webDAVPath.equals(rootPath)) {
-			bean = new WebDAVBean();
-			int lastIndex = webDAVPath.lastIndexOf("/");
-			if (lastIndex > 0) {
-				String dotdot = webDAVPath.substring(0, lastIndex);
-				bean.setName("Up to "+dotdot);
-				bean.setWebDavHttpURL(dotdot);
-			} else {
-				bean.setName("Up to /");
-				bean.setWebDavHttpURL("");
-			}
-			bean.setIsReal(false);
-			bean.setIsCollection(true);
-			v.add(bean);
-		}
-		
-		while (enumer.hasMoreElements()) {
-			resource = (WebdavExtendedResource) enumer.nextElement();
-			if (!resource.getDisplayName().startsWith(".")) {
-				bean = new WebDAVBean(resource);
-				url = resource.getPath();
-				url = url.replaceFirst(webDAVServletURL, "");
-				bean.setWebDavHttpURL(url);
-				v.add(bean);
-			}
-		}
-		return (WebDAVBean[]) v.toArray(new WebDAVBean[]{});
-	}
-*/
-	public void setWebDAVPath(String path) {
-		this.webDAVPath = path;
-	}
-	
-	public String getWebDAVPath() {
-		return webDAVPath;
-	}
 	
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
 	}
@@ -237,15 +130,17 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getNumberOfColumns()
 	 */
 	public int getNumberOfColumns() {
-		return 3;
+		return componentIDToken.length;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getUIComponent(java.lang.String, int)
+	 * Returns the UIComponent for the specific object (one for each row) and row
 	 */
 	public UIComponent getUIComponent(String var, int columnIndex) {
 		int index = columnIndex;
 		UIComponent component = null;
+		//For this bean it will be and HtmlOutputText, HtmlInputText or HtmlCommandButton depending on collumn
 		switch (index) {
 			case 0:
 				component = getTypeUIComponent(var);
@@ -260,10 +155,18 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 		return component;
 	}
 
+	/**
+	 * Creates the UIComponent ID based on the object and the idToken provided
+	 */
 	protected String getUIComponentID(String var, String idToken) {
 		return String.valueOf(var + "." + componentIDToken + ".id");
 	}
 
+	/**
+	 * Returns the Metadata type as an HtmlOutputText
+	 * @param var String used to do the lookup for the data bean
+	 * @return UIComponent
+	 */
 	private UIComponent getTypeUIComponent(String var) {
 		UIColumn typeCol = new UIColumn();
 		typeCol.setHeader(ContentBlock.getBundle().getLocalizedText("type"));
@@ -271,10 +174,14 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 		creation.setStyleClass("wf_listtext");
 		typeCol.getChildren().add(creation);
 
-//		HtmlOutputText t = new HtmlOutputText();
-//		t.setStyleClass("wf_listtext");
 		return typeCol;
 	}
+
+	/**
+	 * Returns the Metadata values as an HtmlInputText
+	 * @param var String used to do the lookup for the data bean
+	 * @return UIComponent
+	 */
 	private UIComponent getValuesUIComponent(String var) {
 		UIColumn valuesCol = new UIColumn();
 		valuesCol.setHeader(ContentBlock.getBundle().getLocalizedText("values"));
@@ -283,18 +190,21 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 		valuesCol.getChildren().add(t);
 		return valuesCol;
 	}
+
+	/**
+	 * Returns Delete Button
+	 * @param var String used to do the lookup for the data bean
+	 * @return
+	 */
 	private UIComponent getButtonUIComponent(String var) {
-		//TODO(JJ) Have to change this to create a button instead.
 		UIColumn buttonCol = new UIColumn();
 		buttonCol.setHeader(ContentBlock.getBundle().getLocalizedText("type"));
-//		HtmlOutputText creation = WFUtil.getTextVB(var + ".type");
-//		creation.setStyleClass("wf_listtext");
-//		typeCol.getChildren().add(creation);
 
 		HtmlCommandButton saveButton = localizer.getButtonVB("delete", "delete", this);
 		buttonCol.getChildren().add(saveButton);
 		return buttonCol;
 	}
+	
 	/* (non-Javadoc)
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getHeader(int)
 	 */
