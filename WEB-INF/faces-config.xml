@@ -70,5 +70,55 @@
         <managed-bean-class>com.idega.content.presentation.WebDAVDocumentDeleterMB</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
+    <managed-bean>
+        <managed-bean-name>standardPermissionMatrix</managed-bean-name>
+        <managed-bean-class>com.idega.content.presentation.WebDAVFilePermissionsManagedBean</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+        <managed-property>
+            <property-name>resourceType</property-name>
+            <property-class>int</property-class>
+            <value>0</value>
+        </managed-property>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>rolePermissionMatrix</managed-bean-name>
+        <managed-bean-class>com.idega.content.presentation.WebDAVFilePermissionsManagedBean</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+        <managed-property>
+            <property-name>resourceType</property-name>
+            <property-class>int</property-class>
+            <value>1</value>
+        </managed-property>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>groupPermissionMatrix</managed-bean-name>
+        <managed-bean-class>com.idega.content.presentation.WebDAVFilePermissionsManagedBean</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+        <managed-property>
+            <property-name>resourceType</property-name>
+            <property-class>int</property-class>
+            <value>2</value>
+        </managed-property>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>userPermissionMatrix</managed-bean-name>
+        <managed-bean-class>com.idega.content.presentation.WebDAVFilePermissionsManagedBean</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+        <managed-property>
+            <property-name>resourceType</property-name>
+            <property-class>int</property-class>
+            <value>3</value>
+        </managed-property>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>sharedPermissionMatrix</managed-bean-name>
+        <managed-bean-class>com.idega.content.presentation.WebDAVFilePermissionsManagedBean</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+        <managed-property>
+            <property-name>resourceType</property-name>
+            <property-class>int</property-class>
+            <value>4</value>
+        </managed-property>
+    </managed-bean>
     
 </faces-config>
