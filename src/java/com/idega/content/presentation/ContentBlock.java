@@ -56,7 +56,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 	}
 
 	public void refreshList() {
-		WFUtil.invoke("WebDAVListBean","refresh");
+		WFUtil.invoke("WebDAVListBean","refresh", this, UIComponent.class);
 	}
 
 	public WebdavExtendedResource getWebdavExentededResource(String path) {
