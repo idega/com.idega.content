@@ -118,6 +118,7 @@ comment=Comment
 checkout=Checkout
 checkin=Checkin
 last_modified=Last modified
+folder=Folder
 
 select_a_file_to_upload=Select a file to upload
 give_it_a_name_optional=and give it a name (optional)
