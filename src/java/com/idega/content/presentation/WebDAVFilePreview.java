@@ -12,6 +12,8 @@ import com.idega.webface.WFToolbar;
  * @author <a href="mailto:eiki@idega.is">Eirikur S. Hrafnsson</a>
  */
 public class WebDAVFilePreview extends ContentBlock {
+	
+	public static final String DEFAULT_STYLE_CLASS = "content_file_preview";
 
 	protected void initializeContent() {
 		WebdavExtendedResource resource = getWebdavExtendedResource();
@@ -20,6 +22,7 @@ public class WebDAVFilePreview extends ContentBlock {
 		if (resource != null) {
 			String resourceName = resource.getDisplayName();
 			WFFrame frame = new WFFrame(resourceName,filePath);
+			frame.setStyleClass(DEFAULT_STYLE_CLASS);
 			frame.setToolbar(new WFToolbar());
 			this.getChildren().add(frame);
 		}
