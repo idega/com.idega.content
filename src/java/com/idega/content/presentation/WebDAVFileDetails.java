@@ -27,18 +27,23 @@ public class WebDAVFileDetails extends ContentBlock {
 		WebdavResource resource = getWebdavResource();
 		
 		Table table = new Table();
-		table.setId(this.getId()+"-table");
+		table.setId(this.getId()+"_table");
+		table.setBorder(1);
+		table.setBorderColor("Blue");
 		int row = 1;
 		table.mergeCells(1, row, 2, row);
 		table.add(WFUtil.getText("Document details"));
 		
 		if (resource != null) {
+			String resourceName = resource.getName(); 
+
 			HtmlOutputLink link = new HtmlOutputLink();
 			link.setValue(resource.getPath());
+			link.setId(getId()+"_dl");
 			link.getChildren().add(WFUtil.getText("Download/View"));
 
 			++row;
-			table.add(WFUtil.getText(resource.getName()), 1, row);
+			table.add(WFUtil.getText(resourceName), 1, row);
 			table.add(link, 2, row);
 			
 			
@@ -46,32 +51,34 @@ public class WebDAVFileDetails extends ContentBlock {
 			timer.start();
 			
 			Table vTable = new Table();
+			vTable.setId(table.getId()+"_ver");
+			vTable.setBorder(1);
+			vTable.setBorderColor("Red");
 			int vRow = 1;
+			
+			vTable.add("Version", 2, vRow);
+			vTable.add("User", 3, vRow);
+			vTable.add("Comment", 4, vRow);
 			
 			Enumeration enumer = VersionHelper.getAllVersions(resource);
 			while (enumer.hasMoreElements()) {
 				ResponseEntity element = (ResponseEntity) enumer.nextElement();
 				Enumeration props = element.getProperties();
 				++vRow;
+				vTable.add(resourceName, 1, vRow);
 				while (props.hasMoreElements()) {
 					BaseProperty prop = (BaseProperty) props.nextElement();
 					String propName = prop.getLocalName();
 					int colToAdd = 1;
-					String textToAdd = "";
 					if (propName.equals(VersionHelper.PROPERTY_VERSION_NAME)) { // Version number
 						colToAdd = 2;
-						textToAdd = prop.getPropertyAsString();
+						vTable.setAlignment(colToAdd, vRow, Table.HORIZONTAL_ALIGN_CENTER);
 					} else if (propName.equals(VersionHelper.PROPERTY_CREATOR_DISPLAYNAME)) { 
 						colToAdd = 3;
-						textToAdd = prop.getPropertyAsString();
-						if (textToAdd.equals("unauthenticated")) {
-							textToAdd = "NONE";
-						}
 					} else if (propName.equals(VersionHelper.PROPERTY_VERSION_COMMENT)) {
 						colToAdd = 4;
-						textToAdd = prop.getPropertyAsString();
 					}
-					vTable.add(textToAdd, colToAdd, vRow);
+					vTable.add(prop.getPropertyAsString(), colToAdd, vRow);
 				}
 			}
 			timer.stop();
@@ -88,20 +95,5 @@ public class WebDAVFileDetails extends ContentBlock {
 		} 
 		
 	}
-	
-
-	
-	
-//	WebdavResources rs = VersionHelper.getAllVersions(resource);
-//	Enumeration rsEnum = rs.getResources();
-//
-//
-//	while (rsEnum.hasMoreElements()) {
-//		WebdavResource enumR = (WebdavResource) rsEnum.nextElement();
-//		
-//		versionGrid.getChildren().add(WFUtil.getText(enumR.getDisplayName()));
-//		versionGrid.getChildren().add(WFUtil.getText(enumR.getName()));
-//	}
-
 
 }
