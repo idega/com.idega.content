@@ -17,6 +17,8 @@ import com.idega.webface.WFUtil;
  */
 public class ContentViewer extends WFBlock {
 
+	public static final String PARAMETER_ROOT_FOLDER = "cv_prt";
+	
 	private static String PARAMETER_ACTION = "prm_action";
 	private static String BAR = "cv_f_bar";
 	private static String LIST = "ac_list";
@@ -36,6 +38,8 @@ public class ContentViewer extends WFBlock {
 	private boolean renderWebDAVFilePreview = false;
 	private boolean renderWebDAVNewFolder = false;
 	
+	private String rootFolder = null;
+	
 	public ContentViewer() {
 		super();
 	}
@@ -43,22 +47,20 @@ public class ContentViewer extends WFBlock {
 	protected IWBundle getBundle() {
 		return ContentBlock.getBundle();
 	}
-	
-	
+		
 	public void initializeContent() {	
 
 		WFTitlebar tb = new WFTitlebar();
 		tb.setValueRefTitle(true);
 		tb.setTitleText("WebDAVListBean.webDAVPath");
-//		tb.getChildren().add(title);
 		this.setTitlebar(tb);
 		
-//		setToolbarEmbeddedInTitlebar(false);
-		
-//		setToolbar();
+
 		setToolbarEmbeddedInTitlebar(false);
 		String startFolder = (String) this.getAttributes().get("startFolder");
-		String rootFolder = (String) this.getAttributes().get("rootFolder");
+		if (rootFolder == null) {
+			rootFolder = (String) this.getAttributes().get("rootFolder");
+		}
 		
 		WebDAVList list = new WebDAVList();
 		list.setId(getId()+"_list");
@@ -87,7 +89,12 @@ public class ContentViewer extends WFBlock {
 	
 	public void encodeBegin(FacesContext context) throws IOException {
 		Boolean fileSelected = (Boolean) WFUtil.invoke("WebDAVListBean", "getIsClickedFile");
-		
+
+		String tmp = (String) context.getExternalContext().getRequestParameterMap().get(PARAMETER_ROOT_FOLDER);
+		if (tmp != null) {
+			WFUtil.invoke("WebDAVListBean", "setWebDAVPath", tmp);
+			rootFolder = tmp;
+		}
 		if (LIST.equals(currentAction)) {
 			
 			renderListLink = true;
@@ -237,6 +244,7 @@ public class ContentViewer extends WFBlock {
 		values[6] = new Boolean(renderDetailsLink);
 		values[7] = new Boolean(renderPreviewLink);
 		values[8] = new Boolean(renderNewFolderLink);
+		values[9] = rootFolder;
 		return values;
 	}
 
@@ -251,5 +259,6 @@ public class ContentViewer extends WFBlock {
 		renderDetailsLink = ((Boolean) values[6]).booleanValue();
 		renderPreviewLink = ((Boolean) values[7]).booleanValue();
 		renderPreviewLink = ((Boolean) values[8]).booleanValue();
+		rootFolder = (String) values[9];
 	}
 }
