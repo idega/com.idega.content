@@ -24,10 +24,17 @@
             <roles/>
         </developer>
         <developer>
-            <id>anders</id>
-            <name>Anders Lindman</name>
-            <email>anders.lindman@ncmedia.com</email>
-            <organization></organization>
+            <id>gimmi</id>
+            <name>Grimur Jonsson</name>
+            <email>gimmi@idega.is</email>
+            <organization>idega software</organization>
+            <roles/>
+        </developer>
+        <developer>
+            <id>eiki</id>
+            <name>Eirikur Hrafnsson</name>
+            <email>eiki@idega.is</email>
+            <organization>idega software</organization>
             <roles/>
         </developer>
     </developers>
