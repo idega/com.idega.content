@@ -155,8 +155,10 @@ create_a_folder=Skapa mapp
 
 principal_name=Namn
 privileges_all=Alla
-privileges_Read=Läs
+privileges_read=Läs
 privileges_write=Skriv
+privileges_read_acl=Läs ACL
+privileges_write_acl=Skriv ACL
 principal.all=Alla
 principal.authenticated=Inloggad användare
 principal.unauthenticated=Ej inloggad användare

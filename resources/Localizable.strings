@@ -148,8 +148,10 @@ create_a_folder=Create a folder
 
 principal_name=Name
 privileges_all=All
-privileges_Read=Read
+privileges_read=Read
 privileges_write=Write
+privileges_read_acl=Read ACL
+privileges_write_acl=Write ACL
 principal.all=Everyone
 principal.authenticated=Authenticated
 principal.unauthenticated=Unauthenticated
