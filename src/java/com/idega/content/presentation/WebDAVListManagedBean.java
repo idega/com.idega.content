@@ -61,24 +61,26 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 
 	public UIColumn[] createColumns(String var) {
 				
-		HtmlCommandLink l = new HtmlCommandLink();
-		l.setId(P_ID);
-//		l.setImmediate(true);
-		l.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".name}"));
-		WFUtil.addParameterVB(l, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
-		WFUtil.addParameterVB(l, PARAMETER_IS_FOLDER, var + ".isCollection");
-		l.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
-
 		UIColumn col0 = new UIColumn();
-		col0.setHeader(WFUtil.getText("Icon"));		
 		HtmlGraphicImage icon = new HtmlGraphicImage();
-		//icon.setUrl("/open.gif");
-		icon.setValueBinding("value", WFUtil.createValueBinding("#{"+var+".iconURL}"));
-		col0.getChildren().add(icon);
+		icon.setValueBinding("url", WFUtil.createValueBinding("#{"+var+".iconURL}"));
+		HtmlCommandLink iconLink = new HtmlCommandLink();
+		iconLink.setId(P_ID+"_L");
+		WFUtil.addParameterVB(iconLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
+		WFUtil.addParameterVB(iconLink, PARAMETER_IS_FOLDER, var + ".isCollection");
+		iconLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
+		iconLink.getChildren().add(icon);
+		col0.getChildren().add(iconLink);
 		
 		UIColumn col = new UIColumn();
+		HtmlCommandLink nameLink = new HtmlCommandLink();
+		nameLink.setId(P_ID);
+		nameLink.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".name}"));
+		WFUtil.addParameterVB(nameLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
+		WFUtil.addParameterVB(nameLink, PARAMETER_IS_FOLDER, var + ".isCollection");
+		nameLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
 		col.setHeader(WFUtil.getText("Name"));
-		col.getChildren().add(l);
+		col.getChildren().add(nameLink);
 		
 		UIColumn col2 = new UIColumn();
 		col2.setHeader(WFUtil.getText("Created"));
