@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.10 2005/02/28 17:29:07 gummi Exp $
+ * $Id: ContentViewManager.java,v 1.11 2005/03/03 11:06:25 tryggvil Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -9,7 +9,10 @@
  */
 package com.idega.content.view;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import javax.faces.context.FacesContext;
+import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.view.ApplicationViewNode;
 import com.idega.core.view.DefaultViewNode;
 import com.idega.core.view.ViewManager;
@@ -22,10 +25,10 @@ import com.idega.repository.data.Singleton;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2005/02/28 17:29:07 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/03/03 11:06:25 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class ContentViewManager implements Singleton  {
 
@@ -70,6 +73,11 @@ public class ContentViewManager implements Singleton  {
 	public ViewNode initalizeContentNode(IWBundle contentBundle){
 		ViewNode root = getViewManager().getWorkspaceRoot();
 		DefaultViewNode contentNode = new ApplicationViewNode(CONTENT_ID,root);
+		Collection roles = new ArrayList();
+		roles.add(StandardRoles.ROLE_KEY_EDITOR);
+		roles.add(StandardRoles.ROLE_KEY_AUTHOR);
+		contentNode.setAuthorizedRoles(roles);
+		
 		contentNode.setJspUri(contentBundle.getJSPURI("content.jsp"));
 		contentRootNode = contentNode;
 		return contentRootNode;
