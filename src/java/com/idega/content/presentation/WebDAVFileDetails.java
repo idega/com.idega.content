@@ -33,7 +33,7 @@ public class WebDAVFileDetails extends ContentBlock {
 			HtmlOutputLink link = new HtmlOutputLink();
 			link.setValue(resource.getPath());
 			link.setId(getId() + "_dl");
-			link.getChildren().add(WFUtil.getText("Download"));
+			link.getChildren().add(WFUtil.getText("Download/View"));
 			++row;
 			table.add(WFUtil.getText(resourceName), 1, row);
 			table.add(link, 2, row);
@@ -78,7 +78,7 @@ public class WebDAVFileDetails extends ContentBlock {
 					//vTable.add(resourceName, 1, vRow);
 					String versionName = version.getVersionName();
 					vTable.add(versionName, ++vColumn, vRow);
-					DownloadLink versionPath = new DownloadLink("Download/View");
+					DownloadLink versionPath = new DownloadLink("Download");
 					versionPath.setId("dl_"+vRow);
 					String url = version.getURL();
 					versionPath.setRelativeFilePath(url);
