@@ -180,10 +180,13 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 				tmp = tmp.getParent();
 			}
 		}
-		v.maintainPath(true);
 		
-		if (comp.getAttributes().get(ContentViewer.PARAMETER_ACTION) != null) {
-			v.setRenderFlags((String) comp.getAttributes().get(ContentViewer.PARAMETER_ACTION) ); 
+		if (v != null) {
+			v.maintainPath(true);
+		
+			if (comp.getAttributes().get(ContentViewer.PARAMETER_ACTION) != null) {
+				v.setRenderFlags((String) comp.getAttributes().get(ContentViewer.PARAMETER_ACTION) ); 
+			}
 		}
 
 		
@@ -232,8 +235,10 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 				}
 			}
 			
-			v.setCurrentFolderPath(webDAVPath);
-			v.setCurrentFileName(getClickedFileName());
+			if (v != null) {
+				v.setCurrentFolderPath(webDAVPath);
+				v.setCurrentFileName(getClickedFileName());
+			}
 		}
 		
 	}
@@ -296,19 +301,15 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			nameSortLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
 			nameSortLink.setId(P_ID+"_sortName");
 			col.setHeader(nameSortLink);
-
+			
 			//NameLink for file
 			HtmlOutputLink nameLink = new HtmlOutputLink();
-//			if (onFileClickEventName != null) {
-//				String onClick = onFileClickEventName+"(";
-//				if (onFileClickEventParameter != null) {
-//					
-//				}
-//				ValueBinding yessir = WFUtil.createValueBinding("#{"+var + ".encodedURL}");
-//				onClick += "'#{"+ var + ".encodedURL}')"+yessir;
-//				nameLink.setOnclick(onClick);
-//				System.out.println("onClick = "+onClick);
-//			}
+			
+			if (onFileClickEventName != null) {
+				// Temporary hardcoding (this.href) to the onclick
+				String onClick = onFileClickEventName+"(this.href);return false;";
+				nameLink.setOnclick(onClick);
+			}
 
 			nameLink.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".encodedURL}"));
 			nameLink.setId(P_ID+"_fi");
