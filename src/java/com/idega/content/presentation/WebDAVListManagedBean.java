@@ -41,6 +41,13 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	private static final String P_ID = "wb_list";
 	public static final String PARAMETER_WEB_DAV_URL = "wdurl";
 	public static final String PARAMETER_IS_FOLDER = "isf";
+	private static final String ACTION_SORT = "wdlmb";
+	private static final String SORT_BY_NAME = "name";
+	private static final String SORT_BY_SIZE = "size";
+	private static final String SORT_BY_MODIFICATION_DATE = "modDate";
+	private static final String SORT_BY_NAME_DESC = "name_desc";
+	private static final String SORT_BY_SIZE_DESC = "size_desc";
+	private static final String SORT_BY_MODIFICATION_DATE_DESC = "modDate_desc";
 
 	private String clickedFilePath;
 	private String clickedFileName;
@@ -52,10 +59,14 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	
 	private int startPage = -1;
 	private int rows = -1;
+	private String sorter = SORT_BY_NAME;
 
 	public WebDAVListManagedBean() {
 	}
 	
+	public void resetSorter() {
+		sorter = SORT_BY_NAME;
+	}
 	
 	public void setWebDAVPath(String path) {
 		this.webDAVPath = path;
@@ -102,8 +113,18 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		this.iconTheme = theme;
 	}
 
-	public void refresh() {
+	public void refresh(UIComponent comp) {
+		ContentBlock block = null;
+		while (comp != null && block == null) {
+			if (comp instanceof ContentBlock) {
+				block = (ContentBlock) comp;
+				block.getContentViewer().setEventHandled(true);
+			} else {
+				comp = comp.getParent();
+			}
+		}
 		updateDataModel(new Integer(startPage), new Integer(rows));
+		
 	}
 	
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
@@ -122,45 +143,52 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		v.setEventHandled(true);
 		
 		boolean isFolder = true;
-		if (comp instanceof UICommand) {
-			List children = comp.getChildren();
-			Iterator iter = children.iterator();
-			UIComponent child;
-			UIParameter par;
-			while (iter.hasNext()) {
-				child = (UIComponent) iter.next();
-				if (child instanceof UIParameter) {
-					par = (UIParameter) child;
-					if (PARAMETER_WEB_DAV_URL.equals(par.getName()) ) {
-						webDAVPath = (String) par.getValue();
-					} else if (PARAMETER_IS_FOLDER.equals(par.getName())) {
-						isFolder = ((Boolean) par.getValue()).booleanValue();
+		
+		String sortBy = (String) comp.getAttributes().get(ACTION_SORT);
+		if (sortBy != null) {
+			sorter = sortBy;
+		}
+		else {
+			if (comp instanceof UICommand) {
+				List children = comp.getChildren();
+				Iterator iter = children.iterator();
+				UIComponent child;
+				UIParameter par;
+				while (iter.hasNext()) {
+					child = (UIComponent) iter.next();
+					if (child instanceof UIParameter) {
+						par = (UIParameter) child;
+						if (PARAMETER_WEB_DAV_URL.equals(par.getName()) ) {
+							webDAVPath = (String) par.getValue();
+						} else if (PARAMETER_IS_FOLDER.equals(par.getName())) {
+							isFolder = ((Boolean) par.getValue()).booleanValue();
+						}
+					}
+						
+				}
+	
+			}
+			
+			WFList parent = getWFListParent(comp);
+			
+			if (webDAVPath != null && parent != null) {
+	//			WFList parentList = (WFList) parent;
+				if (isFolder) {
+					this.setClickedFilePath(null);
+	//				this.updateDataModel(new Integer(parentList.getFirst()), new Integer(parentList.getRows()));
+				} else {
+					this.setClickedFilePath(webDAVPath);
+					int index = webDAVPath.lastIndexOf("/");
+					if (index > -1) {
+						clickedFileName = webDAVPath.substring(index+1);
+						webDAVPath = webDAVPath.substring(0, index);
 					}
 				}
-					
 			}
-
+			
+			v.setCurrentFolderPath(webDAVPath);
+			v.setCurrentFileName(getClickedFileName());
 		}
-		
-		WFList parent = getWFListParent(comp);
-		
-		if (webDAVPath != null && parent != null) {
-//			WFList parentList = (WFList) parent;
-			if (isFolder) {
-				this.setClickedFilePath(null);
-//				this.updateDataModel(new Integer(parentList.getFirst()), new Integer(parentList.getRows()));
-			} else {
-				this.setClickedFilePath(webDAVPath);
-				int index = webDAVPath.lastIndexOf("/");
-				if (index > -1) {
-					clickedFileName = webDAVPath.substring(index+1);
-					webDAVPath = webDAVPath.substring(0, index);
-				}
-			}
-		}
-		
-		v.setCurrentFolderPath(webDAVPath);
-		v.setCurrentFileName(getClickedFileName());
 	}
 
 	private WFList getWFListParent(UIComponent comp) {
@@ -194,20 +222,33 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		
 		WFUtil.addParameterVB(iconLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 		WFUtil.addParameterVB(iconLink, PARAMETER_IS_FOLDER, var + ".isCollection");
-//		iconLink.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		iconLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
 		iconLink.getChildren().add(icon);
 		col0.getChildren().add(iconLink);
 		
 		UIColumn col = new UIColumn();
-		col.setHeader(ContentBlock.getBundle().getLocalizedText("name"));
+		HtmlCommandLink nameSortLink = new HtmlCommandLink();
+		HtmlOutputText nameSortText = ContentBlock.getBundle().getLocalizedText("name");
+		if (SORT_BY_NAME.equals(sorter)) {
+			nameSortText.setStyleClass("wf_listheaderlink_clicked");
+			nameSortLink.getAttributes().put(ACTION_SORT, SORT_BY_NAME_DESC);
+		} else if (SORT_BY_NAME_DESC.equals(sorter)) {
+			nameSortText.setStyleClass("wf_listheaderlink_clicked_descending");
+			nameSortLink.getAttributes().put(ACTION_SORT, SORT_BY_NAME);
+		} else {
+			nameSortText.setStyleClass("wf_listheaderlink");
+			nameSortLink.getAttributes().put(ACTION_SORT, SORT_BY_NAME);
+		}
+		nameSortLink.getChildren().add(nameSortText);
+		nameSortLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
+		nameSortLink.setId(P_ID+"_sortName");
+		col.setHeader(nameSortLink);
 		HtmlCommandLink nameLink = new HtmlCommandLink();
 		nameLink.setId(P_ID);
 		nameLink.setStyleClass("wf_listlink");
 		nameLink.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".name}"));
 		WFUtil.addParameterVB(nameLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 		WFUtil.addParameterVB(nameLink, PARAMETER_IS_FOLDER, var + ".isCollection");
-//		nameLink.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		nameLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
 		col.getChildren().add(nameLink);
 		
@@ -218,7 +259,22 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		col2.getChildren().add(creation);
 		
 		UIColumn col3 = new UIColumn();
-		col3.setHeader(ContentBlock.getBundle().getLocalizedText("size"));
+		HtmlCommandLink sizeSortLink = new HtmlCommandLink();
+		HtmlOutputText sizeSortText = ContentBlock.getBundle().getLocalizedText("size");
+		if (SORT_BY_SIZE.equals(sorter)) {
+			sizeSortText.setStyleClass("wf_listheaderlink_clicked");
+			sizeSortLink.getAttributes().put(ACTION_SORT, SORT_BY_SIZE_DESC);
+		} else if (SORT_BY_SIZE_DESC.equals(sorter)) {
+			sizeSortText.setStyleClass("wf_listheaderlink_clicked_descending");
+			sizeSortLink.getAttributes().put(ACTION_SORT, SORT_BY_SIZE);
+		} else {
+			sizeSortText.setStyleClass("wf_listheaderlink");
+			sizeSortLink.getAttributes().put(ACTION_SORT, SORT_BY_SIZE_DESC);
+		}
+		sizeSortLink.getChildren().add(sizeSortText);
+		sizeSortLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
+		sizeSortLink.setId(P_ID+"_sortSize");
+		col3.setHeader(sizeSortLink);
 		HtmlOutputText size = WFUtil.getTextVB(var + ".length");
 		size.setStyleClass("wf_listtext");
 		col3.getChildren().add(size);
@@ -253,7 +309,22 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		col7.getChildren().add(checkedOut);
 		
 		UIColumn col8 = new UIColumn();
-		col8.setHeader(ContentBlock.getBundle().getLocalizedText("last_modified"));
+		HtmlCommandLink modSortLink = new HtmlCommandLink();
+		HtmlOutputText modSortText = ContentBlock.getBundle().getLocalizedText("last_modified");
+		if (SORT_BY_MODIFICATION_DATE.equals(sorter)) {
+			modSortText.setStyleClass("wf_listheaderlink_clicked");
+			modSortLink.getAttributes().put(ACTION_SORT, SORT_BY_MODIFICATION_DATE_DESC);
+		} else if (SORT_BY_MODIFICATION_DATE_DESC.equals(sorter)) {
+			modSortText.setStyleClass("wf_listheaderlink_clicked_descending");
+			modSortLink.getAttributes().put(ACTION_SORT, SORT_BY_MODIFICATION_DATE);
+		} else {
+			modSortText.setStyleClass("wf_listheaderlink");
+			modSortLink.getAttributes().put(ACTION_SORT, SORT_BY_MODIFICATION_DATE_DESC);
+		}
+		modSortLink.getChildren().add(modSortText);
+		modSortLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
+		modSortLink.setId(P_ID+"_sortMod");
+		col8.setHeader(modSortLink);
 		HtmlOutputText modifiedDate = WFUtil.getTextVB(var + ".modifiedDate");
 		modifiedDate.setStyleClass("wf_listtext");
 		col8.getChildren().add(modifiedDate);
@@ -264,7 +335,6 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		delLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isReal}"));
 		delLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.DELETE);
 		WFUtil.addParameterVB(delLink, ContentViewer.PATH_TO_DELETE, var+".webDavUrl");
-//		delLink.getAttributes().put(ContentViewer.PATH_TO_DELETE, WFUtil.invoke(var, "getWebDavUrl"));
 		delLink.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		delLink.setId(P_ID+"_delLink");
 		HtmlGraphicImage delete = new HtmlGraphicImage();
@@ -276,7 +346,6 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		del.getChildren().add(delLink);
 		
 		
-//		return new UIColumn[] { col0, col, col2, col3, col4, col5, col6 ,col7};
 		return new UIColumn[] { col0, col, col3, col5, col6 , col7, col8, del};
 	}
 	
@@ -407,7 +476,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			}
 		}
 		
-		Collections.sort(v, new WebDAVBeanComparator(IWContext.getInstance().getCurrentLocale()));
+		sortResources(v);
 		if (upBean != null) {
 			v.add(0,upBean);
 		}
@@ -415,6 +484,32 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		return (WebDAVBean[]) v.toArray(new WebDAVBean[]{});
 	}
 	
+	private void sortResources(List v) {
+		int sortMethod = 1;
+		boolean desc = false;
+		
+		if (SORT_BY_NAME.equals(sorter)) {
+			sortMethod = WebDAVBeanComparator.SORT_BY_NAME;
+			desc = false;
+		} else if (SORT_BY_NAME_DESC.equals(sorter)) {
+			sortMethod = WebDAVBeanComparator.SORT_BY_NAME;
+			desc = true;
+		} else if (SORT_BY_SIZE.equals(sorter)) {
+			sortMethod = WebDAVBeanComparator.SORT_BY_SIZE;
+			desc = false;
+		} else if (SORT_BY_SIZE_DESC.equals(sorter)) {
+			sortMethod = WebDAVBeanComparator.SORT_BY_SIZE;
+			desc = true;
+		} else if (SORT_BY_MODIFICATION_DATE.equals(sorter)) {
+			sortMethod = WebDAVBeanComparator.SORT_BY_MODIFICATION_DATE;
+			desc = false;
+		} else if (SORT_BY_MODIFICATION_DATE_DESC.equals(sorter)) {
+			sortMethod = WebDAVBeanComparator.SORT_BY_MODIFICATION_DATE;
+			desc = true;
+		}
+		
+		Collections.sort(v, new WebDAVBeanComparator(IWContext.getInstance().getCurrentLocale(), sortMethod, desc));
+	}
 	
 	/* (non-Javadoc)
 	 * @see com.idega.webface.bean.WFListBean#getDataModel()
