@@ -27,7 +27,7 @@
     </managed-bean>
         <managed-bean>
         <managed-bean-name>WebDAVUploadBean</managed-bean-name>
-        <managed-bean-class>com.idega.content.business.WebDAVUploaderBean</managed-bean-class>
+        <managed-bean-class>com.idega.content.business.WebDAVUploadBean</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
 </faces-config>
