@@ -98,7 +98,8 @@ public class WebDAVUploadBean{
 				IWContext iwc = IWContext.getInstance();
 				session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
 
-				WebdavResource webdavResource = session.getWebdavResource(downloadPath);
+				WebdavResource webdavResource = session.getWebdavResource("");
+				webdavResource.setPath(downloadPath);
 				return webdavResource.getExistence();
 			}
 			catch (Exception e){

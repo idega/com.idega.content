@@ -124,9 +124,10 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 
 			
 			IWUserContext iwuc = IWContext.getInstance();			
-			IWSlideSession ss = (IWSlideSession) IBOLookup.getServiceInstance(iwuc.getApplicationContext(), IWSlideSession.class);
+			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(iwuc, IWSlideSession.class);
 
-			WebdavResource resource = ss.getWebdavResource(webDAVPath);
+			WebdavResource resource = ss.getWebdavResource("");
+			resource.setPath(webDAVPath);
 			if (resource.getExistence()) {
 				data = getDirectoryListing(resource, ss.getWebdavServletURL());
 			} else {
