@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVDocumentDeleter.java,v 1.1 2004/12/30 19:07:19 gimmi Exp $
+ * $Id: WebDAVDocumentDeleter.java,v 1.2 2004/12/31 02:50:06 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -23,20 +23,19 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2004/12/30 19:07:19 $ by $Author: gimmi $
+ *  Last modified: $Date: 2004/12/31 02:50:06 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class WebDAVDocumentDeleter extends ContentBlock implements ActionListener {
 
 	private static final String ACTION = "dd_a";
 	private static final String ACTION_YES = "dd_ay";
 	private static final String PARAMETER_PATH = "dd_pp";
-	private Boolean deleted = null;
-	private boolean resourceIsFolder = false;
 	
 	protected void initializeContent() {
+		Boolean deleted = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getDeleted");
 		if (deleted == null) {
 			WebdavExtendedResource resource = super.getWebdavExtendedResource();
 			String path = resource.getPath();
@@ -68,8 +67,9 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 			getChildren().add(table);
 		} else {
 			Table table = new Table();
+			Boolean wasFolder = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getWasFolder");
 			if (deleted.booleanValue()) {
-				if (resourceIsFolder) {
+				if (wasFolder.booleanValue()) {
 					table.add(getText("folder_deleted"));
 				} else {
 					table.add(getText("file_deleted"));
@@ -78,6 +78,8 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 				table.add(getText("deletion_failed"));
 			}
 			getChildren().add(table);
+			ContentViewer viewer = (ContentViewer) getParent().getParent();
+			viewer.setRenderFlags(ContentViewer.LIST);
 		}
 	}
 
@@ -87,10 +89,11 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 		String action = (String) source.getAttributes().get(ACTION);
 		
 		if (ACTION_YES.equals(action)) {
-			System.out.println("ACTION YEAH");
+
 			WebdavExtendedResource res = super.getWebdavExentededResource(path);
 			String parentPath = res.getParentPath();
-			resourceIsFolder = res.isCollection();
+			Boolean wasFolder = new Boolean(res.isCollection());
+			Boolean deleted = null;
 			try {
 				WFUtil.invoke("WebDAVListBean", "setWebDAVPath", parentPath.replaceFirst(getIWSlideSession().getWebdavServerURI(), ""));
 				WFUtil.invoke("WebDAVListBean","setClickedFilePath", null, String.class);
@@ -106,6 +109,8 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 				deleted = new Boolean(false);
 				e.printStackTrace();
 			}
+			WFUtil.invoke("webdavdocumentdeleterbean", "setDeleted", deleted, Boolean.class);
+			WFUtil.invoke("webdavdocumentdeleterbean", "setWasFolder", wasFolder, Boolean.class);
 		}
 	}
 
