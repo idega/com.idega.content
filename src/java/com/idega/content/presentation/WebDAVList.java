@@ -16,7 +16,7 @@ import com.idega.webface.WFList;
  */
 public class WebDAVList extends IWBaseComponent {
 
-	public final static String WEB_DAV_LIST_BEAN_ID = "webDavList";
+	public final static String WEB_DAV_LIST_BEAN_ID = "WebDAVListBean";
 
 	public WebDAVList() {
 	}
