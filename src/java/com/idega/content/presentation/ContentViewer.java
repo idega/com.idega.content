@@ -75,6 +75,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	private boolean useVersionControl = true;
 	private boolean showPermissionTab = true;
 	private boolean showUploadComponent = true;
+	private String onFileClickEvent = null;
 	
 	private String currentFolderPath = null;
 	private String currentFileName = null;
@@ -111,6 +112,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		list.setShowFolders(showFolders);
 		list.setColumnsToHide(columnsToHide);
 		list.setUseVersionControl(useVersionControl);
+		list.setOnFileClickEvent(onFileClickEvent);
 		listBlock.add(list);
 		
 		WFBlock detailsBlock = new WFBlock();
@@ -614,7 +616,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	}
 	
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[23];
+		Object values[] = new Object[24];
 		values[0] = super.saveState(ctx);
 		values[1] = new Boolean(renderWebDAVList);
 		values[2] = new Boolean(renderWebDAVFileDetails);
@@ -638,6 +640,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		values[20] = new Boolean(renderWebDAVUploadeComponent);
 		values[21] = new Boolean(showPermissionTab);
 		values[22] = new Boolean(showUploadComponent);
+		values[23] = onFileClickEvent;
 
 		return values;
 	}
@@ -667,7 +670,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		renderWebDAVUploadeComponent = ((Boolean) values[20]).booleanValue();
 		showPermissionTab = ((Boolean) values[21]).booleanValue();
 		showUploadComponent = ((Boolean) values[22]).booleanValue();
-		
+		onFileClickEvent = ((String) values[23]);
 		maintainPath(true);
 	}
 	/**
@@ -702,17 +705,39 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		this.currentFolderPath = currentFolderPath;
 	}
 	
+	public void setCurrentResourcePath(String resource) {
+		super.setCurrentResourcePath(resource);
+		int index = resource.lastIndexOf("/");
+		if (index > -1) {
+			String path = resource.substring(0, index);
+			setCurrentFolderPath(path);
+			WFUtil.invoke("WebDAVListBean", "setWebDAVPath", path);
+			
+			if (!resource.endsWith("/")) {
+				WFUtil.invoke("WebDAVListBean", "setClickedFilePath", resource);
+				String file = resource.substring(index+1);
+				setCurrentFileName(file);
+			}
+		}
+		
+	}
+	
 	/**
 	 * @return Returns the current resource path.
 	 */
 	public String getCurrentResourcePath() {
-		String path = getCurrentFolderPath();
-		
-		String fileName = getCurrentFileName();
-		if(fileName != null){
-			return path+(("/".equals(path.substring(path.length()-1)))?"":"/")+fileName;
-		} else {
-			return path;
+		if (super.currentResourcePath != null) {
+			return super.currentResourcePath;
+		}
+		else {
+			String path = getCurrentFolderPath();
+			
+			String fileName = getCurrentFileName();
+			if(fileName != null){
+				return path+(("/".equals(path.substring(path.length()-1)))?"":"/")+fileName;
+			} else {
+				return path;
+			}
 		}
 	}
 	
@@ -765,6 +790,15 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	 */
 	public void setShowUploadComponent(boolean showUploadComponent) {
 		this.showUploadComponent = showUploadComponent;
+	}
+	
+	/**
+	 * Set the onClick event, for a file click
+	 * example .setOnFileClickEvent("event([NAME])"); or event([ID]); or just event()
+	 * @param event
+	 */
+	public void setOnFileClickEvent(String event) {
+		this.onFileClickEvent = event;
 	}
 	
 }
