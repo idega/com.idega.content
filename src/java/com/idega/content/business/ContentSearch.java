@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.1 2005/01/17 19:15:20 eiki Exp $
+ * $Id: ContentSearch.java,v 1.2 2005/01/18 10:43:38 gimmi Exp $
  * Created on Jan 17, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -42,11 +42,11 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- *  Last modified: $Date: 2005/01/17 19:15:20 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/01/18 10:43:38 $ by $Author: gimmi $
  * This class implements the Searchable interface and can therefor be used in a Search block for searching contents of the files in webdav.
  * To use it simply register this class as a iw.searchable component in a bundle.
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ContentSearch implements Searchable {
 
@@ -122,9 +122,9 @@ public class ContentSearch implements Searchable {
 			for (int i = 0; i < headers.length; i++) {
 				System.out.println(headers[i].toString());
 			}
-			Enumeration enum = method.getAllResponseURLs();
-			while (enum.hasMoreElements()) {
-				String url = (String) enum.nextElement();
+			Enumeration enumer = method.getAllResponseURLs();
+			while (enumer.hasMoreElements()) {
+				String url = (String) enumer.nextElement();
 				System.out.println(url);
 				results.add(url);
 			}
