@@ -5,7 +5,12 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
+
+import com.idega.business.IBOLookup;
 import com.idega.idegaweb.IWBundle;
+import com.idega.idegaweb.IWUserContext;
+import com.idega.presentation.IWContext;
+import com.idega.slide.business.IWSlideSession;
 import com.idega.webface.WFBlock;
 import com.idega.webface.WFTitlebar;
 import com.idega.webface.WFToolbar;
@@ -92,6 +97,10 @@ public class ContentViewer extends WFBlock {
 
 		String tmp = (String) context.getExternalContext().getRequestParameterMap().get(PARAMETER_ROOT_FOLDER);
 		if (tmp != null) {
+			IWUserContext iwuc = IWContext.getInstance();			
+			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(iwuc, IWSlideSession.class);
+			String webDAVServerURI = ss.getWebdavServerURI();
+			tmp = tmp.replaceFirst(webDAVServerURI, "");
 			WFUtil.invoke("WebDAVListBean", "setWebDAVPath", tmp);
 			rootFolder = tmp;
 		}
