@@ -32,9 +32,13 @@ public class WebDAVList extends IWBaseComponent {
 		String rootFolder = (String) this.getAttributes().get("rootFolder");
 		if (startFolder != null) {
 			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setStartFolder", startFolder);
+		} else {
+			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setStartFolder", "");
 		}
 		if (rootFolder != null) {
 			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setRootFolder", rootFolder);
+		} else {
+			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setRootFolder", "");
 		}
 		
 		this.setId(this.getId());
