@@ -60,5 +60,10 @@
         <managed-bean-class>com.idega.content.presentation.ContentViewerBean</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
+    <managed-bean>
+        <managed-bean-name>webdavfoldercreationbean</managed-bean-name>
+        <managed-bean-class>com.idega.content.presentation.WebDAVFolderCreationMB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
     
 </faces-config>
