@@ -65,21 +65,6 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		return webDAVPath;
 	}
 	
-	public String getVirtualWebDAVPath() {
-		if (rootPath != null) {
-			int index = rootPath.lastIndexOf("/");
-			if (index > -1) {
-				String pre = rootPath.substring(0, index);
-				String virtualWebDAVPath = webDAVPath.replaceFirst(pre, "");
-				return virtualWebDAVPath;
-			} else {
-				return webDAVPath;
-			}
-		} else {
-			return webDAVPath;
-		}
-	}
-	
 	public boolean getIsClickedFile() {
 		return (getClickedFilePath() != null && !("".equals(getClickedFilePath()))  );
 	}
@@ -391,12 +376,19 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			upBean = new WebDAVBean();
 			upBean.setIconTheme(iconTheme);
 			int lastIndex = webDAVPath.lastIndexOf("/");
+			String upTo = ContentBlock.getBundle().getLocalizedString("up_to_parent_folder");
 			if (lastIndex > 0) {
 				String dotdot = webDAVPath.substring(0, lastIndex);
-				upBean.setName("Up to "+dotdot);
+				int lastIndex2 = dotdot.lastIndexOf("/");
+				if (lastIndex2 > -1) {
+					
+					upBean.setName(upTo+" ("+dotdot.substring(lastIndex2+1)+")");
+				} else {
+					upBean.setName(upTo+" ("+dotdot+")");
+				}
 				upBean.setWebDavHttpURL(dotdot);
 			} else {
-				upBean.setName("Up to /");
+				upBean.setName(upTo);
 				upBean.setWebDavHttpURL("");
 			}
 			upBean.setIsReal(false);
