@@ -15,6 +15,11 @@
 		<component-class>com.idega.content.presentation.WebDAVFileDetails</component-class>
 	</component>
 	
+	<component>
+		<component-type>ContentViewer</component-type>
+		<component-class>com.idega.content.presentation.ContentViewer</component-class>
+	</component>
+	
     <managed-bean>
         <managed-bean-name>SessionBean1</managed-bean-name>
         <managed-bean-class>documentmanagementprototype2.SessionBean1</managed-bean-class>
@@ -50,4 +55,10 @@
         <managed-bean-class>com.idega.content.business.WebDAVUploadBean</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
+    <managed-bean>
+        <managed-bean-name>contentviewerbean</managed-bean-name>
+        <managed-bean-class>com.idega.content.presentation.ContentViewerBean</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
 </faces-config>
