@@ -43,7 +43,6 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 	private String clickedFileName;
 	
 	private String webDAVPath = "";
-	private ActionListener actionListener;
 	
 	private int startPage = -1;
 	private int rows = -1;
@@ -226,11 +225,6 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 			}
 		}
 		return (WebDAVBean[]) v.toArray(new WebDAVBean[]{});
-	}
-	
-	public void setActionListener(ActionListener listener) {
-		System.out.println("Adding actionListener tom WebDAVListManagedBean");
-		this.actionListener = listener;
 	}
 	
 	public void setWebDAVPath(String path) {
