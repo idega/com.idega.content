@@ -253,20 +253,9 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 			resource = (WebdavExtendedResource) enumer.nextElement();
 			if (!resource.getDisplayName().startsWith(".")) {
 				bean = new WebDAVBean(resource);
-//				String decoded = resource.getDecodedPath();
-//				String encoded = resource.getEncodedPath();
-//				String path = resource.getPath();
-//				String name = resource.getName();
-//
-//				System.out.println("decoded: "+decoded);
-//				System.out.println("encoded: "+encoded);
-//				System.out.println("path: "+path);
-//				System.out.println("name: "+name);
 				url = resource.getPath();
 				url = url.replaceFirst(webDAVServletURL, "");
 				bean.setWebDavHttpURL(url);
-//				bean.setParentList(this);
-//				System.out.println("[WebDAVManagerBean] " +url);
 				v.add(bean);
 			}
 		}
