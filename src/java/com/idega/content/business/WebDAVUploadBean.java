@@ -2,6 +2,7 @@ package com.idega.content.business;
 
 import java.io.IOException;
 import net.sourceforge.myfaces.custom.fileupload.UploadedFile;
+import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
 import com.idega.core.file.util.MimeTypeUtil;
@@ -89,15 +90,25 @@ public class WebDAVUploadBean{
 			}
 			
 		
-			boolean success = rootResource.mkcolMethod(filePath);
-			System.out.println("Creating folder success "+success);
-			success = rootResource.putMethod(filePath+fileName,uploadFile.getInputStream());
-			System.out.println("Uploading file success "+success);
+			boolean createFolderSuccess = rootResource.mkcolMethod(filePath);
+			System.out.println("Creating folder success "+createFolderSuccess);
+			
+			boolean uploadFileSuccess = false;
+			try {
+				uploadFileSuccess = rootResource.putMethod(filePath+fileName,uploadFile.getInputStream());
+			}
+			catch (HttpException e) {
+				e.printStackTrace();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+			System.out.println("Uploading file success "+uploadFileSuccess);
 			
 			
 			
 			
-			if(success){
+			if(uploadFileSuccess){
 				String contentType = uploadFile.getContentType();
 				downloadPath = filePath+fileName;
 				if(contentType!=null && MimeTypeUtil.getInstance().isImage(contentType)){
@@ -112,6 +123,7 @@ public class WebDAVUploadBean{
 				WFUtil.invoke("WebDAVListBean","refresh");
 			}
 			else{
+				System.err.println("Error code :"+rootResource.getStatusMessage()+", message: "+rootResource.getStatusMessage());
 				return "upload_failed";
 			}
 		
