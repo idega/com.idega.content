@@ -10,6 +10,7 @@ import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIParameter;
 import javax.faces.component.html.HtmlCommandLink;
+import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
@@ -65,6 +66,13 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		WFUtil.addParameterVB(l, PARAMETER_IS_FOLDER, var + ".isCollection");
 		l.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
 
+		UIColumn col0 = new UIColumn();
+		col0.setHeader(WFUtil.getText("Icon"));		
+		HtmlGraphicImage icon = new HtmlGraphicImage();
+		//icon.setUrl("/open.gif");
+		icon.setValueBinding("url", WFUtil.createValueBinding(var+".iconUrl"));
+		col0.getChildren().add(icon);
+		
 		UIColumn col = new UIColumn();
 		col.setHeader(WFUtil.getText("Name"));
 		col.getChildren().add(l);
@@ -90,7 +98,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		col6.getChildren().add(WFUtil.getTextVB(var + ".modifiedDate"));
 
 
-		return new UIColumn[] { col, col3, col4, col5, col6 };
+		return new UIColumn[] { col0, col, col3, col4, col5, col6 };
 	}
 
 	/**
