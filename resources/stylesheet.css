@@ -1,0 +1,60 @@
+body {
+  background-color: white;
+  color: black;
+  font-family: sans-serif;
+  font-size: 0.9em;
+}
+
+/* To fix a bug in visual designer */
+.grid td span {display: block}
+.grid td img {display: block}
+
+
+.label {
+  font-weight: bold;
+}
+
+/* Style rules to make data tables look better */
+
+.list-header {
+  background-color: #eeeeee;
+  font-size: larger;
+  font-weight: bold;
+}
+
+.list-paging-header {
+  text-align: center;
+}
+
+.list-paging-footer {
+  text-align: center;
+}
+
+.list-row-even { 
+}
+
+.list-row-odd { 
+  background-color: #eeeeee;
+}
+
+/* Style rules for message severity levels */
+
+.infoMessage {
+  color: black;
+}
+
+.warnMessage {
+  color: orange;
+  font-weight: bold;
+}
+
+.errorMessage {
+  color: red;
+  font-weight: bold;
+}
+
+.fatalMessage {
+  color: red;
+  font-style: italic;
+  font-weight: bold;
+}

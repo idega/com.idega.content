@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE faces-config PUBLIC
+  "-//Sun Microsystems, Inc.//DTD JavaServer Faces Config 1.0//EN"
+  "http://java.sun.com/dtd/web-facesconfig_1_0.dtd">
+
+<faces-config>
+    <managed-bean>
+        <managed-bean-name>SessionBean1</managed-bean-name>
+        <managed-bean-class>documentmanagementprototype2.SessionBean1</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>listDocuments2</managed-bean-name>
+        <managed-bean-class>documentmanagementprototype2.listDocuments2</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>WebDavTree</managed-bean-name>
+        <managed-bean-class>documentmanagementprototype2.WebDavTreeBean</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>folderTree</managed-bean-name>
+        <managed-bean-class>documentmanagementprototype2.folderTree</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+	
+	
+</faces-config>
