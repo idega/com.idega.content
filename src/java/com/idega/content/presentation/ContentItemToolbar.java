@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.2 2005/03/05 18:45:56 gummi Exp $
+ * $Id: ContentItemToolbar.java,v 1.3 2005/03/07 16:00:54 gummi Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -17,17 +17,20 @@ import java.util.Set;
 import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
+import com.idega.core.accesscontrol.business.AccessController;
+import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.uri.IWActionURIManager;
+import com.idega.presentation.IWContext;
 import com.idega.webface.WFToolbar;
 import com.idega.webface.WFUtil;
 
 
 /**
  * 
- *  Last modified: $Date: 2005/03/05 18:45:56 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/03/07 16:00:54 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
@@ -36,7 +39,7 @@ public class ContentItemToolbar extends WFToolbar {
 	private IWActionURIManager manager = null;
 	
 	private Map actions;
-	private String[] RolesAllowded = new String[] {"content_editor","content_author"};  //Change to use constants
+	private String[] RolesAllowded = new String[] {StandardRoles.ROLE_KEY_ADMIN,StandardRoles.ROLE_KEY_AUTHOR,StandardRoles.ROLE_KEY_EDITOR};
 	private Boolean rendered;
 	
 	/**
@@ -44,6 +47,7 @@ public class ContentItemToolbar extends WFToolbar {
 	 */
 	public ContentItemToolbar() {
 		super();
+		this.setStyleClass("content_item_toolbar");
 	}
 	
 	public IWActionURIManager getIWActionURIManager(){
@@ -149,11 +153,17 @@ public class ContentItemToolbar extends WFToolbar {
         ValueBinding vb = getValueBinding("rendered");
         Boolean v = vb != null ? (Boolean)vb.getValue(getFacesContext()) : null;
         if(v==null){
-        		//check for role
+        		IWContext iwc = IWContext.getInstance();
+        		AccessController ac = iwc.getAccessController();
+        		for (int i = 0; i < RolesAllowded.length; i++) {
+				if(ac.hasRole(RolesAllowded[i],iwc)){
+					return true;
+				}
+			}
         } else {
         		return v.booleanValue();
         }
-        return true; //true when testing, then probably false
+        return false; //true when testing, then probably false
 	}
 	
 	public void setRendered(boolean value){
