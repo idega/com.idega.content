@@ -73,7 +73,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
     private Collection siblings;
     private int siblingCount = 0;
     private Vector children;
-    private int childrenCount = 0;
+    private int childrenCount = -1;
     
     private static int idCounter = 1;
     
@@ -312,10 +312,26 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	 * @see com.idega.core.data.ICTreeNode#getChildCount()
 	 */
 	public int getChildCount() {
-		if (children == null) {
-			getChildren();
+		try {
+			if (childrenCount < 0) {
+				if (getMe() != null) {
+					WebdavResources resources = getMe().getChildResources();
+		  		Enumeration enumer = resources.getResources();
+		  		childrenCount = 0; 
+		  		while (enumer.hasMoreElements()) {
+	    			++childrenCount;
+		  		}
+				} else { 
+					return 0;
+				}
+			}
+			return childrenCount;
+		} catch (HttpException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return childrenCount;
+		return 0;
 	}
 
 	/* (non-Javadoc)
