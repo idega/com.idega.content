@@ -11,8 +11,6 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import com.idega.business.IBOLookup;
-import com.idega.content.business.WebDAVUpload;
-import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
@@ -25,14 +23,15 @@ import com.idega.webface.WFUtil;
 /**
  * @author gimmi
  */
-public class ContentViewer extends WFBlock implements ActionListener{
+public class ContentViewer extends ContentBlock implements ActionListener{
 
 	public static final String PARAMETER_ROOT_FOLDER = "cv_prt";
 	
 	static String PARAMETER_ACTION = "prm_action";
 	private static String BAR = "cv_f_bar";
-	private static String LIST = "ac_list";
+	public static String LIST = "ac_list";
 	private static String FILE_DETAILS = "ac_file_details";
+	private static String FILE_DETAILS_LESS = "ac_less_file_details";
 	private static String PREVIEW = "ac_preview";
 	private static String NEW_FOLDER = "ac_folder";
 	private static String UPLOAD = "ac_upload";
@@ -45,13 +44,11 @@ public class ContentViewer extends WFBlock implements ActionListener{
 	private boolean renderDetailsLink = false;
 	private boolean renderPreviewLink = false;
 	private boolean renderNewFolderLink = true;
-	private boolean renderUploadLink = false;
 	
 	private boolean renderWebDAVList = true;
 	private boolean renderWebDAVFileDetails = false;
 	private boolean renderWebDAVFilePreview = false;
 	private boolean renderWebDAVNewFolder = false;
-	private boolean renderWebDAVUpload = false;
 	private boolean renderWebDAVDeleter = false;
 	
 	private String rootFolder = null;
@@ -60,66 +57,101 @@ public class ContentViewer extends WFBlock implements ActionListener{
 		super();
 	}
 	
-	protected IWBundle getBundle() {
-		return ContentBlock.getBundle();
-	}
-			
 	public void initializeContent() {	
 
 //		String path = (String) WFUtil.invoke("WebDAVListBean", "getWebDAVPath");
 //		if (path == null || "".equals(path)) {
 //			path = "/"
 //		}
-		WFTitlebar tb = new WFTitlebar();
-		tb.setValueRefTitle(true);
-		tb.setTitleText("WebDAVListBean.webDAVPath");
-		this.setTitlebar(tb);
 		
-
-		setToolbarEmbeddedInTitlebar(false);
 		String startFolder = (String) this.getAttributes().get("startFolder");
 		if (rootFolder == null) {
 			rootFolder = (String) this.getAttributes().get("rootFolder");
 		}
-		
+
+		WFBlock listBlock = new WFBlock();
+		WFTitlebar tb = new WFTitlebar();
+		tb.setValueRefTitle(true);
+		tb.setTitleText("WebDAVListBean.webDAVPath");		
+		listBlock.setToolbarEmbeddedInTitlebar(true);
+		listBlock.setTitlebar(tb);
+		listBlock.setToolbar(getToolbar());
+
 		WebDAVList list = new WebDAVList();
 		list.setId(getId()+"_list");
 		list.setRendered(renderWebDAVList);
 		list.setStartFolder(startFolder);
 		list.setRootFolder(rootFolder);
+		listBlock.add(list);
 		
+		WFBlock detailsBlock = new WFBlock();
+		WFTitlebar detailsBar = new WFTitlebar();
+		detailsBar.setTitleText(getBundle().getLocalizedText("document_details"));
+		detailsBlock.setTitlebar(detailsBar);
+		detailsBlock.setToolbar(getToolbar());
 		WebDAVFileDetails details = new WebDAVFileDetails();
 		details.setRendered(renderWebDAVFileDetails);
 		details.setId(getId()+"_details");
+		detailsBlock.add(details);
 		
+		WFBlock previewBlock = new WFBlock();
+		WFTitlebar previewBar = new WFTitlebar();
+		previewBar.setTitleText(getBundle().getLocalizedText("document_details"));
+		previewBlock.setTitlebar(previewBar);
+		previewBlock.setToolbar(getToolbar());
+		WebDAVFileDetails details2 = new WebDAVFileDetails();
+		details2.setRendered(renderWebDAVFilePreview);
+		details2.setId(getId()+"_details");
+		details2.setDetailed(false);
 		WebDAVFilePreview preview = new WebDAVFilePreview();
 		preview.setRendered(renderWebDAVFilePreview);
 		preview.setId(getId()+"_preview");
+		previewBlock.add(details2);
 		
+		WFBlock folderBlock = new WFBlock();
+		WFTitlebar folderBar = new WFTitlebar();
+		folderBar.setTitleText(getBundle().getLocalizedText("create_a_folder"));
+		folderBlock.setTitlebar(folderBar);
+		folderBlock.setToolbar(new WFToolbar());
 		WebDAVFolderCreation folder = new WebDAVFolderCreation();
 		folder.setRendered(renderWebDAVNewFolder);
 		folder.setId(getId()+"_folder");
+		folderBlock.add(folder);
 		
+		WFBlock uploadBlock = new WFBlock();
+		WFTitlebar uploadBar = new WFTitlebar();
+		uploadBar.setTitleText(getBundle().getLocalizedText("upload"));
+		uploadBlock.setTitlebar(uploadBar);
+		uploadBlock.setToolbar(new WFToolbar());
 		WebDAVUpload upload = new WebDAVUpload();
-		upload.setRendered(renderWebDAVUpload);
+//		upload.setRendered(renderWebDAVUpload);
 		upload.setId(getId()+"_upload");
+		uploadBlock.add(upload);
+		
+		WFBlock deleteBlock = new WFBlock();
+		WFTitlebar deleteBar = new WFTitlebar();
+		deleteBar.setTitleText(getBundle().getLocalizedText("delete"));
+		deleteBlock.setTitlebar(deleteBar);
+		deleteBlock.setToolbar(new WFToolbar());
 		
 		WebDAVDocumentDeleter deleter = new WebDAVDocumentDeleter();
 		deleter.setRendered(renderWebDAVDeleter);
 		deleter.setId(getId()+"_deleter");
-		
+		deleteBlock.add(deleter);
 //		getFacets().put(BAR, bar);
 //		getChildren().add(bar);
 //		super.setToolbar(bar);
 		
-		getFacets().put(LIST, list);
-		getFacets().put(FILE_DETAILS, details);
+		getFacets().put(LIST, listBlock);
+		getFacets().put(FILE_DETAILS, detailsBlock);
+		getFacets().put(FILE_DETAILS_LESS, previewBlock);
 		getFacets().put(PREVIEW, preview);
-		getFacets().put(NEW_FOLDER, folder);
-		getFacets().put(UPLOAD, upload);
-		getFacets().put(DELETE, deleter);
+		getFacets().put(NEW_FOLDER, folderBlock);
+		getFacets().put(UPLOAD, uploadBlock);
+		getFacets().put(DELETE, deleteBlock);
 //		getChildren().add(list);
 //		getChildren().add(details);
+//		System.out.println("tmp Eiki");
 	}
 	
 	public void encodeBegin(FacesContext context) throws IOException {
@@ -134,14 +166,14 @@ public class ContentViewer extends WFBlock implements ActionListener{
 			WFUtil.invoke("WebDAVListBean", "setWebDAVPath", tmp);
 			rootFolder = tmp;
 		}
-		if (LIST.equals(currentAction)) {
+		if (LIST.equals(currentAction)) { //currentAction == null || 
 			
 			renderListLink = true;
 			renderDetailsLink = false;
 			renderPreviewLink = false;
-			renderUploadLink = false;
+			renderNewFolderLink = true;
 			
-			super.setToolbar(getToolbar());
+//			super.setToolbar(getToolbar());
 		}
 		else {
 			if (fileSelected.booleanValue()) {
@@ -150,7 +182,6 @@ public class ContentViewer extends WFBlock implements ActionListener{
 				renderDetailsLink = true;
 				renderPreviewLink = true;
 				renderNewFolderLink = false;
-				renderUploadLink = false;
 				
 				if (currentAction == null) {
 					setRenderFlags(FILE_DETAILS);
@@ -159,7 +190,7 @@ public class ContentViewer extends WFBlock implements ActionListener{
 					setRenderFlags(PREVIEW);
 				}
 				
-				super.setToolbar(getToolbar());
+//				super.setToolbar(getToolbar());
 			}
 		}
 		super.encodeBegin(context);
@@ -177,12 +208,20 @@ public class ContentViewer extends WFBlock implements ActionListener{
 		if (list != null) {
 			list.setRendered(renderWebDAVList);
 			renderChild(context, list);
+			((WFBlock)list).setToolbar(getToolbar());
 		}
 		
 		UIComponent details = getFacet(FILE_DETAILS);
 		if (details != null) {
 			details.setRendered(renderWebDAVFileDetails);
 			renderChild(context, details);
+			((WFBlock)details).setToolbar(getToolbar());
+		}
+
+		UIComponent detailsLess = getFacet(FILE_DETAILS_LESS);
+		if (detailsLess != null) {
+			detailsLess.setRendered(renderWebDAVFilePreview);
+			renderChild(context, detailsLess);
 		}
 		
 		UIComponent preview = getFacet(PREVIEW);
@@ -197,18 +236,16 @@ public class ContentViewer extends WFBlock implements ActionListener{
 			renderChild(context, folder);
 		}
 		
-		UIComponent upload = getFacet(UPLOAD);
-		if (upload != null) {
-			upload.setRendered(renderWebDAVUpload);
-			renderChild(context, upload);
-		}
-
 		UIComponent deleter = getFacet(DELETE);
 		if (deleter != null) {
 			deleter.setRendered(renderWebDAVDeleter);
 			renderChild(context, deleter);
 		}
 		
+		UIComponent upload = getFacet(UPLOAD);
+		if (upload != null) {
+			renderChild(context, upload);
+		}
 	}
 		
 	public WFToolbar getToolbar() {
@@ -243,15 +280,7 @@ public class ContentViewer extends WFBlock implements ActionListener{
 		newFolder.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		newFolder.setRendered(renderNewFolderLink);
 		
-		WFToolbarButton upload = new WFToolbarButton("/images/upload.jpg",getBundle());
-		upload.getAttributes().put(PARAMETER_ACTION, UPLOAD);
-		upload.setId(getId()+"_btnUpload");
-		upload.setToolTip("Upload");
-		upload.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
-		upload.setRendered(renderUploadLink);
-
 		bar.addButton(newFolder);
-		bar.addButton(upload);
 		bar.addButton(list);
 		bar.addButton(details);
 		bar.addButton(preview);
@@ -268,7 +297,6 @@ public class ContentViewer extends WFBlock implements ActionListener{
 			WFToolbarButton bSource = (WFToolbarButton) source;
 			String action = (String) bSource.getAttributes().get(PARAMETER_ACTION);
 			if (action != null) {
-				currentAction = action;
 				setRenderFlags(action);
 			}
 		} else if (source instanceof HtmlCommandLink){
@@ -286,22 +314,20 @@ public class ContentViewer extends WFBlock implements ActionListener{
 					}
 				}
 //				String path = (String) ((HtmlCommandLink)source).getAttributes().get(PATH_TO_DELETE);
-				System.out.println("repps = "+path);
-				currentAction = action;
 				setRenderFlags(action);
 			}
 			
 		}
 	}
 
-	private void setRenderFlags(String action) {
+	public void setRenderFlags(String action) {
 		//System.out.println("[ContentViewer] action = "+action);
+		currentAction = action;
 		if (LIST.equals(action)) {
 			renderWebDAVList = true;
 			renderWebDAVFileDetails = false;
 			renderWebDAVFilePreview = false;
 			renderWebDAVNewFolder = false;
-			renderWebDAVUpload = false;
 			renderWebDAVDeleter = false;
 			WFUtil.invoke("WebDAVListBean","setClickedFilePath", null, String.class);
 		} else if (FILE_DETAILS.equals(action)) {
@@ -309,35 +335,24 @@ public class ContentViewer extends WFBlock implements ActionListener{
 			renderWebDAVFileDetails = true;
 			renderWebDAVFilePreview = false;
 			renderWebDAVNewFolder = false;
-			renderWebDAVUpload = false;
 			renderWebDAVDeleter = false;
 		} else if (PREVIEW.equals(action)) {
 			renderWebDAVList = false;
 			renderWebDAVFileDetails = false;
 			renderWebDAVFilePreview = true;
 			renderWebDAVNewFolder = false;
-			renderWebDAVUpload = false;
 			renderWebDAVDeleter = false;
 		}else if (NEW_FOLDER.equals(action)) {
 			renderWebDAVList = true;
 			renderWebDAVFileDetails = false;
 			renderWebDAVFilePreview = false;
 			renderWebDAVNewFolder = true;
-			renderWebDAVUpload = false;
 			renderWebDAVDeleter = false;
-		}else if (UPLOAD.equals(action)) {
+		}else if (DELETE.equals(action)) {
 			renderWebDAVList = true;
 			renderWebDAVFileDetails = false;
 			renderWebDAVFilePreview = false;
 			renderWebDAVNewFolder = false;
-			renderWebDAVUpload = true;
-			renderWebDAVDeleter = false;
-		}else if (DELETE.equals(action)) {
-			renderWebDAVList = false;
-			renderWebDAVFileDetails = false;
-			renderWebDAVFilePreview = false;
-			renderWebDAVNewFolder = false;
-			renderWebDAVUpload = false;
 			renderWebDAVDeleter = true;
 		}
 	}
@@ -354,8 +369,6 @@ public class ContentViewer extends WFBlock implements ActionListener{
 		values[7] = new Boolean(renderPreviewLink);
 		values[8] = new Boolean(renderNewFolderLink);
 		values[9] = rootFolder;
-		values[12] = new Boolean(renderWebDAVUpload);
-		values[13] = new Boolean(renderUploadLink);
 		values[14] = new Boolean(renderWebDAVDeleter);
 		return values;
 	}
@@ -370,10 +383,8 @@ public class ContentViewer extends WFBlock implements ActionListener{
 		renderListLink = ((Boolean) values[5]).booleanValue();
 		renderDetailsLink = ((Boolean) values[6]).booleanValue();
 		renderPreviewLink = ((Boolean) values[7]).booleanValue();
-		renderPreviewLink = ((Boolean) values[8]).booleanValue();
+		renderNewFolderLink = ((Boolean) values[8]).booleanValue();
 		rootFolder = (String) values[9];
-		renderWebDAVUpload = ((Boolean) values[12]).booleanValue();
-		renderUploadLink = ((Boolean) values[13]).booleanValue();
 		renderWebDAVDeleter = ((Boolean) values[14]).booleanValue();
 	}
 }
