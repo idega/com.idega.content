@@ -1,6 +1,7 @@
 package com.idega.content.presentation;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +20,7 @@ import javax.faces.model.DataModel;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.WebdavResources;
 import com.idega.business.IBOLookup;
+import com.idega.content.business.WebDAVBeanComparator;
 import com.idega.content.data.WebDAVBean;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWUserContext;
@@ -369,24 +371,24 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	private WebDAVBean[] getDirectoryListing(WebdavExtendedResource headResource, String webDAVServletURL)	throws IOException, HttpException {
 		WebdavResources resources = headResource.listWithDeltaV();//headResource.getChildResources();
 		Enumeration enumer = resources.getResources();
-		Vector v = new Vector();
+		List v = new Vector();
 		WebDAVBean bean;
+		WebDAVBean upBean = null;
 		WebdavExtendedResource resource;
 		String url;
 		if (webDAVPath != null && !"".equals(webDAVPath) && !webDAVPath.equals(rootPath)) {
-			bean = new WebDAVBean();
+			upBean = new WebDAVBean();
 			int lastIndex = webDAVPath.lastIndexOf("/");
 			if (lastIndex > 0) {
 				String dotdot = webDAVPath.substring(0, lastIndex);
-				bean.setName("Up to "+dotdot);
-				bean.setWebDavHttpURL(dotdot);
+				upBean.setName("Up to "+dotdot);
+				upBean.setWebDavHttpURL(dotdot);
 			} else {
-				bean.setName("Up to /");
-				bean.setWebDavHttpURL("");
+				upBean.setName("Up to /");
+				upBean.setWebDavHttpURL("");
 			}
-			bean.setIsReal(false);
-			bean.setIsCollection(true);
-			v.add(bean);
+			upBean.setIsReal(false);
+			upBean.setIsCollection(true);
 		}
 		
 		while (enumer.hasMoreElements()) {
@@ -399,6 +401,12 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 				v.add(bean);
 			}
 		}
+		
+		Collections.sort(v, new WebDAVBeanComparator(IWContext.getInstance().getCurrentLocale()));
+		if (upBean != null) {
+			v.add(0,upBean);
+		}
+
 		return (WebDAVBean[]) v.toArray(new WebDAVBean[]{});
 	}
 	
