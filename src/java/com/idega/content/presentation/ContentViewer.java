@@ -56,6 +56,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	private boolean renderWebDAVDeleter = false;
 	
 	private String rootFolder = null;
+	private boolean eventHandled = false;
 	
 	public ContentViewer() {
 		super();
@@ -77,13 +78,15 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		if (rootFolder == null) {
 			rootFolder = (String) this.getAttributes().get("rootFolder");
 		}
+//		rootFolder ="/files/shared";
 
 		WFBlock listBlock = new WFBlock();
 		WFTitlebar tb = new WFTitlebar();
-//		tb.setValueRefTitle(true);
+
 		tb.addTitleText(getBundle().getLocalizedText("document_list"));
 		tb.addTitleText(" (");
-		tb.addTitleText("WebDAVListBean.webDAVPath", true);
+		tb.addTitleText("WebDAVListBean.virtualWebDAVPath", true);
+//		tb.addTitleText("WebDAVListBean.webDAVPath", true);
 		tb.addTitleText(")");
 		listBlock.setToolbarEmbeddedInTitlebar(true);
 		listBlock.setTitlebar(tb);
@@ -130,7 +133,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WFTitlebar folderBar = new WFTitlebar();
 		folderBar.addTitleText(getBundle().getLocalizedText("create_a_folder"));
 		folderBar.addTitleText(" (");
-		folderBar.addTitleText("WebDAVListBean.webDAVPath", true);
+		folderBar.addTitleText("WebDAVListBean.virtualWebDAVPath", true);
 		folderBar.addTitleText(")");
 		folderBlock.setTitlebar(folderBar);
 		folderBlock.setToolbar(new WFToolbar());
@@ -143,7 +146,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WFTitlebar uploadBar = new WFTitlebar();
 		uploadBar.addTitleText(getBundle().getLocalizedText("upload"));
 		uploadBar.addTitleText(" (");
-		uploadBar.addTitleText("WebDAVListBean.webDAVPath", true);
+		uploadBar.addTitleText("WebDAVListBean.virtualWebDAVPath", true);
 		uploadBar.addTitleText(")");
 		uploadBlock.setTitlebar(uploadBar);
 		uploadBlock.setToolbar(new WFToolbar());
@@ -195,6 +198,10 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	}
 	
 	public void encodeBegin(FacesContext context) throws IOException {
+		if (!eventHandled) {
+			WFUtil.invoke("WebDAVListBean", "setClickedFilePath", null, String.class);
+		}
+		
 		Boolean fileSelected = (Boolean) WFUtil.invoke("WebDAVListBean", "getIsClickedFile");
 
 		String tmp = (String) context.getExternalContext().getRequestParameterMap().get(PARAMETER_ROOT_FOLDER);
@@ -364,6 +371,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			if (action != null) {
 				setRenderFlags(action);
 			}
+			setEventHandled(true);
 		} else if (source instanceof HtmlCommandLink){
 			String action = (String) ((HtmlCommandLink)source).getAttributes().get(PARAMETER_ACTION);
 			if (DELETE.equals(action)) {
@@ -381,8 +389,16 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 //				String path = (String) ((HtmlCommandLink)source).getAttributes().get(PATH_TO_DELETE);
 				setRenderFlags(action);
 			}
-			
+			setEventHandled(true);
 		}
+	}
+	
+	protected void setEventHandled(boolean handled) {
+		this.eventHandled = handled;
+	}
+	
+	protected boolean getEventHandled() {
+		return eventHandled;
 	}
 
 	public void setRenderFlags(String action) {
