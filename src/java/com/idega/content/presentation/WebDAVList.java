@@ -25,6 +25,7 @@ public class WebDAVList extends IWBaseComponent {
 	private boolean showFolders = true;
 	private Collection columnsToHide = null;
 	private boolean useVersionControl = true;
+	private String onFileClickEvent = null;
 	
 	public WebDAVList() {
 	}
@@ -45,6 +46,11 @@ public class WebDAVList extends IWBaseComponent {
 			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setIconTheme", iconTheme);
 		} else {
 			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setIconTheme", "");
+		}
+		if (onFileClickEvent != null) {
+			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setOnFileClickEvent", onFileClickEvent);
+		} else {
+			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setOnFileClickEvent", "");
 		}
 		
 		WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setShowFolders", new Boolean(showFolders));
@@ -85,6 +91,10 @@ public class WebDAVList extends IWBaseComponent {
 	
 	public void setUseVersionControl(boolean useVersionControl) {
 		this.useVersionControl = useVersionControl;
+	}
+	
+	public void setOnFileClickEvent(String event) {
+		this.onFileClickEvent = event;
 	}
 	
 	public void encodeChildren(FacesContext context) throws IOException{
