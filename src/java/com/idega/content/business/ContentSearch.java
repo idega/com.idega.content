@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.6 2005/01/20 02:47:26 eiki Exp $
+ * $Id: ContentSearch.java,v 1.7 2005/01/20 14:03:17 eiki Exp $
  * Created on Jan 17, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -25,6 +25,7 @@ import org.apache.commons.httpclient.HttpURL;
 import org.apache.webdav.lib.PropertyName;
 import org.apache.webdav.lib.WebdavState;
 import org.apache.webdav.lib.methods.SearchMethod;
+import org.apache.webdav.lib.search.CompareOperator;
 import org.apache.webdav.lib.search.SearchException;
 import org.apache.webdav.lib.search.SearchExpression;
 import org.apache.webdav.lib.search.SearchRequest;
@@ -46,11 +47,12 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- *  Last modified: $Date: 2005/01/20 02:47:26 $ by $Author: eiki $
- * This class implements the Searchplugin interface and can therefore be used in a Search block for searching contents of the files in the iwfile system.
+ *  Last modified: $Date: 2005/01/20 14:03:17 $ by $Author: eiki $
+ * This class implements the Searchplugin interface and can therefore be used in a Search block (com.idega.core.search)<br>
+ *  for searching contents and properties (metadata) of the files in the iwfile system.
  * To use it simply register this class as a iw.searchable component in a bundle.
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class ContentSearch implements SearchPlugin {
 
@@ -59,8 +61,11 @@ public class ContentSearch implements SearchPlugin {
 	
 	public static final String SEARCH_TYPE = "document";
 
+
 	static final PropertyName DISPLAYNAME = new PropertyName("DAV:", "displayname");
 	static final PropertyName LASTMODIFIED = new PropertyName("DAV:", "getlastmodified");
+	static final PropertyName CREATOR_DISPLAY_NAME = new PropertyName("DAV:", "creator-displayname");
+	static final PropertyName COMMENT = new PropertyName("DAV:", "comment");
 	
 	private IWMainApplication iwma = null;
 	private HttpURL httpURL;
@@ -132,17 +137,7 @@ public class ContentSearch implements SearchPlugin {
 		try {
 			IWSlideSession session = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(), IWSlideSession.class);
 			String servletMapping = session.getWebdavServerURI();
-			SearchRequest s = new SearchRequest();
-			s.addSelection(DISPLAYNAME);
-			s.addSelection(LASTMODIFIED);
-			s.addScope(new SearchScope("files"));
 			String queryString = ((SimpleSearchQuery)searchQuery).getSimpleSearchQuery();
-			SearchExpression expression = s.contains(queryString);
-			s.setWhereExpression(expression);
-			String search = s.asString();
-			System.out.println(search);
-			SearchMethod method = new SearchMethod(servletMapping, search);
-
 			HttpClient client = new HttpClient();
 			client.setState(new WebdavState());
 			HostConfiguration hostConfig = client.getHostConfiguration();
@@ -155,29 +150,18 @@ public class ContentSearch implements SearchPlugin {
 	            clientState.setCredentials(null, httpURL.getHost(),hostCredentials);
 	            clientState.setAuthenticationPreemptive(true);
 	        }
-			        
-			        
-			int state = client.executeMethod(method);
-			System.out.println("State: " + state);
-			Header[] headers = method.getResponseHeaders();
-			for (int i = 0; i < headers.length; i++) {
-				System.out.println(headers[i].toString());
-			}
-			Enumeration enum = method.getAllResponseURLs();
+	        
+	        
+			String content = getContentSearch(queryString);
+			SearchMethod contentSearch = new SearchMethod(servletMapping, content);
+
+			String property = getPropertySearch(queryString);
+			SearchMethod propertySearch = new SearchMethod(servletMapping, property);
 			
-			while (enum.hasMoreElements()) {
-				String fileURI = (String) enum.nextElement();
-				if(!fileURI.equalsIgnoreCase(servletMapping)){
-					BasicSearchResult result = new BasicSearchResult();
-					
-					result.setSearchResultType(SEARCH_TYPE);
-					result.setSearchResultURI(fileURI);
-					result.setSearchResultName(URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/")+1)));
-					result.setSearchResultExtraInformation(URLDecoder.decode(fileURI.substring(0,fileURI.lastIndexOf("/")+1)));
-					
-					results.add(result);
-				}
-			}
+			        
+			        
+			executeSearch(results, servletMapping, contentSearch, client);
+			executeSearch(results, servletMapping, propertySearch, client);
 			
 			searcher.setSearchResults(results);
 		}
@@ -195,6 +179,57 @@ public class ContentSearch implements SearchPlugin {
 		}
 		
 		return searcher;
+	}
+
+	protected String getContentSearch(String queryString) throws SearchException {
+		SearchRequest s = new SearchRequest();
+		//s.addSelection(DISPLAYNAME);
+		s.addSelection(LASTMODIFIED);
+		s.addScope(new SearchScope("files"));
+		
+		SearchExpression expression = s.contains(queryString);
+		s.setWhereExpression(expression);
+		String search = s.asString();
+		//System.out.println(search);
+		return search;
+	}
+	
+	protected String getPropertySearch(String queryString) throws SearchException {
+		SearchRequest s = new SearchRequest();
+		//s.addSelection(DISPLAYNAME);
+		s.addSelection(LASTMODIFIED);
+		s.addScope(new SearchScope("files"));
+		SearchExpression expression = s.or( s.compare(CompareOperator.LIKE, DISPLAYNAME,"%"+queryString+"%"),
+				s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME,"%"+queryString+"%"),s.compare(CompareOperator.LIKE, COMMENT,"%"+queryString+"%")) );
+		//add other properties
+		s.setWhereExpression(expression);
+		String search = s.asString();
+		//System.out.println(search);
+		return search;
+	}
+
+	protected void executeSearch(List results, String servletMapping, SearchMethod method, HttpClient client) throws IOException, HttpException {
+		int state = client.executeMethod(method);
+		System.out.println("State: " + state);
+		Header[] headers = method.getResponseHeaders();
+		for (int i = 0; i < headers.length; i++) {
+			System.out.println(headers[i].toString());
+		}
+		Enumeration enum = method.getAllResponseURLs();
+		
+		while (enum.hasMoreElements()) {
+			String fileURI = (String) enum.nextElement();
+			if(!fileURI.equalsIgnoreCase(servletMapping)){
+				BasicSearchResult result = new BasicSearchResult();
+				
+				result.setSearchResultType(SEARCH_TYPE);
+				result.setSearchResultURI(fileURI);
+				result.setSearchResultName(URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/")+1)));
+				result.setSearchResultExtraInformation(URLDecoder.decode(fileURI.substring(0,fileURI.lastIndexOf("/")+1)));
+				
+				results.add(result);
+			}
+		}
 	}
 
 	/* (non-Javadoc)
