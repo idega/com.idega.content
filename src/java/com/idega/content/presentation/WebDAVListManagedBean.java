@@ -70,7 +70,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		HtmlGraphicImage icon = new HtmlGraphicImage();
 		icon.setValueBinding("url", WFUtil.createValueBinding("#{"+var+".iconURL}"));
 		icon.setId(P_ID+"_I");
-		icon.setHeight("32");// sizes that make sense 16/32/64/128
+		icon.setHeight("16");// sizes that make sense 16/32/64/128
 
 		HtmlCommandLink iconLink = new HtmlCommandLink();
 		iconLink.setId(P_ID+"_L");
@@ -120,7 +120,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		lock.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isLocked}"));
 		lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/locked.gif");
 		lock.setId(P_ID+"_lock");
-		lock.setHeight("32");// sizes that make sense 16/32/64/128
+		lock.setHeight("16");// sizes that make sense 16/32/64/128
 
 		UIColumn col6 = new UIColumn();
 		col6.setHeader(WFUtil.getText("Lock"));
