@@ -202,7 +202,7 @@ public class ContentViewer extends WFBlock {
 	}
 
 	private void setRenderFlags(String action) {
-		System.out.println("[ContentViewer] action = "+action);
+		//System.out.println("[ContentViewer] action = "+action);
 		if (LIST.equals(action)) {
 			renderWebDAVList = true;
 			renderWebDAVFileDetails = false;
