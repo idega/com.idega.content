@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataListManagedBean.java,v 1.4 2005/01/18 14:07:02 joakim Exp $
+ * $Id: MetadataListManagedBean.java,v 1.5 2005/01/24 17:26:34 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -12,6 +12,7 @@ package com.idega.content.presentation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Iterator;
 import javax.faces.component.UIColumn;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
@@ -23,6 +24,7 @@ import javax.faces.event.ActionListener;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
+import com.idega.content.business.MetadataUtil;
 import com.idega.content.data.MetadataValueBean;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
@@ -37,10 +39,10 @@ import com.idega.webface.bean.WFListBean;
 
 /**
  * 
- * Last modified: $Date: 2005/01/18 14:07:02 $ by $Author: joakim $
+ * Last modified: $Date: 2005/01/24 17:26:34 $ by $Author: joakim $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class MetadataListManagedBean extends AbstractWFEditableListManagedBean implements WFListBean, ActionListener {
 
@@ -71,28 +73,34 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 	
 			WebdavRootResource rootResource = session.getWebdavRootResource();
-			//TODO (JJ) have to fetch the filepath
-			String filePath = resourcePath;
+
+			String filePath = service.getURI(resourcePath);
 			
 //			IWUserContext iwuc = IWContext.getInstance();
 //	    	String root = iwuc.getApplicationContext().getIWMainApplication().getApplicationContextURI();
 
-			System.out.println("Resource path is "+service.getWebdavServerURI()+filePath+" # of metadata types:"+WebDAVMetadata.metadataType.length);
-			rootResource.proppatchMethod(service.getWebdavServerURI()+filePath,new PropertyName("DAV:","keywords").toString(),"Test",true);
-			for(int i=0;i<WebDAVMetadata.metadataType.length;i++) {
-				String type = WebDAVMetadata.metadataType[i];
-				System.out.println("Type is "+type);
-				
+			//Debug
+//			System.out.println("Resource path is "+filePath+" # of metadata types:"+MetadataUtil.getMetadataTypes().size());
+//			rootResource.proppatchMethod(filePath,new PropertyName("DAV:","keywords"),"Test",true);
+			
+			Iterator iter = MetadataUtil.getMetadataTypes().iterator();
+			while(iter.hasNext()) {
+				String type = (String)iter.next();
+//			for(int i=0;i<WebDAVMetadata.metadataType.length;i++) {
+//				String type = WebDAVMetadata.metadataType[i];
+//				System.out.println("Type is "+type);
 
-				Enumeration enum = rootResource.propfindMethod(service.getWebdavServerURI()+filePath,new PropertyName("DAV:",type).toString());
+				Enumeration enum = rootResource.propfindMethod(filePath,new PropertyName("DAV",type).toString());
 	
 				StringBuffer value = new StringBuffer();
 				while(enum.hasMoreElements()) {
 					value.append(enum.nextElement());
 				}
-				System.out.println("Value is "+value);
-				MetadataValueBean mvb = new MetadataValueBean(type, value.toString(),"delete");
-				arrayList.add(mvb);
+//				System.out.println("Value is "+value);
+				if(value.length()>0) {
+					MetadataValueBean mvb = new MetadataValueBean(type, value.toString(),"delete");
+					arrayList.add(mvb);
+				}
 			}
 			data = (MetadataValueBean[])arrayList.toArray(new MetadataValueBean[0]);
 			
@@ -117,6 +125,36 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	}
 	
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
+		UIComponent comp = actionEvent.getComponent();
+//		UIComponent comp = actionEvent.getSource();
+		String var = (String)comp.getAttributes().get("var");
+		resourcePath = (String)comp.getAttributes().get("resourcePath");
+//		System.out.println("var = "+var);
+		String type = WFUtil.getStringValue(var,"type");
+//		System.out.println("About to delete type "+type);
+		
+		try {
+
+			IWContext iwc = IWContext.getInstance();
+			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+	
+			WebdavRootResource rootResource = session.getWebdavRootResource();
+
+			String filePath = service.getURI(resourcePath);
+//			System.out.println("Filepath = "+filePath);
+			rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),"",true);
+		} catch (HttpException ex) {
+			ex.printStackTrace();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} catch (NullPointerException ex) {
+			ex.printStackTrace();
+		}
+//		UIComponent tmp = comp.getParent();
+//		while ( tmp != null) {
+//			tmp = tmp.getParent();
+//		}
 	}
 
 	/* (non-Javadoc)
@@ -170,6 +208,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	private UIComponent getTypeUIComponent(String var) {
 		UIColumn typeCol = new UIColumn();
 		typeCol.setHeader(ContentBlock.getBundle().getLocalizedText("type"));
+		//TODO This probably has to be localized
 		HtmlOutputText creation = WFUtil.getTextVB(var + ".type");
 		creation.setStyleClass("wf_listtext");
 		typeCol.getChildren().add(creation);
@@ -186,7 +225,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 		UIColumn valuesCol = new UIColumn();
 		valuesCol.setHeader(ContentBlock.getBundle().getLocalizedText("values"));
 		HtmlInputText t = WFUtil.getInputText("metadatavalues", var + ".metadatavalues");
-		t.setStyleClass("wf_listtext");
+//		t.setStyleClass("wf_listtext");
 		valuesCol.getChildren().add(t);
 		return valuesCol;
 	}
@@ -200,8 +239,11 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 		UIColumn buttonCol = new UIColumn();
 		buttonCol.setHeader(ContentBlock.getBundle().getLocalizedText("type"));
 
-		HtmlCommandButton saveButton = localizer.getButtonVB("delete", "delete", this);
-		buttonCol.getChildren().add(saveButton);
+		HtmlCommandButton deleteButton = localizer.getButtonVB("delete", "delete", this);
+		deleteButton.getAttributes().put("var",var);
+		deleteButton.getAttributes().put("resourcePath",resourcePath);
+		
+		buttonCol.getChildren().add(deleteButton);
 		return buttonCol;
 	}
 	
