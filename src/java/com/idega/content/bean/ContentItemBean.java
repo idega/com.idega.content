@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.2 2005/02/21 16:12:45 gummi Exp $
+ * $Id: ContentItemBean.java,v 1.3 2005/03/01 11:22:30 gummi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -47,10 +47,10 @@ import com.idega.webface.WFUtil;
 /**
  * Bean for idegaWeb content items.   
  * <p>
- * Last modified: $Date: 2005/02/21 16:12:45 $ by $Author: gummi $
+ * Last modified: $Date: 2005/03/01 11:22:30 $ by $Author: gummi $
  *
  * @author Anders Lindman
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 
 public abstract class ContentItemBean implements Serializable, ICFile, ContentItem {
@@ -83,6 +83,7 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	public final static String FIELDNAME_ATTACHMENT = "attachment";
 	public final static String FIELDNAME_CREATION_DATE = "creation_date";
 	public final static String FIELDNAME_RESOURCE_PATH = "resource_path";
+	private Boolean doRender = Boolean.TRUE;
 
 	/**
 	 * Default constructor.
@@ -538,6 +539,18 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	
 	public String getResourcePath() {
 		return (String)getValue(FIELDNAME_RESOURCE_PATH);
+	}
+	
+	public Boolean getRendered() {
+		return doRender;
+	}
+	
+	public void setRendered(boolean render){
+		setRendered(Boolean.valueOf(render));
+	}
+	
+	public void setRendered(Boolean render){
+		doRender = render;
 	}
 
 	/* (non-Javadoc)

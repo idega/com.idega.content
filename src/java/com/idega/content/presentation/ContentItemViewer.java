@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.4 2005/02/27 15:14:24 eiki Exp $
+ * $Id: ContentItemViewer.java,v 1.5 2005/03/01 11:22:30 gummi Exp $
  * Created on 26.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -30,10 +30,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/27 15:14:24 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/03/01 11:22:30 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ContentItemViewer extends WFContainer {
 	
@@ -286,9 +286,6 @@ public class ContentItemViewer extends WFContainer {
 	}	
 	
 
-	/**
-	 * @param author The author to set.
-	 */
 	public void setValue(String fieldName, Object value) {
 		if(value!=null){
 			setLocalValueHasChanged(fieldName, (value.equals(getFieldLocalValue(fieldName))));
@@ -298,6 +295,17 @@ public class ContentItemViewer extends WFContainer {
 		setFieldLocalValue(fieldName,value);
 	}
 	
+
+	public boolean isRendered() {
+		ContentItem item = getContentItem();
+		if (item != null){
+			Boolean renderd = item.getRendered();
+			if(renderd!=null){
+				return renderd.booleanValue();
+			}
+		}
+		return super.isRendered();
+	}
 	
 	
 	

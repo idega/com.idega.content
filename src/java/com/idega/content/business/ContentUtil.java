@@ -1,5 +1,5 @@
 /*
- * $Id: ContentUtil.java,v 1.6 2005/02/21 16:12:45 gummi Exp $
+ * $Id: ContentUtil.java,v 1.7 2005/03/01 11:22:30 gummi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -16,10 +16,10 @@ import com.idega.presentation.IWContext;
 
 /**
  * 
- * Last modified: $Date: 2005/02/21 16:12:45 $ by $Author: gummi $
+ * Last modified: $Date: 2005/03/01 11:22:30 $ by $Author: gummi $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class ContentUtil {
 	public static final String CONTENT_PATH = "/files/cms";
@@ -47,5 +47,24 @@ public class ContentUtil {
 	
 	public static String getContentRootPath(){
 		return CONTENT_PATH;
+	}
+	
+	public static String getParentPath(String path){
+//		if(null!=path) {
+//			return new File(path).getParent();
+//		}
+		if (path == null) {
+			if (path != null) {
+				int index = path.lastIndexOf("/");
+				if (index == 0) {
+					path = "";
+				} else {
+					path = path.substring(0, index);
+				}
+			} else {
+				return null;
+			}
+		}
+		return path;
 	}
 }

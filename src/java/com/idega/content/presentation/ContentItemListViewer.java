@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.3 2005/02/22 15:11:31 gummi Exp $
+ * $Id: ContentItemListViewer.java,v 1.4 2005/03/01 11:22:30 gummi Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -24,10 +24,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/22 15:11:31 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/03/01 11:22:30 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class ContentItemListViewer extends UIData {
 
@@ -105,6 +105,7 @@ public class ContentItemListViewer extends UIData {
 	protected void addContentItemViewer(ContentItemViewer viewer){
 		UIColumn c = new UIColumn();
 		viewer.setContentItemValueBinding(getVar()+".contentItem");  //binded with ContentItemBindingBean#getContentItem()
+		WFUtil.setValueBinding(viewer,"rendered",getVar()+".rendered");
 		c.getChildren().add(viewer);
 		this.getChildren().add(c);
 	}
