@@ -127,7 +127,7 @@ checkout=Checka ut
 checkin=Checka in
 last_modified=Senast ändrad
 
-select_a_file_to_upload=Välj fil fšr att ladda upp
+select_a_file_to_upload=Välj fil för att ladda upp
 give_it_a_name_optional=Ange nytt filnamn (valfritt)
 version_comment=Ange kommentar med version (valfritt)
 select_folder_optional=Ange mapp som filen ska hamna i (valfritt)
