@@ -28,7 +28,6 @@ import com.idega.slide.util.WebdavResourceVersion;
 import com.idega.util.FileUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.Timer;
-import com.idega.webface.WFList;
 import com.idega.webface.WFUtil;
 
 /**
@@ -41,8 +40,8 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 	private static String ACTION_CHECK_OUT = "checkout";
 	private static String ACTION_CHECK_IN = "checkin";
 	private static String ACTION_UNCHECK_OUT = "uncheckout";
-	private static String METADATA_LIST_BEAN = "MetadataList";
-	private static String METADATA_BEAN = "Metadata";
+	private static final String METADATA_LIST_BEAN = "MetadataList";
+	private static final String METADATA_BEAN = "Metadata";
 	
 	private static final String PARAMETER_RESOURCE_PATH = "wfd_prp";
 	private boolean detailed = true;
@@ -188,21 +187,11 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 					}
 				}
 				
-				
-				++row;
-				table.mergeCells(1, row, 2, row);
-				table.add(ContentBlock.getBundle().getLocalizedText("metadata"), 1, row);
-
-				WFList list = new WFList(METADATA_LIST_BEAN);
-				++row;
-				table.mergeCells(1, row, 2, row);
-				table.add(list, 1, row);
-				
+				//Metadata
 				WebDAVMetadata metadataUI = new WebDAVMetadata(getCurrentResourcePath());
 				++row;
 				table.mergeCells(1, row, 2, row);
 				table.add(metadataUI, 1, row);
-				System.out.println("ResPath "+getCurrentResourcePath());
 								
 				if (useVersionControl) {
 					//Then add the version table
@@ -214,12 +203,6 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 				}
 			}
 			this.getChildren().add(table);
-			//Added by Tryggvi, should later be implemented
-//			String path = getChosenFilePath();
-//			WebDAVMetadata metadataList = new WebDAVMetadata();
-//			metadataList.setFilePath(path);
-//			add(metadataList);
-			//this.getChildren().add(new WebDAVMetadata().getMetadataTable());
 		}
 	}
 
