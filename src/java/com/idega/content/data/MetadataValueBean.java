@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataValueBean.java,v 1.2 2005/01/14 11:50:27 joakim Exp $
+ * $Id: MetadataValueBean.java,v 1.3 2005/01/18 17:44:31 gummi Exp $
  * 
  * Copyright (C) 2004 Idega. All Rights Reserved.
  * 
@@ -15,12 +15,12 @@ import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
  * 
- * Last modified: $Date: 2005/01/14 11:50:27 $ by $Author: joakim $
+ * Last modified: $Date: 2005/01/18 17:44:31 $ by $Author: gummi $
  * 
  * @author Joakim Johnson
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class MetadataValueBean implements WFEditableListDataBean{
+public class MetadataValueBean implements WFEditableListDataBean {
 
 	public static final String PROP_TYPE = "type";
 	public static final String PROP_VALUES = "values";
@@ -86,5 +86,12 @@ public class MetadataValueBean implements WFEditableListDataBean{
 
 	public Object[] getValues() {
 		return column;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.webface.bean.WFEditableListDataBean#getRendered()
+	 */
+	public Boolean getRendered() {
+		return Boolean.TRUE;
 	}
 }

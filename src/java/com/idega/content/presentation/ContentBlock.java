@@ -9,6 +9,7 @@ import javax.faces.context.FacesContext;
 import org.apache.commons.httpclient.HttpException;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.content.business.ContentUtil;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWBaseComponent;
@@ -24,8 +25,6 @@ public abstract class ContentBlock extends IWBaseComponent {
 
 	private WebdavExtendedResource resource = null;
 
-	public static final String IW_BUNDLE_IDENTIFIER = "com.idega.content";
-
 	private static IWBundle bundle = null;
 	private IWSlideSession slideSession;
 	
@@ -35,16 +34,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 	protected abstract void initializeContent();
 
 	public static IWBundle getBundle() {
-		if (bundle == null) {
-			setupBundle();
-		}
-		return bundle;
-	}
-
-	private static void setupBundle() {
-		FacesContext context = FacesContext.getCurrentInstance();
-		IWContext iwContext = IWContext.getIWContext(context);
-		bundle = iwContext.getIWMainApplication().getBundle(IW_BUNDLE_IDENTIFIER);
+		return ContentUtil.getBundle();
 	}
 
 	protected WebdavExtendedResource getWebdavExtendedResource() {

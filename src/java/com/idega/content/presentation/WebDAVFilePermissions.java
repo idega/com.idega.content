@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissions.java,v 1.2 2005/01/12 11:56:54 gummi Exp $
+ * $Id: WebDAVFilePermissions.java,v 1.3 2005/01/18 17:44:31 gummi Exp $
  * Created on 29.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -12,16 +12,17 @@ package com.idega.content.presentation;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
+import com.idega.content.business.ContentUtil;
 import com.idega.webface.WFList;
 import com.idega.webface.WFUtil;
 
 
 /**
  * 
- *  Last modified: $Date: 2005/01/12 11:56:54 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/01/18 17:44:31 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class WebDAVFilePermissions extends ContentBlock {
 
@@ -32,7 +33,7 @@ public class WebDAVFilePermissions extends ContentBlock {
 	private static final String BEANID_USER_MATRIX = "userPermissionMatrix";
 	private static final String BEANID_SHARED_MATRIX_BEAN = "sharedPermissionMatrix";
 	
-	private String[] permissionMatrixIDs = new String[] {BEANID_STANDARD_MATRIX,BEANID_ROLE_MATRIX,BEANID_GROUP_MATRIX,BEANID_USER_MATRIX};
+	private String[] permissionMatrixIDs = new String[] {BEANID_STANDARD_MATRIX,BEANID_ROLE_MATRIX,BEANID_GROUP_MATRIX,BEANID_USER_MATRIX,BEANID_SHARED_MATRIX_BEAN};
 	
 	public WebDAVFilePermissions(){
 	}
@@ -44,10 +45,23 @@ public class WebDAVFilePermissions extends ContentBlock {
 		
 		
 		String resourcePath = getCurrentResourcePath();
+		if(resourcePath!=null){
+			WFUtil.invoke(BEANID_SHARED_MATRIX_BEAN, "setResourcePath", resourcePath);
+		} else {
+			System.err.println("[WARNING]["+getClass().getName()+"]: resource path is null");
+		}
 		initializePermissionMatirx(BEANID_STANDARD_MATRIX,"permissionmatrix.standard",resourcePath);
 		initializePermissionMatirx(BEANID_ROLE_MATRIX,"permissionmatrix.roles",resourcePath);
-		initializePermissionMatirx(BEANID_GROUP_MATRIX,"permissionmatrix.groups",resourcePath);
-		initializePermissionMatirx(BEANID_USER_MATRIX,"permissionmatrix.users",resourcePath);
+//		initializePermissionMatirx(BEANID_GROUP_MATRIX,"permissionmatrix.groups",resourcePath);
+//		
+//		HtmlCommandButton addButton = new HtmlCommandButton();
+//		addButton.setId(BEANID_GROUP_MATRIX+".add_principal");
+//		addButton.setStyleClass("permission_add_button");
+//		addButton.setValue("+");
+////		getBundle().getLocalizedUIComponent("add", addButton);
+//		getChildren().add(addButton);
+		
+//		initializePermissionMatirx(BEANID_USER_MATRIX,"permissionmatrix.users",resourcePath);
 		
 		
 		HtmlCommandButton refreshButton = new HtmlCommandButton();
@@ -75,19 +89,19 @@ public class WebDAVFilePermissions extends ContentBlock {
 		
 		WFList pMatrix = new WFList(beanID);
 		pMatrix.setId(beanID);
+		pMatrix.setListStyleClass(ContentUtil.MODULE_PREFIX+"permission_matrix");
+		pMatrix.setRowClasses("cms_permission_listoddrow,cms_permission_listevenrow");
 		
 		HtmlOutputText headerStandard = getBundle().getLocalizedText(headerLocalizedKey);
 		headerStandard.setId(beanID+".title");
+		headerStandard.setStyleClass(ContentUtil.MODULE_PREFIX+"permission_matrix_header");
 
-		HtmlCommandButton addButton = new HtmlCommandButton();
-		addButton.setId(beanID+".add_principal");
-		addButton.setStyleClass("permission_add_button");
-		addButton.setValue("+");
-//		getBundle().getLocalizedUIComponent("add", addButton);
+		
+
 		
 		getChildren().add(headerStandard);
 		getChildren().add(pMatrix);
-		getChildren().add(addButton);
+		
 
 	}	
 	

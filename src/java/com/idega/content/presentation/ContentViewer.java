@@ -65,7 +65,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	private String iconTheme = null;
 	private boolean showFolders = true;
 	private Collection columnsToHide = null;
-	private boolean eventHandled = false;
+	private boolean maintainPath = false;
 	private boolean useVersionControl = true;
 	
 	private String currentFolderPath = null;
@@ -244,7 +244,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			rootFolder = (String) this.getAttributes().get("rootFolder");
 		}
 
-		if (!eventHandled) {
+		if (!maintainPath) {
 			WFUtil.invoke("WebDAVListBean", "resetSorter");
 			WFUtil.invoke("WebDAVListBean", "setClickedFilePath", null, String.class);
 			WFUtil.invoke("WebDAVListBean", "setWebDAVPath", rootFolder, String.class);
@@ -442,7 +442,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 					}
 				}
 			}
-			setEventHandled(true);
+			maintainPath(true);
 		} else if (source instanceof HtmlCommandLink){
 			String action = (String) ((HtmlCommandLink)source).getAttributes().get(PARAMETER_ACTION);
 			if (DELETE.equals(action)) {
@@ -460,16 +460,16 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 //				String path = (String) ((HtmlCommandLink)source).getAttributes().get(PATH_TO_DELETE);
 				setRenderFlags(action);
 			}
-			setEventHandled(true);
+			maintainPath(true);
 		}
 	}
 	
-	protected void setEventHandled(boolean handled) {
-		this.eventHandled = handled;
+	protected void maintainPath(boolean maintain) {
+		this.maintainPath = maintain;
 	}
 	
-	protected boolean getEventHandled() {
-		return eventHandled;
+	protected boolean getMaintainPath() {
+		return maintainPath;
 	}
 
 	public void setRenderFlags(String action) {
@@ -568,6 +568,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		showFolders = ((Boolean) values[17]).booleanValue();
 		columnsToHide = ((Collection) values[18]);
 		useVersionControl = ((Boolean) values[19]).booleanValue();
+		
+		maintainPath(true);
 	}
 	/**
 	 * @return Returns the currentFileName.

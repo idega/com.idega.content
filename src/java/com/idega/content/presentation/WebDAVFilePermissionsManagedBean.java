@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissionsManagedBean.java,v 1.3 2005/01/12 11:53:17 gummi Exp $ Created
+ * $Id: WebDAVFilePermissionsManagedBean.java,v 1.4 2005/01/18 17:44:31 gummi Exp $ Created
  * on 29.12.2004
  * 
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -11,27 +11,27 @@ package com.idega.content.presentation;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIInput;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.component.html.HtmlSelectOneMenu;
 import javax.faces.event.AbortProcessingException;
 import org.apache.commons.httpclient.HttpException;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.content.business.ContentUtil;
 import com.idega.content.business.WebDAVFilePermissionResource;
-import com.idega.content.data.ACEBean;
 import com.idega.presentation.IWContext;
 import com.idega.webface.bean.AbstractWFEditableListManagedBean;
 import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
  * 
- * Last modified: $Date: 2005/01/12 11:53:17 $ by $Author: gummi $
+ * Last modified: $Date: 2005/01/18 17:44:31 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListManagedBean {
 
@@ -48,7 +48,7 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 
 	private String _resourcePath = null;
 
-	private int minRows = 20;
+	private int minRows = 5;
 	/**
 	 *  
 	 */
@@ -97,10 +97,19 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 					aces = resource.getAllAces(_resourcePath);
 					break;
 			}
-				
+			
+			if(aces.size() < minRows){
+				Collection tmp = aces;
+				aces = new ArrayList();  //!!!!!! Swaping collection behind the aces variable;
+				aces.addAll(tmp);
+				EmptyRow emptyRow = new EmptyRow();
+				for(int i = aces.size(); i <= minRows; i++){
+					aces.add(emptyRow);
+				}
+			}
 				
 			if (aces != null) {
-				WFEditableListDataBean[] toReturn =  (WFEditableListDataBean[])aces.toArray(new ACEBean[aces.size()]);
+				WFEditableListDataBean[] toReturn =  (WFEditableListDataBean[])aces.toArray(new WFEditableListDataBean[aces.size()]);
 				return toReturn;
 			}
 		}
@@ -167,6 +176,7 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 	private UIComponent getPrincipalUIComponent(String var) {
 		HtmlOutputText t = new HtmlOutputText();
 		t.setStyleClass("wf_listtext");
+//		t.setStyleClass(ContentConstants.MODULE_PREFIX+"permission_list_text");
 		return t;
 	}
 
@@ -194,7 +204,8 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 	}
 	
 	private UIComponent getPrivilegesUIComponent(String var) {
-		UIInput radio = new HtmlSelectOneMenu();		
+		HtmlSelectOneMenu radio = new HtmlSelectOneMenu();		
+		radio.setStyleClass(ContentUtil.MODULE_PREFIX+"permission_list_input");
 		return radio;
 	}
 

@@ -157,7 +157,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		while (comp != null && block == null) {
 			if (comp instanceof ContentBlock) {
 				block = (ContentBlock) comp;
-				block.getContentViewer().setEventHandled(true);
+				block.getContentViewer().maintainPath(true);
 			} else {
 				comp = comp.getParent();
 			}
@@ -179,7 +179,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 				tmp = tmp.getParent();
 			}
 		}
-		v.setEventHandled(true);
+		v.maintainPath(true);
 		
 		if (comp.getAttributes().get(ContentViewer.PARAMETER_ACTION) != null) {
 			v.setRenderFlags((String) comp.getAttributes().get(ContentViewer.PARAMETER_ACTION) ); 
