@@ -10,9 +10,10 @@
     <f:view>
     		<w:workspace_page id="1234">
 			<h:form id="form1">
+				<c:ContentViewer id="gt"/>
+ 	       		<!--
  	       		<c:WebDAVList id="giT"/>
  	       		<c:WebDAVFileDetails id="id" webDAVPath="#{WebDAVListBean.getClickedFilePath}"/>
- 	       		<!--
  	       		<c:WebDAVFileDetails id="id" webDAVPath="#{WebDAVListBean.webDAVPath}"/>
  	       		<cmf:inputFileUpload id="fileupload"
                                        accept="*"
