@@ -41,7 +41,8 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 	private static String ACTION_CHECK_OUT = "checkout";
 	private static String ACTION_CHECK_IN = "checkin";
 	private static String ACTION_UNCHECK_OUT = "uncheckout";
-	private static String METADATA_BEAN = "MetadataList";
+	private static String METADATA_LIST_BEAN = "MetadataList";
+	private static String METADATA_BEAN = "Metadata";
 	
 	private static final String PARAMETER_RESOURCE_PATH = "wfd_prp";
 	private boolean detailed = true;
@@ -52,6 +53,8 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 		//For Metadata
 		String resourcePath = getCurrentResourcePath();
 		if(resourcePath!=null){
+			System.out.println("Initialize. Setting resourcePath to "+resourcePath);
+			WFUtil.invoke(METADATA_LIST_BEAN, "setResourcePath", resourcePath);
 			WFUtil.invoke(METADATA_BEAN, "setResourcePath", resourcePath);
 		} else {
 			System.err.println("[WARNING]["+getClass().getName()+"]: resource path can not be restored for managed beans");
@@ -185,11 +188,21 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 					}
 				}
 				
-				WFList list = new WFList("MetadataList");
 				
 				++row;
 				table.mergeCells(1, row, 2, row);
+				table.add(ContentBlock.getBundle().getLocalizedText("metadata"), 1, row);
+
+				WFList list = new WFList(METADATA_LIST_BEAN);
+				++row;
+				table.mergeCells(1, row, 2, row);
 				table.add(list, 1, row);
+				
+				WebDAVMetadata metadataUI = new WebDAVMetadata(getCurrentResourcePath());
+				++row;
+				table.mergeCells(1, row, 2, row);
+				table.add(metadataUI, 1, row);
+				System.out.println("ResPath "+getCurrentResourcePath());
 								
 				if (useVersionControl) {
 					//Then add the version table
@@ -350,6 +363,8 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 		//For Metadata
 		String resourcePath = getCurrentResourcePath();
 		if(resourcePath!=null){
+			System.out.println("Restore. Setting resourcePath to "+resourcePath);
+			WFUtil.invoke(METADATA_LIST_BEAN, "setResourcePath", resourcePath);
 			WFUtil.invoke(METADATA_BEAN, "setResourcePath", resourcePath);
 		} else {
 			System.err.println("[WARNING]["+getClass().getName()+"]: resource path can not be restored for managed beans");
