@@ -54,6 +54,7 @@ public class WebDAVUploadBean{
 		WebdavRootResource rootResource = session.getWebdavRootResource();
 		String filePath = service.getWebdavServerURI()+getUploadFilePath();
 		String uploadName = uploadFile.getName();
+		String contentType = uploadFile.getContentType();
 		String fileName = uploadName;
 		if(!"".equals(name)){
 			fileName = name;
@@ -69,7 +70,11 @@ public class WebDAVUploadBean{
 		
 		downloadPath = filePath+fileName;
 		String contextUri = iwc.getIWMainApplication().getApplicationContextURI();
-		imagePath = downloadPath.substring(downloadPath.indexOf(contextUri)+contextUri.length());
+		if(contentType!=null && contentType.startsWith("image")){
+			imagePath = downloadPath.substring(downloadPath.indexOf(contextUri)+contextUri.length());
+		}
+		
+		
 		
 		boolean success = rootResource.mkcolMethod(filePath);
 		System.out.println("Creating folder success "+success);
