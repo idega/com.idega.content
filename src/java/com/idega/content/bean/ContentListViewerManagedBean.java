@@ -1,5 +1,5 @@
 /*
- * $Id: ContentListViewerManagedBean.java,v 1.1 2005/02/07 10:59:41 gummi Exp $
+ * $Id: ContentListViewerManagedBean.java,v 1.2 2005/02/21 16:12:45 gummi Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -16,10 +16,10 @@ import com.idega.content.presentation.ContentItemViewer;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/07 10:59:41 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/02/21 16:12:45 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public interface ContentListViewerManagedBean {
 	/**
@@ -35,5 +35,6 @@ public interface ContentListViewerManagedBean {
 	 */
 	public List getAttachmentViewers();
 	public void setResourcePath(String path);
+	public void setDetailsViewerPath(String path);
 	
 }

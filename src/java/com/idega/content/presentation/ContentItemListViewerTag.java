@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewerTag.java,v 1.1 2005/02/07 10:59:41 gummi Exp $
+ * $Id: ContentItemListViewerTag.java,v 1.2 2005/02/21 16:12:45 gummi Exp $
  * Created on 31.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -16,15 +16,16 @@ import com.idega.content.presentation.ContentItemListViewer;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/07 10:59:41 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/02/21 16:12:45 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ContentItemListViewerTag extends UIComponentTag {
 
 	String resourcePath;
 	String managedBeanId;
+	String detailsViewerPath;
 	
 	/**
 	 * 
@@ -55,6 +56,7 @@ public class ContentItemListViewerTag extends UIComponentTag {
 			ContentItemListViewer viewer = ((ContentItemListViewer)component);
 			viewer.setBeanIdentifier(managedBeanId);
 			viewer.setResourcePath(resourcePath);
+			viewer.setDetailsViewerPath(detailsViewerPath);
 		}
 	}
 	
@@ -72,5 +74,17 @@ public class ContentItemListViewerTag extends UIComponentTag {
 	
 	public String getBeanIdentifier() {
 		return managedBeanId;
+	}
+	/**
+	 * @return Returns the detailsViewerPath.
+	 */
+	public String getDetailsViewerPath() {
+		return detailsViewerPath;
+	}
+	/**
+	 * @param detailsViewerPath The detailsViewerPath to set.
+	 */
+	public void setDetailsViewerPath(String detailsViewerPath) {
+		this.detailsViewerPath = detailsViewerPath;
 	}
 }

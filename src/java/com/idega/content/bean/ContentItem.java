@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItem.java,v 1.1 2005/02/07 10:59:41 gummi Exp $
+ * $Id: ContentItem.java,v 1.2 2005/02/21 16:12:45 gummi Exp $
  * Created on 28.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -9,15 +9,16 @@
  */
 package com.idega.content.bean;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 
 /**
  * 
- *  Last modified: $Date: 2005/02/07 10:59:41 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/02/21 16:12:45 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public interface ContentItem {
 	public Object getValue(String fieldName);
@@ -25,4 +26,8 @@ public interface ContentItem {
 	public List getAttachments();
 	public String[] getContentFieldNames();
 	public String getContentItemPrefix();
+	
+	public Timestamp getCreationDate();
+	public String getResourcePath();
+	
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemFieldViewer.java,v 1.1 2005/02/07 10:59:41 gummi Exp $
+ * $Id: ContentItemFieldViewer.java,v 1.2 2005/02/21 16:12:45 gummi Exp $
  * Created on 3.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -11,7 +11,6 @@ package com.idega.content.presentation;
 
 import java.io.IOException;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 import com.idega.util.RenderUtils;
@@ -19,10 +18,10 @@ import com.idega.webface.WFContainer;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/07 10:59:41 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/02/21 16:12:45 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 
 public class ContentItemFieldViewer extends WFContainer {
@@ -70,23 +69,23 @@ public class ContentItemFieldViewer extends WFContainer {
 	        return vb != null ? (String)vb.getValue(getFacesContext()) : null;
 	    }
 		
-		public UIOutput getPrefixComponent(){
+		public UIComponent getPrefixComponent(){
 			WFContainer c = (WFContainer)getFacet(FACET_PREFIX);
 			if(c!=null){
-				return (UIOutput)c.getFacet(FACET_CONTAINED_COMPONENT);
+				return (UIComponent)c.getFacet(FACET_CONTAINED_COMPONENT);
 			} else {
 				return null;
 			}
 		}
 		
-		public UIOutput getMainComponent(){
-			return (UIOutput)getFacet(FACET_VALUE);
+		public UIComponent getMainComponent(){
+			return (UIComponent)getFacet(FACET_VALUE);
 		}
 		
-		public UIOutput getSuffixComponent(){
+		public UIComponent getSuffixComponent(){
 			WFContainer c = (WFContainer)getFacet(FACET_SUFFIX);
 			if(c!=null){
-				return (UIOutput)c.getFacet(FACET_CONTAINED_COMPONENT);
+				return (UIComponent)c.getFacet(FACET_CONTAINED_COMPONENT);
 			} else {
 				return null;
 			}

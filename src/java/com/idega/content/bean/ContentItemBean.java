@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.1 2005/02/07 10:59:41 gummi Exp $
+ * $Id: ContentItemBean.java,v 1.2 2005/02/21 16:12:45 gummi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -47,10 +47,10 @@ import com.idega.webface.WFUtil;
 /**
  * Bean for idegaWeb content items.   
  * <p>
- * Last modified: $Date: 2005/02/07 10:59:41 $ by $Author: gummi $
+ * Last modified: $Date: 2005/02/21 16:12:45 $ by $Author: gummi $
  *
  * @author Anders Lindman
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 
 public abstract class ContentItemBean implements Serializable, ICFile, ContentItem {
@@ -82,6 +82,7 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	
 	public final static String FIELDNAME_ATTACHMENT = "attachment";
 	public final static String FIELDNAME_CREATION_DATE = "creation_date";
+	public final static String FIELDNAME_RESOURCE_PATH = "resource_path";
 
 	/**
 	 * Default constructor.
@@ -507,6 +508,9 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 		WebdavExtendedResource webdavResource = session.getWebdavResource(path);
 		webdavResource.setProperties();
 		
+		//here I don't use the varible 'path' since it can actually be the URI
+		setResourcePath(webdavResource.getPath());
+		
 		String createDate = webdavResource.getCreationDateString();
 		if(createDate != null){
 			setCreationDate(new IWTimestamp(createDate).getTimestamp());
@@ -530,6 +534,10 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	 */
 	public Timestamp getCreationDate() {
 		return (Timestamp)getValue(FIELDNAME_CREATION_DATE);
+	}
+	
+	public String getResourcePath() {
+		return (String)getValue(FIELDNAME_RESOURCE_PATH);
 	}
 
 	/* (non-Javadoc)
@@ -634,6 +642,10 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	public void setCreationDate(Timestamp date) {
 		setValue(FIELDNAME_CREATION_DATE,date);
 		setItemType(ContentItemField.FIELD_TYPE_TIMESTAMP);
+	}
+	
+	public void setResourcePath(String path) {
+		setValue(FIELDNAME_RESOURCE_PATH,path);
 	}
 
 	/* (non-Javadoc)

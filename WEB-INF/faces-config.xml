@@ -155,6 +155,11 @@
 	          <renderer-type>content_list_viewer</renderer-type>
 	          <renderer-class>com.idega.content.renderkit.ContentListViewerRenderer</renderer-class>
 	     </renderer>
+	     <renderer>
+	          <component-family>iw_content</component-family>
+	          <renderer-type>content_item_viewer</renderer-type>
+	          <renderer-class>com.idega.content.renderkit.ContentItemViewerRenderer</renderer-class>
+	     </renderer>
 	</render-kit>
     
 </faces-config>

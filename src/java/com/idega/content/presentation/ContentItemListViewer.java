@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.1 2005/02/07 10:59:41 gummi Exp $
+ * $Id: ContentItemListViewer.java,v 1.2 2005/02/21 16:12:45 gummi Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -17,21 +17,23 @@ import javax.faces.component.UIData;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 import com.idega.content.bean.ContentItem;
+import com.idega.content.business.ContentUtil;
 import com.idega.webface.WFUtil;
 import com.idega.webface.model.WFDataModel;
 
 
 /**
  * 
- *  Last modified: $Date: 2005/02/07 10:59:41 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/02/21 16:12:45 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ContentItemListViewer extends UIData {
 
 	private String managedBeanId;
 	private String resourcePath;
+	private String detailsViewerPath;
 
 	private String _styleClass;
 	private String _style;
@@ -41,6 +43,7 @@ public class ContentItemListViewer extends UIData {
 	private WFDataModel model=null;
 	
 	private static final String DEFAULT_RENDERER_TYPE = "content_list_viewer";
+	private boolean initialized = false;
 
 	/**
 	 * 
@@ -68,7 +71,15 @@ public class ContentItemListViewer extends UIData {
 		String var = managedBeanId + "_var";
 		setVar(var);
 		
+
+		notifyManagedBeanOfResourcePath(this.resourcePath);
+		notifyManagedBeanOfDetailsViewerPath(this.detailsViewerPath);
+		
+	}
+	
+	protected void initializeInEncodeBegin(){
 		ContentItemViewer viewer = (ContentItemViewer)WFUtil.invoke(this.managedBeanId,"getContentViewer");
+		viewer.setShowRequestedItem(false);
 		addContentItemViewer(viewer);
 		
 		List attachementViewers = (List)WFUtil.invoke(this.managedBeanId,"getAttachmentViewers");
@@ -79,8 +90,12 @@ public class ContentItemListViewer extends UIData {
 				addAttachmentViewer(attachmentViewer,index);
 			}
 		}
-		
-		notifyManagedBeanOfResourcePath(this.resourcePath);
+		initialized = true;
+	}
+	
+	
+	public String getFamily(){
+		return ContentUtil.FAMILY_CONTENT;
 	}
 	
 	public void setResourcePath(String path){
@@ -121,6 +136,9 @@ public class ContentItemListViewer extends UIData {
 	}
 	
 	public void encodeBegin(FacesContext context) throws IOException{
+		if(!initialized){
+			initializeInEncodeBegin();
+		}
 		super.encodeBegin(context);
 	}
 	
@@ -130,10 +148,6 @@ public class ContentItemListViewer extends UIData {
 	
 	public void encodeEnd(FacesContext context) throws IOException{
 		super.encodeEnd(context);
-	}
-	
-	public String getFamily(){
-		return "iw_content";
 	}
 	
 	public String getDefultStyleClass(){
@@ -203,7 +217,7 @@ public class ContentItemListViewer extends UIData {
 	 * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
 	 */
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[7];
+		Object values[] = new Object[9];
 		values[0] = super.saveState(ctx);
 		values[1] = this.managedBeanId;
 		values[2] = this.resourcePath;
@@ -211,6 +225,8 @@ public class ContentItemListViewer extends UIData {
 		values[4] = _style;
 		values[5] = _columnClasses;
 		values[6] = _rowClasses;
+		values[7] = detailsViewerPath;
+		values[8] = Boolean.valueOf(initialized);
 		return values;
 	}
 	
@@ -226,8 +242,11 @@ public class ContentItemListViewer extends UIData {
 		this._style = (String) values[4];
 		this._columnClasses = (String) values[5];
 		this._rowClasses = (String) values[6];
+		this.detailsViewerPath = (String)values[7];
+		this.initialized = ((Boolean)values[8]).booleanValue();
 		
 		notifyManagedBeanOfResourcePath(resourcePath);
+		notifyManagedBeanOfDetailsViewerPath(detailsViewerPath);
 		
 	}
 
@@ -237,6 +256,15 @@ public class ContentItemListViewer extends UIData {
 	private void notifyManagedBeanOfResourcePath(String resourcePath) {
 		if(this.managedBeanId!=null){
 			WFUtil.invoke(this.managedBeanId,"setResourcePath",resourcePath,String.class);
+		}
+	}
+	
+	/**
+	 * @param resourcePath
+	 */
+	private void notifyManagedBeanOfDetailsViewerPath(String path) {
+		if(this.managedBeanId!=null){
+			WFUtil.invoke(this.managedBeanId,"setDetailsViewerPath",path,String.class);
 		}
 	}
 
@@ -266,4 +294,17 @@ public class ContentItemListViewer extends UIData {
 		
 	}
 	
+	/**
+	 * @return Returns the detailsViewerPath.
+	 */
+	public String getDetailsViewerPath() {
+		return detailsViewerPath;
+	}
+	/**
+	 * @param detailsViewerPath The path to set.
+	 */
+	public void setDetailsViewerPath(String path) {
+		this.detailsViewerPath = path;
+		notifyManagedBeanOfDetailsViewerPath(detailsViewerPath);
+	}
 }
