@@ -10,16 +10,16 @@ xmlns:cmf="http://myfaces.sourceforge.net/tld/myfaces_ext_0_9.tld">
     <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
     <f:view>
         <wf:workspace_page>
-               <h:form id="form1" name="form1" enctype="multipart/form-data">
+               <h:form id="uploadForm" name="uploadForm" enctype="multipart/form-data">
                  <cmf:inputFileUpload id="fileupload"
                                        accept="image/*"
-                                       value="#{listDocuments2.upFile}"
+                                       value="#{WebDAVUploaderBean.upFile}"
                                        storage="file"
                                        styleClass="fileUploadInput"
                                        required="true"/>
                     <h:outputText value="and give it a name: "/>
-                    <h:inputText value="#{listDocuments2.name}"/>
-                    <h:commandButton value="load it up" action="#{listDocuments2.upload}"/>
+                    <h:inputText value="#{WebDAVUploaderBean.name}"/>
+                    <h:commandButton value="Upload" action="#{WebDAVUploaderBean.upload}"/>
                 </h:form>
             </wf:workspace_page>
     </f:view>
