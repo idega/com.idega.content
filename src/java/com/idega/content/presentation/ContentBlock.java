@@ -3,7 +3,6 @@ package com.idega.content.presentation;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Iterator;
-import java.util.Vector;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
@@ -109,16 +108,11 @@ public abstract class ContentBlock extends IWBaseComponent {
 				if ((!useFolders() && !newRes.isCollection() ) || (useFolders() && newRes.isCollection())) {
 					resource = newRes;
 					this.setInitialized(false);
-					Vector gr = new Vector();
-					for (Iterator iter = getChildren().iterator(); iter.hasNext();) {
-						UIComponent element = (UIComponent) iter.next();
-						//if (element instanceof HtmlPanelGrid) {
-						gr.add(element);
-						//}
-					}
-					if (gr != null) {
-						getChildren().removeAll(gr);
-					}
+					getChildren().clear();
+				} else if ( !useFolders() && newRes.isCollection()) {
+					resource = newRes;
+					this.setInitialized(false);
+					getChildren().clear();
 				}
 			}
 		}
