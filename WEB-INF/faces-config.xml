@@ -38,7 +38,7 @@
     <managed-bean>
     		<managed-bean-name>webDavList</managed-bean-name>
         <managed-bean-class>com.idega.content.presentation.WebDAVListManagedBean</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
     <managed-bean>
         <managed-bean-name>WebDAVUploadBean</managed-bean-name>
