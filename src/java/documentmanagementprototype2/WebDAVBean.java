@@ -8,8 +8,8 @@ package documentmanagementprototype2;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-
 import org.apache.webdav.lib.WebdavResource;
+import com.idega.core.file.business.FileIconSupplier;
 
 /**
  * @author Roar
@@ -149,13 +149,13 @@ public class WebDAVBean extends Object {
     }
     
     public String getWebDavUrl() {
-    	return webDavUrl;
+    		return webDavUrl;
     }
     
     public void setWebDavHttpURL(String webDavUrl) {
-    	String oldValue = this.webDavUrl;
-    	this.webDavUrl = webDavUrl;
-    	propertySupport.firePropertyChange(PROP_WEB_DAV_URL, oldValue, webDavUrl);
+	    	String oldValue = this.webDavUrl;
+	    	this.webDavUrl = webDavUrl;
+	    	propertySupport.firePropertyChange(PROP_WEB_DAV_URL, oldValue, webDavUrl);
     }    
     
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -168,15 +168,16 @@ public class WebDAVBean extends Object {
     
 	public String getIconURL() {
 		if(iconURL==null){
-			iconURL = "/idegaweb/bundles/com.idega.core.bundle/resources/icfileicons/ui/iw/application_vnd.iw-folder_open.gif";
+			FileIconSupplier iconSupplier = FileIconSupplier.getInstance();
+			iconURL = iconSupplier.getFileIconURIByMimeType(mime);
 		}
 		return iconURL;
 	}
 	
 	
 	public void setIconURL(String iconURL) {
-  	String oldValue = this.iconURL;
-  	this.iconURL = iconURL;
-  	propertySupport.firePropertyChange(PROP_ICON_URL, oldValue, iconURL);
+	  	String oldValue = this.iconURL;
+	  	this.iconURL = iconURL;
+	  	propertySupport.firePropertyChange(PROP_ICON_URL, oldValue, iconURL);
 	}
 }
