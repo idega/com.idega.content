@@ -5,7 +5,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-
 import javax.faces.component.UIColumn;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
@@ -15,21 +14,17 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import javax.faces.model.DataModel;
-
 import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpURL;
 import org.apache.webdav.lib.WebdavResource;
 import org.apache.webdav.lib.WebdavResources;
-
 import com.idega.business.IBOLookup;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
-import com.idega.slide.business.IWSlideService;
+import com.idega.slide.business.IWSlideSession;
 import com.idega.webface.WFList;
 import com.idega.webface.WFUtil;
 import com.idega.webface.bean.WFListBean;
 import com.idega.webface.model.WFDataModel;
-
 import documentmanagementprototype2.WebDAVBean;
 
 /**
@@ -122,24 +117,17 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		dataModel.setRowCount(availableRows);
 	}
 	
+
 	private WebDAVBean[] getDavData() {
 		WebDAVBean[] data;
 		try {
 
-			HttpURL homeUrl = null;
 			
 			IWUserContext iwuc = IWContext.getInstance();			
-			IWSlideService ss = (IWSlideService) IBOLookup.getServiceInstance(iwuc.getApplicationContext(), IWSlideService.class);
+			IWSlideSession ss = (IWSlideSession) IBOLookup.getServiceInstance(iwuc.getApplicationContext(), IWSlideSession.class);
 
-			if (webDAVPath == null) {
-				homeUrl = ss.getWebdavServerURL();
-			} else {
-				homeUrl = ss.getWebdavServerURL(webDAVPath);
-			}
-			homeUrl.setUserinfo("root", "root");
-			
-			WebdavResource resource = new WebdavResource(homeUrl);
-			if (resource.exists()) {
+			WebdavResource resource = ss.getWebdavResource(webDAVPath);
+			if (resource.getExistence()) {
 				data = getDirectoryListing(resource, ss.getWebdavServletURL());
 			} else {
 				data = new WebDAVBean[] { new WebDAVBean("Resource does not exist") };

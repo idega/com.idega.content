@@ -2,13 +2,14 @@ package com.idega.content.business;
 
 import java.io.IOException;
 import net.sourceforge.myfaces.custom.fileupload.UploadedFile;
-import org.apache.commons.httpclient.HttpURL;
 import org.apache.webdav.lib.WebdavResource;
 import com.idega.business.IBOLookup;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
+import com.idega.slide.business.IWSlideSession;
+import com.idega.slide.util.WebdavRootResource;
 
 public class WebDAVUploadBean{
 
@@ -48,16 +49,14 @@ public class WebDAVUploadBean{
 		IWUserContext iwuc = IWContext.getInstance();
 		IWApplicationContext iwac = iwuc.getApplicationContext();
 		
-		//IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwuc,IWSlideSession.class);
+		IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwuc,IWSlideSession.class);
 
 		IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwac,IWSlideService.class);
 	
 		System.out.println("webdavServerURL = "+service.getWebdavServerURL());
 		System.out.println("webdavServletURL = "+service.getWebdavServletURL());
-	
-		HttpURL root = service.getWebdavServerURL();
-		root.setUserinfo("root","root");
-		WebdavResource webdavResource = new WebdavResource(root);
+
+		WebdavRootResource rootResource = session.getWebdavRootResource();
 		String filePath = service.getWebdavServletURL()+getUploadFilePath();
 		String uploadName = uploadFile.getName();
 		String fileName = uploadName;
@@ -77,9 +76,9 @@ public class WebDAVUploadBean{
 		String contextUri = iwac.getIWMainApplication().getApplicationContextURI();
 		imagePath = downloadPath.substring(downloadPath.indexOf(contextUri)+contextUri.length());
 		
-		boolean success = webdavResource.mkcolMethod(filePath);
+		boolean success = rootResource.mkcolMethod(filePath);
 		System.out.println("Creating folder success "+success);
-		success = webdavResource.putMethod(filePath+fileName,uploadFile.getInputStream());
+		success = rootResource.putMethod(filePath+fileName,uploadFile.getInputStream());
 		System.out.println("Uploading file success "+success);
 		
 		
@@ -94,14 +93,12 @@ public class WebDAVUploadBean{
 	public boolean getIsUploaded(){
 		
 		if(downloadPath!=null){
-			IWSlideService service;
+			IWSlideSession session;
 			try {
-				service = (IWSlideService)IBOLookup.getServiceInstance(IWContext.getInstance(),IWSlideService.class);
-			
-				HttpURL root = service.getWebdavServerURL();
-				root.setUserinfo("root","root");
-				WebdavResource webdavResource = new WebdavResource(root);
-				webdavResource.setPath(downloadPath);
+				IWContext iwc = IWContext.getInstance();
+				session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+
+				WebdavResource webdavResource = session.getWebdavResource(downloadPath);
 				return webdavResource.getExistence();
 			}
 			catch (Exception e){
