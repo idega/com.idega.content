@@ -49,3 +49,40 @@
 .content_search_link{
 }
 
+.content_viewer_permissions {
+	width: 16px;
+	height: 16px;
+	background: url(../images/permissions.gif);
+}
+
+.cms_permission_matrix {
+	height: 150px;
+	overflow:auto;
+	border: 1px solid #D3D3D3;
+	margin: 5px 5px 5px 5px;
+}
+
+.cms_permission_matrix_header{
+	font-weight: bold;
+	margin: 5px;
+}
+
+.cms_permission_listoddrow{
+	background-color: #f6f6f6;
+	height: 20px;
+}
+
+.cms_permission_listevenrow{
+	background-color: #ffffff;
+	height: 20px;
+}
+
+.cms_permission_list_input{
+	height: 18px;
+	width: 100px;
+	border: 1px solid #D3D3D3;
+}
+
+.content_search_link{
+}
+
