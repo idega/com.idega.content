@@ -58,6 +58,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
     private boolean isCheckedOut = false;
     private String checkedOutString = null;
     private String comment = null;
+    private String iconTheme = null;
     private boolean real = true;
 
 	/**
@@ -222,8 +223,13 @@ public class WebDAVBean extends Object implements ICTreeNode {
     
 	public String getIconURL() {
 		if(iconURL==null){
-			FileIconSupplier iconSupplier = FileIconSupplier.getInstance();
-			iconURL = iconSupplier.getFileIconURIByMimeType(mime);
+			if (iconTheme == null) {
+				FileIconSupplier iconSupplier = FileIconSupplier.getInstance();
+				iconURL = iconSupplier.getFileIconURIByMimeType(mime);
+			} else {
+				FileIconSupplier iconSupplier = FileIconSupplier.getInstance(iconTheme);
+				iconURL = iconSupplier.getFileIconURIByMimeType(mime);
+			}
 		}
 		return iconURL;
 	}
@@ -293,6 +299,10 @@ public class WebDAVBean extends Object implements ICTreeNode {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public void setIconTheme(String theme) {
+		this.iconTheme = theme;
 	}
 
 	/* (non-Javadoc)
