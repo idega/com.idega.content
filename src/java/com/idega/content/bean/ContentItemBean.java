@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.5 2005/03/05 18:45:56 gummi Exp $
+ * $Id: ContentItemBean.java,v 1.6 2005/03/07 16:04:44 gummi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -49,10 +49,10 @@ import com.idega.webface.WFUtil;
 /**
  * Bean for idegaWeb content items.   
  * <p>
- * Last modified: $Date: 2005/03/05 18:45:56 $ by $Author: gummi $
+ * Last modified: $Date: 2005/03/07 16:04:44 $ by $Author: gummi $
  *
  * @author Anders Lindman
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 
 public abstract class ContentItemBean implements Serializable, ICFile, ContentItem {
@@ -73,7 +73,6 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	private Map _itemFields = null;
 	private Map _categories = null;
 	private Map _mainCategoryIds = null;
-	private Map _versionIds = null;
 	private Map _locales = null;
 
 	private Map _allCategories = null;
@@ -85,6 +84,9 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	public final static String FIELDNAME_ATTACHMENT = "attachment";
 	public final static String FIELDNAME_CREATION_DATE = "creation_date";
 	public final static String FIELDNAME_RESOURCE_PATH = "resource_path";
+	public final static String FIELDNAME_VERSION_NAME = "version_name";
+	public final static String FIELDNAME_STATUS = "status";
+	
 	private Boolean doRender = Boolean.TRUE;
 
 	private final static String[] ACTION_ARRAY = new String[] {"preview","edit"};
@@ -118,8 +120,7 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 		if (_locale == null) {
 			setLocale(new Locale("sv"));
 		}
-		
-		setVersionId(versionId);
+
 	}
 		
 	public int getContentItemId() { return _contentItemId; }
@@ -174,7 +175,6 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 		_itemFields = null;
 		_categories = null;
 		_mainCategoryIds = null;
-		_versionIds = null;
 
 		_allCategories = null;
 		_allLocales = null;
@@ -184,16 +184,6 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 		
 		setStatus(ContentItemCase.STATUS_NEW);
 	}
-
-	// Locale dependent attributes
-	
-	public int getVersionId() {
-		int versionId = -1;
-		try {
-			versionId = ((Integer) _versionIds.get(getLocaleIdAsString())).intValue();
-		} catch (Exception e) {}
-		return versionId; 
-	}
 	
 	public int getMainCategoryId() {
 		int mainCategoryId = -1;
@@ -201,13 +191,6 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 			mainCategoryId = ((Integer) _mainCategoryIds.get(getLocaleIdAsString())).intValue();
 		} catch (Exception e) {}
 		return mainCategoryId; 
-	}
-
-	public void setVersionId(int id) {
-		if (_versionIds == null) {
-			_versionIds = new HashMap();
-		}
-		_versionIds.put(getLocaleIdAsString(), new Integer(id));
 	}
 	
 	public void setMainCategoryId(int id) {
@@ -331,21 +314,14 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	 * Returns the case status for this content item. 
 	 */
 	public String getStatus() {
-		if (_caseBean == null) {
-			return null;
-		}
-		return _caseBean.getCaseStatus();
+		return (String)getValue(FIELDNAME_STATUS);
 	}
 	
 	/**
 	 * Sets the case status for this content item. 
 	 */
 	public void setStatus(String status) {
-		if (_caseBean == null) {
-			_caseBean = new ContentItemCaseBean(-1, status, null, null, null, getVersionId());
-		} else {
-			_caseBean.setCaseStatus(status);
-		}
+		setValue(FIELDNAME_STATUS,status);
 	}
 	
 	/**
@@ -522,6 +498,8 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 			//here I don't use the varible 'path' since it can actually be the URI
 			setResourcePath(webdavResource.getPath());
 			
+			setVersionName(webdavResource.getVersionName());
+			
 			String createDate = webdavResource.getCreationDateString();
 			if(createDate != null){
 				setCreationDate(new IWTimestamp(createDate).getTimestamp());
@@ -560,6 +538,14 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	
 	public String getResourcePath() {
 		return (String)getValue(FIELDNAME_RESOURCE_PATH);
+	}
+	
+	public String getVersionName(){
+		return (String)getValue(FIELDNAME_VERSION_NAME);
+	}
+	
+	public void setVersionName(String name){
+		setValue(FIELDNAME_VERSION_NAME,name);
 	}
 	
 	public Boolean getRendered() {
