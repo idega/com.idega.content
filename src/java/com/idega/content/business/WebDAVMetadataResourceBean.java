@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadataResourceBean.java,v 1.3 2005/03/17 17:33:00 joakim Exp $
+ * $Id: WebDAVMetadataResourceBean.java,v 1.4 2005/03/18 16:11:45 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -29,10 +29,10 @@ import com.idega.slide.util.WebdavRootResource;
 /**
  * A resource bean that holds metadata info for the selected resouce
  * 
- * Last modified: $Date: 2005/03/17 17:33:00 $ by $Author: joakim $
+ * Last modified: $Date: 2005/03/18 16:11:45 $ by $Author: joakim $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class WebDAVMetadataResourceBean extends IBOSessionBean 
 implements WebDAVMetadataResource
@@ -104,14 +104,14 @@ implements WebDAVMetadataResource
 		while(iter.hasNext()) {
 			String type = (String)iter.next();
 
-			System.out.println("Getting metadata '"+type+"' for "+filePath);
+//			System.out.println("Getting metadata '"+type+"' for "+filePath);
 			Enumeration enumerator = rootResource.propfindMethod(filePath,new PropertyName("DAV",type).toString());
 
 			StringBuffer value = new StringBuffer();
 			while(enumerator.hasMoreElements()) {
 				value.append(enumerator.nextElement());
 			}
-//				System.out.println("Value is "+value);
+//			System.out.println("Value is "+value);
 			if(value.length()>0) {
 				MetadataValueBean mvb = new MetadataValueBean(type, value.toString());
 				metadataBeans.add(mvb);
@@ -140,7 +140,7 @@ implements WebDAVMetadataResource
 
 		String filePath = service.getURI(resourcePath);
 		
-		System.out.println("Getting categories for "+filePath);
+//		System.out.println("Getting categories for "+filePath);
 		Enumeration enumerator = rootResource.propfindMethod(filePath,new PropertyName("DAV","categories").toString());
 
 		StringBuffer value = new StringBuffer();
@@ -148,7 +148,7 @@ implements WebDAVMetadataResource
 			value.append(enumerator.nextElement());
 		}
 		
-		System.out.println("Value is "+value);
+//		System.out.println("Value is "+value);
 		if(value.length()>0) {
 			StringTokenizer st = new StringTokenizer(value.toString(),",");
 			while(st.hasMoreTokens()) {
@@ -161,6 +161,10 @@ implements WebDAVMetadataResource
 
 	protected boolean checkPath(String path){
 		//PATCH-HACK
+		if(null==currentPath) {
+			currentPath=path;
+			return false;
+		}
 		if(currentPath.startsWith(path)) {
 			return true;
 		}
