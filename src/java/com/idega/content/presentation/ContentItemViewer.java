@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.2 2005/02/21 16:12:45 gummi Exp $
+ * $Id: ContentItemViewer.java,v 1.3 2005/02/25 14:15:37 eiki Exp $
  * Created on 26.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -30,10 +30,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/21 16:12:45 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/02/25 14:15:37 $ by $Author: eiki $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ContentItemViewer extends WFContainer {
 	
@@ -41,9 +41,7 @@ public class ContentItemViewer extends WFContainer {
 	private Map fieldLocalValueMap = new HashMap();
 	private Map fieldSuffixValueMap = new HashMap();
 	private Map fieldValueChangedMap = new HashMap();
-	
-	public static final String PARAMETER_CONTENT_RESOURCE = "iwcontent";
-	
+		
 	public static final String FACET_TOOLBAR = "item_toolbar";
 	public static final String FACET_ITEM_HEADER = "item_header";
 	public static final String FACET_ITEM_FOOTER = "item_footer";
@@ -301,6 +299,21 @@ public class ContentItemViewer extends WFContainer {
 	}
 	
 	
+	
+	
+	/* (non-Javadoc)
+	 * @see javax.faces.component.UIComponent#decode(javax.faces.context.FacesContext)
+	 */
+	public void decode(FacesContext context) {
+		if(showRequestedItem){
+			IWContext iwc = IWContext.getIWContext(context);
+			String resourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
+			if(resourcePath!=null){
+				requestedResourcePath = resourcePath;
+			}
+		}
+		
+	}
 	/* (non-Javadoc)
 	 * @see javax.faces.component.UIComponent#encodeBegin(javax.faces.context.FacesContext)
 	 */
@@ -308,7 +321,7 @@ public class ContentItemViewer extends WFContainer {
 			
 		if(showRequestedItem){
 			IWContext iwc = IWContext.getIWContext(context);
-			String resourcePath = iwc.getParameter(PARAMETER_CONTENT_RESOURCE);
+			String resourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
 			if(resourcePath!=null){
 				requestedResourcePath = resourcePath;
 			}
@@ -400,7 +413,7 @@ public class ContentItemViewer extends WFContainer {
 	 * @return
 	 */
 	public ContentItem loadContentItem(String itemResourcePath) {
-		System.out.println("[WARNING]["+this.getClass().getName()+"]: method loadContentItem(String itemResourcePath) is not implemented but is required when rendering content spcified by request parameter '"+PARAMETER_CONTENT_RESOURCE+"'.");
+		System.out.println("[WARNING]["+this.getClass().getName()+"]: method loadContentItem(String itemResourcePath) is not implemented but is required when rendering content spcified by request parameter '"+ContentViewer.PARAMETER_CONTENT_RESOURCE+"'.");
 		return null;
 	}
 
@@ -458,7 +471,7 @@ public class ContentItemViewer extends WFContainer {
 				UIComponent component = (UIComponent) iter.next();
 				if(component instanceof UIParameter){
 					UIParameter parameter = (UIParameter)component;
-					if(PARAMETER_CONTENT_RESOURCE.equals(parameter.getName())){
+					if(ContentViewer.PARAMETER_CONTENT_RESOURCE.equals(parameter.getName())){
 						parameter.setValue(getResourcePath());
 						updated = true;
 					}
@@ -467,7 +480,7 @@ public class ContentItemViewer extends WFContainer {
 			
 			if(!updated){
 				UIParameter parameter = new UIParameter();
-				parameter.setName(PARAMETER_CONTENT_RESOURCE);
+				parameter.setName(ContentViewer.PARAMETER_CONTENT_RESOURCE);
 				parameter.setValue(getResourcePath());
 				childrens.add(parameter);
 			}

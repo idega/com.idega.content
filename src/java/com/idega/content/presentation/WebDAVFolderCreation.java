@@ -49,7 +49,7 @@ public class WebDAVFolderCreation extends ContentBlock implements ActionListener
 			table.mergeCells(1, row, 2, row);
 		} else if (folderCreated.booleanValue()) {
 			ContentViewer viewer = (ContentViewer) getParent().getParent();
-			viewer.setRenderFlags(ContentViewer.LIST);
+			viewer.setRenderFlags(ContentViewer.ACTION_LIST);
 			folderName.setDisabled(true);
 
 			HtmlOutputText txt = getBundle().getLocalizedText("folder_created");

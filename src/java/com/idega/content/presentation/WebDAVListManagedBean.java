@@ -318,7 +318,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			HtmlCommandLink nameDetailsLink = new HtmlCommandLink();
 			nameDetailsLink.setId(P_ID+"_det");
 			nameDetailsLink.setStyleClass("content_viewer_file_details");
-			nameDetailsLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.FILE_DETAILS);
+			nameDetailsLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.ACTION_FILE_DETAILS);
 			nameDetailsLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isFile}"));
 			nameDetailsLink.setValueBinding("alt", ContentViewer.getBundle().getValueBinding("document_details"));
 			nameDetailsLink.setValueBinding("title", ContentViewer.getBundle().getValueBinding("document_details"));
@@ -333,7 +333,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			namePreviewLink.setValueBinding("alt", ContentViewer.getBundle().getValueBinding("preview"));
 			//"document_details"
 			namePreviewLink.setStyleClass("content_viewer_file_preview");
-			namePreviewLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.PREVIEW);
+			namePreviewLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.ACTION_PREVIEW);
 			namePreviewLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isFile}"));
 			WFUtil.addParameterVB(namePreviewLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 			WFUtil.addParameterVB(namePreviewLink, PARAMETER_IS_FOLDER, var + ".isCollection");
@@ -468,7 +468,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			del.setHeader(ContentBlock.getBundle().getLocalizedText("delete"));
 			HtmlCommandLink delLink = new HtmlCommandLink();
 			delLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isReal}"));
-			delLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.DELETE);
+			delLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.ACTION_DELETE);
 			WFUtil.addParameterVB(delLink, ContentViewer.PATH_TO_DELETE, var+".webDavUrl");
 			delLink.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 			delLink.setId(P_ID+"_delLink");
