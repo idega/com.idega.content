@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.7 2005/02/01 17:35:50 thomas Exp $
+ * $Id: ContentViewManager.java,v 1.8 2005/02/03 11:06:05 thomas Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -22,10 +22,10 @@ import com.idega.repository.data.Singleton;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2005/02/01 17:35:50 $ by $Author: thomas $
+ *  Last modified: $Date: 2005/02/03 11:06:05 $ by $Author: thomas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class ContentViewManager implements Singleton  {
 
@@ -39,7 +39,7 @@ public class ContentViewManager implements Singleton  {
 		this.iwma=iwma;
 	}
 
-	  public static ContentViewManager getInstance(IWMainApplication iwma){
+	  public static synchronized ContentViewManager getInstance(IWMainApplication iwma){
 	    ContentViewManager contentViewManager = (ContentViewManager) iwma.getAttribute(IW_CONTENT_VIEW_MANAGER_KEY);
 	    if(contentViewManager==null){
 	      contentViewManager = new ContentViewManager(iwma);
