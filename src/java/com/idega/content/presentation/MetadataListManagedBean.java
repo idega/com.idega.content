@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataListManagedBean.java,v 1.2 2005/01/14 11:50:27 joakim Exp $
+ * $Id: MetadataListManagedBean.java,v 1.3 2005/01/17 17:03:42 gimmi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -26,21 +26,21 @@ import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
 import com.idega.content.data.MetadataValueBean;
 import com.idega.presentation.IWContext;
-import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavRootResource;
 import com.idega.webface.WFResourceUtil;
 import com.idega.webface.WFUtil;
 import com.idega.webface.bean.AbstractWFEditableListManagedBean;
+import com.idega.webface.bean.WFEditableListDataBean;
 import com.idega.webface.bean.WFListBean;
 
 
 /**
  * 
- * Last modified: $Date: 2005/01/14 11:50:27 $ by $Author: joakim $
+ * Last modified: $Date: 2005/01/17 17:03:42 $ by $Author: gimmi $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class MetadataListManagedBean extends AbstractWFEditableListManagedBean implements WFListBean, ActionListener {
 
@@ -108,7 +108,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 
 			IWContext iwc = IWContext.getInstance();
 			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+//			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 	
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 			//TODO (JJ) have to fetch the filepath
@@ -117,11 +117,11 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 			
 			while(iter.hasNext()) {
 				String type = (String)iter.next();
-				Enumeration enum = rootResource.propfindMethod(filePath,new PropertyName("DAV:",type).toString());
+				Enumeration enumer = rootResource.propfindMethod(filePath,new PropertyName("DAV:",type).toString());
 	
 				String value = "";
-				while(enum.hasMoreElements()) {
-					value = value+enum.nextElement();
+				while(enumer.hasMoreElements()) {
+					value = value+enumer.nextElement();
 				}
 				MetadataValueBean mvb = new MetadataValueBean(type, value,"delete");
 				arrayList.add(mvb);
@@ -229,7 +229,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	/* (non-Javadoc)
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getData()
 	 */
-	public Object[] getData() {
+	public WFEditableListDataBean[] getData() {
 		return getMetadata();
 	}
 
