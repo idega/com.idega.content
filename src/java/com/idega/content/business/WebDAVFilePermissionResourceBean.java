@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissionResourceBean.java,v 1.1 2005/01/07 19:46:49 gummi Exp $
+ * $Id: WebDAVFilePermissionResourceBean.java,v 1.2 2005/01/12 11:46:59 gummi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -28,10 +28,10 @@ import com.idega.slide.util.AccessControlList;
 
 /**
  * 
- *  Last modified: $Date: 2005/01/07 19:46:49 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/01/12 11:46:59 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements WebDAVFilePermissionResource{
 
@@ -96,10 +96,21 @@ public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements 
 		if(currentList==null){
 			IWSlideSession slideSession = (IWSlideSession)getSessionInstance(IWSlideSession.class);
 			currentList = slideSession.getAccessControlList(path);
-		} else if(!currentList.getResourcePath().equals(path)){
-			throw new ConcurrentModificationException("Asking for ACL for path '"+path+"' while current ACL is for '"+currentList.getResourcePath()+"'. The #clear() method needs to be invoked first.");
 		}
+		checkPath(path);
 		return currentList;
+	}
+	
+	protected void checkPath(String path){
+		if(currentList!=null){ 
+			String currentListPath = currentList.getResourcePath();
+			if(currentListPath==null && path==null){
+				return;
+			}
+			if(( ((currentListPath==null || path==null)&&currentListPath!=path) || !((currentListPath!=null) && currentListPath.equals(path)) )){
+				throw new ConcurrentModificationException("Asking for ACL for path '"+path+"' while current ACL is for '"+currentList.getResourcePath()+"'. The #clear() method needs to be invoked first.");
+			}
+		}
 	}
 	
 	public Collection getAllAces(String path) throws HttpException, RemoteException, IOException{		
@@ -109,10 +120,8 @@ public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements 
 			if(l!=null){
 				allACEBeans = getACEBeans(l,path);
 			}
-		} else if(!currentList.getResourcePath().equals(path)){
-			throw new ConcurrentModificationException("Asking for ACL for path '"+path+"' while current ACL is for '"+currentList.getResourcePath()+"'. The #clear() method needs to be invoked first.");
 		}
-		
+		checkPath(path);
 		return allACEBeans;
 	}
 	
@@ -122,10 +131,8 @@ public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements 
 			AccessControlList acl = getACL(path);
 			List l = acl.getAccessControlEntriesForRoles();
 			aceBeansForRoles = getACEBeans(l,path);
-		} else if(!currentList.getResourcePath().equals(path)){
-			throw new ConcurrentModificationException("Asking for ACL for path '"+path+"' while current ACL is for '"+currentList.getResourcePath()+"'. The #clear() method needs to be invoked first.");
 		}
-		
+		checkPath(path);
 		return aceBeansForRoles;
 	}
 	
@@ -142,10 +149,8 @@ public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements 
 			
 			aceBeansForStandard = c;
 			
-		} else if(!currentList.getResourcePath().equals(path)){
-			throw new ConcurrentModificationException("Asking for ACL for path '"+path+"' while current ACL is for '"+currentList.getResourcePath()+"'. The #clear() method needs to be invoked first.");
 		}
-		
+		checkPath(path);
 		return aceBeansForStandard;
 	}
 
@@ -155,10 +160,8 @@ public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements 
 			AccessControlList acl = getACL(path);
 			List l = acl.getAccessControlEntriesForGroups();
 			aceBeansForGroups = getACEBeans(l,path);
-		} else if(!currentList.getResourcePath().equals(path)){
-			throw new ConcurrentModificationException("Asking for ACL for path '"+path+"' while current ACL is for '"+currentList.getResourcePath()+"'. The #clear() method needs to be invoked first.");
 		}
-		
+		checkPath(path);
 		return aceBeansForGroups;
 	}
 
@@ -168,10 +171,8 @@ public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements 
 			AccessControlList acl = getACL(path);
 			List l = acl.getAccessControlEntriesForUsers();
 			aceBeansForUsers = getACEBeans(l,path);
-		} else if(!currentList.getResourcePath().equals(path)){
-			throw new ConcurrentModificationException("Asking for ACL for path '"+path+"' while current ACL is for '"+currentList.getResourcePath()+"'. The #clear() method needs to be invoked first.");
 		}
-		
+		checkPath(path);
 		return aceBeansForUsers;
 	}
 	
