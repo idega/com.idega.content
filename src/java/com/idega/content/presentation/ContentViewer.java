@@ -58,6 +58,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	private boolean renderWebDAVNewFolder = false;
 	private boolean renderWebDAVFilePermissions = false;
 	private boolean renderWebDAVDeleter = false;
+	private boolean renderWebDAVUploadeComponent = true;
 	
 	private String rootFolder = null;
 	private boolean useUserHomeFolder = false;
@@ -67,6 +68,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	private Collection columnsToHide = null;
 	private boolean maintainPath = false;
 	private boolean useVersionControl = true;
+	private boolean showPermissionTab = true;
+	private boolean showUploadComponent = true;
 	
 	private String currentFolderPath = null;
 	private String currentFileName = null;
@@ -298,6 +301,16 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 				
 			}
 		}
+		
+		if(!getShowPermissionTab()){
+//			renderWebDAVFilePermissions = false;
+			renderPermissionsLink=false;
+		}
+		
+		if(!getShowUploadComponent()){
+			renderWebDAVUploadeComponent = false;
+		}
+		
 		super.encodeBegin(context);
 	}
 	
@@ -356,6 +369,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		
 		UIComponent upload = getFacet(UPLOAD);
 		if (upload != null) {
+			upload.setRendered(renderWebDAVUploadeComponent);
 			renderChild(context, upload);
 		}
 	}
@@ -523,7 +537,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	}
 	
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[20];
+		Object values[] = new Object[21];
 		values[0] = super.saveState(ctx);
 		values[1] = new Boolean(renderWebDAVList);
 		values[2] = new Boolean(renderWebDAVFileDetails);
@@ -544,6 +558,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		values[17] = new Boolean(showFolders);
 		values[18] = columnsToHide;
 		values[19] = new Boolean(useVersionControl);
+		values[20] = new Boolean(renderWebDAVUploadeComponent);
 
 		return values;
 	}
@@ -570,6 +585,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		showFolders = ((Boolean) values[17]).booleanValue();
 		columnsToHide = ((Collection) values[18]);
 		useVersionControl = ((Boolean) values[19]).booleanValue();
+		renderWebDAVUploadeComponent = ((Boolean) values[20]).booleanValue();
 		
 		maintainPath(true);
 	}
@@ -644,4 +660,30 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	public void setUseVersionControl(boolean useVersionControl) {
 		this.useVersionControl = useVersionControl;
 	}
+	/**
+	 * @return Returns the showPermissionTab.
+	 */
+	public boolean getShowPermissionTab() {
+		return showPermissionTab;
+	}
+	/**
+	 * @param showPermissionTab The showPermissionTab to set.
+	 */
+	public void setShowPermissionTab(boolean showPermissionTab) {
+		this.showPermissionTab = showPermissionTab;
+	}	
+	
+	/**
+	 * @return Returns the showUploadComponent.
+	 */
+	public boolean getShowUploadComponent() {
+		return showUploadComponent;
+	}
+	/**
+	 * @param showUploadComponent The showUploadComponent to set.
+	 */
+	public void setShowUploadComponent(boolean showUploadComponent) {
+		this.showUploadComponent = showUploadComponent;
+	}
+	
 }

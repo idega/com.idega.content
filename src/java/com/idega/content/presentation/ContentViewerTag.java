@@ -15,6 +15,8 @@ public class ContentViewerTag extends UIComponentTag {
 	private boolean showFolders = true;
 	private String columnsToHide;
 	private boolean useVersionControl = true;
+	private boolean showPermissionTab = true;
+	private boolean showUploadComponent = true;
 	
 	public void setRootPath(String root) {
 		rootFolder = root;
@@ -56,6 +58,32 @@ public class ContentViewerTag extends UIComponentTag {
 		this.useVersionControl = useVersionControl;
 	}
 	
+	/**
+	 * @return Returns the showPermissionTab.
+	 */
+	public boolean getShowPermissionTab() {
+		return showPermissionTab;
+	}
+	/**
+	 * @param showPermissionTab The showPermissionTab to set.
+	 */
+	public void setShowPermissionTab(boolean showPermissionTab) {
+		this.showPermissionTab = showPermissionTab;
+	}	
+	
+	/**
+	 * @return Returns the showUploadComponent.
+	 */
+	public boolean getShowUploadComponent() {
+		return showUploadComponent;
+	}
+	/**
+	 * @param showUploadComponent The showUploadComponent to set.
+	 */
+	public void setShowUploadComponent(boolean showUploadComponent) {
+		this.showUploadComponent = showUploadComponent;
+	}
+	
 	public void release() {      
 		super.release();      
 		rootFolder = null ;
@@ -65,6 +93,8 @@ public class ContentViewerTag extends UIComponentTag {
 		iconTheme = null;
 		columnsToHide = null;
 		useVersionControl = true;
+		showPermissionTab = true;
+		showUploadComponent = true;
 	}
 
 	protected void setProperties(UIComponent component) {
@@ -79,6 +109,8 @@ public class ContentViewerTag extends UIComponentTag {
 			viewer.setShowFolders(showFolders);
 			viewer.setColumnsToHide(columnsToHide);
 			viewer.setUseVersionControl(useVersionControl);
+			viewer.setShowPermissionTab(showPermissionTab);
+			viewer.setShowUploadComponent(showUploadComponent);
 		}
 	}
 
