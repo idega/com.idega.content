@@ -35,7 +35,13 @@ public abstract class ContentBlock extends IWBaseComponent {
 	
 	public void encodeBegin(FacesContext context) throws IOException {
 		String webDavPath = (String) this.getAttributes().get("path");
-		String path = (String) WFUtil.invoke(webDavPath);
+		String path = null;
+		
+		if (webDavPath == null) {
+			path = (String) WFUtil.createMethodBinding("#{WebDAVListBean.getClickedFilePath}", null).invoke(context, null);
+		} else {
+			path = (String) WFUtil.invoke(webDavPath);
+		}
 		try {
 			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(), IWSlideSession.class);
 			WebdavResource oldRes = resource;
