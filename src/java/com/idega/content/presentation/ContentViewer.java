@@ -35,7 +35,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	static String PARAMETER_ACTION = "prm_action";
 	private static String BAR = "cv_f_bar";
 	public static String LIST = "ac_list";
-	private static String FILE_DETAILS = "ac_file_details";
+	static String FILE_DETAILS = "ac_file_details";
 	private static String FILE_DETAILS_LESS = "ac_less_file_details";
 	static String PREVIEW = "ac_preview";
 	static String NEW_FOLDER = "ac_folder";
