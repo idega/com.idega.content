@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadata.java,v 1.5 2005/01/28 13:52:21 joakim Exp $
+ * $Id: WebDAVMetadata.java,v 1.6 2005/01/31 16:53:29 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -21,6 +21,7 @@ import javax.faces.component.UISelectItems;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlSelectOneMenu;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
@@ -42,16 +43,17 @@ import com.idega.util.Timer;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFList;
 import com.idega.webface.WFResourceUtil;
+import com.idega.webface.WFUtil;
 import com.idega.webface.test.bean.ManagedContentBeans;
 
 /**
  * 
- * Last modified: $Date: 2005/01/28 13:52:21 $ by $Author: joakim $
+ * Last modified: $Date: 2005/01/31 16:53:29 $ by $Author: joakim $
  * 
  * Display the UI for adding metadata type - values to a file.
  *
  * @author Joakim Johnson
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	
@@ -75,6 +77,15 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	}
 	
 	protected void initializeContent() {
+		
+		if(resourcePath!=null){
+			System.out.println("Initialize. Setting resourcePath to "+resourcePath);
+			WFUtil.invoke(METADATA_LIST_BEAN, "setResourcePath", resourcePath);
+		} else {
+			System.err.println("[WARNING]["+getClass().getName()+"]: resource path can not be restored for managed beans");
+		}
+		
+		
 		setId(METADATA_BLOCK_ID);
 		add(ContentBlock.getBundle().getLocalizedText("metadata"));
 		WFList list = new WFList(METADATA_LIST_BEAN);
@@ -226,5 +237,32 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 		while ( tmp != null) {
 			tmp = tmp.getParent();
 		}
+	}
+	/**
+	 * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
+	 */
+	public Object saveState(FacesContext ctx) {
+		Object values[] = new Object[2];
+		values[0] = super.saveState(ctx);
+		values[1] = resourcePath;
+
+		return values;
+	}
+
+	/**
+	 * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext,
+	 *      java.lang.Object)
+	 */
+	public void restoreState(FacesContext ctx, Object state) {
+		Object values[] = (Object[]) state;
+		super.restoreState(ctx, values[0]);
+		resourcePath = ((String) values[1]);
+
+		if(resourcePath!=null){
+				WFUtil.invoke(METADATA_LIST_BEAN, "setResourcePath", resourcePath);
+		} else {
+			System.err.println("[WARNING]["+getClass().getName()+"]: resource path can not be restored for managed beans");
+		}
+		
 	}
 }
