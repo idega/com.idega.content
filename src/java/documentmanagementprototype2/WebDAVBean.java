@@ -32,7 +32,7 @@ public class WebDAVBean extends Object {
     
     private int id;
     private String name;
-    private long length;
+    private String length;
     private boolean isCollection;
     private String modifiedDate;
     private String creationDate;
@@ -59,7 +59,7 @@ public class WebDAVBean extends Object {
     	this();
 			setName(resource.getDisplayName());
 			setIsCollection(resource.isCollection());
-			setLength(resource.getGetContentLength()); 
+			setLength(Long.toString(resource.getGetContentLength())); 
 			setModifiedDate(resource.getGetLastModified());
 			setMime(resource.getGetContentType());
 			setCreationDate(resource.getCreationDate());
@@ -68,14 +68,6 @@ public class WebDAVBean extends Object {
 			setIsLocked(resource.isLocked());
     }
     
-    public WebDAVBean(String name, boolean isCollection, long length, long modifieDate, String mime) {
-        this(name);
-       setIsCollection(isCollection);
-       setLength(length);
-       setModifiedDate(modifieDate);
-       setMime(mime);
-       setId((int)Math.round(Math.random())*1000);
-    }    
     
     public int getId() {
         return id;
@@ -88,11 +80,11 @@ public class WebDAVBean extends Object {
     }
     
    
-    public long getLength() {
-        return length;
+    public String getLength() {
+        return (!isCollection)? length : null;
     }
     
-    public void setLength(long value) {
+    public void setLength(String value) {
 //        long oldValue = length;
         length = value;
 //        propertySupport.firePropertyChange(PROP_LENGTH, oldValue, length);
