@@ -4,11 +4,11 @@
 	xmlns:h="http://java.sun.com/jsf/html" 
 	xmlns:jsp="http://java.sun.com/JSP/Page" 
 	xmlns:owt="http://www.otrix.com/faces/webtree" 
-	xmlns:wf="http://xmlns.idega.com/com.idega.webface"
+	xmlns:ws="http://xmlns.idega.com/com.idega.workspace"
 >
     <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
     <f:view>
-	<wf:workspace_page>
+	<ws:page>
                 <h:form binding="#{listDocuments2.form1}" id="form1">
                     <div style="float: left; padding:10; ">
                         <!--
@@ -84,6 +84,6 @@
                     </div>
                     <iframe src="documentContent.jsp" style="left: 252px; top: 324px; position: absolute"/>
                 </h:form>
-	</wf:workspace_page>
+	</ws:page>
     </f:view>
 </jsp:root>
