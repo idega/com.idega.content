@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.1 2004/12/30 12:39:34 gimmi Exp $
+ * $Id: WebDAVUpload.java,v 1.1 2004/12/31 02:48:28 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -7,23 +7,22 @@
  * This software is the proprietary information of Idega hf.
  * Use is subject to license terms.
  */
-package com.idega.content.business;
+package com.idega.content.presentation;
 
 import javax.faces.component.html.HtmlCommandButton;
-import javax.faces.component.html.HtmlForm;
 import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.component.html.HtmlOutputText;
 import net.sourceforge.myfaces.custom.fileupload.HtmlInputFileUpload;
-import com.idega.content.presentation.ContentBlock;
-import com.idega.content.presentation.WebDAVList;
+import com.idega.presentation.Table;
+import com.idega.webface.WFContainer;
 import com.idega.webface.WFUtil;
 
 
 /**
  * 
- *  Last modified: $Date: 2004/12/30 12:39:34 $ by $Author: gimmi $
+ *  Last modified: $Date: 2004/12/31 02:48:28 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
  * @version $Revision: 1.1 $
@@ -33,12 +32,10 @@ public class WebDAVUpload extends ContentBlock {
 	protected static final String BEAN_ID = "WebDAVUploadBean";
 	
 	protected void initializeContent() {
-		
-		HtmlForm form = new HtmlForm();
-		form.setId("uploadForm");
-		form.setEnctype("multipart/form-data");
 
-		HtmlOutputText selectFile = getText("select_a_file_to_upload");
+		Table table = new Table();
+		int row = 1;
+		HtmlOutputText selectFile = getText("select_a_file_to_upload","wf_inputtext");
 		selectFile.setId(getId()+"_sel");
 		
 		HtmlInputFileUpload fileupload = new HtmlInputFileUpload();
@@ -48,19 +45,19 @@ public class WebDAVUpload extends ContentBlock {
 		fileupload.setStorage("file");
 		fileupload.setStyleClass("fileUploadInput");
 
-		HtmlOutputText giveName = getText("give_it_a_name_optional");
+		HtmlOutputText giveName = getText("give_it_a_name_optional", "wf_inputtext");
 		giveName.setId(getId()+"_giveName");
 		HtmlInputText fileName = new HtmlInputText();
 		fileName.setId(getId()+"_fileName");
 		fileName.setValueBinding("value", WFUtil.createValueBinding("#{"+BEAN_ID+".fileName}"));
 		
-		HtmlOutputText versionText = getText("version_comment");
+		HtmlOutputText versionText = getText("version_comment", "wf_inputtext");
 		versionText.setId(getId()+"_versionText");
 		HtmlInputText comment = new HtmlInputText();
 		comment.setId(getId()+"_comment");
 		comment.setValueBinding("value", WFUtil.createValueBinding("#{"+BEAN_ID+".comment}"));
 
-		HtmlOutputText folder = getText("select_folder_optional");
+		HtmlOutputText folder = getText("select_folder_optional", "wf_inputtext");
 		folder.setId(getId()+"_folder");
 		HtmlInputText uploadPath = new HtmlInputText();
 		uploadPath.setId(getId()+"_uploadPath");
@@ -80,20 +77,44 @@ public class WebDAVUpload extends ContentBlock {
 		HtmlCommandButton upload = new HtmlCommandButton();
 		upload.setId(getId()+"_uploadCmd");
 		upload.setAction(WFUtil.createMethodBinding("#{WebDAVUploadBean.upload}", null));
+		getBundle().getLocalizedUIComponent("upload", upload);
 		
 //		form.getChildren().add("<br>");
-		form.getChildren().add(selectFile);
-		form.getChildren().add(fileupload);
-		form.getChildren().add(giveName);
-		form.getChildren().add(fileName);
-		form.getChildren().add(versionText);
-		form.getChildren().add(comment);
-		form.getChildren().add(folder);
-		form.getChildren().add(fileLink);
-		form.getChildren().add(imagePreview);
-		form.getChildren().add(upload);
+		table.add(selectFile, 1, row);
+		table.add(fileupload, 2, row++);
+//		table.add(giveName, 1, row);
+//		table.add(fileName, 2, row++);
+		table.add(versionText, 1, row);
+		table.add(comment, 2, row++);
+		table.add(folder, 1, row);
+		table.add(uploadPath, 2, row++);
+		table.add(upload, 2, row++);
+		table.setBorder(1);
+		
+		WFContainer line1 = new WFContainer();
+		line1.getChildren().add(selectFile);
+		line1.getChildren().add(fileupload);
 
-		getChildren().add(form);
+		WFContainer line2 = new WFContainer();
+		line2.getChildren().add(versionText);
+		line2.getChildren().add(comment);
+
+		WFContainer line3 = new WFContainer();
+		line3.getChildren().add(folder);
+		line3.getChildren().add(uploadPath);
+		
+		WFContainer line4 = new WFContainer();
+		line4.getChildren().add(upload);
+		
+		WFContainer line5 = new WFContainer();
+		line5.getChildren().add(fileLink);
+		line5.getChildren().add(imagePreview);
+		
+		getChildren().add(line1);
+		getChildren().add(line2);
+//		getChildren().add(line3);
+		getChildren().add(line4);
+		getChildren().add(line5);
 
 //    <f:verbatim><br/></f:verbatim>
 //    <h:outputText value="Select a file to upload : "/>
