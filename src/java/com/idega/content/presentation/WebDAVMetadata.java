@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadata.java,v 1.4 2005/01/25 14:27:07 joakim Exp $
+ * $Id: WebDAVMetadata.java,v 1.5 2005/01/28 13:52:21 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -10,6 +10,7 @@
 package com.idega.content.presentation;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,7 +28,10 @@ import javax.faces.model.SelectItem;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.content.business.MetadataUtil;
+import com.idega.content.business.WebDAVMetadataResource;
+import com.idega.content.data.MetadataValueBean;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
@@ -42,12 +46,12 @@ import com.idega.webface.test.bean.ManagedContentBeans;
 
 /**
  * 
- * Last modified: $Date: 2005/01/25 14:27:07 $ by $Author: joakim $
+ * Last modified: $Date: 2005/01/28 13:52:21 $ by $Author: joakim $
  * 
  * Display the UI for adding metadata type - values to a file.
  *
  * @author Joakim Johnson
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	
@@ -111,30 +115,59 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 
 		Locale locale = IWContext.getInstance().getCurrentLocale();
 		
-		Iterator iter = MetadataUtil.getMetadataTypes().iterator();
-		while(iter.hasNext()) {
-			String type = (String)iter.next();
-			String label = ContentBlock.getBundle().getLocalizedString(type,locale);
-			
-			SelectItem item = new SelectItem(type, label, type, false);
-			l.add(item);
+		//Remove already used types from the dropdown list
+		ArrayList tempTypes = new ArrayList(MetadataUtil.getMetadataTypes());
+		IWContext iwc = IWContext.getInstance();
+		WebDAVMetadataResource resource;
+		try {
+			resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
+					iwc, WebDAVMetadataResource.class);
+			MetadataValueBean[] ret = resource.getMetadata(resourcePath);
+			for(int i=0; i<ret.length;i++) {
+				tempTypes.remove(ret[i].getType());
+			}
 		}
-
-		UISelectItems sItems = new UISelectItems();
-		sItems.setValue(l) ;
-		dropdown.getChildren().add(sItems);
-		
-		metadataTable.add(dropdown, 1, 1);
-		
-		HtmlInputText newValueInput = new HtmlInputText();
-		newValueInput.setSize(40);
-		newValueInput.setId(NEW_VALUES_ID);
-		metadataTable.add(newValueInput, 2, 1);
+		catch (IBOLookupException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int row = 1;
+		if(tempTypes.size()>0) {
+			Iterator iter = tempTypes.iterator();
+			
+	//		Iterator iter = MetadataUtil.getMetadataTypes().iterator();
+			while(iter.hasNext()) {
+				String type = (String)iter.next();
+				String label = ContentBlock.getBundle().getLocalizedString(type,locale);
+				
+				SelectItem item = new SelectItem(type, label, type, false);
+				l.add(item);
+			}
+	
+			UISelectItems sItems = new UISelectItems();
+			sItems.setValue(l) ;
+			dropdown.getChildren().add(sItems);
+			
+			metadataTable.add(dropdown, 1, row);
+			
+			HtmlInputText newValueInput = new HtmlInputText();
+			newValueInput.setSize(40);
+			newValueInput.setId(NEW_VALUES_ID);
+			metadataTable.add(newValueInput, 2, row++);
+		}
 		
 		HtmlCommandButton addButton = localizer.getButtonVB(ADD_ID, "save", this);
 		addButton.getAttributes().put(RESOURCE_PATH,resourcePath);
 
-		metadataTable.add(addButton, 2, 2);
+		metadataTable.add(addButton, 2, row);
 		
 		mainContainer.add(metadataTable);
 		return mainContainer;
@@ -148,19 +181,40 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 		resourcePath = (String)comp.getAttributes().get(RESOURCE_PATH);
 		HtmlInputText newValueInput = (HtmlInputText) actionEvent.getComponent().getParent().findComponent(NEW_VALUES_ID);
 		UIInput dropdown = (UIInput) actionEvent.getComponent().getParent().findComponent(DROPDOWN_ID);
-		String val = newValueInput.getValue().toString();
-		String type = dropdown.getValue().toString();
+		String val = "";
+		String type = "";
+		if(null!=dropdown) {
+			val = newValueInput.getValue().toString();
+			type = dropdown.getValue().toString();
+		}
+		MetadataValueBean[] ret = new MetadataValueBean[0];
 
 		try {
-
 			IWContext iwc = IWContext.getInstance();
 			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
 			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 	
 			WebdavRootResource rootResource = session.getWebdavRootResource();
-
 			String filePath = service.getURI(resourcePath);
-			rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),val,true);
+
+			//Store new settings
+			if(type.length()>0) {
+				System.out.println("Proppatch: filepath="+filePath+" type="+type+" value="+val);
+				rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),val,true);
+			}
+			
+			//Store changes to previously created metadata
+			WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
+					iwc, WebDAVMetadataResource.class);
+			ret = resource.getMetadata(resourcePath);
+
+			for(int i=0; i<ret.length;i++) {
+				type=ret[i].getType();
+				val=ret[i].getMetadatavalues();
+				System.out.println("type="+type+"  val="+val);
+				rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),val,true);
+			}
+			resource.clear();
 		} catch (HttpException ex) {
 			ex.printStackTrace();
 		} catch (IOException ex) {

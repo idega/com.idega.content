@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataValueBean.java,v 1.3 2005/01/18 17:44:31 gummi Exp $
+ * $Id: MetadataValueBean.java,v 1.4 2005/01/28 13:52:21 joakim Exp $
  * 
  * Copyright (C) 2004 Idega. All Rights Reserved.
  * 
@@ -14,11 +14,12 @@ import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
- * 
- * Last modified: $Date: 2005/01/18 17:44:31 $ by $Author: gummi $
+ * Last modified: $Date: 2005/01/28 13:52:21 $ by $Author: joakim $
+ * Data bean that holds information about metadata type - value pair
+ * used to display data in MetadataListManagedBean
  * 
  * @author Joakim Johnson
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class MetadataValueBean implements WFEditableListDataBean {
 
@@ -29,8 +30,7 @@ public class MetadataValueBean implements WFEditableListDataBean {
 	private final static int VALUE_ARRAY_INDEX_VALUES = 1;
 	private final static int VALUE_ARRAY_INDEX_DELETE = 2;
 	
-//	private Object[] column = new Object[]{"","","Delete"};
-	Object[] column = new Object[]{"Categories","Sports, Headline","Delete"};
+	Object[] column = new Object[]{"","","Delete"};
 
 	private PropertyChangeSupport propertySupport;
 	private WebdavExtendedResource me;
@@ -39,24 +39,25 @@ public class MetadataValueBean implements WFEditableListDataBean {
 		propertySupport = new PropertyChangeSupport(this);
 	}
 
-	public MetadataValueBean(String t, String v, String l) {
+	public MetadataValueBean(String t, String v
+//			, String l
+			) {
 		this();
 		setType(t);
 		setMetadatavalues(v);
-		setDelete(l);
-//		localizedString = l;//TODO create setter
+//		setDelete(l);
 	}
 	
-	private void setDelete(String value) {
-		String oldValue = (String)column[VALUE_ARRAY_INDEX_DELETE];
-		column[VALUE_ARRAY_INDEX_DELETE]=value;
-		propertySupport.firePropertyChange(PROP_TYPE, oldValue, value);
-	}
-
-	public String getDelete() {
-		return (String)column[VALUE_ARRAY_INDEX_DELETE];
-	}
-
+//	private void setDelete(String value) {
+//		String oldValue = (String)column[VALUE_ARRAY_INDEX_DELETE];
+//		column[VALUE_ARRAY_INDEX_DELETE]=value;
+//		propertySupport.firePropertyChange(PROP_TYPE, oldValue, value);
+//	}
+//
+//	public String getDelete() {
+//		return (String)column[VALUE_ARRAY_INDEX_DELETE];
+//	}
+//
 	public void setType(String value) {
 		String oldValue = (String)column[VALUE_ARRAY_INDEX_TYPE];
 		column[VALUE_ARRAY_INDEX_TYPE]=value;

@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataListManagedBean.java,v 1.5 2005/01/24 17:26:34 joakim Exp $
+ * $Id: MetadataListManagedBean.java,v 1.6 2005/01/28 13:52:21 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -10,9 +10,7 @@
 package com.idega.content.presentation;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Iterator;
+import java.rmi.RemoteException;
 import javax.faces.component.UIColumn;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
@@ -24,7 +22,8 @@ import javax.faces.event.ActionListener;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
-import com.idega.content.business.MetadataUtil;
+import com.idega.business.IBOLookupException;
+import com.idega.content.business.WebDAVMetadataResource;
 import com.idega.content.data.MetadataValueBean;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
@@ -39,10 +38,11 @@ import com.idega.webface.bean.WFListBean;
 
 /**
  * 
- * Last modified: $Date: 2005/01/24 17:26:34 $ by $Author: joakim $
+ * Last modified: $Date: 2005/01/28 13:52:21 $ by $Author: joakim $
+ * Displays all the metadata types and values for the specified resource
  *
  * @author Joakim Johnson
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class MetadataListManagedBean extends AbstractWFEditableListManagedBean implements WFListBean, ActionListener {
 
@@ -61,80 +61,17 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	public void setResourcePath(String path){
 		resourcePath = path;
 	}
-	
-	private MetadataValueBean[] getMetadata() {
-		MetadataValueBean[] data;
-		ArrayList arrayList = new ArrayList();
-		
-		try {
 
-			IWContext iwc = IWContext.getInstance();
-			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
-	
-			WebdavRootResource rootResource = session.getWebdavRootResource();
-
-			String filePath = service.getURI(resourcePath);
-			
-//			IWUserContext iwuc = IWContext.getInstance();
-//	    	String root = iwuc.getApplicationContext().getIWMainApplication().getApplicationContextURI();
-
-			//Debug
-//			System.out.println("Resource path is "+filePath+" # of metadata types:"+MetadataUtil.getMetadataTypes().size());
-//			rootResource.proppatchMethod(filePath,new PropertyName("DAV:","keywords"),"Test",true);
-			
-			Iterator iter = MetadataUtil.getMetadataTypes().iterator();
-			while(iter.hasNext()) {
-				String type = (String)iter.next();
-//			for(int i=0;i<WebDAVMetadata.metadataType.length;i++) {
-//				String type = WebDAVMetadata.metadataType[i];
-//				System.out.println("Type is "+type);
-
-				Enumeration enum = rootResource.propfindMethod(filePath,new PropertyName("DAV",type).toString());
-	
-				StringBuffer value = new StringBuffer();
-				while(enum.hasMoreElements()) {
-					value.append(enum.nextElement());
-				}
-//				System.out.println("Value is "+value);
-				if(value.length()>0) {
-					MetadataValueBean mvb = new MetadataValueBean(type, value.toString(),"delete");
-					arrayList.add(mvb);
-				}
-			}
-			data = (MetadataValueBean[])arrayList.toArray(new MetadataValueBean[0]);
-			
-		} catch (HttpException ex) {
-			System.out.println("[HTTPException]:"+ex.getMessage());
-			System.out.println("[HTTPException]:"+ex.getReason());
-			System.out.println("[HTTPException]:"+ex.getReasonCode());
-			ex.printStackTrace();
-			data = new MetadataValueBean[] { new MetadataValueBean("Caught HttpException","","") };
-		} catch (IOException ex) {
-			ex.printStackTrace();
-			data = new MetadataValueBean[] { new MetadataValueBean("Caught IOException","","") };
-		} catch (NullPointerException ex) {
-			StackTraceElement[] trace = ex.getStackTrace();
-			String traceString = null;
-			for (int i = 0; i < trace.length; i++) {
-				traceString = traceString + trace[i].toString() + "    \n\r";
-			}
-			data = new MetadataValueBean[] { new MetadataValueBean("Nullpointer: " + traceString,"","") };
-		}
-		return data;
-	}
-	
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
+		System.out.println("MetadataList action");
 		UIComponent comp = actionEvent.getComponent();
-//		UIComponent comp = actionEvent.getSource();
 		String var = (String)comp.getAttributes().get("var");
 		resourcePath = (String)comp.getAttributes().get("resourcePath");
-//		System.out.println("var = "+var);
 		String type = WFUtil.getStringValue(var,"type");
-//		System.out.println("About to delete type "+type);
 		
-		try {
+		MetadataValueBean[] ret = new MetadataValueBean[0];
 
+		try {
 			IWContext iwc = IWContext.getInstance();
 			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
 			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
@@ -142,8 +79,18 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 
 			String filePath = service.getURI(resourcePath);
-//			System.out.println("Filepath = "+filePath);
 			rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),"",true);
+			
+			WebDAVMetadataResource resource;
+			resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
+					iwc, WebDAVMetadataResource.class);
+			ret = resource.getMetadata(resourcePath);
+
+			for(int i=0; i<ret.length;i++) {
+				System.out.println("type="+ret[i].getType()+"  val="+ret[i].getValues());
+			}
+			resource.clear();
+			
 		} catch (HttpException ex) {
 			ex.printStackTrace();
 		} catch (IOException ex) {
@@ -161,7 +108,27 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getData()
 	 */
 	public WFEditableListDataBean[] getData() {
-		return getMetadata();
+		MetadataValueBean[] ret = new MetadataValueBean[0];
+		IWContext iwc = IWContext.getInstance();
+		WebDAVMetadataResource resource;
+		try {
+			resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
+					iwc, WebDAVMetadataResource.class);
+			ret = resource.getMetadata(resourcePath);
+		}
+		catch (IBOLookupException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ret;
 	}
 
 	/* (non-Javadoc)
