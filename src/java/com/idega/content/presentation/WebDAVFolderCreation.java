@@ -1,7 +1,6 @@
 package com.idega.content.presentation;
 
 import java.io.IOException;
-
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlInputText;
@@ -11,13 +10,8 @@ import javax.faces.el.ValueBinding;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
-
 import org.apache.commons.httpclient.HttpException;
-
-import com.idega.business.IBOLookup;
-import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
-import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.webface.WFUtil;
 
@@ -39,27 +33,12 @@ public class WebDAVFolderCreation extends ContentBlock implements ActionListener
 		
 		HtmlOutputText text = getBundle().getLocalizedText("name");
 		text.setId(getId()+"_txtN");
-		text.setStyleClass("wf_listtext");
+		text.setStyleClass("wf_inputtext");
 		HtmlInputText folderName = new HtmlInputText();
 		folderName.setId(this.getId()+"_inpN");
 		folderName.setValueBinding("value", WFUtil.createValueBinding("#{webdavfoldercreationbean.folderName}"));
-
-		try {
-			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
-			HtmlOutputText currFol = getBundle().getLocalizedText("current_folder");
-			currFol.setStyleClass("wf_listtext");
-			
-			table.add(currFol, 1, row);
-			table.add(WFUtil.getText(" = "+res.getPath().replaceFirst(ss.getWebdavServerURI(), ""), "wf_listtext"), 1, row);
-		} catch (Exception e) {
-			HtmlOutputText currFol = getBundle().getLocalizedText("failed_getting_current_folder");
-			currFol.setStyleClass("wf_listtext");
-			table.add(currFol, 1, row);
-		}
-		table.mergeCells(1, row, 2, row);
 		
 		if (errorMessage != null) {
-			++row;
 			HtmlOutputText txt = getBundle().getLocalizedText("folder_creation_failed");
 			txt.setStyleClass("wf_listtext");
 			
@@ -67,7 +46,6 @@ public class WebDAVFolderCreation extends ContentBlock implements ActionListener
 			table.add(WFUtil.getText(" = "+errorMessage, "wf_listtext"), 1, row);
 			table.mergeCells(1, row, 2, row);
 		} else if (folderCreated) {
-			++row;
 			HtmlOutputText txt = getBundle().getLocalizedText("folder_created");
 			txt.setStyleClass("wf_listtext");
 
@@ -122,11 +100,7 @@ public class WebDAVFolderCreation extends ContentBlock implements ActionListener
 		UIComponent source = (UIComponent) event.getSource();
 		String parentPath = (String) source.getAttributes().get(PARAMETER_RESOURCE_PATH);
 		
-		ValueBinding vb = WFUtil.createValueBinding("#{webdavfoldercreationbean.folderName}");
-		HtmlInputText folderName = new HtmlInputText();
-		folderName.setId(this.getId()+"_inpN");
-		folderName.setValueBinding("value", vb);
-		String newFolderName = (String) folderName.getValue();
+		String newFolderName = (String) WFUtil.invoke("webdavfoldercreationbean", "getFolderName");
 		createResource(parentPath, newFolderName);
 	}
 }
