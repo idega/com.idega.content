@@ -8,10 +8,9 @@ package com.idega.content.data;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import org.apache.webdav.lib.WebdavResource;
 import com.idega.core.file.business.FileIconSupplier;
-
 import com.idega.slide.util.VersionHelper;
+import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.FileUtil;
 
 /**
@@ -43,7 +42,22 @@ public class WebDAVBean extends Object {
     private String version;
     private PropertyChangeSupport propertySupport;
     private boolean isLocked = false;
+    private boolean isCheckedOut = false;
+    private String checkedOutString = null;
+    private String comment = null;
     
+	/**
+	 * @return Returns the isCheckedOut.
+	 */
+	public boolean isCheckedOut() {
+		return isCheckedOut;
+	}
+	/**
+	 * @param isCheckedOut The isCheckedOut to set.
+	 */
+	public void setCheckedOut(boolean isCheckedOut) {
+		this.isCheckedOut = isCheckedOut;
+	}
     public WebDAVBean() {
     	
     	propertySupport = new PropertyChangeSupport(this);
@@ -56,8 +70,8 @@ public class WebDAVBean extends Object {
         setName(name);
     }      
    
-    public WebDAVBean(WebdavResource resource) {
-    	this();
+    public WebDAVBean(WebdavExtendedResource resource) {
+    		this();
 			setName(resource.getDisplayName());
 			setIsCollection(resource.isCollection());
 			setLength(resource.getGetContentLength()); 
@@ -67,10 +81,22 @@ public class WebDAVBean extends Object {
 			setWebDavHttpURL(resource.getPath());
 			setVersion(VersionHelper.getLatestVersion(resource));
 			setIsLocked(resource.isLocked());
+			setCheckedOutString(resource.getCheckedOut());
+			setComment(resource.getComment());
     }
     
     
-    public int getId() {
+    /**
+	 * @param checkedOut
+	 */
+	private void setCheckedOutString(String checkedOut) {
+		if(checkedOut!=null && !"".equals(checkedOut)){
+			setCheckedOut(true);
+			checkedOutString = checkedOut;
+		}
+		
+	}
+	public int getId() {
         return id;
     }
     
@@ -201,5 +227,31 @@ public class WebDAVBean extends Object {
 	 */
 	public void setIsLocked(boolean isLocked) {
 		this.isLocked = isLocked;
+	}
+	/**
+	 * @return Returns the comment.
+	 */
+	public String getComment() {
+		if(comment!=null && !"".equals(comment)){
+			return comment;
+		}
+		else{
+			if(isCheckedOut()){
+				return getCheckedOutString().substring(getCheckedOutString().lastIndexOf("/"));
+			}
+		}
+		return null;
+	}
+	/**
+	 * @param comment The comment to set.
+	 */
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+	/**
+	 * @return Returns the checkedOutString.
+	 */
+	public String getCheckedOutString() {
+		return checkedOutString;
 	}
 }
