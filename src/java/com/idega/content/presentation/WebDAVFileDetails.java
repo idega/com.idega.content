@@ -66,11 +66,6 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 //			table.setWidth("100%");
 //			table.setBorder(1);
 			
-//			table.mergeCells(1, row, 2, row);
-//			HtmlOutputText docDetails = getBundle().getLocalizedText("document_details");
-//			docDetails.setStyleClass("wf_text");
-//			table.add(docDetails);
-				
 			HtmlOutputLink link = new HtmlOutputLink();
 			link.setValue(resource.getEncodedPath());
 			link.setStyleClass("wf_listlink");
@@ -82,6 +77,10 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			table.add(link, 2, ++row);
 			table.add(getText("size"), 1, ++row);
 			table.add(WFUtil.getText(FileUtil.getHumanReadableSize(resource.getGetContentLength()),"wf_listtext"), 2, row);
+			table.add(getText("folder"), 1, ++row);
+			HtmlOutputText loc = WFUtil.getTextVB("WebDAVListBean.virtualWebDAVPath");
+			loc.setStyleClass("wf_listtext");
+			table.add(loc, 2, row);
 			table.add(getText("content_type"), 1, ++row);
 			table.add(WFUtil.getText(resource.getGetContentType(),"wf_listtext"), 2, row);
 			
