@@ -46,34 +46,46 @@ public abstract class ContentBlock extends IWBaseComponent {
 	protected WebdavExtendedResource getWebdavExtendedResource() {
 		return resource;
 	}
+		
+	protected boolean useFolders() {
+		return false;
+	}
 
+	public void refreshList() {
+		WFUtil.invoke("WebDAVListBean","refresh");
+	}
+	
+	
 	public void encodeBegin(FacesContext context) throws IOException {
 		String webDavPath = (String) this.getAttributes().get("path");
 		String path = null;
 		if (webDavPath == null) {
-			path = (String) WFUtil.createMethodBinding("#{WebDAVListBean.getClickedFilePath}", null).invoke(context,
-					null);
+			path = (String) WFUtil.createMethodBinding("#{WebDAVListBean.getClickedFilePath}", null).invoke(context,null);
+			if (path == null) {
+				path = (String) WFUtil.createMethodBinding("#{WebDAVListBean.getWebDAVPath}", null).invoke(context,null);
+			}
 		}
 		else {
 			path = (String) WFUtil.invoke(webDavPath);
 		}
 		try {
-			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),
-					IWSlideSession.class);
+			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
 			WebdavExtendedResource oldRes = resource;
 			WebdavExtendedResource newRes = ss.getWebdavResource(path);
-			if (!newRes.isCollection() && (oldRes == null || oldRes.getName().equals(newRes.getName()))) {
-				resource = newRes;
-				this.setInitialized(false);
-				Vector gr = new Vector();
-				for (Iterator iter = getChildren().iterator(); iter.hasNext();) {
-					UIComponent element = (UIComponent) iter.next();
-					//if (element instanceof HtmlPanelGrid) {
-					gr.add(element);
-					//}
-				}
-				if (gr != null) {
-					getChildren().removeAll(gr);
+			if (oldRes == null || oldRes.getName().equals(newRes.getName())) {
+				if ((!useFolders() && !newRes.isCollection() ) || (useFolders() && newRes.isCollection())) {
+					resource = newRes;
+					this.setInitialized(false);
+					Vector gr = new Vector();
+					for (Iterator iter = getChildren().iterator(); iter.hasNext();) {
+						UIComponent element = (UIComponent) iter.next();
+						//if (element instanceof HtmlPanelGrid) {
+						gr.add(element);
+						//}
+					}
+					if (gr != null) {
+						getChildren().removeAll(gr);
+					}
 				}
 			}
 		}
