@@ -319,7 +319,6 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			nameDetailsLink.setId(P_ID+"_det");
 			nameDetailsLink.setStyleClass("content_viewer_file_details");
 			nameDetailsLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.FILE_DETAILS);
-			nameDetailsLink.getChildren().add(WFUtil.getText("     "));
 			nameDetailsLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isFile}"));
 			WFUtil.addParameterVB(nameDetailsLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 			WFUtil.addParameterVB(nameDetailsLink, PARAMETER_IS_FOLDER, var + ".isCollection");
@@ -330,7 +329,6 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			namePreviewLink.setId(P_ID+"_pre");
 			namePreviewLink.setStyleClass("content_viewer_file_preview");
 			namePreviewLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.PREVIEW);
-			namePreviewLink.getChildren().add(WFUtil.getText("     "));
 			namePreviewLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isFile}"));
 			WFUtil.addParameterVB(namePreviewLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 			WFUtil.addParameterVB(namePreviewLink, PARAMETER_IS_FOLDER, var + ".isCollection");
@@ -339,13 +337,14 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			
 			col.getChildren().add(nameLink);
 			col.getChildren().add(nameFolderLink);
-			columns.add(col);
 			
 			UIColumn col2 = new UIColumn();
-			col2.getChildren().add(nameDetailsLink);
-			col2.getChildren().add(WFUtil.getText(" ", "wf_listlink"));
 			col2.getChildren().add(namePreviewLink);
+			col2.getChildren().add(nameDetailsLink);
+
+			columns.add(col);
 			columns.add(col2);
+			
 		}
 		
 //		UIColumn col2 = new UIColumn();
