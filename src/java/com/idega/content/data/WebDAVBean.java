@@ -43,6 +43,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
     public static final String PROP_ICON_URL = "icon_url";
     public static final String PROP_VERSION = "version";
     public static final String PROP_LOCKED = "locked";
+    public static final String PROP_ENCODED_URL = "enc_url";
     
     private int id;
     private String name;
@@ -55,6 +56,8 @@ public class WebDAVBean extends Object implements ICTreeNode {
     private String webDavUrl;
     private String iconURL;
     private String version;
+    private String encodedUrl;
+    
     private PropertyChangeSupport propertySupport;
     private boolean isLocked = false;
     private boolean isCheckedOut = false;
@@ -103,6 +106,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
 			setIsLocked(resource.isLocked());
 			setCheckedOutString(resource.getCheckedOut());
 			setComment(resource.getComment());
+			setEncodedURL(resource.getEncodedPath());
     }
         
 	public int getId() {
@@ -137,6 +141,16 @@ public class WebDAVBean extends Object implements ICTreeNode {
         String oldValue = name;
         name = value;
         propertySupport.firePropertyChange(PROP_NAME, oldValue, name);
+    }
+    
+    public String getEncodedURL() {
+    	return encodedUrl;
+    }
+    
+    public void setEncodedURL(String value) {
+    	String old = encodedUrl;
+    	encodedUrl = value;
+    	propertySupport.firePropertyChange(PROP_ENCODED_URL, old, encodedUrl);
     }
     
     public String getModifiedDate() {
