@@ -27,6 +27,7 @@ import com.idega.slide.util.WebdavResourceVersion;
 import com.idega.util.FileUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.Timer;
+import com.idega.webface.WFList;
 import com.idega.webface.WFUtil;
 
 /**
@@ -168,6 +169,12 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 				//Then add the version table
 				Table vTable = getVersionReportTable(resource);
 				
+				WFList list = new WFList("MetadataList");
+				
+				++row;
+				table.mergeCells(1, row, 2, row);
+				table.add(list, 1, row);
+
 				++row;
 				table.mergeCells(1, row, 2, row);
 				table.add(vTable, 1, row);
@@ -177,8 +184,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 //			String path = getChosenFilePath();
 //			WebDAVMetadata metadataList = new WebDAVMetadata();
 //			metadataList.setFilePath(path);
-//			add(metadataList);
-			//this.getChildren().add(new WebDAVMetadata().getMetadataTable());
+//			this.getChildren().add(new WebDAVMetadata().getMetadataTable());
 		}
 	}
 
