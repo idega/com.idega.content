@@ -148,21 +148,23 @@ yes=Ja
 upload=Ladda upp
 create_a_folder=Skapa mapp
 
-principal_name=Name
-privileges_all=All
-privileges_Read=Read
-privileges_write=Write
-principal.all=Everyone
-principal.authenticated=Authenticated
-principal.unauthenticated=Unauthenticated
-permissions=Permissions
-permission.option.granted=Granted
-permission.option.denied=Denied
-permission.option.not_set=Not set
-refresh=Refresh
-permissionmatrix.standard=Standard Principals
-permissionmatrix.roles=Roles
-permissionmatrix.groups=Groups
-permissionmatrix.users=Users
+
+
+principal_name=Namn
+privileges_all=Alla
+privileges_Read=Läs
+privileges_write=Skriv
+principal.all=Alla
+principal.authenticated=Inloggad användare
+principal.unauthenticated=Ej inloggad användare
+permissions=Behörigheter
+permission.option.granted=Beviljad
+permission.option.denied=Nekad
+permission.option.not_set=Ej satt
+refresh=Uppdatera
+permissionmatrix.standard=Standard roller
+permissionmatrix.roles=Roller
+permissionmatrix.groups=Grupper
+permissionmatrix.users=Användare
 
 initial_version=FÖRSTA VERSIONEN.
