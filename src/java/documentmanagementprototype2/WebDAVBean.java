@@ -6,13 +6,13 @@
 
 package documentmanagementprototype2;
 
-import java.beans.*;
-import java.io.Serializable;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 /**
  * @author Roar
  */
-public class WebDAVBean extends Object implements Serializable {
+public class WebDAVBean extends Object {
     
     public static final String PROP_ID = "id";
     public static final String PROP_NAME = "name";
@@ -32,13 +32,14 @@ public class WebDAVBean extends Object implements Serializable {
     private String creationDate;
     private String mime;
     private String webDavUrl;
-    private listDocuments2 parentList;
     
     private PropertyChangeSupport propertySupport;
     
     public WebDAVBean() {
-        propertySupport = new PropertyChangeSupport(this);
-        setId((int)Math.round(Math.random())*1000);
+    	
+    	propertySupport = new PropertyChangeSupport(this);
+	    setId((int)Math.round(Math.random())*1000);
+  		
     }
    
     public WebDAVBean(String name) {
@@ -141,14 +142,7 @@ public class WebDAVBean extends Object implements Serializable {
     	String oldValue = webDavUrl;
     	this.webDavUrl = webDavUrl;
     	propertySupport.firePropertyChange(PROP_WEB_DAV_URL, oldValue, webDavUrl);
-    }
-    
-    public void setParentList(listDocuments2 parentList) {
-    	listDocuments2 oldValue = this.parentList;
-    	this.parentList = parentList;
-    	propertySupport.firePropertyChange(PROP_PARENT_LIST, oldValue, webDavUrl);
-    }
-    
+    }    
     
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertySupport.addPropertyChangeListener(listener);
@@ -156,21 +150,6 @@ public class WebDAVBean extends Object implements Serializable {
     
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertySupport.removePropertyChangeListener(listener);
-    }
-    
-    public String handleClick() {
-    	System.out.println("Clicked on me = "+name+", URL = "+webDavUrl);
-    	if (isCollection) {
-    		System.out.println("[WebDAVBean] Folder clicked... opening");
-//    		return webDavUrl;
-    		parentList.setWebDavHttpURL(webDavUrl);
-    	} else {
-    		
-    		System.out.println("[WebDAVBean] File clicked... opening");
-    		return webDavUrl;
-//    		parentList.setWebDavHttpURL(webDavUrl);
-    	}
-    	return null;
     }
     
 }

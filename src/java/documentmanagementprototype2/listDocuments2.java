@@ -451,7 +451,7 @@ public class listDocuments2 {
 				bean.setCreationDate(resources[i].getCreationDate());
 				bean.setWebDavHttpURL(resources[i].getHttpURL().toString());
 				System.out.println(i+" "+resources[i].getHttpURL());
-				bean.setParentList(this);
+//				bean.setParentList(this);
 				v.add(bean);
 			}
 		}
