@@ -11,7 +11,7 @@
     <f:view>
     		<ws:page id="listdocuments1">
                <h:form id="uploadForm" name="uploadForm" enctype="multipart/form-data">
-				<co:ContentViewer id="gt"/>
+				<co:ContentViewer rootPath="/files" startPath="/files" id="gt"/>
 			</h:form>
 		</ws:page>
     </f:view>
