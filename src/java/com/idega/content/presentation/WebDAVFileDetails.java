@@ -219,8 +219,10 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 				
 				versionPath.setId("dl_"+vRow);
 				versionPath.setStyleClass("wf_listlink");
-				String url = version.getURL();
-				versionPath.setRelativeFilePath(url);
+				if (versionName != null) {
+					String url = version.getURL();
+					versionPath.setRelativeFilePath(url);
+				}
 				//so we have a sensable name for the file!
 				String fileName = "v"+versionName.replace('.','_')+"-"+resource.getDisplayName();
 				versionPath.setAlternativeFileName(fileName);
