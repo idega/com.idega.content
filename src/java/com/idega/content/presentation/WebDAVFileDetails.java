@@ -174,6 +174,12 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 				table.add(vTable, 1, row);
 			}
 			this.getChildren().add(table);
+			//Added by Tryggvi, should later be implemented
+//			String path = getChosenFilePath();
+//			WebDAVMetadata metadataList = new WebDAVMetadata();
+//			metadataList.setFilePath(path);
+//			add(metadataList);
+			//this.getChildren().add(new WebDAVMetadata().getMetadataTable());
 		}
 	}
 
