@@ -78,6 +78,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		if (rootFolder == null) {
 			rootFolder = (String) this.getAttributes().get("rootFolder");
 		}
+		
+		String iconTheme = (String) this.getAttributes().get("iconTheme");
 //		rootFolder ="/files/shared";
 
 		WFBlock listBlock = new WFBlock();
@@ -97,6 +99,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		list.setRendered(renderWebDAVList);
 		list.setStartFolder(startFolder);
 		list.setRootFolder(rootFolder);
+		list.setIconTheme(iconTheme);
 		listBlock.add(list);
 		
 		WFBlock detailsBlock = new WFBlock();

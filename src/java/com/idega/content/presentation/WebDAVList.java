@@ -30,6 +30,7 @@ public class WebDAVList extends IWBaseComponent {
 
 		String startFolder = (String) this.getAttributes().get("startFolder");
 		String rootFolder = (String) this.getAttributes().get("rootFolder");
+		String iconTheme = (String) this.getAttributes().get("iconTheme");
 		if (startFolder != null) {
 			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setStartFolder", startFolder);
 		} else {
@@ -39,6 +40,11 @@ public class WebDAVList extends IWBaseComponent {
 			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setRootFolder", rootFolder);
 		} else {
 			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setRootFolder", "");
+		}
+		if (iconTheme != null) {
+			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setIconTheme", iconTheme);
+		} else {
+			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setIconTheme", "");
 		}
 		
 		this.setId(this.getId());
@@ -54,6 +60,10 @@ public class WebDAVList extends IWBaseComponent {
 	
 	public void setRootFolder(String root) {
 		getAttributes().put("rootFolder", root);
+	}
+	
+	public void setIconTheme(String theme) {
+		getAttributes().put("iconTheme", theme);
 	}
 	
 	public void encodeChildren(FacesContext context) throws IOException{

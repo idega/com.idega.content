@@ -11,6 +11,7 @@ public class ContentViewerTag extends UIComponentTag {
 	private String rootFolder;
 	private String startFolder;
 	private Boolean useUserHomeFolder;
+	private String iconTheme;
 	
 	public void setRootPath(String root) {
 		rootFolder = root;
@@ -32,11 +33,20 @@ public class ContentViewerTag extends UIComponentTag {
 		useUserHomeFolder = new Boolean(useUserFolder);
 	}
 	
+	public void setIconTheme(String themeName) {
+		iconTheme = themeName;
+	}
+	
+	public String getIconTheme() {
+		return iconTheme;
+	}
+	
 	public void release() {      
 		super.release();      
 		rootFolder = null ;
 		startFolder = null;
 		useUserHomeFolder = null;
+		iconTheme = null;
 	}
 
 	protected void setProperties(UIComponent component) {      
@@ -45,6 +55,7 @@ public class ContentViewerTag extends UIComponentTag {
 			component.getAttributes().put("rootFolder", rootFolder);
 			component.getAttributes().put("startFolder", startFolder);
 			component.getAttributes().put("useUserHomeFolder", useUserHomeFolder);
+			component.getAttributes().put("iconTheme", iconTheme);
 		}
 	}
 

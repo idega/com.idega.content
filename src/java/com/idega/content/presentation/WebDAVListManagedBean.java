@@ -48,6 +48,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	private String webDAVPath = "";
 	private String rootPath = null;
 	private String startPath = null;
+	private String iconTheme = null;
 	
 	private int startPage = -1;
 	private int rows = -1;
@@ -107,6 +108,13 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			root = null;
 		}
 		this.rootPath = root;
+	}
+	
+	public void setIconTheme(String theme) {
+		if (theme != null && "".equals(theme)) {
+			theme = null;
+		}
+		this.iconTheme = theme;
 	}
 
 	public void refresh() {
@@ -378,6 +386,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		String url;
 		if (webDAVPath != null && !"".equals(webDAVPath) && !webDAVPath.equals(rootPath)) {
 			upBean = new WebDAVBean();
+			upBean.setIconTheme(iconTheme);
 			int lastIndex = webDAVPath.lastIndexOf("/");
 			if (lastIndex > 0) {
 				String dotdot = webDAVPath.substring(0, lastIndex);
@@ -398,6 +407,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 				url = resource.getPath();
 				url = url.replaceFirst(webDAVServletURL, "");
 				bean.setWebDavHttpURL(url);
+				bean.setIconTheme(iconTheme);
 				v.add(bean);
 			}
 		}
