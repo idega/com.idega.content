@@ -17,6 +17,7 @@ public class ContentViewerTag extends UIComponentTag {
 	private boolean useVersionControl = true;
 	private boolean showPermissionTab = true;
 	private boolean showUploadComponent = true;
+	private String onFileClickEvent;
 	
 	public void setRootPath(String root) {
 		rootFolder = root;
@@ -58,6 +59,10 @@ public class ContentViewerTag extends UIComponentTag {
 		this.useVersionControl = useVersionControl;
 	}
 	
+	public void setOnFileClickEvent(String onclick) {
+		this.onFileClickEvent = onclick;
+	}
+	
 	/**
 	 * @return Returns the showPermissionTab.
 	 */
@@ -95,6 +100,7 @@ public class ContentViewerTag extends UIComponentTag {
 		useVersionControl = true;
 		showPermissionTab = true;
 		showUploadComponent = true;
+		onFileClickEvent = null;
 	}
 
 	protected void setProperties(UIComponent component) {
@@ -111,6 +117,7 @@ public class ContentViewerTag extends UIComponentTag {
 			viewer.setUseVersionControl(useVersionControl);
 			viewer.setShowPermissionTab(showPermissionTab);
 			viewer.setShowUploadComponent(showUploadComponent);
+			viewer.setOnFileClickEvent(onFileClickEvent);
 		}
 	}
 
