@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.9 2005/02/27 15:14:58 eiki Exp $
+ * $Id: ContentViewManager.java,v 1.10 2005/02/28 17:29:07 gummi Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -22,10 +22,10 @@ import com.idega.repository.data.Singleton;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2005/02/27 15:14:58 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/02/28 17:29:07 $ by $Author: gummi $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class ContentViewManager implements Singleton  {
 
@@ -88,6 +88,7 @@ public class ContentViewManager implements Singleton  {
 		
 		DefaultViewNode previewNode = new DefaultViewNode("preview",documentsNode);
 		previewNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
+		previewNode.setRendered(false);
 		
 		DefaultViewNode searchNode = new DefaultViewNode("search",contentNode);
 		searchNode.setJspUri(bundle.getJSPURI("search.jsp"));	
