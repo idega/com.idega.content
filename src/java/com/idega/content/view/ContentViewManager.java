@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.5 2004/12/31 03:01:35 gimmi Exp $
+ * $Id: ContentViewManager.java,v 1.6 2005/01/24 17:49:04 thomas Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -21,14 +21,14 @@ import com.idega.idegaweb.IWMainApplication;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2004/12/31 03:01:35 $ by $Author: gimmi $
+ *  Last modified: $Date: 2005/01/24 17:49:04 $ by $Author: thomas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class ContentViewManager {
 
-	private static ContentViewManager instance;
+	private static final String IW_CONTENT_VIEW_MANAGER_KEY = "iw_contentviewmanager";
 	private static String CONTENT_ID="content";
 	private static String CONTENT_BUNDLE_IDENTIFIER="com.idega.content";
 	private ViewNode contentRootNode;
@@ -37,13 +37,15 @@ public class ContentViewManager {
 	private ContentViewManager(IWMainApplication iwma){
 		this.iwma=iwma;
 	}
-	
-	public static ContentViewManager getInstance(IWMainApplication iwma){
-		if(instance==null){
-			instance = new ContentViewManager(iwma);
-		}
-		return instance;
-	}
+
+	  public static ContentViewManager getInstance(IWMainApplication iwma){
+	    ContentViewManager contentViewManager = (ContentViewManager) iwma.getAttribute(IW_CONTENT_VIEW_MANAGER_KEY);
+	    if(contentViewManager==null){
+	      contentViewManager = new ContentViewManager(iwma);
+	      iwma.setAttribute(IW_CONTENT_VIEW_MANAGER_KEY,contentViewManager);
+	    }
+	    return contentViewManager;
+	  }	
 	
 	public static ContentViewManager getInstance(FacesContext context){
 		IWMainApplication iwma = IWMainApplication.getIWMainApplication(context);
