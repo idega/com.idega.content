@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadata.java,v 1.1 2005/01/10 10:26:01 joakim Exp $
+ * $Id: WebDAVMetadata.java,v 1.2 2005/01/18 14:11:08 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -9,19 +9,10 @@
  */
 package com.idega.content.presentation;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import javax.faces.component.UIInput;
-import javax.faces.component.UISelectItems;
 import javax.faces.component.html.HtmlCommandButton;
-import javax.faces.component.html.HtmlSelectOneMenu;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
-import javax.faces.model.SelectItem;
-import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.util.Timer;
 import com.idega.webface.WFContainer;
@@ -30,22 +21,16 @@ import com.idega.webface.WFResourceUtil;
 
 /**
  * 
- * Last modified: $Date: 2005/01/10 10:26:01 $ by $Author: joakim $
+ * Last modified: $Date: 2005/01/18 14:11:08 $ by $Author: joakim $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class WebDAVMetadata implements ActionListener{
 	
 	private static final String NEW_VALUES_ID = "newValueID";
 	private static final String ADD_ID = "addID";
-	public static final ArrayList metadataType = new ArrayList();
-	
-	{
-		metadataType.add("categories");
-		metadataType.add("keywords");
-		metadataType.add("publisher");
-	}
+	public static final String[] metadataType = new String[] {"categories","keywords","publisher"};
 	
 	public WFContainer getMetadataTable() {
 		WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
@@ -74,7 +59,7 @@ public class WebDAVMetadata implements ActionListener{
 
 		//Existing metadata
 		
-		
+/*		
 		//Add line
 		ArrayList typesLeft = new ArrayList(metadataType);
 		List l = new ArrayList();
@@ -98,7 +83,7 @@ public class WebDAVMetadata implements ActionListener{
 		dropdown.getChildren().add(sItems);
 		
 		metadataTable.add(dropdown, vColumn++, vRow);
-		
+*/		
 //		HtmlInputText newValueInput = WFUtil.getInputText(NEW_VALUES_ID, "");		
 //		newValueInput.setSize(40);
 //		metadataTable.add(newValueInput);
