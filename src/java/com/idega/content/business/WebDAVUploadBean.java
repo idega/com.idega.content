@@ -3,8 +3,6 @@ package com.idega.content.business;
 import java.io.IOException;
 import net.sourceforge.myfaces.custom.fileupload.UploadedFile;
 import com.idega.business.IBOLookup;
-import com.idega.idegaweb.IWApplicationContext;
-import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
@@ -45,12 +43,10 @@ public class WebDAVUploadBean{
 
 	public String upload() throws IOException{
 		
-		IWUserContext iwuc = IWContext.getInstance();
-		IWApplicationContext iwac = iwuc.getApplicationContext();
+		IWContext iwc = IWContext.getInstance();
 		
-		IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwuc,IWSlideSession.class);
-
-		IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwac,IWSlideService.class);
+		IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+		IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 	
 		System.out.println("webdavServerURL = "+service.getWebdavServerURL());
 		System.out.println("webdavServletURL = "+service.getWebdavServerURI());
@@ -72,7 +68,7 @@ public class WebDAVUploadBean{
 		}
 		
 		downloadPath = filePath+fileName;
-		String contextUri = iwac.getIWMainApplication().getApplicationContextURI();
+		String contextUri = iwc.getIWMainApplication().getApplicationContextURI();
 		imagePath = downloadPath.substring(downloadPath.indexOf(contextUri)+contextUri.length());
 		
 		boolean success = rootResource.mkcolMethod(filePath);
