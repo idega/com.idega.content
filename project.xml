@@ -1,7 +1,6 @@
 <project>
     <extend>../com.idega.core.bundle/base-project.xml</extend>
     <name>idegaWeb Content</name>
-    <groupId>com.idega.content</groupId>
     <artifactId>com.idega.content</artifactId>
     <currentVersion>1.0</currentVersion>
     <inceptionYear>2004</inceptionYear>
