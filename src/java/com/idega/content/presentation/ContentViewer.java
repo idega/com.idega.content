@@ -63,7 +63,7 @@ public class ContentViewer extends WFBlock implements ActionListener{
 	protected IWBundle getBundle() {
 		return ContentBlock.getBundle();
 	}
-		
+			
 	public void initializeContent() {	
 
 //		String path = (String) WFUtil.invoke("WebDAVListBean", "getWebDAVPath");
@@ -303,6 +303,7 @@ public class ContentViewer extends WFBlock implements ActionListener{
 			renderWebDAVNewFolder = false;
 			renderWebDAVUpload = false;
 			renderWebDAVDeleter = false;
+			WFUtil.invoke("WebDAVListBean","setClickedFilePath", null, String.class);
 		} else if (FILE_DETAILS.equals(action)) {
 			renderWebDAVList = false;
 			renderWebDAVFileDetails = true;
