@@ -12,8 +12,7 @@ xmlns:cmf="http://myfaces.sourceforge.net/tld/myfaces_ext_0_9.tld"
     <f:view>
     <w:workspace_page id="1234">
                <h:form id="uploadForm" name="uploadForm" enctype="multipart/form-data">
-               	<c:webdavList id="giT">
- 	       		</c:webdavList>
+               	<c:WebDAVList id="giT"/>
  	       		
                <f:verbatim><br/></f:verbatim>
                     <h:outputText value="Select a file to upload : "/>
@@ -28,7 +27,7 @@ xmlns:cmf="http://myfaces.sourceforge.net/tld/myfaces_ext_0_9.tld"
                     <h:inputText value="#{WebDAVUploadBean.fileName}"/>
                     <f:verbatim><br/></f:verbatim>
                     <h:outputText value="and select the folder to upload to (optional) : "/>
-                     <h:inputText value="#{webDavList.webDAVPath}"/>
+                     <h:inputText value="#{WebDAVListBean.webDAVPath}"/>
                     <h:commandButton value="Upload" action="#{WebDAVUploadBean.upload}"/>
                 
                 <f:verbatim><br/></f:verbatim>
