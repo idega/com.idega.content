@@ -56,7 +56,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			catch (IOException e) {
 				e.printStackTrace();
 			}
-
+			
 			String resourceName = resource.getDisplayName();
 			int row = 1;
 			
@@ -109,16 +109,14 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			lockToggler.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
 			if (resource.isLocked()) {
 				getBundle().getLocalizedUIComponent("unlock", lockToggler);
-//				lockToggler.setValue("Unlock");
 			} else {
 				getBundle().getLocalizedUIComponent("lock", lockToggler);
-//				lockToggler.setValue("Lock");
 			}
+
 			lockToggler.setStyleClass("wf_listlink");
 			lockToggler.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 			lockToggler.getAttributes().put(ACTION, ACTION_TOGGLE_LOCK);
 			table.add(lockToggler, 2, row);
-
 
 			table.add(getText("checkout_status"), 1, ++row);
 			String checkedOut = resource.getCheckedOut();
@@ -130,25 +128,41 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			}
 			table.add(WFUtil.getText("  - "), 2, row);
 			
-			HtmlCommandButton checker = new HtmlCommandButton();
-			checker.setId(getId()+"_check");
-			checker.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
+			HtmlCommandButton checkOuter = new HtmlCommandButton();
+			checkOuter.setId(getId()+"_check");
+			checkOuter.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
+			checkOuter.setStyleClass("wf_listlink");
+			checkOuter.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
+
 			if (checkedOut == null || "".equals(checkedOut)) {
-				getBundle().getLocalizedUIComponent("check_out", checker);
-//				checker.setValue("Check out");
-				checker.getAttributes().put(ACTION, ACTION_CHECK_OUT);
-			} else if (VersionHelper.hasUserCheckedOutResource(resource, userName)) {
-				// Checka if current user has file checked out, or not...
-//				getBundle().getLocalizedUIComponent("check_out", checker);
-				getBundle().getLocalizedUIComponent("uncheck_out", checker);
-//			checker.setValue("Check out");
-			checker.getAttributes().put(ACTION, ACTION_UNCHECK_OUT);
+				getBundle().getLocalizedUIComponent("check_out", checkOuter);
+				checkOuter.getAttributes().put(ACTION, ACTION_CHECK_OUT);
+				table.add(checkOuter, 2, row);
 			} else {
-				checker.setValue("Check in/uncheck something...");
+				if (VersionHelper.hasUserCheckedOutResource(resource, userName)) {
+					
+					getBundle().getLocalizedUIComponent("uncheck_out", checkOuter);
+					checkOuter.getAttributes().put(ACTION, ACTION_UNCHECK_OUT);
+					table.add(checkOuter, 2, row);
+
+					HtmlCommandButton checkInner = new HtmlCommandButton();
+					checkInner.setId(getId()+"_check");
+					checkInner.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
+					checkInner.setStyleClass("wf_listlink");
+					checkInner.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
+					getBundle().getLocalizedUIComponent("check_in", checkInner);
+					checkInner.getAttributes().put(ACTION, ACTION_CHECK_IN);
+					
+					table.add(" ", 2, row);
+					table.add(checkInner, 2, row);
+					
+				} else {
+					HtmlOutputText comm = new HtmlOutputText();
+					comm.setValue("("+VersionHelper.getCheckedOutName(resource)+")");
+					comm.setStyleClass("wf_listtext");
+					table.add(comm, 2, row);
+				}
 			}
-			checker.setStyleClass("wf_listlink");
-			checker.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
-			table.add(checker, 2, row);
 			
 			
 			//Then add the version table
@@ -167,10 +181,8 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 		List versions = VersionHelper.getAllVersions(resource);
 		Table vTable = new Table(8,versions.size()+1);
 		vTable.setId(vTable.getId() + "_ver");
-		//setListStyleClass("wf_list");
 		vTable.setRowStyleClass(1,"wf_listheading");
 		vTable.setStyleClass("wf_listtable");
-		//vTable.setHeaderClass("wf_listheading");
 		
 		int vRow = 1;
 		int vColumn = 1;
@@ -198,7 +210,6 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 				}
 				
 				
-				//vTable.add(resourceName, 1, vRow);
 				String versionName = version.getVersionName();
 								
 				vTable.add(WFUtil.getText(versionName,"wf_listtext"), ++vColumn, vRow);
