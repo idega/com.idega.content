@@ -83,3 +83,10 @@ onclick_remove_attachment=return confirm('Vill du verkligen ta bort bilagan?');r
 onclick_remove_related_content_item=return confirm('Vill du verkligen ta bort referensen till denna artikel?');return false;
 
 no_article_selected=Ingen artickel vald
+
+
+name=Namn
+lock=Lås
+mime_type=Mime Typ
+size=Storlek
+checked_out=Utcheckad
