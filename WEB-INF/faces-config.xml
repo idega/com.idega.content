@@ -10,6 +10,11 @@
 		<component-class>com.idega.content.presentation.WebDAVList</component-class>
 	</component>
 	
+	<component>
+		<component-type>WebDAVFileDetails</component-type>
+		<component-class>com.idega.content.presentation.WebDAVFileDetails</component-class>
+	</component>
+	
     <managed-bean>
         <managed-bean-name>SessionBean1</managed-bean-name>
         <managed-bean-class>documentmanagementprototype2.SessionBean1</managed-bean-class>
@@ -36,7 +41,7 @@
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
     <managed-bean>
-    		<managed-bean-name>webDavList</managed-bean-name>
+    		<managed-bean-name>WebDAVListBean</managed-bean-name>
         <managed-bean-class>com.idega.content.presentation.WebDAVListManagedBean</managed-bean-class>
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
