@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.4 2005/01/19 18:56:59 eiki Exp $
+ * $Id: ContentSearch.java,v 1.5 2005/01/19 23:16:42 eiki Exp $
  * Created on Jan 17, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -46,11 +45,11 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- *  Last modified: $Date: 2005/01/19 18:56:59 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/01/19 23:16:42 $ by $Author: eiki $
  * This class implements the Searchplugin interface and can therefore be used in a Search block for searching contents of the files in the iwfile system.
  * To use it simply register this class as a iw.searchable component in a bundle.
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ContentSearch implements SearchPlugin {
 
