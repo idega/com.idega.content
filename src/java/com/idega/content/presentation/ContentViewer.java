@@ -391,14 +391,12 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		preview.setRendered(renderPreviewLink);
 		
 		WFToolbarButton newFolder = new WFToolbarButton();
-//		WFToolbarButton newFolder = new WFToolbarButton("/images/newfolder.gif",getBundle());
 		newFolder.getAttributes().put(PARAMETER_ACTION, NEW_FOLDER);
 		newFolder.setId(getId()+"_btnNewFolder");
 		newFolder.setStyleClass("content_viewer_new_folder");
 		newFolder.setToolTip(getBundle().getLocalizedString("create_a_folder"));
-		//newFolder.setToolTip("New Folder");
 		newFolder.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
-		newFolder.setRendered(renderNewFolderLink);
+		newFolder.setRendered(showFolders && renderNewFolderLink);
 
 		WFToolbarButton permissions = new WFToolbarButton();
 //		WFToolbarButton permissions = new WFToolbarButton("/images/permissions.gif",getBundle());
