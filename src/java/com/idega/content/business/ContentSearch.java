@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.3 2005/01/19 01:45:55 eiki Exp $
+ * $Id: ContentSearch.java,v 1.4 2005/01/19 18:56:59 eiki Exp $
  * Created on Jan 17, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -46,11 +46,11 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- *  Last modified: $Date: 2005/01/19 01:45:55 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/01/19 18:56:59 $ by $Author: eiki $
  * This class implements the Searchplugin interface and can therefore be used in a Search block for searching contents of the files in the iwfile system.
  * To use it simply register this class as a iw.searchable component in a bundle.
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class ContentSearch implements SearchPlugin {
 
@@ -131,16 +131,17 @@ public class ContentSearch implements SearchPlugin {
 		
 		try {
 			IWSlideSession session = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(), IWSlideSession.class);
-
+			String servletMapping = session.getWebdavServerURI();
 			SearchRequest s = new SearchRequest();
 			s.addSelection(DISPLAYNAME);
 			s.addSelection(LASTMODIFIED);
 			s.addScope(new SearchScope("files"));
-			SearchExpression expression = s.contains(((SimpleSearchQuery)searchQuery).getSimpleSearchQuery());
+			String queryString = ((SimpleSearchQuery)searchQuery).getSimpleSearchQuery();
+			SearchExpression expression = s.contains(queryString);
 			s.setWhereExpression(expression);
 			String search = s.asString();
-			System.out.println(search);
-			SearchMethod method = new SearchMethod("/content", search);
+			//System.out.println(search);
+			SearchMethod method = new SearchMethod(servletMapping, search);
 
 			HttpClient client = new HttpClient();
 			client.setState(new WebdavState());
@@ -158,21 +159,24 @@ public class ContentSearch implements SearchPlugin {
 			        
 			int state = client.executeMethod(method);
 			System.out.println("State: " + state);
-			Header[] headers = method.getResponseHeaders();
-			for (int i = 0; i < headers.length; i++) {
-				System.out.println(headers[i].toString());
-			}
+//			Header[] headers = method.getResponseHeaders();
+//			for (int i = 0; i < headers.length; i++) {
+//				System.out.println(headers[i].toString());
+//			}
 			Enumeration enum = method.getAllResponseURLs();
+			
 			while (enum.hasMoreElements()) {
 				String fileURI = (String) enum.nextElement();
-				BasicSearchResult result = new BasicSearchResult();
-				
-				result.setSearchResultType(SEARCH_TYPE);
-				result.setSearchResultURI(fileURI);
-				result.setSearchResultName(URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/")+1)));
-				result.setSearchResultExtraInformation(URLDecoder.decode(fileURI.substring(0,fileURI.lastIndexOf("/")+1)));
-				
-				results.add(result);
+				if(!fileURI.equalsIgnoreCase(servletMapping)){
+					BasicSearchResult result = new BasicSearchResult();
+					
+					result.setSearchResultType(SEARCH_TYPE);
+					result.setSearchResultURI(fileURI);
+					result.setSearchResultName(URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/")+1)));
+					result.setSearchResultExtraInformation(URLDecoder.decode(fileURI.substring(0,fileURI.lastIndexOf("/")+1)));
+					
+					results.add(result);
+				}
 			}
 			
 			searcher.setSearchResults(results);
