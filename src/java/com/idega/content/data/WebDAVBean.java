@@ -36,6 +36,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
     public static final String PROP_LENGTH = "length";
     public static final String PROP_IS_COLLECTION = "is_collection";
     public static final String PROP_MODIFIED_DATE = "mod_date";
+    public static final String PROP_MODIFIED_DATE_LONG = "mod_date_long";
     public static final String PROP_CREATION_DATE = "cre_date";
     public static final String PROP_MIME = "mime";
     public static final String PROP_WEB_DAV_URL = "webdav_url";
@@ -48,6 +49,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
     private long length;
     private boolean isCollection;
     private String modifiedDate;
+    private Long modifiedDateLong;
     private String creationDate;
     private String mime;
     private String webDavUrl;
@@ -113,6 +115,9 @@ public class WebDAVBean extends Object implements ICTreeNode {
         propertySupport.firePropertyChange(PROP_ID, oldValue, id);
     }
     
+    public long getLengthLong() {
+    	return length;
+    }
    
     public String getLength() {
         return (!isCollection)? FileUtil.getHumanReadableSize(length) : null;
@@ -138,6 +143,14 @@ public class WebDAVBean extends Object implements ICTreeNode {
         return modifiedDate;
     }
     
+    public long getModifiedDateLong() {
+    	if (modifiedDateLong != null) {
+    		return modifiedDateLong.longValue();
+    	} else {
+    		return 0;
+    	}
+    }
+    
     public boolean getIsReal() {
     	return real;
     }
@@ -147,13 +160,20 @@ public class WebDAVBean extends Object implements ICTreeNode {
     }
     
     public void setModifiedDate(long value) {
-    	setModifiedDate(new java.util.Date(value).toString());
+    	Long oldValue = modifiedDateLong;
+    	modifiedDateLong = new Long(value);
+        propertySupport.firePropertyChange(PROP_MODIFIED_DATE_LONG, oldValue, modifiedDateLong);
+
+        setModifiedDate(new java.util.Date(value).toString());
     }
+    
     public void setModifiedDate(String value) {
         String oldValue = modifiedDate;
         modifiedDate = value;
         propertySupport.firePropertyChange(PROP_MODIFIED_DATE, oldValue, modifiedDate);
     }
+    
+    
     
     public String getCreationDate() {
       return creationDate;
