@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadata.java,v 1.8 2005/02/23 17:38:21 joakim Exp $
+ * $Id: WebDAVMetadata.java,v 1.9 2005/03/17 17:34:08 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -21,12 +21,14 @@ import javax.faces.component.UIInput;
 import javax.faces.component.UISelectItems;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlInputText;
+import javax.faces.component.html.HtmlSelectBooleanCheckbox;
 import javax.faces.component.html.HtmlSelectOneMenu;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import javax.faces.model.SelectItem;
+import net.sourceforge.myfaces.component.html.ext.HtmlOutputText;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
@@ -41,7 +43,6 @@ import com.idega.presentation.Table;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavRootResource;
-import com.idega.util.Timer;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFList;
 import com.idega.webface.WFResourceUtil;
@@ -49,12 +50,12 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2005/02/23 17:38:21 $ by $Author: joakim $
+ * Last modified: $Date: 2005/03/17 17:34:08 $ by $Author: joakim $
  * 
  * Display the UI for adding metadata type - values to a file.
  *
  * @author Joakim Johnson
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	
@@ -98,7 +99,12 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	 * @return
 	 */
 	private UIComponent getEditContainer() {
-		return getMetadataTable(resourcePath);
+		WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
+		WFContainer mainContainer = new WFContainer();
+		mainContainer.add(getMetadataTable(resourcePath));
+		mainContainer.add(localizer.getHeaderTextVB("categories"));
+		mainContainer.add(getCategoriesTable(resourcePath));
+		return mainContainer;
 	}
 	
 	/**
@@ -107,27 +113,28 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	 * @param resourcePath
 	 * @return
 	 */
-	public WFContainer getMetadataTable(String resourcePath) {
+	public Table getMetadataTable(String resourcePath) {
 		WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
-		WFContainer mainContainer = new WFContainer();
 		
-		Timer timer = new Timer();
-		timer.start();
+//		Timer timer = new Timer();
+//		timer.start();
 
+		//Create the table
 		Table metadataTable = new Table(3,2);
 		metadataTable.setId(metadataTable.getId() + "_ver");
 		metadataTable.setRowStyleClass(1,"wf_listheading");
 		metadataTable.setStyleClass("wf_listtable");
 		
-		//Add line
+		//Add the lines
 		List l = new ArrayList();
 		
+		//Type dropdown selector
 		UIInput dropdown = new HtmlSelectOneMenu();
 		dropdown.setId(DROPDOWN_ID);
 
 		Locale locale = IWContext.getInstance().getCurrentLocale();
 		
-		//Remove already used types from the dropdown list
+		//First get the list with all metadata types
 		ArrayList tempTypes = new ArrayList(MetadataUtil.getMetadataTypes());
 		IWContext iwc = IWContext.getInstance();
 		WebDAVMetadataResource resource;
@@ -135,23 +142,23 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 			resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
 					iwc, WebDAVMetadataResource.class);
 			MetadataValueBean[] ret = resource.getMetadata(resourcePath);
+			//Remove already used types from the dropdown list
 			for(int i=0; i<ret.length;i++) {
 				tempTypes.remove(ret[i].getType());
 			}
 		}
 		catch (IBOLookupException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		int row = 1;
+		
+		//Display dropdown if there are any more metadata types left to add
 		if(tempTypes.size()>0) {
 			Iterator iter = tempTypes.iterator();
 			
@@ -181,8 +188,54 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 
 		metadataTable.add(addButton, 2, row);
 		
-		mainContainer.add(metadataTable);
-		return mainContainer;
+//		mainContainer.add(metadataTable);
+		return metadataTable;
+	}
+	
+	/**
+	 * <p> Creates a table with checkboxes for all the available categories </p>
+	 * @param resourcePath
+	 * @return table
+	 */
+	private Table getCategoriesTable(String resourcePath) {
+//		WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
+		Table categoriesTable = new Table();
+		
+		IWContext iwc = IWContext.getInstance();
+		WebDAVMetadataResource resource;
+		int count = 0;
+		try {
+			resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
+					iwc, WebDAVMetadataResource.class);
+			Iterator iter = resource.getCategories(resourcePath).iterator();
+			while(iter.hasNext()) {
+//				UISelectMany uism = new UISelectMany();
+				HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
+				smc.setValue(new Boolean(true));
+				categoriesTable.add(smc,count%3 + 1,count/3 + 1);
+				HtmlOutputText catText = new HtmlOutputText();
+				catText.setValue(iter.next().toString());
+				categoriesTable.add(catText,count%3 + 1,count/3 + 1);
+				count++;
+			}
+			count--;
+			categoriesTable.setColumns(Math.min(count,3));
+			categoriesTable.setRows(count/3 + 1);
+			categoriesTable.setId(categoriesTable.getId() + "_ver");
+			categoriesTable.setRowStyleClass(1,"wf_listheading");
+			categoriesTable.setStyleClass("wf_listtable");
+		}
+		catch (IBOLookupException e) {
+			e.printStackTrace();
+		}
+		catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return categoriesTable;
 	}
 
 	/**
