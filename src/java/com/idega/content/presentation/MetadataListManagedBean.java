@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataListManagedBean.java,v 1.7 2005/01/31 16:51:23 joakim Exp $
+ * $Id: MetadataListManagedBean.java,v 1.8 2005/03/09 15:47:18 eiki Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -38,11 +38,11 @@ import com.idega.webface.bean.WFListBean;
 
 /**
  * 
- * Last modified: $Date: 2005/01/31 16:51:23 $ by $Author: joakim $
+ * Last modified: $Date: 2005/03/09 15:47:18 $ by $Author: eiki $
  * Displays all the metadata types and values for the specified resource
  *
  * @author Joakim Johnson
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class MetadataListManagedBean extends AbstractWFEditableListManagedBean implements WFListBean, ActionListener {
 
@@ -217,6 +217,11 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getHeader(int)
 	 */
 	public UIComponent getHeader(int columnIndex) {
-		return ContentBlock.getBundle().getLocalizedText(localizationKey[columnIndex]);
+		if(columnIndex==2){
+			return WFUtil.getText("");
+		}
+		else{
+			return ContentBlock.getBundle().getLocalizedText(localizationKey[columnIndex]);
+		}
 	}
 }
