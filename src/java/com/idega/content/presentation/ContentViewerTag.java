@@ -14,6 +14,7 @@ public class ContentViewerTag extends UIComponentTag {
 	private String iconTheme;
 	private boolean showFolders = true;
 	private String columnsToHide;
+	private boolean useVersionControl = true;
 	
 	public void setRootPath(String root) {
 		rootFolder = root;
@@ -51,6 +52,10 @@ public class ContentViewerTag extends UIComponentTag {
 		this.columnsToHide = columns;
 	}
 	
+	public void setUseVersionControl(boolean useVersionControl) {
+		this.useVersionControl = useVersionControl;
+	}
+	
 	public void release() {      
 		super.release();      
 		rootFolder = null ;
@@ -59,6 +64,7 @@ public class ContentViewerTag extends UIComponentTag {
 		showFolders = true;
 		iconTheme = null;
 		columnsToHide = null;
+		useVersionControl = true;
 	}
 
 	protected void setProperties(UIComponent component) {
@@ -72,6 +78,7 @@ public class ContentViewerTag extends UIComponentTag {
 			viewer.setIconTheme(iconTheme);
 			viewer.setShowFolders(showFolders);
 			viewer.setColumnsToHide(columnsToHide);
+			viewer.setUseVersionControl(useVersionControl);
 		}
 	}
 

@@ -37,7 +37,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	public static String LIST = "ac_list";
 	private static String FILE_DETAILS = "ac_file_details";
 	private static String FILE_DETAILS_LESS = "ac_less_file_details";
-	private static String PREVIEW = "ac_preview";
+	static String PREVIEW = "ac_preview";
 	static String NEW_FOLDER = "ac_folder";
 	private static String PERMISSIONS = "ac_permissions";
 	private static String UPLOAD = "ac_upload";
@@ -66,6 +66,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	private boolean showFolders = true;
 	private Collection columnsToHide = null;
 	private boolean eventHandled = false;
+	private boolean useVersionControl = true;
 	
 	private String currentFolderPath = null;
 	private String currentFileName = null;
@@ -101,6 +102,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		list.setIconTheme(iconTheme);
 		list.setShowFolders(showFolders);
 		list.setColumnsToHide(columnsToHide);
+		list.setUseVersionControl(useVersionControl);
 		listBlock.add(list);
 		
 		WFBlock detailsBlock = new WFBlock();
@@ -112,6 +114,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WebDAVFileDetails details = new WebDAVFileDetails();
 		details.setRendered(renderWebDAVFileDetails);
 		details.setId(getId()+"_details");
+		details.setUseVersionControl(useVersionControl);
 		detailsBlock.add(details);
 		
 		WFBlock previewBlock = new WFBlock();
@@ -124,6 +127,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		details2.setRendered(renderWebDAVFilePreview);
 		details2.setId(getId()+"_details");
 		details2.setDetailed(false);
+		details2.setUseVersionControl(useVersionControl);
 		WebDAVFilePreview preview = new WebDAVFilePreview();
 		preview.setRendered(renderWebDAVFilePreview);
 		preview.setId(getId()+"_preview");
@@ -517,7 +521,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	}
 	
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[19];
+		Object values[] = new Object[20];
 		values[0] = super.saveState(ctx);
 		values[1] = new Boolean(renderWebDAVList);
 		values[2] = new Boolean(renderWebDAVFileDetails);
@@ -537,6 +541,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		values[16] = new Boolean(useUserHomeFolder);
 		values[17] = new Boolean(showFolders);
 		values[18] = columnsToHide;
+		values[19] = new Boolean(useVersionControl);
 
 		return values;
 	}
@@ -562,6 +567,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		useUserHomeFolder = ((Boolean) values[16]).booleanValue();
 		showFolders = ((Boolean) values[17]).booleanValue();
 		columnsToHide = ((Collection) values[18]);
+		useVersionControl = ((Boolean) values[19]).booleanValue();
 	}
 	/**
 	 * @return Returns the currentFileName.
@@ -624,5 +630,9 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			}
 		}
 		return currentResourceName;
+	}
+	
+	public void setUseVersionControl(boolean useVersionControl) {
+		this.useVersionControl = useVersionControl;
 	}
 }

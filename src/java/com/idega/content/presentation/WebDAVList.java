@@ -3,6 +3,7 @@ package com.idega.content.presentation;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Vector;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import com.idega.presentation.IWBaseComponent;
@@ -23,6 +24,7 @@ public class WebDAVList extends IWBaseComponent {
 	private String iconTheme = null;
 	private boolean showFolders = true;
 	private Collection columnsToHide = null;
+	private boolean useVersionControl = true;
 	
 	public WebDAVList() {
 	}
@@ -46,10 +48,12 @@ public class WebDAVList extends IWBaseComponent {
 		}
 		
 		WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setShowFolders", new Boolean(showFolders));
-		
 		if (columnsToHide != null) {
 			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setColumnsToHide", columnsToHide, Collection.class);
+		} else {
+			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setColumnsToHide", new Vector(), Collection.class);
 		}
+		WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setUseVersionControl", new Boolean(useVersionControl));
 		
 		
 		this.setId(this.getId());
@@ -77,6 +81,10 @@ public class WebDAVList extends IWBaseComponent {
 	
 	public void setColumnsToHide(Collection columns) {
 		this.columnsToHide = columns;
+	}
+	
+	public void setUseVersionControl(boolean useVersionControl) {
+		this.useVersionControl = useVersionControl;
 	}
 	
 	public void encodeChildren(FacesContext context) throws IOException{
