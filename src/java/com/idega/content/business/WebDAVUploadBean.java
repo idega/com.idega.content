@@ -1,15 +1,13 @@
 package com.idega.content.business;
 
 import java.io.IOException;
-import java.util.Map;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
 import net.sourceforge.myfaces.custom.fileupload.UploadedFile;
 import com.idega.business.IBOLookup;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavRootResource;
+import com.idega.webface.WFUtil;
 
 public class WebDAVUploadBean{
 
@@ -51,8 +49,13 @@ public class WebDAVUploadBean{
 		
 		if(uploadFile!=null){
 			IWContext iwc = IWContext.getInstance();
-			Map parameters = ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest()).getParameterMap();
-			uploadFolderPath = ((String[])parameters.get("uploadForm:uploadPath"))[0];
+//			Map parameters = ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest()).getParameterMap();
+//			uploadFolderPath = ((String[])parameters.get("uploadForm:uploadPath"))[0];
+//			
+			String tempUploadFolderPath = (String) WFUtil.invoke("WebDAVListBean","getWebDAVPath");
+			if(tempUploadFolderPath!=null){
+				uploadFolderPath = tempUploadFolderPath;
+			}
 			
 			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
 			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
@@ -77,23 +80,28 @@ public class WebDAVUploadBean{
 				}
 			}
 			
-			downloadPath = filePath+fileName;
-			String contextUri = iwc.getIWMainApplication().getApplicationContextURI();
-			if(contentType!=null && contentType.startsWith("image")){
-				imagePath = downloadPath.substring(downloadPath.indexOf(contextUri)+contextUri.length());
-			}
-			
-			
 			
 			boolean success = rootResource.mkcolMethod(filePath);
 			System.out.println("Creating folder success "+success);
 			success = rootResource.putMethod(filePath+fileName,uploadFile.getInputStream());
 			System.out.println("Uploading file success "+success);
+			
+			downloadPath = filePath+fileName;
+			String contextUri = iwc.getIWMainApplication().getApplicationContextURI();
+			if(success && (contentType!=null && contentType.startsWith("image")) ){
+				imagePath = downloadPath.substring(downloadPath.indexOf(contextUri)+contextUri.length());
+			}
+			
+			if(success){
+				WFUtil.invoke("WebDAVListBean","refresh");
+			}
+			else{
+				return "upload_failed";
+			}
 		
 		}
 		
 		return "ok";
-
 	}
 
 	/**
