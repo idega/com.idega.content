@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.Vector;
 import javax.faces.component.UIComponent;
+import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 import org.apache.commons.httpclient.HttpException;
 import com.idega.business.IBOLookup;
@@ -135,4 +136,16 @@ public abstract class ContentBlock extends IWBaseComponent {
 	public boolean getRendersChildren() {
 		return true;
 	}
+	
+	protected HtmlOutputText getText(String localizationKey, String className) {
+		HtmlOutputText text = getBundle().getLocalizedText(localizationKey);
+		text.setStyleClass(className);
+		return text;
+	}
+	
+	protected HtmlOutputText getText(String localizationKey) {
+		return getText(localizationKey, "wf_smalltext");
+	}
+	
+	
 }
