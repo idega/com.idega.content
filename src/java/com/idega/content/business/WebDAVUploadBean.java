@@ -91,7 +91,7 @@ public class WebDAVUploadBean{
 	 * This does a webdav query
 	 * @return
 	 */
-	public boolean isUploaded(){
+	public boolean getIsUploaded(){
 		
 		if(downloadPath!=null){
 			IWSlideService service;
@@ -112,6 +112,8 @@ public class WebDAVUploadBean{
 		return false;
 		
 	}
+	
+	
 	
     protected static final String WEBDAV_SERVLET_URI = "/servlet/webdav";
 	/**

@@ -28,14 +28,13 @@ xmlns:cmf="http://myfaces.sourceforge.net/tld/myfaces_ext_0_9.tld">
                     <h:commandButton value="Upload" action="#{WebDAVUploadBean.upload}"/>
                 
                 <f:verbatim><br/></f:verbatim>
-                <h:outputLink id="filelink" value="#{WebDAVUploadBean.downloadPath}" target="_new">
+                <h:outputLink id="filelink" value="#{WebDAVUploadBean.downloadPath}" target="_new" rendered="#{WebDAVUploadBean.isUploaded}" >
                 <f:verbatim>Click here to get the file</f:verbatim>
                 </h:outputLink>
                 <f:verbatim><br/></f:verbatim>
                 <h:graphicImage id="imagePreview" value="#{WebDAVUploadBean.imagePath}"/>
                 
                 </h:form>
-                
             </wf:workspace_page>
     </f:view>
 </jsp:root>
