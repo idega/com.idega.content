@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.12 2005/02/14 17:43:23 eiki Exp $
+ * $Id: ContentSearch.java,v 1.13 2005/03/20 20:44:33 eiki Exp $
  * Created on Jan 17, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
@@ -36,6 +37,7 @@ import com.idega.business.IBOLookupException;
 import com.idega.core.search.business.Search;
 import com.idega.core.search.business.SearchPlugin;
 import com.idega.core.search.business.SearchQuery;
+import com.idega.core.search.data.AdvancedSearchQuery;
 import com.idega.core.search.data.BasicSearch;
 import com.idega.core.search.data.BasicSearchResult;
 import com.idega.core.search.data.SimpleSearchQuery;
@@ -48,12 +50,12 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/14 17:43:23 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/03/20 20:44:33 $ by $Author: eiki $
  * This class implements the Searchplugin interface and can therefore be used in a Search block (com.idega.core.search)<br>
  *  for searching contents and properties (metadata) of the files in the iwfile system.
  * To use it simply register this class as a iw.searchable component in a bundle.
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class ContentSearch implements SearchPlugin {
 
@@ -61,6 +63,14 @@ public class ContentSearch implements SearchPlugin {
 	public static final String SEARCH_DESCRIPTION_LOCALIZABLE_KEY = "content_search.description";
 	
 	public static final String SEARCH_TYPE = "document";
+	
+	public static final String DOCUMENT_SEARCH_WORD_PARAMETER_NAME = "doc_s_word";
+	public static final String DOCUMENT_TYPE_PARAMETER_NAME = "doc_type";
+	public static final String DOCUMENT_ORDERING_PARAMETER_NAME = "doc_order";
+	public static final String DOCUMENT_ORDERING_BY_DATE = "doc_order_date";
+	public static final String DOCUMENT_ORDERING_BY_NAME = "doc_order_name";
+	public static final String DOCUMENT_ORDERING_BY_SIZE = "doc_order_size";
+	
 	
 	private static final String TEMP_ILLEGAL_PATH = "/files/users/";
 	private String tempCurrentUserPath;
@@ -88,7 +98,11 @@ public class ContentSearch implements SearchPlugin {
 	 * @see com.idega.core.search.business.SearchPlugin#getAdvancedSearchSupportedParameters()
 	 */
 	public List getAdvancedSearchSupportedParameters() {
-		return null;
+		List parameters = new ArrayList();
+		parameters.add(DOCUMENT_SEARCH_WORD_PARAMETER_NAME);
+		parameters.add(DOCUMENT_TYPE_PARAMETER_NAME);
+		parameters.add(DOCUMENT_ORDERING_PARAMETER_NAME);
+		return parameters;
 	}
 
 	/* (non-Javadoc)
@@ -102,7 +116,7 @@ public class ContentSearch implements SearchPlugin {
 	 * @see com.idega.core.search.business.SearchPlugin#getSupportsAdvancedSearch()
 	 */
 	public boolean getSupportsAdvancedSearch() {
-		return false;
+		return true;
 	}
 	
 
@@ -210,11 +224,18 @@ public class ContentSearch implements SearchPlugin {
 		List l = new ArrayList();
 		
 		try {
-			SearchRequest content = getContentSearch(searchQuery);
-			SearchRequest property = getPropertySearch(searchQuery);
+			if(searchQuery instanceof AdvancedSearchQuery){
+				SearchRequest content = getAdvancedContentSearch(searchQuery);	
+				l.add(content);
+			}
+			else if(searchQuery instanceof SimpleSearchQuery){
+				SearchRequest content = getContentSearch(searchQuery);
+				SearchRequest property = getPropertySearch(searchQuery);
+				
+				l.add(content);
+				l.add(property);
+			}
 			
-			l.add(content);
-			l.add(property);
 		}
 		catch (SearchException e) {
 			e.printStackTrace();
@@ -225,6 +246,47 @@ public class ContentSearch implements SearchPlugin {
 	}
 
 
+	protected SearchRequest getAdvancedContentSearch(SearchQuery searchQuery) throws SearchException {
+		SearchRequest s = new SearchRequest();
+		//s.addSelection(DISPLAYNAME);
+		s.addSelection(LASTMODIFIED);
+		s.addScope(new SearchScope("files"));
+		
+		Map params = searchQuery.getSearchParameters();
+		
+		String queryString = (String) params.get(DOCUMENT_SEARCH_WORD_PARAMETER_NAME);
+		String type = (String) params.get(DOCUMENT_TYPE_PARAMETER_NAME);
+		String ordering = (String) params.get(DOCUMENT_ORDERING_PARAMETER_NAME);
+		
+		SearchExpression expression = null;
+		if(queryString!=null && !"".equals(queryString)){
+			//does contain have to be separate?
+			expression = s.contains(queryString);
+			expression = s.or(expression,s.or( s.compare(CompareOperator.LIKE, DISPLAYNAME,"%"+queryString+"%"),s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME,queryString),s.compare(CompareOperator.LIKE, COMMENT,"%"+queryString+"%"))));
+		}
+
+		if(type!=null && !"".equals(type) && !"*".equals(type)){
+			if(expression!=null){
+				expression = s.and(expression,s.compare(CompareOperator.LIKE, DISPLAYNAME,"%."+type));
+			}
+			else{
+				expression = s.compare(CompareOperator.LIKE, DISPLAYNAME,"%."+type);
+			}
+		}
+		
+		if(ordering!=null && !"".equals(ordering)){
+			//TODO eiki do ordering
+		}
+		
+		if(expression!=null){
+			s.setWhereExpression(expression);
+		}
+		String search = s.asString();
+		System.out.println(search);
+		return s;
+	}
+	
+	
 	protected SearchRequest getContentSearch(SearchQuery searchQuery) throws SearchException {
 		SearchRequest s = new SearchRequest();
 		//s.addSelection(DISPLAYNAME);
