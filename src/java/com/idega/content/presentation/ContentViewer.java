@@ -102,6 +102,7 @@ public class ContentViewer extends WFBlock {
 				renderListLink = true;
 				renderDetailsLink = true;
 				renderPreviewLink = true;
+				renderNewFolderLink = false;
 				
 				if (currentAction == null) {
 					setRenderFlags(FILE_DETAILS);
@@ -111,8 +112,6 @@ public class ContentViewer extends WFBlock {
 				}
 				
 				super.setToolbar(getToolbar());
-				
-				
 			}
 		}
 		super.encodeBegin(context);

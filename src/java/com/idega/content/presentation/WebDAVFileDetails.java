@@ -124,7 +124,7 @@ public class WebDAVFileDetails extends ContentBlock {
 				String url = version.getURL();
 				versionPath.setRelativeFilePath(url);
 				//so we have a sensable name for the file!
-				versionPath.setAlternativeFileName("v"+versionName.replace('.','_')+"-"+resource.getName());
+				versionPath.setAlternativeFileName("v"+versionName.replace('.','_')+"-"+resource.getDisplayName());
 				//versionPath.getChildren().add(WFUtil.getText("Download/View"));
 				vTable.add(versionPath, ++vColumn, vRow);
 				vTable.add(WFUtil.getText(version.getCreatorDisplayName(),"wf_listtext"), ++vColumn, vRow);

@@ -5,7 +5,6 @@ package com.idega.content.presentation;
 
 import javax.faces.component.html.HtmlOutputLink;
 import com.idega.presentation.Table;
-import com.idega.presentation.text.HorizontalRule;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.FileUtil;
 import com.idega.util.IWTimestamp;
@@ -52,9 +51,10 @@ public class WebDAVFilePreview extends ContentBlock {
 			
 			this.getChildren().add(table);
 			
-			this.getChildren().add(new HorizontalRule());
+			//this.getChildren().add(new HorizontalRule());
 			
-			WFFrame frame = new WFFrame("Preview",filePath);
+			WFFrame frame = new WFFrame(resourceName,filePath);
+			frame.setToolbarEmbeddedInTitlebar(false);
 			this.getChildren().add(frame);
 			
 //			String mimeType = resource.getGetContentType();
