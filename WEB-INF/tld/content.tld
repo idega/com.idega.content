@@ -11,5 +11,14 @@
     <description>JSF Idega Content Management Tag Library</description>
 	<uri>http://xmlns.idega.com/com.idega.content</uri>
 
+	<tag>
+		<name>webdavList</name>
+		<tag-class>com.idega.content.presentation.WebDAVListTag</tag-class>
+		<attribute>
+			<name>id</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+	</tag>
 	
 </taglib>
