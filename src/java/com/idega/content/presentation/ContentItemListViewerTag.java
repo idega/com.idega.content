@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewerTag.java,v 1.2 2005/02/21 16:12:45 gummi Exp $
+ * $Id: ContentItemListViewerTag.java,v 1.3 2005/02/22 15:11:31 gummi Exp $
  * Created on 31.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -9,6 +9,7 @@
  */
 package com.idega.content.presentation;
 
+import java.util.List;
 import javax.faces.component.UIComponent;
 import javax.faces.webapp.UIComponentTag;
 import com.idega.content.presentation.ContentItemListViewer;
@@ -16,16 +17,17 @@ import com.idega.content.presentation.ContentItemListViewer;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/21 16:12:45 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/02/22 15:11:31 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ContentItemListViewerTag extends UIComponentTag {
 
-	String resourcePath;
-	String managedBeanId;
-	String detailsViewerPath;
+	private String resourcePath;
+	private String managedBeanId;
+	private String detailsViewerPath;
+	private List categories = null;
 	
 	/**
 	 * 
@@ -57,6 +59,7 @@ public class ContentItemListViewerTag extends UIComponentTag {
 			viewer.setBeanIdentifier(managedBeanId);
 			viewer.setResourcePath(resourcePath);
 			viewer.setDetailsViewerPath(detailsViewerPath);
+			viewer.setCategories(categories);
 		}
 	}
 	
@@ -86,5 +89,17 @@ public class ContentItemListViewerTag extends UIComponentTag {
 	 */
 	public void setDetailsViewerPath(String detailsViewerPath) {
 		this.detailsViewerPath = detailsViewerPath;
+	}
+	/**
+	 * @return Returns the categories.
+	 */
+	public List getCategories() {
+		return categories;
+	}
+	/**
+	 * @param categories The categories to set.
+	 */
+	public void setCategories(List categories) {
+		this.categories = categories;
 	}
 }

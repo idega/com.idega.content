@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.2 2005/02/21 16:12:45 gummi Exp $
+ * $Id: ContentItemListViewer.java,v 1.3 2005/02/22 15:11:31 gummi Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -24,10 +24,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/21 16:12:45 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/02/22 15:11:31 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ContentItemListViewer extends UIData {
 
@@ -39,6 +39,8 @@ public class ContentItemListViewer extends UIData {
 	private String _style;
 	private String _columnClasses;
 	private String _rowClasses;
+	
+	private List categories = null;
 	
 	private WFDataModel model=null;
 	
@@ -70,11 +72,8 @@ public class ContentItemListViewer extends UIData {
 		this.managedBeanId = managedBeanId;
 		String var = managedBeanId + "_var";
 		setVar(var);
-		
 
-		notifyManagedBeanOfResourcePath(this.resourcePath);
-		notifyManagedBeanOfDetailsViewerPath(this.detailsViewerPath);
-		
+		notifyManagedBeanOfVariableValues();
 	}
 	
 	protected void initializeInEncodeBegin(){
@@ -217,7 +216,7 @@ public class ContentItemListViewer extends UIData {
 	 * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
 	 */
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[9];
+		Object values[] = new Object[10];
 		values[0] = super.saveState(ctx);
 		values[1] = this.managedBeanId;
 		values[2] = this.resourcePath;
@@ -227,6 +226,7 @@ public class ContentItemListViewer extends UIData {
 		values[6] = _rowClasses;
 		values[7] = detailsViewerPath;
 		values[8] = Boolean.valueOf(initialized);
+		values[9] = categories;
 		return values;
 	}
 	
@@ -244,10 +244,16 @@ public class ContentItemListViewer extends UIData {
 		this._rowClasses = (String) values[6];
 		this.detailsViewerPath = (String)values[7];
 		this.initialized = ((Boolean)values[8]).booleanValue();
+		this.categories = (List)categories;
 		
-		notifyManagedBeanOfResourcePath(resourcePath);
-		notifyManagedBeanOfDetailsViewerPath(detailsViewerPath);
+		notifyManagedBeanOfVariableValues();
 		
+	}
+	
+	protected void notifyManagedBeanOfVariableValues(){
+		notifyManagedBeanOfResourcePath(this.resourcePath);
+		notifyManagedBeanOfDetailsViewerPath(this.detailsViewerPath);
+		notifyManagedBeanOfCategories(this.categories);
 	}
 
 	/**
@@ -265,6 +271,15 @@ public class ContentItemListViewer extends UIData {
 	private void notifyManagedBeanOfDetailsViewerPath(String path) {
 		if(this.managedBeanId!=null){
 			WFUtil.invoke(this.managedBeanId,"setDetailsViewerPath",path,String.class);
+		}
+	}
+	
+	/**
+	 * @param resourcePath
+	 */
+	private void notifyManagedBeanOfCategories(List categories) {
+		if(this.managedBeanId!=null){
+			WFUtil.invoke(this.managedBeanId,"setCategories",categories,List.class);
 		}
 	}
 
@@ -306,5 +321,18 @@ public class ContentItemListViewer extends UIData {
 	public void setDetailsViewerPath(String path) {
 		this.detailsViewerPath = path;
 		notifyManagedBeanOfDetailsViewerPath(detailsViewerPath);
+	}
+	/**
+	 * @return Returns the categories.
+	 */
+	public List getCategories() {
+		return categories;
+	}
+	/**
+	 * @param categories The categories to set.
+	 */
+	public void setCategories(List categories) {
+		this.categories = categories;
+		notifyManagedBeanOfCategories(categories);
 	}
 }
