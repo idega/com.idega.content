@@ -247,7 +247,7 @@ public class ContentViewer extends WFBlock implements ActionListener{
 			renderWebDAVFilePreview = true;
 			renderWebDAVNewFolder = false;
 		}else if (NEW_FOLDER.equals(action)) {
-			renderWebDAVList = false;
+			renderWebDAVList = true;
 			renderWebDAVFileDetails = false;
 			renderWebDAVFilePreview = false;
 			renderWebDAVNewFolder = true;
