@@ -42,6 +42,9 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 	
 	private String webDAVPath = "";
 	private ActionListener actionListener;
+	
+	private int startPage = -1;
+	private int rows = -1;
 
 	public WebDAVListManagedBean() {
 	}
@@ -77,9 +80,9 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		col.setHeader(WFUtil.getText("Name"));
 		col.getChildren().add(l);
 		
-//		UIColumn col2 = new UIColumn();
-//		col2.setHeader(WFUtil.getText("Created"));
-//		col2.getChildren().add(WFUtil.getTextVB(var + ".creationDate"));
+		UIColumn col2 = new UIColumn();
+		col2.setHeader(WFUtil.getText("Created"));
+		col2.getChildren().add(WFUtil.getTextVB(var + ".creationDate"));
 		
 		UIColumn col3 = new UIColumn();
 		col3.setHeader(WFUtil.getText("Length"));
@@ -98,7 +101,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		col6.getChildren().add(WFUtil.getTextVB(var + ".modifiedDate"));
 
 
-		return new UIColumn[] { col0, col, col3, col4, col5, col6 };
+		return new UIColumn[] { col0, col, col2, col3, col4, col5, col6 };
 	}
 
 	/**
@@ -110,6 +113,9 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		if (dataModel == null) {
 			dataModel = new WFDataModel();
 		}
+		
+		this.startPage = start.intValue();
+		this.rows = rows.intValue();
 		
 		WebDAVBean[] beans = getDavData();
 		
@@ -187,22 +193,14 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		}
 		
 		while (enumer.hasMoreElements()) {
-		//for (int i = 0; i < resources.length; i++) {
 			resource = (WebdavResource) enumer.nextElement();
 			if (!resource.getDisplayName().startsWith(".")) {
-				bean = new WebDAVBean();
-				bean.setName(resource.getDisplayName());
-				bean.setIsCollection(resource.isCollection());
-				bean.setLength(resource.getGetContentLength()); 
-				bean.setModifiedDate(resource.getGetLastModified());
-				bean.setMime(resource.getGetContentType());
-				bean.setCreationDate(resource.getCreationDate());
+				bean = new WebDAVBean(resource);
 				url = resource.getPath();
 				url = url.replaceFirst(webDAVServletURL, "");
 				bean.setWebDavHttpURL(url);
-				
-				System.out.println("[WebDAVManagerBean] " +url);
 //				bean.setParentList(this);
+				System.out.println("[WebDAVManagerBean] " +url);
 				v.add(bean);
 			}
 		}
@@ -234,6 +232,10 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		return clickedFilePath;
 	}
 
+	public void refresh() {
+		updateDataModel(new Integer(startPage), new Integer(rows));
+	}
+	
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
 		UIComponent comp = actionEvent.getComponent();
 		
@@ -258,10 +260,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 
 		}
 		
-		UIComponent parent = (UIComponent) comp.getParent();
-		while (parent != null && !(parent instanceof WFList)) {
-			parent = parent.getParent();
-		}
+		WFList parent = getWFListParent(comp);
 		
 		if (parent != null) {
 			WFList parentList = (WFList) parent;
@@ -270,7 +269,23 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 				this.updateDataModel(new Integer(parentList.getFirst()), new Integer(parentList.getRows()));
 			} else {
 				this.setClickedFilePath(webDAVPath);
+				int index = webDAVPath.lastIndexOf("/");
+				if (index > -1) {
+					webDAVPath = webDAVPath.substring(0, index);
+				}
 			}
+		}
+	}
+
+	private WFList getWFListParent(UIComponent comp) {
+		UIComponent parent = (UIComponent) comp.getParent();
+		while (parent != null && !(parent instanceof WFList)) {
+			parent = parent.getParent();
+		}
+		if (parent instanceof WFList) {
+			return (WFList) parent;
+		} else {
+			return null;
 		}
 	}
 
