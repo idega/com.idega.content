@@ -2,7 +2,6 @@ package com.idega.content.business;
 
 import java.io.IOException;
 import net.sourceforge.myfaces.custom.fileupload.UploadedFile;
-import org.apache.webdav.lib.WebdavResource;
 import com.idega.business.IBOLookup;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWUserContext;
@@ -54,10 +53,10 @@ public class WebDAVUploadBean{
 		IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwac,IWSlideService.class);
 	
 		System.out.println("webdavServerURL = "+service.getWebdavServerURL());
-		System.out.println("webdavServletURL = "+service.getWebdavServletURL());
+		System.out.println("webdavServletURL = "+service.getWebdavServerURI());
 
 		WebdavRootResource rootResource = session.getWebdavRootResource();
-		String filePath = service.getWebdavServletURL()+getUploadFilePath();
+		String filePath = service.getWebdavServerURI()+getUploadFilePath();
 		String uploadName = uploadFile.getName();
 		String fileName = uploadName;
 		if(!"".equals(name)){
@@ -95,12 +94,9 @@ public class WebDAVUploadBean{
 		if(downloadPath!=null){
 			IWSlideSession session;
 			try {
-				IWContext iwc = IWContext.getInstance();
-				session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+				session = (IWSlideSession)IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
 
-				WebdavResource webdavResource = session.getWebdavResource("");
-				webdavResource.setPath(downloadPath);
-				return webdavResource.getExistence();
+				return session.getExistence(downloadPath);
 			}
 			catch (Exception e){
 				e.printStackTrace();

@@ -37,7 +37,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 	private static final String PARAMETER_WEB_DAV_URL = "wdurl";
 	private static final String PARAMETER_IS_FOLDER = "isf";
 	
-	private String webDAVPath = null;
+	private String webDAVPath = "/";
 	private ActionListener actionListener;
 
 	public WebDAVListManagedBean() {
@@ -125,17 +125,23 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 			
 			IWUserContext iwuc = IWContext.getInstance();			
 			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(iwuc, IWSlideSession.class);
+			if(webDAVPath == null){ 
+				webDAVPath = "/";
+			}
 
-			WebdavResource resource = ss.getWebdavResource("");
-			resource.setPath(webDAVPath);
-			if (resource.getExistence()) {
-				data = getDirectoryListing(resource, ss.getWebdavServletURL());
+			if (ss.getExistence(webDAVPath)) {
+				data = getDirectoryListing(ss.getWebdavResource(webDAVPath), ss.getWebdavServerURI());
 			} else {
 				data = new WebDAVBean[] { new WebDAVBean("Resource does not exist") };
 			}
 		} catch (HttpException ex) {
+			System.out.println("[HTTPException]:"+ex.getMessage());
+			System.out.println("[HTTPException]:"+ex.getReason());
+			System.out.println("[HTTPException]:"+ex.getReasonCode());
+			ex.printStackTrace();
 			data = new WebDAVBean[] { new WebDAVBean("Caught HttpException") };
 		} catch (IOException ex) {
+			ex.printStackTrace();
 			data = new WebDAVBean[] { new WebDAVBean("Caught IOException") };
 		} catch (NullPointerException ex) {
 			StackTraceElement[] trace = ex.getStackTrace();
