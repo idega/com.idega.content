@@ -445,7 +445,7 @@ public class listDocuments2 {
 				bean = new WebDAVBean();
 				bean.setName(resources[i].getDisplayName());
 				bean.setIsCollection(resources[i].isCollection());
-				bean.setLength(Long.toString(resources[i].getGetContentLength())); 
+				bean.setLength(resources[i].getGetContentLength()); 
 				bean.setModifiedDate(resources[i].getGetLastModified());
 				bean.setMime(resources[i].getGetContentType());
 				bean.setCreationDate(resources[i].getCreationDate());

@@ -12,6 +12,7 @@ import org.apache.webdav.lib.WebdavResource;
 import com.idega.core.file.business.FileIconSupplier;
 
 import com.idega.slide.util.VersionHelper;
+import com.idega.util.FileUtil;
 
 /**
  * @author Roar
@@ -32,7 +33,7 @@ public class WebDAVBean extends Object {
     
     private int id;
     private String name;
-    private String length;
+    private long length;
     private boolean isCollection;
     private String modifiedDate;
     private String creationDate;
@@ -59,7 +60,7 @@ public class WebDAVBean extends Object {
     	this();
 			setName(resource.getDisplayName());
 			setIsCollection(resource.isCollection());
-			setLength(Long.toString(resource.getGetContentLength())); 
+			setLength(resource.getGetContentLength()); 
 			setModifiedDate(resource.getGetLastModified());
 			setMime(resource.getGetContentType());
 			setCreationDate(resource.getCreationDate());
@@ -81,10 +82,10 @@ public class WebDAVBean extends Object {
     
    
     public String getLength() {
-        return (!isCollection)? length : null;
+        return (!isCollection)? FileUtil.getHumanReadableSize(length) : null;
     }
     
-    public void setLength(String value) {
+    public void setLength(long value) {
 //        long oldValue = length;
         length = value;
 //        propertySupport.firePropertyChange(PROP_LENGTH, oldValue, length);
