@@ -124,7 +124,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
     }
    
     public String getLength() {
-        return (!isCollection)? FileUtil.getHumanReadableSize(length) : null;
+        return (!isCollection)? FileUtil.getHumanReadableSize(length) : " ";
     }
     
     public void setLength(long value) {
@@ -238,6 +238,9 @@ public class WebDAVBean extends Object implements ICTreeNode {
     }    
     
     public String getVersion() {
+    	if (version == null) {
+    		version = " "; 
+    	}
     	return version;
     }
     
@@ -279,6 +282,10 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	 */
 	public boolean getIsLocked() {
 		return isLocked;
+	}
+	
+	public boolean getIsUnlocked() {
+		return !getIsLocked();
 	}
 	/**
 	 * @param isLocked The isLocked to set.
