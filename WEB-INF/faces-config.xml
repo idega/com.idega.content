@@ -125,11 +125,6 @@
         <managed-bean-class>com.idega.content.presentation.MetadataListManagedBean</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
-    <managed-bean>
-        <managed-bean-name>Metadata</managed-bean-name>
-        <managed-bean-class>com.idega.content.presentation.WebDAVMetadata</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-    </managed-bean>
 
     <!--  converters -->
     <converter>
