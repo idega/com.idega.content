@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.3 2005/03/01 11:22:30 gummi Exp $
+ * $Id: ContentItemBean.java,v 1.4 2005/03/02 15:08:07 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -27,6 +27,8 @@ import javax.ejb.EJBException;
 import javax.ejb.EJBLocalHome;
 import javax.ejb.EJBLocalObject;
 import javax.ejb.RemoveException;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.webdav.lib.util.WebdavStatus;
 import com.idega.business.IBOLookup;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.file.data.ICFile;
@@ -47,10 +49,10 @@ import com.idega.webface.WFUtil;
 /**
  * Bean for idegaWeb content items.   
  * <p>
- * Last modified: $Date: 2005/03/01 11:22:30 $ by $Author: gummi $
+ * Last modified: $Date: 2005/03/02 15:08:07 $ by $Author: joakim $
  *
  * @author Anders Lindman
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 
 public abstract class ContentItemBean implements Serializable, ICFile, ContentItem {
@@ -500,24 +502,35 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	 * @throws XmlException
 	 * @throws IOException
 	 */
-	public void load(String path) throws Exception{
-		System.out.println("Attempting to load path "+path);
+	public boolean load(String path) throws Exception{
+//		System.out.println("Attempting to load path "+path);
+		clear();
 		IWUserContext iwuc = IWContext.getInstance();
-
-		IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwuc,IWSlideSession.class);
-
-		WebdavExtendedResource webdavResource = session.getWebdavResource(path);
-		webdavResource.setProperties();
-		
-		//here I don't use the varible 'path' since it can actually be the URI
-		setResourcePath(webdavResource.getPath());
-		
-		String createDate = webdavResource.getCreationDateString();
-		if(createDate != null){
-			setCreationDate(new IWTimestamp(createDate).getTimestamp());
+		boolean returner = true;
+		try {
+			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwuc,IWSlideSession.class);
+	
+			WebdavExtendedResource webdavResource = session.getWebdavResource(path);
+			webdavResource.setProperties();
+			
+			//here I don't use the varible 'path' since it can actually be the URI
+			setResourcePath(webdavResource.getPath());
+			
+			String createDate = webdavResource.getCreationDateString();
+			if(createDate != null){
+				setCreationDate(new IWTimestamp(createDate).getTimestamp());
+			}
+			
+			returner = load(webdavResource);
+		}catch(HttpException e) {
+			if(e.getReasonCode()==WebdavStatus.SC_NOT_FOUND) {
+				setRendered(false);
+				return false;
+			} else {
+				throw e;
+			}
 		}
-		
-		load(webdavResource);
+		return returner;
 
 	}
 	
@@ -526,8 +539,8 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	/**
 	 * @param webdavResource
 	 */
-	public void load(WebdavExtendedResource webdavResource) throws Exception {
-		
+	public boolean load(WebdavExtendedResource webdavResource) throws Exception {
+		return true;
 	}
 
 	/* (non-Javadoc)
