@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import javax.faces.component.UIComponent;
-import javax.faces.component.html.HtmlPanelGrid;
 import javax.faces.context.FacesContext;
 
 import org.apache.commons.httpclient.HttpException;
@@ -48,9 +47,9 @@ public abstract class ContentBlock extends IWBaseComponent {
 				Vector gr = new Vector();
 				for (Iterator iter = getChildren().iterator(); iter.hasNext();) {
 					UIComponent element = (UIComponent) iter.next();
-					if (element instanceof HtmlPanelGrid) {
-						gr.add((HtmlPanelGrid) element);
-					}
+					//if (element instanceof HtmlPanelGrid) {
+						gr.add(element);
+					//}
 				}
 				if (gr != null) {
 					getChildren().removeAll(gr);
