@@ -46,19 +46,32 @@ public class WebDAVFolderCreation extends ContentBlock implements ActionListener
 
 		try {
 			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
-			table.add(WFUtil.getText("Current folder = "+res.getPath().replaceFirst(ss.getWebdavServerURI(), ""), "wf_listtext"), 1, row);
+			HtmlOutputText currFol = getBundle().getLocalizedText("current_folder");
+			currFol.setStyleClass("wf_listtext");
+			
+			table.add(currFol, 1, row);
+			table.add(WFUtil.getText(" = "+res.getPath().replaceFirst(ss.getWebdavServerURI(), ""), "wf_listtext"), 1, row);
 		} catch (Exception e) {
-			table.add(WFUtil.getText("Failed getting current folder", "wf_listtext"), 1, row);
+			HtmlOutputText currFol = getBundle().getLocalizedText("failed_getting_current_folder");
+			currFol.setStyleClass("wf_listtext");
+			table.add(currFol, 1, row);
 		}
 		table.mergeCells(1, row, 2, row);
 		
 		if (errorMessage != null) {
 			++row;
-			table.add(WFUtil.getText("Creation failed = "+errorMessage, "wf_listtext"), 1, row);
+			HtmlOutputText txt = getBundle().getLocalizedText("folder_creation_failed");
+			txt.setStyleClass("wf_listtext");
+			
+			table.add(txt, 1, row);
+			table.add(WFUtil.getText(" = "+errorMessage, "wf_listtext"), 1, row);
 			table.mergeCells(1, row, 2, row);
 		} else if (folderCreated) {
 			++row;
-			table.add(WFUtil.getText("FolderCreated", "wf_listtext"), 1, row);
+			HtmlOutputText txt = getBundle().getLocalizedText("folder_created");
+			txt.setStyleClass("wf_listtext");
+
+			table.add(txt, 1, row);
 			table.mergeCells(1, row, 2, row);
 		}
 	

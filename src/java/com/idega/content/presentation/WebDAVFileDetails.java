@@ -9,6 +9,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.component.html.HtmlOutputLink;
+import javax.faces.component.html.HtmlOutputText;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
@@ -41,7 +42,6 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 	protected void initializeContent() {
 		
 		WebdavExtendedResource resource = getWebdavExtendedResource();
-		toggleLock(resource);
 		
 		if (resource != null) {
 			String resourceName = resource.getDisplayName();
@@ -49,32 +49,35 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			
 			Table table = new Table();
 			table.setId(this.getId() + "_table");
-			table.setWidth("100%");
+//			table.setWidth("100%");
+//			table.setBorder(1);
 			
 			table.mergeCells(1, row, 2, row);
-			table.add(WFUtil.getText("Document details"));
+			HtmlOutputText docDetails = getBundle().getLocalizedText("document_details");
+			docDetails.setStyleClass("wf_text");
+			table.add(docDetails);
 				
 			HtmlOutputLink link = new HtmlOutputLink();
 			link.setValue(resource.getEncodedPath());
 			link.setStyleClass("wf_listlink");
 			link.setId(getId() + "_dl");
-			link.getChildren().add(WFUtil.getText("Download/View"));
+			link.getChildren().add(getBundle().getLocalizedText("download_view"));
 			
-			table.add(WFUtil.getText("Document name"), 1, ++row);
+			table.add(getText("document_name"), 1, ++row);
 			table.add(WFUtil.getText(resourceName,"wf_listtext"), 2, row);
 			table.add(link, 2, ++row);
-			table.add(WFUtil.getText("Size"), 1, ++row);
+			table.add(getText("size"), 1, ++row);
 			table.add(WFUtil.getText(FileUtil.getHumanReadableSize(resource.getGetContentLength()),"wf_listtext"), 2, row);
-			table.add(WFUtil.getText("Content type"), 1, ++row);
+			table.add(getText("content_type"), 1, ++row);
 			table.add(WFUtil.getText(resource.getGetContentType(),"wf_listtext"), 2, row);
 			
-			table.add(WFUtil.getText("Creation date"), 1, ++row);
+			table.add(getText("creation_date"), 1, ++row);
 			table.add(WFUtil.getText(new IWTimestamp(resource.getCreationDate()).toString(),"wf_listtext"), 2, row);
 			
-			table.add(WFUtil.getText("Modification date"), 1, ++row);
+			table.add(getText("modification_date"), 1, ++row);
 			table.add(WFUtil.getText(new IWTimestamp(resource.getGetLastModified()).toString(),"wf_listtext"), 2, row);
 			
-			table.add(WFUtil.getText("Locked/Unlocked"), 1, ++row);
+			table.add(getText("locked_unlocked"), 1, ++row);
 			if (resource.isLocked()) {
 				HtmlGraphicImage lock = new HtmlGraphicImage();
 				lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/locked.gif");
@@ -82,9 +85,9 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 				lock.setHeight("16");// sizes that make sense 16/32/64/128
 				lock.setStyle("alignment:bottom");
 				table.add(lock, 2, row);
-				table.add(WFUtil.getText("Locked","wf_listtext"), 2, row);
+				table.add(getText("locked", "wf_listtext"), 2, row);
 			} else {
-				table.add(WFUtil.getText("Unlocked","wf_listtext"), 2, row);
+				table.add(getText("unlocked", "wf_listtext"), 2, row);
 			}
 			table.add(WFUtil.getText("  - "), 2, row);
 			
@@ -92,22 +95,24 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			lockToggler.setId(getId()+"_lockTogg");
 			lockToggler.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
 			if (resource.isLocked()) {
-				lockToggler.setValue("Unlock");
+				getBundle().getLocalizedUIComponent("unlock", lockToggler);
+//				lockToggler.setValue("Unlock");
 			} else {
-				lockToggler.setValue("Lock");
+				getBundle().getLocalizedUIComponent("lock", lockToggler);
+//				lockToggler.setValue("Lock");
 			}
-			
 			lockToggler.setStyleClass("wf_listlink");
 			lockToggler.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 			lockToggler.getAttributes().put(ACTION, ACTION_TOGGLE_LOCK);
 			table.add(lockToggler, 2, row);
 
 
-			table.add(WFUtil.getText("Checkout status"), 1, ++row);
+			table.add(getText("checkout_status"), 1, ++row);
 			if (resource.getCheckedOut() == null) {
-				table.add(WFUtil.getText("Not checked out","wf_listtext"), 2, row);
+				table.add(getText("not_checked_out", "wf_listtext"), 2, row);
 			} else {
-				table.add(WFUtil.getText("Checked out ("+resource.getCheckedOut()+")","wf_listtext"), 2, row);
+				table.add(getText("checked_out", "wf_listtext"), 2, row);
+				table.add(WFUtil.getText(" ("+resource.getCheckedOut()+")","wf_listtext"), 2, row);
 			}
 			table.add(WFUtil.getText("  - "), 2, row);
 			
@@ -116,10 +121,12 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			checker.setId(getId()+"_check");
 			checker.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
 			if (resource.getCheckedOut() == null) {
-				checker.setValue("Check out");
+				getBundle().getLocalizedUIComponent("check_out", checker);
+//				checker.setValue("Check out");
 				checker.getAttributes().put(ACTION, ACTION_CHECK_OUT);
 			} else {
 				// Checka if current user has file checked out, or not...
+//				getBundle().getLocalizedUIComponent("check_out", checker);
 				checker.setValue("Check in/uncheck something...");
 			}
 			checker.setStyleClass("wf_listlink");
@@ -127,16 +134,6 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			table.add(checker, 2, row);
 			
 			
-//			++row;
-//			table.add(WFUtil.getText("Http URL"), 1, row);
-//			table.add(WFUtil.getText(resource.getHttpURL().toString(),"wf_listtext"), 2, row);
-			
-//			table.add(WFUtil.getText("Owner"), 1, ++row);
-//			table.add(WFUtil.getText(resource.getOwner(),"wf_listtext"), 2, row);
-
-//			table.add(WFUtil.getText("Etag"), 1, ++row);
-//			table.add(WFUtil.getText(resource.getGetEtag(),"wf_listtext"), 2, row);
-
 			//Then add the version table
 			Table vTable = getVersionReportTable(resource);
 			
@@ -160,13 +157,13 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 		
 		int vRow = 1;
 		int vColumn = 1;
-		vTable.add("Version", vColumn, vRow);
-		vTable.add("Download", ++vColumn, vRow);
-		vTable.add("User", ++vColumn, vRow);
-		vTable.add("Comment", ++vColumn, vRow);
-		vTable.add("Checkout", ++vColumn, vRow);
-		vTable.add("Checkin", ++vColumn, vRow);
-		vTable.add("Last modified", ++vColumn, vRow);
+		vTable.add(getBundle().getLocalizedText("version"), vColumn, vRow);
+		vTable.add(getBundle().getLocalizedText("download"), ++vColumn, vRow);
+		vTable.add(getBundle().getLocalizedText("user"), ++vColumn, vRow);
+		vTable.add(getBundle().getLocalizedText("comment"), ++vColumn, vRow);
+		vTable.add(getBundle().getLocalizedText("checkout"), ++vColumn, vRow);
+		vTable.add(getBundle().getLocalizedText("checkin"), ++vColumn, vRow);
+		vTable.add(getBundle().getLocalizedText("last_modified"), ++vColumn, vRow);
 
 		
 		if (!versions.isEmpty()) {
@@ -189,6 +186,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 								
 				vTable.add(WFUtil.getText(versionName,"wf_listtext"), ++vColumn, vRow);
 				DownloadLink versionPath = new DownloadLink("Download");
+				
 				versionPath.setId("dl_"+vRow);
 				versionPath.setStyleClass("wf_listlink");
 				String url = version.getURL();

@@ -33,20 +33,20 @@ public class WebDAVFilePreview extends ContentBlock {
 			link.setValue(resource.getPath());
 			link.setStyleClass("wf_listlink");
 			link.setId(getId() + "_dl");
-			link.getChildren().add(WFUtil.getText("Download/View"));
+			link.getChildren().add(getBundle().getLocalizedText("download_view"));
 			
-			table.add(WFUtil.getText("Document name"), 1, ++row);
+			table.add(getText("document_name"), 1, ++row);
 			table.add(WFUtil.getText(resourceName,"wf_listtext"), 2, row);
 			table.add(link, 2, ++row);
-			table.add(WFUtil.getText("Size"), 1, ++row);
+			table.add(getText("size"), 1, ++row);
 			table.add(WFUtil.getText(FileUtil.getHumanReadableSize(resource.getGetContentLength()),"wf_listtext"), 2, row);
-			table.add(WFUtil.getText("Content type"), 1, ++row);
+			table.add(getText("content_type"), 1, ++row);
 			table.add(WFUtil.getText(resource.getGetContentType(),"wf_listtext"), 2, row);
 			
-			table.add(WFUtil.getText("Creation date"), 1, ++row);
+			table.add(getText("creation_date"), 1, ++row);
 			table.add(WFUtil.getText(new IWTimestamp(resource.getCreationDate()).toString(),"wf_listtext"), 2, row);
 			
-			table.add(WFUtil.getText("Modification date"), 1, ++row);
+			table.add(getText("modification_date"), 1, ++row);
 			table.add(WFUtil.getText(new IWTimestamp(resource.getGetLastModified()).toString(),"wf_listtext"), 2, row);
 			
 			this.getChildren().add(table);
