@@ -65,6 +65,8 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 
 	public UIColumn[] createColumns(String var) {
 				
+		String imageSize = "16";
+		
 		UIColumn col0 = new UIColumn();
 		
 		HtmlGraphicImage icon = new HtmlGraphicImage();
@@ -120,7 +122,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		lock.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isLocked}"));
 		lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/locked.gif");
 		lock.setId(P_ID+"_lock");
-		lock.setHeight("16");// sizes that make sense 16/32/64/128
+		lock.setHeight(imageSize);// sizes that make sense 16/32/64/128
 
 		UIColumn col6 = new UIColumn();
 		col6.setHeader(ContentBlock.getBundle().getLocalizedText("lock"));
@@ -139,11 +141,26 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		modifiedDate.setStyleClass("wf_listtext");
 		col8.getChildren().add(modifiedDate);
 		
+		UIColumn del = new UIColumn();
+		del.setHeader(ContentBlock.getBundle().getLocalizedText("delete"));
+		HtmlCommandLink delLink = new HtmlCommandLink();
+		delLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isReal}"));
+		delLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.DELETE);
+		WFUtil.addParameterVB(delLink, ContentViewer.PATH_TO_DELETE, var+".webDavUrl");
+//		delLink.getAttributes().put(ContentViewer.PATH_TO_DELETE, WFUtil.invoke(var, "getWebDavUrl"));
+		delLink.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
+		delLink.setId(P_ID+"_delLink");
+		HtmlGraphicImage delete = new HtmlGraphicImage();
+		delete.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/delete.gif");
+		delete.setId(P_ID+"_delete");
+		delete.setHeight(imageSize);// sizes that make sense 16/32/64/128
+		delLink.getChildren().add(delete);
 		
+		del.getChildren().add(delLink);
 
 
 		//return new UIColumn[] { col0, col, col2, col3, col4, col5, col6 ,col7};
-		return new UIColumn[] { col0, col, col3, col5, col6 , col7, col8};
+		return new UIColumn[] { col0, col, col3, col5, col6 , col7, col8, del};
 	}
 
 	/**
@@ -245,6 +262,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 				bean.setName("Up to /");
 				bean.setWebDavHttpURL("");
 			}
+			bean.setIsReal(false);
 			bean.setIsCollection(true);
 			v.add(bean);
 		}
