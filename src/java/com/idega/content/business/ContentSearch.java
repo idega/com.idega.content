@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.11 2005/02/14 15:11:23 gummi Exp $
+ * $Id: ContentSearch.java,v 1.12 2005/02/14 17:43:23 eiki Exp $
  * Created on Jan 17, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -48,12 +48,12 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/14 15:11:23 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/02/14 17:43:23 $ by $Author: eiki $
  * This class implements the Searchplugin interface and can therefore be used in a Search block (com.idega.core.search)<br>
  *  for searching contents and properties (metadata) of the files in the iwfile system.
  * To use it simply register this class as a iw.searchable component in a bundle.
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class ContentSearch implements SearchPlugin {
 
@@ -61,6 +61,9 @@ public class ContentSearch implements SearchPlugin {
 	public static final String SEARCH_DESCRIPTION_LOCALIZABLE_KEY = "content_search.description";
 	
 	public static final String SEARCH_TYPE = "document";
+	
+	private static final String TEMP_ILLEGAL_PATH = "/files/users/";
+	private String tempCurrentUserPath;
 
 
 	static final PropertyName DISPLAYNAME = new PropertyName("DAV:", "displayname");
@@ -111,6 +114,10 @@ public class ContentSearch implements SearchPlugin {
 		try {
 			IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(iwma.getIWApplicationContext(), IWSlideService.class);
 			httpURL = service.getWebdavServerURL();
+			
+			IWContext iwc = IWContext.getInstance();
+			tempCurrentUserPath = TEMP_ILLEGAL_PATH + iwc.getRemoteUser();
+			
 		}
 		catch (IBOLookupException e) {
 			e.printStackTrace();
@@ -258,19 +265,32 @@ public class ContentSearch implements SearchPlugin {
 //		for (int i = 0; i < headers.length; i++) {
 //			System.out.println(headers[i].toString());
 //		}
+		
+		//todo remove when access control is ok, also change search to ignore folders?
+		tempCurrentUserPath = servletMapping+tempCurrentUserPath;
+		String tempUsersRootPath = servletMapping+TEMP_ILLEGAL_PATH;
+		
 		Enumeration enumerator = method.getAllResponseURLs();
 		
 		while (enumerator.hasMoreElements()) {
 			String fileURI = (String) enumerator.nextElement();
+
 			if(!fileURI.equalsIgnoreCase(servletMapping)){
-				BasicSearchResult result = new BasicSearchResult();
 				
-				result.setSearchResultType(SEARCH_TYPE);
-				result.setSearchResultURI(fileURI);
-				result.setSearchResultName(URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/")+1)));
-				result.setSearchResultExtraInformation(URLDecoder.decode(fileURI.substring(0,fileURI.lastIndexOf("/")+1)));
-				
-				results.add(result);
+				//TODO remove temp stuff when accesscontrol is fixed
+				if(fileURI.startsWith(tempUsersRootPath) && !fileURI.startsWith(tempCurrentUserPath) ){
+					continue;
+				}
+				else{
+					BasicSearchResult result = new BasicSearchResult();
+					
+					result.setSearchResultType(SEARCH_TYPE);
+					result.setSearchResultURI(fileURI);
+					result.setSearchResultName(URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/")+1)));
+					result.setSearchResultExtraInformation(URLDecoder.decode(fileURI.substring(0,fileURI.lastIndexOf("/")+1)));
+					
+					results.add(result);
+				}
 			}
 		}
 	}
