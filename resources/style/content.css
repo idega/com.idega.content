@@ -35,12 +35,16 @@
 	width: 16px;
 	height: 16px;
 	background: url(../images/details.jpg) no-repeat;
+	float: right;
+	padding-right: 10px;
 }
 
 .content_viewer_file_preview {
 	width: 16px;
 	height: 16px;
 	background: url(../images/preview.jpg) no-repeat;
+	float: right;
+	padding-right: 10px;
 }
 
 .content_file_preview{
