@@ -71,7 +71,8 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	private boolean showFolders = true;
 	private Collection columnsToHide = null;
 	private boolean useVersionControl = true;
-	
+	private String onFileClickEventName = null;
+	private String onFileClickEventParameter = null;
 	private int startPage = -1;
 	private int rows = -1;
 	private String sorter = SORT_BY_NAME;
@@ -162,8 +163,8 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 				comp = comp.getParent();
 			}
 		}
+
 		updateDataModel(new Integer(startPage), new Integer(rows));
-		
 	}
 	
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
@@ -298,6 +299,17 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 
 			//NameLink for file
 			HtmlOutputLink nameLink = new HtmlOutputLink();
+//			if (onFileClickEventName != null) {
+//				String onClick = onFileClickEventName+"(";
+//				if (onFileClickEventParameter != null) {
+//					
+//				}
+//				ValueBinding yessir = WFUtil.createValueBinding("#{"+var + ".encodedURL}");
+//				onClick += "'#{"+ var + ".encodedURL}')"+yessir;
+//				nameLink.setOnclick(onClick);
+//				System.out.println("onClick = "+onClick);
+//			}
+
 			nameLink.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".encodedURL}"));
 			nameLink.setId(P_ID+"_fi");
 			nameLink.setStyleClass("wf_listlink");
@@ -667,6 +679,20 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	 */
 	public void setDataModel(DataModel model) {
 		this.dataModel = (WFDataModel) model;
+	}
+
+	public void setOnFileClickEvent(String event) {
+		if (event != null && !"".equals(event.trim())) {
+			int index1 = event.indexOf("(");
+			int index2 = event.indexOf(")");
+			if (index1 > -1 && index2 > -1) {
+				onFileClickEventName = event.substring(0, index1);
+				onFileClickEventParameter = event.substring(index1+1, index2);
+				if (onFileClickEventParameter.trim().equals("")) {
+					onFileClickEventParameter = null;
+				}
+			}
+		}
 	}
 
 }
