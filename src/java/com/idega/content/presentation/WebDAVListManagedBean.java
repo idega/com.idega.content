@@ -39,6 +39,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 	private static final String PARAMETER_IS_FOLDER = "isf";
 	
 	private String clickedFilePath;
+	private String clickedFileName;
 	
 	private String webDAVPath = "";
 	private ActionListener actionListener;
@@ -62,15 +63,20 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 	public UIColumn[] createColumns(String var) {
 				
 		UIColumn col0 = new UIColumn();
+		
 		HtmlGraphicImage icon = new HtmlGraphicImage();
 		icon.setValueBinding("url", WFUtil.createValueBinding("#{"+var+".iconURL}"));
+		icon.setId(P_ID+"_I");
 		icon.setHeight("32");// sizes that make sense 16/32/64/128
+
 		HtmlCommandLink iconLink = new HtmlCommandLink();
 		iconLink.setId(P_ID+"_L");
 		WFUtil.addParameterVB(iconLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 		WFUtil.addParameterVB(iconLink, PARAMETER_IS_FOLDER, var + ".isCollection");
 		iconLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
+		
 		iconLink.getChildren().add(icon);
+		
 		col0.getChildren().add(iconLink);
 		
 		UIColumn col = new UIColumn();
@@ -96,8 +102,8 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		col4.getChildren().add(WFUtil.getTextVB(var + ".mime"));
 		
 		UIColumn col5 = new UIColumn();
-		col5.setHeader(WFUtil.getText("Folder"));
-		col5.getChildren().add(WFUtil.getTextVB(var + ".isCollection"));
+		col5.setHeader(WFUtil.getText("Version"));
+		col5.getChildren().add(WFUtil.getTextVB(var + ".version"));
 		
 		UIColumn col6 = new UIColumn();
 		col6.setHeader(WFUtil.getText("Last modified"));
@@ -234,6 +240,10 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 	public String getClickedFilePath() {
 		return clickedFilePath;
 	}
+	
+	public String getClickedFileName() {
+		return clickedFileName;
+	}
 
 	public void refresh() {
 		updateDataModel(new Integer(startPage), new Integer(rows));
@@ -274,6 +284,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 				this.setClickedFilePath(webDAVPath);
 				int index = webDAVPath.lastIndexOf("/");
 				if (index > -1) {
+					clickedFileName = webDAVPath.substring(index+1);
 					webDAVPath = webDAVPath.substring(0, index);
 				}
 			}

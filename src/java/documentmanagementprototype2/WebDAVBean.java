@@ -11,6 +11,8 @@ import java.beans.PropertyChangeSupport;
 import org.apache.webdav.lib.WebdavResource;
 import com.idega.core.file.business.FileIconSupplier;
 
+import com.idega.slide.util.VersionHelper;
+
 /**
  * @author Roar
  */
@@ -25,6 +27,7 @@ public class WebDAVBean extends Object {
     public static final String PROP_MIME = "mime";
     public static final String PROP_WEB_DAV_URL = "webdav_url";
     public static final String PROP_ICON_URL = "icon_url";
+    public static final String PROP_VERSION = "version";
     
     private int id;
     private String name;
@@ -35,7 +38,7 @@ public class WebDAVBean extends Object {
     private String mime;
     private String webDavUrl;
     private String iconURL;
-    
+    private String version;
     private PropertyChangeSupport propertySupport;
     
     public WebDAVBean() {
@@ -59,6 +62,7 @@ public class WebDAVBean extends Object {
 			setMime(resource.getGetContentType());
 			setCreationDate(resource.getCreationDate());
 			setWebDavHttpURL(resource.getPath());
+			setVersion(VersionHelper.getVersion(resource));
     }
     
     public WebDAVBean(String name, boolean isCollection, long length, long modifieDate, String mime) {
@@ -157,6 +161,16 @@ public class WebDAVBean extends Object {
 	    	this.webDavUrl = webDavUrl;
 	    	propertySupport.firePropertyChange(PROP_WEB_DAV_URL, oldValue, webDavUrl);
     }    
+    
+    public String getVersion() {
+    	return version;
+    }
+    
+    public void setVersion(String version) {
+    	String oldVersion = this.version;
+    	this.version = version;
+    	propertySupport.firePropertyChange(PROP_VERSION, oldVersion, version);
+    }
     
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertySupport.addPropertyChangeListener(listener);

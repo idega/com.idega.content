@@ -10,6 +10,10 @@ import javax.faces.*;
 import java.io.Serializable;
 
 //import com.sun.jsfcl.app.*;
+import com.idega.business.IBOLookup;
+import com.idega.idegaweb.IWUserContext;
+import com.idega.presentation.IWContext;
+import com.idega.slide.business.IWSlideService;
 import com.otrix.faces.webtree.component.TreeNode;
 import com.otrix.faces.webtree.component.WebTree;
 import javax.faces.context.FacesContext;
@@ -59,7 +63,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
 
 
     private String davHost = "localhost";
-    private String davPort = "8082";
+    private String davPort = "8080";
     private String davPath = "/slide/files";
 
 
@@ -80,6 +84,10 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
 
     public void setTree(WebTree theTree) {
         if (tree == null){
+        	theTree.setExpandedIcon("../images/owtfolderexp.gif");
+        	theTree.setIcon("../images/owtfoldercxp.gif");
+        	theTree.setMinusIcon("../images/owtminusxp.gif");
+        	theTree.setPlusIcon("../images/owtplusxp.gif");
             initTree(theTree);
             TreeNode rootNode = (TreeNode) theTree.getChildren().get(0); 
             
@@ -95,7 +103,6 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
             ((SlideTreeNode) tree.getChildren().get(0)).refresh();
         }
         tree = theTree;
-                  
     }
 
     private void initTree(WebTree tree) {
@@ -111,7 +118,10 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
 
 
     private WebdavResource getRoot() throws WebdavException, HttpException, IOException {
-        HttpURL homeUrl = new HttpURL("http://"+davHost+":"+davPort+davPath);
+			IWUserContext iwuc = IWContext.getInstance();
+			IWSlideService ss = (IWSlideService) IBOLookup.getServiceInstance(iwuc.getApplicationContext(), IWSlideService.class);
+			HttpURL homeUrl = ss.getWebdavServerURL();
+//        HttpURL homeUrl = new HttpURL("http://"+davHost+":"+davPort+davPath);
         homeUrl.setUserinfo("root","root");
         WebdavResource resource = new WebdavResource(homeUrl);
         if (! resource.exists()){
