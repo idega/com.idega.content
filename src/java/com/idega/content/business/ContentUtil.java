@@ -1,5 +1,5 @@
 /*
- * $Id: ContentUtil.java,v 1.4 2005/02/07 10:59:41 gummi Exp $
+ * $Id: ContentUtil.java,v 1.5 2005/02/14 15:16:31 gummi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -16,14 +16,13 @@ import com.idega.presentation.IWContext;
 
 /**
  * 
- * Last modified: $Date: 2005/02/07 10:59:41 $ by $Author: gummi $
+ * Last modified: $Date: 2005/02/14 15:16:31 $ by $Author: gummi $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ContentUtil {
 	public static final String CONTENT_PATH = "/files/cms";
-	public static final String ARTICLE_PATH = "/files/cms/article";
 	public static final String PAGES_PATH = "/files/cms/pages";
 	
 	public static final String MODULE_PREFIX = "cms_";
@@ -44,7 +43,7 @@ public class ContentUtil {
 		bundle = iwContext.getIWMainApplication().getBundle(IW_BUNDLE_IDENTIFIER);
 	}
 	
-	public String getContentPath(){
+	public static String getContentRootPath(){
 		return CONTENT_PATH;
 	}
 }
