@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.3 2005/03/07 16:00:54 gummi Exp $
+ * $Id: ContentItemToolbar.java,v 1.4 2005/03/08 18:33:12 gummi Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -27,15 +27,16 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/07 16:00:54 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/03/08 18:33:12 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
 	
 	private String resourcePath;
+	private String actionHandlerIdentifier;
 	private IWActionURIManager manager = null;
 	
 	private Map actions;
@@ -69,18 +70,18 @@ public class ContentItemToolbar extends WFToolbar {
 	}
 	
 	public HtmlOutputLink addToolbarButton(String action, String menuItemId){
-		String url = getActionURL(action,getResourcePath());
+		String url = getActionURL(action,getResourcePath(),getActionHandlerIdentifier());
 		return addToolbarButton(action,url,menuItemId);
 	}
 	
 	public HtmlOutputLink addToolbarButton(String action){
-		String url = getActionURL(action,getResourcePath());
+		String url = getActionURL(action,getResourcePath(),getActionHandlerIdentifier());
 		String menuItemId = getNextMenuItemId();
 		return addToolbarButton(action,url,menuItemId);
 	}
 	
-	protected String getActionURL(String action, String resourcePath){
-		return getIWActionURIManager().getActionURIPrefixWithContext(action,resourcePath);
+	protected String getActionURL(String action, String resourcePath,String handlerIdentifier){
+		return getIWActionURIManager().getActionURIPrefixWithContext(action,resourcePath,handlerIdentifier);
 	}
 	
 	public HtmlOutputLink getToolbarButton(String action){
@@ -103,7 +104,7 @@ public class ContentItemToolbar extends WFToolbar {
 			if(link==null){
 				addToolbarButton(action);
 			} else {
-				link.setValue(getActionURL(action,getResourcePath()));
+				link.setValue(getActionURL(action,getResourcePath(),getActionHandlerIdentifier()));
 			}
 		}
 	}
@@ -168,6 +169,41 @@ public class ContentItemToolbar extends WFToolbar {
 	
 	public void setRendered(boolean value){
 		rendered = Boolean.valueOf(value);
+	}
+	
+	/**
+	 * @return Returns the actionHandlerIdentifier.
+	 */
+	public String getActionHandlerIdentifier() {
+		return actionHandlerIdentifier;
+	}
+	/**
+	 * @param handlerIdentifier The actionHandlerIdentifier to set.
+	 */
+	public void setActionHandlerIdentifier(String handlerIdentifier) {
+		this.actionHandlerIdentifier = handlerIdentifier;
+	}
+	
+	
+	/**
+	 * @see javax.faces.component.UIComponentBase#saveState(javax.faces.context.FacesContext)
+	 */
+	public Object saveState(FacesContext ctx) {
+		Object values[] = new Object[9];
+		values[0] = super.saveState(ctx);
+		values[1] = resourcePath;
+		values[2] = actionHandlerIdentifier;
+		return values;
+	}
+	
+	/**
+	 * @see javax.faces.component.UIComponentBase#restoreState(javax.faces.context.FacesContext, java.lang.Object)
+	 */
+	public void restoreState(FacesContext ctx, Object state) {
+		Object values[] = (Object[])state;
+		super.restoreState(ctx, values[0]);
+		resourcePath = (String)values[1];
+		actionHandlerIdentifier = (String)values[2];
 	}
 	
 }

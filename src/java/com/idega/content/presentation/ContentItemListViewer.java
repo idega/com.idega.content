@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.4 2005/03/01 11:22:30 gummi Exp $
+ * $Id: ContentItemListViewer.java,v 1.5 2005/03/08 18:33:12 gummi Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -24,10 +24,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/01 11:22:30 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/03/08 18:33:12 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ContentItemListViewer extends UIData {
 
@@ -81,6 +81,13 @@ public class ContentItemListViewer extends UIData {
 		viewer.setShowRequestedItem(false);
 		addContentItemViewer(viewer);
 		
+		
+		ContentItemToolbar toolbar = new ContentItemToolbar();
+		toolbar.addToolbarButton("create");
+		toolbar.setResourcePath(getResourcePath());
+		toolbar.setActionHandlerIdentifier((String)WFUtil.invoke(this.managedBeanId,"getIWActionURIHandlerIdentifier"));
+		this.setHeader(toolbar);
+		
 		List attachementViewers = (List)WFUtil.invoke(this.managedBeanId,"getAttachmentViewers");
 		if(attachementViewers!=null){
 			for (ListIterator iter = attachementViewers.listIterator(); iter.hasNext();) {
@@ -100,6 +107,18 @@ public class ContentItemListViewer extends UIData {
 	public void setResourcePath(String path){
 		this.resourcePath=path;
 		notifyManagedBeanOfResourcePath(path);
+	}
+	
+	public String getResourcePath(){
+		if (resourcePath != null) return resourcePath;
+        ValueBinding vb = getValueBinding("resourcePath");
+        String path = vb != null ? (String)vb.getValue(getFacesContext()) : null;
+        if(path==null){
+	        	if(this.managedBeanId!=null){
+	        		path = (String)WFUtil.invoke(this.managedBeanId,"getResourcePath");
+	    		}
+        }
+        return path;
 	}
 
 	protected void addContentItemViewer(ContentItemViewer viewer){

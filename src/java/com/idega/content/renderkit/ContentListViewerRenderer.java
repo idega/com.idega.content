@@ -1,5 +1,5 @@
 /*
- * $Id: ContentListViewerRenderer.java,v 1.1 2005/02/07 10:59:41 gummi Exp $ Created on
+ * $Id: ContentListViewerRenderer.java,v 1.2 2005/03/08 18:33:12 gummi Exp $ Created on
  * 27.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -26,14 +26,15 @@ import net.sourceforge.myfaces.renderkit.html.HtmlRendererUtils;
 import net.sourceforge.myfaces.util.ArrayUtils;
 import net.sourceforge.myfaces.util.StringUtils;
 import com.idega.content.presentation.ContentItemListViewer;
+import com.idega.util.RenderUtils;
 import com.idega.webface.renderkit.BaseRenderer;
 
 /**
  * 
- * Last modified: $Date: 2005/02/07 10:59:41 $ by $Author: gummi $
+ * Last modified: $Date: 2005/03/08 18:33:12 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ContentListViewerRenderer extends BaseRenderer {
 	
@@ -66,7 +67,27 @@ public class ContentListViewerRenderer extends BaseRenderer {
 		writer.startElement(DIV_ELEM, uiComponent);
 		writer.writeAttribute(HTML.ID_ATTR, uiComponent.getClientId(facesContext), null);
 		HtmlRendererUtils.renderHTMLAttributes(writer, uiComponent, HTML.COMMON_PASSTROUGH_ATTRIBUTES);
-		renderFacet(facesContext, writer, (UIData) uiComponent, true);
+//		renderFacet(facesContext, writer, (UIData) uiComponent, true);
+		renderHeader(facesContext,(UIData)uiComponent);
+	}
+
+	/**
+	 * @param facesContext
+	 * @param data
+	 * @throws IOException
+	 */
+	public void renderHeader(FacesContext facesContext, UIData data) throws IOException {
+		UIComponent comp = data.getHeader();
+		RenderUtils.renderChild(facesContext,comp);
+	}
+	/**
+	 * @param facesContext
+	 * @param data
+	 * @throws IOException
+	 */
+	public void renderFooter(FacesContext facesContext, UIData data) throws IOException {
+		UIComponent comp = data.getFooter();
+		RenderUtils.renderChild(facesContext,comp);
 	}
 
 	public void encodeChildren(FacesContext facesContext, UIComponent component) throws IOException {
@@ -160,7 +181,8 @@ public class ContentListViewerRenderer extends BaseRenderer {
 	public void encodeEnd(FacesContext facesContext, UIComponent uiComponent) throws IOException {
 		RendererUtils.checkParamValidity(facesContext, uiComponent, UIData.class);
 		ResponseWriter writer = facesContext.getResponseWriter();
-		renderFacet(facesContext, writer, (UIData) uiComponent, false);
+		renderFooter(facesContext,(UIData)uiComponent);
+//		renderFacet(facesContext, writer, (UIData) uiComponent, false);
 		HtmlRendererUtils.writePrettyLineSeparator(facesContext);
 		writer.endElement(DIV_ELEM);
 		HtmlRendererUtils.writePrettyLineSeparator(facesContext);
