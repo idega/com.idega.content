@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.6 2005/01/24 17:49:04 thomas Exp $
+ * $Id: ContentViewManager.java,v 1.7 2005/02/01 17:35:50 thomas Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -16,21 +16,22 @@ import com.idega.core.view.ViewManager;
 import com.idega.core.view.ViewNode;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.repository.data.Singleton;
 
 
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2005/01/24 17:49:04 $ by $Author: thomas $
+ *  Last modified: $Date: 2005/02/01 17:35:50 $ by $Author: thomas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
-public class ContentViewManager {
+public class ContentViewManager implements Singleton  {
 
 	private static final String IW_CONTENT_VIEW_MANAGER_KEY = "iw_contentviewmanager";
-	private static String CONTENT_ID="content";
-	private static String CONTENT_BUNDLE_IDENTIFIER="com.idega.content";
+	private static final String CONTENT_ID="content";
+	private static final String CONTENT_BUNDLE_IDENTIFIER="com.idega.content";
 	private ViewNode contentRootNode;
 	private IWMainApplication iwma;
 	
