@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.8 2005/01/21 19:32:20 eiki Exp $
+ * $Id: ContentSearch.java,v 1.9 2005/01/31 10:19:28 eiki Exp $
  * Created on Jan 17, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -46,12 +46,12 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- *  Last modified: $Date: 2005/01/21 19:32:20 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/01/31 10:19:28 $ by $Author: eiki $
  * This class implements the Searchplugin interface and can therefore be used in a Search block (com.idega.core.search)<br>
  *  for searching contents and properties (metadata) of the files in the iwfile system.
  * To use it simply register this class as a iw.searchable component in a bundle.
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class ContentSearch implements SearchPlugin {
 
@@ -199,7 +199,7 @@ public class ContentSearch implements SearchPlugin {
 		s.addSelection(LASTMODIFIED);
 		s.addScope(new SearchScope("files"));
 		SearchExpression expression = s.or( s.compare(CompareOperator.LIKE, DISPLAYNAME,"%"+queryString+"%"),
-				s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME,"%"+queryString+"%"),s.compare(CompareOperator.LIKE, COMMENT,"%"+queryString+"%")) );
+				s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME,queryString),s.compare(CompareOperator.LIKE, COMMENT,"%"+queryString+"%")) );
 		//add other properties
 		s.setWhereExpression(expression);
 		String search = s.asString();
