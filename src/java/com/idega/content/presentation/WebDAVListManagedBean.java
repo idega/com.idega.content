@@ -34,12 +34,12 @@ import com.idega.webface.model.WFDataModel;
  * A managed bean for the WebDAVList component
  * @author gimmi
  */
-public class WebDAVListManagedBean implements WFListBean, ActionListener {
-	
+public class WebDAVListManagedBean implements ActionListener, WFListBean {
+
 	private static final String P_ID = "wb_list";
-	private static final String PARAMETER_WEB_DAV_URL = "wdurl";
-	private static final String PARAMETER_IS_FOLDER = "isf";
-	
+	public static final String PARAMETER_WEB_DAV_URL = "wdurl";
+	public static final String PARAMETER_IS_FOLDER = "isf";
+
 	private String clickedFilePath;
 	private String clickedFileName;
 	
@@ -53,18 +53,106 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 	public WebDAVListManagedBean() {
 	}
 	
-	private WFDataModel dataModel = new WFDataModel();
-
-	public DataModel getDataModel() {
-		return dataModel;
+	
+	public void setWebDAVPath(String path) {
+		this.webDAVPath = path;
 	}
 	
-	public void setDataModel(DataModel model) {
-		this.dataModel = (WFDataModel) model;
+	public String getWebDAVPath() {
+		return webDAVPath;
+	}
+	
+	public boolean getIsClickedFile() {
+		return (getClickedFilePath() != null && !("".equals(getClickedFilePath()))  );
+	}
+	
+	public void setClickedFilePath(String path) {
+		this.clickedFilePath = path;
+	}
+	
+	public String getClickedFilePath() {
+		return clickedFilePath;
+	}
+	
+	public String getClickedFileName() {
+		return clickedFileName;
 	}
 
+	public void setStartFolder(String start) {
+		this.startPath = start;
+	}
+	
+	public void setRootFolder(String root) {
+		this.rootPath = root;
+	}
+
+	/**
+	 * @deprecated No longer needed since session is not request
+	 */
+	public void refresh() {
+		
+		//updateDataModel(new Integer(startPage), new Integer(rows));
+	}
+	
+	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
+		UIComponent comp = actionEvent.getComponent();
+		
+		boolean isFolder = true;
+		if (comp instanceof UICommand) {
+			List children = comp.getChildren();
+			Iterator iter = children.iterator();
+			UIComponent child;
+			UIParameter par;
+			while (iter.hasNext()) {
+				child = (UIComponent) iter.next();
+				if (child instanceof UIParameter) {
+					par = (UIParameter) child;
+					if (PARAMETER_WEB_DAV_URL.equals(par.getName()) ) {
+						webDAVPath = (String) par.getValue();
+					} else if (PARAMETER_IS_FOLDER.equals(par.getName())) {
+						isFolder = ((Boolean) par.getValue()).booleanValue();
+					}
+				}
+					
+			}
+
+		}
+		
+		WFList parent = getWFListParent(comp);
+		
+		if (webDAVPath != null && parent != null) {
+//			WFList parentList = (WFList) parent;
+			if (isFolder) {
+				this.setClickedFilePath(null);
+//				this.updateDataModel(new Integer(parentList.getFirst()), new Integer(parentList.getRows()));
+			} else {
+				this.setClickedFilePath(webDAVPath);
+				int index = webDAVPath.lastIndexOf("/");
+				if (index > -1) {
+					clickedFileName = webDAVPath.substring(index+1);
+					webDAVPath = webDAVPath.substring(0, index);
+				}
+			}
+		}
+	}
+
+	private WFList getWFListParent(UIComponent comp) {
+		UIComponent parent = (UIComponent) comp.getParent();
+		while (parent != null && !(parent instanceof WFList)) {
+			parent = parent.getParent();
+		}
+		if (parent instanceof WFList) {
+			return (WFList) parent;
+		} else {
+			return null;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.webface.bean.WFListBean#createColumns(java.lang.String)
+	 */
 	public UIColumn[] createColumns(String var) {
-				
+		
 		String imageSize = "16";
 		
 		UIColumn col0 = new UIColumn();
@@ -73,12 +161,13 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		icon.setValueBinding("url", WFUtil.createValueBinding("#{"+var+".iconURL}"));
 		icon.setId(P_ID+"_I");
 		icon.setHeight("16");// sizes that make sense 16/32/64/128
-
+		
 		HtmlCommandLink iconLink = new HtmlCommandLink();
 		iconLink.setId(P_ID+"_L");
 		
 		WFUtil.addParameterVB(iconLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 		WFUtil.addParameterVB(iconLink, PARAMETER_IS_FOLDER, var + ".isCollection");
+//		iconLink.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		iconLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
 		iconLink.getChildren().add(icon);
 		col0.getChildren().add(iconLink);
@@ -91,6 +180,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		nameLink.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".name}"));
 		WFUtil.addParameterVB(nameLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 		WFUtil.addParameterVB(nameLink, PARAMETER_IS_FOLDER, var + ".isCollection");
+//		nameLink.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		nameLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
 		col.getChildren().add(nameLink);
 		
@@ -123,7 +213,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/locked.gif");
 		lock.setId(P_ID+"_lock");
 		lock.setHeight(imageSize);// sizes that make sense 16/32/64/128
-
+		
 		UIColumn col6 = new UIColumn();
 		col6.setHeader(ContentBlock.getBundle().getLocalizedText("lock"));
 		col6.getChildren().add(lock);
@@ -157,12 +247,15 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		delLink.getChildren().add(delete);
 		
 		del.getChildren().add(delLink);
-
-
-		//return new UIColumn[] { col0, col, col2, col3, col4, col5, col6 ,col7};
+		
+		
+//		return new UIColumn[] { col0, col, col2, col3, col4, col5, col6 ,col7};
 		return new UIColumn[] { col0, col, col3, col5, col6 , col7, col8, del};
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see com.idega.webface.bean.WFListBean#updateDataModel(java.lang.Integer, java.lang.Integer)
+	 */
 	/**
 	 * Updates the datamodel, definded by WFList
 	 * @param first Number of first element
@@ -173,13 +266,13 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 			dataModel = new WFDataModel();
 		}
 		
-		this.startPage = start.intValue();
-		this.rows = rows.intValue();
+//		this.startPage = start.intValue();
+//		this.rows = rows.intValue();
 		
 		WebDAVBean[] beans = getDavData();
 		
 		int availableRows = beans.length;
-		 
+		
 		int nrOfRows = rows.intValue();
 		if (nrOfRows == 0) {
 			nrOfRows = availableRows;
@@ -188,11 +281,11 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		for (int i = start.intValue(); i < maxRow; i++) {
 			dataModel.set(beans[i], i);
 		}
-
+		
 		dataModel.setRowCount(availableRows);
 	}
 	
-
+	
 	private WebDAVBean[] getDavData() {
 		WebDAVBean[] data;
 		try {
@@ -243,7 +336,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		}
 		return data;
 	}
-
+	
 	private WebDAVBean[] getDirectoryListing(WebdavExtendedResource headResource, String webDAVServletURL)	throws IOException, HttpException {
 		WebdavResources resources = headResource.listWithDeltaV();//headResource.getChildResources();
 		Enumeration enumer = resources.getResources();
@@ -280,94 +373,21 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		return (WebDAVBean[]) v.toArray(new WebDAVBean[]{});
 	}
 	
-	public void setWebDAVPath(String path) {
-		this.webDAVPath = path;
+	
+	/* (non-Javadoc)
+	 * @see com.idega.webface.bean.WFListBean#getDataModel()
+	 */
+	private WFDataModel dataModel = new WFDataModel();
+	
+	public DataModel getDataModel() {
+		return dataModel;
 	}
 	
-	public String getWebDAVPath() {
-		return webDAVPath;
-	}
-	
-	public boolean getIsClickedFile() {
-		return (getClickedFilePath() != null && !("".equals(getClickedFilePath()))  );
-	}
-	
-	public void setClickedFilePath(String path) {
-		this.clickedFilePath = path;
-	}
-	
-	public String getClickedFilePath() {
-		return clickedFilePath;
-	}
-	
-	public String getClickedFileName() {
-		return clickedFileName;
-	}
-
-	public void setStartFolder(String start) {
-		this.startPath = start;
-	}
-	
-	public void setRootFolder(String root) {
-		this.rootPath = root;
-	}
-
-	public void refresh() {
-		updateDataModel(new Integer(startPage), new Integer(rows));
-	}
-	
-	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
-		UIComponent comp = actionEvent.getComponent();
-		
-		boolean isFolder = true;
-		if (comp instanceof UICommand) {
-			List children = comp.getChildren();
-			Iterator iter = children.iterator();
-			UIComponent child;
-			UIParameter par;
-			while (iter.hasNext()) {
-				child = (UIComponent) iter.next();
-				if (child instanceof UIParameter) {
-					par = (UIParameter) child;
-					if (PARAMETER_WEB_DAV_URL.equals(par.getName()) ) {
-						webDAVPath = (String) par.getValue();
-					} else if (PARAMETER_IS_FOLDER.equals(par.getName())) {
-						isFolder = ((Boolean) par.getValue()).booleanValue();
-					}
-				}
-					
-			}
-
-		}
-		
-		WFList parent = getWFListParent(comp);
-		
-		if (webDAVPath != null && parent != null) {
-			WFList parentList = (WFList) parent;
-			if (isFolder) {
-				this.setClickedFilePath(null);
-				this.updateDataModel(new Integer(parentList.getFirst()), new Integer(parentList.getRows()));
-			} else {
-				this.setClickedFilePath(webDAVPath);
-				int index = webDAVPath.lastIndexOf("/");
-				if (index > -1) {
-					clickedFileName = webDAVPath.substring(index+1);
-					webDAVPath = webDAVPath.substring(0, index);
-				}
-			}
-		}
-	}
-
-	private WFList getWFListParent(UIComponent comp) {
-		UIComponent parent = (UIComponent) comp.getParent();
-		while (parent != null && !(parent instanceof WFList)) {
-			parent = parent.getParent();
-		}
-		if (parent instanceof WFList) {
-			return (WFList) parent;
-		} else {
-			return null;
-		}
+	/* (non-Javadoc)
+	 * @see com.idega.webface.bean.WFListBean#setDataModel(javax.faces.model.DataModel)
+	 */
+	public void setDataModel(DataModel model) {
+		this.dataModel = (WFDataModel) model;
 	}
 
 }
