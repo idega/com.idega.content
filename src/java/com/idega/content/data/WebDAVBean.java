@@ -57,6 +57,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
     private boolean isCheckedOut = false;
     private String checkedOutString = null;
     private String comment = null;
+    private boolean real = true;
 
 	/**
 	 * @return Returns the isCheckedOut.
@@ -135,6 +136,14 @@ public class WebDAVBean extends Object implements ICTreeNode {
         return modifiedDate;
     }
     
+    public boolean getIsReal() {
+    	return real;
+    }
+    
+    public void setIsReal(boolean isReal) {
+    	real = isReal;
+    }
+    
     public void setModifiedDate(long value) {
     	setModifiedDate(new java.util.Date(value).toString());
     }
@@ -170,6 +179,10 @@ public class WebDAVBean extends Object implements ICTreeNode {
     
     public boolean getIsCollection() {
         return isCollection;
+    }
+    
+    public boolean getIsFile() {
+    	return !getIsCollection();
     }
     
     public void setIsCollection(boolean value) {
