@@ -148,4 +148,18 @@ yes=Ja
 upload=Ladda upp
 create_a_folder=Skapa mapp
 
+principal_name=Name
+privileges_all=All
+privileges_Read=Read
+privileges_write=Write
+permissions=Permissions
+permission.option.granted=Granted
+permission.option.denied=Denied
+permission.option.not_set=Not set
+refresh=Refresh
+permissionmatrix.standard=Standard Principals
+permissionmatrix.roles=Roles
+permissionmatrix.groups=Groups
+permissionmatrix.users=Users
+
 initial_version=FÖRSTA VERSIONEN.
