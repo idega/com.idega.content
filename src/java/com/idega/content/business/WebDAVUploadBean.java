@@ -2,7 +2,9 @@ package com.idega.content.business;
 
 import java.io.IOException;
 import net.sourceforge.myfaces.custom.fileupload.UploadedFile;
+import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
+import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
@@ -17,6 +19,7 @@ public class WebDAVUploadBean{
 	private String uploadFolderPath = DEFAULT_PATH;
 	private String downloadPath = null;
 	private String imagePath = null;
+	private String comment = null;
 	
 	public UploadedFile getUploadFile() {
 		return uploadFile;
@@ -32,6 +35,14 @@ public class WebDAVUploadBean{
 
 	public void setFileName(String name) {
 		this.name = name;
+	}
+	
+	public String getComment(){
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 	
 	public String getUploadFilePath(){
@@ -63,7 +74,7 @@ public class WebDAVUploadBean{
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 			String filePath = service.getWebdavServerURI()+getUploadFilePath();
 			String uploadName = uploadFile.getName();
-			//String contentType = uploadFile.getContentType();
+			
 			String fileName = uploadName;
 			if(!"".equals(name)){
 				fileName = name;
@@ -77,16 +88,27 @@ public class WebDAVUploadBean{
 				}
 			}
 			
-			
+		
 			boolean success = rootResource.mkcolMethod(filePath);
 			System.out.println("Creating folder success "+success);
 			success = rootResource.putMethod(filePath+fileName,uploadFile.getInputStream());
 			System.out.println("Uploading file success "+success);
 			
-			downloadPath = filePath+fileName;
-			imagePath = iwc.getIWMainApplication().getURIFromURL(downloadPath);	
+			
+			
 			
 			if(success){
+				String contentType = uploadFile.getContentType();
+				downloadPath = filePath+fileName;
+				if(contentType!=null && MimeTypeUtil.getInstance().isImage(contentType)){
+					imagePath = iwc.getIWMainApplication().getURIFromURL(downloadPath);	
+				}
+				
+				if(comment!=null && !"".equals(comment)){
+					
+					rootResource.proppatchMethod(filePath+fileName,new PropertyName("DAV:","comment"),comment,true);
+					
+				}
 				WFUtil.invoke("WebDAVListBean","refresh");
 			}
 			else{
