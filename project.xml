@@ -37,6 +37,13 @@
             <organization>idega software</organization>
             <roles/>
         </developer>
+        <developer>
+            <id>gummi</id>
+            <name>Gudmundur Saemundsson</name>
+            <email>gummi@idega.is</email>
+            <organization>idega software</organization>
+            <roles/>
+        </developer>
     </developers>
     <dependencies>
         <dependency>
