@@ -90,3 +90,39 @@ lock=Lås
 mime_type=Mime Typ
 size=Storlek
 checked_out=Utcheckad
+
+
+
+
+name=Namn
+lock=Lås
+mime_type=Mime Typ
+size=Storlek
+checked_out=Utcheckad
+folder_created=Mapp skapad
+folder_creation_failed=Fel uppstod vid skapelse av mapp
+failed_getting_current_folder=Fel uppstod vid att hämta vald mapp
+current_folder=Vald mapp
+document_details=Dokumentdetaljer
+download_view=Ladda ner/Visa
+document_name=Dokumentnamn
+content_type=Contenttyp
+creation_date=Skapelse datum
+modification_date=ändringsdatum
+locked_unlocked=Låst/Ej låst
+locked=Låst
+unlocked=Ej låst
+lock=Lås
+unlock=Avlås
+checkout_status=Utcheckningsstatus
+not_checked_out=Ej checkad ut
+checked_out=Checkad ut
+check_out=Checka ut
+uncheck_out=Avchecka ut
+check_in=Checka in
+download=Ladda ner
+user=Användare
+comment=Kommentar
+checkout=Checka ut
+checkin=Checka in
+last_modified=Senast ändrad
