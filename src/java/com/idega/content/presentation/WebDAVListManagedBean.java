@@ -17,7 +17,6 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import javax.faces.model.DataModel;
 import org.apache.commons.httpclient.HttpException;
-import org.apache.webdav.lib.WebdavResource;
 import org.apache.webdav.lib.WebdavResources;
 import com.idega.business.IBOLookup;
 import com.idega.content.data.WebDAVBean;
@@ -25,6 +24,7 @@ import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
+import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.webface.WFList;
 import com.idega.webface.WFUtil;
 import com.idega.webface.bean.WFListBean;
@@ -127,13 +127,22 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		col6.getChildren().add(lock);
 		
 		UIColumn col7 = new UIColumn();
-		col7.setHeader(WFUtil.getText("Last modified"));
+		col7.setHeader(WFUtil.getText("Checked-out"));
+		HtmlOutputText checkedOut = WFUtil.getTextVB(var + ".comment");
+		checkedOut.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".checkedOut}"));
+		checkedOut.setStyleClass("wf_listtext");
+		col7.getChildren().add(checkedOut);
+		
+		UIColumn col8 = new UIColumn();
+		col8.setHeader(WFUtil.getText("Last modified"));
 		HtmlOutputText modifiedDate = WFUtil.getTextVB(var + ".modifiedDate");
 		modifiedDate.setStyleClass("wf_listtext");
-		col7.getChildren().add(modifiedDate);
+		col8.getChildren().add(modifiedDate);
+		
+		
 
 		//return new UIColumn[] { col0, col, col2, col3, col4, col5, col6 ,col7};
-		return new UIColumn[] { col0, col, col3, col5, col6 ,col7};
+		return new UIColumn[] { col0, col, col3, col5, col6 , col7, col8};
 	}
 
 	/**
@@ -217,12 +226,13 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		return data;
 	}
 
-	private WebDAVBean[] getDirectoryListing(WebdavResource headResource, String webDAVServletURL)	throws IOException, HttpException {
-		WebdavResources resources = headResource.getChildResources();
+	private WebDAVBean[] getDirectoryListing(WebdavExtendedResource headResource, String webDAVServletURL)	throws IOException, HttpException {
+		
+		WebdavResources resources = headResource.listWithDeltaV();//headResource.getChildResources();
 		Enumeration enumer = resources.getResources();
 		Vector v = new Vector();
 		WebDAVBean bean;
-		WebdavResource resource;
+		WebdavExtendedResource resource;
 		String url;
 		if (webDAVPath != null && !"".equals(webDAVPath) && !webDAVPath.equals(rootPath)) {
 			bean = new WebDAVBean();
@@ -240,7 +250,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		}
 		
 		while (enumer.hasMoreElements()) {
-			resource = (WebdavResource) enumer.nextElement();
+			resource = (WebdavExtendedResource) enumer.nextElement();
 			if (!resource.getDisplayName().startsWith(".")) {
 				bean = new WebDAVBean(resource);
 				url = resource.getPath();

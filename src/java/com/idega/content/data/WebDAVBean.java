@@ -237,7 +237,7 @@ public class WebDAVBean extends Object {
 		}
 		else{
 			if(isCheckedOut()){
-				return getCheckedOutString().substring(getCheckedOutString().lastIndexOf("/"));
+				return getCheckedOutString().substring(getCheckedOutString().lastIndexOf("/")+1);
 			}
 		}
 		return null;

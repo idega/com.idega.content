@@ -24,54 +24,49 @@ public class WebDAVFileDetails extends ContentBlock {
 	protected void initializeContent() {
 		this.setId(this.getId());
 		WebdavResource resource = getWebdavResource();
-		Table table = new Table();
-		table.setId(this.getId() + "_table");
-		table.setWidth("100%");
-		int row = 1;
-		table.mergeCells(1, row, 2, row);
-		table.add(WFUtil.getText("Document details"));
+		
 		if (resource != null) {
 			String resourceName = resource.getName();
+			int row = 1;
+			
+			Table table = new Table();
+			table.setId(this.getId() + "_table");
+			table.setWidth("100%");
+			
+			table.mergeCells(1, row, 2, row);
+			table.add(WFUtil.getText("Document details"));
+				
 			HtmlOutputLink link = new HtmlOutputLink();
 			link.setValue(resource.getPath());
 			link.setStyleClass("wf_listlink");
 			link.setId(getId() + "_dl");
 			link.getChildren().add(WFUtil.getText("Download/View"));
-			++row;
-			table.add(WFUtil.getText("Document name"), 1, row);
+			
+			table.add(WFUtil.getText("Document name"), 1, ++row);
 			table.add(WFUtil.getText(resourceName,"wf_listtext"), 2, row);
-			
-			++row;
-			table.add(link, 2, row);
-			
-			++row;
-			table.add(WFUtil.getText("Size"), 1, row);
+			table.add(link, 2, ++row);
+			table.add(WFUtil.getText("Size"), 1, ++row);
 			table.add(WFUtil.getText(FileUtil.getHumanReadableSize(resource.getGetContentLength()),"wf_listtext"), 2, row);
-
-			++row;
-			table.add(WFUtil.getText("Content type"), 1, row);
+			table.add(WFUtil.getText("Content type"), 1, ++row);
 			table.add(WFUtil.getText(resource.getGetContentType(),"wf_listtext"), 2, row);
-
-			++row;
-			table.add(WFUtil.getText("Creation date"), 1, row);
+			
+			table.add(WFUtil.getText("Creation date"), 1, ++row);
 			table.add(WFUtil.getText(new IWTimestamp(resource.getCreationDate()).toString(),"wf_listtext"), 2, row);
 			
-			++row;
-			table.add(WFUtil.getText("Modification date"), 1, row);
+			table.add(WFUtil.getText("Modification date"), 1, ++row);
 			table.add(WFUtil.getText(new IWTimestamp(resource.getGetLastModified()).toString(),"wf_listtext"), 2, row);
 
 //			++row;
 //			table.add(WFUtil.getText("Http URL"), 1, row);
 //			table.add(WFUtil.getText(resource.getHttpURL().toString(),"wf_listtext"), 2, row);
 			
-			++row;
-			table.add(WFUtil.getText("Owner"), 1, row);
-			table.add(WFUtil.getText(resource.getOwner(),"wf_listtext"), 2, row);
+//			table.add(WFUtil.getText("Owner"), 1, ++row);
+//			table.add(WFUtil.getText(resource.getOwner(),"wf_listtext"), 2, row);
 
-			++row;
-			table.add(WFUtil.getText("Etag"), 1, row);
-			table.add(WFUtil.getText(resource.getGetEtag(),"wf_listtext"), 2, row);
+//			table.add(WFUtil.getText("Etag"), 1, ++row);
+//			table.add(WFUtil.getText(resource.getGetEtag(),"wf_listtext"), 2, row);
 
+			//Then add the version table
 			Table vTable = getVersionReportTable(resource);
 			
 			++row;
