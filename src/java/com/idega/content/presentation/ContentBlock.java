@@ -32,7 +32,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 	// this, parentContentViewer, should not be saved in save state
 	private ContentViewer parentContentViewer = null;
 
-	private String currentResourcePath = null;
+	protected String currentResourcePath = null;
 
 	protected abstract void initializeContent();
 
@@ -116,7 +116,8 @@ public abstract class ContentBlock extends IWBaseComponent {
 		
 		ContentViewer v = getContentViewer();
 		if(v!=null){
-			return v.getCurrentResourcePath();
+			String tmp = v.getCurrentResourcePath(); 
+			return tmp;
 		}
 		return null;
 	}
