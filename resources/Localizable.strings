@@ -135,3 +135,17 @@ deletion_failed=Deletion failed
 yes=Yes
 upload=Upload
 create_a_folder=Create a folder
+
+principal_name=Name
+privileges_all=All
+privileges_Read=Read
+privileges_write=Write
+permissions=Permissions
+permission.option.granted=Granted
+permission.option.denied=Denied
+permission.option.not_set=Not set
+refresh=Refresh
+permissionmatrix.standard=Standard Principals
+permissionmatrix.roles=Roles
+permissionmatrix.groups=Groups
+permissionmatrix.users=Users
