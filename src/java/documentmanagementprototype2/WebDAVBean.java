@@ -1,7 +1,7 @@
 /*
  * WebDAVBean.java
  *
- * Created on 15. okt?ber 2004, 13:11
+ * Created on 15. oktober 2004, 13:11
  */
 
 package documentmanagementprototype2;
@@ -18,20 +18,27 @@ public class WebDAVBean extends Object implements Serializable {
     public static final String PROP_NAME = "name";
     public static final String PROP_LENGTH = "length";
     public static final String PROP_IS_COLLECTION = "is_collection";
-    public static final String PROP_DATE = "date";
+    public static final String PROP_MODIFIED_DATE = "mod_date";
+    public static final String PROP_CREATION_DATE = "cre_date";
     public static final String PROP_MIME = "mime";
+    public static final String PROP_WEB_DAV_URL = "webdav_url";
+    public static final String PROP_PARENT_LIST = "par_list";
     
     private int id;
     private String name;
     private long length;
     private boolean isCollection;
-    private String date;
+    private String modifiedDate;
+    private String creationDate;
     private String mime;
+    private String webDavUrl;
+    private listDocuments2 parentList;
     
     private PropertyChangeSupport propertySupport;
     
     public WebDAVBean() {
         propertySupport = new PropertyChangeSupport(this);
+        setId((int)Math.round(Math.random())*1000);
     }
    
     public WebDAVBean(String name) {
@@ -39,11 +46,11 @@ public class WebDAVBean extends Object implements Serializable {
         setName(name);
     }      
                
-    public WebDAVBean(String name, boolean isCollection, long length, long date, String mime) {
+    public WebDAVBean(String name, boolean isCollection, long length, long modifieDate, String mime) {
         this(name);
        setIsCollection(isCollection);
        setLength(length);
-       setDate(new java.util.Date(date).toString());
+       setModifiedDate(modifieDate);
        setMime(mime);
        setId((int)Math.round(Math.random())*1000);
     }    
@@ -64,7 +71,7 @@ public class WebDAVBean extends Object implements Serializable {
     }
     
     public void setLength(long value) {
-        long oldValue = length;
+//        long oldValue = length;
         length = value;
 //        propertySupport.firePropertyChange(PROP_LENGTH, oldValue, length);
     }
@@ -79,15 +86,32 @@ public class WebDAVBean extends Object implements Serializable {
         propertySupport.firePropertyChange(PROP_NAME, oldValue, name);
     }
     
-    public String getDate() {
-        return date;
+    public String getModifiedDate() {
+        return modifiedDate;
     }
     
-    public void setDate(String value) {
-        String oldValue = date;
-        date = value;
-        propertySupport.firePropertyChange(PROP_DATE, oldValue, date);
+    public void setModifiedDate(long value) {
+    	setModifiedDate(new java.util.Date(value).toString());
     }
+    public void setModifiedDate(String value) {
+        String oldValue = modifiedDate;
+        modifiedDate = value;
+        propertySupport.firePropertyChange(PROP_MODIFIED_DATE, oldValue, modifiedDate);
+    }
+    
+    public String getCreationDate() {
+      return creationDate;
+    }
+  
+	  public void setCreationDate(long value) {
+	  	setCreationDate(new java.util.Date(value).toString());
+	  }
+
+	  public void setCreationDate(String value) {
+	      String oldValue = creationDate;
+	      creationDate = value;
+	      propertySupport.firePropertyChange(PROP_CREATION_DATE, oldValue, creationDate);
+	  }
     
     public String getMime() {
         return mime;
@@ -109,6 +133,22 @@ public class WebDAVBean extends Object implements Serializable {
         propertySupport.firePropertyChange(PROP_IS_COLLECTION, oldValue, isCollection); 
     }
     
+    public String getWebDavUrl() {
+    	return webDavUrl;
+    }
+    
+    public void setWebDavHttpURL(String webDavUrl) {
+    	String oldValue = webDavUrl;
+    	this.webDavUrl = webDavUrl;
+    	propertySupport.firePropertyChange(PROP_WEB_DAV_URL, oldValue, webDavUrl);
+    }
+    
+    public void setParentList(listDocuments2 parentList) {
+    	listDocuments2 oldValue = this.parentList;
+    	this.parentList = parentList;
+    	propertySupport.firePropertyChange(PROP_PARENT_LIST, oldValue, webDavUrl);
+    }
+    
     
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertySupport.addPropertyChangeListener(listener);
@@ -116,6 +156,21 @@ public class WebDAVBean extends Object implements Serializable {
     
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertySupport.removePropertyChangeListener(listener);
+    }
+    
+    public String handleClick() {
+    	System.out.println("Clicked on me = "+name+", URL = "+webDavUrl);
+    	if (isCollection) {
+    		System.out.println("[WebDAVBean] Folder clicked... opening");
+//    		return webDavUrl;
+    		parentList.setWebDavHttpURL(webDavUrl);
+    	} else {
+    		
+    		System.out.println("[WebDAVBean] File clicked... opening");
+    		return webDavUrl;
+//    		parentList.setWebDavHttpURL(webDavUrl);
+    	}
+    	return null;
     }
     
 }

@@ -1,19 +1,22 @@
 /*
  * listDocuments2.java
  * 
- * Created on 14. oktÃƒÂ¯Ã‚Â¿Ã‚Â½ber 2004, 10:40 Copyright Roar
+ * Created on 14. oktober 2004, 10:40 Copyright Roar
  */
 package documentmanagementprototype2;
 
 import java.io.IOException;
+import java.util.Vector;
 
 import javax.faces.FacesException;
 import javax.faces.component.UIColumn;
 import javax.faces.component.html.HtmlCommandButton;
+import javax.faces.component.html.HtmlCommandLink;
 import javax.faces.component.html.HtmlDataTable;
 import javax.faces.component.html.HtmlForm;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.component.html.HtmlPanelGrid;
+import javax.faces.el.MethodBinding;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpURL;
@@ -24,11 +27,12 @@ import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 
-public class listDocuments2 extends AbstractSessionBean {
+public class listDocuments2 {
 	// <editor-fold defaultstate="collapsed" desc="Creator-managed Component
 	// Definition">
 
 	private int __placeholder;
+	private String webDavHttpURL = null;
 
 	private HtmlForm form1 = new HtmlForm();
 
@@ -60,6 +64,16 @@ public class listDocuments2 extends AbstractSessionBean {
 		this.column1 = uic;
 	}
 
+	private HtmlCommandLink nameLink = new HtmlCommandLink();
+	
+	public HtmlCommandLink getNameLink() {
+		return nameLink;
+	}
+	
+	public void setNameLink(HtmlCommandLink hcl) {
+		this.nameLink = hcl;
+	}
+	
 	private HtmlOutputText outputText1 = new HtmlOutputText();
 
 	public HtmlOutputText getOutputText1() {
@@ -110,14 +124,7 @@ public class listDocuments2 extends AbstractSessionBean {
 		this.outputText4 = hot;
 	}
 
-	/*
-	 * private RowSetDataModel dataTable1Model = new RowSetDataModel();
-	 * 
-	 * public RowSetDataModel getDataTable1Model() { return dataTable1Model; }
-	 * 
-	 * public void setDataTable1Model(RowSetDataModel rsdm) {
-	 * this.dataTable1Model = rsdm; }
-	 */
+
 	private javax.faces.model.ArrayDataModel dataTable1Model = new javax.faces.model.ArrayDataModel();
 
 	public javax.faces.model.ArrayDataModel getDataTable1Model() {
@@ -199,6 +206,16 @@ public class listDocuments2 extends AbstractSessionBean {
 		this.column5 = uic;
 	}
 
+	private UIColumn column6 = new UIColumn();
+
+	public UIColumn getColumn6() {
+		return column6;
+	}
+
+	public void setColumn6(UIColumn uic) {
+		this.column6 = uic;
+	}
+
 	private HtmlOutputText outputText9 = new HtmlOutputText();
 
 	public HtmlOutputText getOutputText9() {
@@ -219,6 +236,25 @@ public class listDocuments2 extends AbstractSessionBean {
 		this.outputText10 = hot;
 	}
 
+	private HtmlOutputText outputText11 = new HtmlOutputText();
+
+	public HtmlOutputText getOutputText11() {
+		return outputText11;
+	}
+
+	public void setOutputText11(HtmlOutputText hot) {
+		this.outputText11 = hot;
+	}
+	
+	private HtmlOutputText outputText12 = new HtmlOutputText();
+
+	public HtmlOutputText getOutputText12() {
+		return outputText12;
+	}
+
+	public void setOutputText12(HtmlOutputText hot) {
+		this.outputText12 = hot;
+	}
 	private HtmlPanelGrid gridPanel1 = new HtmlPanelGrid();
 
 	public HtmlPanelGrid getGridPanel1() {
@@ -269,22 +305,15 @@ public class listDocuments2 extends AbstractSessionBean {
 		this.dataTable1HeaderLastButton = hcb;
 	}
 
-	// </editor-fold>
 	public listDocuments2() {
-		beforeRenderResponse();
-		// <editor-fold defaultstate="collapsed" desc="Creator-managed Component
 		// Initialization">
 		try {
+			initialize();
 		} catch (Exception e) {
-			log("listDocuments2 Initialization Failure", e);
+			System.out.println("listDocuments2 Initialization Failure");
 			throw e instanceof javax.faces.FacesException ? (FacesException) e
 					: new FacesException(e);
 		}
-		// <editor-fold defaultstate="collapsed" desc="Creator-managed Component
-		// Initialization">
-
-		// <editor-fold defaultstate="collapsed" desc="Creator-managed Component
-		// Initialization">
 		/*
 		 * try { personRowSet.setDataSourceName("java:comp/env/jdbc/Travel");
 		 * personRowSet.setCommand("SELECT * FROM TRAVEL.PERSON");
@@ -296,39 +325,37 @@ public class listDocuments2 extends AbstractSessionBean {
 		 * javax.faces.FacesException ? (FacesException) e : new
 		 * FacesException(e); }
 		 */
-		// </editor-fold>
-		// Additional user provided initialization code
-		// </editor-fold>
-		// Additional user provided initialization code
-		// </editor-fold>
-		// Additional user provided initialization code
+	}
+	
+	protected void initialize() {
+		dataTable1Model.setWrappedData(getDavData());
+//			beforeRenderResponse();
 	}
 
-	protected void beforeRenderResponse() {
-		super.beforeRenderResponse();
+	protected void beforeRenderResponse2() {
+//		super.beforeRenderResponse();
 		try {
 			dataTable1Model.setWrappedData(getDavData());
 		} catch (Exception e) {
-			log("listDocuments2 Initialization Failure", e);
+//			log("listDocuments2 Initialization Failure", e);
 			throw e instanceof javax.faces.FacesException ? (FacesException) e
 					: new FacesException(e);
 		}
-
 	}
-
+/*
 	protected documentmanagementprototype2.WebDavTreeBean getWebDavTreeBean() {
 		return (documentmanagementprototype2.WebDavTreeBean) getBean("WebDavTreeBean");
 	}
-
+*/
 	//    protected documentmanagementprototype2.ApplicationBean1
 	// getApplicationBean1() {
 	//        return
 	// (documentmanagementprototype2.ApplicationBean1)getBean("ApplicationBean1");
 	//    }
 
-	protected documentmanagementprototype2.SessionBean1 getSessionBean1() {
-		return (documentmanagementprototype2.SessionBean1) getBean("SessionBean1");
-	}
+//	protected documentmanagementprototype2.SessionBean1 getSessionBean1() {
+//		return (documentmanagementprototype2.SessionBean1) getBean("SessionBean1");
+//	}
 
 	/**
 	 * Bean cleanup.
@@ -355,9 +382,26 @@ public class listDocuments2 extends AbstractSessionBean {
 //				ss.getWebdavServerURL();
 				
 			//}
-			IWUserContext iwuc = IWContext.getInstance();			
-			IWSlideService ss = (IWSlideService) IBOLookup.getServiceInstance(iwuc.getApplicationContext(), IWSlideService.class);
-			HttpURL homeUrl = ss.getWebdavServerURL();
+//			ApplicationFactory factory = (ApplicationFactory) FactoryFinder.getFactory(FactoryFinder.APPLICATION_FACTORY);
+//			MethodBinding mb = factory.getApplication().createMethodBinding("#{WebDAVBean.handleClick}", null);
+//			nameLink.setAction(mb);
+//			String tmp = null;
+//			try {
+//				tmp = (String) mb.invoke(FacesContext.getCurrentInstance(), null);
+//			} catch (PropertyNotFoundException e) {
+//				System.out.println("Property 'dataTable1' not found");
+//			} catch (EvaluationException e) {
+//				System.out.println("EvaluationException caught... possible error : Property 'currentRow' not found ... message = "+e.getMessage());
+//			}
+
+			HttpURL homeUrl = null;
+			if (webDavHttpURL == null) {
+				IWUserContext iwuc = IWContext.getInstance();			
+				IWSlideService ss = (IWSlideService) IBOLookup.getServiceInstance(iwuc.getApplicationContext(), IWSlideService.class);
+				homeUrl = ss.getWebdavServerURL();
+			} else {
+				homeUrl = new HttpURL(webDavHttpURL);
+			}
 			homeUrl.setUserinfo("root", "root");
 			WebdavResource resource = new WebdavResource(homeUrl);
 			if (resource.exists()) {
@@ -381,7 +425,6 @@ public class listDocuments2 extends AbstractSessionBean {
 					+ traceString) };
 		}
 		return data;
-		//        return new java.util.ArrayList(java.util.Arrays.asList(data));
 	}
 
 	private WebDAVBean[] getFileNameList(WebdavResource resource) {
@@ -393,19 +436,26 @@ public class listDocuments2 extends AbstractSessionBean {
 		return data;
 	}
 
-	private WebDAVBean[] getDirectoryListing(WebdavResource resource)
-			throws IOException, HttpException {
+	private WebDAVBean[] getDirectoryListing(WebdavResource resource)	throws IOException, HttpException {
 		WebdavResource[] resources = resource.listWebdavResources();
-		WebDAVBean[] data = new WebDAVBean[resources.length];
+		Vector v = new Vector();
+		WebDAVBean bean;
 		for (int i = 0; i < resources.length; i++) {
-			data[i] = new WebDAVBean(resources[i].getDisplayName(),
-					resources[i].isCollection(), resources[i]
-							.getGetContentLength(), resources[i]
-							.getGetLastModified(), resources[i]
-							.getGetContentType());
-
+			if (!resources[i].getDisplayName().startsWith(".")) {
+				bean = new WebDAVBean();
+				bean.setName(resources[i].getDisplayName());
+				bean.setIsCollection(resources[i].isCollection());
+				bean.setLength(resources[i].getGetContentLength()); 
+				bean.setModifiedDate(resources[i].getGetLastModified());
+				bean.setMime(resources[i].getGetContentType());
+				bean.setCreationDate(resources[i].getCreationDate());
+				bean.setWebDavHttpURL(resources[i].getHttpURL().toString());
+				System.out.println(i+" "+resources[i].getHttpURL());
+				bean.setParentList(this);
+				v.add(bean);
+			}
 		}
-		return data;
+		return (WebDAVBean[]) v.toArray(new WebDAVBean[]{});
 	}
 
 	public String dataTable1_firstPageAction() {
@@ -449,7 +499,48 @@ public class listDocuments2 extends AbstractSessionBean {
 			throws javax.faces.event.AbortProcessingException {
 		Object source = actionEvent.getSource();
 
-		java.lang.System.out.print("Action event received");
+		if (source instanceof HtmlCommandLink) {
+			MethodBinding mb = ((HtmlCommandLink) source).getAction();
+			java.lang.System.out.println("mb = "+mb);
+			
+			
+		}
+		java.lang.System.out.println("Action event received");
+
+	}
+	
+	public void setWebDavHttpURL(String path) {
+		this.webDavHttpURL = path;
+
+		try {
+//		String uri = (String) getApplication().createMethodBinding(
+//		"#{WebDavTree.getUri}", null)
+//		.invoke(
+//				javax.faces.context.FacesContext
+//						.getCurrentInstance(), null);
+
+//			ApplicationFactory factory = (ApplicationFactory) FactoryFinder.getFactory(FactoryFinder.APPLICATION_FACTORY);
+//			ValueBinding vb = factory.getApplication().createValueBinding("#{currentRow.name}");
+//			MethodBinding mb = factory.getApplication().createMethodBinding("#{currentRow.handleClick}", null);
+//			MethodBinding mb2 = factory.getApplication().createMethodBinding("#{listDocuments2.processAction}", new Class[]{javax.faces.event.ActionEvent.class});
+//			
+//			String tmp = (String) mb.invoke(FacesContext.getCurrentInstance(), null);
+//			
+//			setNameLink(new HtmlCommandLink());
+////			setDataTable1Model(new ArrayDataModel());
+//			
+//			nameLink.setValueBinding("nameLink", vb);
+//			nameLink.setAction(mb);
+//			nameLink.setActionListener(mb2);
+//			
+			getDataTable1Model().setWrappedData(getDavData());
+		} catch (Exception e) {
+			
+			System.out.println("listDocuments2 Initialization Failure");
+			throw e instanceof javax.faces.FacesException ? (FacesException) e
+					: new FacesException(e);
+			
+		}
 
 	}
 }
