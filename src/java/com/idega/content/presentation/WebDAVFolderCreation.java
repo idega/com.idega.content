@@ -84,6 +84,7 @@ public class WebDAVFolderCreation extends ContentBlock implements ActionListener
 		save.setId(getId()+"_btnS");
 		save.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		save.getAttributes().put(PARAMETER_RESOURCE_PATH, res.getPath());
+		save = (HtmlCommandButton) getBundle().getLocalizedUIComponent("create", save);
 		table.add(save, 2, row);
 		table.setAlignment(2, row, Table.HORIZONTAL_ALIGN_RIGHT);
 		getChildren().add(table);
