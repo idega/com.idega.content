@@ -47,9 +47,15 @@ public class ContentViewer extends WFBlock {
 //		setToolbar();
 		setToolbarEmbeddedInTitlebar(false);
 		
+
+		String startFolder = (String) this.getAttributes().get("startFolder");
+		String rootFolder = (String) this.getAttributes().get("rootFolder");
+		
 		WebDAVList list = new WebDAVList();
 		list.setId(getId()+"_list");
 		list.setRendered(renderWebDAVList.booleanValue());
+		list.setStartFolder(startFolder);
+		list.setRootFolder(rootFolder);
 		
 		WebDAVFileDetails details = new WebDAVFileDetails();
 		details.setRendered(renderWebDAVFileDetails.booleanValue());

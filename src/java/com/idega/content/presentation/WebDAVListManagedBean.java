@@ -43,6 +43,8 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 	private String clickedFileName;
 	
 	private String webDAVPath = "";
+	private String rootPath = null;
+	private String startPath = null;
 	
 	private int startPage = -1;
 	private int rows = -1;
@@ -161,10 +163,25 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 			
 			IWUserContext iwuc = IWContext.getInstance();			
 			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(iwuc, IWSlideSession.class);
-			if(webDAVPath == null){ 
+			if (startPath != null && startPath.equals("/")) {
+				startPath = "";
+			}
+			if (rootPath != null && rootPath.equals("/")) {
+				rootPath = "";
+			}
+			
+			
+			if (startPath != null) {
+				webDAVPath = startPath;
+				startPath = null;
+			} else if(webDAVPath == null){
 				webDAVPath = "";
 			}
-
+			
+			if (rootPath != null && webDAVPath.indexOf(rootPath) == -1) {
+				webDAVPath = rootPath;
+			}
+			
 			if (ss.getExistence(webDAVPath)) {
 				data = getDirectoryListing(ss.getWebdavResource(webDAVPath), ss.getWebdavServerURI());
 			} else {
@@ -197,7 +214,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		WebDAVBean bean;
 		WebdavResource resource;
 		String url;
-		if (webDAVPath != null && !"".equals(webDAVPath)) {
+		if (webDAVPath != null && !"".equals(webDAVPath) && !webDAVPath.equals(rootPath)) {
 			bean = new WebDAVBean();
 			int lastIndex = webDAVPath.lastIndexOf("/");
 			if (lastIndex > 0) {
@@ -249,6 +266,14 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 	
 	public String getClickedFileName() {
 		return clickedFileName;
+	}
+
+	public void setStartFolder(String start) {
+		this.startPath = start;
+	}
+	
+	public void setRootFolder(String root) {
+		this.rootPath = root;
 	}
 
 	public void refresh() {

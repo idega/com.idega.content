@@ -8,6 +8,7 @@ import javax.faces.context.FacesContext;
 
 import com.idega.presentation.IWBaseComponent;
 import com.idega.webface.WFList;
+import com.idega.webface.WFUtil;
 
 /**
  * @author gimmi
@@ -22,10 +23,28 @@ public class WebDAVList extends IWBaseComponent {
 	}
 	
 	protected void initializeContent() {
+		
+		String startFolder = (String) this.getAttributes().get("startFolder");
+		String rootFolder = (String) this.getAttributes().get("rootFolder");
+		if (startFolder != null) {
+			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setStartFolder", startFolder);
+		}
+		if (rootFolder != null) {
+			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setRootFolder", rootFolder);
+		}
+		
 		this.setId(this.getId());
 		WFList list = new WFList(WEB_DAV_LIST_BEAN_ID, 0, 0);
 		list.setId(this.getId()+"_l");
 		getChildren().add(list);
+	}
+	
+	public void setStartFolder(String start) {
+		getAttributes().put("startFolder", start);
+	}
+	
+	public void setRootFolder(String root) {
+		getAttributes().put("rootFolder", root);
 	}
 
 	public void encodeChildren(FacesContext context) throws IOException{
