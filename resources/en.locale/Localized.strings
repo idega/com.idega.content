@@ -87,3 +87,4 @@ name=Name
 lock=Lock
 mime_type=Mime Type
 size=Size
+checked_out=Checked-out
