@@ -6,6 +6,7 @@ import java.util.Iterator;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
+import javax.faces.el.ValueBinding;
 import org.apache.commons.httpclient.HttpException;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -30,6 +31,8 @@ public abstract class ContentBlock extends IWBaseComponent {
 	
 	// this, parentContentViewer, should not be saved in save state
 	private ContentViewer parentContentViewer = null;
+
+	private String currentResourcePath = null;
 
 	protected abstract void initializeContent();
 
@@ -101,6 +104,16 @@ public abstract class ContentBlock extends IWBaseComponent {
 	 * @return
 	 */
 	public String getCurrentResourcePath() {
+		
+		if (currentResourcePath != null) {
+			return currentResourcePath;
+		}
+		ValueBinding vb = getValueBinding("currentResourcePath");
+		String returner = vb != null ? (String)vb.getValue(getFacesContext()) : null;
+		if(returner != null) {
+			return returner;
+		}
+		
 		ContentViewer v = getContentViewer();
 		if(v!=null){
 			return v.getCurrentResourcePath();
@@ -194,4 +207,23 @@ public abstract class ContentBlock extends IWBaseComponent {
 	}
 	
 	
+	/**
+	 * @param currentResourcePath The currentResourcePath to set.
+	 */
+	public void setCurrentResourcePath(String currentResourcePath) {
+		this.currentResourcePath = currentResourcePath;
+	}
+	
+	public Object saveState(FacesContext ctx) {
+		Object values[] = new Object[2];
+		values[0] = super.saveState(ctx);
+		values[1] = currentResourcePath;
+		return values;
+	}
+
+	public void restoreState(FacesContext ctx, Object state) {
+		Object values[] = (Object[]) state;
+		super.restoreState(ctx, values[0]);
+		currentResourcePath = (String) values[1];
+	}
 }
