@@ -6,7 +6,7 @@
 
 <faces-config>
 	<component>
-		<component-type>WebDAVList<component-type>
+		<component-type>WebDAVList</component-type>
 		<component-class>com.idega.content.presentation.WebDAVList</component-class>
 	</component>
 	
