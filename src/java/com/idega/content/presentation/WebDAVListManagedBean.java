@@ -530,7 +530,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			}
 			
 			
-			if (startPath != null) {
+			if (startPath != null && webDAVPath.indexOf(startPath) == -1) {
 				webDAVPath = startPath;
 				startPath = null;
 			} else if(webDAVPath == null){
