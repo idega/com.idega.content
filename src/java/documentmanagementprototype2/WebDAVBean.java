@@ -9,6 +9,8 @@ package documentmanagementprototype2;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+import org.apache.webdav.lib.WebdavResource;
+
 /**
  * @author Roar
  */
@@ -47,7 +49,18 @@ public class WebDAVBean extends Object {
         this();
         setName(name);
     }      
-               
+   
+    public WebDAVBean(WebdavResource resource) {
+    	this();
+			setName(resource.getDisplayName());
+			setIsCollection(resource.isCollection());
+			setLength(resource.getGetContentLength()); 
+			setModifiedDate(resource.getGetLastModified());
+			setMime(resource.getGetContentType());
+			setCreationDate(resource.getCreationDate());
+			setWebDavHttpURL(resource.getPath());
+    }
+    
     public WebDAVBean(String name, boolean isCollection, long length, long modifieDate, String mime) {
         this(name);
        setIsCollection(isCollection);
