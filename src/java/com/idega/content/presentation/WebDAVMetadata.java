@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadata.java,v 1.7 2005/02/07 10:59:41 gummi Exp $
+ * $Id: WebDAVMetadata.java,v 1.8 2005/02/23 17:38:21 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -9,6 +9,7 @@
  */
 package com.idega.content.presentation;
 
+import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -48,12 +49,12 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2005/02/07 10:59:41 $ by $Author: gummi $
+ * Last modified: $Date: 2005/02/23 17:38:21 $ by $Author: joakim $
  * 
  * Display the UI for adding metadata type - values to a file.
  *
  * @author Joakim Johnson
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	
@@ -212,6 +213,8 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 			if(type.length()>0) {
 				System.out.println("Proppatch: filepath="+filePath+" type="+type+" value="+val);
 				rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),val,true);
+				//Also set the metadata on the parent folder
+				rootResource.proppatchMethod(new File(filePath).getParent(),new PropertyName("DAV:",type),val,true);
 			}
 			
 			//Store changes to previously created metadata
@@ -224,6 +227,8 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 				val=ret[i].getMetadatavalues();
 				System.out.println("type="+type+"  val="+val);
 				rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),val,true);
+				//Also set the metadata on the parent folder
+				rootResource.proppatchMethod(new File(filePath).getParent(),new PropertyName("DAV:",type),val,true);
 			}
 			resource.clear();
 		} catch (HttpException ex) {
