@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.4 2005/02/28 13:35:25 eiki Exp $
+ * $Id: IWBundleStarter.java,v 1.5 2005/03/06 13:17:42 tryggvil Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -13,17 +13,17 @@ import com.idega.content.business.ContentIWActionURIHandler;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.view.ContentViewManager;
 import com.idega.core.uri.IWActionURIManager;
-import com.idega.idegaweb.GlobalIncludeManager;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWBundleStartable;
+import com.idega.idegaweb.include.GlobalIncludeManager;
 
 
 /**
  * 
- *  Last modified: $Date: 2005/02/28 13:35:25 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/03/06 13:17:42 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class IWBundleStarter implements IWBundleStartable {
 
