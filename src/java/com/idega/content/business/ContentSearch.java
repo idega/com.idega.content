@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.10 2005/02/06 16:25:18 laddi Exp $
+ * $Id: ContentSearch.java,v 1.11 2005/02/14 15:11:23 gummi Exp $
  * Created on Jan 17, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -13,7 +13,9 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HostConfiguration;
@@ -46,12 +48,12 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/06 16:25:18 $ by $Author: laddi $
+ *  Last modified: $Date: 2005/02/14 15:11:23 $ by $Author: gummi $
  * This class implements the Searchplugin interface and can therefore be used in a Search block (com.idega.core.search)<br>
  *  for searching contents and properties (metadata) of the files in the iwfile system.
  * To use it simply register this class as a iw.searchable component in a bundle.
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class ContentSearch implements SearchPlugin {
 
@@ -72,6 +74,11 @@ public class ContentSearch implements SearchPlugin {
 	
 	public ContentSearch() {
 		super();
+	}
+	
+	public ContentSearch(IWMainApplication iwma) {
+		this();
+		initialize(iwma);
 	}
 
 	/* (non-Javadoc)
@@ -124,9 +131,9 @@ public class ContentSearch implements SearchPlugin {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.idega.core.search.business.SearchPlugin#createSearch(com.idega.core.search.business.SearchQuery)
+	 * @see com.idega.core.search.business.SearchPlugin#createSearch(com.idega.core.search.business.SearchQuery,java.util.List)
 	 */
-	public Search createSearch(SearchQuery searchQuery) {
+	public Search createSearch(SearchQuery searchQuery, List searchRequests) {
 		List results = new ArrayList();
 		BasicSearch searcher = new BasicSearch();
 		searcher.setSearchName(getSearchName());
@@ -136,7 +143,6 @@ public class ContentSearch implements SearchPlugin {
 		try {
 			IWSlideSession session = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(), IWSlideSession.class);
 			String servletMapping = session.getWebdavServerURI();
-			String queryString = ((SimpleSearchQuery)searchQuery).getSimpleSearchQuery();
 			HttpClient client = new HttpClient();
 			client.setState(new WebdavState());
 			HostConfiguration hostConfig = client.getHostConfiguration();
@@ -151,16 +157,11 @@ public class ContentSearch implements SearchPlugin {
 	        }
 	        
 	        
-			String content = getContentSearch(queryString);
-			SearchMethod contentSearch = new SearchMethod(servletMapping, content);
-
-			String property = getPropertySearch(queryString);
-			SearchMethod propertySearch = new SearchMethod(servletMapping, property);
-			
-			        
-			        
-			executeSearch(results, servletMapping, contentSearch, client);
-			executeSearch(results, servletMapping, propertySearch, client);
+			for (Iterator iter = searchRequests.iterator(); iter.hasNext();) {
+				SearchRequest request = (SearchRequest) iter.next();
+				SearchMethod contentSearch = new SearchMethod(servletMapping, request.asString());
+				executeSearch(results, servletMapping, contentSearch, client);
+			}
 			
 			searcher.setSearchResults(results);
 		}
@@ -179,32 +180,74 @@ public class ContentSearch implements SearchPlugin {
 		
 		return searcher;
 	}
+	
+	/* (non-Javadoc)
+	 * @see com.idega.core.search.business.SearchPlugin#createSearch(java.util.List)
+	 */
+	public Search createSearch(List searchRequests) {
+		return createSearch(null,searchRequests);
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.idega.core.search.business.SearchPlugin#createSearch(SearchRequest)
+	 */
+	public Search createSearch(SearchRequest searchRequest) {
+		return createSearch(null,Collections.singletonList(searchRequest));
+	}
 
-	protected String getContentSearch(String queryString) throws SearchException {
+	
+	/* (non-Javadoc)
+	 * @see com.idega.core.search.business.SearchPlugin#createSearch(com.idega.core.search.business.SearchQuery)
+	 */
+	public Search createSearch(SearchQuery searchQuery) {
+		List l = new ArrayList();
+		
+		try {
+			SearchRequest content = getContentSearch(searchQuery);
+			SearchRequest property = getPropertySearch(searchQuery);
+			
+			l.add(content);
+			l.add(property);
+		}
+		catch (SearchException e) {
+			e.printStackTrace();
+		}
+			
+		return createSearch(searchQuery, l);
+
+	}
+
+
+	protected SearchRequest getContentSearch(SearchQuery searchQuery) throws SearchException {
 		SearchRequest s = new SearchRequest();
 		//s.addSelection(DISPLAYNAME);
 		s.addSelection(LASTMODIFIED);
 		s.addScope(new SearchScope("files"));
 		
+		String queryString = ((SimpleSearchQuery)searchQuery).getSimpleSearchQuery();
+		
 		SearchExpression expression = s.contains(queryString);
 		s.setWhereExpression(expression);
-		String search = s.asString();
+//		String search = s.asString();
 		//System.out.println(search);
-		return search;
+		return s;
 	}
 	
-	protected String getPropertySearch(String queryString) throws SearchException {
+	protected SearchRequest getPropertySearch(SearchQuery searchQuery) throws SearchException {
 		SearchRequest s = new SearchRequest();
 		//s.addSelection(DISPLAYNAME);
 		s.addSelection(LASTMODIFIED);
 		s.addScope(new SearchScope("files"));
+		
+		String queryString = ((SimpleSearchQuery)searchQuery).getSimpleSearchQuery();
+		
 		SearchExpression expression = s.or( s.compare(CompareOperator.LIKE, DISPLAYNAME,"%"+queryString+"%"),
 				s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME,queryString),s.compare(CompareOperator.LIKE, COMMENT,"%"+queryString+"%")) );
 		//add other properties
 		s.setWhereExpression(expression);
-		String search = s.asString();
+//		String search = s.asString();
 		//System.out.println(search);
-		return search;
+		return s;
 	}
 
 	protected void executeSearch(List results, String servletMapping, SearchMethod method, HttpClient client) throws IOException, HttpException {
