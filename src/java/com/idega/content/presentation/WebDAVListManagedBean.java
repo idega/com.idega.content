@@ -5,7 +5,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-
 import javax.faces.component.UIColumn;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
@@ -17,10 +16,8 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import javax.faces.model.DataModel;
-
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.WebdavResources;
-
 import com.idega.business.IBOLookup;
 import com.idega.content.data.WebDAVBean;
 import com.idega.idegaweb.IWMainApplication;
@@ -231,8 +228,6 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 	}
 
 	private WebDAVBean[] getDirectoryListing(WebdavExtendedResource headResource, String webDAVServletURL)	throws IOException, HttpException {
-//		System.out.println("---------ENCODING IS:  " + System.getProperty("file.encoding")+"  ---------------");
-		//System.setProperty("file.encoding","ISO-8859-1");
 		WebdavResources resources = headResource.listWithDeltaV();//headResource.getChildResources();
 		Enumeration enumer = resources.getResources();
 		Vector v = new Vector();
@@ -258,16 +253,15 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 			resource = (WebdavExtendedResource) enumer.nextElement();
 			if (!resource.getDisplayName().startsWith(".")) {
 				bean = new WebDAVBean(resource);
-				String decoded = resource.getDecodedPath();
-				String encoded = resource.getEncodedPath();
-				String path = resource.getPath();
-				String name = resource.getName();
-
-				System.out.println("decoded: "+decoded);
-				System.out.println("encoded: "+encoded);
-				System.out.println("path: "+path);
-				System.out.println("name: "+name);
-				
+//				String decoded = resource.getDecodedPath();
+//				String encoded = resource.getEncodedPath();
+//				String path = resource.getPath();
+//				String name = resource.getName();
+//
+//				System.out.println("decoded: "+decoded);
+//				System.out.println("encoded: "+encoded);
+//				System.out.println("path: "+path);
+//				System.out.println("name: "+name);
 				url = resource.getPath();
 				url = url.replaceFirst(webDAVServletURL, "");
 				bean.setWebDavHttpURL(url);
