@@ -133,3 +133,5 @@ file_deleted=File deleted
 folder_deleted=Folder deleted
 deletion_failed=Deletion failed
 yes=Yes
+upload=Upload
+create_a_folder=Create a folder
