@@ -13,6 +13,7 @@ import org.apache.webdav.lib.WebdavResource;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
@@ -24,10 +25,25 @@ import com.idega.webface.WFUtil;
  */
 public abstract class ContentBlock extends IWBaseComponent {
 
+	public static final String IW_BUNDLE_IDENTIFIER = "com.idega.content";
+	
 	private WebdavResource resource = null;
+	private static IWBundle bundle = null;
 	
 	protected abstract void initializeContent();
-	
+
+	public static IWBundle getBundle() {
+		if (bundle == null) {
+			setupBundle();
+		}
+		return bundle;
+	}
+		
+	private static void setupBundle() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		IWContext iwContext = IWContext.getIWContext(context);
+		bundle = iwContext.getIWMainApplication().getBundle(IW_BUNDLE_IDENTIFIER);
+	}
 	
 	protected WebdavResource getWebdavResource() {
 		return resource;
