@@ -6,7 +6,13 @@
     <inceptionYear>2004</inceptionYear>
     <shortDescription>idegaWeb is the new ContentManagement System and Framework</shortDescription>
     <issueTrackingUrl>http://issues.idega.is</issueTrackingUrl>
-    <versions/>
+  <versions>
+      <version>
+      <id>0.5.0</id>
+      <name>0.5.0</name>
+      <tag>CONTENT_0_5_0</tag>
+    </version>
+  </versions>
     <branches/>
     <developers>
         <developer>
