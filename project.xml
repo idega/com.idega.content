@@ -64,7 +64,7 @@
         <dependency>
             <groupId>bundles</groupId>
             <artifactId>com.idega.slide</artifactId>
-            <version>0.2.0</version>
+            <version>0.3.0</version>
             <!--<version>SNAPSHOT</version>-->
             <type>jar</type>
             <url>http://www.idega.com/</url>
