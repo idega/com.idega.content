@@ -81,7 +81,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		list.setId(getId()+"_list");
 		list.setRendered(renderWebDAVList);
 		list.setStartFolder(startFolder);
-//		list.setRootFolder(rootFolder);
+		list.setRootFolder(rootFolder);
 		listBlock.add(list);
 		
 		WFBlock detailsBlock = new WFBlock();
