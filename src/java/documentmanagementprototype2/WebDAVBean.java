@@ -62,7 +62,7 @@ public class WebDAVBean extends Object {
 			setMime(resource.getGetContentType());
 			setCreationDate(resource.getCreationDate());
 			setWebDavHttpURL(resource.getPath());
-			setVersion(VersionHelper.getVersion(resource));
+			setVersion(VersionHelper.getLatestVersion(resource));
     }
     
     public WebDAVBean(String name, boolean isCollection, long length, long modifieDate, String mime) {
