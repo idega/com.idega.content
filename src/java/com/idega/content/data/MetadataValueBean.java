@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataValueBean.java,v 1.1 2005/01/10 10:26:01 joakim Exp $
+ * $Id: MetadataValueBean.java,v 1.2 2005/01/14 11:50:27 joakim Exp $
  * 
  * Copyright (C) 2004 Idega. All Rights Reserved.
  * 
@@ -11,82 +11,80 @@ package com.idega.content.data;
 
 import java.beans.PropertyChangeSupport;
 import com.idega.slide.util.WebdavExtendedResource;
+import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
  * 
- * Last modified: $Date: 2005/01/10 10:26:01 $ by $Author: joakim $
+ * Last modified: $Date: 2005/01/14 11:50:27 $ by $Author: joakim $
  * 
  * @author Joakim Johnson
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-public class MetadataValueBean {
+public class MetadataValueBean implements WFEditableListDataBean{
 
-	public static final String PROP_ID = "id";
 	public static final String PROP_TYPE = "type";
 	public static final String PROP_VALUES = "values";
 
-	private int id;
-	private String type = "";
-	private String values = "";
+	private final static int VALUE_ARRAY_INDEX_TYPE = 0;
+	private final static int VALUE_ARRAY_INDEX_VALUES = 1;
+	private final static int VALUE_ARRAY_INDEX_DELETE = 2;
+	
+//	private Object[] column = new Object[]{"","","Delete"};
+	Object[] column = new Object[]{"Categories","Sports, Headline","Delete"};
 
 	private PropertyChangeSupport propertySupport;
 	private WebdavExtendedResource me;
 
 	public MetadataValueBean() {
 		propertySupport = new PropertyChangeSupport(this);
-		setId((int) (Math.random() * 1000));
 	}
 
-	public MetadataValueBean(String t, String v) {
+	public MetadataValueBean(String t, String v, String l) {
 		this();
 		setType(t);
-		setValues(v);
+		setMetadatavalues(v);
+		setDelete(l);
+//		localizedString = l;//TODO create setter
+	}
+	
+	private void setDelete(String value) {
+		String oldValue = (String)column[VALUE_ARRAY_INDEX_DELETE];
+		column[VALUE_ARRAY_INDEX_DELETE]=value;
+		propertySupport.firePropertyChange(PROP_TYPE, oldValue, value);
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int value) {
-		int oldValue = id;
-		id = value;
-		propertySupport.firePropertyChange(PROP_ID, oldValue, id);
-	}
-
-	public String getType() {
-		return type;
+	public String getDelete() {
+		return (String)column[VALUE_ARRAY_INDEX_DELETE];
 	}
 
 	public void setType(String value) {
-		String oldValue = type;
-		type = value;
-		propertySupport.firePropertyChange(PROP_TYPE, oldValue, type);
+		String oldValue = (String)column[VALUE_ARRAY_INDEX_TYPE];
+		column[VALUE_ARRAY_INDEX_TYPE]=value;
+		propertySupport.firePropertyChange(PROP_TYPE, oldValue, value);
 	}
 
-	public String getValues() {
-		return values;
+	public String getType() {
+		return (String)column[VALUE_ARRAY_INDEX_TYPE];
 	}
 
-	public void setValues(String v) {
-		String oldValue = values;
-		values = v;
-		propertySupport.firePropertyChange(PROP_VALUES, oldValue, values);
+	public void setMetadatavalues(String value) {
+		String oldValue = (String)column[VALUE_ARRAY_INDEX_VALUES];
+		column[VALUE_ARRAY_INDEX_VALUES]=value;
+		propertySupport.firePropertyChange(PROP_TYPE, oldValue, value);
 	}
 
-//	private WebdavExtendedResource getMe() {
-//		if (me == null) {
-//			try {
-//				IWContext iwc = IWContext.getInstance();
-//				IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(iwc, IWSlideSession.class);
-//				WebdavExtendedResource resource = ss.getWebdavResource(getWebDavUrl().replaceFirst(
-//						ss.getWebdavServerURI(), ""));
-//				this.me = resource;
-//			}
-//			catch (Exception e) {
-//				//				e.printStackTrace();
-//				setName("Error getting resource (" + getWebDavUrl() + ")");
-//			}
-//		}
-//		return me;
-//	}
+	public String getMetadatavalues() {
+		return (String)column[VALUE_ARRAY_INDEX_VALUES];
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.webface.bean.WFEditableListDataBean#getSelectItemListArray()
+	 */
+	public Object[] getSelectItemListArray() {
+		return new Object[column.length];
+	}
+
+	public Object[] getValues() {
+		return column;
+	}
 }
