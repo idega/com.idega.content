@@ -15,7 +15,7 @@
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/otrix/jars/otrix-webtree-beta3.jar">
   </classpathentry>
-  <classpathentry kind="var" path="MAVEN_REPO/slide/jars/jakarta-slide-webdavlib-2.1b2.jar">
+  <classpathentry kind="var" path="MAVEN_REPO/slide/jars/jakarta-slide-webdavlib-2.1rc1.jar">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/commons-httpclient/jars/commons-httpclient-2.0.jar">
   </classpathentry>
