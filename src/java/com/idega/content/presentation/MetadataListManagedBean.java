@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataListManagedBean.java,v 1.6 2005/01/28 13:52:21 joakim Exp $
+ * $Id: MetadataListManagedBean.java,v 1.7 2005/01/31 16:51:23 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -38,11 +38,11 @@ import com.idega.webface.bean.WFListBean;
 
 /**
  * 
- * Last modified: $Date: 2005/01/28 13:52:21 $ by $Author: joakim $
+ * Last modified: $Date: 2005/01/31 16:51:23 $ by $Author: joakim $
  * Displays all the metadata types and values for the specified resource
  *
  * @author Joakim Johnson
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class MetadataListManagedBean extends AbstractWFEditableListManagedBean implements WFListBean, ActionListener {
 
@@ -176,7 +176,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 		UIColumn typeCol = new UIColumn();
 		typeCol.setHeader(ContentBlock.getBundle().getLocalizedText("type"));
 		//TODO This probably has to be localized
-		HtmlOutputText creation = WFUtil.getTextVB(var + ".type");
+		HtmlOutputText creation = WFUtil.getTextVB(var + ".localizedType");
 		creation.setStyleClass("wf_listtext");
 		typeCol.getChildren().add(creation);
 
@@ -192,7 +192,6 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 		UIColumn valuesCol = new UIColumn();
 		valuesCol.setHeader(ContentBlock.getBundle().getLocalizedText("values"));
 		HtmlInputText t = WFUtil.getInputText("metadatavalues", var + ".metadatavalues");
-//		t.setStyleClass("wf_listtext");
 		valuesCol.getChildren().add(t);
 		return valuesCol;
 	}
