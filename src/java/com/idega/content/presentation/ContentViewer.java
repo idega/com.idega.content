@@ -34,7 +34,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	private static String FILE_DETAILS = "ac_file_details";
 	private static String FILE_DETAILS_LESS = "ac_less_file_details";
 	private static String PREVIEW = "ac_preview";
-	private static String NEW_FOLDER = "ac_folder";
+	static String NEW_FOLDER = "ac_folder";
 	private static String PERMISSIONS = "ac_permissions";
 	private static String UPLOAD = "ac_upload";
 	static String DELETE = "ac_delete";
@@ -80,8 +80,11 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 
 		WFBlock listBlock = new WFBlock();
 		WFTitlebar tb = new WFTitlebar();
-		tb.setValueRefTitle(true);
-		tb.setTitleText("WebDAVListBean.webDAVPath");		
+//		tb.setValueRefTitle(true);
+		tb.addTitleText(getBundle().getLocalizedText("documents"));
+		tb.addTitleText(" (");
+		tb.addTitleText("WebDAVListBean.webDAVPath", true);
+		tb.addTitleText(")");
 		listBlock.setToolbarEmbeddedInTitlebar(true);
 		listBlock.setTitlebar(tb);
 		listBlock.setToolbar(getToolbar());
@@ -95,7 +98,10 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		
 		WFBlock detailsBlock = new WFBlock();
 		WFTitlebar detailsBar = new WFTitlebar();
-		detailsBar.setTitleText(getBundle().getLocalizedText("document_details"));
+		detailsBar.addTitleText(getBundle().getLocalizedText("document_details"));
+		detailsBar.addTitleText(" (");
+		detailsBar.addTitleText("WebDAVListBean.clickedFileName", true);
+		detailsBar.addTitleText(")");
 		detailsBlock.setTitlebar(detailsBar);
 		detailsBlock.setToolbar(getToolbar());
 		WebDAVFileDetails details = new WebDAVFileDetails();
@@ -105,7 +111,10 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		
 		WFBlock previewBlock = new WFBlock();
 		WFTitlebar previewBar = new WFTitlebar();
-		previewBar.setTitleText(getBundle().getLocalizedText("document_details"));
+		previewBar.addTitleText(getBundle().getLocalizedText("document_details"));
+		previewBar.addTitleText(" (");
+		previewBar.addTitleText("WebDAVListBean.clickedFileName", true);
+		previewBar.addTitleText(")");
 		previewBlock.setTitlebar(previewBar);
 		previewBlock.setToolbar(getToolbar());
 		WebDAVFileDetails details2 = new WebDAVFileDetails();
@@ -119,7 +128,10 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		
 		WFBlock folderBlock = new WFBlock();
 		WFTitlebar folderBar = new WFTitlebar();
-		folderBar.setTitleText(getBundle().getLocalizedText("create_a_folder"));
+		folderBar.addTitleText(getBundle().getLocalizedText("create_a_folder"));
+		folderBar.addTitleText(" (");
+		folderBar.addTitleText("WebDAVListBean.webDAVPath", true);
+		folderBar.addTitleText(")");
 		folderBlock.setTitlebar(folderBar);
 		folderBlock.setToolbar(new WFToolbar());
 		WebDAVFolderCreation folder = new WebDAVFolderCreation();
@@ -129,7 +141,10 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		
 		WFBlock uploadBlock = new WFBlock();
 		WFTitlebar uploadBar = new WFTitlebar();
-		uploadBar.setTitleText(getBundle().getLocalizedText("upload"));
+		uploadBar.addTitleText(getBundle().getLocalizedText("upload"));
+		uploadBar.addTitleText(" (");
+		uploadBar.addTitleText("WebDAVListBean.webDAVPath", true);
+		uploadBar.addTitleText(")");
 		uploadBlock.setTitlebar(uploadBar);
 		uploadBlock.setToolbar(new WFToolbar());
 		WebDAVUpload upload = new WebDAVUpload();
@@ -139,7 +154,10 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		
 		WFBlock deleteBlock = new WFBlock();
 		WFTitlebar deleteBar = new WFTitlebar();
-		deleteBar.setTitleText(getBundle().getLocalizedText("delete"));
+		deleteBar.addTitleText(getBundle().getLocalizedText("delete"));
+		deleteBar.addTitleText(" (");
+		deleteBar.addTitleText("WebDAVListBean.clickedFilePath", true);
+		deleteBar.addTitleText(")");
 		deleteBlock.setTitlebar(deleteBar);
 		deleteBlock.setToolbar(new WFToolbar());
 		
@@ -154,7 +172,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 
 		WFBlock permissionsBlock = new WFBlock();
 		WFTitlebar permissionsBar = new WFTitlebar();
-		permissionsBar.setTitleText(getBundle().getLocalizedText("permissions"));
+		permissionsBar.addTitleText(getBundle().getLocalizedText("permissions"));
 		permissionsBlock.setTitlebar(permissionsBar);
 		permissionsBlock.setToolbar(getToolbar());
 		WebDAVFilePermissions permissions = new WebDAVFilePermissions();
