@@ -10,6 +10,7 @@ import org.apache.webdav.lib.WebdavResource;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.DownloadLink;
 import com.idega.slide.util.VersionHelper;
+import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.slide.util.WebdavResourceVersion;
 import com.idega.util.FileUtil;
 import com.idega.util.IWTimestamp;
@@ -22,11 +23,11 @@ import com.idega.webface.WFUtil;
 public class WebDAVFileDetails extends ContentBlock {
 
 	protected void initializeContent() {
-		this.setId(this.getId());
-		WebdavResource resource = getWebdavResource();
+		
+		WebdavExtendedResource resource = getWebdavExtendedResource();
 		
 		if (resource != null) {
-			String resourceName = resource.getName();
+			String resourceName = resource.getDisplayName();
 			int row = 1;
 			
 			Table table = new Table();
