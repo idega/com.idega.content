@@ -19,6 +19,7 @@ import org.apache.webdav.lib.WebdavResources;
 import com.idega.business.IBOLookup;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.file.business.FileIconSupplier;
+import com.idega.core.uri.IWActionURIManager;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
@@ -65,14 +66,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
     private String comment = null;
     private String iconTheme = null;
     private boolean real = true;
-
-	/**
-	 * @return Returns the isCheckedOut.
-	 */
-	public boolean isCheckedOut() {
-		return isCheckedOut;
-	}
-	    
+    
     private WebdavExtendedResource me;
     private ICTreeNode parent;
     private Collection siblings;
@@ -81,6 +75,14 @@ public class WebDAVBean extends Object implements ICTreeNode {
     private int childrenCount = -1;
     
     private static int idCounter = 1;
+	private String previewActionURI;
+
+	/**
+	 * @return Returns the isCheckedOut.
+	 */
+	public boolean isCheckedOut() {
+		return isCheckedOut;
+	}
     
     public WebDAVBean() {
     	
@@ -107,6 +109,9 @@ public class WebDAVBean extends Object implements ICTreeNode {
 			setCheckedOutString(resource.getCheckedOut());
 			setComment(resource.getComment());
 			setEncodedURL(resource.getEncodedPath());
+			
+			//action uri for preview
+			setPreviewActionURI(IWActionURIManager.getInstance().getActionURIPrefixWithContext("preview",getEncodedURL()));
     }
         
 	public int getId() {
@@ -151,6 +156,16 @@ public class WebDAVBean extends Object implements ICTreeNode {
     	String old = encodedUrl;
     	encodedUrl = value;
     	propertySupport.firePropertyChange(PROP_ENCODED_URL, old, encodedUrl);
+    }
+    
+    public String getPreviewActionURI() {
+    		return previewActionURI;
+    }
+    
+    public void setPreviewActionURI(String value) {
+	    	String old = previewActionURI;
+	    	previewActionURI = value;
+	    	propertySupport.firePropertyChange(PROP_ENCODED_URL, old, previewActionURI);
     }
     
     public String getModifiedDate() {

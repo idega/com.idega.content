@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.3 2005/02/25 14:15:37 eiki Exp $
+ * $Id: ContentItemViewer.java,v 1.4 2005/02/27 15:14:24 eiki Exp $
  * Created on 26.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -30,10 +30,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/25 14:15:37 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/02/27 15:14:24 $ by $Author: eiki $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class ContentItemViewer extends WFContainer {
 	
@@ -305,6 +305,7 @@ public class ContentItemViewer extends WFContainer {
 	 * @see javax.faces.component.UIComponent#decode(javax.faces.context.FacesContext)
 	 */
 	public void decode(FacesContext context) {
+		//TODO USE DECODE RATHER THAN ENCODEBEGIN! not working because->NEVER CALLED!
 		if(showRequestedItem){
 			IWContext iwc = IWContext.getIWContext(context);
 			String resourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
@@ -312,8 +313,10 @@ public class ContentItemViewer extends WFContainer {
 				requestedResourcePath = resourcePath;
 			}
 		}
+		updateValues();
 		
 	}
+	
 	/* (non-Javadoc)
 	 * @see javax.faces.component.UIComponent#encodeBegin(javax.faces.context.FacesContext)
 	 */

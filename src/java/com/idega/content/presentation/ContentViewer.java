@@ -248,6 +248,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	 */
 	public void decode(FacesContext context) {
 		//super.decode(arg0);
+		//TODO USE DECODE, DOES NOT WORK BECAUSE IT IS NEVER CALLED!
 		
 		Map parameters = context.getExternalContext().getRequestMap();
 		
@@ -296,6 +297,35 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		
 		if (rootFolder == null) {
 			rootFolder = (String) this.getAttributes().get("rootFolder");
+		}
+		
+		Map parameters = context.getExternalContext().getRequestParameterMap();
+		
+		String action = (String) parameters.get(PARAMETER_ACTION);
+		String resourceURL = (String) parameters.get(PARAMETER_CONTENT_RESOURCE);
+		if(resourceURL!=null){
+			setCurrentResourcePath(resourceURL);
+		}
+		
+		if(action!=null){
+			setRenderFlags(action);
+			
+			if(ACTION_PERMISSIONS.equals(action)){
+				IWContext iwc = IWContext.getInstance();
+				try {
+					WebDAVFilePermissionResource resource = (WebDAVFilePermissionResource) IBOLookup.getSessionInstance(iwc, WebDAVFilePermissionResource.class);
+					resource.clear();
+				}
+				catch (IBOLookupException e) {
+					e.printStackTrace();
+				}
+				catch (RemoteException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			maintainPath(true);
+		
 		}
 
 		if (!maintainPath) {

@@ -328,16 +328,18 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			nameDetailsLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
 
 			// PreviewLink
-			HtmlCommandLink namePreviewLink = new HtmlCommandLink();
+//			HtmlCommandLink namePreviewLink = new HtmlCommandLink();
+			HtmlOutputLink namePreviewLink = new HtmlOutputLink();
+			
 			namePreviewLink.setId(P_ID+"_pre");
-			namePreviewLink.setValueBinding("alt", ContentViewer.getBundle().getValueBinding("preview"));
+			namePreviewLink.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".previewActionURI}"));
 			//"document_details"
 			namePreviewLink.setStyleClass("content_viewer_file_preview");
-			namePreviewLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.ACTION_PREVIEW);
+			//namePreviewLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.ACTION_PREVIEW);
 			namePreviewLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isFile}"));
-			WFUtil.addParameterVB(namePreviewLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
-			WFUtil.addParameterVB(namePreviewLink, PARAMETER_IS_FOLDER, var + ".isCollection");
-			namePreviewLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
+			//WFUtil.addParameterVB(namePreviewLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
+			//WFUtil.addParameterVB(namePreviewLink, PARAMETER_IS_FOLDER, var + ".isCollection");
+			//namePreviewLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
 			namePreviewLink.setValueBinding("alt", ContentViewer.getBundle().getValueBinding("preview"));
 			namePreviewLink.setValueBinding("title", ContentViewer.getBundle().getValueBinding("preview"));
 
