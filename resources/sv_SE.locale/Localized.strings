@@ -131,7 +131,7 @@ comment=Kommentar
 checkout=Checka ut
 checkin=Checka in
 last_modified=Senast ändrad
-folder=Folder
+folder=Mapp
 
 select_a_file_to_upload=Välj fil för att ladda upp
 give_it_a_name_optional=Ange nytt filnamn (valfritt)
