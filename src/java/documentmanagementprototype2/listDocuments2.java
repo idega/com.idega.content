@@ -23,6 +23,7 @@ import org.apache.commons.httpclient.HttpURL;
 import org.apache.webdav.lib.WebdavResource;
 
 import com.idega.business.IBOLookup;
+import com.idega.content.data.WebDAVBean;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;

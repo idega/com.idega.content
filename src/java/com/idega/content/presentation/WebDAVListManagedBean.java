@@ -20,6 +20,7 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.WebdavResource;
 import org.apache.webdav.lib.WebdavResources;
 import com.idega.business.IBOLookup;
+import com.idega.content.data.WebDAVBean;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
@@ -28,7 +29,6 @@ import com.idega.webface.WFList;
 import com.idega.webface.WFUtil;
 import com.idega.webface.bean.WFListBean;
 import com.idega.webface.model.WFDataModel;
-import documentmanagementprototype2.WebDAVBean;
 
 /**
  * A managed bean for the WebDAVList component
