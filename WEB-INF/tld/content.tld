@@ -74,7 +74,16 @@
 			<required>false</required>
 			<rtexprvalue>false</rtexprvalue>
 		</attribute>
-
+		<attribute>
+			<name>showPermissionTab</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>showUploadComponent</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
 	</tag>
 	
 	<tag>
