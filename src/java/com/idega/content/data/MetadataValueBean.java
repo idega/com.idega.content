@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataValueBean.java,v 1.4 2005/01/28 13:52:21 joakim Exp $
+ * $Id: MetadataValueBean.java,v 1.5 2005/01/31 16:50:47 joakim Exp $
  * 
  * Copyright (C) 2004 Idega. All Rights Reserved.
  * 
@@ -10,16 +10,17 @@
 package com.idega.content.data;
 
 import java.beans.PropertyChangeSupport;
+import com.idega.content.presentation.ContentBlock;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
- * Last modified: $Date: 2005/01/28 13:52:21 $ by $Author: joakim $
+ * Last modified: $Date: 2005/01/31 16:50:47 $ by $Author: joakim $
  * Data bean that holds information about metadata type - value pair
  * used to display data in MetadataListManagedBean
  * 
  * @author Joakim Johnson
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class MetadataValueBean implements WFEditableListDataBean {
 
@@ -40,24 +41,12 @@ public class MetadataValueBean implements WFEditableListDataBean {
 	}
 
 	public MetadataValueBean(String t, String v
-//			, String l
 			) {
 		this();
 		setType(t);
 		setMetadatavalues(v);
-//		setDelete(l);
 	}
 	
-//	private void setDelete(String value) {
-//		String oldValue = (String)column[VALUE_ARRAY_INDEX_DELETE];
-//		column[VALUE_ARRAY_INDEX_DELETE]=value;
-//		propertySupport.firePropertyChange(PROP_TYPE, oldValue, value);
-//	}
-//
-//	public String getDelete() {
-//		return (String)column[VALUE_ARRAY_INDEX_DELETE];
-//	}
-//
 	public void setType(String value) {
 		String oldValue = (String)column[VALUE_ARRAY_INDEX_TYPE];
 		column[VALUE_ARRAY_INDEX_TYPE]=value;
@@ -68,6 +57,11 @@ public class MetadataValueBean implements WFEditableListDataBean {
 		return (String)column[VALUE_ARRAY_INDEX_TYPE];
 	}
 
+	public String getLocalizedType() {
+		String locType = ContentBlock.getBundle().getLocalizedString((String)column[VALUE_ARRAY_INDEX_TYPE]);
+		return locType;
+	}
+	
 	public void setMetadatavalues(String value) {
 		String oldValue = (String)column[VALUE_ARRAY_INDEX_VALUES];
 		column[VALUE_ARRAY_INDEX_VALUES]=value;
