@@ -1,0 +1,693 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Idega Software CMS and RAD webapplication tools</title>
+
+<script type="text/javascript" language="javascript" src="/idegaweb/bundles/com.idega.core.bundle/resources/iw_core.js"></script>
+<script  type="text/javascript" language="javascript" >
+<!--//
+function setImageId(imageId,imagename) { 
+ 	if (document.images) { 
+ 		document.images['im'+imagename].src = "/servlet/MediaServlet?media_id="+imageId; 
+	}
+	document.forms[0].elements[getElementIndex(imagename)].value = imageId 
+}
+function getElementIndex(elementname){ 
+ 	len = document.forms[0].length 
+ 	for(i=0; i<len; i++){ 
+ 	 	if(document.forms[0].elements[i].name == elementname.toString()){ 
+		 return i; 
+ 	 	} 
+  	} 
+ }
+
+	function openwindow(Address,Name,ToolBar,Location,Directories,Status,Menubar,Titlebar,Scrollbars,Resizable,Width,Height) {  
+		// usage openwindow(addr,name,yes/no,yes/no,yes/no,yes/no,yes/no,yes/no,yes/no,yes/no,width,height) 
+		var option = "toolbar=" + ToolBar + ",location=" + Location  + ",directories=" + Directories  + ",status=" + Status  + ",menubar=" + Menubar  + ",titlebar=" + Titlebar  + ",scrollbars=" + Scrollbars  + ",resizable="  + Resizable  + ",width=" + Width  + ",height=" + Height; 
+		var new_win = window.open(Address, Name, option );
+	}
+//-->
+</script>
+
+<link type="text/css" href="/idegaweb/style/style.css" rel="stylesheet">
+
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+<meta name="generator" content="idegaWeb 1.3"/>
+<meta http-equiv="pragma" content="no-cache"/>
+
+</head>
+<body  marginwidth="0" topmargin="0" leftmargin="0" marginheight="0">
+<form name="id23141793"  action="/servlet/WindowOpener" method="post" id="id23141793" >
+<input type="hidden" name="idega_special_form_event"  value="id23141793" id="id14694607" ><input type="hidden" name="iw_event_address"  value="" id="id11656200" ><table  height="100%" border="0" width="100%" cellspacing="0" cellpadding="0" >
+
+<tr>
+
+<td  bgcolor="#0E2456" colspan="2" rowspan="1" >
+<table  border="0" width="100%" cellspacing="0" cellpadding="0" >
+
+<tr>
+
+<td  valign="middle" align="left" >
+<img alt="" name="idegaWeb" border="0" alt="idegaWeb" src="/idegaweb/bundles/com.idega.core.bundle/resources//editorwindow/idegaweb.gif" ></td>
+<td  valign="middle" align="right" >
+<b><font  color="#FFFFFF" size="3" face="Arial, Helvetica, Sans-serif" >News Editor&nbsp;&nbsp;</font></b></td>
+</tr>
+
+</table>
+</td>
+
+</tr>
+
+<tr>
+
+<td  height="100%" bgcolor="#FFFFFF" valign="top" >
+<table  border="0" width="100%" cellpadding="8" align="center" >
+
+<tr>
+
+<td  valign="middle" align="left" >
+<b><font  color="#000000" size="1" face="Verdana, Arial, Helvetica, sans-serif" >Headline</font></b><br/><input type="text" name="nwep_headline"  maxlength="255" size="40" style="font-family:arial; font-size:8pt; color:#000000; text-align: justify; border: 1 solid #000000;" value="Vinbud.is (idegaWeb) voted best corporate website 2003 in Iceland" id="id854617" ></td>
+</tr>
+
+<tr>
+
+<td  valign="middle" align="left" >
+<b><font  color="#000000" size="1" face="Verdana, Arial, Helvetica, sans-serif" >Locale</font></b><br/><select name="nwep_locale"  onChange="this.form.submit()" style="font-family:arial; font-size:8pt; color:#000000; text-align: justify; border: 1 solid #000000;" id="id31584219" >
+<option  selected value="2" id="id4868921" >English</option>
+</select>
+</td>
+</tr>
+
+<tr>
+
+<td  valign="middle" align="left" >
+<b><font  color="#000000" size="1" face="Verdana, Arial, Helvetica, sans-serif" >Teaser</font></b><br/><textarea name="nwep_teaser" style="font-family:arial; font-size:8pt; color:#000000; text-align: justify; border: 1 solid #000000;" rows="2" cols="65" id="id26251644" ></textarea></td>
+</tr>
+
+<tr>
+
+<td  valign="middle" align="left" >
+<b><font  color="#000000" size="1" face="Verdana, Arial, Helvetica, sans-serif" >News</font></b><br/><textarea name="nwe_body" rows="20" cols="45" id="id22752624" ><P>The Icelandic Web awards were held last night by <A href="http://www.imark.is/" target=open>Ímark</A>, The Icelandic marketing association, and <A href="http://www.vefsyn.is/" target=open>Vefsýn</A> for the third time. 
+This year many great websites were nominated and awards were awarded in 5 categories. 
+A special guest of the awards, Valgerdur Sverrisdottir the Minister of Industry- and Business Affairs, handed out the awards.</P>
+<P>The best corporate website award went this year to <A href="http://www.vinbud.is" target=open>atvr.is </A>(vinbud.is) or the corporate website of the Alcohol & Tobacco Monopoly of Iceland. 
+The website was jointly implemented, with the idegaWeb Builder and Intershop software, by Idega Software and their business and development partner <A href="http://www.landsteinarstrengur.is" target=open>Landsteinar - Strengur</A>. </P>
+<P>The graphic design was done by Idega's very own graphic designer, <A href="http://www.jonathangerlach.com" target=open>Jonathan Gerlach</A>.</P>
+<P>Congratulations to all concerned. More info on the awards can be found on <A href="http://www.vefsyn.is" target=open>www.vefsyn.is</A> or on <A href="http://www.imark.is" target=open>www.imark.is</A></P></textarea></td>
+</tr>
+
+<tr>
+
+<td  valign="middle" align="left" >
+<b><font  color="#000000" size="1" face="Verdana, Arial, Helvetica, sans-serif" >News date</font></b><br/><select name="nwep_newsdate_day"  onChange="setValueOfHiddenTimestamp(this.form.nwep_newsdate_year,this.form.nwep_newsdate_month,this.form.nwep_newsdate_day,this.form.nwep_newsdate_hour,this.form.nwep_newsdate_minute,this.form.nwep_newsdate)" id="id26746973" >
+<option  value="" id="id6993658" >D</option>
+<option  value="01" id="id26879812" >1</option>
+<option  value="02" id="id25693507" >2</option>
+<option  value="03" id="id18802961" >3</option>
+<option  value="04" id="id5729299" >4</option>
+<option  value="05" id="id24678161" >5</option>
+<option  value="06" id="id33075488" >6</option>
+<option  value="07" id="id3466049" >7</option>
+<option  value="08" id="id3394244" >8</option>
+<option  value="09" id="id4528211" >9</option>
+<option  value="10" id="id4192112" >10</option>
+<option  value="11" id="id26075224" >11</option>
+<option  value="12" id="id25415667" >12</option>
+<option  value="13" id="id13208450" >13</option>
+<option  value="14" id="id31860764" >14</option>
+<option  value="15" id="id22246496" >15</option>
+<option  value="16" id="id33379728" >16</option>
+<option  value="17" id="id16543300" >17</option>
+<option  value="18" id="id11228868" >18</option>
+<option  value="19" id="id13472388" >19</option>
+<option  value="20" id="id5134104" >20</option>
+<option  value="21" id="id20451537" >21</option>
+<option  value="22" id="id30951299" >22</option>
+<option  value="23" id="id4133481" >23</option>
+<option  value="24" id="id13740959" >24</option>
+<option  value="25" id="id22702773" >25</option>
+<option  value="26" id="id18075473" >26</option>
+<option  value="27" id="id26205895" >27</option>
+<option  value="28" id="id7013017" >28</option>
+<option  value="29" id="id24615791" >29</option>
+<option  selected value="30" id="id25017906" >30</option>
+<option  value="31" id="id5359208" >31</option>
+</select>
+<select name="nwep_newsdate_month"  onChange="populateDays(this.form.nwep_newsdate_year,this,this.form.nwep_newsdate_day);setValueOfHiddenTimestamp(this.form.nwep_newsdate_year,this.form.nwep_newsdate_month,this.form.nwep_newsdate_day,this.form.nwep_newsdate_hour,this.form.nwep_newsdate_minute,this.form.nwep_newsdate);" id="id7662258" >
+<option  value="" id="id1235027" >M</option>
+<option  value="01" id="id25485378" >January</option>
+<option  value="02" id="id10431643" >February</option>
+<option  value="03" id="id2729125" >March</option>
+<option  value="04" id="id33054511" >April</option>
+<option  value="05" id="id19995695" >May</option>
+<option  value="06" id="id20024247" >June</option>
+<option  value="07" id="id30131199" >July</option>
+<option  value="08" id="id11581963" >August</option>
+<option  value="09" id="id8793775" >September</option>
+<option  selected value="10" id="id23262955" >October</option>
+<option  value="11" id="id4249768" >November</option>
+<option  value="12" id="id22024502" >December</option>
+</select>
+<select name="nwep_newsdate_year"  onChange="populateDays(this,this.form.nwep_newsdate_month,this.form.nwep_newsdate_day);setValueOfHiddenTimestamp(this.form.nwep_newsdate_year,this.form.nwep_newsdate_month,this.form.nwep_newsdate_day,this.form.nwep_newsdate_hour,this.form.nwep_newsdate_minute,this.form.nwep_newsdate);" id="id31230963" >
+<option  value="" id="id20465600" >Y</option>
+<option  value="1999" id="id17060430" >1999</option>
+<option  value="2000" id="id12036207" >2000</option>
+<option  value="2001" id="id26430015" >2001</option>
+<option  value="2002" id="id15706989" >2002</option>
+<option  selected value="2003" id="id14661095" >2003</option>
+<option  value="2004" id="id18829603" >2004</option>
+<option  value="2005" id="id17301919" >2005</option>
+</select>
+at<select name="nwep_newsdate_hour"  onChange="setValueOfHiddenTimestamp(this.form.nwep_newsdate_year,this.form.nwep_newsdate_month,this.form.nwep_newsdate_day,this.form.nwep_newsdate_hour,this.form.nwep_newsdate_minute,this.form.nwep_newsdate)" id="id6827952" >
+<option  value="" id="id32412410" >h</option>
+<option  value="00" id="id12120237" >00</option>
+<option  value="01" id="id29434244" >01</option>
+<option  value="02" id="id8353414" >02</option>
+<option  value="03" id="id4094866" >03</option>
+<option  value="04" id="id2284679" >04</option>
+<option  value="05" id="id12337641" >05</option>
+<option  value="06" id="id25899681" >06</option>
+<option  value="07" id="id27857632" >07</option>
+<option  value="08" id="id18242838" >08</option>
+<option  value="09" id="id20536901" >09</option>
+<option  value="10" id="id22812705" >10</option>
+<option  value="11" id="id20198071" >11</option>
+<option  value="12" id="id32347181" >12</option>
+<option  value="13" id="id10169570" >13</option>
+<option  value="14" id="id27256912" >14</option>
+<option  selected value="15" id="id21827138" >15</option>
+<option  value="16" id="id31667366" >16</option>
+<option  value="17" id="id26587263" >17</option>
+<option  value="18" id="id7759818" >18</option>
+<option  value="19" id="id26740535" >19</option>
+<option  value="20" id="id119725" >20</option>
+<option  value="21" id="id32513940" >21</option>
+<option  value="22" id="id27881258" >22</option>
+<option  value="23" id="id12674725" >23</option>
+</select>
+<select name="nwep_newsdate_minute"  onChange="setValueOfHiddenTimestamp(this.form.nwep_newsdate_year,this.form.nwep_newsdate_month,this.form.nwep_newsdate_day,this.form.nwep_newsdate_hour,this.form.nwep_newsdate_minute,this.form.nwep_newsdate)" id="id1232927" >
+<option  value="" id="id32736014" >m</option>
+<option  value="00" id="id20570676" >00</option>
+<option  value="01" id="id20046412" >01</option>
+<option  value="02" id="id5958" >02</option>
+<option  value="03" id="id33035382" >03</option>
+<option  value="04" id="id494722" >04</option>
+<option  value="05" id="id26856357" >05</option>
+<option  value="06" id="id579085" >06</option>
+<option  value="07" id="id1899733" >07</option>
+<option  value="08" id="id18555329" >08</option>
+<option  value="09" id="id4532568" >09</option>
+<option  selected value="10" id="id10325528" >10</option>
+<option  value="11" id="id31181830" >11</option>
+<option  value="12" id="id19898340" >12</option>
+<option  value="13" id="id27941990" >13</option>
+<option  value="14" id="id26762126" >14</option>
+<option  value="15" id="id27446939" >15</option>
+<option  value="16" id="id27928859" >16</option>
+<option  value="17" id="id7391799" >17</option>
+<option  value="18" id="id15462788" >18</option>
+<option  value="19" id="id4012176" >19</option>
+<option  value="20" id="id21791064" >20</option>
+<option  value="21" id="id29343546" >21</option>
+<option  value="22" id="id27493898" >22</option>
+<option  value="23" id="id11876848" >23</option>
+<option  value="24" id="id32428670" >24</option>
+<option  value="25" id="id4023745" >25</option>
+<option  value="26" id="id14905180" >26</option>
+<option  value="27" id="id27532324" >27</option>
+<option  value="28" id="id20160544" >28</option>
+<option  value="29" id="id5614869" >29</option>
+<option  value="30" id="id14053936" >30</option>
+<option  value="31" id="id14855876" >31</option>
+<option  value="32" id="id4189515" >32</option>
+<option  value="33" id="id15987392" >33</option>
+<option  value="34" id="id29764384" >34</option>
+<option  value="35" id="id20534066" >35</option>
+<option  value="36" id="id8725857" >36</option>
+<option  value="37" id="id22619493" >37</option>
+<option  value="38" id="id27665465" >38</option>
+<option  value="39" id="id9710449" >39</option>
+<option  value="40" id="id28318067" >40</option>
+<option  value="41" id="id5694580" >41</option>
+<option  value="42" id="id11566565" >42</option>
+<option  value="43" id="id18446599" >43</option>
+<option  value="44" id="id22608833" >44</option>
+<option  value="45" id="id16281045" >45</option>
+<option  value="46" id="id32688065" >46</option>
+<option  value="47" id="id1605654" >47</option>
+<option  value="48" id="id8477906" >48</option>
+<option  value="49" id="id16049249" >49</option>
+<option  value="50" id="id29210217" >50</option>
+<option  value="51" id="id1236673" >51</option>
+<option  value="52" id="id14584944" >52</option>
+<option  value="53" id="id14028424" >53</option>
+<option  value="54" id="id22295651" >54</option>
+<option  value="55" id="id20664912" >55</option>
+<option  value="56" id="id26816763" >56</option>
+<option  value="57" id="id6207690" >57</option>
+<option  value="58" id="id11922830" >58</option>
+<option  value="59" id="id33500410" >59</option>
+</select>
+<input type="hidden" name="nwep_newsdate"  value="2003-10-30 15:10:00.000000" id="id18734260" ><script  type="text/javascript" language="javascript" >
+<!--//
+function populateDays(yearInput,monthInput,dayInput) {	timeA = new Date(yearInput.options[yearInput.selectedIndex].text, monthInput.options[monthInput.selectedIndex].value,1);	timeDifference = timeA - 86400000;	timeB = new Date(timeDifference);		var oldSelectedDay = dayInput.selectedIndex;		var daysInMonth = timeB.getDate();	for (var i = 0; i < dayInput.length; i++) {		dayInput.options[0] = null;		dayInput.options[0] = new Option('Dagur','');	}	for (var i = 1; i <= daysInMonth; i++) {		if(i<10){			dayInput.options[i] = new Option(i,'0'+i);		}		else{			dayInput.options[i] = new Option(i,i);		}	}		dayInput.options[oldSelectedDay].selected = true;	}
+function setValueOfHiddenTimestamp(yearInput,monthInput,dayInput,hourInput,minuteInput,hiddenInput){	var yearValue = '2000';	var monthValue = '01';	var dayValue = '01';		var hourValue='00';	var minuteValue='00';	var secondValue='00';	var millisecondValue='000000';			if(hourInput.selectedIndex != 0){		hourValue=hourInput.options[hourInput.selectedIndex].value;	}	if(minuteInput.selectedIndex != 0){		minuteValue=minuteInput.options[minuteInput.selectedIndex].value;	}	if(yearInput.selectedIndex != 0){		yearValue=yearInput.options[yearInput.selectedIndex].value;	}	if(monthInput.selectedIndex != 0){		monthValue=monthInput.options[monthInput.selectedIndex].value;	}	if(dayInput.selectedIndex != 0){		dayValue=dayInput.options[dayInput.selectedIndex].value;	}	if ((yearInput.selectedIndex == 0) || (monthInput.selectedIndex == 0) || (dayInput.selectedIndex == 0) || (hourInput.selectedIndex == 0) || (minuteInput.selectedIndex == 0) ){		hiddenInput.value = '';	}	else{		hiddenInput.value = yearValue+'-'+monthValue+'-'+dayValue+' '+hourValue+':'+minuteValue+':'+secondValue+'.'+millisecondValue;	}}
+//-->
+</script>
+
+</td>
+</tr>
+
+<tr>
+
+<td  valign="middle" align="left" >
+<b><font  color="#000000" size="1" face="Verdana, Arial, Helvetica, sans-serif" >Publish from</font></b><br/><select name="nwep_publishfrom_day"  onChange="setValueOfHiddenTimestamp(this.form.nwep_publishfrom_year,this.form.nwep_publishfrom_month,this.form.nwep_publishfrom_day,this.form.nwep_publishfrom_hour,this.form.nwep_publishfrom_minute,this.form.nwep_publishfrom)" id="id19817332" >
+<option  value="" id="id8608375" >D</option>
+<option  value="01" id="id29266141" >1</option>
+<option  value="02" id="id1617004" >2</option>
+<option  value="03" id="id31460469" >3</option>
+<option  value="04" id="id5366424" >4</option>
+<option  value="05" id="id32738354" >5</option>
+<option  value="06" id="id7951815" >6</option>
+<option  value="07" id="id32417310" >7</option>
+<option  value="08" id="id14420453" >8</option>
+<option  value="09" id="id901852" >9</option>
+<option  value="10" id="id24381678" >10</option>
+<option  value="11" id="id16141904" >11</option>
+<option  value="12" id="id9400035" >12</option>
+<option  value="13" id="id12125876" >13</option>
+<option  value="14" id="id23540631" >14</option>
+<option  value="15" id="id7090819" >15</option>
+<option  value="16" id="id23618773" >16</option>
+<option  value="17" id="id11802667" >17</option>
+<option  value="18" id="id27179960" >18</option>
+<option  value="19" id="id3561976" >19</option>
+<option  value="20" id="id5039465" >20</option>
+<option  value="21" id="id6915844" >21</option>
+<option  value="22" id="id2050056" >22</option>
+<option  value="23" id="id28456843" >23</option>
+<option  value="24" id="id22856196" >24</option>
+<option  value="25" id="id12956167" >25</option>
+<option  value="26" id="id19605378" >26</option>
+<option  value="27" id="id3081978" >27</option>
+<option  value="28" id="id24325935" >28</option>
+<option  value="29" id="id18804953" >29</option>
+<option  selected value="30" id="id5658613" >30</option>
+<option  value="31" id="id11059739" >31</option>
+</select>
+<select name="nwep_publishfrom_month"  onChange="populateDays(this.form.nwep_publishfrom_year,this,this.form.nwep_publishfrom_day);setValueOfHiddenTimestamp(this.form.nwep_publishfrom_year,this.form.nwep_publishfrom_month,this.form.nwep_publishfrom_day,this.form.nwep_publishfrom_hour,this.form.nwep_publishfrom_minute,this.form.nwep_publishfrom);" id="id8610723" >
+<option  value="" id="id27812844" >M</option>
+<option  value="01" id="id667758" >January</option>
+<option  value="02" id="id15839978" >February</option>
+<option  value="03" id="id1647407" >March</option>
+<option  value="04" id="id5566213" >April</option>
+<option  value="05" id="id1588932" >May</option>
+<option  value="06" id="id29414837" >June</option>
+<option  value="07" id="id17724285" >July</option>
+<option  value="08" id="id29371834" >August</option>
+<option  value="09" id="id33180872" >September</option>
+<option  selected value="10" id="id29817646" >October</option>
+<option  value="11" id="id9736736" >November</option>
+<option  value="12" id="id361103" >December</option>
+</select>
+<select name="nwep_publishfrom_year"  onChange="populateDays(this,this.form.nwep_publishfrom_month,this.form.nwep_publishfrom_day);setValueOfHiddenTimestamp(this.form.nwep_publishfrom_year,this.form.nwep_publishfrom_month,this.form.nwep_publishfrom_day,this.form.nwep_publishfrom_hour,this.form.nwep_publishfrom_minute,this.form.nwep_publishfrom);" id="id166816" >
+<option  value="" id="id3689476" >Y</option>
+<option  selected value="2003" id="id10645056" >2003</option>
+<option  value="2004" id="id32786111" >2004</option>
+<option  value="2005" id="id5287893" >2005</option>
+<option  value="2006" id="id21483069" >2006</option>
+<option  value="2007" id="id20259621" >2007</option>
+<option  value="2008" id="id26638518" >2008</option>
+</select>
+at<select name="nwep_publishfrom_hour"  onChange="setValueOfHiddenTimestamp(this.form.nwep_publishfrom_year,this.form.nwep_publishfrom_month,this.form.nwep_publishfrom_day,this.form.nwep_publishfrom_hour,this.form.nwep_publishfrom_minute,this.form.nwep_publishfrom)" id="id18671525" >
+<option  value="" id="id438077" >h</option>
+<option  value="00" id="id23042752" >00</option>
+<option  value="01" id="id27840685" >01</option>
+<option  value="02" id="id1845338" >02</option>
+<option  value="03" id="id10302713" >03</option>
+<option  value="04" id="id16833603" >04</option>
+<option  value="05" id="id24963216" >05</option>
+<option  value="06" id="id25715301" >06</option>
+<option  value="07" id="id15993603" >07</option>
+<option  value="08" id="id33501182" >08</option>
+<option  value="09" id="id11009256" >09</option>
+<option  value="10" id="id13431306" >10</option>
+<option  value="11" id="id19307537" >11</option>
+<option  value="12" id="id30432564" >12</option>
+<option  value="13" id="id9897198" >13</option>
+<option  value="14" id="id12887439" >14</option>
+<option  selected value="15" id="id5336429" >15</option>
+<option  value="16" id="id31928869" >16</option>
+<option  value="17" id="id26032867" >17</option>
+<option  value="18" id="id18159650" >18</option>
+<option  value="19" id="id31692570" >19</option>
+<option  value="20" id="id13977497" >20</option>
+<option  value="21" id="id5228462" >21</option>
+<option  value="22" id="id29266565" >22</option>
+<option  value="23" id="id8739758" >23</option>
+</select>
+<select name="nwep_publishfrom_minute"  onChange="setValueOfHiddenTimestamp(this.form.nwep_publishfrom_year,this.form.nwep_publishfrom_month,this.form.nwep_publishfrom_day,this.form.nwep_publishfrom_hour,this.form.nwep_publishfrom_minute,this.form.nwep_publishfrom)" id="id11275383" >
+<option  value="" id="id14340584" >m</option>
+<option  value="00" id="id21374939" >00</option>
+<option  value="01" id="id14867492" >01</option>
+<option  value="02" id="id31648780" >02</option>
+<option  value="03" id="id16198835" >03</option>
+<option  value="04" id="id26713418" >04</option>
+<option  value="05" id="id14122677" >05</option>
+<option  value="06" id="id29346468" >06</option>
+<option  value="07" id="id9497452" >07</option>
+<option  value="08" id="id5250692" >08</option>
+<option  value="09" id="id234566" >09</option>
+<option  selected value="10" id="id16496663" >10</option>
+<option  value="11" id="id32703763" >11</option>
+<option  value="12" id="id30557240" >12</option>
+<option  value="13" id="id24958512" >13</option>
+<option  value="14" id="id13760361" >14</option>
+<option  value="15" id="id13246292" >15</option>
+<option  value="16" id="id30335212" >16</option>
+<option  value="17" id="id17880593" >17</option>
+<option  value="18" id="id5641052" >18</option>
+<option  value="19" id="id17890608" >19</option>
+<option  value="20" id="id6186007" >20</option>
+<option  value="21" id="id16597764" >21</option>
+<option  value="22" id="id20641693" >22</option>
+<option  value="23" id="id5665903" >23</option>
+<option  value="24" id="id32919736" >24</option>
+<option  value="25" id="id2976325" >25</option>
+<option  value="26" id="id26992719" >26</option>
+<option  value="27" id="id10710430" >27</option>
+<option  value="28" id="id24229623" >28</option>
+<option  value="29" id="id10690875" >29</option>
+<option  value="30" id="id31109906" >30</option>
+<option  value="31" id="id19043566" >31</option>
+<option  value="32" id="id23053575" >32</option>
+<option  value="33" id="id8409951" >33</option>
+<option  value="34" id="id14793382" >34</option>
+<option  value="35" id="id27590216" >35</option>
+<option  value="36" id="id20074173" >36</option>
+<option  value="37" id="id30380883" >37</option>
+<option  value="38" id="id13719316" >38</option>
+<option  value="39" id="id28050776" >39</option>
+<option  value="40" id="id9624164" >40</option>
+<option  value="41" id="id20971899" >41</option>
+<option  value="42" id="id18967372" >42</option>
+<option  value="43" id="id17528119" >43</option>
+<option  value="44" id="id20744732" >44</option>
+<option  value="45" id="id26172910" >45</option>
+<option  value="46" id="id23061566" >46</option>
+<option  value="47" id="id8510354" >47</option>
+<option  value="48" id="id24530560" >48</option>
+<option  value="49" id="id1826107" >49</option>
+<option  value="50" id="id22631878" >50</option>
+<option  value="51" id="id945438" >51</option>
+<option  value="52" id="id18746681" >52</option>
+<option  value="53" id="id32918796" >53</option>
+<option  value="54" id="id20732702" >54</option>
+<option  value="55" id="id25306303" >55</option>
+<option  value="56" id="id20609906" >56</option>
+<option  value="57" id="id8303473" >57</option>
+<option  value="58" id="id3595178" >58</option>
+<option  value="59" id="id26186427" >59</option>
+</select>
+<input type="hidden" name="nwep_publishfrom"  value="2003-10-30 15:10:00.000000" id="id23488341" ><script  type="text/javascript" language="javascript" >
+<!--//
+function populateDays(yearInput,monthInput,dayInput) {	timeA = new Date(yearInput.options[yearInput.selectedIndex].text, monthInput.options[monthInput.selectedIndex].value,1);	timeDifference = timeA - 86400000;	timeB = new Date(timeDifference);		var oldSelectedDay = dayInput.selectedIndex;		var daysInMonth = timeB.getDate();	for (var i = 0; i < dayInput.length; i++) {		dayInput.options[0] = null;		dayInput.options[0] = new Option('Dagur','');	}	for (var i = 1; i <= daysInMonth; i++) {		if(i<10){			dayInput.options[i] = new Option(i,'0'+i);		}		else{			dayInput.options[i] = new Option(i,i);		}	}		dayInput.options[oldSelectedDay].selected = true;	}
+function setValueOfHiddenTimestamp(yearInput,monthInput,dayInput,hourInput,minuteInput,hiddenInput){	var yearValue = '2000';	var monthValue = '01';	var dayValue = '01';		var hourValue='00';	var minuteValue='00';	var secondValue='00';	var millisecondValue='000000';			if(hourInput.selectedIndex != 0){		hourValue=hourInput.options[hourInput.selectedIndex].value;	}	if(minuteInput.selectedIndex != 0){		minuteValue=minuteInput.options[minuteInput.selectedIndex].value;	}	if(yearInput.selectedIndex != 0){		yearValue=yearInput.options[yearInput.selectedIndex].value;	}	if(monthInput.selectedIndex != 0){		monthValue=monthInput.options[monthInput.selectedIndex].value;	}	if(dayInput.selectedIndex != 0){		dayValue=dayInput.options[dayInput.selectedIndex].value;	}	if ((yearInput.selectedIndex == 0) || (monthInput.selectedIndex == 0) || (dayInput.selectedIndex == 0) || (hourInput.selectedIndex == 0) || (minuteInput.selectedIndex == 0) ){		hiddenInput.value = '';	}	else{		hiddenInput.value = yearValue+'-'+monthValue+'-'+dayValue+' '+hourValue+':'+minuteValue+':'+secondValue+'.'+millisecondValue;	}}
+//-->
+</script>
+
+</td>
+</tr>
+
+<tr>
+
+<td  valign="middle" align="left" >
+<b><font  color="#000000" size="1" face="Verdana, Arial, Helvetica, sans-serif" >Publish to</font></b><br/><select name="nwep_publishto_day"  onChange="setValueOfHiddenTimestamp(this.form.nwep_publishto_year,this.form.nwep_publishto_month,this.form.nwep_publishto_day,this.form.nwep_publishto_hour,this.form.nwep_publishto_minute,this.form.nwep_publishto)" id="id18233904" >
+<option  value="" id="id30600129" >D</option>
+<option  value="01" id="id23255923" >1</option>
+<option  value="02" id="id20276207" >2</option>
+<option  value="03" id="id3414521" >3</option>
+<option  value="04" id="id9789409" >4</option>
+<option  value="05" id="id13223871" >5</option>
+<option  value="06" id="id22604480" >6</option>
+<option  value="07" id="id10219059" >7</option>
+<option  value="08" id="id20141716" >8</option>
+<option  value="09" id="id24727235" >9</option>
+<option  value="10" id="id19005346" >10</option>
+<option  value="11" id="id18218202" >11</option>
+<option  value="12" id="id9141761" >12</option>
+<option  value="13" id="id33401420" >13</option>
+<option  value="14" id="id12032759" >14</option>
+<option  value="15" id="id2030760" >15</option>
+<option  value="16" id="id6135971" >16</option>
+<option  value="17" id="id14495896" >17</option>
+<option  value="18" id="id27362046" >18</option>
+<option  selected value="19" id="id10422553" >19</option>
+<option  value="20" id="id17722503" >20</option>
+<option  value="21" id="id32984596" >21</option>
+<option  value="22" id="id19341248" >22</option>
+<option  value="23" id="id26582482" >23</option>
+<option  value="24" id="id28076200" >24</option>
+<option  value="25" id="id718767" >25</option>
+<option  value="26" id="id725131" >26</option>
+<option  value="27" id="id7020532" >27</option>
+<option  value="28" id="id16711334" >28</option>
+<option  value="29" id="id16808221" >29</option>
+<option  value="30" id="id1021914" >30</option>
+<option  value="31" id="id28994904" >31</option>
+</select>
+<select name="nwep_publishto_month"  onChange="populateDays(this.form.nwep_publishto_year,this,this.form.nwep_publishto_day);setValueOfHiddenTimestamp(this.form.nwep_publishto_year,this.form.nwep_publishto_month,this.form.nwep_publishto_day,this.form.nwep_publishto_hour,this.form.nwep_publishto_minute,this.form.nwep_publishto);" id="id4612183" >
+<option  value="" id="id7595118" >M</option>
+<option  value="01" id="id20798459" >January</option>
+<option  value="02" id="id23184007" >February</option>
+<option  value="03" id="id19548536" >March</option>
+<option  value="04" id="id20815961" >April</option>
+<option  value="05" id="id15360737" >May</option>
+<option  value="06" id="id122827" >June</option>
+<option  value="07" id="id17546168" >July</option>
+<option  value="08" id="id22104387" >August</option>
+<option  value="09" id="id27328677" >September</option>
+<option  value="10" id="id20023517" >October</option>
+<option  value="11" id="id17864978" >November</option>
+<option  selected value="12" id="id11630738" >December</option>
+</select>
+<select name="nwep_publishto_year"  onChange="populateDays(this,this.form.nwep_publishto_month,this.form.nwep_publishto_day);setValueOfHiddenTimestamp(this.form.nwep_publishto_year,this.form.nwep_publishto_month,this.form.nwep_publishto_day,this.form.nwep_publishto_hour,this.form.nwep_publishto_minute,this.form.nwep_publishto);" id="id6229150" >
+<option  value="" id="id10097360" >Y</option>
+<option  selected value="2003" id="id30342066" >2003</option>
+<option  value="2004" id="id32402496" >2004</option>
+<option  value="2005" id="id324680" >2005</option>
+<option  value="2006" id="id21085343" >2006</option>
+<option  value="2007" id="id13016481" >2007</option>
+<option  value="2008" id="id26668766" >2008</option>
+</select>
+at<select name="nwep_publishto_hour"  onChange="setValueOfHiddenTimestamp(this.form.nwep_publishto_year,this.form.nwep_publishto_month,this.form.nwep_publishto_day,this.form.nwep_publishto_hour,this.form.nwep_publishto_minute,this.form.nwep_publishto)" id="id3498884" >
+<option  value="" id="id21582731" >h</option>
+<option  value="00" id="id6342909" >00</option>
+<option  value="01" id="id2847451" >01</option>
+<option  value="02" id="id8493411" >02</option>
+<option  value="03" id="id8215782" >03</option>
+<option  value="04" id="id6168073" >04</option>
+<option  value="05" id="id17178793" >05</option>
+<option  value="06" id="id21641945" >06</option>
+<option  value="07" id="id6131368" >07</option>
+<option  value="08" id="id4253694" >08</option>
+<option  value="09" id="id20905435" >09</option>
+<option  value="10" id="id9199766" >10</option>
+<option  value="11" id="id1647991" >11</option>
+<option  value="12" id="id15393843" >12</option>
+<option  value="13" id="id19662882" >13</option>
+<option  value="14" id="id30017894" >14</option>
+<option  selected value="15" id="id19867976" >15</option>
+<option  value="16" id="id20927045" >16</option>
+<option  value="17" id="id3305011" >17</option>
+<option  value="18" id="id14740720" >18</option>
+<option  value="19" id="id14914163" >19</option>
+<option  value="20" id="id10742697" >20</option>
+<option  value="21" id="id29677008" >21</option>
+<option  value="22" id="id28401692" >22</option>
+<option  value="23" id="id1895387" >23</option>
+</select>
+<select name="nwep_publishto_minute"  onChange="setValueOfHiddenTimestamp(this.form.nwep_publishto_year,this.form.nwep_publishto_month,this.form.nwep_publishto_day,this.form.nwep_publishto_hour,this.form.nwep_publishto_minute,this.form.nwep_publishto)" id="id18392732" >
+<option  value="" id="id17559882" >m</option>
+<option  value="00" id="id12619133" >00</option>
+<option  value="01" id="id25762128" >01</option>
+<option  value="02" id="id31264370" >02</option>
+<option  value="03" id="id31421924" >03</option>
+<option  value="04" id="id28627410" >04</option>
+<option  value="05" id="id3895665" >05</option>
+<option  value="06" id="id9748530" >06</option>
+<option  value="07" id="id30807024" >07</option>
+<option  value="08" id="id28781817" >08</option>
+<option  value="09" id="id15320750" >09</option>
+<option  selected value="10" id="id32697825" >10</option>
+<option  value="11" id="id31415843" >11</option>
+<option  value="12" id="id27093117" >12</option>
+<option  value="13" id="id20380643" >13</option>
+<option  value="14" id="id13828881" >14</option>
+<option  value="15" id="id24007568" >15</option>
+<option  value="16" id="id3158116" >16</option>
+<option  value="17" id="id28914663" >17</option>
+<option  value="18" id="id33471749" >18</option>
+<option  value="19" id="id19640052" >19</option>
+<option  value="20" id="id15419926" >20</option>
+<option  value="21" id="id21831197" >21</option>
+<option  value="22" id="id32771025" >22</option>
+<option  value="23" id="id20176098" >23</option>
+<option  value="24" id="id32148348" >24</option>
+<option  value="25" id="id23825225" >25</option>
+<option  value="26" id="id25525482" >26</option>
+<option  value="27" id="id13377497" >27</option>
+<option  value="28" id="id20902510" >28</option>
+<option  value="29" id="id27148155" >29</option>
+<option  value="30" id="id5877850" >30</option>
+<option  value="31" id="id4780076" >31</option>
+<option  value="32" id="id9438978" >32</option>
+<option  value="33" id="id29117174" >33</option>
+<option  value="34" id="id14509983" >34</option>
+<option  value="35" id="id29243332" >35</option>
+<option  value="36" id="id20921163" >36</option>
+<option  value="37" id="id5104806" >37</option>
+<option  value="38" id="id31351804" >38</option>
+<option  value="39" id="id24536720" >39</option>
+<option  value="40" id="id4683952" >40</option>
+<option  value="41" id="id4484353" >41</option>
+<option  value="42" id="id5281340" >42</option>
+<option  value="43" id="id12012457" >43</option>
+<option  value="44" id="id29916424" >44</option>
+<option  value="45" id="id25737980" >45</option>
+<option  value="46" id="id28051088" >46</option>
+<option  value="47" id="id14876089" >47</option>
+<option  value="48" id="id8362985" >48</option>
+<option  value="49" id="id30739561" >49</option>
+<option  value="50" id="id2226907" >50</option>
+<option  value="51" id="id14435862" >51</option>
+<option  value="52" id="id24990700" >52</option>
+<option  value="53" id="id17870014" >53</option>
+<option  value="54" id="id29162189" >54</option>
+<option  value="55" id="id32879585" >55</option>
+<option  value="56" id="id32804428" >56</option>
+<option  value="57" id="id11157864" >57</option>
+<option  value="58" id="id28058258" >58</option>
+<option  value="59" id="id1162713" >59</option>
+</select>
+<input type="hidden" name="nwep_publishto"  value="2003-12-19 15:10:00.000000" id="id23224010" ><script  type="text/javascript" language="javascript" >
+<!--//
+function populateDays(yearInput,monthInput,dayInput) {	timeA = new Date(yearInput.options[yearInput.selectedIndex].text, monthInput.options[monthInput.selectedIndex].value,1);	timeDifference = timeA - 86400000;	timeB = new Date(timeDifference);		var oldSelectedDay = dayInput.selectedIndex;		var daysInMonth = timeB.getDate();	for (var i = 0; i < dayInput.length; i++) {		dayInput.options[0] = null;		dayInput.options[0] = new Option('Dagur','');	}	for (var i = 1; i <= daysInMonth; i++) {		if(i<10){			dayInput.options[i] = new Option(i,'0'+i);		}		else{			dayInput.options[i] = new Option(i,i);		}	}		dayInput.options[oldSelectedDay].selected = true;	}
+function setValueOfHiddenTimestamp(yearInput,monthInput,dayInput,hourInput,minuteInput,hiddenInput){	var yearValue = '2000';	var monthValue = '01';	var dayValue = '01';		var hourValue='00';	var minuteValue='00';	var secondValue='00';	var millisecondValue='000000';			if(hourInput.selectedIndex != 0){		hourValue=hourInput.options[hourInput.selectedIndex].value;	}	if(minuteInput.selectedIndex != 0){		minuteValue=minuteInput.options[minuteInput.selectedIndex].value;	}	if(yearInput.selectedIndex != 0){		yearValue=yearInput.options[yearInput.selectedIndex].value;	}	if(monthInput.selectedIndex != 0){		monthValue=monthInput.options[monthInput.selectedIndex].value;	}	if(dayInput.selectedIndex != 0){		dayValue=dayInput.options[dayInput.selectedIndex].value;	}	if ((yearInput.selectedIndex == 0) || (monthInput.selectedIndex == 0) || (dayInput.selectedIndex == 0) || (hourInput.selectedIndex == 0) || (minuteInput.selectedIndex == 0) ){		hiddenInput.value = '';	}	else{		hiddenInput.value = yearValue+'-'+monthValue+'-'+dayValue+' '+hourValue+':'+minuteValue+':'+secondValue+'.'+millisecondValue;	}}
+//-->
+</script>
+
+</td>
+</tr>
+
+</table>
+</td>
+
+<td  height="100%" bgcolor="#EFEFEF" valign="top" width="160" >
+<table  height="100%" border="0" width="100%" cellpadding="8" align="center" >
+
+<tr>
+
+<td  valign="middle" align="left" >
+<b><font  color="#000000" size="1" face="Verdana, Arial, Helvetica, sans-serif" >Category</font></b><br/><select name="nwep_category"  style="font-family:arial; font-size:8pt; color:#000000; text-align: justify; border: 1 solid #000000;" id="id11570168" >
+<option  selected value="45" id="id11889417" >Fresh news</option>
+</select>
+</td>
+</tr>
+
+<tr>
+
+<td  valign="middle" align="left" >
+<b><font  color="#000000" size="1" face="Verdana, Arial, Helvetica, sans-serif" >Author</font></b><br/><input type="text" name="nwep_author"  maxlength="255" size="22" style="font-family:arial; font-size:8pt; color:#000000; text-align: justify; border: 1 solid #000000;" value="Felix" id="id8803758" ></td>
+</tr>
+
+<tr>
+
+<td  valign="middle" align="left" >
+<b><font  color="#000000" size="1" face="Verdana, Arial, Helvetica, sans-serif" >Source</font></b><br/><input type="text" name="nwep_source"  style="font-family:arial; font-size:8pt; color:#000000; text-align: justify; border: 1 solid #000000;" value="" id="id23272975" ></td>
+</tr>
+
+<tr>
+
+<td  valign="middle" align="left" >
+<b><font  color="#000000" size="1" face="Verdana, Arial, Helvetica, sans-serif" >Images</font></b><br/><table  border="0" >
+
+<tr>
+
+<td  colspan="3" rowspan="1" >
+<table  border="0" >
+
+<tr>
+
+<td  valign="middle" align="left" >
+<table  bgcolor="#000000" border="0" width="100%" cellpadding="0" cellspacing="1" >
+
+<tr>
+
+<td  valign="middle" align="left" >
+<a  href="javascript:openwindow('/servlet/WindowOpener?idegaweb_frame_class=7610&submit=new&me_file_in_sess_n=nwep_imageid&me_ch=me_im_ch&nwep_imageid=1166&idegaweb_frame_class=7610&iw_language=en&idega_session_id=FFF98A6249BFC59E41D54D666EA9DFEF','id32734259','0','0','0','0','0','0','0','1','640','480')" ><img alt="" name="imnwep_imageid" height="90" border="0" width="130" src="/iw_cache/1166_vinbud_screen1.jpg" ></a></td>
+</tr>
+
+</table>
+</td>
+</tr>
+
+<tr>
+
+<td  valign="middle" align="right" >
+<input type="hidden" name="nwep_imageid"  value="1166" id="id20441184" ></td>
+</tr>
+
+</table>
+</td>
+
+</tr>
+
+<tr>
+
+<td  colspan="3" rowspan="1" >
+<input type="image" name="nwep_savefile"  value="default" src="/idegaweb/bundles/com.idega.core.bundle/resources//shared/create.gif" id="id29688216" ></td>
+
+</tr>
+
+<tr>
+
+<td  colspan="3" rowspan="1" >
+<b><font  color="#000000" size="1" face="Verdana, Arial, Helvetica, sans-serif" >News images :</font></b></td>
+
+</tr>
+
+<tr>
+
+<td  >
+<img alt="" name="id15446906" border="0" width="50" src="/iw_cache/1166_vinbud_screen1.jpg" ></td>
+
+<td  >
+<a  href="javascript:openwindow('/servlet/WindowOpener?idegaweb_frame_class=7841&prmAttributeKey=newsimage&prmImageEntityId=1166&idegaweb_frame_class=7841&iw_language=en&idega_session_id=FFF98A6249BFC59E41D54D666EA9DFEF','id26317809','0','0','0','0','0','0','0','1','260','320')" ><img alt="" name="id5510454" border="0" alt="id5510454" src="/idegaweb/bundles/com.idega.block.news.bundle/resources//shared/edit.gif" ></a></td>
+
+<td  >
+<a  href="/servlet/WindowOpener?nwep_deletefile=1166&nwep_nwnewsid=362&nwe_formprocess=Y&iw_language=en&idegaweb_frame_class=7368&idega_session_id=FFF98A6249BFC59E41D54D666EA9DFEF" ><img alt="" name="id3977292" border="0" alt="id3977292" src="/idegaweb/bundles/com.idega.core.bundle/resources//shared/delete.gif" ></a></td>
+
+</tr>
+
+</table>
+</td>
+</tr>
+
+<tr>
+
+<td  height="100%" valign="bottom" align="center" >
+<input type="image" name="nwea_save"  value="default" src="/idegaweb/bundles/com.idega.block.text.bundle/resources/en.locale/iw_generated/save54x15_button_up.gif" id="id4472285" ><input type="image" name="nwea_close"  value="default" src="/idegaweb/bundles/com.idega.block.text.bundle/resources/en.locale/iw_generated/close54x15_button_up.gif" id="id3773965" ></td>
+</tr>
+
+</table>
+</td>
+
+</tr>
+
+</table>
+<input type="hidden" name="nwep_loctextid"  value="862" id="id4887162" ><input type="hidden" name="nwep_nwnewsid"  value="362" id="id30841657" ><input type="hidden" name="nwep_icobjinstid"  value="2123" id="id6877560" ><input type="hidden" name="nwe_formprocess"  value="Y" id="id11164596" ><input type="hidden" name="iw_language"  value="en" id="id11517043" ><input type="hidden" name="idegaweb_frame_class"  value="7368" id="id24983004" ></form>
+
+</body>
+</html>
+<!--149 ms-->
