@@ -89,6 +89,21 @@ public abstract class ContentBlock extends IWBaseComponent {
 		return slideSession;
 	}
 	
+	protected boolean removeClickedFile(WebdavExtendedResource resource) {
+		try {
+			String parentPath = null;
+			if (resource == null) {
+				parentPath = resource.getParentPath().replaceFirst(getIWSlideSession().getWebdavServerURI(), "");
+			}
+			WFUtil.invoke("WebDAVListBean", "setWebDAVPath", parentPath, String.class);
+			WFUtil.invoke("WebDAVListBean","setClickedFilePath", null, String.class);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
 	public void encodeBegin(FacesContext context) throws IOException {
 		String webDavPath = (String) this.getAttributes().get("path");
 		String path = null;
