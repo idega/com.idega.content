@@ -108,7 +108,9 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WFBlock detailsBlock = new WFBlock();
 		WFTitlebar detailsBar = new WFTitlebar();
 		detailsBar.addTitleText(getBundle().getLocalizedText("document_details"));
-		detailsBar.addTitleText(getCurrentResourcePath());
+		detailsBar.addTitleText(" (");
+		detailsBar.addTitleText(getCurrentFileName());
+		detailsBar.addTitleText(")");
 		detailsBlock.setTitlebar(detailsBar);
 		detailsBlock.setToolbar(getToolbar());
 		WebDAVFileDetails details = new WebDAVFileDetails();
@@ -120,7 +122,9 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WFBlock previewBlock = new WFBlock();
 		WFTitlebar previewBar = new WFTitlebar();
 		previewBar.addTitleText(getBundle().getLocalizedText("document_details"));
-		previewBar.addTitleText(getCurrentResourcePath());
+		previewBar.addTitleText(" (");
+		previewBar.addTitleText(getCurrentFileName());
+		previewBar.addTitleText(")");
 		previewBlock.setTitlebar(previewBar);
 		previewBlock.setToolbar(getToolbar());
 		WebDAVFileDetails details2 = new WebDAVFileDetails();
@@ -618,17 +622,17 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	public String getCurrentResourceName() {
 		if (currentResourceName == null) {
 			currentResourceName = "";
-			String tmp = null;
-			if (rootFolder != null) {
-				tmp = currentFolderPath.replaceAll(rootFolder, "");
-			} else {
-				tmp = currentFolderPath;
-			}
-			int index = tmp.lastIndexOf("/");
+//			String tmp = null;
+//			if (rootFolder != null) {
+//				tmp = currentFolderPath.replaceAll(rootFolder, "");
+//			} else {
+//				tmp = currentFolderPath;
+//			}
+			int index = currentFolderPath.lastIndexOf("/");
 			try {
-				if (index >= 0 && !tmp.equals("/")) {
+				if (index >= 0 && !currentFolderPath.equals("/")) {
 
-					currentResourceName = " ("+tmp.substring(index+1)+")";
+					currentResourceName = " ("+currentFolderPath.substring(index+1)+")";
 				}
 			} catch (ArrayIndexOutOfBoundsException e) {
 				currentResourceName = "";
