@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadata.java,v 1.2 2005/01/18 14:11:08 joakim Exp $
+ * $Id: WebDAVMetadata.java,v 1.3 2005/01/24 17:23:17 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -9,67 +9,104 @@
  */
 package com.idega.content.presentation;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import javax.faces.component.UIComponent;
+import javax.faces.component.UIInput;
+import javax.faces.component.UISelectItems;
 import javax.faces.component.html.HtmlCommandButton;
+import javax.faces.component.html.HtmlInputText;
+import javax.faces.component.html.HtmlSelectOneMenu;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
+import javax.faces.model.SelectItem;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.webdav.lib.PropertyName;
+import com.idega.business.IBOLookup;
+import com.idega.content.business.MetadataUtil;
+import com.idega.presentation.IWBaseComponent;
+import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
+import com.idega.slide.business.IWSlideService;
+import com.idega.slide.business.IWSlideSession;
+import com.idega.slide.util.WebdavRootResource;
 import com.idega.util.Timer;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFResourceUtil;
-
+import com.idega.webface.test.bean.ManagedContentBeans;
 
 /**
  * 
- * Last modified: $Date: 2005/01/18 14:11:08 $ by $Author: joakim $
+ * Last modified: $Date: 2005/01/24 17:23:17 $ by $Author: joakim $
+ * 
+ * Display the UI for adding metadata type - values to a file.
  *
  * @author Joakim Johnson
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class WebDAVMetadata implements ActionListener{
+public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	
+	private static final String METADATA_BLOCK_ID = "metadataBlockID";
 	private static final String NEW_VALUES_ID = "newValueID";
+	private static final String DROPDOWN_ID = "dropdownID";
 	private static final String ADD_ID = "addID";
-	public static final String[] metadataType = new String[] {"categories","keywords","publisher"};
+	private static final String RESOURCE_PATH = "resourcePath";
+	private String resourcePath = "";
 	
-	public WFContainer getMetadataTable() {
+	public WebDAVMetadata() {
+	}
+	
+	public WebDAVMetadata(String path){
+		resourcePath = path;
+	}
+	
+	public void setResourcePath(String path){
+		resourcePath = path;
+	}
+	
+	protected void initializeContent() {
+		setId(METADATA_BLOCK_ID);
+		add(getEditContainer());
+	}
+	
+	/**
+	 * @return
+	 */
+	private UIComponent getEditContainer() {
+		return getMetadataTable(resourcePath);
+	}
+	
+	/**
+	 * Creates the metadata UI for the specified resource
+	 * 
+	 * @param resourcePath
+	 * @return
+	 */
+	public WFContainer getMetadataTable(String resourcePath) {
 		WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
 		WFContainer mainContainer = new WFContainer();
-//		mainContainer.setId(METADATA_ID);
 		
-		mainContainer.add(ContentBlock.getBundle().getLocalizedText("metadata"));
-
 		Timer timer = new Timer();
 		timer.start();
-//		List versions = VersionHelper.getAllVersions(resource);
 
 		Table metadataTable = new Table(3,2);
 		metadataTable.setId(metadataTable.getId() + "_ver");
 		metadataTable.setRowStyleClass(1,"wf_listheading");
 		metadataTable.setStyleClass("wf_listtable");
 		
-		//Header
-		int vRow = 1;
-		int vColumn = 1;
-		metadataTable.add(ContentBlock.getBundle().getLocalizedText("type"), vColumn, vRow);
-		metadataTable.add(ContentBlock.getBundle().getLocalizedText("values"), ++vColumn, vRow);
-//		metadataTable.add("", ++vColumn, vRow);
-		vColumn = 1;
-		vRow++;
-
-		//Existing metadata
-		
-/*		
 		//Add line
-		ArrayList typesLeft = new ArrayList(metadataType);
 		List l = new ArrayList();
 		
 		UIInput dropdown = new HtmlSelectOneMenu();
-//		dropdown.setId(getUIComponentID(var, bindingNames[3]));
+		dropdown.setId(DROPDOWN_ID);
 
 		Locale locale = IWContext.getInstance().getCurrentLocale();
 		
-		Iterator iter = typesLeft.iterator();
+		Iterator iter = MetadataUtil.getMetadataTypes().iterator();
 		while(iter.hasNext()) {
 			String type = (String)iter.next();
 			String label = ContentBlock.getBundle().getLocalizedString(type,locale);
@@ -82,72 +119,53 @@ public class WebDAVMetadata implements ActionListener{
 		sItems.setValue(l) ;
 		dropdown.getChildren().add(sItems);
 		
-		metadataTable.add(dropdown, vColumn++, vRow);
-*/		
-//		HtmlInputText newValueInput = WFUtil.getInputText(NEW_VALUES_ID, "");		
-//		newValueInput.setSize(40);
-//		metadataTable.add(newValueInput);
-		metadataTable.add(ContentBlock.getBundle().getLocalizedText("values"), vColumn++, vRow);
+		metadataTable.add(dropdown, 1, 1);
 		
-		HtmlCommandButton addButton = localizer.getButtonVB(ADD_ID, "add", this);
-		metadataTable.add(addButton, vColumn++, vRow);
+		HtmlInputText newValueInput = new HtmlInputText();
+		newValueInput.setSize(40);
+		newValueInput.setId(NEW_VALUES_ID);
+		metadataTable.add(newValueInput, 2, 1);
+		
+		HtmlCommandButton addButton = localizer.getButtonVB(ADD_ID, "save", this);
+		addButton.getAttributes().put(RESOURCE_PATH,resourcePath);
 
-		/*
-		if (!versions.isEmpty()) {
-			Iterator iter = versions.iterator();
-			while (iter.hasNext()) {
-				vColumn = 0;
-				WebdavResourceVersion version = (WebdavResourceVersion) iter.next();
-				++vRow;
-			
-				if(vRow%2==0){
-					vTable.setRowStyleClass(vRow,"wf_listevenrow");
-				}
-				else{
-					vTable.setRowStyleClass(vRow,"wf_listoddrow");
-				}
-				
-				
-				String versionName = version.getVersionName();
-								
-				vTable.add(WFUtil.getText(versionName,"wf_listtext"), ++vColumn, vRow);
-				DownloadLink versionPath = new DownloadLink("Download");
-				
-				versionPath.setId("dl_"+vRow);
-				versionPath.setStyleClass("wf_listlink");
-				String url = version.getURL();
-				versionPath.setRelativeFilePath(url);
-				//so we have a sensable name for the file!
-				String fileName = "v"+versionName.replace('.','_')+"-"+resource.getDisplayName();
-				versionPath.setAlternativeFileName(fileName);
-				//versionPath.getChildren().add(WFUtil.getText("Download/View"));
-				vTable.add(versionPath, ++vColumn, vRow);
-				vTable.add(WFUtil.getText(version.getCreatorDisplayName(),"wf_listtext"), ++vColumn, vRow);
-				vTable.add(WFUtil.getText(version.getComment(),"wf_listtext"), ++vColumn, vRow);
-				vTable.add(WFUtil.getText(version.getCheckedOut(),"wf_listtext"), ++vColumn, vRow);
-				vTable.add(WFUtil.getText(version.getCheckedIn(),"wf_listtext"), ++vColumn, vRow);
-				vTable.add(WFUtil.getText(version.getLastModified(),"wf_listtext"), ++vColumn, vRow);
-			}
-		}
-		
-		++vRow;
-		vTable.add("Creation time", 3, vRow);
-		vTable.add(timer.getTimeString(), 4, vRow);
-		
-		timer.stop();
-		*/
+		metadataTable.add(addButton, 2, 2);
 		
 		mainContainer.add(metadataTable);
 		return mainContainer;
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.faces.event.ActionListener#processAction(javax.faces.event.ActionEvent)
+	/**
+	 * Will add the specified type - value as a property to the selected resource.
 	 */
-	public void processAction(ActionEvent arg0) throws AbortProcessingException {
-		// TODO Auto-generated method stub
-		
+	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
+		UIComponent comp = actionEvent.getComponent();
+		resourcePath = (String)comp.getAttributes().get(RESOURCE_PATH);
+		HtmlInputText newValueInput = (HtmlInputText) actionEvent.getComponent().getParent().findComponent(NEW_VALUES_ID);
+		UIInput dropdown = (UIInput) actionEvent.getComponent().getParent().findComponent(DROPDOWN_ID);
+		String val = newValueInput.getValue().toString();
+		String type = dropdown.getValue().toString();
+
+		try {
+
+			IWContext iwc = IWContext.getInstance();
+			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+	
+			WebdavRootResource rootResource = session.getWebdavRootResource();
+
+			String filePath = service.getURI(resourcePath);
+			rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),val,true);
+		} catch (HttpException ex) {
+			ex.printStackTrace();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} catch (NullPointerException ex) {
+			ex.printStackTrace();
+		}
+		UIComponent tmp = comp.getParent();
+		while ( tmp != null) {
+			tmp = tmp.getParent();
+		}
 	}
-
-
 }
