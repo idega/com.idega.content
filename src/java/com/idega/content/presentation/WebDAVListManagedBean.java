@@ -19,6 +19,7 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.WebdavResource;
 import org.apache.webdav.lib.WebdavResources;
 import com.idega.business.IBOLookup;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
@@ -94,7 +95,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		col2.getChildren().add(WFUtil.getTextVB(var + ".creationDate"));
 		
 		UIColumn col3 = new UIColumn();
-		col3.setHeader(WFUtil.getText("Length"));
+		col3.setHeader(WFUtil.getText("Size"));
 		col3.getChildren().add(WFUtil.getTextVB(var + ".length"));
 		
 		UIColumn col4 = new UIColumn();
@@ -105,12 +106,23 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		col5.setHeader(WFUtil.getText("Version"));
 		col5.getChildren().add(WFUtil.getTextVB(var + ".version"));
 		
+		
+		HtmlGraphicImage lock = new HtmlGraphicImage();
+		lock.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isLocked}"));
+		lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getBundle().getResourcesVirtualPath())+"/images/locked.gif");
+		lock.setId(P_ID+"_lock");
+		lock.setHeight("16");// sizes that make sense 16/32/64/128
+
 		UIColumn col6 = new UIColumn();
-		col6.setHeader(WFUtil.getText("Last modified"));
-		col6.getChildren().add(WFUtil.getTextVB(var + ".modifiedDate"));
+		col6.setHeader(WFUtil.getText("Lock"));
+		col6.getChildren().add(lock);
+		
+		UIColumn col7 = new UIColumn();
+		col7.setHeader(WFUtil.getText("Last modified"));
+		col7.getChildren().add(WFUtil.getTextVB(var + ".modifiedDate"));
 
 
-		return new UIColumn[] { col0, col, col2, col3, col4, col5, col6 };
+		return new UIColumn[] { col0, col, col2, col3, col4, col5, col6 ,col7};
 	}
 
 	/**
