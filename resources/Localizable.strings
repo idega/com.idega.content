@@ -126,3 +126,10 @@ version_comment=and a version comment (optional)
 select_folder_optional=and select the folder to upload to (optional)
 click_to_get_the_file=Click here to get the file
 create=Create
+
+are_you_sure_you_want_to_delete_folder=Are you sure you want to delete this folder, and all its content?
+are_you_sure_you_want_to_delete_file=Are you sure you want to delete this file ?
+file_deleted=File deleted
+folder_deleted=Folder deleted
+deletion_failed=Deletion failed
+yes=Yes
