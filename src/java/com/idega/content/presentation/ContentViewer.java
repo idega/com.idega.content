@@ -93,7 +93,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		tb.setToolTip(getCurrentFolderPath());
 //		tb.addTitleText("WebDAVListBean.virtualWebDAVPath", true);
 //		tb.addTitleText("WebDAVListBean.webDAVPath", true);
-		listBlock.setToolbarEmbeddedInTitlebar(true);
+//		listBlock.setToolbarEmbeddedInTitlebar(true);
 		listBlock.setTitlebar(tb);
 		listBlock.setToolbar(getToolbar());
 
@@ -156,7 +156,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		uploadBar.addTitleText(getBundle().getLocalizedText("upload"));
 		uploadBar.addTitleText(getCurrentResourceName());
 		uploadBlock.setTitlebar(uploadBar);
-		uploadBlock.setToolbar(new WFToolbar());
+		//uploadBlock.setToolbar(new WFToolbar());
 		WebDAVUpload upload = new WebDAVUpload();
 //		upload.setRendered(renderWebDAVUpload);
 		upload.setId(getId()+"_upload");
