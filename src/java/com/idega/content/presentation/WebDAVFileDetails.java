@@ -5,16 +5,15 @@ package com.idega.content.presentation;
 
 import java.util.Iterator;
 import java.util.List;
-
 import javax.faces.component.UIComponent;
-import javax.faces.component.html.HtmlCommandLink;
+import javax.faces.component.html.HtmlCommandButton;
+import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
-
 import org.apache.webdav.lib.WebdavResource;
-
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.DownloadLink;
 import com.idega.slide.util.VersionHelper;
@@ -71,24 +70,30 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			table.add(WFUtil.getText("Modification date"), 1, ++row);
 			table.add(WFUtil.getText(new IWTimestamp(resource.getGetLastModified()).toString(),"wf_listtext"), 2, row);
 			
-			table.add(WFUtil.getText("Modification date"), 1, ++row);
-			table.add(WFUtil.getText(new IWTimestamp(resource.getGetLastModified()).toString(),"wf_listtext"), 2, row);
-
 			table.add(WFUtil.getText("Locked/Unlocked"), 1, ++row);
 			if (resource.isLocked()) {
+				HtmlGraphicImage lock = new HtmlGraphicImage();
+				lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/locked.gif");
+				lock.setId(this.getId()+"_lock");
+				lock.setHeight("16");// sizes that make sense 16/32/64/128
+				lock.setStyle("alignment:bottom");
+				table.add(lock, 2, row);
 				table.add(WFUtil.getText("Locked","wf_listtext"), 2, row);
 			} else {
-				table.add(WFUtil.getText("Unocked","wf_listtext"), 2, row);
+				table.add(WFUtil.getText("Unlocked","wf_listtext"), 2, row);
 			}
 			table.add(WFUtil.getText("  - "), 2, row);
 			
-			HtmlCommandLink lockToggler = new HtmlCommandLink();
+			HtmlCommandButton lockToggler = new HtmlCommandButton();
 			lockToggler.setId(getId()+"_lockTogg");
 			if (resource.isLocked()) {
-				lockToggler.getChildren().add( WFUtil.getText("Changed to Unlocked"));
+				//lockToggler.getChildren().add( WFUtil.getText("Change to unlocked"));
+				lockToggler.setValue("Unlock");
 			} else {
-				lockToggler.getChildren().add( WFUtil.getText("Change to Locked"));
+				//lockToggler.getChildren().add( WFUtil.getText("Change to locked"));
+				lockToggler.setValue("Lock");
 			}
+			
 			lockToggler.setStyleClass("wf_listlink");
 			lockToggler.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 			lockToggler.getAttributes().put(ACTION, ACTION_TOGGLE_LOCK);
@@ -188,6 +193,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			} else {
 				VersionHelper.lock(resource);
 			}
+			super.refreshList();
 		}
 	}
 	
