@@ -31,7 +31,6 @@ import com.idega.slide.business.IWSlideService;
 public class listDocuments2 {
 	// <editor-fold defaultstate="collapsed" desc="Creator-managed Component
 	// Definition">
-
 	private int __placeholder;
 	private String webDavHttpURL = null;
 
