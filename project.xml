@@ -2,7 +2,7 @@
     <extend>${base.project.dir}/base-dependencies.xml</extend>
     <name>idegaWeb Content</name>
     <artifactId>com.idega.content</artifactId>
-    <currentVersion>0.6.0</currentVersion>
+    <currentVersion>0.7.0</currentVersion>
     <inceptionYear>2004</inceptionYear>
     <shortDescription>idegaWeb is the new ContentManagement System and Framework</shortDescription>
     <issueTrackingUrl>http://issues.idega.is</issueTrackingUrl>
@@ -60,8 +60,8 @@
         <dependency>
             <groupId>bundles</groupId>
             <artifactId>com.idega.core</artifactId>
-            <version>3.0.0</version>
-            <!--version>SNAPSHOT</version-->
+            <--version>3.0.0</version-->
+            <version>SNAPSHOT</version>
             <type>jar</type>
             <url>http://www.idega.com/</url>
             <properties><eclipse.dependency>true</eclipse.dependency></properties>
@@ -69,8 +69,8 @@
         <dependency>
             <groupId>bundles</groupId>
             <artifactId>com.idega.slide</artifactId>
-            <version>0.4.0</version>
-            <!--version>SNAPSHOT</version-->
+            <!--version>0.4.0</version-->
+            <version>SNAPSHOT</version>
             <type>jar</type>
             <url>http://www.idega.com/</url>
             <properties><eclipse.dependency>true</eclipse.dependency></properties>
@@ -78,8 +78,8 @@
          <dependency>
             <groupId>bundles</groupId>
             <artifactId>com.idega.webface</artifactId>
-            <version>0.9.0</version>
-            <!--version>SNAPSHOT</version-->
+            <!--version>0.9.0</version-->
+            <version>SNAPSHOT</version>
             <type>jar</type>
             <url>http://www.idega.com/</url>
             <properties><eclipse.dependency>true</eclipse.dependency></properties>
