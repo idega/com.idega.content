@@ -537,7 +537,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	}
 	
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[21];
+		Object values[] = new Object[23];
 		values[0] = super.saveState(ctx);
 		values[1] = new Boolean(renderWebDAVList);
 		values[2] = new Boolean(renderWebDAVFileDetails);
@@ -559,6 +559,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		values[18] = columnsToHide;
 		values[19] = new Boolean(useVersionControl);
 		values[20] = new Boolean(renderWebDAVUploadeComponent);
+		values[21] = new Boolean(showPermissionTab);
+		values[22] = new Boolean(showUploadComponent);
 
 		return values;
 	}
@@ -586,6 +588,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		columnsToHide = ((Collection) values[18]);
 		useVersionControl = ((Boolean) values[19]).booleanValue();
 		renderWebDAVUploadeComponent = ((Boolean) values[20]).booleanValue();
+		showPermissionTab = ((Boolean) values[21]).booleanValue();
+		showUploadComponent = ((Boolean) values[22]).booleanValue();
 		
 		maintainPath(true);
 	}
