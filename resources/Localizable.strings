@@ -117,6 +117,7 @@ uncheck_out=Uncheck out
 check_in=Check in
 download=Download
 user=User
+created_by=Created by
 comment=Comment
 checkout=Checkout
 checkin=Checkin
@@ -151,3 +152,5 @@ permissionmatrix.standard=Standard Principals
 permissionmatrix.roles=Roles
 permissionmatrix.groups=Groups
 permissionmatrix.users=Users
+
+initial_version=INITIAL VERSION.
