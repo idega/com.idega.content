@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.1 2004/11/14 23:32:38 tryggvil Exp $
+ * $Id: IWBundleStarter.java,v 1.2 2005/01/12 10:48:41 gimmi Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -9,17 +9,19 @@
  */
 package com.idega.content;
 
+import com.idega.content.presentation.ContentBlock;
 import com.idega.content.view.ContentViewManager;
+import com.idega.idegaweb.GlobalIncludeManager;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWBundleStartable;
 
 
 /**
  * 
- *  Last modified: $Date: 2004/11/14 23:32:38 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/01/12 10:48:41 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class IWBundleStarter implements IWBundleStartable {
 
@@ -37,6 +39,7 @@ public class IWBundleStarter implements IWBundleStartable {
 	public void start(IWBundle starterBundle) {
 		ContentViewManager cViewManager = ContentViewManager.getInstance(starterBundle.getApplication());
 		cViewManager.initializeStandardNodes(starterBundle);
+		GlobalIncludeManager.getInstance().addBundleStyleSheet(ContentBlock.IW_BUNDLE_IDENTIFIER,"/style/content.css");
 	}
 
 	/* (non-Javadoc)
