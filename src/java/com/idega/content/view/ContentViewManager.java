@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.4 2004/12/14 14:41:05 gimmi Exp $
+ * $Id: ContentViewManager.java,v 1.5 2004/12/31 03:01:35 gimmi Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -21,10 +21,10 @@ import com.idega.idegaweb.IWMainApplication;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2004/12/14 14:41:05 $ by $Author: gimmi $
+ *  Last modified: $Date: 2004/12/31 03:01:35 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ContentViewManager {
 
@@ -85,9 +85,6 @@ public class ContentViewManager {
 		
 		DefaultViewNode searchNode = new DefaultViewNode("search",contentNode);
 		searchNode.setJspUri(bundle.getJSPURI("search.jsp"));	
-		
-		DefaultViewNode uploadNode = new DefaultViewNode("upload",contentNode);
-		uploadNode.setJspUri(bundle.getJSPURI("upload.jsp"));	
 		
 	}
 }
