@@ -109,7 +109,9 @@ public class WebDAVUploadBean{
 			
 			
 			
-			
+			// Always refreshing/keeping status
+			WFUtil.invoke("WebDAVListBean","refresh", event.getSource(), UIComponent.class);
+
 			if(uploadFileSuccess){
 				String contentType = uploadFile.getContentType();
 				downloadPath = filePath+fileName;
@@ -122,7 +124,6 @@ public class WebDAVUploadBean{
 					rootResource.proppatchMethod(filePath+fileName,new PropertyName("DAV:","comment"),comment,true);
 					
 				}
-				WFUtil.invoke("WebDAVListBean","refresh", event.getSource(), UIComponent.class);
 			}
 			else{
 				System.err.println("Error code :"+rootResource.getStatusMessage()+", message: "+rootResource.getStatusMessage());
