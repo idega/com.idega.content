@@ -51,7 +51,7 @@ public class WebDAVUploadBean{
 			IWContext iwc = IWContext.getInstance();
 //			Map parameters = ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest()).getParameterMap();
 //			uploadFolderPath = ((String[])parameters.get("uploadForm:uploadPath"))[0];
-//			
+			
 			String tempUploadFolderPath = (String) WFUtil.invoke("WebDAVListBean","getWebDAVPath");
 			if(tempUploadFolderPath!=null){
 				uploadFolderPath = tempUploadFolderPath;
@@ -59,9 +59,6 @@ public class WebDAVUploadBean{
 			
 			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
 			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
-		
-			System.out.println("webdavServerURL = "+service.getWebdavServerURL());
-			System.out.println("webdavServletURL = "+service.getWebdavServerURI());
 	
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 			String filePath = service.getWebdavServerURI()+getUploadFilePath();
