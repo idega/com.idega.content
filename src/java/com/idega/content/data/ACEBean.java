@@ -1,5 +1,5 @@
 /*
- * $Id: ACEBean.java,v 1.1 2005/01/07 19:46:49 gummi Exp $
+ * $Id: ACEBean.java,v 1.2 2005/01/10 13:52:17 gummi Exp $
  * Created on 3.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -20,16 +20,17 @@ import com.idega.content.presentation.ContentBlock;
 import com.idega.presentation.IWContext;
 import com.idega.slide.util.AccessControlEntry;
 import com.idega.slide.util.IWSlideConstants;
+import com.idega.webface.bean.WFEditableListDataBean;
 
 
 /**
  * 
- *  Last modified: $Date: 2005/01/07 19:46:49 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/01/10 13:52:17 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-public class ACEBean { // implements WFPropertyMatrixDataBean {
+public class ACEBean implements WFEditableListDataBean {
 
 	
 	private String principal;
@@ -46,6 +47,7 @@ public class ACEBean { // implements WFPropertyMatrixDataBean {
 	private boolean[] isInherited;
 	
 	private Object[] selectItemArray = null;
+	private Object[] columnValueArray = null;
 	
 	public static final String PRIVLIDGE_VALUE_GRANTED = "granted";
 	public static final String PRIVLIDGE_VALUE_DENIED = "denied";
@@ -269,10 +271,12 @@ public class ACEBean { // implements WFPropertyMatrixDataBean {
 	 * 
 	 */
 	public void updateACEs() {
-		// TODO Auto-generated method stub
-		//  Get values from arrays and uppdate granted and denied.
-		//	Add ace to session bean if needed.
 		System.out.println("[ACEBean - Update]: "+getPrincipalName());	
+		
+		Object[] values = getValues();
+		for (int i = 0; i < values.length; i++) {
+			setColumnValue(i,values[i]);
+		}
 		
 		grantedACE.clearPrivileges();
 		deniedACE.clearPrivileges();
@@ -323,6 +327,27 @@ public class ACEBean { // implements WFPropertyMatrixDataBean {
 		return l;
 	}
 	
+	public Object getColumnValue(int index){
+		switch (index) {
+			case 0:
+				return getPrincipalName();
+			default:
+				return privligeValue[index-1];
+		}
+	}
+	
+	public void setColumnValue(int index, Object obj){
+		switch (index) {
+			case 0:
+				break;
+			default:
+				privligeValue[index-1]=(String)obj;
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.idega.webface.bean.WFEditableListDataBean#getSelectItemListArray()
+	 */
 	public Object[] getSelectItemListArray(){
 		if(selectItemArray==null){
 			//+1 because the first column has no UIInput item
@@ -335,19 +360,18 @@ public class ACEBean { // implements WFPropertyMatrixDataBean {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.idega.content.data.WFPropertyMatrixDataBean#getColumnValue()
+	 * @see com.idega.webface.bean.WFEditableListDataBean#getValues()
 	 */
-	public Object[] getColumnValue() {
-		// TODO Auto-generated method stub
-		return null;
+	public Object[] getValues() {
+		if(columnValueArray==null){
+			//+1 because the first column has no UIInput item
+			columnValueArray = new Object[PROPERTY_NAMES.length+1];
+			for (int i = 0; i < columnValueArray.length; i++) {
+				columnValueArray[i]=getColumnValue(i);
+			}
+		}
+		return columnValueArray;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.idega.content.data.WFPropertyMatrixDataBean#getDoRender()
-	 */
-	public Boolean[] getDoRender() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 }
