@@ -209,7 +209,7 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 				url = url.replaceFirst(webDAVServletURL, "");
 				bean.setWebDavHttpURL(url);
 //				bean.setParentList(this);
-				System.out.println("[WebDAVManagerBean] " +url);
+//				System.out.println("[WebDAVManagerBean] " +url);
 				v.add(bean);
 			}
 		}
