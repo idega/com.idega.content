@@ -86,7 +86,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			table.add(WFUtil.getText(resource.getGetContentType(),"wf_listtext"), 2, row);
 			
 			table.add(getText("creation_date"), 1, ++row);
-			table.add(WFUtil.getText(new IWTimestamp(resource.getCreationDate()).toString(),"wf_listtext"), 2, row);
+			table.add(WFUtil.getText(new IWTimestamp(resource.getCreationDateString()).toString(),"wf_listtext"), 2, row);
 			
 			table.add(getText("modification_date"), 1, ++row);
 			table.add(WFUtil.getText(new IWTimestamp(resource.getGetLastModified()).toString(),"wf_listtext"), 2, row);
