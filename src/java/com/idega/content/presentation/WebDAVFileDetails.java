@@ -11,6 +11,7 @@ import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.component.html.HtmlOutputText;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
@@ -39,11 +40,11 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 	private static String ACTION_CHECK_IN = "checkin";
 	private static String ACTION_UNCHECK_OUT = "uncheckout";
 	
-	
 	private static final String PARAMETER_RESOURCE_PATH = "wfd_prp";
+	private boolean detailed = true;
 	
 	protected void initializeContent() {
-		
+
 		WebdavExtendedResource resource = getWebdavExtendedResource();
 		String userName = null;
 		
@@ -65,10 +66,10 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 //			table.setWidth("100%");
 //			table.setBorder(1);
 			
-			table.mergeCells(1, row, 2, row);
-			HtmlOutputText docDetails = getBundle().getLocalizedText("document_details");
-			docDetails.setStyleClass("wf_text");
-			table.add(docDetails);
+//			table.mergeCells(1, row, 2, row);
+//			HtmlOutputText docDetails = getBundle().getLocalizedText("document_details");
+//			docDetails.setStyleClass("wf_text");
+//			table.add(docDetails);
 				
 			HtmlOutputLink link = new HtmlOutputLink();
 			link.setValue(resource.getEncodedPath());
@@ -76,7 +77,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			link.setId(getId() + "_dl");
 			link.getChildren().add(getBundle().getLocalizedText("download_view"));
 			
-			table.add(getText("document_name"), 1, ++row);
+			table.add(getText("document_name"), 1, row);
 			table.add(WFUtil.getText(resourceName,"wf_listtext"), 2, row);
 			table.add(link, 2, ++row);
 			table.add(getText("size"), 1, ++row);
@@ -89,88 +90,89 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			
 			table.add(getText("modification_date"), 1, ++row);
 			table.add(WFUtil.getText(new IWTimestamp(resource.getGetLastModified()).toString(),"wf_listtext"), 2, row);
-			
-			table.add(getText("locked_unlocked"), 1, ++row);
-			if (resource.isLocked()) {
-				HtmlGraphicImage lock = new HtmlGraphicImage();
-				lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/locked.gif");
-				lock.setId(this.getId()+"_lock");
-				lock.setHeight("16");// sizes that make sense 16/32/64/128
-				lock.setStyle("alignment:bottom");
-				table.add(lock, 2, row);
-				table.add(getText("locked", "wf_listtext"), 2, row);
-			} else {
-				table.add(getText("unlocked", "wf_listtext"), 2, row);
-			}
-			table.add(WFUtil.getText("  - "), 2, row);
-			
-			HtmlCommandButton lockToggler = new HtmlCommandButton();
-			lockToggler.setId(getId()+"_lockTogg");
-			lockToggler.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
-			if (resource.isLocked()) {
-				getBundle().getLocalizedUIComponent("unlock", lockToggler);
-			} else {
-				getBundle().getLocalizedUIComponent("lock", lockToggler);
-			}
-
-			lockToggler.setStyleClass("wf_listlink");
-			lockToggler.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
-			lockToggler.getAttributes().put(ACTION, ACTION_TOGGLE_LOCK);
-			table.add(lockToggler, 2, row);
-
-			table.add(getText("checkout_status"), 1, ++row);
-			String checkedOut = resource.getCheckedOut();
-			if (checkedOut == null || "".equals(checkedOut)) {
-				table.add(getText("not_checked_out", "wf_listtext"), 2, row);
-			} else {
-				table.add(getText("checked_out", "wf_listtext"), 2, row);
-				table.add(WFUtil.getText(" ("+checkedOut.substring(checkedOut.lastIndexOf("/")+1)+")","wf_listtext"), 2, row);
-			}
-			table.add(WFUtil.getText("  - "), 2, row);
-			
-			HtmlCommandButton checkOuter = new HtmlCommandButton();
-			checkOuter.setId(getId()+"_check");
-			checkOuter.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
-			checkOuter.setStyleClass("wf_listlink");
-			checkOuter.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
-
-			if (checkedOut == null || "".equals(checkedOut)) {
-				getBundle().getLocalizedUIComponent("check_out", checkOuter);
-				checkOuter.getAttributes().put(ACTION, ACTION_CHECK_OUT);
-				table.add(checkOuter, 2, row);
-			} else {
-				if (VersionHelper.hasUserCheckedOutResource(resource, userName)) {
-					
-					getBundle().getLocalizedUIComponent("uncheck_out", checkOuter);
-					checkOuter.getAttributes().put(ACTION, ACTION_UNCHECK_OUT);
-					table.add(checkOuter, 2, row);
-
-					HtmlCommandButton checkInner = new HtmlCommandButton();
-					checkInner.setId(getId()+"_check");
-					checkInner.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
-					checkInner.setStyleClass("wf_listlink");
-					checkInner.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
-					getBundle().getLocalizedUIComponent("check_in", checkInner);
-					checkInner.getAttributes().put(ACTION, ACTION_CHECK_IN);
-					
-					table.add(" ", 2, row);
-					table.add(checkInner, 2, row);
-					
+			if (detailed) {
+				table.add(getText("locked_unlocked"), 1, ++row);
+				if (resource.isLocked()) {
+					HtmlGraphicImage lock = new HtmlGraphicImage();
+					lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/locked.gif");
+					lock.setId(this.getId()+"_lock");
+					lock.setHeight("16");// sizes that make sense 16/32/64/128
+					lock.setStyle("alignment:bottom");
+					table.add(lock, 2, row);
+					table.add(getText("locked", "wf_listtext"), 2, row);
 				} else {
-					HtmlOutputText comm = new HtmlOutputText();
-					comm.setValue("("+VersionHelper.getCheckedOutName(resource)+")");
-					comm.setStyleClass("wf_listtext");
-					table.add(comm, 2, row);
+					table.add(getText("unlocked", "wf_listtext"), 2, row);
 				}
+				table.add(WFUtil.getText("  - "), 2, row);
+				
+				HtmlCommandButton lockToggler = new HtmlCommandButton();
+				lockToggler.setId(getId()+"_lockTogg");
+				lockToggler.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
+				if (resource.isLocked()) {
+					getBundle().getLocalizedUIComponent("unlock", lockToggler);
+				} else {
+					getBundle().getLocalizedUIComponent("lock", lockToggler);
+				}
+	
+				lockToggler.setStyleClass("wf_listlink");
+				lockToggler.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
+				lockToggler.getAttributes().put(ACTION, ACTION_TOGGLE_LOCK);
+				table.add(lockToggler, 2, row);
+	
+				table.add(getText("checkout_status"), 1, ++row);
+				String checkedOut = resource.getCheckedOut();
+				if (checkedOut == null || "".equals(checkedOut)) {
+					table.add(getText("not_checked_out", "wf_listtext"), 2, row);
+				} else {
+					table.add(getText("checked_out", "wf_listtext"), 2, row);
+					table.add(WFUtil.getText(" ("+checkedOut.substring(checkedOut.lastIndexOf("/")+1)+")","wf_listtext"), 2, row);
+				}
+				table.add(WFUtil.getText("  - "), 2, row);
+				
+				HtmlCommandButton checkOuter = new HtmlCommandButton();
+				checkOuter.setId(getId()+"_check");
+				checkOuter.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
+				checkOuter.setStyleClass("wf_listlink");
+				checkOuter.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
+	
+				if (checkedOut == null || "".equals(checkedOut)) {
+					getBundle().getLocalizedUIComponent("check_out", checkOuter);
+					checkOuter.getAttributes().put(ACTION, ACTION_CHECK_OUT);
+					table.add(checkOuter, 2, row);
+				} else {
+					if (VersionHelper.hasUserCheckedOutResource(resource, userName)) {
+						
+						getBundle().getLocalizedUIComponent("uncheck_out", checkOuter);
+						checkOuter.getAttributes().put(ACTION, ACTION_UNCHECK_OUT);
+						table.add(checkOuter, 2, row);
+	
+						HtmlCommandButton checkInner = new HtmlCommandButton();
+						checkInner.setId(getId()+"_check");
+						checkInner.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
+						checkInner.setStyleClass("wf_listlink");
+						checkInner.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
+						getBundle().getLocalizedUIComponent("check_in", checkInner);
+						checkInner.getAttributes().put(ACTION, ACTION_CHECK_IN);
+						
+						table.add(" ", 2, row);
+						table.add(checkInner, 2, row);
+						
+					} else {
+						HtmlOutputText comm = new HtmlOutputText();
+						comm.setValue("("+VersionHelper.getCheckedOutName(resource)+")");
+						comm.setStyleClass("wf_listtext");
+						table.add(comm, 2, row);
+					}
+				}
+				
+				
+				//Then add the version table
+				Table vTable = getVersionReportTable(resource);
+				
+				++row;
+				table.mergeCells(1, row, 2, row);
+				table.add(vTable, 1, row);
 			}
-			
-			
-			//Then add the version table
-			Table vTable = getVersionReportTable(resource);
-			
-			++row;
-			table.mergeCells(1, row, 2, row);
-			table.add(vTable, 1, row);
 			this.getChildren().add(table);
 		}
 	}
@@ -276,4 +278,21 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			e.printStackTrace();
 		}
 	}
+	
+	public void setDetailed(boolean detailed) {
+		this.detailed = detailed;
+	}
+	
+	public Object saveState(FacesContext ctx) {
+		Object values[] = new Object[2];
+		values[0] = super.saveState(ctx);
+		values[1] = new Boolean(detailed);
+		return values;
+	}
+
+	public void restoreState(FacesContext ctx, Object state) {
+		Object values[] = (Object[]) state;
+		super.restoreState(ctx, values[0]);
+		detailed = ((Boolean) values[1]).booleanValue();
+	}	
 }
