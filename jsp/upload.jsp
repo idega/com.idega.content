@@ -21,14 +21,19 @@ xmlns:c="http://xmlns.idega.com/com.idega.content">
                                        storage="file"
                                        styleClass="fileUploadInput"/>
                 <f:verbatim><br/></f:verbatim>
-                    <h:outputText value="and give it a name (optional) : "/>
-                    <h:inputText value="#{WebDAVUploadBean.fileName}"/>
+                    <h:outputText id ="nametext" value="and give it a name (optional) : "/>
+                    <h:inputText id="filename" value="#{WebDAVUploadBean.fileName}"/>
+                       <f:verbatim><br/></f:verbatim>
+                    <h:outputText id="versiontext" value="and a version comment : "/>
+                       <h:inputText id="comment" value="#{WebDAVUploadBean.comment}"/>
                     <f:verbatim><br/></f:verbatim>
-                    <h:outputText value="and select the folder to upload to (optional) : "/>
+                    <h:outputText id ="outtext" value="and select the folder to upload to (optional) : "/>
                      <h:inputText id="uploadPath" value="#{WebDAVListBean.webDAVPath}"/>
                     <h:commandButton value="Upload" action="#{WebDAVUploadBean.upload}"/>
                 
                 <f:verbatim><br/></f:verbatim>
+                <c:WebDAVFileDetails id="id" webDAVPath="#{WebDAVListBean.getClickedFilePath}"/>
+                
                 <h:outputLink id="filelink" value="#{WebDAVUploadBean.downloadPath}" target="_new" rendered="#{WebDAVUploadBean.isUploaded}" >
                 <f:verbatim>Click here to get the file</f:verbatim>
                 </h:outputLink>
