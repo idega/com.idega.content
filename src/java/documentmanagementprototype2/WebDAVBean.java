@@ -28,6 +28,7 @@ public class WebDAVBean extends Object {
     public static final String PROP_WEB_DAV_URL = "webdav_url";
     public static final String PROP_ICON_URL = "icon_url";
     public static final String PROP_VERSION = "version";
+    public static final String PROP_LOCKED = "locked";
     
     private int id;
     private String name;
@@ -40,6 +41,7 @@ public class WebDAVBean extends Object {
     private String iconURL;
     private String version;
     private PropertyChangeSupport propertySupport;
+    private boolean isLocked = false;
     
     public WebDAVBean() {
     	
@@ -63,6 +65,7 @@ public class WebDAVBean extends Object {
 			setCreationDate(resource.getCreationDate());
 			setWebDavHttpURL(resource.getPath());
 			setVersion(VersionHelper.getLatestVersion(resource));
+			setIsLocked(resource.isLocked());
     }
     
     public WebDAVBean(String name, boolean isCollection, long length, long modifieDate, String mime) {
@@ -193,5 +196,17 @@ public class WebDAVBean extends Object {
 	  	String oldValue = this.iconURL;
 	  	this.iconURL = iconURL;
 	  	propertySupport.firePropertyChange(PROP_ICON_URL, oldValue, iconURL);
+	}
+	/**
+	 * @return Returns the isLocked.
+	 */
+	public boolean getIsLocked() {
+		return isLocked;
+	}
+	/**
+	 * @param isLocked The isLocked to set.
+	 */
+	public void setIsLocked(boolean isLocked) {
+		this.isLocked = isLocked;
 	}
 }

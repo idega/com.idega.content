@@ -109,9 +109,9 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		
 		HtmlGraphicImage lock = new HtmlGraphicImage();
 		lock.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isLocked}"));
-		lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getBundle().getResourcesVirtualPath())+"/images/locked.gif");
+		lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/locked.gif");
 		lock.setId(P_ID+"_lock");
-		lock.setHeight("16");// sizes that make sense 16/32/64/128
+		lock.setHeight("18");// sizes that make sense 16/32/64/128
 
 		UIColumn col6 = new UIColumn();
 		col6.setHeader(WFUtil.getText("Lock"));
@@ -121,8 +121,8 @@ public class WebDAVListManagedBean implements WFListBean, ActionListener {
 		col7.setHeader(WFUtil.getText("Last modified"));
 		col7.getChildren().add(WFUtil.getTextVB(var + ".modifiedDate"));
 
-
-		return new UIColumn[] { col0, col, col2, col3, col4, col5, col6 ,col7};
+		//return new UIColumn[] { col0, col, col2, col3, col4, col5, col6 ,col7};
+		return new UIColumn[] { col0, col, col3, col5, col6 ,col7};
 	}
 
 	/**
