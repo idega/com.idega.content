@@ -126,3 +126,19 @@ comment=Kommentar
 checkout=Checka ut
 checkin=Checka in
 last_modified=Senast ändrad
+
+select_a_file_to_upload=Välj fil fšr att ladda upp
+give_it_a_name_optional=Ange nytt filnamn (valfritt)
+version_comment=Ange kommentar med version (valfritt)
+select_folder_optional=Ange mapp som filen ska hamna i (valfritt)
+click_to_get_the_file=Klicka här för att hämta filen
+create=Skapa
+
+are_you_sure_you_want_to_delete_folder=Är du säker att du vill ta bort denna mapp och dess innehåll?
+are_you_sure_you_want_to_delete_file=Är du säker att du vill ta bort denna fil?
+file_deleted=Fil togs bort
+folder_deleted=Mapp togs bort
+deletion_failed=Deletion failed
+yes=Ja
+upload=Ladda upp
+create_a_folder=Skapa mapp
