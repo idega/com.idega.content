@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.1 2004/12/31 02:48:28 gimmi Exp $
+ * $Id: WebDAVUpload.java,v 1.2 2004/12/31 04:01:51 eiki Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -22,10 +22,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2004/12/31 02:48:28 $ by $Author: gimmi $
+ *  Last modified: $Date: 2004/12/31 04:01:51 $ by $Author: eiki $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class WebDAVUpload extends ContentBlock {
 
@@ -76,6 +76,7 @@ public class WebDAVUpload extends ContentBlock {
 		
 		HtmlCommandButton upload = new HtmlCommandButton();
 		upload.setId(getId()+"_uploadCmd");
+		upload.setStyleClass("wf_webdav_upload_button");
 		upload.setAction(WFUtil.createMethodBinding("#{WebDAVUploadBean.upload}", null));
 		getBundle().getLocalizedUIComponent("upload", upload);
 		
@@ -92,29 +93,39 @@ public class WebDAVUpload extends ContentBlock {
 		table.setBorder(1);
 		
 		WFContainer line1 = new WFContainer();
+		line1.setStyleClass("wf_webdav_upload");
+		line1.setId("upload_file");
 		line1.getChildren().add(selectFile);
 		line1.getChildren().add(fileupload);
 
 		WFContainer line2 = new WFContainer();
+		line2.setStyleClass("wf_webdav_upload");
+		line2.setId("upload_comment");
 		line2.getChildren().add(versionText);
 		line2.getChildren().add(comment);
+		
+//		WFContainer line4 = new WFContainer();
+//		line4.setStyleClass("wf_webdav_upload");
+//		line4.setId("upload_button");
+		line2.getChildren().add(upload);
 
-		WFContainer line3 = new WFContainer();
-		line3.getChildren().add(folder);
-		line3.getChildren().add(uploadPath);
+//		WFContainer line3 = new WFContainer();
+//		line3.setStyleClass("wf_webdav_upload");
+//		line3.setId("upload_path");
+//		line3.getChildren().add(folder);
+//		line3.getChildren().add(uploadPath);
 		
-		WFContainer line4 = new WFContainer();
-		line4.getChildren().add(upload);
 		
-		WFContainer line5 = new WFContainer();
-		line5.getChildren().add(fileLink);
-		line5.getChildren().add(imagePreview);
+		
+//		WFContainer line5 = new WFContainer();
+//		line5.getChildren().add(fileLink);
+//		line5.getChildren().add(imagePreview);
 		
 		getChildren().add(line1);
 		getChildren().add(line2);
 //		getChildren().add(line3);
-		getChildren().add(line4);
-		getChildren().add(line5);
+		//getChildren().add(line4);
+		//getChildren().add(line5);
 
 //    <f:verbatim><br/></f:verbatim>
 //    <h:outputText value="Select a file to upload : "/>
