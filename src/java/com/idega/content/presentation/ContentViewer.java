@@ -200,6 +200,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		}
 
 		if (!eventHandled) {
+			WFUtil.invoke("WebDAVListBean", "resetSorter");
 			WFUtil.invoke("WebDAVListBean", "setClickedFilePath", null, String.class);
 			WFUtil.invoke("WebDAVListBean", "setWebDAVPath", rootFolder, String.class);
 			WFUtil.invoke("WebDAVListBean", "setRootFolder", rootFolder, String.class);
