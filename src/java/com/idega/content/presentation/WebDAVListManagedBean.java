@@ -1,6 +1,7 @@
 package com.idega.content.presentation;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -49,6 +50,15 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	private static final String SORT_BY_SIZE_DESC = "size_desc";
 	private static final String SORT_BY_MODIFICATION_DATE_DESC = "modDate_desc";
 
+	public static final String COLUMN_ICON = "icon";
+	public static final String COLUMN_NAME = "name";
+	public static final String COLUMN_SIZE = "size";
+	public static final String COLUMN_VERSION = "version";
+	public static final String COLUMN_LOCK = "lock";
+	public static final String COLUMN_CHECKOUT = "checkout";
+	public static final String COLUMN_LAST_MODIFIED = "last_modified";
+	public static final String COLUMN_DELETE = "delete";
+	
 	private String clickedFilePath;
 	private String clickedFileName;
 	
@@ -56,6 +66,8 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	private String rootPath = null;
 	private String startPath = null;
 	private String iconTheme = null;
+	private boolean showFolders = true;
+	private Collection columnsToHide = null;
 	
 	private int startPage = -1;
 	private int rows = -1;
@@ -106,11 +118,23 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		this.rootPath = root;
 	}
 	
+	public void setShowFolders(Boolean show) {
+		this.showFolders = show.booleanValue();
+	}
+	
 	public void setIconTheme(String theme) {
 		if (theme != null && "".equals(theme)) {
 			theme = null;
 		}
 		this.iconTheme = theme;
+	}
+	
+	public void setColumnsToHide(Collection columns) {
+		this.columnsToHide = columns;
+	}
+	
+	private boolean showColumn(String columnName) {
+		return (columnsToHide == null || !columnsToHide.contains(columnName));
 	}
 
 	public void refresh(UIComponent comp) {
@@ -208,145 +232,178 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	 */
 	public UIColumn[] createColumns(String var) {
 		
+		Vector columns = new Vector();
+		
 		String imageSize = "16";
 		
-		UIColumn col0 = new UIColumn();
 		
-		HtmlGraphicImage icon = new HtmlGraphicImage();
-		icon.setValueBinding("url", WFUtil.createValueBinding("#{"+var+".iconURL}"));
-		icon.setId(P_ID+"_I");
-		icon.setHeight("16");// sizes that make sense 16/32/64/128
-		
-		HtmlCommandLink iconLink = new HtmlCommandLink();
-		iconLink.setId(P_ID+"_L");
-		
-		WFUtil.addParameterVB(iconLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
-		WFUtil.addParameterVB(iconLink, PARAMETER_IS_FOLDER, var + ".isCollection");
-		iconLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
-		iconLink.getChildren().add(icon);
-		col0.getChildren().add(iconLink);
-		
-		UIColumn col = new UIColumn();
-		HtmlCommandLink nameSortLink = new HtmlCommandLink();
-		HtmlOutputText nameSortText = ContentBlock.getBundle().getLocalizedText("name");
-		if (SORT_BY_NAME.equals(sorter)) {
-			nameSortText.setStyleClass("wf_listheaderlink_clicked");
-			nameSortLink.getAttributes().put(ACTION_SORT, SORT_BY_NAME_DESC);
-		} else if (SORT_BY_NAME_DESC.equals(sorter)) {
-			nameSortText.setStyleClass("wf_listheaderlink_clicked_descending");
-			nameSortLink.getAttributes().put(ACTION_SORT, SORT_BY_NAME);
-		} else {
-			nameSortText.setStyleClass("wf_listheaderlink");
-			nameSortLink.getAttributes().put(ACTION_SORT, SORT_BY_NAME);
+		if (showColumn(COLUMN_ICON)) {
+			UIColumn col0 = new UIColumn();
+			HtmlGraphicImage icon = new HtmlGraphicImage();
+			icon.setValueBinding("url", WFUtil.createValueBinding("#{"+var+".iconURL}"));
+			icon.setId(P_ID+"_I");
+			icon.setHeight("16");// sizes that make sense 16/32/64/128
+			HtmlCommandLink iconLink = new HtmlCommandLink();
+			iconLink.setId(P_ID+"_L");
+			
+			WFUtil.addParameterVB(iconLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
+			WFUtil.addParameterVB(iconLink, PARAMETER_IS_FOLDER, var + ".isCollection");
+			iconLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
+			iconLink.getChildren().add(icon);
+			col0.getChildren().add(iconLink);
+			
+			columns.add(col0);
 		}
-		nameSortLink.getChildren().add(nameSortText);
-		nameSortLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
-		nameSortLink.setId(P_ID+"_sortName");
-		col.setHeader(nameSortLink);
-		HtmlCommandLink nameLink = new HtmlCommandLink();
-		nameLink.setId(P_ID);
-		nameLink.setStyleClass("wf_listlink");
-		nameLink.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".name}"));
-		WFUtil.addParameterVB(nameLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
-		WFUtil.addParameterVB(nameLink, PARAMETER_IS_FOLDER, var + ".isCollection");
-		nameLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
-		col.getChildren().add(nameLink);
 		
-		UIColumn col2 = new UIColumn();
-		col2.setHeader(ContentBlock.getBundle().getLocalizedText("created"));
-		HtmlOutputText creation = WFUtil.getTextVB(var + ".creationDate");
-		creation.setStyleClass("wf_listtext");
-		col2.getChildren().add(creation);
-		
-		UIColumn col3 = new UIColumn();
-		HtmlCommandLink sizeSortLink = new HtmlCommandLink();
-		HtmlOutputText sizeSortText = ContentBlock.getBundle().getLocalizedText("size");
-		if (SORT_BY_SIZE.equals(sorter)) {
-			sizeSortText.setStyleClass("wf_listheaderlink_clicked");
-			sizeSortLink.getAttributes().put(ACTION_SORT, SORT_BY_SIZE_DESC);
-		} else if (SORT_BY_SIZE_DESC.equals(sorter)) {
-			sizeSortText.setStyleClass("wf_listheaderlink_clicked_descending");
-			sizeSortLink.getAttributes().put(ACTION_SORT, SORT_BY_SIZE);
-		} else {
-			sizeSortText.setStyleClass("wf_listheaderlink");
-			sizeSortLink.getAttributes().put(ACTION_SORT, SORT_BY_SIZE_DESC);
+		if (showColumn(COLUMN_NAME)) {
+			UIColumn col = new UIColumn();
+			HtmlCommandLink nameSortLink = new HtmlCommandLink();
+			HtmlOutputText nameSortText = ContentBlock.getBundle().getLocalizedText("name");
+			if (SORT_BY_NAME.equals(sorter)) {
+				nameSortText.setStyleClass("wf_listheaderlink_clicked");
+				nameSortLink.getAttributes().put(ACTION_SORT, SORT_BY_NAME_DESC);
+			} else if (SORT_BY_NAME_DESC.equals(sorter)) {
+				nameSortText.setStyleClass("wf_listheaderlink_clicked_descending");
+				nameSortLink.getAttributes().put(ACTION_SORT, SORT_BY_NAME);
+			} else {
+				nameSortText.setStyleClass("wf_listheaderlink");
+				nameSortLink.getAttributes().put(ACTION_SORT, SORT_BY_NAME);
+			}
+			nameSortLink.getChildren().add(nameSortText);
+			nameSortLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
+			nameSortLink.setId(P_ID+"_sortName");
+			col.setHeader(nameSortLink);
+			HtmlCommandLink nameLink = new HtmlCommandLink();
+			nameLink.setId(P_ID);
+			nameLink.setStyleClass("wf_listlink");
+			nameLink.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".name}"));
+			WFUtil.addParameterVB(nameLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
+			WFUtil.addParameterVB(nameLink, PARAMETER_IS_FOLDER, var + ".isCollection");
+			nameLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
+			col.getChildren().add(nameLink);
+			
+			columns.add(col);
 		}
-		sizeSortLink.getChildren().add(sizeSortText);
-		sizeSortLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
-		sizeSortLink.setId(P_ID+"_sortSize");
-		col3.setHeader(sizeSortLink);
-		HtmlOutputText size = WFUtil.getTextVB(var + ".length");
-		size.setStyleClass("wf_listtext");
-		col3.getChildren().add(size);
 		
-		UIColumn col4 = new UIColumn();
-		col4.setHeader(ContentBlock.getBundle().getLocalizedText("mime_type"));
-		HtmlOutputText mime = WFUtil.getTextVB(var + ".mime");
-		mime.setStyleClass("wf_listtext");
-		col4.getChildren().add(mime);
+//		UIColumn col2 = new UIColumn();
+//		col2.setHeader(ContentBlock.getBundle().getLocalizedText("created"));
+//		HtmlOutputText creation = WFUtil.getTextVB(var + ".creationDate");
+//		creation.setStyleClass("wf_listtext");
+//		col2.getChildren().add(creation);
 		
-		UIColumn col5 = new UIColumn();
-		col5.setHeader(ContentBlock.getBundle().getLocalizedText("version"));
-		HtmlOutputText version = WFUtil.getTextVB(var + ".version");
-		version.setStyleClass("wf_listtext");
-		col5.getChildren().add(version);
-		
-		HtmlGraphicImage lock = new HtmlGraphicImage();
-		lock.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isLocked}"));
-		lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/locked.gif");
-		lock.setId(P_ID+"_lock");
-		lock.setHeight(imageSize);// sizes that make sense 16/32/64/128
-		
-		UIColumn col6 = new UIColumn();
-		col6.setHeader(ContentBlock.getBundle().getLocalizedText("lock"));
-		col6.getChildren().add(lock);
-		
-		UIColumn col7 = new UIColumn();
-		col7.setHeader(ContentBlock.getBundle().getLocalizedText("checked_out"));
-		HtmlOutputText checkedOut = WFUtil.getTextVB(var + ".comment");
-		checkedOut.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".checkedOut}"));
-		checkedOut.setStyleClass("wf_listtext");
-		col7.getChildren().add(checkedOut);
-		
-		UIColumn col8 = new UIColumn();
-		HtmlCommandLink modSortLink = new HtmlCommandLink();
-		HtmlOutputText modSortText = ContentBlock.getBundle().getLocalizedText("last_modified");
-		if (SORT_BY_MODIFICATION_DATE.equals(sorter)) {
-			modSortText.setStyleClass("wf_listheaderlink_clicked");
-			modSortLink.getAttributes().put(ACTION_SORT, SORT_BY_MODIFICATION_DATE_DESC);
-		} else if (SORT_BY_MODIFICATION_DATE_DESC.equals(sorter)) {
-			modSortText.setStyleClass("wf_listheaderlink_clicked_descending");
-			modSortLink.getAttributes().put(ACTION_SORT, SORT_BY_MODIFICATION_DATE);
-		} else {
-			modSortText.setStyleClass("wf_listheaderlink");
-			modSortLink.getAttributes().put(ACTION_SORT, SORT_BY_MODIFICATION_DATE_DESC);
+		if (showColumn(COLUMN_SIZE)) {
+			UIColumn col3 = new UIColumn();
+			HtmlCommandLink sizeSortLink = new HtmlCommandLink();
+			HtmlOutputText sizeSortText = ContentBlock.getBundle().getLocalizedText("size");
+			if (SORT_BY_SIZE.equals(sorter)) {
+				sizeSortText.setStyleClass("wf_listheaderlink_clicked");
+				sizeSortLink.getAttributes().put(ACTION_SORT, SORT_BY_SIZE_DESC);
+			} else if (SORT_BY_SIZE_DESC.equals(sorter)) {
+				sizeSortText.setStyleClass("wf_listheaderlink_clicked_descending");
+				sizeSortLink.getAttributes().put(ACTION_SORT, SORT_BY_SIZE);
+			} else {
+				sizeSortText.setStyleClass("wf_listheaderlink");
+				sizeSortLink.getAttributes().put(ACTION_SORT, SORT_BY_SIZE_DESC);
+			}
+			sizeSortLink.getChildren().add(sizeSortText);
+			sizeSortLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
+			sizeSortLink.setId(P_ID+"_sortSize");
+			col3.setHeader(sizeSortLink);
+			HtmlOutputText size = WFUtil.getTextVB(var + ".length");
+			size.setStyleClass("wf_listtext");
+			col3.getChildren().add(size);
+			
+			columns.add(col3);
 		}
-		modSortLink.getChildren().add(modSortText);
-		modSortLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
-		modSortLink.setId(P_ID+"_sortMod");
-		col8.setHeader(modSortLink);
-		HtmlOutputText modifiedDate = WFUtil.getTextVB(var + ".modifiedDate");
-		modifiedDate.setStyleClass("wf_listtext");
-		col8.getChildren().add(modifiedDate);
 		
-		UIColumn del = new UIColumn();
-		del.setHeader(ContentBlock.getBundle().getLocalizedText("delete"));
-		HtmlCommandLink delLink = new HtmlCommandLink();
-		delLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isReal}"));
-		delLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.DELETE);
-		WFUtil.addParameterVB(delLink, ContentViewer.PATH_TO_DELETE, var+".webDavUrl");
-		delLink.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
-		delLink.setId(P_ID+"_delLink");
-		HtmlGraphicImage delete = new HtmlGraphicImage();
-		delete.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/delete.gif");
-		delete.setId(P_ID+"_delete");
-		delete.setHeight(imageSize);// sizes that make sense 16/32/64/128
-		delLink.getChildren().add(delete);
+//		UIColumn col4 = new UIColumn();
+//		col4.setHeader(ContentBlock.getBundle().getLocalizedText("mime_type"));
+//		HtmlOutputText mime = WFUtil.getTextVB(var + ".mime");
+//		mime.setStyleClass("wf_listtext");
+//		col4.getChildren().add(mime);
 		
-		del.getChildren().add(delLink);
+		if (showColumn(COLUMN_VERSION)) {
+			UIColumn col5 = new UIColumn();
+			col5.setHeader(ContentBlock.getBundle().getLocalizedText("version"));
+			HtmlOutputText version = WFUtil.getTextVB(var + ".version");
+			version.setStyleClass("wf_listtext");
+			col5.getChildren().add(version);
+			
+			columns.add(col5);
+		}
 		
+		if (showColumn(COLUMN_LOCK)) {
+			HtmlGraphicImage lock = new HtmlGraphicImage();
+			lock.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isLocked}"));
+			lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/locked.gif");
+			lock.setId(P_ID+"_lock");
+			lock.setHeight(imageSize);// sizes that make sense 16/32/64/128
+
+			UIColumn col6 = new UIColumn();
+			col6.setHeader(ContentBlock.getBundle().getLocalizedText("lock"));
+			col6.getChildren().add(lock);
+			
+			columns.add(col6);
+		}
 		
-		return new UIColumn[] { col0, col, col3, col5, col6 , col7, col8, del};
+		if (showColumn(COLUMN_CHECKOUT)) {
+			UIColumn col7 = new UIColumn();
+			col7.setHeader(ContentBlock.getBundle().getLocalizedText("checked_out"));
+			HtmlOutputText checkedOut = WFUtil.getTextVB(var + ".comment");
+			checkedOut.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".checkedOut}"));
+			checkedOut.setStyleClass("wf_listtext");
+			col7.getChildren().add(checkedOut);
+			
+			columns.add(col7);
+		}
+		
+		if (showColumn(COLUMN_LAST_MODIFIED)) {
+			UIColumn col8 = new UIColumn();
+			HtmlCommandLink modSortLink = new HtmlCommandLink();
+			HtmlOutputText modSortText = ContentBlock.getBundle().getLocalizedText("last_modified");
+			if (SORT_BY_MODIFICATION_DATE.equals(sorter)) {
+				modSortText.setStyleClass("wf_listheaderlink_clicked");
+				modSortLink.getAttributes().put(ACTION_SORT, SORT_BY_MODIFICATION_DATE_DESC);
+			} else if (SORT_BY_MODIFICATION_DATE_DESC.equals(sorter)) {
+				modSortText.setStyleClass("wf_listheaderlink_clicked_descending");
+				modSortLink.getAttributes().put(ACTION_SORT, SORT_BY_MODIFICATION_DATE);
+			} else {
+				modSortText.setStyleClass("wf_listheaderlink");
+				modSortLink.getAttributes().put(ACTION_SORT, SORT_BY_MODIFICATION_DATE_DESC);
+			}
+			modSortLink.getChildren().add(modSortText);
+			modSortLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
+			modSortLink.setId(P_ID+"_sortMod");
+			col8.setHeader(modSortLink);
+			HtmlOutputText modifiedDate = WFUtil.getTextVB(var + ".modifiedDate");
+			modifiedDate.setStyleClass("wf_listtext");
+			col8.getChildren().add(modifiedDate);
+			
+			columns.add(col8);
+		}
+		
+		if (showColumn(COLUMN_DELETE)) {
+			UIColumn del = new UIColumn();
+			del.setHeader(ContentBlock.getBundle().getLocalizedText("delete"));
+			HtmlCommandLink delLink = new HtmlCommandLink();
+			delLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isReal}"));
+			delLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.DELETE);
+			WFUtil.addParameterVB(delLink, ContentViewer.PATH_TO_DELETE, var+".webDavUrl");
+			delLink.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
+			delLink.setId(P_ID+"_delLink");
+			HtmlGraphicImage delete = new HtmlGraphicImage();
+			delete.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/delete.gif");
+			delete.setId(P_ID+"_delete");
+			delete.setHeight(imageSize);// sizes that make sense 16/32/64/128
+			delLink.getChildren().add(delete);
+			
+			del.getChildren().add(delLink);
+			
+			columns.add(del);
+		}
+		
+		return (UIColumn[]) columns.toArray(new UIColumn[]{});
+//		return new UIColumn[] { col0, col, col3, col5, col6 , col7, col8, del};
 	}
 	
 	/* (non-Javadoc)
@@ -467,12 +524,14 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		while (enumer.hasMoreElements()) {
 			resource = (WebdavExtendedResource) enumer.nextElement();
 			if (!resource.getDisplayName().startsWith(".")) {
-				bean = new WebDAVBean(resource);
-				url = resource.getPath();
-				url = url.replaceFirst(webDAVServletURL, "");
-				bean.setWebDavHttpURL(url);
-				bean.setIconTheme(iconTheme);
-				v.add(bean);
+				if (showFolders || (!showFolders && !resource.isCollection())) {
+					bean = new WebDAVBean(resource);
+					url = resource.getPath();
+					url = url.replaceFirst(webDAVServletURL, "");
+					bean.setWebDavHttpURL(url);
+					bean.setIconTheme(iconTheme);
+					v.add(bean);
+				}
 			}
 		}
 		

@@ -10,8 +10,10 @@ public class ContentViewerTag extends UIComponentTag {
 
 	private String rootFolder;
 	private String startFolder;
-	private Boolean useUserHomeFolder;
+	private boolean useUserHomeFolder;
 	private String iconTheme;
+	private boolean showFolders = true;
+	private String columnsToHide;
 	
 	public void setRootPath(String root) {
 		rootFolder = root;
@@ -30,7 +32,7 @@ public class ContentViewerTag extends UIComponentTag {
 	}
 	
 	public void setUseUserHomeFolder(boolean useUserFolder) {
-		useUserHomeFolder = new Boolean(useUserFolder);
+		useUserHomeFolder = useUserFolder;
 	}
 	
 	public void setIconTheme(String themeName) {
@@ -41,21 +43,35 @@ public class ContentViewerTag extends UIComponentTag {
 		return iconTheme;
 	}
 	
+	public void setShowFolders(boolean showFolders) {
+		this.showFolders = showFolders;
+	}
+	
+	public void setColumnsToHide(String columns) {
+		this.columnsToHide = columns;
+	}
+	
 	public void release() {      
 		super.release();      
 		rootFolder = null ;
 		startFolder = null;
-		useUserHomeFolder = null;
+		useUserHomeFolder = false;
+		showFolders = true;
 		iconTheme = null;
+		columnsToHide = null;
 	}
 
-	protected void setProperties(UIComponent component) {      
-		super.setProperties(component);
+	protected void setProperties(UIComponent component) {
 		if (component != null) {
-			component.getAttributes().put("rootFolder", rootFolder);
-			component.getAttributes().put("startFolder", startFolder);
-			component.getAttributes().put("useUserHomeFolder", useUserHomeFolder);
-			component.getAttributes().put("iconTheme", iconTheme);
+			ContentViewer viewer = (ContentViewer) component;
+			super.setProperties(component);
+
+			viewer.setRootFolder(rootFolder);
+			viewer.setStartFolder(startFolder);
+			viewer.setUseUserHomeFolder(useUserHomeFolder);
+			viewer.setIconTheme(iconTheme);
+			viewer.setShowFolders(showFolders);
+			viewer.setColumnsToHide(columnsToHide);
 		}
 	}
 

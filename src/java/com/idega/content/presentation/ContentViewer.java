@@ -2,8 +2,10 @@ package com.idega.content.presentation;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIParameter;
 import javax.faces.component.html.HtmlCommandLink;
@@ -58,6 +60,11 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	private boolean renderWebDAVDeleter = false;
 	
 	private String rootFolder = null;
+	private boolean useUserHomeFolder = false;
+	private String startFolder = null;
+	private String iconTheme = null;
+	private boolean showFolders = true;
+	private Collection columnsToHide = null;
 	private boolean eventHandled = false;
 	
 	private String currentFolderPath = null;
@@ -70,9 +77,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	
 	public void initializeContent() {	
 
-		String startFolder = (String) this.getAttributes().get("startFolder");
-		
-		String iconTheme = (String) this.getAttributes().get("iconTheme");
+//		String startFolder = (String) this.getAttributes().get("startFolder");
+//		String iconTheme = (String) this.getAttributes().get("iconTheme");
 //		rootFolder ="/files/shared";
 
 		WFBlock listBlock = new WFBlock();
@@ -93,6 +99,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		list.setStartFolder(startFolder);
 		list.setRootFolder(rootFolder);
 		list.setIconTheme(iconTheme);
+		list.setShowFolders(showFolders);
+		list.setColumnsToHide(columnsToHide);
 		listBlock.add(list);
 		
 		WFBlock detailsBlock = new WFBlock();
@@ -179,14 +187,47 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		getFacets().put(UPLOAD, uploadBlock);
 		getFacets().put(DELETE, deleteBlock);
 		
-//		getChildren().add(list);
-//		getChildren().add(details);
-//		System.out.println("tmp Eiki");
+	}
+	
+	public void setRootFolder(String rootFolder) {
+		this.rootFolder = rootFolder;
+	}
+	
+	public void setUseUserHomeFolder(boolean useUserHomeFolder) {
+		this.useUserHomeFolder = useUserHomeFolder;
+	}
+	
+	public void setStartFolder(String startFolder) {
+		this.startFolder = startFolder;
+	}
+	
+	public void setIconTheme(String iconTheme) {
+		this.iconTheme = iconTheme;
+	}
+	
+	public void setShowFolders(boolean showFolders) {
+		this.showFolders = showFolders;
+	}
+	
+	public void setColumnsToHide(String columns) {
+		if (columns != null) {
+			Collection v = new Vector();
+			int index = columns.indexOf(",");
+			while (index > -1) {
+				String tmp = columns.substring(0, index);
+				v.add(tmp.trim());
+				columns = columns.substring(index+1);
+				index = columns.indexOf(",");
+			}
+			v.add(columns.trim());
+			
+			this.columnsToHide = v;
+		}
 	}
 	
 	public void encodeBegin(FacesContext context) throws IOException {
-		Boolean useUserHomeFolder = (Boolean) this.getAttributes().get("useUserHomeFolder");
-		if (useUserHomeFolder != null && useUserHomeFolder.booleanValue()) {
+//		Boolean useUserHomeFolder = (Boolean) this.getAttributes().get("useUserHomeFolder");
+		if (useUserHomeFolder) {
 			try {
 				rootFolder = super.getIWSlideSession().getUserHomeFolder();
 			}
@@ -476,7 +517,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	}
 	
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[15];
+		Object values[] = new Object[19];
 		values[0] = super.saveState(ctx);
 		values[1] = new Boolean(renderWebDAVList);
 		values[2] = new Boolean(renderWebDAVFileDetails);
@@ -492,6 +533,10 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		values[12] = new Boolean(renderWebDAVDeleter);
 		values[13] = currentFolderPath;
 		values[14] = currentFileName;
+		values[15] = startFolder;
+		values[16] = new Boolean(useUserHomeFolder);
+		values[17] = new Boolean(showFolders);
+		values[18] = columnsToHide;
 
 		return values;
 	}
@@ -513,6 +558,10 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		renderWebDAVDeleter = ((Boolean) values[12]).booleanValue();
 		currentFolderPath = ((String)values[13]);
 		currentFileName = ((String)values[14]);
+		startFolder = ((String) values[15]);
+		useUserHomeFolder = ((Boolean) values[16]).booleanValue();
+		showFolders = ((Boolean) values[17]).booleanValue();
+		columnsToHide = ((Collection) values[18]);
 	}
 	/**
 	 * @return Returns the currentFileName.
