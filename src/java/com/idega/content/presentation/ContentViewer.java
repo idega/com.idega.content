@@ -12,6 +12,8 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
+import com.idega.content.business.WebDAVFilePermissionResource;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
@@ -58,6 +60,9 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	private String rootFolder = null;
 	private boolean eventHandled = false;
 	
+	private String currentFolderPath = null;
+	private String currentFileName = null;
+	
 	public ContentViewer() {
 		super();
 	}
@@ -87,7 +92,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 
 		tb.addTitleText(getBundle().getLocalizedText("document_list"));
 		tb.addTitleText(" (");
-		tb.addTitleText("WebDAVListBean.virtualWebDAVPath", true);
+		tb.addTitleText(getCurrentResourcePath());
+//		tb.addTitleText("WebDAVListBean.virtualWebDAVPath", true);
 //		tb.addTitleText("WebDAVListBean.webDAVPath", true);
 		tb.addTitleText(")");
 		listBlock.setToolbarEmbeddedInTitlebar(true);
@@ -106,7 +112,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WFTitlebar detailsBar = new WFTitlebar();
 		detailsBar.addTitleText(getBundle().getLocalizedText("document_details"));
 		detailsBar.addTitleText(" (");
-		detailsBar.addTitleText("WebDAVListBean.clickedFileName", true);
+		detailsBar.addTitleText(getCurrentResourcePath());
 		detailsBar.addTitleText(")");
 		detailsBlock.setTitlebar(detailsBar);
 		detailsBlock.setToolbar(getToolbar());
@@ -119,7 +125,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WFTitlebar previewBar = new WFTitlebar();
 		previewBar.addTitleText(getBundle().getLocalizedText("document_details"));
 		previewBar.addTitleText(" (");
-		previewBar.addTitleText("WebDAVListBean.clickedFileName", true);
+		previewBar.addTitleText(getCurrentResourcePath());
 		previewBar.addTitleText(")");
 		previewBlock.setTitlebar(previewBar);
 		previewBlock.setToolbar(getToolbar());
@@ -136,7 +142,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WFTitlebar folderBar = new WFTitlebar();
 		folderBar.addTitleText(getBundle().getLocalizedText("create_a_folder"));
 		folderBar.addTitleText(" (");
-		folderBar.addTitleText("WebDAVListBean.virtualWebDAVPath", true);
+		folderBar.addTitleText(getCurrentResourcePath());
 		folderBar.addTitleText(")");
 		folderBlock.setTitlebar(folderBar);
 		folderBlock.setToolbar(new WFToolbar());
@@ -149,7 +155,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WFTitlebar uploadBar = new WFTitlebar();
 		uploadBar.addTitleText(getBundle().getLocalizedText("upload"));
 		uploadBar.addTitleText(" (");
-		uploadBar.addTitleText("WebDAVListBean.virtualWebDAVPath", true);
+		uploadBar.addTitleText(getCurrentResourcePath());
 		uploadBar.addTitleText(")");
 		uploadBlock.setTitlebar(uploadBar);
 		uploadBlock.setToolbar(new WFToolbar());
@@ -162,7 +168,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WFTitlebar deleteBar = new WFTitlebar();
 		deleteBar.addTitleText(getBundle().getLocalizedText("delete"));
 		deleteBar.addTitleText(" (");
-		deleteBar.addTitleText("WebDAVListBean.clickedFilePath", true);
+		deleteBar.addTitleText(getCurrentResourcePath());
 		deleteBar.addTitleText(")");
 		deleteBlock.setTitlebar(deleteBar);
 		deleteBlock.setToolbar(new WFToolbar());
@@ -179,6 +185,9 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WFBlock permissionsBlock = new WFBlock();
 		WFTitlebar permissionsBar = new WFTitlebar();
 		permissionsBar.addTitleText(getBundle().getLocalizedText("permissions"));
+		permissionsBar.addTitleText(" (");
+		permissionsBar.addTitleText(getCurrentResourcePath());
+		permissionsBar.addTitleText(")");
 		permissionsBlock.setTitlebar(permissionsBar);
 		permissionsBlock.setToolbar(getToolbar());
 		WebDAVFilePermissions permissions = new WebDAVFilePermissions();
@@ -214,7 +223,6 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			String webDAVServerURI = ss.getWebdavServerURI();
 			tmp = tmp.replaceFirst(webDAVServerURI, "");
 			WFUtil.invoke("WebDAVListBean", "setWebDAVPath", tmp);
-			((WebDAVFilePermissions)getFacet(PERMISSIONS)).setResourcePath(tmp);
 			rootFolder = tmp;
 		}
 		if (LIST.equals(currentAction)) { //currentAction == null || 
@@ -383,6 +391,19 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			String action = (String) bSource.getAttributes().get(PARAMETER_ACTION);
 			if (action != null) {
 				setRenderFlags(action);
+				if(PERMISSIONS.equals(action)){
+					IWContext iwc = IWContext.getInstance();
+					try {
+						WebDAVFilePermissionResource resource = (WebDAVFilePermissionResource) IBOLookup.getSessionInstance(iwc, WebDAVFilePermissionResource.class);
+						resource.clear();
+					}
+					catch (IBOLookupException e) {
+						e.printStackTrace();
+					}
+					catch (RemoteException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 			setEventHandled(true);
 		} else if (source instanceof HtmlCommandLink){
@@ -477,6 +498,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		values[10] = new Boolean(renderPermissionsLink);
 		values[11] = new Boolean(renderWebDAVFilePermissions);
 		values[12] = new Boolean(renderWebDAVDeleter);
+		values[13] = currentFolderPath;
+		values[14] = currentFileName;
 
 		return values;
 	}
@@ -496,5 +519,52 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		renderPermissionsLink = ((Boolean) values[10]).booleanValue();
 		renderWebDAVFilePermissions = ((Boolean) values[11]).booleanValue();
 		renderWebDAVDeleter = ((Boolean) values[12]).booleanValue();
+		currentFolderPath = ((String)values[13]);
+		currentFileName = ((String)values[14]);
+	}
+	/**
+	 * @return Returns the currentFileName.
+	 */
+	public String getCurrentFileName() {
+		return currentFileName;
+	}
+	/**
+	 * @param currentFileName The currentFileName to set.
+	 */
+	public void setCurrentFileName(String currentFileName) {
+		this.currentFileName = currentFileName;
+	}
+	/**
+	 * @return Returns the currentFolderPath.
+	 */
+	public String getCurrentFolderPath() {
+		if(currentFolderPath == null){
+			FacesContext context = getFacesContext();
+			currentFolderPath = (String) WFUtil.createMethodBinding("#{WebDAVListBean.getWebDAVPath}", null).invoke(context,null);
+			if(currentFolderPath == null || "".equals(currentFolderPath)){
+				currentFolderPath = "/";
+			}
+		}
+		return currentFolderPath;
+	}
+	/**
+	 * @param currentFolderPath The currentFolderPath to set.
+	 */
+	public void setCurrentFolderPath(String currentFolderPath) {
+		this.currentFolderPath = currentFolderPath;
+	}
+	
+	/**
+	 * @return Returns the current resource path.
+	 */
+	public String getCurrentResourcePath() {
+		String path = getCurrentFolderPath();
+		
+		String fileName = getCurrentFileName();
+		if(fileName != null){
+			return path+(("/".equals(path.substring(path.length()-1)))?"":"/")+fileName;
+		} else {
+			return path;
+		}
 	}
 }

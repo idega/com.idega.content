@@ -173,6 +173,9 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 				}
 			}
 		}
+		
+		v.setCurrentFolderPath(webDAVPath);
+		v.setCurrentFileName(getClickedFileName());
 	}
 
 	private WFList getWFListParent(UIComponent comp) {
