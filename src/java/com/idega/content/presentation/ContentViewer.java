@@ -59,10 +59,10 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	
 	public void initializeContent() {	
 
-//		String path = (String) WFUtil.invoke("WebDAVListBean", "getWebDAVPath");
-//		if (path == null || "".equals(path)) {
-//			path = "/"
-//		}
+		Boolean useUserHomeFolder = (Boolean) this.getAttributes().get("useUserHomeFolder");
+		if (useUserHomeFolder != null && useUserHomeFolder.booleanValue()) {
+			rootFolder = super.getIWSlideSession().getUserHomeFolder();
+		}
 		
 		String startFolder = (String) this.getAttributes().get("startFolder");
 		if (rootFolder == null) {
@@ -81,7 +81,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		list.setId(getId()+"_list");
 		list.setRendered(renderWebDAVList);
 		list.setStartFolder(startFolder);
-		list.setRootFolder(rootFolder);
+//		list.setRootFolder(rootFolder);
 		listBlock.add(list);
 		
 		WFBlock detailsBlock = new WFBlock();

@@ -10,6 +10,7 @@ public class ContentViewerTag extends UIComponentTag {
 
 	private String rootFolder;
 	private String startFolder;
+	private Boolean useUserHomeFolder;
 	
 	public void setRootPath(String root) {
 		rootFolder = root;
@@ -27,10 +28,15 @@ public class ContentViewerTag extends UIComponentTag {
 		return startFolder;
 	}
 	
+	public void setUseUserHomeFolder(boolean useUserFolder) {
+		useUserHomeFolder = new Boolean(useUserFolder);
+	}
+	
 	public void release() {      
 		super.release();      
 		rootFolder = null ;
 		startFolder = null;
+		useUserHomeFolder = null;
 	}
 
 	protected void setProperties(UIComponent component) {      
@@ -38,6 +44,7 @@ public class ContentViewerTag extends UIComponentTag {
 		if (component != null) {
 			component.getAttributes().put("rootFolder", rootFolder);
 			component.getAttributes().put("startFolder", startFolder);
+			component.getAttributes().put("useUserHomeFolder", useUserHomeFolder);
 		}
 	}
 
