@@ -82,3 +82,8 @@ onclick_remove_attachment=return confirm('Are you sure you want to remove the at
 onclick_remove_related_content_item=return confirm('Are you sure you want to remove the reference to the content item?');return false;
 
 no_article_selected=No article selected
+
+name=Name
+lock=Lock
+mime_type=Mime Type
+size=Size
