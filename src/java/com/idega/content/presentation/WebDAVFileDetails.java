@@ -5,12 +5,16 @@ package com.idega.content.presentation;
 
 import java.util.Iterator;
 import java.util.List;
+
 import javax.faces.component.html.HtmlOutputLink;
+
 import org.apache.webdav.lib.WebdavResource;
+
 import com.idega.presentation.Table;
 import com.idega.presentation.text.DownloadLink;
 import com.idega.slide.util.VersionHelper;
 import com.idega.slide.util.WebdavResourceVersion;
+import com.idega.util.IWTimestamp;
 import com.idega.util.Timer;
 import com.idega.webface.WFUtil;
 
@@ -35,8 +39,40 @@ public class WebDAVFileDetails extends ContentBlock {
 			link.setId(getId() + "_dl");
 			link.getChildren().add(WFUtil.getText("Download/View"));
 			++row;
-			table.add(WFUtil.getText(resourceName), 1, row);
+			table.add(WFUtil.getText("Document name"), 1, row);
+			table.add(WFUtil.getText(resourceName), 2, row);
+			
+			++row;
 			table.add(link, 2, row);
+			
+			++row;
+			table.add(WFUtil.getText("Size"), 1, row);
+			table.add(WFUtil.getText(Long.toString(resource.getGetContentLength())), 2, row);
+
+			++row;
+			table.add(WFUtil.getText("Content type"), 1, row);
+			table.add(WFUtil.getText(resource.getGetContentType()), 2, row);
+
+			++row;
+			table.add(WFUtil.getText("Creation date"), 1, row);
+			table.add(WFUtil.getText(new IWTimestamp(resource.getCreationDate()).toString()), 2, row);
+			
+			++row;
+			table.add(WFUtil.getText("Modification date"), 1, row);
+			table.add(WFUtil.getText(new IWTimestamp(resource.getGetLastModified()).toString()), 2, row);
+
+//			++row;
+//			table.add(WFUtil.getText("Http URL"), 1, row);
+//			table.add(WFUtil.getText(resource.getHttpURL().toString()), 2, row);
+			
+			++row;
+			table.add(WFUtil.getText("Owner"), 1, row);
+			table.add(WFUtil.getText(resource.getOwner()), 2, row);
+
+			++row;
+			table.add(WFUtil.getText("Etag"), 1, row);
+			table.add(WFUtil.getText(resource.getGetEtag()), 2, row);
+			
 			Timer timer = new Timer();
 			timer.start();
 			
