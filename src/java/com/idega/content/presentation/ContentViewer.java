@@ -8,7 +8,9 @@ import javax.faces.el.ValueBinding;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 
+import com.idega.idegaweb.IWBundle;
 import com.idega.webface.WFBlock;
+import com.idega.webface.WFTitlebar;
 import com.idega.webface.WFToolbar;
 import com.idega.webface.WFToolbarButton;
 import com.idega.webface.WFUtil;
@@ -39,6 +41,12 @@ public class ContentViewer extends WFBlock {
 	}
 	
 	public void initializeContent() {
+
+		WFTitlebar tb = new WFTitlebar();
+		tb.setValueRefTitle(true);
+		tb.setTitleText("WebDAVListBean.webDAVPath");
+//		tb.getChildren().add(title);
+		this.setTitlebar(tb);
 		renderWebDAVList = new Boolean(true);
 		renderWebDAVFileDetails = new Boolean(false);
 		
@@ -71,6 +79,10 @@ public class ContentViewer extends WFBlock {
 //		getChildren().add(details);
 	}
 	
+	protected IWBundle getBundle() {
+		return ContentBlock.getBundle();
+	}
+	
 	public Boolean getRenderWebDAVList() {
     if (renderWebDAVList != null) return renderWebDAVList;
     ValueBinding vb = getValueBinding("renderWebDAVList");
@@ -94,7 +106,6 @@ public class ContentViewer extends WFBlock {
 	}
 	
 	public void encodeBegin(FacesContext context) throws IOException {
-		WFUtil.createValueBinding("#{WebDAVListBean.isClickedFile}");
 		Boolean fileSelected = (Boolean) WFUtil.invoke("WebDAVListBean", "getIsClickedFile");
 		
 		if (LIST.equals(currentAction)) {
@@ -148,36 +159,31 @@ public class ContentViewer extends WFBlock {
 	public WFToolbar getToolbar() {
 		WFToolbar bar = new WFToolbar();
 		
-		WFToolbarButton list = new WFToolbarButton("list.jpg");
+		WFToolbarButton list = new WFToolbarButton("images/list.jpg", getBundle());
 		list.getAttributes().put(PARAMETER_ACTION, LIST);
 		list.setId(getId()+"_btnList");
 		list.setToolTip("Document List");
 		list.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
-//		list.setValueBinding("rendered", WFUtil.createValueBinding("#{contentviewerbean.renderListLink}"));
 		list.setRendered(renderListLink);
 
-		WFToolbarButton details = new WFToolbarButton("details.jpg");
+		WFToolbarButton details = new WFToolbarButton("images/details.jpg", getBundle());
 		details.getAttributes().put(PARAMETER_ACTION, FILE_DETAILS);
 		details.setId(getId()+"_btnDetails");
 		details.setToolTip("Document Details");
 		details.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
-//		details.setValueBinding("rendered", WFUtil.createValueBinding("#{contentviewerbean.renderDetailsLink}"));
 		details.setRendered(renderDetailsLink);
 
-		WFToolbarButton preview = new WFToolbarButton("preview.jpg");
+		WFToolbarButton preview = new WFToolbarButton("images/preview.jpg", getBundle());
 		preview.getAttributes().put(PARAMETER_ACTION, PREVIEW);
 		preview.setId(getId()+"_btnPreview");
 		preview.setToolTip("Document Preview");
 		preview.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
-//		preview.setValueBinding("rendered", WFUtil.createValueBinding("#{contentviewerbean.renderPreviewLink}"));
 		preview.setRendered(renderPreviewLink);
 
 		bar.addButton(list);
 		bar.addButton(details);
 		bar.addButton(preview);
 
-//		super.setToolbar(bar);
-//		getChildren().add(bar);
 		return bar;
 	}
 
