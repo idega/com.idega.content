@@ -22,6 +22,7 @@ import com.idega.core.file.business.FileIconSupplier;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
+import com.idega.slide.util.VersionHelper;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.FileUtil;
 
@@ -95,7 +96,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
 			setMime(resource.getGetContentType());
 			setCreationDate(resource.getCreationDate());
 			setWebDavHttpURL(resource.getPath());
-			setVersion(resource.getVersionName());
+			setVersion(VersionHelper.getLatestVersion(resource));
 			setIsLocked(resource.isLocked());
 			setCheckedOutString(resource.getCheckedOut());
 			setComment(resource.getComment());
