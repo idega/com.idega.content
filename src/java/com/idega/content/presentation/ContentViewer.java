@@ -18,8 +18,10 @@ import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.WebDAVFilePermissionResource;
 import com.idega.idegaweb.IWUserContext;
+import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
+import com.idega.slide.util.IWSlideConstants;
 import com.idega.webface.WFBlock;
 import com.idega.webface.WFTitlebar;
 import com.idega.webface.WFToolbar;
@@ -284,6 +286,46 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 
 	}
 	
+	public boolean doRenderPermissionLink(){
+		if(renderPermissionsLink){
+			try {
+				IWContext iwc = IWContext.getInstance();
+				IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+				return session.hasPermission(getCurrentResourcePath(),IWSlideConstants.PRIVILEGE_READ_ACL);
+			}
+			catch (IBOLookupException e) {
+				e.printStackTrace();
+			}
+			catch (UnavailableIWContext e) {
+				e.printStackTrace();
+			}
+			catch (RemoteException e) {
+				e.printStackTrace();
+			}        		
+		}
+		return false;
+	}
+	
+	public boolean doRenderUploadeComponent(){
+		if(renderWebDAVUploadeComponent){
+			try {
+				IWContext iwc = IWContext.getInstance();
+				IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+				return session.hasPermission(getCurrentResourcePath(),IWSlideConstants.PRIVILEGE_WRITE);
+			}
+			catch (IBOLookupException e) {
+				e.printStackTrace();
+			}
+			catch (UnavailableIWContext e) {
+				e.printStackTrace();
+			}
+			catch (RemoteException e) {
+				e.printStackTrace();
+			}        		
+		}
+		return false;
+	}
+	
 	
 	
 	public void encodeBegin(FacesContext context) throws IOException {
@@ -448,7 +490,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		
 		UIComponent upload = getFacet(ACTION_UPLOAD);
 		if (upload != null) {
-			upload.setRendered(renderWebDAVUploadeComponent);
+			upload.setRendered(doRenderUploadeComponent());
 			renderChild(context, upload);
 		}
 	}
@@ -503,7 +545,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 //		permissions.setToolTip("Permissions");
 		permissions.setToolTip(getBundle().getLocalizedString("permissions"));
 		permissions.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
-		permissions.setRendered(renderPermissionsLink);
+		permissions.setRendered(doRenderPermissionLink());
 		
 		bar.addButton(newFolder);
 		bar.addButton(list);
@@ -577,6 +619,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			renderWebDAVNewFolder = false;
 			renderWebDAVFilePermissions = false;
 			renderWebDAVDeleter = false;
+			renderWebDAVUploadeComponent = true;
 			WFUtil.invoke("WebDAVListBean","setClickedFilePath", null, String.class);
 			
 		} else if (ACTION_FILE_DETAILS.equals(action)) {
@@ -586,6 +629,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			renderWebDAVNewFolder = false;
 			renderWebDAVFilePermissions = false;
 			renderWebDAVDeleter = false;
+			renderWebDAVUploadeComponent = true;
 		} else if (ACTION_PREVIEW.equals(action)) {
 			renderWebDAVList = false;
 			renderWebDAVFileDetails = false;
@@ -593,18 +637,21 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			renderWebDAVNewFolder = false;
 			renderWebDAVFilePermissions = false;
 			renderWebDAVDeleter = false;
+			renderWebDAVUploadeComponent = true;
 		}else if (ACTION_NEW_FOLDER.equals(action)) {
 			renderWebDAVList = true;
 			renderWebDAVFileDetails = false;
 			renderWebDAVFilePreview = false;
 			renderWebDAVNewFolder = true;
 			renderWebDAVFilePermissions = false;
+			renderWebDAVUploadeComponent = true;
 		} else if (ACTION_PERMISSIONS.equals(action)) {
 			renderWebDAVList = false;
 			renderWebDAVFileDetails = false;
 			renderWebDAVFilePreview = false;
 			renderWebDAVNewFolder = false;
 			renderWebDAVFilePermissions = true;
+			renderWebDAVUploadeComponent = false;
 		}else if (ACTION_DELETE.equals(action)) {
 			renderWebDAVList = true;
 			renderWebDAVFileDetails = false;
@@ -612,6 +659,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			renderWebDAVNewFolder = false;
 			renderWebDAVFilePermissions = false;
 			renderWebDAVDeleter = true;
+			renderWebDAVUploadeComponent = true;
 		}
 	}
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissionsManagedBean.java,v 1.4 2005/01/18 17:44:31 gummi Exp $ Created
+ * $Id: WebDAVFilePermissionsManagedBean.java,v 1.5 2005/03/10 14:36:59 gummi Exp $ Created
  * on 29.12.2004
  * 
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -22,21 +22,24 @@ import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.business.WebDAVFilePermissionResource;
+import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWContext;
+import com.idega.slide.business.IWSlideSession;
+import com.idega.slide.util.IWSlideConstants;
 import com.idega.webface.bean.AbstractWFEditableListManagedBean;
 import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
  * 
- * Last modified: $Date: 2005/01/18 17:44:31 $ by $Author: gummi $
+ * Last modified: $Date: 2005/03/10 14:36:59 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListManagedBean {
 
-	protected String[] localizationKey = new String[] { "principal_name", "privileges_all", "privileges_Read",
-			"privileges_write" };
+	protected String[] localizationKey = new String[] { "principal_name", "privileges_all", "privileges_read",
+			"privileges_write", "privileges_read_acl", "privileges_write_acl" };
 
 	
 	private int _resourceType = -1;
@@ -184,7 +187,7 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getNumberOfColumns()
 	 */
 	public int getNumberOfColumns() {
-		return 4;
+		return 6;
 	}
 
 
@@ -214,6 +217,24 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 	 */
 	public UIComponent getHeader(int columnIndex) {
 		return ContentBlock.getBundle().getLocalizedText(localizationKey[columnIndex]);
+	}
+	
+	public boolean isAllowedToWriteACL(){
+		try {
+			IWContext iwc = IWContext.getInstance();
+			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+			return session.hasPermission(_resourcePath,IWSlideConstants.PRIVILEGE_WRITE_ACL);
+		}
+		catch (IBOLookupException e) {
+			e.printStackTrace();
+		}
+		catch (UnavailableIWContext e) {
+			e.printStackTrace();
+		}
+		catch (RemoteException e) {
+			e.printStackTrace();
+		}   
+		return false;
 	}
 	
 }

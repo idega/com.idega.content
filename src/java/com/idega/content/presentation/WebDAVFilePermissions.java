@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissions.java,v 1.5 2005/01/25 14:25:59 joakim Exp $
+ * $Id: WebDAVFilePermissions.java,v 1.6 2005/03/10 14:36:59 gummi Exp $
  * Created on 29.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -19,10 +19,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/01/25 14:25:59 $ by $Author: joakim $
+ *  Last modified: $Date: 2005/03/10 14:36:59 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class WebDAVFilePermissions extends ContentBlock {
 
@@ -73,6 +73,7 @@ public class WebDAVFilePermissions extends ContentBlock {
 		button.setId("save_permissions");
 		getBundle().getLocalizedUIComponent("save", button);
 		button.setAction(WFUtil.createMethodBinding("#{"+BEANID_SHARED_MATRIX_BEAN+".saveACL}", new Class[0]));
+		WFUtil.setValueBinding(button,"rendered",BEANID_SHARED_MATRIX_BEAN+".allowedToWriteACL");
 		
 		getChildren().add(refreshButton);
 		getChildren().add(button);
