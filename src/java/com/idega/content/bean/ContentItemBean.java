@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.6 2005/03/07 16:04:44 gummi Exp $
+ * $Id: ContentItemBean.java,v 1.7 2005/04/08 17:17:39 gummi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -49,10 +49,10 @@ import com.idega.webface.WFUtil;
 /**
  * Bean for idegaWeb content items.   
  * <p>
- * Last modified: $Date: 2005/03/07 16:04:44 $ by $Author: gummi $
+ * Last modified: $Date: 2005/04/08 17:17:39 $ by $Author: gummi $
  *
  * @author Anders Lindman
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 
 public abstract class ContentItemBean implements Serializable, ICFile, ContentItem {
@@ -497,6 +497,7 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 			
 			//here I don't use the varible 'path' since it can actually be the URI
 			setResourcePath(webdavResource.getPath());
+			setName(webdavResource.getDisplayName());
 			
 			setVersionName(webdavResource.getVersionName());
 			

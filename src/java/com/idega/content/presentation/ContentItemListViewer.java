@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.5 2005/03/08 18:33:12 gummi Exp $
+ * $Id: ContentItemListViewer.java,v 1.6 2005/04/08 17:17:39 gummi Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -24,10 +24,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/08 18:33:12 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/04/08 17:17:39 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class ContentItemListViewer extends UIData {
 
@@ -76,17 +76,25 @@ public class ContentItemListViewer extends UIData {
 		notifyManagedBeanOfVariableValues();
 	}
 	
+	protected String[] getToolbarActions(){
+		return new String[] {"create"};
+	}
+	
 	protected void initializeInEncodeBegin(){
 		ContentItemViewer viewer = (ContentItemViewer)WFUtil.invoke(this.managedBeanId,"getContentViewer");
 		viewer.setShowRequestedItem(false);
 		addContentItemViewer(viewer);
 		
-		
-		ContentItemToolbar toolbar = new ContentItemToolbar();
-		toolbar.addToolbarButton("create");
-		toolbar.setResourcePath(getResourcePath());
-		toolbar.setActionHandlerIdentifier((String)WFUtil.invoke(this.managedBeanId,"getIWActionURIHandlerIdentifier"));
-		this.setHeader(toolbar);
+		String[] actions = getToolbarActions();
+		if(actions != null && actions.length > 0){
+			ContentItemToolbar toolbar = new ContentItemToolbar();
+			for (int i = 0; i < actions.length; i++) {
+				toolbar.addToolbarButton(actions[i]);
+			}
+			toolbar.setResourcePath(getResourcePath());
+			toolbar.setActionHandlerIdentifier((String)WFUtil.invoke(this.managedBeanId,"getIWActionURIHandlerIdentifier"));
+			this.setHeader(toolbar);
+		}
 		
 		List attachementViewers = (List)WFUtil.invoke(this.managedBeanId,"getAttachmentViewers");
 		if(attachementViewers!=null){

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.6 2005/03/05 18:45:56 gummi Exp $
+ * $Id: ContentItemViewer.java,v 1.7 2005/04/08 17:17:39 gummi Exp $
  * Created on 26.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -18,6 +18,7 @@ import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
 import javax.faces.component.UIParameter;
+import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
@@ -31,10 +32,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/05 18:45:56 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/04/08 17:17:39 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class ContentItemViewer extends WFContainer {
 	
@@ -196,11 +197,19 @@ public class ContentItemViewer extends WFContainer {
 	protected void initializeToolbar() {
 		ContentItem item = getContentItem();
 		if(item!=null){
-			ContentItemToolbar toolbar = new ContentItemToolbar();
-			toolbar.setToolbarActions(item.getToolbarActions());
-			this.setToolbar(toolbar);		
+			String[] actions = item.getToolbarActions();
+			if(actions != null && actions.length > 0){
+				ContentItemToolbar toolbar = new ContentItemToolbar();
+				toolbar.setToolbarActions(actions);
+				this.setToolbar(toolbar);		
+			}
 		}
 	}
+	
+	protected String getBindingAttribute(String fieldName){
+		return "value";
+	}
+	
 
 	/**
 	 * 
@@ -212,13 +221,32 @@ public class ContentItemViewer extends WFContainer {
 		div.setSuffixClass(getSuffixStyleClass());
 		UIComponent output = createFieldComponent(fieldName);
 		ValueBinding binding = getValueBinding(fieldName);
+		String bindingAttribute = getBindingAttribute(fieldName);
 		if(binding != null){
-			output.setValueBinding("value",binding);
+			output.setValueBinding(bindingAttribute,binding);
 		} else {
-			if(output instanceof UIOutput) {
-				((UIOutput)output).setValue(getValue(fieldName));
-			} else if(output instanceof UICommand){
-				((UICommand)output).setValue(getValue(fieldName));
+			boolean invoked = false;
+			if("value".equals(bindingAttribute)){
+				if(output instanceof UIOutput) {
+					((UIOutput)output).setValue(getValue(fieldName));
+					invoked = true;
+				} else if(output instanceof UICommand){
+					((UICommand)output).setValue(getValue(fieldName));
+					invoked = true;
+				} else if(output instanceof HtmlGraphicImage) {
+					((HtmlGraphicImage)output).setValue(getValue(fieldName));
+					invoked = true;
+				}
+			} else if("url".equals(bindingAttribute)){
+				if(output instanceof HtmlGraphicImage) {
+					((HtmlGraphicImage)output).setUrl((String)getValue(fieldName));
+					invoked = true;
+				}
+			}
+
+			if(!invoked){
+				//TODO use reflection
+				throw new UnsupportedOperationException("Not implemented yet");
 			}
 			componentHasBeenUpdatedWithNewValue(fieldName);
 		}
@@ -378,15 +406,37 @@ public class ContentItemViewer extends WFContainer {
 			if(component != null){
 				if(component instanceof ContentItemFieldViewer){
 					UIComponent value = ((ContentItemFieldViewer)component).getMainComponent();
-					if(value instanceof UIOutput){
-						((UIOutput)value).setValue(getValue(fieldName));
-					} else if(value instanceof UICommand){
-						((UICommand)value).setValue(getValue(fieldName));
+					String bindingAttribute = getBindingAttribute(fieldName);
+					boolean invoked = false;
+					if("value".equals(bindingAttribute)){
+						if(value instanceof UIOutput){
+							((UIOutput)value).setValue(getValue(fieldName));
+							invoked=true;
+						} else if(value instanceof UICommand){
+							((UICommand)value).setValue(getValue(fieldName));
+							invoked=true;
+						} else if(value instanceof HtmlGraphicImage) {
+							((HtmlGraphicImage)value).setValue(getValue(fieldName));
+							invoked = true;
+						}
+					} else if("url".equals(bindingAttribute)){
+						if(value instanceof HtmlGraphicImage) {
+							((HtmlGraphicImage)value).setUrl((String)getValue(fieldName));
+							invoked = true;
+						}
+					}
+
+					if(!invoked){
+						//TODO use reflection
+						throw new UnsupportedOperationException("Not implemented yet");
 					}
 				} else if(component instanceof UIOutput){
 					((UIOutput)component).setValue(getValue(fieldName));
 				} else  if(component instanceof UICommand){
 					((UICommand)component).setValue(getValue(fieldName));
+				} else {
+					//TODO Use reflection and getBindingAttribute(fieldName)
+					throw new UnsupportedOperationException("Not implemented yet");
 				}
 			}
 		}
