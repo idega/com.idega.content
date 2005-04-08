@@ -1,5 +1,5 @@
 /*
- * $Id: ACEBean.java,v 1.4 2005/03/10 14:38:43 gummi Exp $
+ * $Id: ACEBean.java,v 1.5 2005/04/08 17:11:54 gummi Exp $
  * Created on 3.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -14,10 +14,16 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+import javax.ejb.FinderException;
 import javax.faces.model.SelectItem;
 import org.apache.webdav.lib.Privilege;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.presentation.ContentBlock;
+import com.idega.core.accesscontrol.data.ICRole;
+import com.idega.core.accesscontrol.data.ICRoleHome;
+import com.idega.data.IDOLookup;
+import com.idega.data.IDOLookupException;
+import com.idega.idegaweb.block.presentation.Builderaware;
 import com.idega.presentation.IWContext;
 import com.idega.slide.util.AccessControlEntry;
 import com.idega.slide.util.IWSlideConstants;
@@ -26,10 +32,10 @@ import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/10 14:38:43 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/04/08 17:11:54 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ACEBean implements WFEditableListDataBean {
 
@@ -252,6 +258,30 @@ public class ACEBean implements WFEditableListDataBean {
 		switch (principalType) {
 			case AccessControlEntry.PRINCIPAL_TYPE_STANDARD:
 				return ContentUtil.getBundle().getLocalizedString("principal."+principal,locale);
+			case AccessControlEntry.PRINCIPAL_TYPE_ROLE:
+				String principal = getPrincipalName();
+				String roleKey = principal;
+				int lastIndexOfSlash = principal.lastIndexOf('/');
+				if(lastIndexOfSlash > -1){
+					roleKey = principal.substring(lastIndexOfSlash+1);
+				}
+				String roleName = roleKey;
+				
+				try {
+					ICRole role = (ICRole)((ICRoleHome)IDOLookup.getHome(ICRole.class)).findByPrimaryKey(roleName);
+					IWContext iwc = IWContext.getInstance();
+					roleName = iwc.getIWMainApplication().getBundle(Builderaware.IW_CORE_BUNDLE_IDENTIFIER).getLocalizedString(role.getRoleNameLocalizableKey(),roleName);
+				}
+				catch (IDOLookupException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				catch (FinderException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				return roleName;
 			default:
 				break;
 		}
