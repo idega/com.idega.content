@@ -357,6 +357,15 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			namePreviewLink.setValueBinding("title", ContentViewer.getBundle().getValueBinding("preview"));
 
 			
+			HtmlOutputLink permissionLink = new HtmlOutputLink();
+			permissionLink.setId(P_ID+"_per");
+			permissionLink.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".permissionActionURI}"));
+			permissionLink.setStyleClass("content_viewer_file_permissions");
+			permissionLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".renderPermissionLink}"));
+			permissionLink.setValueBinding("alt", ContentViewer.getBundle().getValueBinding("permissions"));
+			permissionLink.setValueBinding("title", ContentViewer.getBundle().getValueBinding("permissions"));
+			
+			
 			col.getChildren().add(nameLink);
 			col.getChildren().add(nameFolderLink);
 			
@@ -365,6 +374,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			emptyText.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isCollection}"));
 			col2.getChildren().add(namePreviewLink);
 			col2.getChildren().add(nameDetailsLink);
+			col2.getChildren().add(permissionLink);
 			col2.getChildren().add(emptyText);
 
 			columns.add(col);

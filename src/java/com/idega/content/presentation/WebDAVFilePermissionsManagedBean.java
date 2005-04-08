@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissionsManagedBean.java,v 1.5 2005/03/10 14:36:59 gummi Exp $ Created
+ * $Id: WebDAVFilePermissionsManagedBean.java,v 1.6 2005/04/08 17:16:01 gummi Exp $ Created
  * on 29.12.2004
  * 
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -24,6 +24,7 @@ import com.idega.content.business.ContentUtil;
 import com.idega.content.business.WebDAVFilePermissionResource;
 import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWContext;
+import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.IWSlideConstants;
 import com.idega.webface.bean.AbstractWFEditableListManagedBean;
@@ -31,10 +32,10 @@ import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
  * 
- * Last modified: $Date: 2005/03/10 14:36:59 $ by $Author: gummi $
+ * Last modified: $Date: 2005/04/08 17:16:01 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListManagedBean {
 
@@ -68,7 +69,18 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 	}
 	
 	public void setResourcePath(String path){
+		IWContext iwc = IWContext.getInstance();
 		_resourcePath = path;
+		try {
+			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+			_resourcePath = service.getPath(path);
+		}
+		catch (IBOLookupException e) {
+			e.printStackTrace();
+		}
+		catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/*

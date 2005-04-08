@@ -1,5 +1,5 @@
 /*
- * $Id: ContentIWActionURIHandler.java,v 1.2 2005/03/08 18:29:41 gummi Exp $
+ * $Id: ContentIWActionURIHandler.java,v 1.3 2005/04/08 17:16:01 gummi Exp $
  * Created on Jan 31, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -19,11 +19,11 @@ import com.idega.core.uri.IWActionURIHandler;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/08 18:29:41 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/04/08 17:16:01 $ by $Author: gummi $
  * 
  * An IWActionURIHandler handler that handles uri's to documents (webdav)
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ContentIWActionURIHandler extends DefaultIWActionURIHandler implements IWActionURIHandler {
 
@@ -42,7 +42,7 @@ public class ContentIWActionURIHandler extends DefaultIWActionURIHandler impleme
 			return true;
 		}
 		//Todo get webservleturi
-		return uri.toString().indexOf("/content/files/")>=0;
+		return uri.toString().indexOf("/content/")>=0;
 	}
 	
 	public String getHandlerIdentifier(){
@@ -53,7 +53,16 @@ public class ContentIWActionURIHandler extends DefaultIWActionURIHandler impleme
 	 * @see com.idega.core.uri.IWActionURIHandler#getRedirectURI(com.idega.core.uri.IWActionURI)
 	 */
 	public String getRedirectURI(IWActionURI uri) {
-		String redirectURI = uri.getContextURI()+"workspace/content/documents/"+uri.getActionPart()+"/?"+ContentViewer.PARAMETER_ACTION+"="+ContentViewer.ACTION_PREVIEW+"&"+ContentViewer.PARAMETER_CONTENT_RESOURCE+"="+uri.getPathPart();
+		
+		String actionPart = uri.getActionPart();
+		String actionParam = ContentViewer.ACTION_LIST;
+		if("preview".equals(actionPart)){
+			actionParam = ContentViewer.ACTION_PREVIEW;
+		} else if("permission".equals(actionPart)){
+			actionParam = ContentViewer.ACTION_PERMISSIONS;
+		} 
+		
+		String redirectURI = uri.getContextURI()+"workspace/content/documents/"+actionPart+"/?"+ContentViewer.PARAMETER_ACTION+"="+actionParam+"&"+ContentViewer.PARAMETER_CONTENT_RESOURCE+"="+uri.getPathPart();
 		return redirectURI;
 	}
 }

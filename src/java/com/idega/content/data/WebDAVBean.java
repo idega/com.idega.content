@@ -9,6 +9,7 @@ package com.idega.content.data;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -17,12 +18,15 @@ import java.util.Vector;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.WebdavResources;
 import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.file.business.FileIconSupplier;
 import com.idega.core.uri.IWActionURIManager;
 import com.idega.idegaweb.IWApplicationContext;
+import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
+import com.idega.slide.util.IWSlideConstants;
 import com.idega.slide.util.VersionHelper;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.FileUtil;
@@ -76,6 +80,8 @@ public class WebDAVBean extends Object implements ICTreeNode {
     
     private static int idCounter = 1;
 	private String previewActionURI;
+	private String permissionActionURI;
+	private boolean renderPermissionLink = true;
 
 	/**
 	 * @return Returns the isCheckedOut.
@@ -112,6 +118,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
 			
 			//action uri for preview
 			setPreviewActionURI(IWActionURIManager.getInstance().getActionURIPrefixWithContext("preview",getEncodedURL()));
+			setPermissionActionURI(IWActionURIManager.getInstance().getActionURIPrefixWithContext("permission",getEncodedURL()));
     }
         
 	public int getId() {
@@ -167,6 +174,40 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	    	previewActionURI = value;
 	    	propertySupport.firePropertyChange(PROP_ENCODED_URL, old, previewActionURI);
     }
+    
+    public String getPermissionActionURI() {
+			return permissionActionURI;
+	}
+	
+	public void setPermissionActionURI(String value) {
+	    	String old = permissionActionURI;
+	    	permissionActionURI = value;
+	    	propertySupport.firePropertyChange(PROP_ENCODED_URL, old, permissionActionURI);
+	}
+	
+	public boolean getRenderPermissionLink(){
+		if(getIsFile() && renderPermissionLink){
+			try {
+				IWContext iwc = IWContext.getInstance();
+				IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+				return session.hasPermission(getEncodedURL(),IWSlideConstants.PRIVILEGE_READ_ACL);
+			}
+			catch (IBOLookupException e) {
+				e.printStackTrace();
+			}
+			catch (UnavailableIWContext e) {
+				e.printStackTrace();
+			}
+			catch (RemoteException e) {
+				e.printStackTrace();
+			}        		
+		}
+		return false;
+	}
+	
+	public void setRenderPermissionLink(boolean value){
+		renderPermissionLink = value;
+	}
     
     public String getModifiedDate() {
         return modifiedDate;
