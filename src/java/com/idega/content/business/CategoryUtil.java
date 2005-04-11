@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryUtil.java,v 1.2 2005/03/18 16:10:57 joakim Exp $
+ * $Id: CategoryUtil.java,v 1.3 2005/04/11 16:19:28 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -27,13 +27,16 @@ import com.idega.slide.util.WebdavRootResource;
 /**
  * <p>Utility functions for category. 
  * functions for getting and setting all the available categories</p>
- *  Last modified: $Date: 2005/03/18 16:10:57 $ by $Author: joakim $
+ *  Last modified: $Date: 2005/04/11 16:19:28 $ by $Author: joakim $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class CategoryUtil {
-	private static final String CATEORY_FILE_PATH = "categories.properties";
+	private static final String CATEORY_FIX_PREFIX = "/cms/content";
+	private static final String CATEORY_CONFIG_PATH = "/files/cms/";
+//	private static final String CATEORY_CONFIG_FILE = CATEORY_CONFIG_PATH+"categories.properties";
+	private static final String CATEORY_CONFIG_FILE = CATEORY_CONFIG_PATH+"cat.prp";
 	
 	/**
 	 * <p> Get a collection of categories </p>
@@ -64,7 +67,7 @@ public class CategoryUtil {
 //			String filePath = service.getURI(CATEORY_FILE_PATH);
 //			System.out.println("Loading categories for "+filePath);
 			//TODO have to fix the path
-			categories = rootResource.getMethodDataAsString(CATEORY_FILE_PATH);
+			categories = rootResource.getMethodDataAsString(CATEORY_FIX_PREFIX+CATEORY_CONFIG_FILE);
 		}
 		catch (IBOLookupException e) {
 			e.printStackTrace();
@@ -111,7 +114,16 @@ public class CategoryUtil {
 			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
 
 			WebdavRootResource rootResource = session.getWebdavRootResource();
-			rootResource.putMethod(CATEORY_FILE_PATH, categories);
+			//TODO make sure that the folder exists
+			boolean hadToCreate = session.createAllFoldersInPath(CATEORY_FIX_PREFIX + CATEORY_CONFIG_PATH);
+			System.out.println("Had to create folder "+hadToCreate);
+			System.out.println("Storing categories "+categories+" to file "+CATEORY_CONFIG_FILE);
+			boolean putOK = rootResource.putMethod(CATEORY_CONFIG_FILE, categories);
+			System.out.println("Put to "+CATEORY_CONFIG_FILE+" was "+putOK);
+			if(!putOK) {
+				putOK = rootResource.putMethod(CATEORY_FIX_PREFIX + CATEORY_CONFIG_FILE, categories);
+				System.out.println("Put to "+CATEORY_FIX_PREFIX + CATEORY_CONFIG_FILE+" was "+putOK);
+			}
 //			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 //			String filePath = service.getURI(CATEORY_FILE_PATH);
 //			WebdavResource webdavResource = new WebdavResource(filePath);
@@ -139,11 +151,14 @@ public class CategoryUtil {
 		if(getCategories().contains(category)) {
 			return;
 		}
-		StringBuffer sb = new StringBuffer(getCategoriesAsString());
+		StringBuffer sb = new StringBuffer(
+				getCategoriesAsString()
+				);
 		if(sb.length()>0) {
 			sb.append(",");
 		}
 		sb.append(category);
+		System.out.println("New category string to store:"+sb.toString()+"  New category:"+category);
 		storeCategories(sb.toString());
 	}
 
