@@ -78,7 +78,24 @@ public class WebDAVUploadBean{
 			String filePath = service.getWebdavServerURI()+getUploadFilePath();
 			String uploadName = uploadFile.getName();
 			
+			//FIXME THIS IS A BUG IN THE MYFACES UPLOADER I THINK
+			//The problem is that in IE 6 the filename actually contains the full file path!
+			//example I'm uploading test.txt from c:\myfolder\test.txt to the folder /files/public
+			//then the variable filePath+fileName = /files/public/C:/myfolder/test.txt
+			//workaround
+			int lastBloodySlash = uploadName.lastIndexOf("\\");
+			if(lastBloodySlash>-1){
+				uploadName = uploadName.substring(lastBloodySlash+1);
+			}
+			
+			lastBloodySlash = uploadName.lastIndexOf("/");
+			if(lastBloodySlash>-1){
+				uploadName = uploadName.substring(lastBloodySlash+1);
+			}	
+			//workaround ends
+			
 			String fileName = uploadName;
+			
 			if(!"".equals(name)){
 				fileName = name;
 				int lastDot = uploadName.lastIndexOf(".");
