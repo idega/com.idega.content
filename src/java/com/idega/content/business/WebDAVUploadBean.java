@@ -15,7 +15,7 @@ import com.idega.slide.util.WebdavRootResource;
 import com.idega.webface.WFUtil;
 
 public class WebDAVUploadBean{
-
+	
 	private static String DEFAULT_PATH = "/files/documents/";
 	private UploadedFile uploadFile;
 	private String name = "";
