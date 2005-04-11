@@ -631,12 +631,19 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			resource = (WebdavExtendedResource) enumer.nextElement();
 			if (!resource.getDisplayName().startsWith(".")) {
 				if (showFolders || (!showFolders && !resource.isCollection())) {
-					bean = new WebDAVBean(resource);
-					url = resource.getPath();
-					url = url.replaceFirst(webDAVServletURL, "");
-					bean.setWebDavHttpURL(url);
-					bean.setIconTheme(iconTheme);
-					v.add(bean);
+					try {
+						bean = new WebDAVBean(resource);
+						url = resource.getPath();
+						url = url.replaceFirst(webDAVServletURL, "");
+						bean.setWebDavHttpURL(url);
+						bean.setIconTheme(iconTheme);
+						v.add(bean);
+					}
+					catch (ClassCastException e) {
+						//cused by 403 Forbidden
+						//Should not stop the list from being shown
+						e.printStackTrace();
+					}
 				}
 			}
 		}

@@ -110,7 +110,22 @@ public class WebDAVBean extends Object implements ICTreeNode {
 			setMime(resource.getGetContentType());
 			setCreationDate(resource.getCreationDate());
 			setWebDavHttpURL(resource.getPath());
-			setVersion(VersionHelper.getLatestVersion(resource));
+			
+			try {
+				setVersion(VersionHelper.getLatestVersion(resource.getEncodedPath()));
+			}
+			catch (HttpException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			setIsLocked(resource.isLocked());
 			setCheckedOutString(resource.getCheckedOut());
 			setComment(resource.getComment());
