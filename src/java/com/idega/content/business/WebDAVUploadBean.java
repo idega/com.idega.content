@@ -87,11 +87,6 @@ public class WebDAVUploadBean{
 			if(lastBloodySlash>-1){
 				uploadName = uploadName.substring(lastBloodySlash+1);
 			}
-			
-			lastBloodySlash = uploadName.lastIndexOf("/");
-			if(lastBloodySlash>-1){
-				uploadName = uploadName.substring(lastBloodySlash+1);
-			}	
 			//workaround ends
 			
 			String fileName = uploadName;
