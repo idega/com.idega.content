@@ -109,8 +109,8 @@ public class WebDAVUploadBean{
 			}
 			
 		
-			boolean createFolderSuccess = rootResource.mkcolMethod(filePath);
-			System.out.println("Creating folder success "+createFolderSuccess);
+//			boolean createFolderSuccess = rootResource.mkcolMethod(filePath);
+//			System.out.println("Creating folder success "+createFolderSuccess);
 			
 			boolean uploadFileSuccess = false;
 			try {
