@@ -181,6 +181,12 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 				++row;
 				table.mergeCells(1, row, 2, row);
 				table.add(metadataUI, 1, row);
+
+				//Categories
+				WebDAVCategories categoriesUI = new WebDAVCategories(getCurrentResourcePath());
+				++row;
+				table.mergeCells(1, row, 2, row);
+				table.add(categoriesUI, 1, row);
 								
 				if (useVersionControl) {
 					//Then add the version table
