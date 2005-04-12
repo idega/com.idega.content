@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryUtil.java,v 1.3 2005/04/11 16:19:28 joakim Exp $
+ * $Id: CategoryUtil.java,v 1.4 2005/04/12 16:34:06 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -27,10 +27,10 @@ import com.idega.slide.util.WebdavRootResource;
 /**
  * <p>Utility functions for category. 
  * functions for getting and setting all the available categories</p>
- *  Last modified: $Date: 2005/04/11 16:19:28 $ by $Author: joakim $
+ *  Last modified: $Date: 2005/04/12 16:34:06 $ by $Author: joakim $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class CategoryUtil {
 	private static final String CATEORY_FIX_PREFIX = "/cms/content";
@@ -115,11 +115,12 @@ public class CategoryUtil {
 
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 			//TODO make sure that the folder exists
-			boolean hadToCreate = session.createAllFoldersInPath(CATEORY_FIX_PREFIX + CATEORY_CONFIG_PATH);
-			System.out.println("Had to create folder "+hadToCreate);
-			System.out.println("Storing categories "+categories+" to file "+CATEORY_CONFIG_FILE);
+			//boolean hadToCreate = 
+			session.createAllFoldersInPath(CATEORY_FIX_PREFIX + CATEORY_CONFIG_PATH);
+//			System.out.println("Had to create folder "+hadToCreate);
+//			System.out.println("Storing categories "+categories+" to file "+CATEORY_CONFIG_FILE);
 			boolean putOK = rootResource.putMethod(CATEORY_CONFIG_FILE, categories);
-			System.out.println("Put to "+CATEORY_CONFIG_FILE+" was "+putOK);
+//			System.out.println("Put to "+CATEORY_CONFIG_FILE+" was "+putOK);
 			if(!putOK) {
 				putOK = rootResource.putMethod(CATEORY_FIX_PREFIX + CATEORY_CONFIG_FILE, categories);
 				System.out.println("Put to "+CATEORY_FIX_PREFIX + CATEORY_CONFIG_FILE+" was "+putOK);
@@ -154,7 +155,7 @@ public class CategoryUtil {
 		StringBuffer sb = new StringBuffer(
 				getCategoriesAsString()
 				);
-		if(sb.length()>0) {
+		if(sb.length()>0 && !sb.toString().endsWith(",")) {
 			sb.append(",");
 		}
 		sb.append(category);

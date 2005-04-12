@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataListManagedBean.java,v 1.9 2005/03/17 17:33:30 joakim Exp $
+ * $Id: MetadataListManagedBean.java,v 1.10 2005/04/12 16:34:31 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -38,12 +38,12 @@ import com.idega.webface.bean.WFListBean;
 
 /**
  * 
- * Last modified: $Date: 2005/03/17 17:33:30 $ by $Author: joakim $
+ * Last modified: $Date: 2005/04/12 16:34:31 $ by $Author: joakim $
  * Displays all the metadata types and values for the specified resource
  * Typically followed by WebDavMetadata in presentation to enable addeing metadata
  *
  * @author Joakim Johnson
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class MetadataListManagedBean extends AbstractWFEditableListManagedBean implements WFListBean, ActionListener {
 
@@ -67,7 +67,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	 * Deleting metadata settings
 	 */
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
-		System.out.println("MetadataList action");
+//		System.out.println("MetadataList action");
 		UIComponent comp = actionEvent.getComponent();
 		String var = (String)comp.getAttributes().get("var");
 		resourcePath = (String)comp.getAttributes().get("resourcePath");
@@ -91,7 +91,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 			ret = resource.getMetadata(resourcePath);
 
 			for(int i=0; i<ret.length;i++) {
-				System.out.println("type="+ret[i].getType()+"  val="+ret[i].getValues());
+//				System.out.println("type="+ret[i].getType()+"  val="+ret[i].getValues());
 			}
 			resource.clear();
 			
