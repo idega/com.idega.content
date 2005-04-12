@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadata.java,v 1.11 2005/04/11 16:26:09 joakim Exp $
+ * $Id: WebDAVMetadata.java,v 1.12 2005/04/12 16:36:36 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -9,7 +9,6 @@
  */
 package com.idega.content.presentation;
 
-import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -48,12 +47,12 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2005/04/11 16:26:09 $ by $Author: joakim $
+ * Last modified: $Date: 2005/04/12 16:36:36 $ by $Author: joakim $
  * 
  * Display the UI for adding metadata type - values to a file.
  *
  * @author Joakim Johnson
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	
@@ -62,9 +61,10 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	private static final String DROPDOWN_ID = "dropdownID";
 	private static final String ADD_ID = "addID";
 	private static final String RESOURCE_PATH = "resourcePath";
-	private String resourcePath = "";
 	private static final String METADATA_LIST_BEAN = "MetadataList";
-	
+
+	private String resourcePath = "";
+
 	public WebDAVMetadata() {
 	}
 	
@@ -79,7 +79,7 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	protected void initializeContent() {
 		
 		if(resourcePath!=null){
-			System.out.println("Initialize. Setting resourcePath to "+resourcePath);
+//			System.out.println("Initialize. Setting resourcePath to "+resourcePath);
 			WFUtil.invoke(METADATA_LIST_BEAN, "setResourcePath", resourcePath);
 		} else {
 			System.err.println("[WARNING]["+getClass().getName()+"]: resource path can not be restored for managed beans");
@@ -90,7 +90,8 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 		add(ContentBlock.getBundle().getLocalizedText("metadata"));
 		WFList list = new WFList(METADATA_LIST_BEAN);
 		add(list);
-		add(getEditContainer());
+		add(getMetadataTable(resourcePath));
+//		add(getEditContainer());
 	}
 	
 	/**
@@ -212,10 +213,10 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 
 			//Store new settings
 			if(type.length()>0) {
-				System.out.println("Proppatch: filepath="+filePath+" type="+type+" value="+val);
+//				System.out.println("Proppatch: filepath="+filePath+" type="+type+" value="+val);
 				rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),val,true);
 				//Also set the metadata on the parent folder
-				rootResource.proppatchMethod(new File(filePath).getParent(),new PropertyName("DAV:",type),val,true);
+				rootResource.proppatchMethod(getParentWOContext(filePath),new PropertyName("DAV:",type),val,true);
 			}
 			
 			//Store changes to previously created metadata
@@ -226,10 +227,10 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 			for(int i=0; i<ret.length;i++) {
 				type=ret[i].getType();
 				val=ret[i].getMetadatavalues();
-				System.out.println("type="+type+"  val="+val);
+//				System.out.println("type="+type+"  val="+val);
 				rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),val,true);
 				//Also set the metadata on the parent folder
-				rootResource.proppatchMethod(new File(filePath).getParent(),new PropertyName("DAV:",type),val,true);
+				rootResource.proppatchMethod(getParentWOContext(filePath),new PropertyName("DAV:",type),val,true);
 			}
 			resource.clear();
 		} catch (HttpException ex) {
@@ -244,6 +245,19 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 			tmp = tmp.getParent();
 		}
 	}
+	
+	/**
+	 * TODO move to business logic and use same as for WebDavCategories
+	 */
+	private String getParentWOContext(String s) {
+		int begin = Math.max(s.indexOf("/",1),s.indexOf("\\",1));
+		int end = Math.max(s.lastIndexOf("/"),s.lastIndexOf("\\"));
+		if(begin>0) {
+			return s.substring(begin,end);
+		}
+		return s;
+	}
+
 	/**
 	 * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
 	 */
