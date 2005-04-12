@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.1 2005/04/11 16:24:14 joakim Exp $
+ * $Id: WebDAVCategories.java,v 1.2 2005/04/12 14:03:29 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -12,10 +12,8 @@ package com.idega.content.presentation;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlInputText;
@@ -32,7 +30,6 @@ import com.idega.business.IBOLookupException;
 import com.idega.content.bean.ManagedContentBeans;
 import com.idega.content.business.CategoryUtil;
 import com.idega.content.business.WebDAVMetadataResource;
-import com.idega.content.data.MetadataValueBean;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
@@ -45,24 +42,28 @@ import com.idega.webface.WFResourceUtil;
 
 /**
  * <p>
- * TODO Joakim Describe Type WebDAVCategories
+ * Presentation object for the categories.<br>
+ * Displays checkboxes for the categoriues that an article can belong to, so that a user can
+ * select them accordingly.<br>
+ * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2005/04/11 16:24:14 $ by $Author: joakim $
+ *  Last modified: $Date: 2005/04/12 14:03:29 $ by $Author: joakim $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
+	//Constants
 	private static final String ADD_ID = "addID";
 	private static final String SAVE_ID = "saveID";
 	private static final String ADD_CATEGORY_ID = "addCategoryID";
 	private static final String CATEGORIES_BLOCK_ID = "categoriesBlockID";
-	private static final String CATEGORY = "category_";
+	private static final String CATEGORY = "category_";		//Prefix for the id in the userinterface
+	private static final String RESOURCE_PATH = "resourcePath";	//key
 
-	private static final String RESOURCE_PATH = "resourcePath";
 	private String resourcePath = "";
 	
-	List categoryStatus = new ArrayList();
+//	List categoryStatus = new ArrayList();
 
 	public WebDAVCategories() {
 	}
@@ -81,13 +82,15 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	}
 
 	/**
-	 * @return
+	 * Creates the edit container
+	 * @return editContainer
 	 */
 	private UIComponent getEditContainer() {
 		WFContainer mainContainer = new WFContainer();
 		WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
 		mainContainer.add(localizer.getHeaderTextVB("categories"));
 		mainContainer.add(getCategoriesTable(resourcePath));
+
 		mainContainer.add(getAddCategoryContainer());
 
 		return mainContainer;
@@ -109,33 +112,36 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 			resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
 					iwc, WebDAVMetadataResource.class);
 			Collection selectedCategories = resource.getCategories(resourcePath);
-			Iterator iter = selectedCategories.iterator();
-			while(iter.hasNext()) {
-				String text = iter.next().toString();
+			Iterator selectedIter = selectedCategories.iterator();
+			while(selectedIter.hasNext()) {
+				String text = selectedIter.next().toString();
+				//Checkbox
 				HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
 				smc.setValue(new Boolean(true));
 				smc.setId(CATEGORY+text);
 				smc.getAttributes().put(RESOURCE_PATH,resourcePath);
 				categoriesTable.add(smc,count%3 + 1,count/3 + 1);
+				//Text
 				HtmlOutputText catText = new HtmlOutputText();
-//				System.out.println("Adding selected category "+text);
 				catText.setValue(text);
 				categoriesTable.add(catText,count%3 + 1,count/3 + 1);
 				count++;
 			}
+
 			//Display all the non-selected categories
 			Iterator nonSelectedIter = CategoryUtil.getCategories().iterator();
 			while(nonSelectedIter.hasNext()) {
 				Object nonSel = nonSelectedIter.next();
 				if(!selectedCategories.contains(nonSel)) {
 					String text = nonSel.toString();
+					//Checkbox
 					HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
 					smc.setValue(new Boolean(false));
 					smc.setId(CATEGORY+text);
 					smc.getAttributes().put(RESOURCE_PATH,resourcePath);
 					categoriesTable.add(smc,count%3 + 1,count/3 + 1);
+					//Text
 					HtmlOutputText catText = new HtmlOutputText();
-//					System.out.println("Adding non-selected category "+text);
 					catText.setValue(text);
 					categoriesTable.add(catText,count%3 + 1,count/3 + 1);
 					count++;
@@ -151,7 +157,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 			categoriesTable.setColumns(Math.min(count+1,3));
 			categoriesTable.setRows(count/3 + 2);
 			categoriesTable.setId(categoriesTable.getId() + "_ver");
-			categoriesTable.setRowStyleClass(1,"wf_listheading");
+//			categoriesTable.setRowStyleClass(1,"wf_listheading");
 			categoriesTable.setStyleClass("wf_listtable");
 		}
 		catch (IBOLookupException e) {
@@ -174,14 +180,15 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	private WFContainer getAddCategoryContainer() {
 		WFContainer container = new WFContainer();
 		WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
+		//Text
 		HtmlOutputText addText = localizer.getTextVB("new_category");
 		container.add(addText);
-		
+		//Input
 		HtmlInputText newCategoryInput = new HtmlInputText();
 		newCategoryInput.setSize(40);
 		newCategoryInput.setId(ADD_CATEGORY_ID);
 		container.add(newCategoryInput);
-
+		//Button
 		HtmlCommandButton addCategoryButton = localizer.getButtonVB(ADD_ID, "add", this);
 		container.add(addCategoryButton);
 
@@ -207,12 +214,13 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		}
 		if(id.equalsIgnoreCase(SAVE_ID)) {
 			//save the selection of categories to the article
-			Iterator iter = CategoryUtil.getCategories().iterator();
+			//Build together the categories string
 			StringBuffer categories = new StringBuffer();
+			Iterator iter = CategoryUtil.getCategories().iterator();
+			HtmlSelectBooleanCheckbox smc = null;
 			while(iter.hasNext()) {
 				String text = iter.next().toString();
-				HtmlSelectBooleanCheckbox smc = (HtmlSelectBooleanCheckbox)comp.getParent().findComponent(CATEGORY+text);
-				resourcePath = (String)smc.getAttributes().get(RESOURCE_PATH);
+				smc = (HtmlSelectBooleanCheckbox)comp.getParent().findComponent(CATEGORY+text);
 
 				boolean bool = ((Boolean)smc.getValue()).booleanValue();
 				System.out.println("Category "+text+" was set to "+bool);
@@ -220,75 +228,44 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 					categories.append(text).append(",");
 				}
 			}
-			IWContext iwc = IWContext.getInstance();
-			try {
-				IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-				IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
-				String filePath = service.getURI(resourcePath);
-				WebdavRootResource rootResource = session.getWebdavRootResource();
-
-				//Store new settings
-				if(categories.length()>0) {
-					System.out.println("Proppatch: filepath="+filePath+" categories value="+categories);
-					rootResource.proppatchMethod(filePath,new PropertyName("DAV:","categories"),categories.toString(),true);
-					//Also set the metadata on the parent folder
-					String parent = new File(filePath).getParent().substring(4);
-					rootResource.proppatchMethod(parent,new PropertyName("DAV:","categories"),categories.toString(),true);
+			if(smc!=null) {
+				//Store categories to file and folder
+				resourcePath = (String)smc.getAttributes().get(RESOURCE_PATH);
+				IWContext iwc = IWContext.getInstance();
+				try {
+					IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+					IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+					String filePath = service.getURI(resourcePath);
+					WebdavRootResource rootResource = session.getWebdavRootResource();
+	
+					//Store new settings
+					if(categories.length()>0) {
+						System.out.println("Proppatch: filepath="+filePath+" categories value="+categories);
+						rootResource.proppatchMethod(filePath,new PropertyName("DAV:","categories"),categories.toString(),true);
+						//Also set the metadata on the parent folder
+						String parent = new File(filePath).getParent().substring(4);
+						rootResource.proppatchMethod(parent,new PropertyName("DAV:","categories"),categories.toString(),true);
+					}
+					//Clear the cashed data so that it will be reloaded.
+					WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
+							iwc, WebDAVMetadataResource.class);
+					resource.clear();
 				}
-				WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
-						iwc, WebDAVMetadataResource.class);
-				resource.clear();
-			}
-			catch (RemoteException e) {
-				e.printStackTrace();
-			}
-			catch (HttpException e) {
-				e.printStackTrace();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
+				catch (RemoteException e) {
+					e.printStackTrace();
+				}
+				catch (HttpException e) {
+					e.printStackTrace();
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 
 			return;
 		}
-		String val = "";
-		String type = "";
-		MetadataValueBean[] ret = new MetadataValueBean[0];
-
-		try {
-			IWContext iwc = IWContext.getInstance();
-			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
-	
-			WebdavRootResource rootResource = session.getWebdavRootResource();
-			String filePath = service.getURI(resourcePath);
-
-			//Store changes to previously created metadata
-			WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
-					iwc, WebDAVMetadataResource.class);
-			ret = resource.getMetadata(resourcePath);
-
-			for(int i=0; i<ret.length;i++) {
-				type=ret[i].getType();
-				val=ret[i].getMetadatavalues();
-				System.out.println("type="+type+"  val="+val);
-				rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),val,true);
-				//Also set the metadata on the parent folder
-				rootResource.proppatchMethod(new File(filePath).getParent(),new PropertyName("DAV:",type),val,true);
-			}
-			resource.clear();
-		} catch (HttpException ex) {
-			ex.printStackTrace();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} catch (NullPointerException ex) {
-			ex.printStackTrace();
-		}
-		UIComponent tmp = comp.getParent();
-		while ( tmp != null) {
-			tmp = tmp.getParent();
-		}
 	}
+
 	/**
 	 * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
 	 */
@@ -310,4 +287,3 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		resourcePath = ((String) values[1]);
 	}
 }
-
