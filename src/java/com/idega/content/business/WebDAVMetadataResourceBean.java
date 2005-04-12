@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadataResourceBean.java,v 1.5 2005/04/11 16:29:25 joakim Exp $
+ * $Id: WebDAVMetadataResourceBean.java,v 1.6 2005/04/12 14:09:16 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -29,10 +29,10 @@ import com.idega.slide.util.WebdavRootResource;
 /**
  * A resource bean that holds metadata info for the selected resouce
  * 
- * Last modified: $Date: 2005/04/11 16:29:25 $ by $Author: joakim $
+ * Last modified: $Date: 2005/04/12 14:09:16 $ by $Author: joakim $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class WebDAVMetadataResourceBean extends IBOSessionBean 
 implements WebDAVMetadataResource
@@ -49,6 +49,9 @@ implements WebDAVMetadataResource
 		super();
 	}
 	
+	/**
+	 * Clears the metadata beans (cashe) 
+	 */
 	public void clear() {
 		metadataBeans = null;
 	}
@@ -64,6 +67,10 @@ implements WebDAVMetadataResource
 		currentPath = resourcePath;
 	}
 	
+	/**
+	 * returns metadata key - value pairs for the article specified by the given resourcePath
+	 * @return a collection of MetadataValueBeans
+	 */
 	public Collection getMetadataBeans(String resourcePath) throws RemoteException, IOException {
 		if(metadataBeans == null || !checkPath(resourcePath)) {
 			setMetadataBeans(resourcePath,getMetadataFromRepository(resourcePath));
@@ -72,6 +79,10 @@ implements WebDAVMetadataResource
 	}
 	
 
+	/**
+	 * returns categories selected for the article specified by the given resourcePath
+	 * @return a collection of Strings
+	 */
 	public Collection getCategories(String resourcePath) throws RemoteException, IOException {
 		//Cashing removed so that categories is loaded propperly... TODO look into how to use cashing again
 //		if(selectedCategories == null || !checkPath(resourcePath)) {
