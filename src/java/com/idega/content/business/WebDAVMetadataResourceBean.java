@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadataResourceBean.java,v 1.6 2005/04/12 14:09:16 joakim Exp $
+ * $Id: WebDAVMetadataResourceBean.java,v 1.7 2005/04/13 17:34:31 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOSessionBean;
@@ -29,10 +30,10 @@ import com.idega.slide.util.WebdavRootResource;
 /**
  * A resource bean that holds metadata info for the selected resouce
  * 
- * Last modified: $Date: 2005/04/12 14:09:16 $ by $Author: joakim $
+ * Last modified: $Date: 2005/04/13 17:34:31 $ by $Author: joakim $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class WebDAVMetadataResourceBean extends IBOSessionBean 
 implements WebDAVMetadataResource
@@ -111,24 +112,34 @@ implements WebDAVMetadataResource
 
 		WebdavRootResource rootResource = session.getWebdavRootResource();
 
-		String filePath = service.getURI(resourcePath);
+		String filePath = resourcePath;
+		String serverURI = service.getWebdavServerURI();
+		if(!resourcePath.startsWith(serverURI)) {
+			filePath = service.getURI(resourcePath);
+		}
 		
 		Iterator iter = MetadataUtil.getMetadataTypes().iterator();
 		while(iter.hasNext()) {
 			String type = (String)iter.next();
 
 //			System.out.println("Getting metadata '"+type+"' for "+filePath);
-			Enumeration enumerator = rootResource.propfindMethod(filePath,new PropertyName("DAV",type).toString());
+			
+			try {
+				Enumeration enumerator = rootResource.propfindMethod(filePath,new PropertyName("DAV",type).toString());
 
-			StringBuffer value = new StringBuffer();
-			while(enumerator.hasMoreElements()) {
-				value.append(enumerator.nextElement());
+				StringBuffer value = new StringBuffer();
+				while(enumerator.hasMoreElements()) {
+					value.append(enumerator.nextElement());
+				}
+//				System.out.println("Value is "+value);
+				if(value.length()>0) {
+					MetadataValueBean mvb = new MetadataValueBean(type, value.toString());
+					metadataBeans.add(mvb);
+				}
+			}catch (HttpException e) {
+				System.out.println("Warning could not load metadata '"+type+"' for "+filePath);
 			}
-//			System.out.println("Value is "+value);
-			if(value.length()>0) {
-				MetadataValueBean mvb = new MetadataValueBean(type, value.toString());
-				metadataBeans.add(mvb);
-			}
+
 		}
 			
 		return metadataBeans;
@@ -151,22 +162,30 @@ implements WebDAVMetadataResource
 
 		WebdavRootResource rootResource = session.getWebdavRootResource();
 
-		String filePath = service.getURI(resourcePath);
-		
-//		System.out.println("Getting categories for "+filePath);
-		Enumeration enumerator = rootResource.propfindMethod(filePath,new PropertyName("DAV","categories").toString());
-
-		StringBuffer value = new StringBuffer();
-		while(enumerator.hasMoreElements()) {
-			value.append(enumerator.nextElement());
+		String filePath = resourcePath;
+		String serverURI = service.getWebdavServerURI();
+		if(!resourcePath.startsWith(serverURI)) {
+			filePath = service.getURI(resourcePath);
 		}
 		
-//		System.out.println("Value is "+value);
-		if(value.length()>0) {
-			StringTokenizer st = new StringTokenizer(value.toString(),",");
-			while(st.hasMoreTokens()) {
-				selectedCategories.add(st.nextToken());
+//		System.out.println("Getting categories for "+filePath);
+		try {
+			Enumeration enumerator = rootResource.propfindMethod(filePath,new PropertyName("DAV","categories").toString());
+	
+			StringBuffer value = new StringBuffer();
+			while(enumerator.hasMoreElements()) {
+				value.append(enumerator.nextElement());
 			}
+			
+	//		System.out.println("Value is "+value);
+			if(value.length()>0) {
+				StringTokenizer st = new StringTokenizer(value.toString(),",");
+				while(st.hasMoreTokens()) {
+					selectedCategories.add(st.nextToken());
+				}
+			}
+		}catch (HttpException e) {
+			System.out.println("Warning could not load categories for "+filePath);
 		}
 		
 		return selectedCategories;
