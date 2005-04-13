@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadata.java,v 1.12 2005/04/12 16:36:36 joakim Exp $
+ * $Id: WebDAVMetadata.java,v 1.13 2005/04/13 17:36:16 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -47,12 +47,12 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2005/04/12 16:36:36 $ by $Author: joakim $
+ * Last modified: $Date: 2005/04/13 17:36:16 $ by $Author: joakim $
  * 
  * Display the UI for adding metadata type - values to a file.
  *
  * @author Joakim Johnson
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	
@@ -209,7 +209,12 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 	
 			WebdavRootResource rootResource = session.getWebdavRootResource();
-			String filePath = service.getURI(resourcePath);
+
+			String filePath = resourcePath;
+			String serverURI = service.getWebdavServerURI();
+			if(!resourcePath.startsWith(serverURI)) {
+				filePath = service.getURI(resourcePath);
+			}
 
 			//Store new settings
 			if(type.length()>0) {

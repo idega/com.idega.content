@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataListManagedBean.java,v 1.10 2005/04/12 16:34:31 joakim Exp $
+ * $Id: MetadataListManagedBean.java,v 1.11 2005/04/13 17:35:30 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -38,12 +38,12 @@ import com.idega.webface.bean.WFListBean;
 
 /**
  * 
- * Last modified: $Date: 2005/04/12 16:34:31 $ by $Author: joakim $
+ * Last modified: $Date: 2005/04/13 17:35:30 $ by $Author: joakim $
  * Displays all the metadata types and values for the specified resource
  * Typically followed by WebDavMetadata in presentation to enable addeing metadata
  *
  * @author Joakim Johnson
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class MetadataListManagedBean extends AbstractWFEditableListManagedBean implements WFListBean, ActionListener {
 
@@ -82,7 +82,11 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 
-			String filePath = service.getURI(resourcePath);
+			String filePath = resourcePath;
+			String serverURI = service.getWebdavServerURI();
+			if(!resourcePath.startsWith(serverURI)) {
+				filePath = service.getURI(resourcePath);
+			}
 			rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),"",true);
 			
 			WebDAVMetadataResource resource;
@@ -109,21 +113,23 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	 */
 	public WFEditableListDataBean[] getData() {
 		MetadataValueBean[] ret = new MetadataValueBean[0];
-		IWContext iwc = IWContext.getInstance();
-		WebDAVMetadataResource resource;
-		try {
-			resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
-					iwc, WebDAVMetadataResource.class);
-			ret = resource.getMetadata(resourcePath);
-		}
-		catch (IBOLookupException e) {
-			e.printStackTrace();
-		}
-		catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
+		if(resourcePath!=null) {
+			IWContext iwc = IWContext.getInstance();
+			WebDAVMetadataResource resource;
+			try {
+				resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
+						iwc, WebDAVMetadataResource.class);
+				ret = resource.getMetadata(resourcePath);
+			}
+			catch (IBOLookupException e) {
+				e.printStackTrace();
+			}
+			catch (RemoteException e) {
+				e.printStackTrace();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		return ret;
 	}

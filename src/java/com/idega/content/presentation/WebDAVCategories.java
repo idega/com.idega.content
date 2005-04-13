@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.3 2005/04/12 16:35:51 joakim Exp $
+ * $Id: WebDAVCategories.java,v 1.4 2005/04/13 17:35:50 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -46,10 +46,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2005/04/12 16:35:51 $ by $Author: joakim $
+ *  Last modified: $Date: 2005/04/13 17:35:50 $ by $Author: joakim $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -233,7 +233,11 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 				try {
 					IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
 					IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
-					String filePath = service.getURI(resourcePath);
+					String filePath = resourcePath;
+					String serverURI = service.getWebdavServerURI();
+					if(!resourcePath.startsWith(serverURI)) {
+						filePath = service.getURI(resourcePath);
+					}
 					WebdavRootResource rootResource = session.getWebdavRootResource();
 	
 					//Store new settings
