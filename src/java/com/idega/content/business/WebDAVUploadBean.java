@@ -3,7 +3,7 @@ package com.idega.content.business;
 import java.io.IOException;
 import javax.faces.component.UIComponent;
 import javax.faces.event.ActionEvent;
-import net.sourceforge.myfaces.custom.fileupload.UploadedFile;
+import org.apache.myfaces.custom.fileupload.UploadedFile;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;

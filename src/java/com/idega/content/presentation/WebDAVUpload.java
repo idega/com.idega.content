@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.3 2005/01/13 15:53:35 gimmi Exp $
+ * $Id: WebDAVUpload.java,v 1.4 2005/04/13 11:54:52 tryggvil Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -15,7 +15,7 @@ import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.event.ActionEvent;
-import net.sourceforge.myfaces.custom.fileupload.HtmlInputFileUpload;
+import org.apache.myfaces.custom.fileupload.HtmlInputFileUpload;
 import com.idega.presentation.Table;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFUtil;
@@ -23,10 +23,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/01/13 15:53:35 $ by $Author: gimmi $
+ *  Last modified: $Date: 2005/04/13 11:54:52 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class WebDAVUpload extends ContentBlock {
 

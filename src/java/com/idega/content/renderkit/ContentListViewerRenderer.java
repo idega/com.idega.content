@@ -1,5 +1,5 @@
 /*
- * $Id: ContentListViewerRenderer.java,v 1.2 2005/03/08 18:33:12 gummi Exp $ Created on
+ * $Id: ContentListViewerRenderer.java,v 1.3 2005/04/13 11:54:52 tryggvil Exp $ Created on
  * 27.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -19,22 +19,22 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIData;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
-import net.sourceforge.myfaces.renderkit.JSFAttr;
-import net.sourceforge.myfaces.renderkit.RendererUtils;
-import net.sourceforge.myfaces.renderkit.html.HTML;
-import net.sourceforge.myfaces.renderkit.html.HtmlRendererUtils;
-import net.sourceforge.myfaces.util.ArrayUtils;
-import net.sourceforge.myfaces.util.StringUtils;
+import org.apache.myfaces.renderkit.JSFAttr;
+import org.apache.myfaces.renderkit.RendererUtils;
+import org.apache.myfaces.renderkit.html.HTML;
+import org.apache.myfaces.renderkit.html.HtmlRendererUtils;
+import org.apache.myfaces.util.ArrayUtils;
+import org.apache.myfaces.util.StringUtils;
 import com.idega.content.presentation.ContentItemListViewer;
 import com.idega.util.RenderUtils;
 import com.idega.webface.renderkit.BaseRenderer;
 
 /**
  * 
- * Last modified: $Date: 2005/03/08 18:33:12 $ by $Author: gummi $
+ * Last modified: $Date: 2005/04/13 11:54:52 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ContentListViewerRenderer extends BaseRenderer {
 	
