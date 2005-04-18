@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.4 2005/04/13 17:35:50 joakim Exp $
+ * $Id: WebDAVCategories.java,v 1.5 2005/04/18 14:04:09 joakim Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -46,17 +46,17 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2005/04/13 17:35:50 $ by $Author: joakim $
+ *  Last modified: $Date: 2005/04/18 14:04:09 $ by $Author: joakim $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
+	public static final String CATEGORIES_BLOCK_ID = "categoriesBlockID";
 	private static final String ADD_BUTTON_ID = "add_button_ID";
 	private static final String SAVE_ID = "save_category_ID";
 	private static final String ADD_CATEGORY_TEXT_ID = "addCategoryID";
-	private static final String CATEGORIES_BLOCK_ID = "categoriesBlockID";
 	private static final String CATEGORY = "category_";		//Prefix for the id in the userinterface
 	private static final String RESOURCE_PATH = "resourcePath";	//key
 	private static final int COLLUMNS = 3;		//Number of collumns to display the categories in
@@ -150,9 +150,11 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 
 			count--;
 			//Add the save button
-			WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
-			HtmlCommandButton addCategoryButton = localizer.getButtonVB(SAVE_ID, "save", this);
-			categoriesTable.add(addCategoryButton,1,count/COLLUMNS + 2);
+			if(resourcePath!=null && resourcePath.length()>0) {
+				WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
+				HtmlCommandButton addCategoryButton = localizer.getButtonVB(SAVE_ID, "save", this);
+				categoriesTable.add(addCategoryButton,1,count/COLLUMNS + 2);
+			}
 			
 			categoriesTable.setColumns(Math.min(count+1,COLLUMNS));
 			categoriesTable.setRows(count/COLLUMNS + 2);
@@ -211,6 +213,8 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 			return;
 		}
 		if(id.equalsIgnoreCase(SAVE_ID)) {
+			saveCategoriesSettings(null, comp);
+/*			
 			//save the selection of categories to the article
 			//Build together the categories string
 			StringBuffer categories = new StringBuffer();
@@ -266,6 +270,65 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 			}
 
 			return;
+*/
+		}
+	}
+	
+	public void saveCategoriesSettings(String resourcePath, UIComponent comp) {
+		//save the selection of categories to the article
+		//Build together the categories string
+		StringBuffer categories = new StringBuffer();
+		Iterator iter = CategoryUtil.getCategories().iterator();
+		HtmlSelectBooleanCheckbox smc = null;
+		while(iter.hasNext()) {
+			String text = iter.next().toString();
+			smc = (HtmlSelectBooleanCheckbox)comp.getParent().findComponent(CATEGORY+text);
+
+			boolean bool = ((Boolean)smc.getValue()).booleanValue();
+//			System.out.println("Category "+text+" was set to "+bool);
+			if(bool) {
+				categories.append(text).append(",");
+			}
+		}
+		if(smc!=null) {
+			//Store categories to file and folder
+			if(resourcePath == null) {
+				resourcePath = (String)smc.getAttributes().get(RESOURCE_PATH);
+			}
+			IWContext iwc = IWContext.getInstance();
+			try {
+				IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+				IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+				String filePath = resourcePath;
+				String serverURI = service.getWebdavServerURI();
+				if(!resourcePath.startsWith(serverURI)) {
+					filePath = service.getURI(resourcePath);
+				}
+				WebdavRootResource rootResource = session.getWebdavRootResource();
+
+				//Store new settings
+				if(categories.length()>0) {
+//					System.out.println("Proppatch: filepath="+filePath+" categories value="+categories);
+					rootResource.proppatchMethod(filePath,new PropertyName("DAV:","categories"),categories.toString(),true);
+					//Also set the metadata on the parent folder
+					String parent = getParentWOContext(filePath);
+//					System.out.println("Proppatch: filepath="+parent+" categories value="+categories);
+					rootResource.proppatchMethod(parent,new PropertyName("DAV:","categories"),categories.toString(),true);
+				}
+				//Clear the cashed data so that it will be reloaded.
+				WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
+						iwc, WebDAVMetadataResource.class);
+				resource.clear();
+			}
+			catch (RemoteException e) {
+				e.printStackTrace();
+			}
+			catch (HttpException e) {
+				e.printStackTrace();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
