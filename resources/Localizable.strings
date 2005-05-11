@@ -168,3 +168,9 @@ permissionmatrix.groups=Groups
 permissionmatrix.users=Users
 
 initial_version=INITIAL VERSION.
+
+createpage.Pages=Pages
+createpage.Create_Edit=Create/Edit
+createpage.Save=Save
+createpage.Reset=Reset
+

@@ -99,3 +99,37 @@
 .content_search_link{
 }
 
+.page_create_edit_link {
+	background-image: url(images/editscript_16.gif);
+}
+.page_details_link {
+	background-image: url(images/runscript_16.gif);
+}
+.page_preview_link {
+	background-image: url(images/table_16.gif);
+}
+
+.create_page_fieldset {
+	height: 200px;
+}
+
+.create_page_fieldset .formInput {
+	float: left;
+	clear: right;
+	display: inline;
+}
+
+.create_page_fieldset .label {
+	float: left;
+	clear: left;
+	display: inline;
+}
+
+.page_tree {
+	width: 200px;
+	height: 100px;
+	clear: both;
+	background-color:#EEEEEE;
+	border: 1px solid #CCCCCC;
+	overflow: auto;
+}

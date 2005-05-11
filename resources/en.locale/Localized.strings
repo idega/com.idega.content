@@ -164,3 +164,20 @@ permissionmatrix.groups=Groups
 permissionmatrix.users=Users
 
 initial_version=INITIAL VERSION.
+
+createpage.Pages=Pages
+createpage.Create=Create
+createpage.Edit=Edit
+createpage.Save=Save
+createpage.Reset=Reset
+
+
+createsimpletemplate.Pages=Pages
+createsimpletemplate.Create_Edit=Create/Edit
+createsimpletemplate.Save=Save
+createsimpletemplate.Reset=Reset
+createsimpletemplate.TemplateName=Template Name
+createsimpletemplate.Image=Image
+createsimpletemplate.Description=Description
+createsimpletemplate.Type=Type
+createsimpletemplate.Component=Component

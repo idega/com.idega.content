@@ -192,3 +192,18 @@ privileges_all=Alla
 privileges_write=Skriva
 refresh=Uppdatera
 up_to_parent_folder=Upp till ovanstående mapp
+
+createpage.Pages=Pages
+createpage.Create_Edit=Create/Edit
+createpage.Save=Save
+createpage.Reset=Reset
+
+createsimpletemplate.Pages=Pages
+createsimpletemplate.Create_Edit=Create/Edit
+createsimpletemplate.Save=Save
+createsimpletemplate.Reset=Reset
+createsimpletemplate.TemplateName=Template Name
+createsimpletemplate.Image=Image
+createsimpletemplate.Description=Description
+createsimpletemplate.Type=Type
+createsimpletemplate.Component=Component
