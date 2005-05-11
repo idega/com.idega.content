@@ -142,6 +142,12 @@
 		<managed-bean-class>com.idega.content.bean.CaseListBean</managed-bean-class>
 		<managed-bean-scope>session</managed-bean-scope>
 	</managed-bean>
+	
+	<managed-bean>
+		<managed-bean-name>pageCreationBean</managed-bean-name>
+		<managed-bean-class>com.idega.content.bean.PageCreationManagedBean</managed-bean-class>
+		<managed-bean-scope>request</managed-bean-scope>
+	</managed-bean>
 
     <!--  converters -->
     <converter>
