@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissionsManagedBean.java,v 1.6 2005/04/08 17:16:01 gummi Exp $ Created
+ * $Id: WebDAVFilePermissionsManagedBean.java,v 1.7 2005/05/11 18:32:58 gummi Exp $ Created
  * on 29.12.2004
  * 
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -32,10 +32,10 @@ import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
  * 
- * Last modified: $Date: 2005/04/08 17:16:01 $ by $Author: gummi $
+ * Last modified: $Date: 2005/05/11 18:32:58 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListManagedBean {
 
@@ -181,7 +181,7 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 	}
 
 	protected String getUIComponentID(String var, int columnIndex) {
-		return String.valueOf(var + "." + localizationKey[columnIndex] + ".id");
+		return String.valueOf(var + "_" + localizationKey[columnIndex] + "-id");
 	}
 
 

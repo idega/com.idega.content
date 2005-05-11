@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryUtil.java,v 1.4 2005/04/12 16:34:06 joakim Exp $
+ * $Id: CategoryUtil.java,v 1.5 2005/05/11 18:30:32 gummi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 import org.apache.commons.httpclient.HttpException;
+import org.apache.webdav.lib.util.WebdavStatus;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.idegaweb.IWUserContext;
@@ -27,10 +28,10 @@ import com.idega.slide.util.WebdavRootResource;
 /**
  * <p>Utility functions for category. 
  * functions for getting and setting all the available categories</p>
- *  Last modified: $Date: 2005/04/12 16:34:06 $ by $Author: joakim $
+ *  Last modified: $Date: 2005/05/11 18:30:32 $ by $Author: gummi $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class CategoryUtil {
 	private static final String CATEORY_FIX_PREFIX = "/cms/content";
@@ -46,11 +47,12 @@ public class CategoryUtil {
 		Collection ret = new ArrayList();
 		
 		String categories = getCategoriesAsString();
-		StringTokenizer st = new StringTokenizer(categories,",");
-		while(st.hasMoreTokens()) {
-			ret.add(st.nextToken().trim());
+		if( categories != null){
+			StringTokenizer st = new StringTokenizer(categories,",");
+			while(st.hasMoreTokens()) {
+				ret.add(st.nextToken().trim());
+			}
 		}
-		
 		return ret;
 	}
 	
@@ -68,6 +70,9 @@ public class CategoryUtil {
 //			System.out.println("Loading categories for "+filePath);
 			//TODO have to fix the path
 			categories = rootResource.getMethodDataAsString(CATEORY_FIX_PREFIX+CATEORY_CONFIG_FILE);
+			if(rootResource.getStatusCode() != WebdavStatus.SC_OK){
+				return "";
+			}
 		}
 		catch (IBOLookupException e) {
 			e.printStackTrace();

@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissions.java,v 1.6 2005/03/10 14:36:59 gummi Exp $
+ * $Id: WebDAVFilePermissions.java,v 1.7 2005/05/11 18:32:35 gummi Exp $
  * Created on 29.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -19,10 +19,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/10 14:36:59 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/05/11 18:32:35 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class WebDAVFilePermissions extends ContentBlock {
 
@@ -61,7 +61,7 @@ public class WebDAVFilePermissions extends ContentBlock {
 ////		getBundle().getLocalizedUIComponent("add", addButton);
 //		getChildren().add(addButton);
 		
-//		initializePermissionMatirx(BEANID_USER_MATRIX,"permissionmatrix.users",resourcePath);
+		initializePermissionMatirx(BEANID_USER_MATRIX,"permissionmatrix.users",resourcePath);
 		
 		
 		HtmlCommandButton refreshButton = new HtmlCommandButton();
@@ -94,7 +94,7 @@ public class WebDAVFilePermissions extends ContentBlock {
 		pMatrix.setRowClasses("cms_permission_listoddrow,cms_permission_listevenrow");
 		
 		HtmlOutputText headerStandard = getBundle().getLocalizedText(headerLocalizedKey);
-		headerStandard.setId(beanID+".title");
+		headerStandard.setId(beanID+"_title");
 		headerStandard.setStyleClass(ContentUtil.MODULE_PREFIX+"permission_matrix_header");
 
 		
