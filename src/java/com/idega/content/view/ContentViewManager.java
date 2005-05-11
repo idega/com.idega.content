@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.13 2005/04/08 17:16:01 gummi Exp $
+ * $Id: ContentViewManager.java,v 1.14 2005/05/11 18:29:03 gummi Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -25,10 +25,10 @@ import com.idega.repository.data.Singleton;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2005/04/08 17:16:01 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/05/11 18:29:03 $ by $Author: gummi $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class ContentViewManager implements Singleton  {
 
@@ -87,8 +87,29 @@ public class ContentViewManager implements Singleton  {
 	public void initializeStandardNodes(IWBundle bundle){
 		ViewNode contentNode = initalizeContentNode(bundle);
 		
+		/* Page nodes begin */
 		DefaultViewNode pagesNode = new DefaultViewNode("pages",contentNode);
 		pagesNode.setJspUri(bundle.getJSPURI("pages.jsp"));
+		
+		DefaultViewNode pageListNode = new DefaultViewNode("list",pagesNode);
+		pageListNode.setJspUri(bundle.getJSPURI("pages.jsp"));
+		
+		DefaultViewNode createPageNode = new DefaultViewNode("create",pagesNode);
+		createPageNode.setJspUri(bundle.getJSPURI("createpage.jsp"));
+		
+		DefaultViewNode previewPageNode = new DefaultViewNode("preview",pagesNode);
+		previewPageNode.setJspUri(bundle.getJSPURI("pagepreview.jsp"));
+		previewPageNode.setVisibleInMenus(false);
+		
+		DefaultViewNode detailsPageNode = new DefaultViewNode("details",pagesNode);
+		detailsPageNode.setJspUri(bundle.getJSPURI("pagedetails.jsp"));
+		detailsPageNode.setVisibleInMenus(false);
+		
+		DefaultViewNode simpleTemplateNode = new DefaultViewNode("templatesettings",pagesNode);
+		simpleTemplateNode.setJspUri(bundle.getJSPURI("simpletemplate.jsp"));
+		
+		/* Page nodes end */
+		
 		
 		DefaultViewNode documentsNode = new DefaultViewNode("documents",contentNode);
 		//documentsNode.setJspUri(bundle.getJSPURI("documents.jsp"));
