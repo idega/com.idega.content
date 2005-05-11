@@ -516,6 +516,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		details.setId(getId()+"_btnDetails");
 //		details.setToolTip("Document Details");
 		details.setToolTip(getBundle().getLocalizedString("document_details"));
+		details.setDisplayText(getBundle().getLocalizedString("document_details"));
 		details.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		details.setRendered(renderDetailsLink);
 
@@ -525,6 +526,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		preview.setId(getId()+"_btnPreview");
 		preview.setStyleClass("content_viewer_preview");
 		preview.setToolTip(getBundle().getLocalizedString("preview"));
+		preview.setDisplayText(getBundle().getLocalizedString("preview"));
 //		preview.setToolTip("Preview");
 		preview.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		preview.setRendered(renderPreviewLink);
@@ -534,6 +536,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		newFolder.setId(getId()+"_btnNewFolder");
 		newFolder.setStyleClass("content_viewer_new_folder");
 		newFolder.setToolTip(getBundle().getLocalizedString("create_a_folder"));
+		newFolder.setDisplayText(getBundle().getLocalizedString("create_a_folder"));
 		newFolder.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		newFolder.setRendered(showFolders && renderNewFolderLink);
 
@@ -544,6 +547,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		permissions.setStyleClass("content_viewer_permissions");
 //		permissions.setToolTip("Permissions");
 		permissions.setToolTip(getBundle().getLocalizedString("permissions"));
+		permissions.setDisplayText(getBundle().getLocalizedString("permissions"));
 		permissions.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		permissions.setRendered(doRenderPermissionLink());
 		
