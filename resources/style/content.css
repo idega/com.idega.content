@@ -100,13 +100,13 @@
 }
 
 .page_create_edit_link {
-	background-image: url(images/editscript_16.gif);
+	background-image: url(../images/editscript_16.gif);
 }
 .page_details_link {
-	background-image: url(images/runscript_16.gif);
+	background-image: url(../images/runscript_16.gif);
 }
 .page_preview_link {
-	background-image: url(images/table_16.gif);
+	background-image: url(../images/table_16.gif);
 }
 
 .create_page_fieldset {
