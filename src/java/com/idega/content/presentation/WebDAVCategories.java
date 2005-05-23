@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.5 2005/04/18 14:04:09 joakim Exp $
+ * $Id: WebDAVCategories.java,v 1.6 2005/05/23 07:44:59 gummi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -46,10 +46,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2005/04/18 14:04:09 $ by $Author: joakim $
+ *  Last modified: $Date: 2005/05/23 07:44:59 $ by $Author: gummi $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -118,7 +118,9 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 				//Checkbox
 				HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
 				smc.setValue(new Boolean(true));
-				smc.setId(CATEGORY+text);
+				String id = CATEGORY+count;
+//				System.out.println("CATEGORY-COMPONENT-ID:"+id);
+				smc.setId(id);
 				smc.getAttributes().put(RESOURCE_PATH,resourcePath);
 				categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
 				//Text
@@ -137,7 +139,9 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 					//Checkbox
 					HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
 					smc.setValue(new Boolean(false));
-					smc.setId(CATEGORY+text);
+					String id = CATEGORY+count;
+//					System.out.println("CATEGORY-COMPONENT-ID:"+id);
+					smc.setId(id);
 					smc.getAttributes().put(RESOURCE_PATH,resourcePath);
 					categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					//Text
@@ -280,9 +284,10 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		StringBuffer categories = new StringBuffer();
 		Iterator iter = CategoryUtil.getCategories().iterator();
 		HtmlSelectBooleanCheckbox smc = null;
+		int count = 0;
 		while(iter.hasNext()) {
 			String text = iter.next().toString();
-			smc = (HtmlSelectBooleanCheckbox)comp.getParent().findComponent(CATEGORY+text);
+			smc = (HtmlSelectBooleanCheckbox)comp.getParent().findComponent(CATEGORY+count++);
 
 			boolean bool = ((Boolean)smc.getValue()).booleanValue();
 //			System.out.println("Category "+text+" was set to "+bool);
