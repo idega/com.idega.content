@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.7 2005/04/08 17:17:39 gummi Exp $
+ * $Id: ContentItemBean.java,v 1.8 2005/06/02 12:05:11 gummi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -49,10 +49,10 @@ import com.idega.webface.WFUtil;
 /**
  * Bean for idegaWeb content items.   
  * <p>
- * Last modified: $Date: 2005/04/08 17:17:39 $ by $Author: gummi $
+ * Last modified: $Date: 2005/06/02 12:05:11 $ by $Author: gummi $
  *
  * @author Anders Lindman
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 
 public abstract class ContentItemBean implements Serializable, ICFile, ContentItem {
@@ -1131,5 +1131,9 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	public int getLocaleId() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	public String getDatasource(){
+		return null;
 	}
 }
