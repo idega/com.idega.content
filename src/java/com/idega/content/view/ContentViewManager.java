@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.14 2005/05/11 18:29:03 gummi Exp $
+ * $Id: ContentViewManager.java,v 1.15 2005/06/02 17:08:53 eiki Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -15,6 +15,7 @@ import javax.faces.context.FacesContext;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.view.ApplicationViewNode;
 import com.idega.core.view.DefaultViewNode;
+import com.idega.core.view.KeyboardShortcut;
 import com.idega.core.view.ViewManager;
 import com.idega.core.view.ViewNode;
 import com.idega.idegaweb.IWBundle;
@@ -25,10 +26,10 @@ import com.idega.repository.data.Singleton;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2005/05/11 18:29:03 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/06/02 17:08:53 $ by $Author: eiki $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class ContentViewManager implements Singleton  {
 
@@ -78,7 +79,10 @@ public class ContentViewManager implements Singleton  {
 		roles.add(StandardRoles.ROLE_KEY_AUTHOR);
 		contentNode.setAuthorizedRoles(roles);
 		
+		
 		contentNode.setJspUri(contentBundle.getJSPURI("content.jsp"));
+		contentNode.setKeyboardShortcut(new KeyboardShortcut("4"));
+		
 		contentRootNode = contentNode;
 		return contentRootNode;
 	}
@@ -90,6 +94,7 @@ public class ContentViewManager implements Singleton  {
 		/* Page nodes begin */
 		DefaultViewNode pagesNode = new DefaultViewNode("pages",contentNode);
 		pagesNode.setJspUri(bundle.getJSPURI("pages.jsp"));
+		pagesNode.setKeyboardShortcut(new KeyboardShortcut("p"));
 		
 		DefaultViewNode pageListNode = new DefaultViewNode("list",pagesNode);
 		pageListNode.setJspUri(bundle.getJSPURI("pages.jsp"));
@@ -114,6 +119,7 @@ public class ContentViewManager implements Singleton  {
 		DefaultViewNode documentsNode = new DefaultViewNode("documents",contentNode);
 		//documentsNode.setJspUri(bundle.getJSPURI("documents.jsp"));
 		documentsNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
+		documentsNode.setKeyboardShortcut(new KeyboardShortcut("d"));
 		
 		DefaultViewNode previewNode = new DefaultViewNode("preview",documentsNode);
 		previewNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
@@ -125,6 +131,7 @@ public class ContentViewManager implements Singleton  {
 		
 		DefaultViewNode searchNode = new DefaultViewNode("search",contentNode);
 		searchNode.setJspUri(bundle.getJSPURI("search.jsp"));	
+		searchNode.setKeyboardShortcut(new KeyboardShortcut("s"));
 		
 	}
 }
