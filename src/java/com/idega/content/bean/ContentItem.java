@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItem.java,v 1.4 2005/03/05 18:45:56 gummi Exp $
+ * $Id: ContentItem.java,v 1.5 2005/06/13 14:16:12 gummi Exp $
  * Created on 28.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -15,15 +15,21 @@ import java.util.List;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/05 18:45:56 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/06/13 14:16:12 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public interface ContentItem {
 	public Object getValue(String fieldName);
 	public void setValue(String fieldName, Object value);
 	public List getAttachments();
+	
+	/**
+	 * This method tells the ContentItemViewer which fields to show, that is it iterates through
+	 * the returning array and gets the value of those fields and presents them.
+	 * @return
+	 */
 	public String[] getContentFieldNames();
 	public String getContentItemPrefix();
 	

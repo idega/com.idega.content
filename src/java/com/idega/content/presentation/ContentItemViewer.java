@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.7 2005/04/08 17:17:39 gummi Exp $
+ * $Id: ContentItemViewer.java,v 1.8 2005/06/13 14:16:12 gummi Exp $
  * Created on 26.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -32,10 +32,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/04/08 17:17:39 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/06/13 14:16:12 $ by $Author: gummi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class ContentItemViewer extends WFContainer {
 	
@@ -206,6 +206,15 @@ public class ContentItemViewer extends WFContainer {
 		}
 	}
 	
+	
+	/**
+	 * This method returns the name of the attribute that should be value binded to in the component that
+	 * presents the field.  This is used when the component is initialized and updated.  By default the 
+	 * binding attribute is "value" as is used by most of the components but this can be overwitten
+	 * if needed.
+	 * @param fieldName
+	 * @return Returns the name of the attribute that should be value binded to in the component that presents the field.
+	 */
 	protected String getBindingAttribute(String fieldName){
 		return "value";
 	}
@@ -313,6 +322,10 @@ public class ContentItemViewer extends WFContainer {
 	}
 
 	/**
+	 * To value bind to this use the value of fieldName variable. For instance, getHeadline() in some subclass
+	 * would be implemented as: public String getHeadline(){return (String)getValue("headline");} and the 
+	 * value binding will be to "headline" and can be used in tag classes to for value bindings in jsf pages. 
+	 * 
 	 * @return Returns the author.
 	 */
 	public Object getValue(String fieldName) {
