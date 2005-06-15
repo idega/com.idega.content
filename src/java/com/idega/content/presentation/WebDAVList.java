@@ -23,6 +23,8 @@ public class WebDAVList extends IWBaseComponent {
 	private String rootFolder = null;
 	private String iconTheme = null;
 	private boolean showFolders = true;
+	private boolean showPublicFolder = true;
+	private boolean showDropboxFolder = true;
 	private Collection columnsToHide = null;
 	private boolean useVersionControl = true;
 	private String onFileClickEvent = null;
@@ -54,6 +56,8 @@ public class WebDAVList extends IWBaseComponent {
 		}
 		
 		WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setShowFolders", new Boolean(showFolders));
+		WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setShowPublicFolder", new Boolean(showPublicFolder));
+		WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setShowDropboxFolder", new Boolean(showDropboxFolder));
 		if (columnsToHide != null) {
 			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setColumnsToHide", columnsToHide, Collection.class);
 		} else {
@@ -83,6 +87,14 @@ public class WebDAVList extends IWBaseComponent {
 	
 	public void setShowFolders(boolean showFolders) {
 		this.showFolders = showFolders;
+	}
+	
+	public void setShowPublicFolder(boolean showPublicFolder){
+		this.showPublicFolder = showPublicFolder;
+	}
+	
+	public void setShowDropboxFolder(boolean showDropboxFolder){
+		this.showDropboxFolder = showDropboxFolder;
 	}
 	
 	public void setColumnsToHide(Collection columns) {

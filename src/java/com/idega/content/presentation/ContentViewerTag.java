@@ -13,6 +13,8 @@ public class ContentViewerTag extends UIComponentTag {
 	private boolean useUserHomeFolder;
 	private String iconTheme;
 	private boolean showFolders = true;
+	private boolean showPublicFolder = true;
+	private boolean showDropboxFolder = true;
 	private String columnsToHide;
 	private boolean useVersionControl = true;
 	private boolean showPermissionTab = true;
@@ -49,6 +51,14 @@ public class ContentViewerTag extends UIComponentTag {
 	
 	public void setShowFolders(boolean showFolders) {
 		this.showFolders = showFolders;
+	}
+	
+	public void setShowPublicFolder(boolean showPublicFolder){
+		this.showPublicFolder = showPublicFolder;
+	}
+	
+	public void setShowDropboxFolder(boolean showDropboxFolder){
+		this.showDropboxFolder = showDropboxFolder;
 	}
 	
 	public void setColumnsToHide(String columns) {
@@ -95,6 +105,8 @@ public class ContentViewerTag extends UIComponentTag {
 		startFolder = null;
 		useUserHomeFolder = false;
 		showFolders = true;
+		showPublicFolder = true;
+		showDropboxFolder = true;
 		iconTheme = null;
 		columnsToHide = null;
 		useVersionControl = true;
@@ -113,6 +125,8 @@ public class ContentViewerTag extends UIComponentTag {
 			viewer.setUseUserHomeFolder(useUserHomeFolder);
 			viewer.setIconTheme(iconTheme);
 			viewer.setShowFolders(showFolders);
+			viewer.setShowDropboxFolder(showDropboxFolder);
+			viewer.setShowPublicFolder(showPublicFolder);
 			viewer.setColumnsToHide(columnsToHide);
 			viewer.setUseVersionControl(useVersionControl);
 			viewer.setShowPermissionTab(showPermissionTab);

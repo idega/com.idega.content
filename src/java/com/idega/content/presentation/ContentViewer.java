@@ -72,6 +72,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	private String startFolder = null;
 	private String iconTheme = null;
 	private boolean showFolders = true;
+	private boolean showPublicFolder = true;
+	private boolean showDropboxFolder = true;
 	private Collection columnsToHide = null;
 	private boolean maintainPath = false;
 	private boolean useVersionControl = true;
@@ -112,6 +114,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		list.setRootFolder(rootFolder);
 		list.setIconTheme(iconTheme);
 		list.setShowFolders(showFolders);
+		list.setShowDropboxFolder(showDropboxFolder);
+		list.setShowPublicFolder(showPublicFolder);
 		list.setColumnsToHide(columnsToHide);
 		list.setUseVersionControl(useVersionControl);
 		list.setOnFileClickEvent(onFileClickEvent);
@@ -227,6 +231,14 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	
 	public void setShowFolders(boolean showFolders) {
 		this.showFolders = showFolders;
+	}
+	
+	public void setShowPublicFolder(boolean showPublicFolder){
+		this.showPublicFolder = showPublicFolder;
+	}
+	
+	public void setShowDropboxFolder(boolean showDropboxFolder){
+		this.showDropboxFolder = showDropboxFolder;
 	}
 	
 	public void setColumnsToHide(String columns) {
@@ -693,6 +705,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		values[21] = new Boolean(showPermissionTab);
 		values[22] = new Boolean(showUploadComponent);
 		values[23] = onFileClickEvent;
+		values[24] = new Boolean(showPublicFolder);
+		values[25] = new Boolean(showDropboxFolder);
 
 		return values;
 	}
@@ -723,6 +737,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		showPermissionTab = ((Boolean) values[21]).booleanValue();
 		showUploadComponent = ((Boolean) values[22]).booleanValue();
 		onFileClickEvent = ((String) values[23]);
+		showPublicFolder = ((Boolean) values[24]).booleanValue();
+		showDropboxFolder = ((Boolean) values[25]).booleanValue();
 		maintainPath(true);
 	}
 	/**

@@ -69,6 +69,8 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	private String startPath = null;
 	private String iconTheme = null;
 	private boolean showFolders = true;
+	private boolean showPublicFolder = true;
+	private boolean showDropboxFolder = true;
 	private Collection columnsToHide = null;
 	private boolean useVersionControl = true;
 	private String onFileClickEventName = null;
@@ -124,6 +126,14 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	
 	public void setShowFolders(Boolean show) {
 		this.showFolders = show.booleanValue();
+	}
+	
+	public void setShowPublicFolder(Boolean show){
+		this.showPublicFolder = show.booleanValue();
+	}
+	
+	public void setShowDropboxFolder(Boolean show){
+		this.showDropboxFolder = show.booleanValue();
 	}
 	
 	public void setIconTheme(String theme) {
@@ -631,6 +641,12 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			resource = (WebdavExtendedResource) enumer.nextElement();
 			if (!resource.getDisplayName().startsWith(".")) {
 				if (showFolders || (!showFolders && !resource.isCollection())) {
+					if (resource.getName().equalsIgnoreCase("public") && resource.isCollection() && !showPublicFolder) {
+						continue;
+					}
+					if (resource.getName().equalsIgnoreCase("dropbox") && resource.isCollection() && !showDropboxFolder) {
+						continue;
+					}
 					try {
 						bean = new WebDAVBean(resource);
 						url = resource.getPath();
