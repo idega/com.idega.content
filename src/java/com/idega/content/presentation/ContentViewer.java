@@ -680,7 +680,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	}
 	
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[24];
+		Object values[] = new Object[26];
 		values[0] = super.saveState(ctx);
 		values[1] = new Boolean(renderWebDAVList);
 		values[2] = new Boolean(renderWebDAVFileDetails);
