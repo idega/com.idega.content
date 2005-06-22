@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.13 2005/03/20 20:44:33 eiki Exp $
+ * $Id: ContentSearch.java,v 1.14 2005/06/22 17:17:10 eiki Exp $
  * Created on Jan 17, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -50,15 +50,16 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/20 20:44:33 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/06/22 17:17:10 $ by $Author: eiki $
  * This class implements the Searchplugin interface and can therefore be used in a Search block (com.idega.core.search)<br>
  *  for searching contents and properties (metadata) of the files in the iwfile system.
  * To use it simply register this class as a iw.searchable component in a bundle.
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class ContentSearch implements SearchPlugin {
 
+	private static final String DASL_WHERE_XML_SNIPPET = "</D:where>";
 	public static final String SEARCH_NAME_LOCALIZABLE_KEY = "content_search.name";
 	public static final String SEARCH_DESCRIPTION_LOCALIZABLE_KEY = "content_search.description";
 	
@@ -77,7 +78,7 @@ public class ContentSearch implements SearchPlugin {
 
 
 	static final PropertyName DISPLAYNAME = new PropertyName("DAV:", "displayname");
-	static final PropertyName LASTMODIFIED = new PropertyName("DAV:", "getlastmodified");
+	static final PropertyName CONTENTLENGTH = new PropertyName("DAV:", "getcontentlength");
 	static final PropertyName CREATOR_DISPLAY_NAME = new PropertyName("DAV:", "creator-displayname");
 	static final PropertyName COMMENT = new PropertyName("DAV:", "comment");
 	
@@ -179,8 +180,19 @@ public class ContentSearch implements SearchPlugin {
 	        
 	        
 			for (Iterator iter = searchRequests.iterator(); iter.hasNext();) {
-				SearchRequest request = (SearchRequest) iter.next();
-				SearchMethod contentSearch = new SearchMethod(servletMapping, request.asString());
+				
+				Object request = (Object) iter.next();
+				String queryXML = null;
+				
+				if(request instanceof String){
+					queryXML = (String)request;
+				}
+				else{
+					SearchRequest query = (SearchRequest) request;
+					queryXML = query.asString();
+				}
+				
+				SearchMethod contentSearch = new SearchMethod(servletMapping, queryXML);
 				executeSearch(results, servletMapping, contentSearch, client);
 			}
 			
@@ -225,15 +237,17 @@ public class ContentSearch implements SearchPlugin {
 		
 		try {
 			if(searchQuery instanceof AdvancedSearchQuery){
-				SearchRequest content = getAdvancedContentSearch(searchQuery);	
+				String content = getAdvancedContentSearch(searchQuery);	
 				l.add(content);
 			}
 			else if(searchQuery instanceof SimpleSearchQuery){
-				SearchRequest content = getContentSearch(searchQuery);
-				SearchRequest property = getPropertySearch(searchQuery);
+				//SearchRequest content = getContentSearch(searchQuery);
+				String contentSearchXML = getContentSearch(searchQuery);
 				
-				l.add(content);
-				l.add(property);
+				String propertySearchXML = getPropertySearch(searchQuery);
+				
+				l.add(contentSearchXML);
+				l.add(propertySearchXML);
 			}
 			
 		}
@@ -246,10 +260,10 @@ public class ContentSearch implements SearchPlugin {
 	}
 
 
-	protected SearchRequest getAdvancedContentSearch(SearchQuery searchQuery) throws SearchException {
+	protected String getAdvancedContentSearch(SearchQuery searchQuery) throws SearchException {
 		SearchRequest s = new SearchRequest();
-		//s.addSelection(DISPLAYNAME);
-		s.addSelection(LASTMODIFIED);
+
+		s.addSelection(CONTENTLENGTH);
 		s.addScope(new SearchScope("files"));
 		
 		Map params = searchQuery.getSearchParameters();
@@ -262,61 +276,95 @@ public class ContentSearch implements SearchPlugin {
 		if(queryString!=null && !"".equals(queryString)){
 			//does contain have to be separate?
 			expression = s.contains(queryString);
-			expression = s.or(expression,s.or( s.compare(CompareOperator.LIKE, DISPLAYNAME,"%"+queryString+"%"),s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME,queryString),s.compare(CompareOperator.LIKE, COMMENT,"%"+queryString+"%"))));
+			expression = s.or(expression,s.or( s.compare(CompareOperator.LIKE, DISPLAYNAME,"*"+queryString+"*"),s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME,queryString),s.compare(CompareOperator.LIKE, COMMENT,"*"+queryString+"*"))));
 		}
 
 		if(type!=null && !"".equals(type) && !"*".equals(type)){
 			if(expression!=null){
-				expression = s.and(expression,s.compare(CompareOperator.LIKE, DISPLAYNAME,"%."+type));
+				expression = s.and(expression,s.compare(CompareOperator.LIKE, DISPLAYNAME,"*."+type));
 			}
 			else{
-				expression = s.compare(CompareOperator.LIKE, DISPLAYNAME,"%."+type);
+				expression = s.compare(CompareOperator.LIKE, DISPLAYNAME,"*."+type);
 			}
-		}
-		
-		if(ordering!=null && !"".equals(ordering)){
-			//TODO eiki do ordering
 		}
 		
 		if(expression!=null){
 			s.setWhereExpression(expression);
 		}
-		String search = s.asString();
-		System.out.println(search);
-		return s;
+
+		String searchXML = s.asString();
+		String orderingXML = null; 
+		
+		if(ordering!=null && !"".equals(ordering)){
+			orderingXML = new String("<D:orderby><D:order><D:prop><D:"+ordering+"/></D:prop></D:order></D:orderby>");
+		}
+		else{
+			orderingXML = new String("<D:orderby><D:order><D:prop><D:displayname/></D:prop></D:order></D:orderby>");
+		}
+		
+		//FIXME because the query objects do not support order by yet...
+		int index = searchXML.indexOf(DASL_WHERE_XML_SNIPPET);
+		searchXML = searchXML.substring(0,index+DASL_WHERE_XML_SNIPPET.length())+orderingXML+searchXML.substring(index+DASL_WHERE_XML_SNIPPET.length());
+		//
+		
+		return searchXML;
 	}
 	
 	
-	protected SearchRequest getContentSearch(SearchQuery searchQuery) throws SearchException {
+	protected String getContentSearch(SearchQuery searchQuery) throws SearchException {
 		SearchRequest s = new SearchRequest();
-		//s.addSelection(DISPLAYNAME);
-		s.addSelection(LASTMODIFIED);
+
+		s.addSelection(CONTENTLENGTH);
 		s.addScope(new SearchScope("files"));
 		
 		String queryString = ((SimpleSearchQuery)searchQuery).getSimpleSearchQuery();
 		
 		SearchExpression expression = s.contains(queryString);
 		s.setWhereExpression(expression);
-//		String search = s.asString();
-		//System.out.println(search);
-		return s;
+		
+		String searchXML = s.asString();
+		String orderingXML = new String("<D:orderby><D:order><D:prop><D:displayname/></D:prop></D:order></D:orderby>");
+		
+		//FIXME because the query objects do not support order by yet...
+		int index = searchXML.indexOf(DASL_WHERE_XML_SNIPPET);
+		searchXML = searchXML.substring(0,index+DASL_WHERE_XML_SNIPPET.length())+orderingXML+searchXML.substring(index+DASL_WHERE_XML_SNIPPET.length());
+		//
+		
+		return searchXML;
 	}
 	
-	protected SearchRequest getPropertySearch(SearchQuery searchQuery) throws SearchException {
+	protected String getPropertySearch(SearchQuery searchQuery) throws SearchException {
 		SearchRequest s = new SearchRequest();
-		//s.addSelection(DISPLAYNAME);
-		s.addSelection(LASTMODIFIED);
+		s.addSelection(CONTENTLENGTH);
+
 		s.addScope(new SearchScope("files"));
 		
 		String queryString = ((SimpleSearchQuery)searchQuery).getSimpleSearchQuery();
 		
-		SearchExpression expression = s.or( s.compare(CompareOperator.LIKE, DISPLAYNAME,"%"+queryString+"%"),
-				s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME,queryString),s.compare(CompareOperator.LIKE, COMMENT,"%"+queryString+"%")) );
+		SearchExpression expression = s.or( s.compare(CompareOperator.LIKE, DISPLAYNAME,"*"+queryString+"*"),
+		s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME,queryString),s.compare(CompareOperator.LIKE, COMMENT,"*"+queryString+"*")) );
 		//add other properties
+		
 		s.setWhereExpression(expression);
-//		String search = s.asString();
-		//System.out.println(search);
-		return s;
+		
+//		StringBuffer searchXML = new StringBuffer();
+//		searchXML.append("<D:searchrequest xmlns:D=\"DAV:\"><D:basicsearch><D:select><D:prop><D:getcontentlength/></D:prop></D:select>");
+//		searchXML.append("<D:from><D:scope><D:href>files</D:href><D:depth>infinity</D:depth></D:scope></D:from>");
+//		searchXML.append("<D:where>");
+//		searchXML.append("<D:like><D:prop><D:displayname/></D:prop><D:literal>*"+queryString+"*</D:literal></D:like>");
+//		searchXML.append("</D:where>");
+//		searchXML.append("<D:orderby><D:order><D:prop><D:displayname/></D:prop></D:order></D:orderby>");
+//		searchXML.append("</D:basicsearch></D:searchrequest>");
+//		System.out.println(searchXML);
+		
+		String searchXML = s.asString();
+		String orderingXML = new String("<D:orderby><D:order><D:prop><D:displayname/></D:prop></D:order></D:orderby>");
+		
+		//FIXME because the query objects do not support order by yet...
+		int index = searchXML.indexOf(DASL_WHERE_XML_SNIPPET);
+		searchXML = searchXML.substring(0,index+DASL_WHERE_XML_SNIPPET.length())+orderingXML+searchXML.substring(index+DASL_WHERE_XML_SNIPPET.length());
+		//
+		return searchXML.toString();
 	}
 
 	protected void executeSearch(List results, String servletMapping, SearchMethod method, HttpClient client) throws IOException, HttpException {
