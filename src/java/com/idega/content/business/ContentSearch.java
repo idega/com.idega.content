@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.16 2005/06/22 18:14:14 eiki Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.17 2005/06/22 18:37:17 eiki Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -49,7 +49,7 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- * Last modified: $Date: 2005/06/22 18:14:14 $ by $Author: eiki $ This class
+ * Last modified: $Date: 2005/06/22 18:37:17 $ by $Author: eiki $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -57,7 +57,7 @@ import com.idega.slide.business.IWSlideSession;
  * a bundle.
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.17 $
  */
 public class ContentSearch implements SearchPlugin {
 
@@ -239,11 +239,15 @@ public class ContentSearch implements SearchPlugin {
 				l.add(content);
 			}
 			else if (searchQuery instanceof SimpleSearchQuery) {
-				// SearchRequest content = getContentSearch(searchQuery);
-				String contentSearchXML = getContentSearch(searchQuery);
-				String propertySearchXML = getPropertySearch(searchQuery);
-				l.add(contentSearchXML);
-				l.add(propertySearchXML);
+				// switched to string until we have order by in the query objects SearchRequest content = getContentSearch(searchQuery);
+//				String contentSearchXML = getContentSearch(searchQuery);
+//				String propertySearchXML = getPropertySearch(searchQuery);
+//				l.add(contentSearchXML);
+//				l.add(propertySearchXML);
+				//Searches both at the same time
+				String combinedSearch = getCombinedContentAndPropertySearch(searchQuery);
+				l.add(combinedSearch);
+				
 			}
 		}
 		catch (SearchException e) {
@@ -364,6 +368,38 @@ public class ContentSearch implements SearchPlugin {
 		// searchXML.append("<D:orderby><D:order><D:prop><D:displayname/></D:prop></D:order></D:orderby>");
 		// searchXML.append("</D:basicsearch></D:searchrequest>");
 		// System.out.println(searchXML);
+		String searchXML = s.asString();
+		String orderingXML = new String("<D:orderby><D:order><D:prop><D:displayname/></D:prop></D:order></D:orderby>");
+		// FIXME because the query objects do not support order by yet...
+		int index = searchXML.indexOf(DASL_WHERE_XML_SNIPPET);
+		searchXML = searchXML.substring(0, index + DASL_WHERE_XML_SNIPPET.length()) + orderingXML
+				+ searchXML.substring(index + DASL_WHERE_XML_SNIPPET.length());
+		//
+		return searchXML;
+	}
+	
+	protected String getCombinedContentAndPropertySearch(SearchQuery searchQuery) throws SearchException {
+		SearchRequest s = new SearchRequest();
+		s.addSelection(CONTENTLENGTH);
+		s.addScope(new SearchScope("files"));
+		String queryString = ((SimpleSearchQuery) searchQuery).getSimpleSearchQuery();
+		SearchExpression expression = null;
+		String[] tokens = queryString.split(" ");
+		for (int i = 0; i < tokens.length; i++) {
+			String searchWord = tokens[i];
+			SearchExpression contains = s.contains(searchWord);
+			SearchExpression orExpression = s.or(contains, s.or(s.compare(CompareOperator.LIKE, DISPLAYNAME, "*" + searchWord + "*"),
+					s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME, searchWord), s.compare(
+							CompareOperator.LIKE, COMMENT, "*" + searchWord + "*"))));
+			if (expression != null) {
+				expression = s.and(orExpression, expression);
+			}
+			else {
+				expression = orExpression;
+			}
+		}
+		s.setWhereExpression(expression);
+
 		String searchXML = s.asString();
 		String orderingXML = new String("<D:orderby><D:order><D:prop><D:displayname/></D:prop></D:order></D:orderby>");
 		// FIXME because the query objects do not support order by yet...
