@@ -1,11 +1,11 @@
 /*
- * $Id: ContentSearch.java,v 1.14 2005/06/22 17:17:10 eiki Exp $
- * Created on Jan 17, 2005
- *
+ * $Id: ContentSearch.java,v 1.15 2005/06/22 18:04:27 eiki Exp $ Created on Jan
+ * 17, 2005
+ * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- *
- * This software is the proprietary information of Idega hf.
- * Use is subject to license terms.
+ * 
+ * This software is the proprietary information of Idega hf. Use is subject to
+ * license terms.
  */
 package com.idega.content.business;
 
@@ -47,55 +47,51 @@ import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 
-
 /**
  * 
- *  Last modified: $Date: 2005/06/22 17:17:10 $ by $Author: eiki $
- * This class implements the Searchplugin interface and can therefore be used in a Search block (com.idega.core.search)<br>
- *  for searching contents and properties (metadata) of the files in the iwfile system.
- * To use it simply register this class as a iw.searchable component in a bundle.
+ * Last modified: $Date: 2005/06/22 18:04:27 $ by $Author: eiki $ This class
+ * implements the Searchplugin interface and can therefore be used in a Search
+ * block (com.idega.core.search)<br>
+ * for searching contents and properties (metadata) of the files in the iwfile
+ * system. To use it simply register this class as a iw.searchable component in
+ * a bundle.
+ * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class ContentSearch implements SearchPlugin {
 
 	private static final String DASL_WHERE_XML_SNIPPET = "</D:where>";
 	public static final String SEARCH_NAME_LOCALIZABLE_KEY = "content_search.name";
 	public static final String SEARCH_DESCRIPTION_LOCALIZABLE_KEY = "content_search.description";
-	
 	public static final String SEARCH_TYPE = "document";
-	
 	public static final String DOCUMENT_SEARCH_WORD_PARAMETER_NAME = "doc_s_word";
 	public static final String DOCUMENT_TYPE_PARAMETER_NAME = "doc_type";
 	public static final String DOCUMENT_ORDERING_PARAMETER_NAME = "doc_order";
 	public static final String DOCUMENT_ORDERING_BY_DATE = "doc_order_date";
 	public static final String DOCUMENT_ORDERING_BY_NAME = "doc_order_name";
 	public static final String DOCUMENT_ORDERING_BY_SIZE = "doc_order_size";
-	
-	
 	private static final String TEMP_ILLEGAL_PATH = "/files/users/";
 	private String tempCurrentUserPath;
-
-
 	static final PropertyName DISPLAYNAME = new PropertyName("DAV:", "displayname");
 	static final PropertyName CONTENTLENGTH = new PropertyName("DAV:", "getcontentlength");
 	static final PropertyName CREATOR_DISPLAY_NAME = new PropertyName("DAV:", "creator-displayname");
 	static final PropertyName COMMENT = new PropertyName("DAV:", "comment");
-	
 	private IWMainApplication iwma = null;
 	private HttpURL httpURL;
 
-	
 	public ContentSearch() {
 		super();
 	}
-	
+
 	public ContentSearch(IWMainApplication iwma) {
 		this();
 		initialize(iwma);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.idega.core.search.business.SearchPlugin#getAdvancedSearchSupportedParameters()
 	 */
 	public List getAdvancedSearchSupportedParameters() {
@@ -106,33 +102,37 @@ public class ContentSearch implements SearchPlugin {
 		return parameters;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.idega.core.search.business.SearchPlugin#getSupportsSimpleSearch()
 	 */
 	public boolean getSupportsSimpleSearch() {
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.idega.core.search.business.SearchPlugin#getSupportsAdvancedSearch()
 	 */
 	public boolean getSupportsAdvancedSearch() {
 		return true;
 	}
-	
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.idega.core.search.business.SearchPlugin#initialize(com.idega.idegaweb.IWMainApplication)
 	 */
 	public boolean initialize(IWMainApplication iwma) {
 		this.iwma = iwma;
 		try {
-			IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(iwma.getIWApplicationContext(), IWSlideService.class);
+			IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(iwma.getIWApplicationContext(),
+					IWSlideService.class);
 			httpURL = service.getWebdavServerURL();
-			
 			IWContext iwc = IWContext.getInstance();
 			tempCurrentUserPath = TEMP_ILLEGAL_PATH + iwc.getRemoteUser();
-			
 		}
 		catch (IBOLookupException e) {
 			e.printStackTrace();
@@ -142,17 +142,20 @@ public class ContentSearch implements SearchPlugin {
 			e.printStackTrace();
 			return false;
 		}
-
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.idega.core.search.business.SearchPlugin#destroy(com.idega.idegaweb.IWMainApplication)
 	 */
 	public void destroy(IWMainApplication iwma) {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.idega.core.search.business.SearchPlugin#createSearch(com.idega.core.search.business.SearchQuery,java.util.List)
 	 */
 	public Search createSearch(SearchQuery searchQuery, List searchRequests) {
@@ -161,41 +164,33 @@ public class ContentSearch implements SearchPlugin {
 		searcher.setSearchName(getSearchName());
 		searcher.setSearchType(SEARCH_TYPE);
 		searcher.setSearchQuery(searchQuery);
-		
 		try {
-			IWSlideSession session = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(), IWSlideSession.class);
+			IWSlideSession session = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),
+					IWSlideSession.class);
 			String servletMapping = session.getWebdavServerURI();
 			HttpClient client = new HttpClient();
 			client.setState(new WebdavState());
 			HostConfiguration hostConfig = client.getHostConfiguration();
 			hostConfig.setHost(httpURL);
-			
-	        Credentials hostCredentials = session.getUserCredentials();
-	
-	        if (hostCredentials != null) {
-	            HttpState clientState = client.getState();
-	            clientState.setCredentials(null, httpURL.getHost(),hostCredentials);
-	            clientState.setAuthenticationPreemptive(true);
-	        }
-	        
-	        
+			Credentials hostCredentials = session.getUserCredentials();
+			if (hostCredentials != null) {
+				HttpState clientState = client.getState();
+				clientState.setCredentials(null, httpURL.getHost(), hostCredentials);
+				clientState.setAuthenticationPreemptive(true);
+			}
 			for (Iterator iter = searchRequests.iterator(); iter.hasNext();) {
-				
 				Object request = (Object) iter.next();
 				String queryXML = null;
-				
-				if(request instanceof String){
-					queryXML = (String)request;
+				if (request instanceof String) {
+					queryXML = (String) request;
 				}
-				else{
+				else {
 					SearchRequest query = (SearchRequest) request;
 					queryXML = query.asString();
 				}
-				
 				SearchMethod contentSearch = new SearchMethod(servletMapping, queryXML);
 				executeSearch(results, servletMapping, contentSearch, client);
 			}
-			
 			searcher.setSearchResults(results);
 		}
 		catch (IBOLookupException e) {
@@ -210,215 +205,228 @@ public class ContentSearch implements SearchPlugin {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 		return searcher;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.idega.core.search.business.SearchPlugin#createSearch(java.util.List)
 	 */
 	public Search createSearch(List searchRequests) {
-		return createSearch(null,searchRequests);
+		return createSearch(null, searchRequests);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.idega.core.search.business.SearchPlugin#createSearch(SearchRequest)
 	 */
 	public Search createSearch(SearchRequest searchRequest) {
-		return createSearch(null,Collections.singletonList(searchRequest));
+		return createSearch(null, Collections.singletonList(searchRequest));
 	}
 
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.idega.core.search.business.SearchPlugin#createSearch(com.idega.core.search.business.SearchQuery)
 	 */
 	public Search createSearch(SearchQuery searchQuery) {
 		List l = new ArrayList();
-		
 		try {
-			if(searchQuery instanceof AdvancedSearchQuery){
-				String content = getAdvancedContentSearch(searchQuery);	
+			if (searchQuery instanceof AdvancedSearchQuery) {
+				String content = getAdvancedContentSearch(searchQuery);
 				l.add(content);
 			}
-			else if(searchQuery instanceof SimpleSearchQuery){
-				//SearchRequest content = getContentSearch(searchQuery);
+			else if (searchQuery instanceof SimpleSearchQuery) {
+				// SearchRequest content = getContentSearch(searchQuery);
 				String contentSearchXML = getContentSearch(searchQuery);
-				
-				String propertySearchXML = getPropertySearch(searchQuery);
-				
+		//		String propertySearchXML = getPropertySearch(searchQuery);
 				l.add(contentSearchXML);
-				l.add(propertySearchXML);
+			//	l.add(propertySearchXML);
 			}
-			
 		}
 		catch (SearchException e) {
 			e.printStackTrace();
 		}
-			
 		return createSearch(searchQuery, l);
-
 	}
-
 
 	protected String getAdvancedContentSearch(SearchQuery searchQuery) throws SearchException {
 		SearchRequest s = new SearchRequest();
-
 		s.addSelection(CONTENTLENGTH);
 		s.addScope(new SearchScope("files"));
-		
 		Map params = searchQuery.getSearchParameters();
-		
 		String queryString = (String) params.get(DOCUMENT_SEARCH_WORD_PARAMETER_NAME);
 		String type = (String) params.get(DOCUMENT_TYPE_PARAMETER_NAME);
 		String ordering = (String) params.get(DOCUMENT_ORDERING_PARAMETER_NAME);
-		
 		SearchExpression expression = null;
-		if(queryString!=null && !"".equals(queryString)){
-			//does contain have to be separate?
-			expression = s.contains(queryString);
-			expression = s.or(expression,s.or( s.compare(CompareOperator.LIKE, DISPLAYNAME,"*"+queryString+"*"),s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME,queryString),s.compare(CompareOperator.LIKE, COMMENT,"*"+queryString+"*"))));
-		}
-
-		if(type!=null && !"".equals(type) && !"*".equals(type)){
-			if(expression!=null){
-				expression = s.and(expression,s.compare(CompareOperator.LIKE, DISPLAYNAME,"*."+type));
+		if (queryString != null && !"".equals(queryString)) {
+			// does contain have to be separate?
+			String[] tokens = queryString.split(" ");
+			for (int i = 0; i < tokens.length; i++) {
+				String searchWord = tokens[i];
+				SearchExpression orExpression = s.contains(queryString);
+				orExpression = s.or(orExpression, s.or(s.compare(CompareOperator.LIKE, DISPLAYNAME, "*" + searchWord
+						+ "*"), s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME, searchWord), s.compare(
+						CompareOperator.LIKE, COMMENT, "*" + searchWord + "*"))));
+				if (expression != null) {
+					expression = s.and(orExpression, expression);
+				}
+				else {
+					expression = orExpression;
+				}
 			}
-			else{
-				expression = s.compare(CompareOperator.LIKE, DISPLAYNAME,"*."+type);
+		}
+		if (type != null && !"".equals(type) && !"*".equals(type)) {
+			if (expression != null) {
+				expression = s.and(expression, s.compare(CompareOperator.LIKE, DISPLAYNAME, "*." + type));
+			}
+			else {
+				expression = s.compare(CompareOperator.LIKE, DISPLAYNAME, "*." + type);
 			}
 		}
-		
-		if(expression!=null){
+		if (expression != null) {
 			s.setWhereExpression(expression);
 		}
-
 		String searchXML = s.asString();
-		String orderingXML = null; 
-		
-		if(ordering!=null && !"".equals(ordering)){
-			orderingXML = new String("<D:orderby><D:order><D:prop><D:"+ordering+"/></D:prop></D:order></D:orderby>");
+		String orderingXML = null;
+		if (ordering != null && !"".equals(ordering)) {
+			orderingXML = new String("<D:orderby><D:order><D:prop><D:" + ordering + "/></D:prop></D:order></D:orderby>");
 		}
-		else{
+		else {
 			orderingXML = new String("<D:orderby><D:order><D:prop><D:displayname/></D:prop></D:order></D:orderby>");
 		}
-		
-		//FIXME because the query objects do not support order by yet...
+		// FIXME because the query objects do not support order by yet...
 		int index = searchXML.indexOf(DASL_WHERE_XML_SNIPPET);
-		searchXML = searchXML.substring(0,index+DASL_WHERE_XML_SNIPPET.length())+orderingXML+searchXML.substring(index+DASL_WHERE_XML_SNIPPET.length());
+		searchXML = searchXML.substring(0, index + DASL_WHERE_XML_SNIPPET.length()) + orderingXML
+				+ searchXML.substring(index + DASL_WHERE_XML_SNIPPET.length());
 		//
-		
 		return searchXML;
 	}
-	
-	
+
 	protected String getContentSearch(SearchQuery searchQuery) throws SearchException {
 		SearchRequest s = new SearchRequest();
-
 		s.addSelection(CONTENTLENGTH);
 		s.addScope(new SearchScope("files"));
-		
-		String queryString = ((SimpleSearchQuery)searchQuery).getSimpleSearchQuery();
-		
-		SearchExpression expression = s.contains(queryString);
+		String queryString = ((SimpleSearchQuery) searchQuery).getSimpleSearchQuery();
+		SearchExpression expression = null;
+		String[] tokens = queryString.split(" ");
+		for (int i = 0; i < tokens.length; i++) {
+			String searchWord = tokens[i];
+			SearchExpression contains = s.contains(searchWord);
+			if (expression != null) {
+				expression = s.and(contains, expression);
+			}
+			else {
+				expression = contains;
+			}
+		}
 		s.setWhereExpression(expression);
-		
 		String searchXML = s.asString();
 		String orderingXML = new String("<D:orderby><D:order><D:prop><D:displayname/></D:prop></D:order></D:orderby>");
-		
-		//FIXME because the query objects do not support order by yet...
+		// FIXME because the query objects do not support order by yet...
 		int index = searchXML.indexOf(DASL_WHERE_XML_SNIPPET);
-		searchXML = searchXML.substring(0,index+DASL_WHERE_XML_SNIPPET.length())+orderingXML+searchXML.substring(index+DASL_WHERE_XML_SNIPPET.length());
+		searchXML = searchXML.substring(0, index + DASL_WHERE_XML_SNIPPET.length()) + orderingXML
+				+ searchXML.substring(index + DASL_WHERE_XML_SNIPPET.length());
 		//
-		
 		return searchXML;
 	}
-	
+
 	protected String getPropertySearch(SearchQuery searchQuery) throws SearchException {
 		SearchRequest s = new SearchRequest();
 		s.addSelection(CONTENTLENGTH);
-
 		s.addScope(new SearchScope("files"));
-		
-		String queryString = ((SimpleSearchQuery)searchQuery).getSimpleSearchQuery();
-		
-		SearchExpression expression = s.or( s.compare(CompareOperator.LIKE, DISPLAYNAME,"*"+queryString+"*"),
-		s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME,queryString),s.compare(CompareOperator.LIKE, COMMENT,"*"+queryString+"*")) );
-		//add other properties
-		
+		String queryString = ((SimpleSearchQuery) searchQuery).getSimpleSearchQuery();
+		SearchExpression expression = null;
+		String[] tokens = queryString.split(" ");
+		for (int i = 0; i < tokens.length; i++) {
+			String searchWord = tokens[i];
+			SearchExpression orExpression = s.or(s.compare(CompareOperator.LIKE, DISPLAYNAME, "*" + searchWord + "*"),
+					s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME, searchWord), s.compare(
+							CompareOperator.LIKE, COMMENT, "*" + searchWord + "*")));
+			if (expression != null) {
+				expression = s.and(orExpression, expression);
+			}
+			else {
+				expression = orExpression;
+			}
+		}
+		// add other properties
 		s.setWhereExpression(expression);
-		
-//		StringBuffer searchXML = new StringBuffer();
-//		searchXML.append("<D:searchrequest xmlns:D=\"DAV:\"><D:basicsearch><D:select><D:prop><D:getcontentlength/></D:prop></D:select>");
-//		searchXML.append("<D:from><D:scope><D:href>files</D:href><D:depth>infinity</D:depth></D:scope></D:from>");
-//		searchXML.append("<D:where>");
-//		searchXML.append("<D:like><D:prop><D:displayname/></D:prop><D:literal>*"+queryString+"*</D:literal></D:like>");
-//		searchXML.append("</D:where>");
-//		searchXML.append("<D:orderby><D:order><D:prop><D:displayname/></D:prop></D:order></D:orderby>");
-//		searchXML.append("</D:basicsearch></D:searchrequest>");
-//		System.out.println(searchXML);
-		
+		// StringBuffer searchXML = new StringBuffer();
+		// searchXML.append("<D:searchrequest
+		// xmlns:D=\"DAV:\"><D:basicsearch><D:select><D:prop><D:getcontentlength/></D:prop></D:select>");
+		// searchXML.append("<D:from><D:scope><D:href>files</D:href><D:depth>infinity</D:depth></D:scope></D:from>");
+		// searchXML.append("<D:where>");
+		// searchXML.append("<D:like><D:prop><D:displayname/></D:prop><D:literal>*"+queryString+"*</D:literal></D:like>");
+		// searchXML.append("</D:where>");
+		// searchXML.append("<D:orderby><D:order><D:prop><D:displayname/></D:prop></D:order></D:orderby>");
+		// searchXML.append("</D:basicsearch></D:searchrequest>");
+		// System.out.println(searchXML);
 		String searchXML = s.asString();
 		String orderingXML = new String("<D:orderby><D:order><D:prop><D:displayname/></D:prop></D:order></D:orderby>");
-		
-		//FIXME because the query objects do not support order by yet...
+		// FIXME because the query objects do not support order by yet...
 		int index = searchXML.indexOf(DASL_WHERE_XML_SNIPPET);
-		searchXML = searchXML.substring(0,index+DASL_WHERE_XML_SNIPPET.length())+orderingXML+searchXML.substring(index+DASL_WHERE_XML_SNIPPET.length());
+		searchXML = searchXML.substring(0, index + DASL_WHERE_XML_SNIPPET.length()) + orderingXML
+				+ searchXML.substring(index + DASL_WHERE_XML_SNIPPET.length());
 		//
-		return searchXML.toString();
+		return searchXML;
 	}
 
-	protected void executeSearch(List results, String servletMapping, SearchMethod method, HttpClient client) throws IOException, HttpException {
+	protected void executeSearch(List results, String servletMapping, SearchMethod method, HttpClient client)
+			throws IOException, HttpException {
 		int state = client.executeMethod(method);
-		//todo remove
+		// todo remove
 		System.out.println("DASL Search result state: " + state);
-//		Header[] headers = method.getResponseHeaders();
-//		for (int i = 0; i < headers.length; i++) {
-//			System.out.println(headers[i].toString());
-//		}
-		
-		//todo remove when access control is ok, also change search to ignore folders?
-		tempCurrentUserPath = servletMapping+tempCurrentUserPath;
-		String tempUsersRootPath = servletMapping+TEMP_ILLEGAL_PATH;
-		
+		// Header[] headers = method.getResponseHeaders();
+		// for (int i = 0; i < headers.length; i++) {
+		// System.out.println(headers[i].toString());
+		// }
+		// todo remove when access control is ok, also change search to ignore
+		// folders?
+		tempCurrentUserPath = servletMapping + tempCurrentUserPath;
+		String tempUsersRootPath = servletMapping + TEMP_ILLEGAL_PATH;
 		Enumeration enumerator = method.getAllResponseURLs();
-		
 		while (enumerator.hasMoreElements()) {
 			String fileURI = (String) enumerator.nextElement();
-
-			if(!fileURI.equalsIgnoreCase(servletMapping)){
-				
-				//TODO remove temp stuff when accesscontrol is fixed
-				if(fileURI.startsWith(tempUsersRootPath) && !fileURI.startsWith(tempCurrentUserPath) ){
+			if (!fileURI.equalsIgnoreCase(servletMapping)) {
+				// TODO remove temp stuff when accesscontrol is fixed
+				if (fileURI.startsWith(tempUsersRootPath) && !fileURI.startsWith(tempCurrentUserPath)) {
 					continue;
 				}
-				else{
+				else {
 					BasicSearchResult result = new BasicSearchResult();
-					
 					result.setSearchResultType(SEARCH_TYPE);
 					result.setSearchResultURI(fileURI);
-					result.setSearchResultName(URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/")+1)));
-					result.setSearchResultExtraInformation(URLDecoder.decode(fileURI.substring(0,fileURI.lastIndexOf("/")+1)));
-					
+					result.setSearchResultName(URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/") + 1)));
+					result.setSearchResultExtraInformation(URLDecoder.decode(fileURI.substring(0,
+							fileURI.lastIndexOf("/") + 1)));
 					results.add(result);
 				}
 			}
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.idega.core.search.business.SearchPlugin#getSearchName()
 	 */
 	public String getSearchName() {
 		IWBundle bundle = ContentUtil.getBundle();
-		return bundle.getResourceBundle(IWContext.getInstance()).getLocalizedString(SEARCH_NAME_LOCALIZABLE_KEY,"Documents");
+		return bundle.getResourceBundle(IWContext.getInstance()).getLocalizedString(SEARCH_NAME_LOCALIZABLE_KEY,
+				"Documents");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.idega.core.search.business.SearchPlugin#getSearchDescription()
 	 */
 	public String getSearchDescription() {
 		IWBundle bundle = ContentUtil.getBundle();
-		return bundle.getResourceBundle(IWContext.getInstance()).getLocalizedString(SEARCH_DESCRIPTION_LOCALIZABLE_KEY,"Searches the contents of documents in an IdegaWeb file system.");
+		return bundle.getResourceBundle(IWContext.getInstance()).getLocalizedString(SEARCH_DESCRIPTION_LOCALIZABLE_KEY,
+				"Searches the contents of documents in an IdegaWeb file system.");
 	}
-	
 }
