@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.15 2005/06/02 17:08:53 eiki Exp $
+ * $Id: ContentViewManager.java,v 1.16 2005/08/11 18:35:10 tryggvil Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -26,10 +26,10 @@ import com.idega.repository.data.Singleton;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2005/06/02 17:08:53 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/08/11 18:35:10 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
 public class ContentViewManager implements Singleton  {
 
@@ -95,12 +95,15 @@ public class ContentViewManager implements Singleton  {
 		DefaultViewNode pagesNode = new DefaultViewNode("pages",contentNode);
 		pagesNode.setJspUri(bundle.getJSPURI("pages.jsp"));
 		pagesNode.setKeyboardShortcut(new KeyboardShortcut("p"));
+		pagesNode.setName("#{localizedStrings['com.idega.content']['pages']}");
 		
-		DefaultViewNode pageListNode = new DefaultViewNode("list",pagesNode);
-		pageListNode.setJspUri(bundle.getJSPURI("pages.jsp"));
+		//DefaultViewNode pageListNode = new DefaultViewNode("list",pagesNode);
+		//pageListNode.setJspUri(bundle.getJSPURI("pages.jsp"));
+		//pageListNode.setName("#{localizedStrings['com.idega.content']['list_pages']}");
 		
 		DefaultViewNode createPageNode = new DefaultViewNode("create",pagesNode);
 		createPageNode.setJspUri(bundle.getJSPURI("createpage.jsp"));
+		createPageNode.setName("#{localizedStrings['com.idega.content']['create_page']}");
 		
 		DefaultViewNode previewPageNode = new DefaultViewNode("preview",pagesNode);
 		previewPageNode.setJspUri(bundle.getJSPURI("pagepreview.jsp"));
@@ -109,9 +112,11 @@ public class ContentViewManager implements Singleton  {
 		DefaultViewNode detailsPageNode = new DefaultViewNode("details",pagesNode);
 		detailsPageNode.setJspUri(bundle.getJSPURI("pagedetails.jsp"));
 		detailsPageNode.setVisibleInMenus(false);
+		detailsPageNode.setName("#{localizedStrings['com.idega.content']['page_details']}");
 		
 		DefaultViewNode simpleTemplateNode = new DefaultViewNode("templatesettings",pagesNode);
 		simpleTemplateNode.setJspUri(bundle.getJSPURI("simpletemplate.jsp"));
+		simpleTemplateNode.setName("#{localizedStrings['com.idega.content']['template_settings']}");
 		
 		/* Page nodes end */
 		
@@ -120,6 +125,7 @@ public class ContentViewManager implements Singleton  {
 		//documentsNode.setJspUri(bundle.getJSPURI("documents.jsp"));
 		documentsNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
 		documentsNode.setKeyboardShortcut(new KeyboardShortcut("d"));
+		documentsNode.setName("#{localizedStrings['com.idega.content']['documents']}");
 		
 		DefaultViewNode previewNode = new DefaultViewNode("preview",documentsNode);
 		previewNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
@@ -132,6 +138,7 @@ public class ContentViewManager implements Singleton  {
 		DefaultViewNode searchNode = new DefaultViewNode("search",contentNode);
 		searchNode.setJspUri(bundle.getJSPURI("search.jsp"));	
 		searchNode.setKeyboardShortcut(new KeyboardShortcut("s"));
+		searchNode.setName("#{localizedStrings['com.idega.content']['search']}");
 		
 	}
 }
