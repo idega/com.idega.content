@@ -10,7 +10,7 @@ version="1.2">
 <jsf:view>
         <ws:page id="contentpages1">
                 <h:form id="contentpagesform1">
-					<wf:webview/>
+					<wf:webview title="#{localizedStrings['com.idega.content']['pages']}" />
                 </h:form>
         </ws:page>
 </jsf:view>

@@ -9,9 +9,10 @@
 version="1.2">
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 	<f:view>
-        <ws:page id="contentpages1">
+        <!--ws:page id="contentpages1"-->
+        <b:page id="contentpages1">
                 <h:form id="contentpagesform1">
-					<wf:wfblock title="Pages">
+					<wf:wfblock title="#{localizedStrings['com.idega.content']['template_settings']}">
 						<f:facet name="wf_block_toolbar">
 							<wf:toolbar id="toolbar">
 								<wf:toolbarbutton id="button1" displayText="#{localizedStrings['com.idega.builder']['create_simple_template.Create']}/#{localizedStrings['com.idega.builder']['create_simple_template.Edit']}" styleClass="page_create_edit_link"/>
@@ -106,6 +107,7 @@ version="1.2">
 						
 					</wf:wfblock>
                 </h:form>
-        </ws:page>
+        <!--/ws:page-->
+        </b:page>
 	</f:view>
 </jsp:root>

@@ -11,7 +11,7 @@ version="1.2">
 	<f:view>
         <ws:page id="createpage">
                 <h:form id="createpageform" name="createpageform">
-					<wf:wfblock title="#{localizedStrings['com.idega.content']['createpage.Pages']}">
+					<wf:wfblock title="#{localizedStrings['com.idega.content']['create_page']}">
 						<f:facet name="wf_block_toolbar">
 							<wf:toolbar id="toolbar">
 								<wf:toolbarbutton id="button1" displayText="#{localizedStrings['com.idega.content']['createpage.Create']}/#{localizedStrings['com.idega.content']['createpage.Edit']}" styleClass="page_create_edit_link"/>
