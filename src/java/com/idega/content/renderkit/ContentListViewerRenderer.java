@@ -1,5 +1,5 @@
 /*
- * $Id: ContentListViewerRenderer.java,v 1.3 2005/04/13 11:54:52 tryggvil Exp $ Created on
+ * $Id: ContentListViewerRenderer.java,v 1.4 2005/08/11 18:01:08 dainis Exp $ Created on
  * 27.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -14,27 +14,31 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.faces.component.UIColumn;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIData;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+
 import org.apache.myfaces.renderkit.JSFAttr;
 import org.apache.myfaces.renderkit.RendererUtils;
 import org.apache.myfaces.renderkit.html.HTML;
 import org.apache.myfaces.renderkit.html.HtmlRendererUtils;
 import org.apache.myfaces.util.ArrayUtils;
 import org.apache.myfaces.util.StringUtils;
+
 import com.idega.content.presentation.ContentItemListViewer;
 import com.idega.util.RenderUtils;
+import com.idega.webface.WFContainer;
 import com.idega.webface.renderkit.BaseRenderer;
 
 /**
  * 
- * Last modified: $Date: 2005/04/13 11:54:52 $ by $Author: tryggvil $
+ * Last modified: $Date: 2005/08/11 18:01:08 $ by $Author: dainis $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class ContentListViewerRenderer extends BaseRenderer {
 	
@@ -90,16 +94,20 @@ public class ContentListViewerRenderer extends BaseRenderer {
 		RenderUtils.renderChild(facesContext,comp);
 	}
 
-	public void encodeChildren(FacesContext facesContext, UIComponent component) throws IOException {
+	public void encodeChildren(FacesContext facesContext, UIComponent component) throws IOException {		
 		RendererUtils.checkParamValidity(facesContext, component, UIData.class);
 		UIData uiData = (UIData) component;
 		ResponseWriter writer = facesContext.getResponseWriter();
+		
+		String savedArticleItemStyleClass = null;
+		String firstArticleItemStyleClass = null;
 		
 		String rowClasses;
 		String columnClasses;
 		if (component instanceof ContentItemListViewer) {
 			rowClasses = ((ContentItemListViewer) component).getRowClasses();
 			columnClasses = ((ContentItemListViewer) component).getColumnClasses();
+			firstArticleItemStyleClass = ((ContentItemListViewer) component).getFirstArticleItemStyleClass();
 		}
 		else {
 			rowClasses = (String) component.getAttributes().get(JSFAttr.ROW_CLASSES_ATTR);
@@ -117,7 +125,8 @@ public class ContentListViewerRenderer extends BaseRenderer {
 		if (last > rowCount)
 			last = rowCount;
 		for (int i = first; i < last; i++) {
-			uiData.setRowIndex(i);
+			uiData.setRowIndex(i);   
+			
 			if (!uiData.isRowAvailable()) {
 				logError("Row is not available. Rowindex = " + i);
 				return;
@@ -132,7 +141,8 @@ public class ContentListViewerRenderer extends BaseRenderer {
 			}
 			List children = component.getChildren();
 			for (int j = 0, size = component.getChildCount(); j < size; j++) {
-				UIComponent child = (UIComponent) children.get(j);
+				UIComponent child = (UIComponent) children.get(j);				
+				
 				if (child instanceof UIColumn && ((UIColumn) child).isRendered()) {
 					if (styles.hasColumnStyle()) {
 						HtmlRendererUtils.writePrettyLineSeparator(facesContext);
@@ -141,6 +151,20 @@ public class ContentListViewerRenderer extends BaseRenderer {
 						writer.writeAttribute(HTML.CLASS_ATTR, columnStyle, null);
 					}
 					HtmlRendererUtils.writePrettyLineSeparator(facesContext);
+					
+					if (!(firstArticleItemStyleClass == null)) {
+						List childrenOfAChild = child.getChildren(); // the same as getting first child...					
+						for (int k = 0; k < child.getChildCount(); k++) { 
+							WFContainer article = (WFContainer) childrenOfAChild.get(k);
+							if (i == first) { // this is first atricle item
+								savedArticleItemStyleClass = article.getStyleClass();
+								article.setStyleClass(firstArticleItemStyleClass);  
+							} else {
+								article.setStyleClass(savedArticleItemStyleClass);
+							}
+						}
+					}					
+					
 					RendererUtils.renderChild(facesContext, child);
 					if (styles.hasColumnStyle()) {
 						writer.endElement(DIV_ELEM);

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewerTag.java,v 1.4 2005/02/23 14:57:17 gummi Exp $
+ * $Id: ContentItemListViewerTag.java,v 1.5 2005/08/11 18:01:08 dainis Exp $
  * Created on 31.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -20,10 +20,10 @@ import com.idega.content.presentation.ContentItemListViewer;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/23 14:57:17 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/08/11 18:01:08 $ by $Author: dainis $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ContentItemListViewerTag extends UIComponentTag {
 
@@ -32,6 +32,7 @@ public class ContentItemListViewerTag extends UIComponentTag {
 	private String detailsViewerPath;
 	private List categories = null;
 	private static final String listDelim = ",";
+	private String firstArticleItemStyleClass = null;
 	
 	/**
 	 * 
@@ -56,6 +57,7 @@ public class ContentItemListViewerTag extends UIComponentTag {
 		managedBeanId = null;
 		detailsViewerPath = null;
 		categories = null;
+		firstArticleItemStyleClass = null;
 	}
 
 	protected void setProperties(UIComponent component) {      
@@ -66,6 +68,7 @@ public class ContentItemListViewerTag extends UIComponentTag {
 			viewer.setResourcePath(resourcePath);
 			viewer.setDetailsViewerPath(detailsViewerPath);
 			viewer.setCategories(categories);
+			viewer.setFirstArticleItemStyleClass(firstArticleItemStyleClass);
 		}
 	}
 	
@@ -127,5 +130,19 @@ public class ContentItemListViewerTag extends UIComponentTag {
 		} else {	
 			this.categories = null;
 		}
+	}
+
+	/**
+	 * @return Returns the style class for first article list item.
+	 */	
+	public String getFirstArticleItemStyleClass() {
+		return firstArticleItemStyleClass;
+	}
+
+	/**
+	 * @param firstArticleItemStyleClass The first article item to set.
+	 */
+	public void setFirstArticleItemStyleClass(String firstArticleItemStyleClass) {
+		this.firstArticleItemStyleClass = firstArticleItemStyleClass;
 	}
 }
