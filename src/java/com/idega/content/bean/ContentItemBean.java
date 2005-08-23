@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.8 2005/06/02 12:05:11 gummi Exp $
+ * $Id: ContentItemBean.java,v 1.9 2005/08/23 15:25:03 thomas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -49,10 +49,10 @@ import com.idega.webface.WFUtil;
 /**
  * Bean for idegaWeb content items.   
  * <p>
- * Last modified: $Date: 2005/06/02 12:05:11 $ by $Author: gummi $
+ * Last modified: $Date: 2005/08/23 15:25:03 $ by $Author: thomas $
  *
  * @author Anders Lindman
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 
 public abstract class ContentItemBean implements Serializable, ICFile, ContentItem {
@@ -874,6 +874,10 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	 */
 	public Iterator getChildrenIterator(String p0) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public Iterator getChildrenIterator(String p0, boolean p1) {
 		return null;
 	}
 
