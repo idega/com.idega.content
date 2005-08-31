@@ -133,3 +133,40 @@
 	border: 1px solid #CCCCCC;
 	overflow: auto;
 }
+
+
+.content_item_toolbarcontainer{
+
+	padding: 1px;
+	margin: 4px;
+	font-style: Verdana, Helvetica, Sans-Serif;
+	font-size:0.9em;
+	font-style:none;
+	
+	overflow:none;
+}
+
+.content_item_toolbar{
+
+	padding: 0px;
+	margin: 0px;
+	overflow:none;
+}
+
+.content_item_toolbar li{
+	border: 1px solid #D3D3D3;
+	background-color: #F2F2F2;
+	margin: 1px;
+	padding:3px;
+	list-style: none;
+	display:inline;
+}
+
+.content_item_toolbar li.first{
+
+}
+
+.content_item_toolbar li.last{
+	
+}
+
