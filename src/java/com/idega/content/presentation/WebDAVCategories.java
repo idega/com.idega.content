@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.6 2005/05/23 07:44:59 gummi Exp $
+ * $Id: WebDAVCategories.java,v 1.7 2005/09/01 22:40:40 eiki Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -46,10 +46,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2005/05/23 07:44:59 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/09/01 22:40:40 $ by $Author: eiki $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -112,29 +112,31 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 			resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
 					iwc, WebDAVMetadataResource.class);
 			Collection selectedCategories = resource.getCategories(resourcePath);
-			Iterator selectedIter = selectedCategories.iterator();
-			while(selectedIter.hasNext()) {
-				String text = selectedIter.next().toString();
-				//Checkbox
-				HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
-				smc.setValue(new Boolean(true));
-				String id = CATEGORY+count;
-//				System.out.println("CATEGORY-COMPONENT-ID:"+id);
-				smc.setId(id);
-				smc.getAttributes().put(RESOURCE_PATH,resourcePath);
-				categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
-				//Text
-				HtmlOutputText catText = new HtmlOutputText();
-				catText.setValue(text);
-				categoriesTable.add(catText,count%COLLUMNS + 1,count/COLLUMNS + 1);
-				count++;
+			if(selectedCategories!=null){
+				Iterator selectedIter = selectedCategories.iterator();
+				while(selectedIter.hasNext()) {
+					String text = selectedIter.next().toString();
+					//Checkbox
+					HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
+					smc.setValue(new Boolean(true));
+					String id = CATEGORY+count;
+	//				System.out.println("CATEGORY-COMPONENT-ID:"+id);
+					smc.setId(id);
+					smc.getAttributes().put(RESOURCE_PATH,resourcePath);
+					categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
+					//Text
+					HtmlOutputText catText = new HtmlOutputText();
+					catText.setValue(text);
+					categoriesTable.add(catText,count%COLLUMNS + 1,count/COLLUMNS + 1);
+					count++;
+				}
 			}
 
 			//Display all the non-selected categories
 			Iterator nonSelectedIter = CategoryUtil.getCategories().iterator();
 			while(nonSelectedIter.hasNext()) {
 				Object nonSel = nonSelectedIter.next();
-				if(!selectedCategories.contains(nonSel)) {
+				if(selectedCategories == null || !selectedCategories.contains(nonSel)) {
 					String text = nonSel.toString();
 					//Checkbox
 					HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
