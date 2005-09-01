@@ -1,5 +1,5 @@
 /*
- * $Id: ContentListViewerRenderer.java,v 1.5 2005/09/01 15:21:16 dainis Exp $ Created on
+ * $Id: ContentListViewerRenderer.java,v 1.6 2005/09/01 15:52:44 dainis Exp $ Created on
  * 27.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -35,10 +35,10 @@ import com.idega.webface.renderkit.BaseRenderer;
 
 /**
  * 
- * Last modified: $Date: 2005/09/01 15:21:16 $ by $Author: dainis $
+ * Last modified: $Date: 2005/09/01 15:52:44 $ by $Author: dainis $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class ContentListViewerRenderer extends BaseRenderer {
 	
@@ -173,23 +173,35 @@ public class ContentListViewerRenderer extends BaseRenderer {
                     for (int k = 0; k < child.getChildCount(); k++) { // because there is only one child allways 
                         WFContainer article = (WFContainer) childrenOfAChild.get(k);
                         if (i == first) {
-                            savedArticleItemStyleClass = article.getStyleClass();
+                            savedArticleItemStyleClass = article.getStyleClass();                        
                         }
+                        StringBuffer buf = new StringBuffer();
                         
                         if (!(firstArticleItemStyleClass == null)) {
                             if (i == first) { // this is first atricle item                                
-                                article.setStyleClass(firstArticleItemStyleClass);  
+                                buf.append(firstArticleItemStyleClass);  
                             } else {
-                                article.setStyleClass(savedArticleItemStyleClass);
+                                buf.append(savedArticleItemStyleClass);
                             }
+                        } else {
+                            buf.append(savedArticleItemStyleClass);
                         }
                         
-                        // this will break previous first article thingie... hmm... its not used anyway...:)
-                        if ((i % 2) == 0) {
-                            article.setStyleClass(savedArticleItemStyleClass + " " + "odd");
-                        } else {
-                            article.setStyleClass(savedArticleItemStyleClass + " " + "even");
+                        if (i == first) {                            
+                            buf.append(" ").append(savedArticleItemStyleClass).append("_first");
                         }
+                        if (i == last - 1) { //last                            
+                            buf.append(" ").append(savedArticleItemStyleClass).append("_last");
+                        }
+                        
+                        if ((i % 2) == 0) {
+                            buf.append(" ").append(savedArticleItemStyleClass).append("_odd");
+                        } else {
+                            buf.append(" ").append(savedArticleItemStyleClass).append("_even");
+                        }
+                        
+                        article.setStyleClass(buf.toString());
+                        
                     }
 					
 					RendererUtils.renderChild(facesContext, child);
