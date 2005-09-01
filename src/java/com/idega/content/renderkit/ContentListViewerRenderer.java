@@ -1,5 +1,5 @@
 /*
- * $Id: ContentListViewerRenderer.java,v 1.4 2005/08/11 18:01:08 dainis Exp $ Created on
+ * $Id: ContentListViewerRenderer.java,v 1.5 2005/09/01 15:21:16 dainis Exp $ Created on
  * 27.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -35,10 +35,10 @@ import com.idega.webface.renderkit.BaseRenderer;
 
 /**
  * 
- * Last modified: $Date: 2005/08/11 18:01:08 $ by $Author: dainis $
+ * Last modified: $Date: 2005/09/01 15:21:16 $ by $Author: dainis $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ContentListViewerRenderer extends BaseRenderer {
 	
@@ -152,7 +152,9 @@ public class ContentListViewerRenderer extends BaseRenderer {
 					}
 					HtmlRendererUtils.writePrettyLineSeparator(facesContext);
 					
-					if (!(firstArticleItemStyleClass == null)) {
+					
+                    /*
+                    if (!(firstArticleItemStyleClass == null)) {                        
 						List childrenOfAChild = child.getChildren(); // the same as getting first child...					
 						for (int k = 0; k < child.getChildCount(); k++) { 
 							WFContainer article = (WFContainer) childrenOfAChild.get(k);
@@ -163,7 +165,32 @@ public class ContentListViewerRenderer extends BaseRenderer {
 								article.setStyleClass(savedArticleItemStyleClass);
 							}
 						}
-					}					
+					}
+                    */
+					//different style classes to article items are assigned;
+                    //that will help to style articles 
+                    List childrenOfAChild = child.getChildren(); // the same as getting first child...
+                    for (int k = 0; k < child.getChildCount(); k++) { // because there is only one child allways 
+                        WFContainer article = (WFContainer) childrenOfAChild.get(k);
+                        if (i == first) {
+                            savedArticleItemStyleClass = article.getStyleClass();
+                        }
+                        
+                        if (!(firstArticleItemStyleClass == null)) {
+                            if (i == first) { // this is first atricle item                                
+                                article.setStyleClass(firstArticleItemStyleClass);  
+                            } else {
+                                article.setStyleClass(savedArticleItemStyleClass);
+                            }
+                        }
+                        
+                        // this will break previous first article thingie... hmm... its not used anyway...:)
+                        if ((i % 2) == 0) {
+                            article.setStyleClass(savedArticleItemStyleClass + " " + "odd");
+                        } else {
+                            article.setStyleClass(savedArticleItemStyleClass + " " + "even");
+                        }
+                    }
 					
 					RendererUtils.renderChild(facesContext, child);
 					if (styles.hasColumnStyle()) {
