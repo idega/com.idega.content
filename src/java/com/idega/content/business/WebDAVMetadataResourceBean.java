@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadataResourceBean.java,v 1.7 2005/04/13 17:34:31 joakim Exp $
+ * $Id: WebDAVMetadataResourceBean.java,v 1.8 2005/09/01 21:46:53 eiki Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -30,10 +30,10 @@ import com.idega.slide.util.WebdavRootResource;
 /**
  * A resource bean that holds metadata info for the selected resouce
  * 
- * Last modified: $Date: 2005/04/13 17:34:31 $ by $Author: joakim $
+ * Last modified: $Date: 2005/09/01 21:46:53 $ by $Author: eiki $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class WebDAVMetadataResourceBean extends IBOSessionBean 
 implements WebDAVMetadataResource
@@ -87,7 +87,10 @@ implements WebDAVMetadataResource
 	public Collection getCategories(String resourcePath) throws RemoteException, IOException {
 		//Cashing removed so that categories is loaded propperly... TODO look into how to use cashing again
 //		if(selectedCategories == null || !checkPath(resourcePath)) {
+		//eiki added if here. no idea what cashing is ;)
+		if(!"".equals(resourcePath)){
 			setMetadataBeans(resourcePath,getMetadataFromRepository(resourcePath),getCategoriesFromRepository(resourcePath));
+		}
 //		}
 		return selectedCategories;
 	}
