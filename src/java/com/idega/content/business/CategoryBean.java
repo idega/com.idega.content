@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryUtil.java,v 1.5 2005/05/11 18:30:32 gummi Exp $
+ * $Id: CategoryBean.java,v 1.1 2005/09/08 23:08:41 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -19,31 +19,68 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.util.WebdavStatus;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
+import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavRootResource;
 
 
 /**
- * <p>Utility functions for category. 
- * functions for getting and setting all the available categories</p>
- *  Last modified: $Date: 2005/05/11 18:30:32 $ by $Author: gummi $
+ * <p>
+ * Class for manipulating Categories that are stored in slide.<br/>
+ * Includes functions for getting and setting all the available categories
+ * </p>
+ *  Last modified: $Date: 2005/09/08 23:08:41 $ by $Author: tryggvil $
  * 
- * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.5 $
+ * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
+ * @version $Revision: 1.1 $
  */
-public class CategoryUtil {
-	private static final String CATEORY_FIX_PREFIX = "/cms/content";
+public class CategoryBean {
+	
+	private static String BEAN_KEY="ContentCategoryBean";
+	
+	//private static final String CATEORY_FIX_PREFIX = "/agura-intra/content";
 	private static final String CATEORY_CONFIG_PATH = "/files/cms/";
-//	private static final String CATEORY_CONFIG_FILE = CATEORY_CONFIG_PATH+"categories.properties";
-	private static final String CATEORY_CONFIG_FILE = CATEORY_CONFIG_PATH+"cat.prp";
+	private static final String CATEORY_CONFIG_FILE = CATEORY_CONFIG_PATH+"categories.prop";
+//	private static final String CATEORY_CONFIG_FILE = CATEORY_CONFIG_PATH+"cat.prp";
+	private IWMainApplication iwma;
+
+	protected CategoryBean(IWMainApplication iwma){
+		this.iwma=iwma;
+	}
+	
+	/**
+	 * <p>
+	 * Get the instance of the bean for this application.
+	 * </p>
+	 * @return
+	 */
+	public static CategoryBean getInstance(){
+		IWMainApplication iwma = IWMainApplication.getDefaultIWMainApplication();
+		CategoryBean bean = (CategoryBean) iwma.getAttribute(BEAN_KEY);
+		if(bean==null){
+			bean = new CategoryBean(iwma);
+			iwma.setAttribute(BEAN_KEY,bean);
+		}
+		return bean;
+	}
+	
+	public IWSlideService getSlideService(){
+		try {
+			return (IWSlideService)IBOLookup.getServiceInstance(iwma.getIWApplicationContext(),IWSlideService.class);
+		}
+		catch (IBOLookupException e) {
+			throw new RuntimeException("Error getting IWSlideService");
+		}
+	}
 	
 	/**
 	 * <p> Get a collection of categories </p>
 	 * @return collection of strings
 	 */
-	public static Collection getCategories() {
+	public Collection getCategories() {
 		Collection ret = new ArrayList();
 		
 		String categories = getCategoriesAsString();
@@ -57,10 +94,10 @@ public class CategoryUtil {
 	}
 	
 	/**
-	 * <p>Getts all the categories as a string</p>
+	 * <p>Getts all the categories as one String (comma separated)</p>
 	 * @return categories
 	 */
-	public static String getCategoriesAsString() {
+	public String getCategoriesAsString() {
 		IWUserContext iwuc = IWContext.getInstance();
 		String categories = null;
 		try {
@@ -68,8 +105,10 @@ public class CategoryUtil {
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 //			String filePath = service.getURI(CATEORY_FILE_PATH);
 //			System.out.println("Loading categories for "+filePath);
-			//TODO have to fix the path
-			categories = rootResource.getMethodDataAsString(CATEORY_FIX_PREFIX+CATEORY_CONFIG_FILE);
+			
+			String path = getSlideService().getURI(CATEORY_CONFIG_FILE);
+			
+			categories = rootResource.getMethodDataAsString(path);
 			if(rootResource.getStatusCode() != WebdavStatus.SC_OK){
 				return "";
 			}
@@ -93,7 +132,7 @@ public class CategoryUtil {
 	 * <p>Stores all the given categories</p>
 	 * @param categories
 	 */
-	public static void storeCategories(Collection categories) {
+	public void storeCategories(Collection categories) {
 		//Create a string out of the collection
 		StringBuffer sb = new StringBuffer();
 		boolean first = true;
@@ -112,7 +151,7 @@ public class CategoryUtil {
 	 * <p>Store categories</p>
 	 * @param categories
 	 */
-	public static void storeCategories(String categories) {
+	public void storeCategories(String categories) {
 		IWContext iwc = IWContext.getInstance();
 		
 		try {
@@ -121,14 +160,16 @@ public class CategoryUtil {
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 			//TODO make sure that the folder exists
 			//boolean hadToCreate = 
-			session.createAllFoldersInPath(CATEORY_FIX_PREFIX + CATEORY_CONFIG_PATH);
+			String path = getSlideService().getURI(CATEORY_CONFIG_PATH);
+			String filePath = getSlideService().getURI(CATEORY_CONFIG_FILE);
+			session.createAllFoldersInPath(path);
 //			System.out.println("Had to create folder "+hadToCreate);
 //			System.out.println("Storing categories "+categories+" to file "+CATEORY_CONFIG_FILE);
 			boolean putOK = rootResource.putMethod(CATEORY_CONFIG_FILE, categories);
 //			System.out.println("Put to "+CATEORY_CONFIG_FILE+" was "+putOK);
 			if(!putOK) {
-				putOK = rootResource.putMethod(CATEORY_FIX_PREFIX + CATEORY_CONFIG_FILE, categories);
-				System.out.println("Put to "+CATEORY_FIX_PREFIX + CATEORY_CONFIG_FILE+" was "+putOK);
+				putOK = rootResource.putMethod(filePath, categories);
+				System.out.println("Put to "+ filePath +" was "+putOK);
 			}
 //			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 //			String filePath = service.getURI(CATEORY_FILE_PATH);
@@ -153,7 +194,7 @@ public class CategoryUtil {
 	 * <p>Adds a category to the available categories</p>
 	 * @param category
 	 */
-	public static void addCategory(String category) {
+	public void addCategory(String category) {
 		if(getCategories().contains(category)) {
 			return;
 		}

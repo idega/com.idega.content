@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadata.java,v 1.13 2005/04/13 17:36:16 joakim Exp $
+ * $Id: WebDAVMetadata.java,v 1.14 2005/09/08 23:08:41 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -47,12 +47,12 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2005/04/13 17:36:16 $ by $Author: joakim $
+ * Last modified: $Date: 2005/09/08 23:08:41 $ by $Author: tryggvil $
  * 
  * Display the UI for adding metadata type - values to a file.
  *
  * @author Joakim Johnson
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	
@@ -91,7 +91,7 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 		WFList list = new WFList(METADATA_LIST_BEAN);
 		add(list);
 		add(getMetadataTable(resourcePath));
-//		add(getEditContainer());
+		add(getEditContainer());
 	}
 	
 	/**
