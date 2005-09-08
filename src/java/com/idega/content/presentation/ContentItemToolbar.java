@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.6 2005/08/31 19:32:23 tryggvil Exp $
+ * $Id: ContentItemToolbar.java,v 1.7 2005/09/08 23:10:15 tryggvil Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -27,10 +27,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/08/31 19:32:23 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/09/08 23:10:15 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
@@ -48,7 +48,8 @@ public class ContentItemToolbar extends WFToolbar {
 	 */
 	public ContentItemToolbar() {
 		super();
-		this.setStyleClass("content_item_toolbar");
+		//this.setStyleClass("content_item_toolbar");
+		this.setMenuStyleClass("content_item_toolbar");
 	}
 	
 	public IWActionURIManager getIWActionURIManager(){

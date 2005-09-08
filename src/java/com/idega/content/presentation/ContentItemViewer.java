@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.8 2005/06/13 14:16:12 gummi Exp $
+ * $Id: ContentItemViewer.java,v 1.9 2005/09/08 23:10:15 tryggvil Exp $
  * Created on 26.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -32,10 +32,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/06/13 14:16:12 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/09/08 23:10:15 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class ContentItemViewer extends WFContainer {
 	
@@ -582,7 +582,7 @@ public class ContentItemViewer extends WFContainer {
 	 * 
 	 */
 	public void updateToolbar() {
-		ContentItemToolbar toolbar = (ContentItemToolbar)getViewerFacet(FACET_TOOLBAR);
+		ContentItemToolbar toolbar = (ContentItemToolbar)getToolbar();
 		if(toolbar!=null){
 			toolbar.setResourcePath(getResourcePath());
 		}
@@ -597,9 +597,17 @@ public class ContentItemViewer extends WFContainer {
     }
     
     public void setToolbar(ContentItemToolbar toolbar){
-    		setViewerFacet(FACET_TOOLBAR, toolbar);
+    		//setViewerFacet(FACET_TOOLBAR, toolbar);
+    		
+    		getFacets().put(FACET_TOOLBAR,toolbar);
     }
 	
+    
+    public ContentItemToolbar getToolbar(){
+    		//ContentItemToolbar bar = getViewerFacet(FACET_TOOLBAR);
+    		ContentItemToolbar bar = (ContentItemToolbar)getFacets().get(FACET_TOOLBAR);
+    		return bar;
+    }
 	
 
 	/**

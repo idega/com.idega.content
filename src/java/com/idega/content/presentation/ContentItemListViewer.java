@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.7 2005/08/11 18:01:08 dainis Exp $
+ * $Id: ContentItemListViewer.java,v 1.8 2005/09/08 23:10:15 tryggvil Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -10,8 +10,11 @@
 package com.idega.content.presentation;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.StringTokenizer;
 import javax.faces.component.UIColumn;
 import javax.faces.component.UIData;
 import javax.faces.context.FacesContext;
@@ -24,10 +27,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- *  Last modified: $Date: 2005/08/11 18:01:08 $ by $Author: dainis $
+ *  Last modified: $Date: 2005/09/08 23:10:15 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class ContentItemListViewer extends UIData {
 
@@ -48,7 +51,8 @@ public class ContentItemListViewer extends UIData {
 	private boolean initialized = false;
 	
 	private String firstArticleItemStyleClass = null;
-
+	private static final String listDelim = ",";
+	
 	/**
 	 * 
 	 */
@@ -75,7 +79,7 @@ public class ContentItemListViewer extends UIData {
 		String var = managedBeanId + "_var";
 		setVar(var);
 
-		notifyManagedBeanOfVariableValues();
+		//notifyManagedBeanOfVariableValues();
 	}
 	
 	protected String[] getToolbarActions(){
@@ -83,6 +87,9 @@ public class ContentItemListViewer extends UIData {
 	}
 	
 	protected void initializeInEncodeBegin(){
+		
+		notifyManagedBeanOfVariableValues();
+		
 		ContentItemViewer viewer = (ContentItemViewer)WFUtil.invoke(this.managedBeanId,"getContentViewer");
 		viewer.setShowRequestedItem(false);
 		addContentItemViewer(viewer);
@@ -358,6 +365,42 @@ public class ContentItemListViewer extends UIData {
 	public List getCategories() {
 		return categories;
 	}
+	/**
+	 * <p>
+	 * Sets the categories as a comma separated list
+	 * </p>
+	 * @param categories
+	 */
+	public void setCategories(String categories){
+		if(categories!=null){
+			ArrayList cats = new ArrayList();
+			StringTokenizer tokenizer = new StringTokenizer(categories,listDelim);
+			while(tokenizer.hasMoreTokens()){
+				cats.add(tokenizer.nextToken());
+			}
+			List cats2 = (cats.isEmpty())?null:cats;
+			setCategories(cats2);
+		} else {	
+			//null
+		}
+	}
+	
+	public String getCategoriesAsString() {
+		if(categories!=null){
+			Iterator iter = categories.iterator();
+			if(iter.hasNext()){
+				StringBuffer catString = new StringBuffer();
+				catString.append((String)iter.next());
+				while(iter.hasNext()){
+					catString.append(listDelim);
+					catString.append((String)iter.next());
+				}
+			}
+		}
+		return null;
+	}
+	
+	
 	/**
 	 * @param categories The categories to set.
 	 */

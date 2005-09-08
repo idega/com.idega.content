@@ -135,7 +135,7 @@
 }
 
 
-.content_item_toolbarcontainer{
+.content_item_toolbar{
 
 	padding: 1px;
 	margin: 4px;
@@ -146,7 +146,7 @@
 	overflow:none;
 }
 
-.content_item_toolbar{
+.content_item_toolbar ul{
 
 	padding: 0px;
 	margin: 0px;

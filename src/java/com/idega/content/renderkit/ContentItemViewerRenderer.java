@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewerRenderer.java,v 1.2 2005/03/05 18:45:56 gummi Exp $
+ * $Id: ContentItemViewerRenderer.java,v 1.3 2005/09/08 23:10:15 tryggvil Exp $
  * Created on 16.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -19,10 +19,10 @@ import com.idega.webface.renderkit.ContainerRenderer;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/05 18:45:56 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/09/08 23:10:15 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ContentItemViewerRenderer extends ContainerRenderer {
 	
@@ -101,7 +101,8 @@ public class ContentItemViewerRenderer extends ContainerRenderer {
 	 * @throws IOException
 	 */
 	public void renderToolbar(FacesContext ctx, ContentItemViewer viewer) throws IOException {
-		RenderUtils.renderChild(ctx,viewer.getViewerFacetWrapper(ContentItemViewer.FACET_TOOLBAR));
+		UIComponent toolbar = (UIComponent) viewer.getFacets().get(ContentItemViewer.FACET_TOOLBAR);
+		RenderUtils.renderChild(ctx,toolbar);
 	}
 
 	
