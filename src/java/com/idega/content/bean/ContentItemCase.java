@@ -19,7 +19,7 @@ public interface ContentItemCase {
 
 	public final static String CASE_CODE = "CONTIM";
 
-	public final static String STATUS_NEW = "SNEW";
+	public final static String STATUS_NEW = "NEW";
 
 	public final static String STATUS_READY_FOR_REVIEW = "RFRV";
 

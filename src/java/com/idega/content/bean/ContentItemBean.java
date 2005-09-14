@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.9 2005/08/23 15:25:03 thomas Exp $
+ * $Id: ContentItemBean.java,v 1.10 2005/09/14 22:21:36 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -49,10 +49,10 @@ import com.idega.webface.WFUtil;
 /**
  * Bean for idegaWeb content items.   
  * <p>
- * Last modified: $Date: 2005/08/23 15:25:03 $ by $Author: thomas $
+ * Last modified: $Date: 2005/09/14 22:21:36 $ by $Author: tryggvil $
  *
  * @author Anders Lindman
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 
 public abstract class ContentItemBean implements Serializable, ICFile, ContentItem {
@@ -117,9 +117,9 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 		_createdTimestamp = createdTimestamp;
 		_createdByUserId = createdByUserId;
 		
-		if (_locale == null) {
-			setLocale(new Locale("sv"));
-		}
+		//if (_locale == null) {
+		//	setLocale(new Locale("sv"));
+		//}
 
 	}
 		
@@ -499,7 +499,8 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 			setResourcePath(webdavResource.getPath());
 			setName(webdavResource.getDisplayName());
 			
-			setVersionName(webdavResource.getVersionName());
+			String versionName = webdavResource.getVersionName();
+			setVersionName(versionName);
 			
 			String createDate = webdavResource.getCreationDateString();
 			if(createDate != null){

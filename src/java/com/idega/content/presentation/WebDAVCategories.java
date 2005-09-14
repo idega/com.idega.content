@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.8 2005/09/08 23:08:41 tryggvil Exp $
+ * $Id: WebDAVCategories.java,v 1.9 2005/09/14 22:21:37 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -14,6 +14,7 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
 import javax.faces.component.UIComponent;
+import javax.faces.component.UIOutput;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputText;
@@ -46,10 +47,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2005/09/08 23:08:41 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/09/14 22:21:37 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -62,7 +63,8 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	private static final int COLLUMNS = 3;		//Number of collumns to display the categories in
 
 	private String resourcePath = "";
-	private boolean setOnParent=true;
+	private boolean setOnParent=false;
+	private boolean displaySaveButton=true;
 	
 //	List categoryStatus = new ArrayList();
 
@@ -126,9 +128,10 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 			if(selectedCategories!=null){
 				Iterator selectedIter = selectedCategories.iterator();
 				while(selectedIter.hasNext()) {
-					String text = selectedIter.next().toString();
+					String categoryKey = selectedIter.next().toString();
 					//Checkbox
 					HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
+					setCategory(smc,categoryKey);
 					smc.setValue(new Boolean(true));
 					String id = CATEGORY+count;
 	//				System.out.println("CATEGORY-COMPONENT-ID:"+id);
@@ -137,7 +140,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 					categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					//Text
 					HtmlOutputText catText = new HtmlOutputText();
-					catText.setValue(text);
+					catText.setValue(categoryKey);
 					categoriesTable.add(catText,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					count++;
 				}
@@ -148,9 +151,10 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 			while(nonSelectedIter.hasNext()) {
 				Object nonSel = nonSelectedIter.next();
 				if(selectedCategories == null || !selectedCategories.contains(nonSel)) {
-					String text = nonSel.toString();
+					String categoryKey = nonSel.toString();
 					//Checkbox
 					HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
+					setCategory(smc,categoryKey);
 					smc.setValue(new Boolean(false));
 					String id = CATEGORY+count;
 //					System.out.println("CATEGORY-COMPONENT-ID:"+id);
@@ -159,18 +163,20 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 					categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					//Text
 					HtmlOutputText catText = new HtmlOutputText();
-					catText.setValue(text);
+					catText.setValue(categoryKey);
 					categoriesTable.add(catText,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					count++;
 				}
 			}
 
 			count--;
-			//Add the save button
-			if(resourcePath!=null && resourcePath.length()>0) {
-				WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
-				HtmlCommandButton addCategoryButton = localizer.getButtonVB(SAVE_ID, "save", this);
-				categoriesTable.add(addCategoryButton,1,count/COLLUMNS + 2);
+			if(getDisplaySaveButton()){
+				//Add the save button
+				if(resourcePath!=null && resourcePath.length()>0) {
+					WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
+					HtmlCommandButton addCategoryButton = localizer.getButtonVB(SAVE_ID, "save", this);
+					categoriesTable.add(addCategoryButton,1,count/COLLUMNS + 2);
+				}
 			}
 			
 			categoriesTable.setColumns(Math.min(count+1,COLLUMNS));
@@ -312,17 +318,21 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		//Build together the categories string
 		StringBuffer categories = new StringBuffer(",");
 		CategoryBean categoryBean = CategoryBean.getInstance();
-		Iterator iter = categoryBean.getCategories().iterator();
+		//Iterator iter = categoryBean.getCategories().iterator();
+		int categoriesCount = categoryBean.getCategories().size();
 		HtmlSelectBooleanCheckbox smc = null;
 		int count = 0;
-		while(iter.hasNext()) {
-			String text = iter.next().toString();
-			smc = (HtmlSelectBooleanCheckbox)comp.getParent().findComponent(CATEGORY+count++);
-
+		while(count<categoriesCount){
+		//while(iter.hasNext()) {
+			//String categoryKey = iter.next().toString();
+			String categoryKey = "";
+			String checkId=CATEGORY+count++;
+			smc = (HtmlSelectBooleanCheckbox)comp.getParent().findComponent(checkId);
+			categoryKey = getCategory(smc);
 			boolean bool = ((Boolean)smc.getValue()).booleanValue();
 //			System.out.println("Category "+text+" was set to "+bool);
 			if(bool) {
-				categories.append(text).append(",");
+				categories.append(categoryKey).append(",");
 			}
 		}
 		if(smc!=null) {
@@ -387,10 +397,11 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	 * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
 	 */
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[3];
+		Object values[] = new Object[4];
 		values[0] = super.saveState(ctx);
 		values[1] = resourcePath;
 		values[2] = Boolean.valueOf(setOnParent);
+		values[3] = Boolean.valueOf(displaySaveButton);
 		return values;
 	}
 
@@ -403,6 +414,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		super.restoreState(ctx, values[0]);
 		resourcePath = ((String) values[1]);
 		setOnParent = ((Boolean) values[2]).booleanValue();
+		displaySaveButton = ((Boolean) values[3]).booleanValue();
 	}
 	
 	
@@ -410,6 +422,14 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		super.encodeBegin(context);
 	}
 
+	public String getCategory(HtmlSelectBooleanCheckbox checkbox){
+		String categoryKey =  (String) checkbox.getAttributes().get("categoryKey");
+		return categoryKey;
+	}
+	
+	public void setCategory(HtmlSelectBooleanCheckbox checkbox,String categoryKey){
+		checkbox.getAttributes().put("categoryKey",categoryKey);
+	}
 
 	/**
 	 * <p>
@@ -423,5 +443,13 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	
 	public boolean getSetCategoriesOnParent(){
 		return setOnParent;
+	}
+	
+	public void setDisplaySaveButton(boolean displaySave){
+		this.displaySaveButton=displaySave;
+	}
+	
+	public boolean getDisplaySaveButton(){
+		return displaySaveButton;
 	}
 }
