@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.10 2005/09/14 22:21:36 tryggvil Exp $
+ * $Id: ContentItemBean.java,v 1.11 2005/09/14 23:35:39 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -40,6 +40,7 @@ import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
+import com.idega.slide.util.VersionHelper;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.IWTimestamp;
 import com.idega.webface.WFPage;
@@ -49,10 +50,10 @@ import com.idega.webface.WFUtil;
 /**
  * Bean for idegaWeb content items.   
  * <p>
- * Last modified: $Date: 2005/09/14 22:21:36 $ by $Author: tryggvil $
+ * Last modified: $Date: 2005/09/14 23:35:39 $ by $Author: tryggvil $
  *
  * @author Anders Lindman
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 
 public abstract class ContentItemBean implements Serializable, ICFile, ContentItem {
@@ -499,8 +500,11 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 			setResourcePath(webdavResource.getPath());
 			setName(webdavResource.getDisplayName());
 			
-			String versionName = webdavResource.getVersionName();
-			setVersionName(versionName);
+			//String versionName = webdavResource.getVersionName();
+			String version = VersionHelper.getLatestVersion(webdavResource);
+			if(version!=null){
+				setVersionName(version);
+			}
 			
 			String createDate = webdavResource.getCreationDateString();
 			if(createDate != null){
