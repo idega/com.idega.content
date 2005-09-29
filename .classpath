@@ -13,10 +13,6 @@
   </classpathentry>
   <classpathentry kind="src" path="/com.idega.builder">
   </classpathentry>
-  <classpathentry kind="var" path="MAVEN_REPO/otrix/jars/otrix-common-beta3.jar">
-  </classpathentry>
-  <classpathentry kind="var" path="MAVEN_REPO/otrix/jars/otrix-webtree-beta3.jar">
-  </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/slide/jars/jakarta-slide-webdavlib-2.2pre1.iwbuild4.jar">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/commons-httpclient/jars/commons-httpclient-2.0.2.jar">

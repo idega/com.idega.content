@@ -131,26 +131,6 @@
           <eclipse.dependency>${idegaweb.project.source.dependent}</eclipse.dependency>
       </properties>
     </dependency>
-    <dependency>
-      <groupId>otrix</groupId>
-      <artifactId>otrix-common</artifactId>
-      <version>beta3</version>
-      <type>jar</type>
-      <url>http://www.otrix.com/</url>
-      <properties>
-        <idegaweb.bundle.include>true</idegaweb.bundle.include>
-      </properties>
-    </dependency>
-    <dependency>
-      <groupId>otrix</groupId>
-      <artifactId>otrix-webtree</artifactId>
-      <version>beta3</version>
-      <type>jar</type>
-      <url>http://www.otrix.com/</url>
-      <properties>
-        <idegaweb.bundle.include>true</idegaweb.bundle.include>
-      </properties>
-    </dependency>
     <!-- already included in core -->
 
     <dependency>

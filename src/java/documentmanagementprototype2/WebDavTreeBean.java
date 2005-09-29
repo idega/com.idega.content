@@ -14,8 +14,6 @@ import com.idega.business.IBOLookup;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
-import com.otrix.faces.webtree.component.TreeNode;
-import com.otrix.faces.webtree.component.WebTree;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionListener;
 import org.apache.commons.httpclient.HttpURL;
@@ -59,7 +57,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
     protected void afterRenderResponse() {
     }
 
-    private WebTree tree;
+    //private WebTree tree;
 
 
     private String davHost = "localhost";
@@ -67,9 +65,9 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
     private String davPath = "/slide/files";
 
 
-    public WebTree getTree() {
-        return tree;
-    }
+    //public WebTree getTree() {
+    //    return tree;
+    //}
 
     private WebdavResource cloneResource(WebdavResource resource) throws WebdavException, HttpException, IOException {
         HttpURL url = new HttpURL("http://"+davHost+":"+davPort+resource.getPath());
@@ -82,7 +80,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
         return newResource;
     } 
 
-    public void setTree(WebTree theTree) {
+   /* public void setTree(WebTree theTree) {
         if (tree == null){
         	theTree.setExpandedIcon("../images/owtfolderexp.gif");
         	theTree.setIcon("../images/owtfoldercxp.gif");
@@ -94,18 +92,14 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
             
 //            rootNode.hide();
             
-            /*rootNode.setIcon("");
-            rootNode.setEnabled(false);
-            rootNode.setExpanded(true);
-            rootNode.setLabel("");*/
         } else {
             //refresh the tree, starting from root
             ((SlideTreeNode) tree.getChildren().get(0)).refresh();
         }
         tree = theTree;
-    }
+    }*/
 
-    private void initTree(WebTree tree) {
+    /*private void initTree(WebTree tree) {
         FacesContext fContext = javax.faces.context.FacesContext.getCurrentInstance();
         try {
             tree.getChildren().add(getSubTree(getRoot(), fContext));
@@ -113,7 +107,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
         } catch (Exception ex){
             tree.getChildren().add(new TreeNode("Exception: " + ex.getMessage() + " " + ex.getClass().getName()));
         }
-    }
+    }*/
    
 
 
@@ -138,9 +132,9 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
 
     private documentmanagementprototype2.WebDavTreeBean.SlideTreeNode getSubTree(WebdavResource resource, FacesContext fContext) throws IOException, HttpException{
         documentmanagementprototype2.WebDavTreeBean.SlideTreeNode node = new documentmanagementprototype2.WebDavTreeBean.SlideTreeNode(resource);
-        node.setActionListener(getApplication().createMethodBinding("#{WebDavTree.processAction}", new Class[] {javax.faces.event.ActionEvent.class }));
-        node.setImmediate(true);
-        node.setId(fContext.getViewRoot().createUniqueId());
+        //node.setActionListener(getApplication().createMethodBinding("#{WebDavTree.processAction}", new Class[] {javax.faces.event.ActionEvent.class }));
+        //node.setImmediate(true);
+        //node.setId(fContext.getViewRoot().createUniqueId());
 
         WebdavResource[] resources = resource.getChildResources().listResources();
         for (int i =0; i<resources.length; i++){
@@ -188,7 +182,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
     private String _selectedCollectionUri;
     public void processAction(javax.faces.event.ActionEvent actionEvent) throws javax.faces.event.AbortProcessingException {
             Object source = actionEvent.getSource();
-            documentmanagementprototype2.WebDavTreeBean.SlideTreeNode node = (documentmanagementprototype2.WebDavTreeBean.SlideTreeNode) actionEvent.getComponent();
+            /*documentmanagementprototype2.WebDavTreeBean.SlideTreeNode node = (SlideTreeNode) actionEvent.getComponent();
             WebdavResource resource = node.getWebdavResource();
             try{
                 _selectedCollectionUri = resource.getHttpURL().getURI();
@@ -196,9 +190,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
             }catch (org.apache.commons.httpclient.URIException ex){
                 java.lang.System.out.println(ex.getMessage());
 
-            }
-
-
+            }*/
             java.lang.System.out.print("Action event received");
 
     }
@@ -221,7 +213,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
     }*/
 
 
-        class SlideTreeNode extends TreeNode {
+        class SlideTreeNode {//extends TreeNode {
             private boolean _refreshed = true;
             private boolean _visible = true;
             private java.util.Map _children = new java.util.HashMap();
@@ -229,7 +221,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
             
             private SlideTreeNode(){}
             public SlideTreeNode(WebdavResource resource){
-                super(resource.getDisplayName());
+                //super(resource.getDisplayName());
                 _resource = resource;
             }
             public WebdavResource getWebdavResource(){
@@ -239,7 +231,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
                 return _resource.exists();
             }
             public void addTreeNode(SlideTreeNode child){
-                super.getChildren().add(child);
+                //super.getChildren().add(child);
                 _children.put(child.getDisplayName(), child);
             }
             public String getDisplayName(){
@@ -290,7 +282,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
                     SlideTreeNode childNode = (SlideTreeNode) childNodes.next();
                     if (! childNode.isRefreshed()){
                         
-                    	getChildren().remove(childNode);
+                    	// getChildren().remove(childNode);
                         
                     }
                 }
