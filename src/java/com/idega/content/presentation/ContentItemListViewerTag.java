@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewerTag.java,v 1.6 2005/09/08 23:10:15 tryggvil Exp $
+ * $Id: ContentItemListViewerTag.java,v 1.7 2005/10/04 11:47:09 gimmi Exp $
  * Created on 31.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -9,21 +9,16 @@
  */
 package com.idega.content.presentation;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
 import javax.faces.component.UIComponent;
 import javax.faces.webapp.UIComponentTag;
-import com.idega.content.presentation.ContentItemListViewer;
 
 
 /**
  * 
- *  Last modified: $Date: 2005/09/08 23:10:15 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/10/04 11:47:09 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class ContentItemListViewerTag extends UIComponentTag {
 

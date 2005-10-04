@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.9 2005/09/14 22:21:37 tryggvil Exp $
+ * $Id: WebDAVCategories.java,v 1.10 2005/10/04 11:47:09 gimmi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -14,7 +14,6 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIOutput;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputText;
@@ -47,10 +46,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2005/09/14 22:21:37 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/10/04 11:47:09 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
