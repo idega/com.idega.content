@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.11 2005/09/14 23:35:39 tryggvil Exp $
+ * $Id: ContentItemBean.java,v 1.12 2005/10/04 17:19:10 thomas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -38,6 +39,8 @@ import com.idega.data.IDOStoreException;
 import com.idega.data.TreeableEntity;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWUserContext;
+import com.idega.io.serialization.ObjectReader;
+import com.idega.io.serialization.ObjectWriter;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.VersionHelper;
@@ -50,10 +53,10 @@ import com.idega.webface.WFUtil;
 /**
  * Bean for idegaWeb content items.   
  * <p>
- * Last modified: $Date: 2005/09/14 23:35:39 $ by $Author: tryggvil $
+ * Last modified: $Date: 2005/10/04 17:19:10 $ by $Author: thomas $
  *
  * @author Anders Lindman
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 
 public abstract class ContentItemBean implements Serializable, ICFile, ContentItem {
@@ -1145,4 +1148,14 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	public String getDatasource(){
 		return null;
 	}
+	
+	// implements Storable
+	public Object write(ObjectWriter writer, IWContext iwc) throws RemoteException {
+		return writer.write(this, iwc);
+	}
+
+	// implements Storable
+	public Object read(ObjectReader reader, IWContext iwc) throws RemoteException {
+		return reader.read(this, iwc);
+	}	
 }
