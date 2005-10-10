@@ -68,7 +68,7 @@ version="1.2">
 			                <f:facet name="PageTreeNode">
 			                  <h:panelGroup>
 			                    <h:commandLink immediate="true" action="#{t.toggleExpanded}">
-			                      <h:graphicImage value="#{pageCreationBean.coreBundle.resourcesPath}/treeviewer/ui/iw/treeviewer_node_leaf.gif" border="0"/>
+			                      <h:graphicImage value="#{pageCreationBean.coreBundle.resourcesPath}/treeviewer/ui/iw/treeviewer_node_leaf.gif"/>
 			                    </h:commandLink>
 							   <h:commandLink  onclick="document.forms['createpageform'].elements['createpageform:selectedPageLocationIdentifier'].value='#{node.identifier}';document.forms['createpageform'].elements['createpageform:selectedPageLocationName'].value='#{node.description}';document.forms['createpageform'].elements['createpageform:pageLocation'].value='#{node.description}'">
 			                    	 <h:outputText value="#{node.description}" styleClass="nodeFolder"/>
