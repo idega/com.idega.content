@@ -97,7 +97,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 
 		WFBlock listBlock = new WFBlock();
 		WFTitlebar tb = new WFTitlebar();
-
+		String listBlockId = getId()+"_list";
+		
 		tb.addTitleText(getBundle().getLocalizedText("document_list"));
 		tb.addTitleText(getCurrentResourceName());
 		tb.setToolTip(getCurrentFolderPath());
@@ -105,10 +106,10 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 //		tb.addTitleText("WebDAVListBean.webDAVPath", true);
 //		listBlock.setToolbarEmbeddedInTitlebar(true);
 		listBlock.setTitlebar(tb);
-		listBlock.setToolbar(getToolbar());
+		listBlock.setToolbar(getToolbar(listBlockId));
 
 		WebDAVList list = new WebDAVList();
-		list.setId(getId()+"_list");
+		list.setId(listBlockId);
 		list.setRendered(renderWebDAVList);
 		list.setStartFolder(startFolder);
 		list.setRootFolder(rootFolder);
@@ -123,34 +124,38 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		
 		WFBlock detailsBlock = new WFBlock();
 		WFTitlebar detailsBar = new WFTitlebar();
+		String detailsBlockId = getId()+"_details";
 		detailsBar.addTitleText(getBundle().getLocalizedText("document_details"));
 		detailsBar.addTitleText(" (");
 		detailsBar.addTitleText(getCurrentFileName());
 		detailsBar.addTitleText(")");
 		detailsBlock.setTitlebar(detailsBar);
-		detailsBlock.setToolbar(getToolbar());
+		detailsBlock.setToolbar(getToolbar(detailsBlockId));
 		WebDAVFileDetails details = new WebDAVFileDetails();
 		details.setRendered(renderWebDAVFileDetails);
-		details.setId(getId()+"_details");
+		details.setId(detailsBlockId);
 		details.setUseVersionControl(useVersionControl);
 		detailsBlock.add(details);
 		
 		WFBlock previewBlock = new WFBlock();
 		WFTitlebar previewBar = new WFTitlebar();
+		String previewBlockId = getId()+"_preview";
+		String details2BlockId = getId()+"_details2";
+		
 		previewBar.addTitleText(getBundle().getLocalizedText("document_details"));
 		previewBar.addTitleText(" (");
 		previewBar.addTitleText(getCurrentFileName());
 		previewBar.addTitleText(")");
 		previewBlock.setTitlebar(previewBar);
-		previewBlock.setToolbar(getToolbar());
+		previewBlock.setToolbar(getToolbar(previewBlockId));
 		WebDAVFileDetails details2 = new WebDAVFileDetails();
 		details2.setRendered(renderWebDAVFilePreview);
-		details2.setId(getId()+"_details");
+		details2.setId(details2BlockId);
 		details2.setDetailed(false);
 		details2.setUseVersionControl(useVersionControl);
 		WebDAVFilePreview preview = new WebDAVFilePreview();
 		preview.setRendered(renderWebDAVFilePreview);
-		preview.setId(getId()+"_preview");
+		preview.setId(previewBlockId);
 		previewBlock.add(details2);
 		
 		WFBlock folderBlock = new WFBlock();
@@ -193,13 +198,14 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 
 		WFBlock permissionsBlock = new WFBlock();
 		WFTitlebar permissionsBar = new WFTitlebar();
+		String permissionsBlockId = getId()+"_permissions";
 		permissionsBar.addTitleText(getBundle().getLocalizedText("permissions"));
 		permissionsBar.addTitleText(getCurrentResourceName());
 		permissionsBlock.setTitlebar(permissionsBar);
-		permissionsBlock.setToolbar(getToolbar());
+		permissionsBlock.setToolbar(getToolbar(permissionsBlockId));
 		WebDAVFilePermissions permissions = new WebDAVFilePermissions();
 		permissions.setRendered(renderWebDAVFilePermissions);
-		permissions.setId(getId()+"_permissions");
+		permissions.setId(permissionsBlockId);
 		permissionsBlock.add(permissions);
 		
 		getFacets().put(ACTION_LIST, listBlock);
@@ -459,14 +465,14 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		if (list != null) {
 			list.setRendered(renderWebDAVList);
 			renderChild(context, list);
-			((WFBlock)list).setToolbar(getToolbar());
+			//((WFBlock)list).setToolbar(getToolbar());
 		}
 		
 		UIComponent details = getFacet(ACTION_FILE_DETAILS);
 		if (details != null) {
 			details.setRendered(renderWebDAVFileDetails);
 			renderChild(context, details);
-			((WFBlock)details).setToolbar(getToolbar());
+			//((WFBlock)details).setToolbar(getToolbar());
 		}
 
 		UIComponent detailsLess = getFacet(ACTION_FILE_DETAILS_LESS);
@@ -491,7 +497,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		if (permissions != null) {
 			permissions.setRendered(renderWebDAVFilePermissions);
 			renderChild(context, permissions);
-			((WFBlock)permissions).setToolbar(getToolbar());
+			//((WFBlock)permissions).setToolbar(getToolbar());
 		}
 		
 		UIComponent deleter = getFacet(ACTION_DELETE);
@@ -507,13 +513,13 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		}
 	}
 		
-	public WFToolbar getToolbar() {
+	public WFToolbar getToolbar(String baseId) {
 		WFToolbar bar = new WFToolbar();
-		
+		bar.setId(baseId+"_toolbar");
 		WFToolbarButton list = new WFToolbarButton();
 //		WFToolbarButton list = new WFToolbarButton("/images/list.jpg",getBundle());
 		list.getAttributes().put(PARAMETER_ACTION, ACTION_LIST);
-		list.setId(getId()+"_btnList");
+		list.setId(baseId+"_btnList");
 		list.setStyleClass("content_viewer_document_list");
 		list.setToolTip(getBundle().getLocalizedString("document_list"));
 //		list.setToolTip("Document List");
@@ -525,7 +531,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 //		WFToolbarButton details = new WFToolbarButton("/images/details.jpg",getBundle());
 		details.getAttributes().put(PARAMETER_ACTION, ACTION_FILE_DETAILS);
 		details.setStyleClass("content_viewer_details");
-		details.setId(getId()+"_btnDetails");
+		details.setId(baseId+"_btnDetails");
 //		details.setToolTip("Document Details");
 		details.setToolTip(getBundle().getLocalizedString("document_details"));
 		details.setDisplayText(getBundle().getLocalizedString("document_details"));
@@ -535,7 +541,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WFToolbarButton preview = new WFToolbarButton();
 //		WFToolbarButton preview = new WFToolbarButton("/images/preview.jpg",getBundle());
 		preview.getAttributes().put(PARAMETER_ACTION, ACTION_PREVIEW);
-		preview.setId(getId()+"_btnPreview");
+		preview.setId(baseId+"_btnPreview");
 		preview.setStyleClass("content_viewer_preview");
 		preview.setToolTip(getBundle().getLocalizedString("preview"));
 		preview.setDisplayText(getBundle().getLocalizedString("preview"));
@@ -545,7 +551,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		
 		WFToolbarButton newFolder = new WFToolbarButton();
 		newFolder.getAttributes().put(PARAMETER_ACTION, ACTION_NEW_FOLDER);
-		newFolder.setId(getId()+"_btnNewFolder");
+		newFolder.setId(baseId+"_btnNewFolder");
 		newFolder.setStyleClass("content_viewer_new_folder");
 		newFolder.setToolTip(getBundle().getLocalizedString("create_a_folder"));
 		newFolder.setDisplayText(getBundle().getLocalizedString("create_a_folder"));
@@ -555,7 +561,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WFToolbarButton permissions = new WFToolbarButton();
 //		WFToolbarButton permissions = new WFToolbarButton("/images/permissions.gif",getBundle());
 		permissions.getAttributes().put(PARAMETER_ACTION, ACTION_PERMISSIONS);
-		permissions.setId(getId()+"_btnPermissions");
+		permissions.setId(baseId+"_btnPermissions");
 		permissions.setStyleClass("content_viewer_permissions");
 //		permissions.setToolTip("Permissions");
 		permissions.setToolTip(getBundle().getLocalizedString("permissions"));
