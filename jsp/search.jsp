@@ -11,9 +11,9 @@ version="1.2">
 <jsf:view>
         <ws:page id="contentsearch1">
                 <h:form id="contentsearchform1">
-                <wf:wfblock id="serverpropertiesblock" title="#{localizedStrings['com.idega.content']['search']}">
-                		<builder:module componentClass="com.idega.core.search.presentation.Searcher" />
-                		<builder:module componentClass="com.idega.core.search.presentation.SearchResults" />
+                <wf:wfblock id="contentsearchblock1" title="#{localizedStrings['com.idega.content']['search']}">
+                		<builder:module id="contentsearcher1" componentClass="com.idega.core.search.presentation.Searcher" />
+                		<builder:module id="contentsearchresults1" componentClass="com.idega.core.search.presentation.SearchResults" />
                 </wf:wfblock>
                 </h:form>
         </ws:page>
