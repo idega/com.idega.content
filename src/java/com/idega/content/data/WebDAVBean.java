@@ -103,7 +103,9 @@ public class WebDAVBean extends Object implements ICTreeNode {
    
     public WebDAVBean(WebdavExtendedResource resource) {
     		this();
-			setName(resource.getDisplayName());
+    		try{
+    			String name = resource.getDisplayName();
+			setName(name);
 			setIsCollection(resource.isCollection());
 			setLength(resource.getGetContentLength()); 
 			setModifiedDate(resource.getGetLastModified());
@@ -131,6 +133,10 @@ public class WebDAVBean extends Object implements ICTreeNode {
 			//action uri for preview
 			setPreviewActionURI(IWActionURIManager.getInstance().getActionURIPrefixWithContext("preview",getEncodedURL()));
 			setPermissionActionURI(IWActionURIManager.getInstance().getActionURIPrefixWithContext("permission",getEncodedURL()));
+    		}
+    		catch(Exception e){
+    			e.printStackTrace();
+    		}
     }
         
 	public int getId() {

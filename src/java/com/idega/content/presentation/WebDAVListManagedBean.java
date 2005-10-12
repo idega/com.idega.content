@@ -639,6 +639,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		
 		while (enumer.hasMoreElements()) {
 			resource = (WebdavExtendedResource) enumer.nextElement();
+			try{
 			if (!resource.getDisplayName().startsWith(".")) {
 				if (showFolders || (!showFolders && !resource.isCollection())) {
 					if (resource.getName().equalsIgnoreCase("public") && resource.isCollection() && !showPublicFolder) {
@@ -661,6 +662,10 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 						e.printStackTrace();
 					}
 				}
+			}
+			}
+			catch(Exception e){
+				e.printStackTrace();
 			}
 		}
 		
