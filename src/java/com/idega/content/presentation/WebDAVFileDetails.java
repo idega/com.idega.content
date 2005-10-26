@@ -46,7 +46,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 	private boolean detailed = true;
 	private boolean useVersionControl = true;
 	
-	protected void initializeContent() {
+	protected void initializeComponent(FacesContext context) {
 
 		WebdavExtendedResource resource = getWebdavExtendedResource();
 		String userName = null;

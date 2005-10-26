@@ -34,7 +34,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 
 	protected String currentResourcePath = null;
 
-	protected abstract void initializeContent();
+	protected abstract void initializeComponent(FacesContext context);
 
 	public static IWBundle getBundle() {
 		return ContentUtil.getBundle();

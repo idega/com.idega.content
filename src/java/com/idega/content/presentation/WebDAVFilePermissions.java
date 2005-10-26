@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissions.java,v 1.7 2005/05/11 18:32:35 gummi Exp $
+ * $Id: WebDAVFilePermissions.java,v 1.8 2005/10/26 11:44:48 tryggvil Exp $
  * Created on 29.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -19,10 +19,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/05/11 18:32:35 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/10/26 11:44:48 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class WebDAVFilePermissions extends ContentBlock {
 
@@ -41,7 +41,7 @@ public class WebDAVFilePermissions extends ContentBlock {
 	/* (non-Javadoc)
 	 * @see com.idega.presentation.IWBaseComponent#initializeContent()
 	 */
-	protected void initializeContent() {
+	protected void initializeComponent(FacesContext context) {
 		
 		
 		String resourcePath = getCurrentResourcePath();

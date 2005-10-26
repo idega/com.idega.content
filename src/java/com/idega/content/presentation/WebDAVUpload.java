@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.4 2005/04/13 11:54:52 tryggvil Exp $
+ * $Id: WebDAVUpload.java,v 1.5 2005/10/26 11:44:48 tryggvil Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -14,6 +14,7 @@ import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.component.html.HtmlOutputText;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import org.apache.myfaces.custom.fileupload.HtmlInputFileUpload;
 import com.idega.presentation.Table;
@@ -23,16 +24,16 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/04/13 11:54:52 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/10/26 11:44:48 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class WebDAVUpload extends ContentBlock {
 
 	protected static final String BEAN_ID = "WebDAVUploadBean";
 	
-	protected void initializeContent() {
+	protected void initializeComponent(FacesContext context) {
 
 		Table table = new Table();
 		int row = 1;

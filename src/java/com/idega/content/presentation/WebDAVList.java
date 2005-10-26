@@ -32,7 +32,7 @@ public class WebDAVList extends IWBaseComponent {
 	public WebDAVList() {
 	}
 	
-	protected void initializeContent() {
+	protected void initializeComponent(FacesContext context) {
 		
 		if (startFolder != null) {
 			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setStartFolder", startFolder);

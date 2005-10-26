@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.9 2005/09/08 23:10:15 tryggvil Exp $
+ * $Id: ContentItemViewer.java,v 1.10 2005/10/26 11:44:48 tryggvil Exp $
  * Created on 26.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -32,10 +32,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/09/08 23:10:15 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/10/26 11:44:48 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class ContentItemViewer extends WFContainer {
 	
@@ -183,7 +183,7 @@ public class ContentItemViewer extends WFContainer {
 		setLocalValueHasChanged(fieldName,false);
 	}
 	
-	protected void initializeContent() {		
+	protected void initializeComponent(FacesContext context) {		
 		String attr[] = getViewerFieldNames();
 		for (int i = 0; i < attr.length; i++) {
 			initializeComponent(attr[i]);

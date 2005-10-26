@@ -89,7 +89,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		super();
 	}
 	
-	public void initializeContent() {	
+	public void initializeComponent(FacesContext context) {	
 
 //		String startFolder = (String) this.getAttributes().get("startFolder");
 //		String iconTheme = (String) this.getAttributes().get("iconTheme");

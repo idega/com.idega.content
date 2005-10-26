@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.8 2005/09/08 23:10:15 tryggvil Exp $
+ * $Id: ContentItemListViewer.java,v 1.9 2005/10/26 11:44:48 tryggvil Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -27,10 +27,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- *  Last modified: $Date: 2005/09/08 23:10:15 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/10/26 11:44:48 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class ContentItemListViewer extends UIData {
 
@@ -44,13 +44,11 @@ public class ContentItemListViewer extends UIData {
 	private String _rowClasses;
 	
 	private List categories = null;
-	
 	private WFDataModel model=null;
-	
-	private static final String DEFAULT_RENDERER_TYPE = "content_list_viewer";
+	private String firstArticleItemStyleClass = null;
 	private boolean initialized = false;
 	
-	private String firstArticleItemStyleClass = null;
+	private static final String DEFAULT_RENDERER_TYPE = "content_list_viewer";
 	private static final String listDelim = ",";
 	
 	/**

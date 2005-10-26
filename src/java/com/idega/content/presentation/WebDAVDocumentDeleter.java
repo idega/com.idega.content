@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVDocumentDeleter.java,v 1.5 2005/02/25 14:15:37 eiki Exp $
+ * $Id: WebDAVDocumentDeleter.java,v 1.6 2005/10/26 11:44:48 tryggvil Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -12,6 +12,7 @@ package com.idega.content.presentation;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import javax.faces.component.html.HtmlCommandButton;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
@@ -23,10 +24,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/25 14:15:37 $ by $Author: eiki $
+ *  Last modified: $Date: 2005/10/26 11:44:48 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class WebDAVDocumentDeleter extends ContentBlock implements ActionListener {
 
@@ -34,7 +35,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	private static final String ACTION_YES = "dd_ay";
 	private static final String PARAMETER_PATH = "dd_pp";
 	
-	protected void initializeContent() {
+	protected void initializeComponent(FacesContext context) {
 		Boolean deleted = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getDeleted");
 		if (deleted == null) {
 			String clickedPath = (String) WFUtil.invoke("WebDAVListBean", "getClickedFilePath");

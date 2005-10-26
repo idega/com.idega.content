@@ -22,7 +22,7 @@ public class WebDAVFolderCreation extends ContentBlock implements ActionListener
 
 	private static final String PARAMETER_RESOURCE_PATH = "prp";
 		
-	protected void initializeContent() {
+	protected void initializeComponent(FacesContext context) {
 		WebdavExtendedResource res = getWebdavExtendedResource();
 		
 		Table table = new Table();

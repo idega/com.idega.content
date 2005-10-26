@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadata.java,v 1.14 2005/09/08 23:08:41 tryggvil Exp $
+ * $Id: WebDAVMetadata.java,v 1.15 2005/10/26 11:44:48 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -47,12 +47,12 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2005/09/08 23:08:41 $ by $Author: tryggvil $
+ * Last modified: $Date: 2005/10/26 11:44:48 $ by $Author: tryggvil $
  * 
  * Display the UI for adding metadata type - values to a file.
  *
  * @author Joakim Johnson
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	
@@ -76,7 +76,7 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 		resourcePath = path;
 	}
 	
-	protected void initializeContent() {
+	protected void initializeComponent(FacesContext context) {
 		
 		if(resourcePath!=null){
 //			System.out.println("Initialize. Setting resourcePath to "+resourcePath);

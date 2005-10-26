@@ -3,6 +3,7 @@
  */
 package com.idega.content.presentation;
 
+import javax.faces.context.FacesContext;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.webface.WFFrame;
 import com.idega.webface.WFToolbar;
@@ -15,7 +16,7 @@ public class WebDAVFilePreview extends ContentBlock {
 	
 	public static final String DEFAULT_STYLE_CLASS = "content_file_preview";
 
-	protected void initializeContent() {
+	protected void initializeComponent(FacesContext context) {
 		WebdavExtendedResource resource = getWebdavExtendedResource();
 		
 		String filePath = resource.getPath();
