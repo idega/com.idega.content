@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.7 2005/09/08 23:10:15 tryggvil Exp $
+ * $Id: ContentItemToolbar.java,v 1.8 2005/11/02 13:37:06 tryggvil Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import javax.faces.component.UIParameter;
 import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
@@ -26,15 +27,20 @@ import com.idega.webface.WFUtil;
 
 
 /**
- * 
- *  Last modified: $Date: 2005/09/08 23:10:15 $ by $Author: tryggvil $
+ *  <p>
+ *  Toolbar used by new content management system to display editor buttons.
+ *  </p>
+ *  Last modified: $Date: 2005/11/02 13:37:06 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
+	//static constants:
+	public final static String PARAMETER_CATEGORIES="content_categories";
 	
+	//instance variables
 	private String resourcePath;
 	private String actionHandlerIdentifier;
 	private IWActionURIManager manager = null;
@@ -42,7 +48,8 @@ public class ContentItemToolbar extends WFToolbar {
 	private Map actions;
 	private String[] RolesAllowded = new String[] {StandardRoles.ROLE_KEY_ADMIN,StandardRoles.ROLE_KEY_AUTHOR,StandardRoles.ROLE_KEY_EDITOR};
 	private Boolean rendered;
-	
+	private String categories;
+
 	/**
 	 * 
 	 */
@@ -111,6 +118,13 @@ public class ContentItemToolbar extends WFToolbar {
 				link.setValue(getActionURL(action,getResourcePath(),getActionHandlerIdentifier()));
 				
 				link.setResourcePath(getResourcePath());
+				String categories = this.getCategories();
+				if(categories!=null){
+					UIParameter categoriesParameter = new UIParameter();
+					categoriesParameter.setName(PARAMETER_CATEGORIES);
+					categoriesParameter.setValue(categories);
+					link.getChildren().add(categoriesParameter);
+				}
 				link.setAction(action);
 			}
 		}
@@ -197,10 +211,11 @@ public class ContentItemToolbar extends WFToolbar {
 	 * @see javax.faces.component.UIComponentBase#saveState(javax.faces.context.FacesContext)
 	 */
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[9];
+		Object values[] = new Object[4];
 		values[0] = super.saveState(ctx);
 		values[1] = resourcePath;
 		values[2] = actionHandlerIdentifier;
+		values[3] = categories;
 		return values;
 	}
 	
@@ -212,6 +227,23 @@ public class ContentItemToolbar extends WFToolbar {
 		super.restoreState(ctx, values[0]);
 		resourcePath = (String)values[1];
 		actionHandlerIdentifier = (String)values[2];
+		categories=(String)values[3];
 	}
 	
+	
+	
+	/**
+	 * @return Returns the categories.
+	 */
+	public String getCategories() {
+		return categories;
+	}
+
+	
+	/**
+	 * @param categories The categories to set.
+	 */
+	public void setCategories(String categories) {
+		this.categories = categories;
+	}
 }
