@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.9 2005/10/26 11:44:48 tryggvil Exp $
+ * $Id: ContentItemListViewer.java,v 1.10 2005/11/02 13:32:22 tryggvil Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -20,6 +20,7 @@ import javax.faces.component.UIData;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 import com.idega.content.bean.ContentItem;
+import com.idega.content.bean.ContentListViewerManagedBean;
 import com.idega.content.business.ContentUtil;
 import com.idega.webface.WFUtil;
 import com.idega.webface.model.WFDataModel;
@@ -27,10 +28,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- *  Last modified: $Date: 2005/10/26 11:44:48 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/11/02 13:32:22 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class ContentItemListViewer extends UIData {
 
@@ -47,6 +48,7 @@ public class ContentItemListViewer extends UIData {
 	private WFDataModel model=null;
 	private String firstArticleItemStyleClass = null;
 	private boolean initialized = false;
+	private boolean headlineAsLink=false;
 	
 	private static final String DEFAULT_RENDERER_TYPE = "content_list_viewer";
 	private static final String listDelim = ",";
@@ -87,9 +89,10 @@ public class ContentItemListViewer extends UIData {
 	protected void initializeInEncodeBegin(){
 		
 		notifyManagedBeanOfVariableValues();
-		
-		ContentItemViewer viewer = (ContentItemViewer)WFUtil.invoke(this.managedBeanId,"getContentViewer");
+		ContentListViewerManagedBean bean = getManagedBean();
+		ContentItemViewer viewer = bean.getContentViewer();//WFUtil.invoke(this.managedBeanId,"getContentViewer");
 		viewer.setShowRequestedItem(false);
+		viewer.setHeadlineAsLink(getHeadlineAsLink());
 		addContentItemViewer(viewer);
 		
 		String[] actions = getToolbarActions();
@@ -98,12 +101,16 @@ public class ContentItemListViewer extends UIData {
 			for (int i = 0; i < actions.length; i++) {
 				toolbar.addToolbarButton(actions[i]);
 			}
+			String categories = this.getCategoriesAsString();
+			if(categories!=null){
+				toolbar.setCategories(categories);
+			}
 			toolbar.setResourcePath(getResourcePath());
-			toolbar.setActionHandlerIdentifier((String)WFUtil.invoke(this.managedBeanId,"getIWActionURIHandlerIdentifier"));
+			toolbar.setActionHandlerIdentifier(bean.getIWActionURIHandlerIdentifier());//WFUtil.invoke(this.managedBeanId,"getIWActionURIHandlerIdentifier"));
 			this.setHeader(toolbar);
 		}
 		
-		List attachementViewers = (List)WFUtil.invoke(this.managedBeanId,"getAttachmentViewers");
+		List attachementViewers = bean.getAttachmentViewers();//WFUtil.invoke(this.managedBeanId,"getAttachmentViewers");
 		if(attachementViewers!=null){
 			for (ListIterator iter = attachementViewers.listIterator(); iter.hasNext();) {
 				ContentItemViewer attachmentViewer = (ContentItemViewer) iter.next();
@@ -414,4 +421,18 @@ public class ContentItemListViewer extends UIData {
 	public void setFirstArticleItemStyleClass(String firstArticleItemStyleClass) {
 		this.firstArticleItemStyleClass = firstArticleItemStyleClass;
 	}
+	
+	public void setHeadlineAsLink(boolean asLink){
+		this.headlineAsLink=asLink;
+	}
+
+	public boolean getHeadlineAsLink(){
+		return this.headlineAsLink;
+	}
+	
+	public ContentListViewerManagedBean getManagedBean(){
+		ContentListViewerManagedBean bean = (ContentListViewerManagedBean) WFUtil.getBeanInstance(managedBeanId);
+		return bean;
+	}
+
 }

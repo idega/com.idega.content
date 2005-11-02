@@ -1,11 +1,11 @@
 /*
- * $Id: ContentItemViewer.java,v 1.10 2005/10/26 11:44:48 tryggvil Exp $
- * Created on 26.1.2005
- *
+ * $Id: ContentItemViewer.java,v 1.11 2005/11/02 13:32:22 tryggvil Exp $ Created
+ * on 26.1.2005
+ * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- *
- * This software is the proprietary information of Idega hf.
- * Use is subject to license terms.
+ * 
+ * This software is the proprietary information of Idega hf. Use is subject to
+ * license terms.
  */
 package com.idega.content.presentation;
 
@@ -19,6 +19,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
 import javax.faces.component.UIParameter;
 import javax.faces.component.html.HtmlGraphicImage;
+import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
@@ -29,146 +30,143 @@ import com.idega.presentation.IWContext;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFUtil;
 
-
 /**
  * 
- *  Last modified: $Date: 2005/10/26 11:44:48 $ by $Author: tryggvil $
+ * Last modified: $Date: 2005/11/02 13:32:22 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class ContentItemViewer extends WFContainer {
-	
+
 	private Map fieldPrefixValueMap = new HashMap();
 	private Map fieldLocalValueMap = new HashMap();
 	private Map fieldSuffixValueMap = new HashMap();
 	private Map fieldValueChangedMap = new HashMap();
-		
 	public static final String FACET_TOOLBAR = "item_toolbar";
 	public static final String FACET_ITEM_HEADER = "item_header";
 	public static final String FACET_ITEM_FOOTER = "item_footer";
 	public static final String FACET_ITEM_DETAILS_COMMAND = "item_details_command";
-	
 	public static final String DEFAULT_RENDERER_TYPE = "content_item_viewer";
-	
 	/*
-	 * The field requestedResourcePath is used to store the path that is requested by a http request
+	 * The field requestedResourcePath is used to store the path that is
+	 * requested by a http request
 	 */
 	private String requestedResourcePath = null;
-	
 	/*
-	 * The field resourcePath is used to store the path to the resource this instance currently renders 
+	 * The field resourcePath is used to store the path to the resource this
+	 * instance currently renders
 	 */
 	private String resourcePath = null;
-	
 	private boolean showRequestedItem = true;
-	
 	private Boolean renderDetailsCommand = null;
-	
 	private ContentItem contentItemCach = null;
-	
-	
+	private boolean headlineAsLink = false;
+	private String detailsViewerPath;
+
 	public ContentItemViewer() {
 		super();
 		this.setStyleClass("content_item_viewer");
 		setRendererType(DEFAULT_RENDERER_TYPE);
 	}
-	
-	public String getFamily(){
+
+	public String getFamily() {
 		return ContentUtil.FAMILY_CONTENT;
 	}
-	
-	public String[] getViewerFieldNames(){
+
+	public String[] getViewerFieldNames() {
 		ContentItem item = getContentItem();
-		if(item!=null){
+		if (item != null) {
 			return item.getContentFieldNames();
-		} else {
+		}
+		else {
 			return new String[0];
 		}
 	}
-	
+
 	/**
 	 * @return Returns the styleClassPrefix.
 	 */
 	protected String getDefaultStyleClassPrefix() {
 		ContentItem item = getContentItem();
-		if(item!=null){
+		if (item != null) {
 			return item.getContentItemPrefix();
-		} else {
+		}
+		else {
 			return "";
 		}
 	}
-	
-	protected UIComponent createPrefixComponent(String fieldName){
+
+	protected UIComponent createPrefixComponent(String fieldName) {
 		return new HtmlOutputText();
 	}
-	
-	protected UIComponent createFieldComponent(String fieldName){
+
+	protected UIComponent createFieldComponent(String fieldName) {
 		return new HtmlOutputText();
 	}
-	
-	protected UIComponent getSuffixComponent(String fieldName){
+
+	protected UIComponent getSuffixComponent(String fieldName) {
 		return new HtmlOutputText();
 	}
-	
-	protected boolean hasLocalValueChanged(String fieldName){
-		Boolean changed = (Boolean)fieldValueChangedMap.get(fieldName);
-		if(changed != null){
+
+	protected boolean hasLocalValueChanged(String fieldName) {
+		Boolean changed = (Boolean) fieldValueChangedMap.get(fieldName);
+		if (changed != null) {
 			return changed.booleanValue();
-		} else {
+		}
+		else {
 			return false;
 		}
 	}
-	
-	protected void setLocalValueHasChanged(String fieldName, boolean value){
-		fieldValueChangedMap.put(fieldName,Boolean.valueOf(value));
+
+	protected void setLocalValueHasChanged(String fieldName, boolean value) {
+		fieldValueChangedMap.put(fieldName, Boolean.valueOf(value));
 	}
-	
-	protected void setFieldPrefixValue(String fieldName, Object value){
-		fieldPrefixValueMap.put(fieldName,value);
+
+	protected void setFieldPrefixValue(String fieldName, Object value) {
+		fieldPrefixValueMap.put(fieldName, value);
 	}
-	
-	protected Object getFieldPrefixValue(String fieldName){
+
+	protected Object getFieldPrefixValue(String fieldName) {
 		return fieldPrefixValueMap.get(fieldName);
 	}
-	
-	protected void setFieldLocalValue(String fieldName, Object value){
-		fieldLocalValueMap.put(fieldName,value);
+
+	protected void setFieldLocalValue(String fieldName, Object value) {
+		fieldLocalValueMap.put(fieldName, value);
 	}
-	
-	protected Object getFieldLocalValue(String fieldName){
+
+	protected Object getFieldLocalValue(String fieldName) {
 		return fieldLocalValueMap.get(fieldName);
 	}
-	
-	protected void setFieldSuffixValue(String fieldName, Object value){
-		fieldSuffixValueMap.put(fieldName,value);
+
+	protected void setFieldSuffixValue(String fieldName, Object value) {
+		fieldSuffixValueMap.put(fieldName, value);
 	}
-	
-	protected Object getFieldSuffixValue(String fieldName){
+
+	protected Object getFieldSuffixValue(String fieldName) {
 		return fieldSuffixValueMap.get(fieldName);
 	}
-	
-	protected ContentItemFieldViewer getFieldViewer(String fieldName){
-		return (ContentItemFieldViewer)getFacet(getFacetName(fieldName));
+
+	protected ContentItemFieldViewer getFieldViewer(String fieldName) {
+		return (ContentItemFieldViewer) getFacet(getFacetName(fieldName));
 	}
-	
-	protected UIComponent getFieldViewerPrefixComponent(String fieldName){
+
+	protected UIComponent getFieldViewerPrefixComponent(String fieldName) {
 		return getFieldViewer(fieldName).getPrefixComponent();
 	}
-	
-	protected UIComponent getFieldViewerComponent(String fieldName){
+
+	protected UIComponent getFieldViewerComponent(String fieldName) {
 		return getFieldViewer(fieldName).getMainComponent();
 	}
-	
-	protected UIComponent getFieldViewerSuffixComponent(String fieldName){
+
+	protected UIComponent getFieldViewerSuffixComponent(String fieldName) {
 		return getFieldViewer(fieldName).getSuffixComponent();
 	}
-	
-	
-	public String getFacetName(String fieldName){
-		return getFacetIdPrefix()+fieldName;
+
+	public String getFacetName(String fieldName) {
+		return getFacetIdPrefix() + fieldName;
 	}
-	
+
 	/**
 	 * @return Returns the facetIdPrefix.
 	 */
@@ -180,10 +178,10 @@ public class ContentItemViewer extends WFContainer {
 	 * 
 	 */
 	protected void componentHasBeenUpdatedWithNewValue(String fieldName) {
-		setLocalValueHasChanged(fieldName,false);
+		setLocalValueHasChanged(fieldName, false);
 	}
-	
-	protected void initializeComponent(FacesContext context) {		
+
+	protected void initializeComponent(FacesContext context) {
 		String attr[] = getViewerFieldNames();
 		for (int i = 0; i < attr.length; i++) {
 			initializeComponent(attr[i]);
@@ -196,29 +194,30 @@ public class ContentItemViewer extends WFContainer {
 	 */
 	protected void initializeToolbar() {
 		ContentItem item = getContentItem();
-		if(item!=null){
+		if (item != null) {
 			String[] actions = item.getToolbarActions();
-			if(actions != null && actions.length > 0){
+			if (actions != null && actions.length > 0) {
 				ContentItemToolbar toolbar = new ContentItemToolbar();
 				toolbar.setToolbarActions(actions);
-				this.setToolbar(toolbar);		
+				this.setToolbar(toolbar);
 			}
 		}
 	}
-	
-	
+
 	/**
-	 * This method returns the name of the attribute that should be value binded to in the component that
-	 * presents the field.  This is used when the component is initialized and updated.  By default the 
-	 * binding attribute is "value" as is used by most of the components but this can be overwitten
+	 * This method returns the name of the attribute that should be value binded
+	 * to in the component that presents the field. This is used when the
+	 * component is initialized and updated. By default the binding attribute is
+	 * "value" as is used by most of the components but this can be overwitten
 	 * if needed.
+	 * 
 	 * @param fieldName
-	 * @return Returns the name of the attribute that should be value binded to in the component that presents the field.
+	 * @return Returns the name of the attribute that should be value binded to
+	 *         in the component that presents the field.
 	 */
-	protected String getBindingAttribute(String fieldName){
+	protected String getBindingAttribute(String fieldName) {
 		return "value";
 	}
-	
 
 	/**
 	 * 
@@ -229,32 +228,36 @@ public class ContentItemViewer extends WFContainer {
 		div.setStyleClass(getStyleClass(fieldName));
 		div.setSuffixClass(getSuffixStyleClass());
 		UIComponent output = createFieldComponent(fieldName);
+		UIComponent uiValueBound = getValueBindingComponent(output);
 		ValueBinding binding = getValueBinding(fieldName);
 		String bindingAttribute = getBindingAttribute(fieldName);
-		if(binding != null){
-			output.setValueBinding(bindingAttribute,binding);
-		} else {
+		if (binding != null) {
+			uiValueBound.setValueBinding(bindingAttribute, binding);
+		}
+		else {
 			boolean invoked = false;
-			if("value".equals(bindingAttribute)){
-				if(output instanceof UIOutput) {
-					((UIOutput)output).setValue(getValue(fieldName));
-					invoked = true;
-				} else if(output instanceof UICommand){
-					((UICommand)output).setValue(getValue(fieldName));
-					invoked = true;
-				} else if(output instanceof HtmlGraphicImage) {
-					((HtmlGraphicImage)output).setValue(getValue(fieldName));
+			if ("value".equals(bindingAttribute)) {
+				if (uiValueBound instanceof UIOutput) {
+					((UIOutput) uiValueBound).setValue(getValue(fieldName));
 					invoked = true;
 				}
-			} else if("url".equals(bindingAttribute)){
-				if(output instanceof HtmlGraphicImage) {
-					((HtmlGraphicImage)output).setUrl((String)getValue(fieldName));
+				else if (uiValueBound instanceof UICommand) {
+					((UICommand) uiValueBound).setValue(getValue(fieldName));
+					invoked = true;
+				}
+				else if (uiValueBound instanceof HtmlGraphicImage) {
+					((HtmlGraphicImage) uiValueBound).setValue(getValue(fieldName));
 					invoked = true;
 				}
 			}
-
-			if(!invoked){
-				//TODO use reflection
+			else if ("url".equals(bindingAttribute)) {
+				if (uiValueBound instanceof HtmlGraphicImage) {
+					((HtmlGraphicImage) uiValueBound).setUrl((String) getValue(fieldName));
+					invoked = true;
+				}
+			}
+			if (!invoked) {
+				// TODO use reflection
 				throw new UnsupportedOperationException("Not implemented yet");
 			}
 			componentHasBeenUpdatedWithNewValue(fieldName);
@@ -262,7 +265,25 @@ public class ContentItemViewer extends WFContainer {
 		div.setValueComponent(output);
 		getFacets().put(getFacetName(fieldName), div);
 	}
-	
+/**
+	 * <p>
+	 * TODO tryggvil describe method getValueBindingComponent
+	 * </p>
+	 * @param output
+	 * @return
+	 */
+	private UIComponent getValueBindingComponent(UIComponent output) {
+		if(output instanceof HtmlOutputLink){
+			//This is the case when a headline is a link
+			//then we want the child HtmlOutputText to be valuebound
+			return (UIComponent) output.getChildren().get(0);
+		}
+		else{
+			return output;
+		}
+	}
+
+
 	/**
 	 * 
 	 */
@@ -274,29 +295,28 @@ public class ContentItemViewer extends WFContainer {
 		div.setValueComponent(output);
 		getFacets().put(facetName, div);
 	}
-	
-	public ContentItemFieldViewer getViewerFacetWrapper(String facetName){
-		return (ContentItemFieldViewer)getFacet(facetName);
+
+	public ContentItemFieldViewer getViewerFacetWrapper(String facetName) {
+		return (ContentItemFieldViewer) getFacet(facetName);
 	}
 
-	public UIComponent getViewerFacet(String facetName){
+	public UIComponent getViewerFacet(String facetName) {
 		ContentItemFieldViewer v = getViewerFacetWrapper(facetName);
-		if(v!=null){
+		if (v != null) {
 			return v.getMainComponent();
-		} else {
+		}
+		else {
 			return null;
 		}
 	}
 
-	
 	/**
 	 * @param fieldName
 	 * @return
 	 */
 	protected String getViewerFacetStyleClass(String facetName) {
-		return getViwerFacetStyleClassPrefix()+facetName;
+		return getViwerFacetStyleClassPrefix() + facetName;
 	}
-	
 
 	/**
 	 * @return
@@ -310,7 +330,7 @@ public class ContentItemViewer extends WFContainer {
 	 * @return
 	 */
 	protected String getStyleClass(String fieldName) {
-		return getDefaultStyleClassPrefix()+fieldName;
+		return getDefaultStyleClassPrefix() + fieldName;
 	}
 
 	/**
@@ -322,9 +342,11 @@ public class ContentItemViewer extends WFContainer {
 	}
 
 	/**
-	 * To value bind to this use the value of fieldName variable. For instance, getHeadline() in some subclass
-	 * would be implemented as: public String getHeadline(){return (String)getValue("headline");} and the 
-	 * value binding will be to "headline" and can be used in tag classes to for value bindings in jsf pages. 
+	 * To value bind to this use the value of fieldName variable. For instance,
+	 * getHeadline() in some subclass would be implemented as: public String
+	 * getHeadline(){return (String)getValue("headline");} and the value binding
+	 * will be to "headline" and can be used in tag classes to for value
+	 * bindings in jsf pages.
 	 * 
 	 * @return Returns the author.
 	 */
@@ -333,71 +355,69 @@ public class ContentItemViewer extends WFContainer {
 			return getFieldLocalValue(fieldName);
 		}
 		ContentItem item = getContentItem();
-		if (item != null){
+		if (item != null) {
 			return item.getValue(fieldName);
 		}
 		ValueBinding vb = getValueBinding(fieldName);
-		return (String) (vb != null ? (Object)vb.getValue(getFacesContext()) : null);
-	}	
-	
+		return (String) (vb != null ? (Object) vb.getValue(getFacesContext()) : null);
+	}
 
 	public void setValue(String fieldName, Object value) {
-		if(value!=null){
+		if (value != null) {
 			setLocalValueHasChanged(fieldName, (value.equals(getFieldLocalValue(fieldName))));
-		} else {
+		}
+		else {
 			setLocalValueHasChanged(fieldName, (getFieldLocalValue(fieldName) != null));
 		}
-		setFieldLocalValue(fieldName,value);
+		setFieldLocalValue(fieldName, value);
 	}
-	
 
 	public boolean isRendered() {
 		ContentItem item = getContentItem();
-		if (item != null){
+		if (item != null) {
 			Boolean renderd = item.getRendered();
-			if(renderd!=null){
+			if (renderd != null) {
 				return renderd.booleanValue();
 			}
 		}
 		return super.isRendered();
 	}
-	
-	
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see javax.faces.component.UIComponent#decode(javax.faces.context.FacesContext)
 	 */
 	public void decode(FacesContext context) {
-		//TODO USE DECODE RATHER THAN ENCODEBEGIN! not working because->NEVER CALLED!
-		if(showRequestedItem){
+		// TODO USE DECODE RATHER THAN ENCODEBEGIN! not working because->NEVER
+		// CALLED!
+		if (showRequestedItem) {
 			IWContext iwc = IWContext.getIWContext(context);
 			String resourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
-			if(resourcePath!=null){
+			if (resourcePath != null) {
 				requestedResourcePath = resourcePath;
 			}
 		}
 		updateValues();
-		
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see javax.faces.component.UIComponent#encodeBegin(javax.faces.context.FacesContext)
 	 */
 	public void encodeBegin(FacesContext context) throws IOException {
-			
-		if(showRequestedItem){
+		if (showRequestedItem) {
 			IWContext iwc = IWContext.getIWContext(context);
 			String resourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
-			if(resourcePath!=null){
+			if (resourcePath != null) {
 				requestedResourcePath = resourcePath;
 			}
 		}
-		
 		super.encodeBegin(context);
 		updateValues();
-		
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -406,49 +426,58 @@ public class ContentItemViewer extends WFContainer {
 		for (int i = 0; i < attr.length; i++) {
 			updateComponentValue(attr[i]);
 		}
-		
 	}
-	
+
 	/**
 	 * 
 	 */
 	protected void updateComponentValue(String fieldName) {
 		ContentItem item = getContentItem();
-		if(item != null || hasLocalValueChanged(fieldName)){
+		if (item != null || hasLocalValueChanged(fieldName)) {
 			UIComponent component = getFacet(getFacetName(fieldName));
-			if(component != null){
-				if(component instanceof ContentItemFieldViewer){
-					UIComponent value = ((ContentItemFieldViewer)component).getMainComponent();
+			if (component != null) {
+				if (component instanceof ContentItemFieldViewer) {
+					UIComponent main = ((ContentItemFieldViewer) component).getMainComponent();
+					if(main instanceof HtmlOutputLink){
+						//this is then the headline is a link
+						updateDetailsLink(main);
+					}
+					UIComponent value = getValueBindingComponent(main);
 					String bindingAttribute = getBindingAttribute(fieldName);
 					boolean invoked = false;
-					if("value".equals(bindingAttribute)){
-						if(value instanceof UIOutput){
-							((UIOutput)value).setValue(getValue(fieldName));
-							invoked=true;
-						} else if(value instanceof UICommand){
-							((UICommand)value).setValue(getValue(fieldName));
-							invoked=true;
-						} else if(value instanceof HtmlGraphicImage) {
-							((HtmlGraphicImage)value).setValue(getValue(fieldName));
+					if ("value".equals(bindingAttribute)) {
+						if (value instanceof UIOutput) {
+							((UIOutput) value).setValue(getValue(fieldName));
 							invoked = true;
 						}
-					} else if("url".equals(bindingAttribute)){
-						if(value instanceof HtmlGraphicImage) {
-							((HtmlGraphicImage)value).setUrl((String)getValue(fieldName));
+						else if (value instanceof UICommand) {
+							((UICommand) value).setValue(getValue(fieldName));
+							invoked = true;
+						}
+						else if (value instanceof HtmlGraphicImage) {
+							((HtmlGraphicImage) value).setValue(getValue(fieldName));
 							invoked = true;
 						}
 					}
-
-					if(!invoked){
-						//TODO use reflection
+					else if ("url".equals(bindingAttribute)) {
+						if (value instanceof HtmlGraphicImage) {
+							((HtmlGraphicImage) value).setUrl((String) getValue(fieldName));
+							invoked = true;
+						}
+					}
+					if (!invoked) {
+						// TODO use reflection
 						throw new UnsupportedOperationException("Not implemented yet");
 					}
-				} else if(component instanceof UIOutput){
-					((UIOutput)component).setValue(getValue(fieldName));
-				} else  if(component instanceof UICommand){
-					((UICommand)component).setValue(getValue(fieldName));
-				} else {
-					//TODO Use reflection and getBindingAttribute(fieldName)
+				}
+				else if (component instanceof UIOutput) {
+					((UIOutput) component).setValue(getValue(fieldName));
+				}
+				else if (component instanceof UICommand) {
+					((UICommand) component).setValue(getValue(fieldName));
+				}
+				else {
+					// TODO Use reflection and getBindingAttribute(fieldName)
 					throw new UnsupportedOperationException("Not implemented yet");
 				}
 			}
@@ -457,24 +486,20 @@ public class ContentItemViewer extends WFContainer {
 		updateToolbar();
 	}
 
-
-
-	public void processDecodes(FacesContext context){
+	public void processDecodes(FacesContext context) {
 		super.processDecodes(context);
-		
-//		if(showRequestedItem){
-//			IWContext iwc = IWContext.getIWContext(context);
-//			String resourcePath = iwc.getParameter(PARAMETER_CONTENT_RESOURCE);
-//			if(resourcePath!=null){
-//				requestedResourcePath = resourcePath;
-//			}
-//		}
-		
+		// if(showRequestedItem){
+		// IWContext iwc = IWContext.getIWContext(context);
+		// String resourcePath = iwc.getParameter(PARAMETER_CONTENT_RESOURCE);
+		// if(resourcePath!=null){
+		// requestedResourcePath = resourcePath;
+		// }
+		// }
 		ContentItem item = getContentItem();
-		if(item != null){ 
+		if (item != null) {
 			String attr[] = getViewerFieldNames();
 			for (int i = 0; i < attr.length; i++) {
-				item.setValue(attr[i],getValue(attr[i]));
+				item.setValue(attr[i], getValue(attr[i]));
 			}
 			resourcePath = item.getResourcePath();
 		}
@@ -484,92 +509,103 @@ public class ContentItemViewer extends WFContainer {
 	 * @return
 	 */
 	public ContentItem getContentItem() {
-		if(requestedResourcePath != null && showRequestedItem){
-			if(contentItemCach==null){
+		if (requestedResourcePath != null && showRequestedItem) {
+			if (contentItemCach == null) {
 				contentItemCach = loadContentItem(requestedResourcePath);
 			}
 			return contentItemCach;
 		}
 		ValueBinding vb = getValueBinding("contentItem");
-		return (ContentItem) (vb != null ? (Object)vb.getValue(getFacesContext()) : null);
+		return (ContentItem) (vb != null ? (Object) vb.getValue(getFacesContext()) : null);
 	}
-	
+
 	/**
-	 * This method should return an instance of ContentItem which represents the resource that the 
-	 * itemResourcePath parameter points to.  This is implemented to return null by default but should
-	 * overwritten in subclasses to activate the functionality to show a content item that is defined by
-	 * parameter 'iwcontent' in the request.
+	 * This method should return an instance of ContentItem which represents the
+	 * resource that the itemResourcePath parameter points to. This is
+	 * implemented to return null by default but should overwritten in
+	 * subclasses to activate the functionality to show a content item that is
+	 * defined by parameter 'iwcontent' in the request.
 	 * 
 	 * @param itemResourcePath
 	 * @return
 	 */
 	public ContentItem loadContentItem(String itemResourcePath) {
-		System.out.println("[WARNING]["+this.getClass().getName()+"]: method loadContentItem(String itemResourcePath) is not implemented but is required when rendering content spcified by request parameter '"+ContentViewer.PARAMETER_CONTENT_RESOURCE+"'.");
+		System.out.println("[WARNING]["
+				+ this.getClass().getName()
+				+ "]: method loadContentItem(String itemResourcePath) is not implemented but is required when rendering content spcified by request parameter '"
+				+ ContentViewer.PARAMETER_CONTENT_RESOURCE + "'.");
 		return null;
 	}
 
-	public void setContentItemValueBinding(String fieldName){
-		WFUtil.setValueBinding(this,"contentItem",fieldName);
-		//Might need to add value binding between #getValue(String) and the 
-		//FieldComponent get/set-Value() somehow for editable elements to update
+	public void setContentItemValueBinding(String fieldName) {
+		WFUtil.setValueBinding(this, "contentItem", fieldName);
+		// Might need to add value binding between #getValue(String) and the
+		// FieldComponent get/set-Value() somehow for editable elements to
+		// update
 	}
-	
-	
+
 	/**
-	 * This method decides if this viewer should hande http requests that request it to show a spesific content item. 
+	 * This method decides if this viewer should hande http requests that
+	 * request it to show a spesific content item.
+	 * 
 	 * @param value
 	 */
-	public void setShowRequestedItem(boolean value){
+	public void setShowRequestedItem(boolean value) {
 		showRequestedItem = value;
 	}
-	
-	
-	public void setRenderDetailsCommand(boolean value){
+
+	public void setRenderDetailsCommand(boolean value) {
 		renderDetailsCommand = Boolean.valueOf(value);
 	}
-	
-	public boolean getRenderDetailsCommand(){
-		if(renderDetailsCommand != null){
+
+	public boolean getRenderDetailsCommand() {
+		if (renderDetailsCommand != null) {
 			return renderDetailsCommand.booleanValue();
 		}
 		ValueBinding vb = getValueBinding("renderDetailsCommand");
-		Boolean render =  (Boolean) (vb != null ? (Object)vb.getValue(getFacesContext()) : null);
-		if(render!= null){
+		Boolean render = (Boolean) (vb != null ? (Object) vb.getValue(getFacesContext()) : null);
+		if (render != null) {
 			return render.booleanValue();
-		} else {
+		}
+		else {
 			return false;
 		}
 	}
-	
-	
+
 	/**
-	 * This sets the UIComponent that should handle the action to go to the details view.  This
-	 * command does not have to have a parameter with the name ContentItemViewer#PARAMETER_CONTENT_RESOURCE
-	 * since this object adds it if it is missing and updates it otherwise.  The value that will be
-	 * used is ContentItemViewer#getResourcePath() and can be value binded using 'resourcePath'.
+	 * This sets the UIComponent that should handle the action to go to the
+	 * details view. This command does not have to have a parameter with the
+	 * name ContentItemViewer#PARAMETER_CONTENT_RESOURCE since this object adds
+	 * it if it is missing and updates it otherwise. The value that will be used
+	 * is ContentItemViewer#getResourcePath() and can be value binded using
+	 * 'resourcePath'.
+	 * 
 	 * @param command
 	 */
-	public void setDetailsCommand(UIComponent command){
-		setViewerFacet(FACET_ITEM_DETAILS_COMMAND,command);
+	public void setDetailsCommand(UIComponent command) {
+		setViewerFacet(FACET_ITEM_DETAILS_COMMAND, command);
 	}
-	
-	public void updateDetailsCommand(){
-		UIComponent command = (UIComponent)getViewerFacet(FACET_ITEM_DETAILS_COMMAND);
-		if(command!=null){
+
+	public void updateDetailsCommand() {
+		UIComponent command = (UIComponent) getViewerFacet(FACET_ITEM_DETAILS_COMMAND);
+		updateDetailsLink(command);
+	}
+
+	public void updateDetailsLink(UIComponent link) {
+		if (link != null) {
 			boolean updated = false;
-			List childrens = command.getChildren();
+			List childrens = link.getChildren();
 			for (Iterator iter = childrens.iterator(); iter.hasNext();) {
 				UIComponent component = (UIComponent) iter.next();
-				if(component instanceof UIParameter){
-					UIParameter parameter = (UIParameter)component;
-					if(ContentViewer.PARAMETER_CONTENT_RESOURCE.equals(parameter.getName())){
+				if (component instanceof UIParameter) {
+					UIParameter parameter = (UIParameter) component;
+					if (ContentViewer.PARAMETER_CONTENT_RESOURCE.equals(parameter.getName())) {
 						parameter.setValue(getResourcePath());
 						updated = true;
 					}
 				}
 			}
-			
-			if(!updated){
+			if (!updated) {
 				UIParameter parameter = new UIParameter();
 				parameter.setName(ContentViewer.PARAMETER_CONTENT_RESOURCE);
 				parameter.setValue(getResourcePath());
@@ -577,44 +613,41 @@ public class ContentItemViewer extends WFContainer {
 			}
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
 	public void updateToolbar() {
-		ContentItemToolbar toolbar = (ContentItemToolbar)getToolbar();
-		if(toolbar!=null){
+		ContentItemToolbar toolbar = (ContentItemToolbar) getToolbar();
+		if (toolbar != null) {
 			toolbar.setResourcePath(getResourcePath());
 		}
 	}
-	
-	public void setFooter(UIComponent footer){
-		setViewerFacet(FACET_ITEM_FOOTER, footer);
-    }
 
-    public void setHeader(UIComponent header){
-    		setViewerFacet(FACET_ITEM_HEADER, header);
-    }
-    
-    public void setToolbar(ContentItemToolbar toolbar){
-    		//setViewerFacet(FACET_TOOLBAR, toolbar);
-    		
-    		getFacets().put(FACET_TOOLBAR,toolbar);
-    }
-	
-    
-    public ContentItemToolbar getToolbar(){
-    		//ContentItemToolbar bar = getViewerFacet(FACET_TOOLBAR);
-    		ContentItemToolbar bar = (ContentItemToolbar)getFacets().get(FACET_TOOLBAR);
-    		return bar;
-    }
-	
+	public void setFooter(UIComponent footer) {
+		setViewerFacet(FACET_ITEM_FOOTER, footer);
+	}
+
+	public void setHeader(UIComponent header) {
+		setViewerFacet(FACET_ITEM_HEADER, header);
+	}
+
+	public void setToolbar(ContentItemToolbar toolbar) {
+		// setViewerFacet(FACET_TOOLBAR, toolbar);
+		getFacets().put(FACET_TOOLBAR, toolbar);
+	}
+
+	public ContentItemToolbar getToolbar() {
+		// ContentItemToolbar bar = getViewerFacet(FACET_TOOLBAR);
+		ContentItemToolbar bar = (ContentItemToolbar) getFacets().get(FACET_TOOLBAR);
+		return bar;
+	}
 
 	/**
 	 * @see javax.faces.component.UIComponentBase#saveState(javax.faces.context.FacesContext)
 	 */
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[9];
+		Object values[] = new Object[10];
 		values[0] = super.saveState(ctx);
 		values[1] = fieldPrefixValueMap;
 		values[2] = fieldLocalValueMap;
@@ -624,29 +657,32 @@ public class ContentItemViewer extends WFContainer {
 		values[6] = Boolean.valueOf(showRequestedItem);
 		values[7] = renderDetailsCommand;
 		values[8] = resourcePath;
+		values[9] = detailsViewerPath;
 		return values;
 	}
-	
+
 	/**
-	 * @see javax.faces.component.UIComponentBase#restoreState(javax.faces.context.FacesContext, java.lang.Object)
+	 * @see javax.faces.component.UIComponentBase#restoreState(javax.faces.context.FacesContext,
+	 *      java.lang.Object)
 	 */
 	public void restoreState(FacesContext ctx, Object state) {
-		Object values[] = (Object[])state;
+		Object values[] = (Object[]) state;
 		super.restoreState(ctx, values[0]);
-		fieldPrefixValueMap = (Map)values[1];
-		fieldLocalValueMap = (Map)values[2];
-		fieldSuffixValueMap = (Map)values[3];
-		fieldValueChangedMap = (Map)values[4];
-		requestedResourcePath = (String)values[5];
-		showRequestedItem = ((Boolean)values[6]).booleanValue();
-		renderDetailsCommand = (Boolean)values[7];
-		resourcePath = (String)values[8];
+		fieldPrefixValueMap = (Map) values[1];
+		fieldLocalValueMap = (Map) values[2];
+		fieldSuffixValueMap = (Map) values[3];
+		fieldValueChangedMap = (Map) values[4];
+		requestedResourcePath = (String) values[5];
+		showRequestedItem = ((Boolean) values[6]).booleanValue();
+		renderDetailsCommand = (Boolean) values[7];
+		resourcePath = (String) values[8];
+		detailsViewerPath=(String)values[9];
 	}
-	
+
 	public String getPrefixStyleClass() {
 		return "prefix";
 	}
-	
+
 	public String getSuffixStyleClass() {
 		return "suffix";
 	}
@@ -654,36 +690,67 @@ public class ContentItemViewer extends WFContainer {
 	/**
 	 * @return Returns the resourcePath.
 	 */
-	public String getResourcePath() {		
-        if (resourcePath != null) return resourcePath;
-        
-        ContentItem item = getContentItem();
-		if (item != null){
+	public String getResourcePath() {
+		if (resourcePath != null)
+			return resourcePath;
+		ContentItem item = getContentItem();
+		if (item != null) {
 			return item.getResourcePath();
 		}
-        
-        ValueBinding vb = getValueBinding("resourcePath");
-        return vb != null ? (String)vb.getValue(getFacesContext()) : null;
+		ValueBinding vb = getValueBinding("resourcePath");
+		return vb != null ? (String) vb.getValue(getFacesContext()) : null;
 	}
+
 	/**
-	 * This method just sets the information about the resource path but does not load other information according to it.
+	 * This method just sets the information about the resource path but does
+	 * not load other information according to it.
 	 * 
-	 * @param resourcePath The resourcePath to set.
+	 * @param resourcePath
+	 *            The resourcePath to set.
 	 */
 	public void setResourcePath(String resourcePath) {
 		this.resourcePath = resourcePath;
 	}
-	
-	public String[] getToolbarActions(){
+
+	public String[] getToolbarActions() {
 		ContentItem item = getContentItem();
-		if(item!=null){
+		if (item != null) {
 			return item.getToolbarActions();
-		} else {
+		}
+		else {
 			return null;
 		}
 	}
-	
+
 	public String getActionURIPath(String action) {
-		return IWActionURIManager.getInstance().getActionURIPrefixWithContext(action,getResourcePath());
+		return IWActionURIManager.getInstance().getActionURIPrefixWithContext(action, getResourcePath());
+	}
+
+	public void setHeadlineAsLink(boolean asLink) {
+		this.headlineAsLink = asLink;
+	}
+
+	public boolean getHeadlineAsLink() {
+		return this.headlineAsLink;
+	}
+	
+	public HtmlOutputLink getEmptyMoreLink(){
+		HtmlOutputLink moreLink = new HtmlOutputLink();
+		IWContext iwc = IWContext.getInstance();
+		
+		String appContext = iwc.getIWMainApplication().getApplicationContextURI();
+		if (appContext.endsWith("/")){
+			appContext = appContext.substring(0, appContext.lastIndexOf("/"));			
+		}
+		moreLink.setValue(appContext+getDetailsViewerPath());
+		return moreLink;
+	}
+	
+	public void setDetailsViewerPath(String path){
+		this.detailsViewerPath=path;
+	}
+	
+	public String getDetailsViewerPath(){
+		return detailsViewerPath;
 	}
 }
