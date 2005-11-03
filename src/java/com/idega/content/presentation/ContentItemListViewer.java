@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.10 2005/11/02 13:32:22 tryggvil Exp $
+ * $Id: ContentItemListViewer.java,v 1.11 2005/11/03 16:07:12 tryggvil Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -28,10 +28,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- *  Last modified: $Date: 2005/11/02 13:32:22 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/11/03 16:07:12 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class ContentItemListViewer extends UIData {
 
@@ -48,7 +48,6 @@ public class ContentItemListViewer extends UIData {
 	private WFDataModel model=null;
 	private String firstArticleItemStyleClass = null;
 	private boolean initialized = false;
-	private boolean headlineAsLink=false;
 	
 	private static final String DEFAULT_RENDERER_TYPE = "content_list_viewer";
 	private static final String listDelim = ",";
@@ -92,7 +91,7 @@ public class ContentItemListViewer extends UIData {
 		ContentListViewerManagedBean bean = getManagedBean();
 		ContentItemViewer viewer = bean.getContentViewer();//WFUtil.invoke(this.managedBeanId,"getContentViewer");
 		viewer.setShowRequestedItem(false);
-		viewer.setHeadlineAsLink(getHeadlineAsLink());
+		//viewer.setHeadlineAsLink(getHeadlineAsLink());
 		addContentItemViewer(viewer);
 		
 		String[] actions = getToolbarActions();
@@ -303,7 +302,8 @@ public class ContentItemListViewer extends UIData {
 	 */
 	private void notifyManagedBeanOfResourcePath(String resourcePath) {
 		if(this.managedBeanId!=null){
-			WFUtil.invoke(this.managedBeanId,"setResourcePath",resourcePath,String.class);
+			//WFUtil.invoke(this.managedBeanId,"setResourcePath",resourcePath,String.class);
+			getManagedBean().setResourcePath(resourcePath);
 		}
 	}
 	
@@ -312,7 +312,8 @@ public class ContentItemListViewer extends UIData {
 	 */
 	private void notifyManagedBeanOfDetailsViewerPath(String path) {
 		if(this.managedBeanId!=null){
-			WFUtil.invoke(this.managedBeanId,"setDetailsViewerPath",path,String.class);
+			//WFUtil.invoke(this.managedBeanId,"setDetailsViewerPath",path,String.class);
+			getManagedBean().setDetailsViewerPath(detailsViewerPath);
 		}
 	}
 	
@@ -321,7 +322,8 @@ public class ContentItemListViewer extends UIData {
 	 */
 	private void notifyManagedBeanOfCategories(List categories) {
 		if(this.managedBeanId!=null){
-			WFUtil.invoke(this.managedBeanId,"setCategories",categories,List.class);
+			//WFUtil.invoke(this.managedBeanId,"setCategories",categories,List.class);
+			getManagedBean().setCategories(categories);
 		}
 	}
 
@@ -420,14 +422,6 @@ public class ContentItemListViewer extends UIData {
 
 	public void setFirstArticleItemStyleClass(String firstArticleItemStyleClass) {
 		this.firstArticleItemStyleClass = firstArticleItemStyleClass;
-	}
-	
-	public void setHeadlineAsLink(boolean asLink){
-		this.headlineAsLink=asLink;
-	}
-
-	public boolean getHeadlineAsLink(){
-		return this.headlineAsLink;
 	}
 	
 	public ContentListViewerManagedBean getManagedBean(){

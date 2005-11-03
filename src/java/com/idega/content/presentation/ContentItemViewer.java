@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.11 2005/11/02 13:32:22 tryggvil Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.12 2005/11/03 16:07:12 tryggvil Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -32,10 +32,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2005/11/02 13:32:22 $ by $Author: tryggvil $
+ * Last modified: $Date: 2005/11/03 16:07:12 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -61,7 +61,6 @@ public class ContentItemViewer extends WFContainer {
 	private boolean showRequestedItem = true;
 	private Boolean renderDetailsCommand = null;
 	private ContentItem contentItemCach = null;
-	private boolean headlineAsLink = false;
 	private String detailsViewerPath;
 
 	public ContentItemViewer() {
@@ -724,14 +723,6 @@ public class ContentItemViewer extends WFContainer {
 
 	public String getActionURIPath(String action) {
 		return IWActionURIManager.getInstance().getActionURIPrefixWithContext(action, getResourcePath());
-	}
-
-	public void setHeadlineAsLink(boolean asLink) {
-		this.headlineAsLink = asLink;
-	}
-
-	public boolean getHeadlineAsLink() {
-		return this.headlineAsLink;
 	}
 	
 	public HtmlOutputLink getEmptyMoreLink(){
