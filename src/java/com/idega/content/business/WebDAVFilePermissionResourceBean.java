@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissionResourceBean.java,v 1.3 2005/01/18 17:44:31 gummi Exp $
+ * $Id: WebDAVFilePermissionResourceBean.java,v 1.4 2005/11/25 11:14:57 tryggvil Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -34,10 +34,10 @@ import com.idega.slide.util.IWSlideConstants;
 
 /**
  * 
- *  Last modified: $Date: 2005/01/18 17:44:31 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/11/25 11:14:57 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements WebDAVFilePermissionResource{
 
@@ -269,7 +269,7 @@ public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements 
 					}
 					
 					//add all missing roles
-					Collection roles = getUserContext().getAccessController().getAllRoles();
+					Collection roles = getIWApplicationContext().getIWMainApplication().getAccessController().getAllRoles();
 					for (Iterator iter = roles.iterator(); iter.hasNext();) {
 						ICRole role = (ICRole) iter.next();
 						String roleURI = authBean.getRoleURI(role.getRoleKey());
