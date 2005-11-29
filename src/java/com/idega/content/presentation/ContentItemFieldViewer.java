@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemFieldViewer.java,v 1.2 2005/02/21 16:12:45 gummi Exp $
+ * $Id: ContentItemFieldViewer.java,v 1.3 2005/11/29 15:30:27 laddi Exp $
  * Created on 3.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -18,10 +18,10 @@ import com.idega.webface.WFContainer;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/21 16:12:45 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/11/29 15:30:27 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 
 public class ContentItemFieldViewer extends WFContainer {
@@ -72,20 +72,20 @@ public class ContentItemFieldViewer extends WFContainer {
 		public UIComponent getPrefixComponent(){
 			WFContainer c = (WFContainer)getFacet(FACET_PREFIX);
 			if(c!=null){
-				return (UIComponent)c.getFacet(FACET_CONTAINED_COMPONENT);
+				return c.getFacet(FACET_CONTAINED_COMPONENT);
 			} else {
 				return null;
 			}
 		}
 		
 		public UIComponent getMainComponent(){
-			return (UIComponent)getFacet(FACET_VALUE);
+			return getFacet(FACET_VALUE);
 		}
 		
 		public UIComponent getSuffixComponent(){
 			WFContainer c = (WFContainer)getFacet(FACET_SUFFIX);
 			if(c!=null){
-				return (UIComponent)c.getFacet(FACET_CONTAINED_COMPONENT);
+				return c.getFacet(FACET_CONTAINED_COMPONENT);
 			} else {
 				return null;
 			}

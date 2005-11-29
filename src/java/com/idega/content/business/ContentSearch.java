@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.17 2005/06/22 18:37:17 eiki Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.18 2005/11/29 15:30:27 laddi Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -49,7 +49,7 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- * Last modified: $Date: 2005/06/22 18:37:17 $ by $Author: eiki $ This class
+ * Last modified: $Date: 2005/11/29 15:30:27 $ by $Author: laddi $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -57,7 +57,7 @@ import com.idega.slide.business.IWSlideSession;
  * a bundle.
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 public class ContentSearch implements SearchPlugin {
 
@@ -179,7 +179,7 @@ public class ContentSearch implements SearchPlugin {
 				clientState.setAuthenticationPreemptive(true);
 			}
 			for (Iterator iter = searchRequests.iterator(); iter.hasNext();) {
-				Object request = (Object) iter.next();
+				Object request = iter.next();
 				String queryXML = null;
 				if (request instanceof String) {
 					queryXML = (String) request;

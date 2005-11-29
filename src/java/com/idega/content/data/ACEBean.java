@@ -1,5 +1,5 @@
 /*
- * $Id: ACEBean.java,v 1.6 2005/06/30 13:55:21 gummi Exp $
+ * $Id: ACEBean.java,v 1.7 2005/11/29 15:30:27 laddi Exp $
  * Created on 3.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -34,10 +34,10 @@ import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
  * 
- *  Last modified: $Date: 2005/06/30 13:55:21 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/11/29 15:30:27 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class ACEBean implements WFEditableListDataBean {
 
@@ -272,14 +272,14 @@ public class ACEBean implements WFEditableListDataBean {
 				ICRole role = null;
 				
 				try {
-					role = (ICRole)((ICRoleHome)IDOLookup.getHome(ICRole.class)).findByPrimaryKey(roleKey);
+					role = ((ICRoleHome)IDOLookup.getHome(ICRole.class)).findByPrimaryKey(roleKey);
 				}
 				catch (IDOLookupException e) {
 					e.printStackTrace();
 				}
 				catch (FinderException e) {
 					try {
-						role = (ICRole)((ICRoleHome)IDOLookup.getHome(ICRole.class)).create();
+						role = ((ICRoleHome)IDOLookup.getHome(ICRole.class)).create();
 						role.setRoleKey(roleKey);
 						role.setRoleNameLocalizableKey("slide_role_"+roleKey);
 						role.setRoleDescriptionLocalizableKey("slide_role_"+roleKey+"_desc");

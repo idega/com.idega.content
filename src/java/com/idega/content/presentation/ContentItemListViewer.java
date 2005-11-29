@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.11 2005/11/03 16:07:12 tryggvil Exp $
+ * $Id: ContentItemListViewer.java,v 1.12 2005/11/29 15:30:27 laddi Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -28,10 +28,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- *  Last modified: $Date: 2005/11/03 16:07:12 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/11/29 15:30:27 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class ContentItemListViewer extends UIData {
 
@@ -285,7 +285,7 @@ public class ContentItemListViewer extends UIData {
 		this._rowClasses = (String) values[6];
 		this.detailsViewerPath = (String)values[7];
 		this.initialized = ((Boolean)values[8]).booleanValue();
-		this.categories = (List)categories;
+		this.categories = (List) values[9];
 		
 		notifyManagedBeanOfVariableValues();
 		

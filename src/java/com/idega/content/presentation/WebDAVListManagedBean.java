@@ -254,7 +254,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	}
 
 	private WFList getWFListParent(UIComponent comp) {
-		UIComponent parent = (UIComponent) comp.getParent();
+		UIComponent parent = comp.getParent();
 		while (parent != null && !(parent instanceof WFList)) {
 			parent = parent.getParent();
 		}

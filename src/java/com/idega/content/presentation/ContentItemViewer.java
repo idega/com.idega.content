@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.12 2005/11/03 16:07:12 tryggvil Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.13 2005/11/29 15:30:27 laddi Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -32,10 +32,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2005/11/03 16:07:12 $ by $Author: tryggvil $
+ * Last modified: $Date: 2005/11/29 15:30:27 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -358,7 +358,7 @@ public class ContentItemViewer extends WFContainer {
 			return item.getValue(fieldName);
 		}
 		ValueBinding vb = getValueBinding(fieldName);
-		return (String) (vb != null ? (Object) vb.getValue(getFacesContext()) : null);
+		return vb != null ? (Object) vb.getValue(getFacesContext()) : null;
 	}
 
 	public void setValue(String fieldName, Object value) {
@@ -586,7 +586,7 @@ public class ContentItemViewer extends WFContainer {
 	}
 
 	public void updateDetailsCommand() {
-		UIComponent command = (UIComponent) getViewerFacet(FACET_ITEM_DETAILS_COMMAND);
+		UIComponent command = getViewerFacet(FACET_ITEM_DETAILS_COMMAND);
 		updateDetailsLink(command);
 	}
 
@@ -617,7 +617,7 @@ public class ContentItemViewer extends WFContainer {
 	 * 
 	 */
 	public void updateToolbar() {
-		ContentItemToolbar toolbar = (ContentItemToolbar) getToolbar();
+		ContentItemToolbar toolbar = getToolbar();
 		if (toolbar != null) {
 			toolbar.setResourcePath(getResourcePath());
 		}
