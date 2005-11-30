@@ -1,5 +1,5 @@
 /*
- * $Id: PageCreationManagedBean.java,v 1.1 2005/05/11 18:29:45 gummi Exp $
+ * $Id: PageCreationManagedBean.java,v 1.2 2005/11/30 09:36:26 laddi Exp $
  * Created on 2.5.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -43,10 +43,10 @@ import com.idega.webface.WFTreeNode;
 
 /**
  * 
- *  Last modified: $Date: 2005/05/11 18:29:45 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/11/30 09:36:26 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class PageCreationManagedBean implements ActionListener {
 
@@ -188,39 +188,8 @@ public class PageCreationManagedBean implements ActionListener {
 		if(!SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED.equals(getTemplateIdentifier())){
 			//Create new page
 			String templateID = getTemplateIdentifier();
-//			if(templateID!=null){
-//				Map tree = PageTreeNode.getTree(iwc);
-//				try {
-//					ICTreeNode n = (PageTreeNode)tree.get(Integer.valueOf(templateID));
-//					if(n!=null){
-//						ICTreeNode p = n.getParentNode();
-//						if(p!=null){
-//							templateID = String.valueOf(p.getNodeID());
-//						}
-//					}
-//				} catch (NumberFormatException e) {
-//					e.printStackTrace();
-//				}
-//			}
-			
-			String id = createSimpleTemplatePage(iwc, getParentPageIdentifier(), getPageName(), templateID,getBuilderLogic().PAGE_FORMAT_JSP_1_2,stringSourceMarkup);
-		} else {
-//			try {
-//				if(getSimpleTemplateIdentifier() != null){
-//					getBuilderLogic().getPageCacher().storePage(getSimpleTemplateIdentifier(),getBuilderLogic().PAGE_FORMAT_JSP_1_2,stringSourceMarkup);
-//				} else {
-//					throw new AbortProcessingException("Page identifier is null. Most likely explaination is that creating new page failed");
-//				}
-//			}
-//			catch (Exception e) {
-//				if(e instanceof AbortProcessingException){
-//					throw (AbortProcessingException)e;
-//				} else {
-//					throw new AbortProcessingException(e);
-//				}
-//			}
+			createSimpleTemplatePage(iwc, getParentPageIdentifier(), getPageName(), templateID,getBuilderLogic().PAGE_FORMAT_JSP_1_2,stringSourceMarkup);
 		}
-	
 	}
 	
 	/**

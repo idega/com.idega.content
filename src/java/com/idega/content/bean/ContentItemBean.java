@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.12 2005/10/04 17:19:10 thomas Exp $
+ * $Id: ContentItemBean.java,v 1.13 2005/11/30 09:36:26 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -53,10 +53,10 @@ import com.idega.webface.WFUtil;
 /**
  * Bean for idegaWeb content items.   
  * <p>
- * Last modified: $Date: 2005/10/04 17:19:10 $ by $Author: thomas $
+ * Last modified: $Date: 2005/11/30 09:36:26 $ by $Author: laddi $
  *
  * @author Anders Lindman
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 
 public abstract class ContentItemBean implements Serializable, ICFile, ContentItem {
@@ -410,9 +410,9 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 			_allLocales = new LinkedHashMap();
 			Locale sv = new Locale("sv");
 			Locale en = new Locale("en");
-			Locale is = new Locale("is");
+			/*Locale is = new Locale("is");
 			String displayLang = is.getDisplayLanguage();
-			String lang = is.getLanguage();
+			String lang = is.getLanguage();*/
 			_allLocales.put(WFUtil.getValue(bref + sv.getLanguage()), sv.getDisplayLanguage());
 			_allLocales.put(WFUtil.getValue(bref + en.getLanguage()), en.getDisplayLanguage());
 			//_allLocales.put(WFUtil.getValue(bref + is.getDisplayLanguage()), is.getLanguage());

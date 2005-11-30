@@ -164,14 +164,11 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
 
 
     private void test(WebdavResource resource) throws IOException, HttpException{
-        String host = resource.getHost();
-        String uri = resource.getHttpURL().getURI();
 
         WebdavResource[] resources = resource.getChildResources().listResources();
 
         for (int i =0; i<resources.length; i++){
 //            if (resources[i].isCollection()){
-                String host2 = resources[i].getHost();
                 String uri2 = resources[i].getHttpURL().getURI();
                 java.lang.System.out.println(uri2);
 
@@ -181,7 +178,6 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
 
     private String _selectedCollectionUri;
     public void processAction(javax.faces.event.ActionEvent actionEvent) throws javax.faces.event.AbortProcessingException {
-            Object source = actionEvent.getSource();
             /*documentmanagementprototype2.WebDavTreeBean.SlideTreeNode node = (SlideTreeNode) actionEvent.getComponent();
             WebdavResource resource = node.getWebdavResource();
             try{
