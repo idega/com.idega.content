@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.12 2005/11/29 15:30:27 laddi Exp $
+ * $Id: ContentItemListViewer.java,v 1.13 2005/12/12 11:40:26 tryggvil Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -28,10 +28,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- *  Last modified: $Date: 2005/11/29 15:30:27 $ by $Author: laddi $
+ * Last modified: $Date: 2005/12/12 11:40:26 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class ContentItemListViewer extends UIData {
 
@@ -44,7 +44,7 @@ public class ContentItemListViewer extends UIData {
 	private String _columnClasses;
 	private String _rowClasses;
 	
-	private List categories = null;
+	private List categoriesList = null;
 	private WFDataModel model=null;
 	private String firstArticleItemStyleClass = null;
 	private boolean initialized = false;
@@ -100,7 +100,7 @@ public class ContentItemListViewer extends UIData {
 			for (int i = 0; i < actions.length; i++) {
 				toolbar.addToolbarButton(actions[i]);
 			}
-			String categories = this.getCategoriesAsString();
+			String categories = this.getCategories();
 			if(categories!=null){
 				toolbar.setCategories(categories);
 			}
@@ -267,7 +267,7 @@ public class ContentItemListViewer extends UIData {
 		values[6] = _rowClasses;
 		values[7] = detailsViewerPath;
 		values[8] = Boolean.valueOf(initialized);
-		values[9] = categories;
+		values[9] = categoriesList;
 		return values;
 	}
 	
@@ -285,7 +285,7 @@ public class ContentItemListViewer extends UIData {
 		this._rowClasses = (String) values[6];
 		this.detailsViewerPath = (String)values[7];
 		this.initialized = ((Boolean)values[8]).booleanValue();
-		this.categories = (List) values[9];
+		this.categoriesList = (List) values[9];
 		
 		notifyManagedBeanOfVariableValues();
 		
@@ -294,7 +294,7 @@ public class ContentItemListViewer extends UIData {
 	protected void notifyManagedBeanOfVariableValues(){
 		notifyManagedBeanOfResourcePath(this.resourcePath);
 		notifyManagedBeanOfDetailsViewerPath(this.detailsViewerPath);
-		notifyManagedBeanOfCategories(this.categories);
+		notifyManagedBeanOfCategories(this.categoriesList);
 	}
 
 	/**
@@ -322,7 +322,7 @@ public class ContentItemListViewer extends UIData {
 	 */
 	private void notifyManagedBeanOfCategories(List categories) {
 		if(this.managedBeanId!=null){
-			//WFUtil.invoke(this.managedBeanId,"setCategories",categories,List.class);
+			//WFUtil.invoke(this.managedBeanId,"setCategories",categoriesList,List.class);
 			getManagedBean().setCategories(categories);
 		}
 	}
@@ -367,16 +367,16 @@ public class ContentItemListViewer extends UIData {
 		notifyManagedBeanOfDetailsViewerPath(detailsViewerPath);
 	}
 	/**
-	 * @return Returns the categories.
+	 * @return Returns the categoriesList.
 	 */
-	public List getCategories() {
-		return categories;
+	public List getCategoriesList() {
+		return categoriesList;
 	}
 	/**
 	 * <p>
-	 * Sets the categories as a comma separated list
+	 * Sets the categoriesList as a comma separated list
 	 * </p>
-	 * @param categories
+	 * @param categoriesList
 	 */
 	public void setCategories(String categories){
 		if(categories!=null){
@@ -386,15 +386,15 @@ public class ContentItemListViewer extends UIData {
 				cats.add(tokenizer.nextToken());
 			}
 			List cats2 = (cats.isEmpty())?null:cats;
-			setCategories(cats2);
+			setCategoriesList(cats2);
 		} else {	
 			//null
 		}
 	}
 	
-	public String getCategoriesAsString() {
-		if(categories!=null){
-			Iterator iter = categories.iterator();
+	public String getCategories() {
+		if(categoriesList!=null){
+			Iterator iter = categoriesList.iterator();
 			if(iter.hasNext()){
 				StringBuffer catString = new StringBuffer();
 				catString.append((String)iter.next());
@@ -402,6 +402,7 @@ public class ContentItemListViewer extends UIData {
 					catString.append(listDelim);
 					catString.append((String)iter.next());
 				}
+				return catString.toString();
 			}
 		}
 		return null;
@@ -409,10 +410,10 @@ public class ContentItemListViewer extends UIData {
 	
 	
 	/**
-	 * @param categories The categories to set.
+	 * @param categoriesList The categoriesList to set.
 	 */
-	public void setCategories(List categories) {
-		this.categories = categories;
+	public void setCategoriesList(List categories) {
+		this.categoriesList = categories;
 		notifyManagedBeanOfCategories(categories);
 	}
 

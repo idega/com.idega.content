@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.17 2005/10/19 18:23:34 tryggvil Exp $
+ * $Id: ContentViewManager.java,v 1.18 2005/12/12 11:40:25 tryggvil Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -26,10 +26,10 @@ import com.idega.repository.data.Singleton;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2005/10/19 18:23:34 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/12/12 11:40:25 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 public class ContentViewManager implements Singleton  {
 
@@ -104,7 +104,7 @@ public class ContentViewManager implements Singleton  {
 		DefaultViewNode createPageNode = new DefaultViewNode("create",pagesNode);
 		createPageNode.setJspUri(bundle.getJSPURI("createpage.jsp"));
 		createPageNode.setName("#{localizedStrings['com.idega.content']['create_page']}");
-		createPageNode.setVisibleInMenus(false);
+		//createPageNode.setVisibleInMenus(false);
 		
 		DefaultViewNode previewPageNode = new DefaultViewNode("preview",pagesNode);
 		previewPageNode.setJspUri(bundle.getJSPURI("pagepreview.jsp"));
@@ -118,7 +118,7 @@ public class ContentViewManager implements Singleton  {
 		DefaultViewNode simpleTemplateNode = new DefaultViewNode("templatesettings",pagesNode);
 		simpleTemplateNode.setJspUri(bundle.getJSPURI("simpletemplate.jsp"));
 		simpleTemplateNode.setName("#{localizedStrings['com.idega.content']['template_settings']}");
-		simpleTemplateNode.setVisibleInMenus(false);
+		//simpleTemplateNode.setVisibleInMenus(false);
 		
 		/* Page nodes end */
 		

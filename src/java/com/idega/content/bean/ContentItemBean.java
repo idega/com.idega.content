@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.13 2005/11/30 09:36:26 laddi Exp $
+ * $Id: ContentItemBean.java,v 1.14 2005/12/12 11:40:26 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -53,10 +53,10 @@ import com.idega.webface.WFUtil;
 /**
  * Bean for idegaWeb content items.   
  * <p>
- * Last modified: $Date: 2005/11/30 09:36:26 $ by $Author: laddi $
+ * Last modified: $Date: 2005/12/12 11:40:26 $ by $Author: tryggvil $
  *
  * @author Anders Lindman
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 
 public abstract class ContentItemBean implements Serializable, ICFile, ContentItem {
@@ -68,7 +68,8 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	private String _itemType = null;
 	private Date _createdTimestamp = null;
 	private int _createdByUserId = 0;
-
+	private boolean autoCreateResource;
+	
 	private String _pendingLocaleId = null;
 	private String _requestedStatus = null;
 	
@@ -92,10 +93,11 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	public final static String FIELDNAME_STATUS = "status";
 	
 	private Boolean doRender = Boolean.TRUE;
+	private boolean exists=false;
 
-	private final static String[] ACTION_ARRAY = new String[] {"preview","edit"};
-	
-	
+	private final static String[] ACTION_EXISTS_ARRAY = new String[] {"preview","edit"};
+	private final static String[] ACTION_NOT_EXISTS_ARRAY = new String[] {"create"};
+
 	/**
 	 * Default constructor.
 	 */
@@ -245,7 +247,12 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	 */
 	
 	public String[] getToolbarActions(){
-		return ACTION_ARRAY;
+		if(getExists()){
+			return ACTION_EXISTS_ARRAY;
+		}
+		else{
+			return ACTION_NOT_EXISTS_ARRAY;
+		}
 	}
 	/**
 	 *Sets the item field with the specified key. 
@@ -494,6 +501,7 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 		IWUserContext iwuc = IWContext.getInstance();
 		boolean returner = true;
 		try {
+			
 			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwuc,IWSlideSession.class);
 	
 			WebdavExtendedResource webdavResource = session.getWebdavResource(path);
@@ -515,12 +523,19 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 			}
 			
 			returner = load(webdavResource);
+			setExists(true);
 //			System.out.print("["+this.toString()+"]:");
 //			System.out.println("Load "+((returner)?"":"not")+" successful of path "+path);
 		}catch(HttpException e) {
 			if(e.getReasonCode()==WebdavStatus.SC_NOT_FOUND) {
-				setRendered(false);
-				return false;
+				/*if(isAutoCreateResource()){
+					//in this case ignore the error message that it isn't fount
+					return true;
+				}
+				else{*/
+					setRendered(false);
+					return false;
+				//}
 			} else {
 				throw e;
 			}
@@ -1157,5 +1172,40 @@ public abstract class ContentItemBean implements Serializable, ICFile, ContentIt
 	// implements Storable
 	public Object read(ObjectReader reader, IWContext iwc) throws RemoteException {
 		return reader.read(this, iwc);
+	}
+
+	
+	/**
+	 * @return Returns the autoCreateResource.
+	 */
+	public boolean isAutoCreateResource() {
+		return autoCreateResource;
+	}
+
+	
+	/**
+	 * @param autoCreateResource The autoCreateResource to set.
+	 */
+	public void setAutoCreateResource(boolean autoCreateResource) {
+		this.autoCreateResource = autoCreateResource;
+	}
+
+	
+	/**
+	 * <p>
+	 * Gets wheather this contentItem exists in the content repository.
+	 * </p>
+	 * @return Returns the exists.
+	 */
+	public boolean getExists() {
+		return exists;
+	}
+
+	
+	/**
+	 * @param exists The exists to set.
+	 */
+	public void setExists(boolean exists) {
+		this.exists = exists;
 	}	
 }

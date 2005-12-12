@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.13 2005/11/29 15:30:27 laddi Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.14 2005/12/12 11:40:25 tryggvil Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -32,10 +32,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2005/11/29 15:30:27 $ by $Author: laddi $
+ * Last modified: $Date: 2005/12/12 11:40:25 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -52,7 +52,7 @@ public class ContentItemViewer extends WFContainer {
 	 * The field requestedResourcePath is used to store the path that is
 	 * requested by a http request
 	 */
-	private String requestedResourcePath = null;
+	//private String requestedResourcePath = null;
 	/*
 	 * The field resourcePath is used to store the path to the resource this
 	 * instance currently renders
@@ -62,7 +62,8 @@ public class ContentItemViewer extends WFContainer {
 	private Boolean renderDetailsCommand = null;
 	private ContentItem contentItemCach = null;
 	private String detailsViewerPath;
-
+	private boolean autoCreateResource=true;
+	
 	public ContentItemViewer() {
 		super();
 		this.setStyleClass("content_item_viewer");
@@ -197,6 +198,7 @@ public class ContentItemViewer extends WFContainer {
 			String[] actions = item.getToolbarActions();
 			if (actions != null && actions.length > 0) {
 				ContentItemToolbar toolbar = new ContentItemToolbar();
+				toolbar.setId(this.getId()+"_toolbar");
 				toolbar.setToolbarActions(actions);
 				this.setToolbar(toolbar);
 			}
@@ -374,9 +376,14 @@ public class ContentItemViewer extends WFContainer {
 	public boolean isRendered() {
 		ContentItem item = getContentItem();
 		if (item != null) {
-			Boolean renderd = item.getRendered();
-			if (renderd != null) {
-				return renderd.booleanValue();
+			if(isAutoCreateResource()){
+				return true;
+			}
+			else{
+				Boolean renderd = item.getRendered();
+				if (renderd != null) {
+					return renderd.booleanValue();
+				}
 			}
 		}
 		return super.isRendered();
@@ -392,9 +399,9 @@ public class ContentItemViewer extends WFContainer {
 		// CALLED!
 		if (showRequestedItem) {
 			IWContext iwc = IWContext.getIWContext(context);
-			String resourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
-			if (resourcePath != null) {
-				requestedResourcePath = resourcePath;
+			String paramResourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
+			if (paramResourcePath != null) {
+				setResourcePath(paramResourcePath);
 			}
 		}
 		updateValues();
@@ -408,9 +415,9 @@ public class ContentItemViewer extends WFContainer {
 	public void encodeBegin(FacesContext context) throws IOException {
 		if (showRequestedItem) {
 			IWContext iwc = IWContext.getIWContext(context);
-			String resourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
-			if (resourcePath != null) {
-				requestedResourcePath = resourcePath;
+			String paramResourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
+			if (paramResourcePath != null) {
+				setResourcePath(paramResourcePath);
 			}
 		}
 		super.encodeBegin(context);
@@ -508,9 +515,9 @@ public class ContentItemViewer extends WFContainer {
 	 * @return
 	 */
 	public ContentItem getContentItem() {
-		if (requestedResourcePath != null && showRequestedItem) {
+		if (resourcePath != null && showRequestedItem) {
 			if (contentItemCach == null) {
-				contentItemCach = loadContentItem(requestedResourcePath);
+				contentItemCach = loadContentItem(resourcePath);
 			}
 			return contentItemCach;
 		}
@@ -652,11 +659,11 @@ public class ContentItemViewer extends WFContainer {
 		values[2] = fieldLocalValueMap;
 		values[3] = fieldSuffixValueMap;
 		values[4] = fieldValueChangedMap;
-		values[5] = requestedResourcePath;
-		values[6] = Boolean.valueOf(showRequestedItem);
-		values[7] = renderDetailsCommand;
-		values[8] = resourcePath;
-		values[9] = detailsViewerPath;
+		values[5] = Boolean.valueOf(showRequestedItem);
+		values[6] = renderDetailsCommand;
+		values[7] = resourcePath;
+		values[8] = detailsViewerPath;
+		values[9] = Boolean.valueOf(autoCreateResource);
 		return values;
 	}
 
@@ -671,11 +678,11 @@ public class ContentItemViewer extends WFContainer {
 		fieldLocalValueMap = (Map) values[2];
 		fieldSuffixValueMap = (Map) values[3];
 		fieldValueChangedMap = (Map) values[4];
-		requestedResourcePath = (String) values[5];
-		showRequestedItem = ((Boolean) values[6]).booleanValue();
-		renderDetailsCommand = (Boolean) values[7];
-		resourcePath = (String) values[8];
-		detailsViewerPath=(String)values[9];
+		showRequestedItem = ((Boolean) values[5]).booleanValue();
+		renderDetailsCommand = (Boolean) values[6];
+		resourcePath = (String) values[7];
+		detailsViewerPath=(String)values[8];
+		autoCreateResource=((Boolean)values[9]).booleanValue();
 	}
 
 	public String getPrefixStyleClass() {
@@ -744,4 +751,21 @@ public class ContentItemViewer extends WFContainer {
 	public String getDetailsViewerPath(){
 		return detailsViewerPath;
 	}
+
+	
+	/**
+	 * @return Returns the autoCreateResource.
+	 */
+	public boolean isAutoCreateResource() {
+		return autoCreateResource;
+	}
+
+	
+	/**
+	 * @param autoCreateResource The autoCreateResource to set.
+	 */
+	public void setAutoCreateResource(boolean autoCreateResource) {
+		this.autoCreateResource = autoCreateResource;
+	}
+
 }
