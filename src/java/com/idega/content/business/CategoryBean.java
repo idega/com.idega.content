@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.1 2005/09/08 23:08:41 tryggvil Exp $
+ * $Id: CategoryBean.java,v 1.2 2005/12/20 16:42:00 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -32,10 +32,10 @@ import com.idega.slide.util.WebdavRootResource;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2005/09/08 23:08:41 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class CategoryBean {
 	
@@ -81,15 +81,7 @@ public class CategoryBean {
 	 * @return collection of strings
 	 */
 	public Collection getCategories() {
-		Collection ret = new ArrayList();
-		
-		String categories = getCategoriesAsString();
-		if( categories != null){
-			StringTokenizer st = new StringTokenizer(categories,",");
-			while(st.hasMoreTokens()) {
-				ret.add(st.nextToken().trim());
-			}
-		}
+		Collection ret = getCategoriesFromString(getCategoriesAsString());
 		return ret;
 	}
 	
@@ -126,6 +118,24 @@ public class CategoryBean {
 			e.printStackTrace();
 		}
 		return categories;
+	}
+	
+	/**
+	 * <p>
+	 * Constructs a collection from a comma separated list of categories
+	 * </p>
+	 * @param categoryCommaSeparatedList
+	 */
+	public static Collection getCategoriesFromString(String categoryCommaSeparatedList){
+		Collection ret = new ArrayList();
+		
+		if( categoryCommaSeparatedList != null){
+			StringTokenizer st = new StringTokenizer(categoryCommaSeparatedList,",");
+			while(st.hasMoreTokens()) {
+				ret.add(st.nextToken().trim());
+			}
+		}
+		return ret;
 	}
 	
 	/**

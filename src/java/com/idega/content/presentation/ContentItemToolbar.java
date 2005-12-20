@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.9 2005/12/12 11:40:25 tryggvil Exp $
+ * $Id: ContentItemToolbar.java,v 1.10 2005/12/20 16:42:00 tryggvil Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -30,15 +30,16 @@ import com.idega.webface.WFUtil;
  *  <p>
  *  Toolbar used by new content management system to display editor buttons.
  *  </p>
- *  Last modified: $Date: 2005/12/12 11:40:25 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
 	//static constants:
 	public final static String PARAMETER_CATEGORIES="content_categories";
+	public final static String PARAMETER_BASE_FOLDER_PATH="content_base_path";
 	
 	//instance variables
 	private String resourcePath;
@@ -49,7 +50,9 @@ public class ContentItemToolbar extends WFToolbar {
 	private String[] RolesAllowded = new String[] {StandardRoles.ROLE_KEY_ADMIN,StandardRoles.ROLE_KEY_AUTHOR,StandardRoles.ROLE_KEY_EDITOR};
 	private Boolean rendered;
 	private String categories;
+	private String baseFolderPath;
 
+	
 	/**
 	 * 
 	 */
@@ -125,6 +128,13 @@ public class ContentItemToolbar extends WFToolbar {
 					categoriesParameter.setName(PARAMETER_CATEGORIES);
 					categoriesParameter.setValue(categories);
 					link.getChildren().add(categoriesParameter);
+				}
+				String basePath = this.getBaseFolderPath();
+				if(basePath!=null){
+					UIParameter basePathParameter = new UIParameter();
+					basePathParameter.setName(PARAMETER_BASE_FOLDER_PATH);
+					basePathParameter.setValue(basePath);
+					link.getChildren().add(basePathParameter);
 				}
 				link.setAction(action);
 			}
@@ -212,11 +222,12 @@ public class ContentItemToolbar extends WFToolbar {
 	 * @see javax.faces.component.UIComponentBase#saveState(javax.faces.context.FacesContext)
 	 */
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[4];
+		Object values[] = new Object[5];
 		values[0] = super.saveState(ctx);
 		values[1] = resourcePath;
 		values[2] = actionHandlerIdentifier;
 		values[3] = categories;
+		values[4] = baseFolderPath;
 		return values;
 	}
 	
@@ -229,6 +240,7 @@ public class ContentItemToolbar extends WFToolbar {
 		resourcePath = (String)values[1];
 		actionHandlerIdentifier = (String)values[2];
 		categories=(String)values[3];
+		baseFolderPath=(String)values[4];
 	}
 	
 	
@@ -247,4 +259,21 @@ public class ContentItemToolbar extends WFToolbar {
 	public void setCategories(String categories) {
 		this.categories = categories;
 	}
+	
+
+	/**
+	 * @return Returns the basePath.
+	 */
+	public String getBaseFolderPath() {
+		return baseFolderPath;
+	}
+
+	
+	/**
+	 * @param basePath The basePath to set.
+	 */
+	public void setBaseFolderPath(String basePath) {
+		this.baseFolderPath = basePath;
+	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewerTag.java,v 1.7 2005/10/04 11:47:09 gimmi Exp $
+ * $Id: ContentItemListViewerTag.java,v 1.8 2005/12/20 16:42:00 tryggvil Exp $
  * Created on 31.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -15,14 +15,14 @@ import javax.faces.webapp.UIComponentTag;
 
 /**
  * 
- *  Last modified: $Date: 2005/10/04 11:47:09 $ by $Author: gimmi $
+ *  Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class ContentItemListViewerTag extends UIComponentTag {
 
-	private String resourcePath;
+	private String baseFolderPath;
 	private String managedBeanId;
 	private String detailsViewerPath;
 	private String categories = null;
@@ -47,7 +47,7 @@ public class ContentItemListViewerTag extends UIComponentTag {
 	
 	public void release() {      
 		super.release();      
-		resourcePath = null; 
+		baseFolderPath = null; 
 		managedBeanId = null;
 		detailsViewerPath = null;
 		categories = null;
@@ -61,19 +61,32 @@ public class ContentItemListViewerTag extends UIComponentTag {
 			if(managedBeanId!=null){
 				viewer.setBeanIdentifier(managedBeanId);
 			}
-			viewer.setResourcePath(resourcePath);
+			viewer.setBaseFolderPath(getBaseFolderPath());
 			viewer.setDetailsViewerPath(detailsViewerPath);
 			viewer.setCategories(categories);
 			viewer.setFirstArticleItemStyleClass(firstArticleItemStyleClass);
 		}
 	}
 	
+	/**
+	 * @deprecated replaced with setBaseFolderPath
+	 */
 	public void setResourcePath(String path) {
-		this.resourcePath = path;
+		setBaseFolderPath(path);
+	}
+	/**
+	 * @deprecated replaced with getBaseFolderPath
+	 */
+	public String getResourcePath() {
+		return getBaseFolderPath();
 	}
 	
-	public String getResourcePath() {
-		return resourcePath;
+	public void setBaseFolderPath(String path) {
+		this.baseFolderPath = path;
+	}
+	
+	public String getBaseFolderPath() {
+		return baseFolderPath;
 	}
 	
 	public void setBeanIdentifier(String identifier) {

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentListViewerManagedBean.java,v 1.4 2005/03/08 18:33:12 gummi Exp $
+ * $Id: ContentListViewerManagedBean.java,v 1.5 2005/12/20 16:42:00 tryggvil Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -16,10 +16,10 @@ import com.idega.content.presentation.ContentItemViewer;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/08 18:33:12 $ by $Author: gummi $
+ *  Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public interface ContentListViewerManagedBean {
 	/**
@@ -34,7 +34,8 @@ public interface ContentListViewerManagedBean {
 	 * @return list of ContentItemViewers
 	 */
 	public List getAttachmentViewers();
-	public void setResourcePath(String path);
+	public void setBaseFolderPath(String path);
+	public String getBaseFolderPath();
 	public void setDetailsViewerPath(String path);
 	public void setCategories(List categories);
 	
@@ -43,5 +44,13 @@ public interface ContentListViewerManagedBean {
 	 * @return can return null to indicate that default handler should be used
 	 */
 	public String getIWActionURIHandlerIdentifier();
+	/**
+	 * <p>
+	 * TODO tryggvil describe method setMaxNumberOfDisplayed
+	 * </p>
+	 * @param maxItems
+	 */
+	public void setMaxNumberOfDisplayed(int maxItems);
+	public int getMaxNumberOfDisplayed();
 	
 }

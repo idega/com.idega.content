@@ -1,5 +1,5 @@
 /*
- * $Id: ContentUtil.java,v 1.8 2005/03/02 15:08:51 joakim Exp $
+ * $Id: ContentUtil.java,v 1.9 2005/12/20 16:42:00 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -16,10 +16,10 @@ import com.idega.presentation.IWContext;
 
 /**
  * 
- * Last modified: $Date: 2005/03/02 15:08:51 $ by $Author: joakim $
+ * Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class ContentUtil {
 	public static final String CONTENT_PATH = "/files/cms";
@@ -45,7 +45,14 @@ public class ContentUtil {
 		bundle = iwContext.getIWMainApplication().getBundle(IW_BUNDLE_IDENTIFIER);
 	}
 	
-	public static String getContentRootPath(){
+	/**
+	 * <p>
+	 * This article returns the standard root or 'baseFolderPath' for content in the cms system.<br/>
+	 * By default this is /files/cms
+	 * </p>
+	 * @return
+	 */
+	public static String getContentBaseFolderPath(){
 		return CONTENT_PATH;
 	}
 	

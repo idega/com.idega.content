@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.13 2005/12/12 11:40:26 tryggvil Exp $
+ * $Id: ContentItemListViewer.java,v 1.14 2005/12/20 16:42:00 tryggvil Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -28,10 +28,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- * Last modified: $Date: 2005/12/12 11:40:26 $ by $Author: tryggvil $
+ * Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class ContentItemListViewer extends UIData {
 
@@ -51,6 +51,7 @@ public class ContentItemListViewer extends UIData {
 	
 	private static final String DEFAULT_RENDERER_TYPE = "content_list_viewer";
 	private static final String listDelim = ",";
+	private int maxNumberOfDisplayed=-1;
 	
 	/**
 	 * 
@@ -104,7 +105,12 @@ public class ContentItemListViewer extends UIData {
 			if(categories!=null){
 				toolbar.setCategories(categories);
 			}
-			toolbar.setResourcePath(getResourcePath());
+			String basePath = getBaseFolderPath();
+			if(basePath!=null){
+				toolbar.setBaseFolderPath(basePath);
+			}
+			
+			//toolbar.setResourcePath(getResourcePath());
 			toolbar.setActionHandlerIdentifier(bean.getIWActionURIHandlerIdentifier());//WFUtil.invoke(this.managedBeanId,"getIWActionURIHandlerIdentifier"));
 			this.setHeader(toolbar);
 		}
@@ -125,19 +131,27 @@ public class ContentItemListViewer extends UIData {
 		return ContentUtil.FAMILY_CONTENT;
 	}
 	
-	public void setResourcePath(String path){
-		this.resourcePath=path;
-		notifyManagedBeanOfResourcePath(path);
+	/**
+	 * @deprecated replaced with setBaseFolderPath
+	 */
+	public void setResourcePath(String resourcePath){
+		setBaseFolderPath(resourcePath);
 	}
 	
-	public String getResourcePath(){
+	public void setBaseFolderPath(String path){
+		this.resourcePath=path;
+		notifyManagedBeanOfBaseFolderPath(path);
+	}
+	
+	public String getBaseFolderPath(){
 		if (resourcePath != null) return resourcePath;
-        ValueBinding vb = getValueBinding("resourcePath");
+        ValueBinding vb = getValueBinding("baseFolderPath");
         String path = vb != null ? (String)vb.getValue(getFacesContext()) : null;
         if(path==null){
 	        	if(this.managedBeanId!=null){
-	        		path = (String)WFUtil.invoke(this.managedBeanId,"getResourcePath");
-	    		}
+	        		//path = (String)WFUtil.invoke(this.managedBeanId,"getResourcePath");
+	        		path = getManagedBean().getBaseFolderPath();
+	        	}
         }
         return path;
 	}
@@ -159,7 +173,8 @@ public class ContentItemListViewer extends UIData {
 	
 	public Object getValue(){
 		if(model==null){
-			List items = (List)WFUtil.invoke(this.managedBeanId,"getContentItems");
+			//List items = (List)WFUtil.invoke(this.managedBeanId,"getContentItems");
+			List items = getManagedBean().getContentItems();
 			if(items!=null){
 				model = new WFDataModel();
 				for (ListIterator iter = items.listIterator(); iter.hasNext();) {
@@ -257,7 +272,7 @@ public class ContentItemListViewer extends UIData {
 	 * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
 	 */
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[10];
+		Object values[] = new Object[11];
 		values[0] = super.saveState(ctx);
 		values[1] = this.managedBeanId;
 		values[2] = this.resourcePath;
@@ -268,6 +283,7 @@ public class ContentItemListViewer extends UIData {
 		values[7] = detailsViewerPath;
 		values[8] = Boolean.valueOf(initialized);
 		values[9] = categoriesList;
+		values[10] = new Integer(maxNumberOfDisplayed);
 		return values;
 	}
 	
@@ -286,24 +302,28 @@ public class ContentItemListViewer extends UIData {
 		this.detailsViewerPath = (String)values[7];
 		this.initialized = ((Boolean)values[8]).booleanValue();
 		this.categoriesList = (List) values[9];
-		
+		this.maxNumberOfDisplayed=((Integer)values[10]).intValue();
 		notifyManagedBeanOfVariableValues();
 		
 	}
 	
 	protected void notifyManagedBeanOfVariableValues(){
-		notifyManagedBeanOfResourcePath(this.resourcePath);
+		notifyManagedBeanOfBaseFolderPath(this.resourcePath);
 		notifyManagedBeanOfDetailsViewerPath(this.detailsViewerPath);
 		notifyManagedBeanOfCategories(this.categoriesList);
+		int maxItems = getMaxNumberOfDisplayed();
+		if(maxItems!=-1){
+			getManagedBean().setMaxNumberOfDisplayed(maxItems);
+		}
 	}
 
 	/**
 	 * @param resourcePath
 	 */
-	private void notifyManagedBeanOfResourcePath(String resourcePath) {
+	private void notifyManagedBeanOfBaseFolderPath(String resourcePath) {
 		if(this.managedBeanId!=null){
 			//WFUtil.invoke(this.managedBeanId,"setResourcePath",resourcePath,String.class);
-			getManagedBean().setResourcePath(resourcePath);
+			getManagedBean().setBaseFolderPath(resourcePath);
 		}
 	}
 	
@@ -428,6 +448,22 @@ public class ContentItemListViewer extends UIData {
 	public ContentListViewerManagedBean getManagedBean(){
 		ContentListViewerManagedBean bean = (ContentListViewerManagedBean) WFUtil.getBeanInstance(managedBeanId);
 		return bean;
+	}
+
+	
+	/**
+	 * @return Returns the maxNumberOfItems.
+	 */
+	public int getMaxNumberOfDisplayed() {
+		return maxNumberOfDisplayed;
+	}
+
+	
+	/**
+	 * @param maxNumberOfItems The maxNumberOfItems to set.
+	 */
+	public void setMaxNumberOfDisplayed(int maxNumberOfItems) {
+		this.maxNumberOfDisplayed = maxNumberOfItems;
 	}
 
 }

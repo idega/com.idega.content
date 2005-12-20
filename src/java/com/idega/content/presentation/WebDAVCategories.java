@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.11 2005/10/26 11:44:48 tryggvil Exp $
+ * $Id: WebDAVCategories.java,v 1.12 2005/12/20 16:42:00 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -29,6 +29,7 @@ import com.idega.business.IBOLookupException;
 import com.idega.content.bean.ManagedContentBeans;
 import com.idega.content.business.CategoryBean;
 import com.idega.content.business.WebDAVMetadataResource;
+import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
@@ -46,10 +47,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2005/10/26 11:44:48 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -61,9 +62,10 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	private static final String RESOURCE_PATH = "resourcePath";	//key
 	private static final int COLLUMNS = 3;		//Number of collumns to display the categories in
 
-	private String resourcePath = "";
+	private String resourcePath;
 	private boolean setOnParent=false;
 	private boolean displaySaveButton=true;
+	private String setCategories;
 	
 //	List categoryStatus = new ArrayList();
 
@@ -85,11 +87,13 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		getChildren().add(getEditContainer());
 	}
 
-	protected void reInitializeContent(){
+	public void reset(){
 		getChildren().clear();
 		//initializeContent();
 		//add(new Text("Crap"));
 		setInitialized(false);
+		IWContext iwc = IWContext.getInstance();
+		getWebDAVMetadataResource(iwc).clear();
 	}
 	
 	
@@ -101,11 +105,24 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		WFContainer mainContainer = new WFContainer();
 		WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
 		mainContainer.add(localizer.getHeaderTextVB("categories"));
-		mainContainer.add(getCategoriesTable(resourcePath));
+		mainContainer.add(getCategoriesTable());
 
 		mainContainer.add(getAddCategoryContainer());
 
 		return mainContainer;
+	}
+	
+	protected WebDAVMetadataResource getWebDAVMetadataResource(IWUserContext iwuc){
+		WebDAVMetadataResource resource=null;
+		//Get all the selected categories for this article and display them as selected
+		try {
+			resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
+					iwuc, WebDAVMetadataResource.class);
+		}
+		catch (IBOLookupException e) {
+			throw new RuntimeException(e);
+		}
+		return resource;
 	}
 	
 	/**
@@ -113,17 +130,10 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	 * @param resourcePath
 	 * @return table
 	 */
-	private Table getCategoriesTable(String resourcePath) {
+	private Table getCategoriesTable() {
 		Table categoriesTable = new Table();
-		
-		IWContext iwc = IWContext.getInstance();
-		WebDAVMetadataResource resource;
 		int count = 0;
-		try {
-			//Get all the selected categories for this article and display them as selected
-			resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
-					iwc, WebDAVMetadataResource.class);
-			Collection selectedCategories = resource.getCategories(resourcePath);
+			Collection selectedCategories = getSetCategoriesList();
 			if(selectedCategories!=null){
 				Iterator selectedIter = selectedCategories.iterator();
 				while(selectedIter.hasNext()) {
@@ -135,7 +145,9 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 					String id = CATEGORY+count;
 	//				System.out.println("CATEGORY-COMPONENT-ID:"+id);
 					smc.setId(id);
-					smc.getAttributes().put(RESOURCE_PATH,resourcePath);
+					if(resourcePath!=null){
+						smc.getAttributes().put(RESOURCE_PATH,resourcePath);
+					}
 					categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					//Text
 					HtmlOutputText catText = new HtmlOutputText();
@@ -158,7 +170,9 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 					String id = CATEGORY+count;
 //					System.out.println("CATEGORY-COMPONENT-ID:"+id);
 					smc.setId(id);
-					smc.getAttributes().put(RESOURCE_PATH,resourcePath);
+					if(resourcePath!=null){
+						smc.getAttributes().put(RESOURCE_PATH,resourcePath);
+					}
 					categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					//Text
 					HtmlOutputText catText = new HtmlOutputText();
@@ -183,20 +197,40 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 			categoriesTable.setId(categoriesTable.getId() + "_ver");
 //			categoriesTable.setRowStyleClass(1,"wf_listheading");
 			categoriesTable.setStyleClass("wf_listtable");
-		}
-		catch (IBOLookupException e) {
-			e.printStackTrace();
-		}
-		catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
 		
 		return categoriesTable;
 	}
 	
+	/**
+	 * <p>
+	 * Gets the set categories, either from the resourcePath property or
+	 * the setCategories property
+	 * </p>
+	 * @return
+	 */
+	private Collection getSetCategoriesList() {
+		if(resourcePath!=null){
+			IWContext iwc = IWContext.getInstance();
+			//if resourcepath is iset
+			//Get all the selected categories for this article and display them as selected
+			WebDAVMetadataResource resource = getWebDAVMetadataResource(iwc);
+			Collection selectedResourceCategories;
+			try {
+				selectedResourceCategories = resource.getCategories(resourcePath);
+			}
+			catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			return selectedResourceCategories;
+		}
+		else if(setCategories!=null){
+			Collection selectedCategories=null;
+			selectedCategories = CategoryBean.getCategoriesFromString(setCategories);
+			return selectedCategories;
+		}
+		return null;
+	}
+
 	/**
 	 * <p> Returns a container with "add category" UI</p>
 	 * @return WFContainer
@@ -246,7 +280,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 			String newCategoryName=newCategoryInput.getValue().toString();
 			CategoryBean.getInstance().addCategory(newCategoryName);
 			if(realCategories!=null){
-				realCategories.reInitializeContent();
+				realCategories.reset();
 			}
 			return;
 		}
@@ -313,6 +347,9 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	}
 	
 	public void saveCategoriesSettings(String resourcePath, UIComponent comp) {
+		if(resourcePath==null){
+			throw new RuntimeException("resourcePath is null");
+		}
 		//save the selection of categories to the article
 		//Build together the categories string
 		StringBuffer categories = new StringBuffer(",");
@@ -396,11 +433,12 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	 * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
 	 */
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[4];
+		Object values[] = new Object[5];
 		values[0] = super.saveState(ctx);
 		values[1] = resourcePath;
 		values[2] = Boolean.valueOf(setOnParent);
 		values[3] = Boolean.valueOf(displaySaveButton);
+		values[4] = setCategories;
 		return values;
 	}
 
@@ -414,6 +452,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		resourcePath = ((String) values[1]);
 		setOnParent = ((Boolean) values[2]).booleanValue();
 		displaySaveButton = ((Boolean) values[3]).booleanValue();
+		setCategories=(String)values[4];
 	}
 	
 	
@@ -450,5 +489,15 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	
 	public boolean getDisplaySaveButton(){
 		return displaySaveButton;
+	}
+
+	/**
+	 * <p>
+	 * Set categories to preset with, this works only if resourcePath is not set.
+	 * </p>
+	 * @param setCategories
+	 */
+	public void setCategories(String setCategories) {
+		this.setCategories=setCategories;
 	}
 }

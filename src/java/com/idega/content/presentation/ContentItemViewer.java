@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.14 2005/12/12 11:40:25 tryggvil Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.15 2005/12/20 16:42:00 tryggvil Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -32,10 +32,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2005/12/12 11:40:25 $ by $Author: tryggvil $
+ * Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -453,7 +453,8 @@ public class ContentItemViewer extends WFContainer {
 					boolean invoked = false;
 					if ("value".equals(bindingAttribute)) {
 						if (value instanceof UIOutput) {
-							((UIOutput) value).setValue(getValue(fieldName));
+							Object setValue = getValue(fieldName);
+							((UIOutput) value).setValue(setValue);
 							invoked = true;
 						}
 						else if (value instanceof UICommand) {

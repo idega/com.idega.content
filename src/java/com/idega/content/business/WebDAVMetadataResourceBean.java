@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadataResourceBean.java,v 1.8 2005/09/01 21:46:53 eiki Exp $
+ * $Id: WebDAVMetadataResourceBean.java,v 1.9 2005/12/20 16:42:00 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -30,10 +30,10 @@ import com.idega.slide.util.WebdavRootResource;
 /**
  * A resource bean that holds metadata info for the selected resouce
  * 
- * Last modified: $Date: 2005/09/01 21:46:53 $ by $Author: eiki $
+ * Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class WebDAVMetadataResourceBean extends IBOSessionBean 
 implements WebDAVMetadataResource
@@ -55,6 +55,8 @@ implements WebDAVMetadataResource
 	 */
 	public void clear() {
 		metadataBeans = null;
+		selectedCategories=null;
+		currentPath=null;
 	}
 	
 	private void setMetadataBeans(String resourcePath, Collection meta) {
@@ -157,7 +159,7 @@ implements WebDAVMetadataResource
 	 * @throws IOException
 	 */
 	protected Collection getCategoriesFromRepository(String resourcePath) throws RemoteException, IOException {
-		selectedCategories = new ArrayList();
+		//selectedCategories = new ArrayList();
 	
 		IWContext iwc = IWContext.getInstance();
 		IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
@@ -180,13 +182,8 @@ implements WebDAVMetadataResource
 				value.append(enumerator.nextElement());
 			}
 			
-	//		System.out.println("Value is "+value);
-			if(value.length()>0) {
-				StringTokenizer st = new StringTokenizer(value.toString(),",");
-				while(st.hasMoreTokens()) {
-					selectedCategories.add(st.nextToken());
-				}
-			}
+			selectedCategories=CategoryBean.getCategoriesFromString(value.toString());
+			
 		}catch (HttpException e) {
 			System.out.println("Warning could not load categories for "+filePath);
 		}
