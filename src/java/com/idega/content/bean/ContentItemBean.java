@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.15 2005/12/20 16:42:00 tryggvil Exp $
+ * $Id: ContentItemBean.java,v 1.16 2005/12/21 14:24:58 laddi Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -10,55 +10,33 @@
 package com.idega.content.bean;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
-import java.rmi.RemoteException;
-import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import javax.ejb.EJBException;
-import javax.ejb.EJBLocalHome;
-import javax.ejb.EJBLocalObject;
-import javax.ejb.RemoveException;
 import javax.faces.context.FacesContext;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.util.WebdavStatus;
 import com.idega.business.IBOLookup;
-import com.idega.core.data.ICTreeNode;
-import com.idega.core.file.data.ICFile;
-import com.idega.core.localisation.data.ICLocale;
-import com.idega.data.IDOEntityDefinition;
-import com.idega.data.IDOStoreException;
-import com.idega.data.TreeableEntity;
-import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWUserContext;
-import com.idega.io.serialization.ObjectReader;
-import com.idega.io.serialization.ObjectWriter;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.VersionHelper;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.IWTimestamp;
-import com.idega.webface.WFPage;
-import com.idega.webface.WFUtil;
 
 /**
  * <p>
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2005/12/21 14:24:58 $ by $Author: laddi $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
