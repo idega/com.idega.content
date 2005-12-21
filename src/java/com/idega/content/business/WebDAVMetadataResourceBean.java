@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadataResourceBean.java,v 1.9 2005/12/20 16:42:00 tryggvil Exp $
+ * $Id: WebDAVMetadataResourceBean.java,v 1.10 2005/12/21 14:25:28 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
@@ -30,10 +29,10 @@ import com.idega.slide.util.WebdavRootResource;
 /**
  * A resource bean that holds metadata info for the selected resouce
  * 
- * Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
+ * Last modified: $Date: 2005/12/21 14:25:28 $ by $Author: laddi $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class WebDAVMetadataResourceBean extends IBOSessionBean 
 implements WebDAVMetadataResource
