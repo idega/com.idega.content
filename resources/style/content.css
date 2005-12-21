@@ -37,7 +37,7 @@
 }
 
 .content_viewer_file_details {
-	width: auto;
+	width: 16px;
 	height: 16px;
 	background: url(../images/details.jpg) no-repeat;
 	float: right;
@@ -45,7 +45,7 @@
 }
 
 .content_viewer_file_preview {
-	width: auto;
+	width: 16px;
 	height: 16px;
 	background: url(../images/preview.jpg) no-repeat;
 	float: right;
@@ -53,7 +53,7 @@
 }
 
 .content_viewer_file_permissions {
-	width: auto;
+	width: 16px;
 	height: 16px;
 	background: url(../images/permissions.gif) no-repeat;
 	float: right;
