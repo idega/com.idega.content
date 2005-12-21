@@ -2,42 +2,42 @@
 /*** idegaWeb Content CSS classes ***/
 
 .content_viewer_new_folder {
-	width: 16px;
+	width: auto;
 	height: 14px;
 	background: url(../images/newfolder.gif) no-repeat;
 	padding-left: 18px;
 }
 
 .content_viewer_details {
-	width: 16px;
+	width: auto;
 	height: 16px;
 	background: url(../images/details.jpg) no-repeat;
 	padding-left: 18px;
 }
 
 .content_viewer_preview {
-	width: 16px;
+	width: auto;
 	height: 16px;
 	background: url(../images/preview.jpg) no-repeat;
 	padding-left: 18px;
 }
 
 .content_viewer_document_list {
-	width: 16px;
+	width: auto;
 	height: 16px;
 	background: url(../images/list.jpg) no-repeat;
 	padding-left: 18px;
 }
 
 .content_viewer_permissions {
-	width: 16px;
+	width: auto;
 	height: 16px;
 	background: url(../images/permissions.gif) no-repeat;
 	padding-left: 18px;
 }
 
 .content_viewer_file_details {
-	width: 16px;
+	width: auto;
 	height: 16px;
 	background: url(../images/details.jpg) no-repeat;
 	float: right;
@@ -45,7 +45,7 @@
 }
 
 .content_viewer_file_preview {
-	width: 16px;
+	width: auto;
 	height: 16px;
 	background: url(../images/preview.jpg) no-repeat;
 	float: right;
@@ -53,7 +53,7 @@
 }
 
 .content_viewer_file_permissions {
-	width: 16px;
+	width: auto;
 	height: 16px;
 	background: url(../images/permissions.gif) no-repeat;
 	float: right;
