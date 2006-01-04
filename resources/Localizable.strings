@@ -69,6 +69,7 @@ edit_article=Edit article
 edit_categories=Edit categories
 en=English
 error_body_empty=Body text must be entered.
+error_error_saving=error_error_saving
 error_headline_empty=Heading must be entered.
 error_published_from_date_empty=Published date must be entered.
 expiration_date=Expiration date

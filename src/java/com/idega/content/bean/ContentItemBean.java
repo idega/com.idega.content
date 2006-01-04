@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.16 2005/12/21 14:24:58 laddi Exp $
+ * $Id: ContentItemBean.java,v 1.17 2006/01/04 14:33:52 tryggvil Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -12,7 +12,6 @@ package com.idega.content.bean;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -21,8 +20,10 @@ import javax.faces.context.FacesContext;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.util.WebdavStatus;
 import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
+import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.VersionHelper;
 import com.idega.slide.util.WebdavExtendedResource;
@@ -33,10 +34,10 @@ import com.idega.util.IWTimestamp;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2005/12/21 14:24:58 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/01/04 14:33:52 $ by $Author: tryggvil $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.17 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -44,7 +45,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	private String _name = null;
 	private String _description = null;
 	private String _itemType = null;
-	private Date _createdTimestamp = null;
 	private int _createdByUserId = 0;
 	private boolean autoCreateResource;
 	
@@ -66,7 +66,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	private Boolean doRender = Boolean.TRUE;
 	private boolean exists=false;
 
-	private final static String[] ACTION_EXISTS_ARRAY = new String[] {"preview","edit"};
+	private final static String[] ACTION_EXISTS_ARRAY = new String[] {"delete","edit"};
 	private final static String[] ACTION_NOT_EXISTS_ARRAY = new String[] {"create"};
 	
 	private List versions;
@@ -120,7 +120,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		_name = null;
 		_description = null;
 		_itemType = null;
-		_createdTimestamp = null;
 		_createdByUserId = 0;
 
 		_pendingLocaleId = null;
@@ -298,9 +297,8 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		IWUserContext iwuc = IWContext.getInstance();
 		boolean returner = true;
 		try {
+			IWSlideSession session = getIWSlideSession(iwuc);
 			
-			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwuc,IWSlideSession.class);
-	
 			WebdavExtendedResource webdavResource = session.getWebdavResource(path);
 			webdavResource.setProperties();
 			
@@ -357,6 +355,18 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		return true;
 	}
 
+	
+	protected IWSlideSession getIWSlideSession(IWUserContext iwuc){
+		IWSlideSession session=null;
+		try {
+			session = (IWSlideSession)IBOLookup.getSessionInstance(iwuc,IWSlideSession.class);
+		}
+		catch (IBOLookupException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return session;
+	}
 	
 	public Timestamp getCreationDate() {
 		return (Timestamp)getValue(FIELDNAME_CREATION_DATE);
@@ -464,12 +474,57 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		return versions;
 	}
 
-
-	
 	/**
 	 * @param versions The versions to set.
 	 */
 	public void setVersions(List versions) {
 		this.versions = versions;
 	}
+
+	/**
+	 * <p>
+	 * TODO tryggvil describe method getIWSlideService
+	 * </p>
+	 * @param iwuc
+	 * @return
+	 */
+	protected IWSlideService getIWSlideService(IWUserContext iwuc) {
+		try {
+			IWSlideService slideService = (IWSlideService) IBOLookup.getServiceInstance(iwuc.getApplicationContext(),IWSlideService.class);
+			return slideService;
+		}
+		catch (IBOLookupException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected WebdavExtendedResource getWebdavResource(){
+		String resourcePath = getResourcePath();
+		IWUserContext iwuc = IWContext.getInstance();
+		IWSlideSession session = getIWSlideSession(iwuc);
+		WebdavExtendedResource webdavResource;
+		try {
+			webdavResource = session.getWebdavResource(resourcePath);
+			return webdavResource;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+
+	public void delete(){
+		try {
+			String resourcePath = getResourcePath();
+			WebdavExtendedResource webdavResource = getWebdavResource();
+			webdavResource.deleteMethod();
+			webdavResource.close();
+			clear();
+			System.out.println("Deleted: "+resourcePath+" successfully");
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 }

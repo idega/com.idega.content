@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.14 2005/12/20 16:42:00 tryggvil Exp $
+ * $Id: ContentItemListViewer.java,v 1.15 2006/01/04 14:33:52 tryggvil Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -28,10 +28,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- * Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
+ * Last modified: $Date: 2006/01/04 14:33:52 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class ContentItemListViewer extends UIData {
 
@@ -361,10 +361,6 @@ public class ContentItemListViewer extends UIData {
 		
 		public void setContentItem(Object obj){
 			//does nothing
-		}
-		
-		public List getAttachments(){
-			return item.getAttachments();
 		}
 		
 		public void setAttachments(){

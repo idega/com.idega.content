@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.12 2005/12/20 16:42:00 tryggvil Exp $
+ * $Id: WebDAVCategories.java,v 1.13 2006/01/04 14:33:52 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -47,10 +47,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/01/04 14:33:52 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -66,6 +66,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	private boolean setOnParent=false;
 	private boolean displaySaveButton=true;
 	private String setCategories;
+	private boolean displayHeader=true;
 	
 //	List categoryStatus = new ArrayList();
 
@@ -104,7 +105,9 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	private UIComponent getEditContainer() {
 		WFContainer mainContainer = new WFContainer();
 		WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
-		mainContainer.add(localizer.getHeaderTextVB("categories"));
+		if(getDisplayHeader()){
+			mainContainer.add(localizer.getHeaderTextVB("categories"));
+		}
 		mainContainer.add(getCategoriesTable());
 
 		mainContainer.add(getAddCategoryContainer());
@@ -112,6 +115,20 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		return mainContainer;
 	}
 	
+	/**
+	 * <p>
+	 * TODO tryggvil describe method getAddHeader
+	 * </p>
+	 * @return
+	 */
+	private boolean getDisplayHeader() {
+		return displayHeader;
+	}
+	
+	public void setDisplayHeader(boolean display){
+		this.displayHeader=display;
+	}
+
 	protected WebDAVMetadataResource getWebDAVMetadataResource(IWUserContext iwuc){
 		WebDAVMetadataResource resource=null;
 		//Get all the selected categories for this article and display them as selected
@@ -433,12 +450,13 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	 * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
 	 */
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[5];
+		Object values[] = new Object[6];
 		values[0] = super.saveState(ctx);
 		values[1] = resourcePath;
 		values[2] = Boolean.valueOf(setOnParent);
 		values[3] = Boolean.valueOf(displaySaveButton);
 		values[4] = setCategories;
+		values[5] = Boolean.valueOf(displayHeader);
 		return values;
 	}
 
@@ -453,6 +471,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		setOnParent = ((Boolean) values[2]).booleanValue();
 		displaySaveButton = ((Boolean) values[3]).booleanValue();
 		setCategories=(String)values[4];
+		displayHeader=((Boolean)values[5]).booleanValue();
 	}
 	
 	
