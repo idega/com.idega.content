@@ -69,7 +69,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
     //    return tree;
     //}
 
-    private WebdavResource cloneResource(WebdavResource resource) throws WebdavException, HttpException, IOException {
+    WebdavResource cloneResource(WebdavResource resource) throws WebdavException, HttpException, IOException {
         HttpURL url = new HttpURL("http://"+davHost+":"+davPort+resource.getPath());
         url.setUserinfo("root","root");
         WebdavResource newResource = new WebdavResource(url);
@@ -130,7 +130,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
         System.out.println("setTreeAction");
     }
 
-    private documentmanagementprototype2.WebDavTreeBean.SlideTreeNode getSubTree(WebdavResource resource, FacesContext fContext) throws IOException, HttpException{
+    documentmanagementprototype2.WebDavTreeBean.SlideTreeNode getSubTree(WebdavResource resource, FacesContext fContext) throws IOException, HttpException{
         documentmanagementprototype2.WebDavTreeBean.SlideTreeNode node = new documentmanagementprototype2.WebDavTreeBean.SlideTreeNode(resource);
         //node.setActionListener(getApplication().createMethodBinding("#{WebDavTree.processAction}", new Class[] {javax.faces.event.ActionEvent.class }));
         //node.setImmediate(true);
