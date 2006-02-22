@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataValueBean.java,v 1.5 2005/01/31 16:50:47 joakim Exp $
+ * $Id: MetadataValueBean.java,v 1.6 2006/02/22 21:02:21 laddi Exp $
  * 
  * Copyright (C) 2004 Idega. All Rights Reserved.
  * 
@@ -11,16 +11,15 @@ package com.idega.content.data;
 
 import java.beans.PropertyChangeSupport;
 import com.idega.content.presentation.ContentBlock;
-import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
- * Last modified: $Date: 2005/01/31 16:50:47 $ by $Author: joakim $
+ * Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $
  * Data bean that holds information about metadata type - value pair
  * used to display data in MetadataListManagedBean
  * 
  * @author Joakim Johnson
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class MetadataValueBean implements WFEditableListDataBean {
 
@@ -29,13 +28,9 @@ public class MetadataValueBean implements WFEditableListDataBean {
 
 	private final static int VALUE_ARRAY_INDEX_TYPE = 0;
 	private final static int VALUE_ARRAY_INDEX_VALUES = 1;
-	private final static int VALUE_ARRAY_INDEX_DELETE = 2;
-	
 	Object[] column = new Object[]{"","","Delete"};
 
 	private PropertyChangeSupport propertySupport;
-	private WebdavExtendedResource me;
-
 	public MetadataValueBean() {
 		propertySupport = new PropertyChangeSupport(this);
 	}

@@ -40,8 +40,6 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 	private static String ACTION_CHECK_OUT = "checkout";
 	private static String ACTION_CHECK_IN = "checkin";
 	private static String ACTION_UNCHECK_OUT = "uncheckout";
-	private static final String METADATA_LIST_BEAN = "MetadataList";
-	
 	private static final String PARAMETER_RESOURCE_PATH = "wfd_prp";
 	private boolean detailed = true;
 	private boolean useVersionControl = true;

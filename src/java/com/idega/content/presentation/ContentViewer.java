@@ -49,8 +49,6 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	
 	static final String PATH_TO_DELETE = "ac_path2del";
 	
-	private static String BAR = "cv_f_bar";
-	
 	private String currentAction = null;
 	
 	private boolean renderListLink = true;

@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissions.java,v 1.8 2005/10/26 11:44:48 tryggvil Exp $
+ * $Id: WebDAVFilePermissions.java,v 1.9 2006/02/22 21:02:21 laddi Exp $
  * Created on 29.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -19,14 +19,13 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2005/10/26 11:44:48 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class WebDAVFilePermissions extends ContentBlock {
 
-	private static final String ATTRIBUTE_RESOURCE_PATH = "resourcePath";
 	private static final String BEANID_STANDARD_MATRIX = "standardPermissionMatrix";
 	private static final String BEANID_ROLE_MATRIX = "rolePermissionMatrix";
 	private static final String BEANID_GROUP_MATRIX = "groupPermissionMatrix";

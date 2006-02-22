@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataListManagedBean.java,v 1.11 2005/04/13 17:35:30 joakim Exp $
+ * $Id: MetadataListManagedBean.java,v 1.12 2006/02/22 21:02:21 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -38,12 +38,12 @@ import com.idega.webface.bean.WFListBean;
 
 /**
  * 
- * Last modified: $Date: 2005/04/13 17:35:30 $ by $Author: joakim $
+ * Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $
  * Displays all the metadata types and values for the specified resource
  * Typically followed by WebDavMetadata in presentation to enable addeing metadata
  *
  * @author Joakim Johnson
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class MetadataListManagedBean extends AbstractWFEditableListManagedBean implements WFListBean, ActionListener {
 
@@ -52,8 +52,6 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 
 	private String resourcePath = null;
 	
-	private String rootPath = null;
-
 	private static WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
 
 	public MetadataListManagedBean() {

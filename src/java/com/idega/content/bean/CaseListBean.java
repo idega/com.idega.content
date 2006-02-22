@@ -1,5 +1,5 @@
 /*
- * $Id: CaseListBean.java,v 1.2 2005/03/03 04:57:44 tryggvil Exp $
+ * $Id: CaseListBean.java,v 1.3 2006/02/22 21:02:21 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -26,10 +26,10 @@ import com.idega.webface.model.WFDataModel;
 /**
  * Bean for content item case list rows.   
  * <p>
- * Last modified: $Date: 2005/03/03 04:57:44 $ by $Author: tryggvil $
+ * Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $
  *
  * @author Anders Lindman
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 
 public class CaseListBean implements WFListBean, Serializable {
@@ -54,61 +54,6 @@ public class CaseListBean implements WFListBean, Serializable {
 		WFPage.CONTENT_BUNDLE + ".status"
 	};				
 	
-	private String[] testDescriptions = {
-		"Idega represented in the Baltics",
-		"The new Hekla Rejser website is up-and running",
-		"Idega Multimedia becomes Idega Software",
-		"Idega featured in PC World!",
-		"The new ÁTVR website is up-and running",
-		"Lifidn Pension Fund selects idegaWeb Builder...",
-		"Idega Software signs an agreement with the...",
-		"Nacka elected the IT municipality 2003 in Sweden"
-	};
-	
-	private Date[] testCreated = {
-		new Date(),
-		new Date(),
-		new Date(),
-		new Date(),
-		new Date(),
-		new Date(),
-		new Date(),
-		new Date()
-	};
-	
-	private Date[] testLastModified = {
-		new Date(),
-		new Date(),
-		new Date(),
-		new Date(),
-		new Date(),
-		new Date(),
-		new Date(),
-		new Date()
-	};
-	
-	private String[] testAuthors = {
-		"Smith",
-		"Andersson",
-		"Rappson",
-		"Trappson",
-		"Smith",
-		"Rappson",
-		"Anderson",
-		"Andersson"
-	};
-	
-	private String[] testStatus = {
-		"Under review",
-		"Rewrite",
-		"Under review",
-		"Ready for review",
-		"Ready for review",
-		"Ready for review",
-		"Ready for review",
-		"Ready for review"
-	};
-
 	/**
 	 * Default constructor.
 	 */

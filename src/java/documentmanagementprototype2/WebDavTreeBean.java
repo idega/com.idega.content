@@ -9,11 +9,6 @@ package documentmanagementprototype2;
 import javax.faces.*;
 import java.io.Serializable;
 
-//import com.sun.jsfcl.app.*;
-import com.idega.business.IBOLookup;
-import com.idega.idegaweb.IWUserContext;
-import com.idega.presentation.IWContext;
-import com.idega.slide.business.IWSlideService;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionListener;
 import org.apache.commons.httpclient.HttpURL;
@@ -30,7 +25,6 @@ import java.io.IOException;
 public class WebDavTreeBean extends AbstractSessionBean implements Serializable, ActionListener {
     // <editor-fold defaultstate="collapsed" desc="Creator-managed Component Definition">
 
-    private int __placeholder;
     // </editor-fold>
     public WebDavTreeBean(){
     // <editor-fold defaultstate="collapsed" desc="Creator-managed Component Initialization">
@@ -62,13 +56,6 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
 
     private String davHost = "localhost";
     private String davPort = "8080";
-    private String davPath = "/slide/files";
-
-
-    //public WebTree getTree() {
-    //    return tree;
-    //}
-
     WebdavResource cloneResource(WebdavResource resource) throws WebdavException, HttpException, IOException {
         HttpURL url = new HttpURL("http://"+davHost+":"+davPort+resource.getPath());
         url.setUserinfo("root","root");
@@ -111,21 +98,6 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
    
 
 
-    private WebdavResource getRoot() throws WebdavException, HttpException, IOException {
-			IWUserContext iwuc = IWContext.getInstance();
-			IWSlideService ss = (IWSlideService) IBOLookup.getServiceInstance(iwuc.getApplicationContext(), IWSlideService.class);
-			HttpURL homeUrl = ss.getWebdavServerURL();
-//        HttpURL homeUrl = new HttpURL("http://"+davHost+":"+davPort+davPath);
-        homeUrl.setUserinfo("root","root");
-        WebdavResource resource = new WebdavResource(homeUrl);
-        if (! resource.exists()){
-            throw new WebdavException("Resource not found.");
-        }
-        return resource;
-    }
-
-
-
     public void setTreeAction(){
         System.out.println("setTreeAction");
     }
@@ -144,38 +116,6 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
         }
         return node;
     }
-    /**
-     *Invariant: node is verified to represent an existing webdav collection.
-     */
-/*    private void updateSubTree(SlideTreeNode node, FacesContext fContext) throws IOException, HttpException{
-        WebdavResource resource = node.getWebdavResource();
-        WebdavResource[] resources = resource.getChildResources().listResources();
-        
-        
-        for (int i =0; i<resources.length; i++){
-            if (resources[i].isCollection()){
-                node.refreshChild(resources[i]);
-            } else {
-                updateSubTree(node.findChild(resources[i].getDisplayName()), fContext);
-            }
-            node.removeNotRefreshed();
-        }
-    }    */
-
-
-    private void test(WebdavResource resource) throws IOException, HttpException{
-
-        WebdavResource[] resources = resource.getChildResources().listResources();
-
-        for (int i =0; i<resources.length; i++){
-//            if (resources[i].isCollection()){
-                String uri2 = resources[i].getHttpURL().getURI();
-                java.lang.System.out.println(uri2);
-
-//            }
-        }
-    }
-
     private String _selectedCollectionUri;
     public void processAction(javax.faces.event.ActionEvent actionEvent) throws javax.faces.event.AbortProcessingException {
             /*documentmanagementprototype2.WebDavTreeBean.SlideTreeNode node = (SlideTreeNode) actionEvent.getComponent();
@@ -211,7 +151,6 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
 
         class SlideTreeNode {//extends TreeNode {
             private boolean _refreshed = true;
-            private boolean _visible = true;
             private java.util.Map _children = new java.util.HashMap();
             private WebdavResource _resource;
             
@@ -289,8 +228,6 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
 
             
             public void hide(){
-                _visible = false;
-//                 setRendererType(null);
                  
             }
 

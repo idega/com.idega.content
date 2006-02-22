@@ -1,5 +1,5 @@
 /*
- * $Id: ACEBean.java,v 1.7 2005/11/29 15:30:27 laddi Exp $
+ * $Id: ACEBean.java,v 1.8 2006/02/22 21:02:21 laddi Exp $
  * Created on 3.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -9,15 +9,17 @@
  */
 package com.idega.content.data;
 
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 import javax.faces.model.SelectItem;
+
 import org.apache.webdav.lib.Privilege;
+
 import com.idega.content.business.ContentUtil;
 import com.idega.content.presentation.ContentBlock;
 import com.idega.core.accesscontrol.data.ICRole;
@@ -34,10 +36,10 @@ import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
  * 
- *  Last modified: $Date: 2005/11/29 15:30:27 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class ACEBean implements WFEditableListDataBean {
 
@@ -66,8 +68,6 @@ public class ACEBean implements WFEditableListDataBean {
 	private AccessControlEntry grantedACE = null;
 	private AccessControlEntry deniedACE = null;
 	
-    private PropertyChangeSupport propertySupport;
-	
 	/**
 	 * 
 	 */
@@ -80,7 +80,6 @@ public class ACEBean implements WFEditableListDataBean {
 		}
 		inheritedFrom = new String[arraySize];
 		isInherited = new boolean[arraySize];
-		propertySupport = new PropertyChangeSupport(this);
 	}
 	
 	public ACEBean(Locale locale){
@@ -206,14 +205,6 @@ public class ACEBean implements WFEditableListDataBean {
 	protected void initialize(String principal, int principalType){
 		this.principal=principal;
 		this.principalType=principalType;
-	}
-	
-	
-	/**
-	 * @param principal
-	 */
-	private void setPrincipal(String principal) {
-		this.principal=principal;
 	}
 	
 	

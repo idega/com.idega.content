@@ -1,5 +1,5 @@
 /*
- * $Id: ContentListViewerRenderer.java,v 1.7 2005/09/01 15:53:27 dainis Exp $ Created on
+ * $Id: ContentListViewerRenderer.java,v 1.8 2006/02/22 21:02:21 laddi Exp $ Created on
  * 27.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -10,7 +10,6 @@
 package com.idega.content.renderkit;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,10 +34,10 @@ import com.idega.webface.renderkit.BaseRenderer;
 
 /**
  * 
- * Last modified: $Date: 2005/09/01 15:53:27 $ by $Author: dainis $
+ * Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class ContentListViewerRenderer extends BaseRenderer {
 	
@@ -237,43 +236,6 @@ public class ContentListViewerRenderer extends BaseRenderer {
 		afterViewerList(facesContext, (UIData) uiComponent);
 	}
 
-	private void renderFacet(FacesContext facesContext, ResponseWriter writer, UIData uiData, boolean header)
-			throws IOException {
-		boolean hasColumnFacet = false;
-		for (Iterator it = uiData.getChildren().iterator(); it.hasNext();) {
-			UIComponent uiComponent = (UIComponent) it.next();
-			if (uiComponent instanceof UIColumn && ((UIColumn) uiComponent).isRendered()) {
-				if (!hasColumnFacet) {
-					hasColumnFacet = header ? ((UIColumn) uiComponent).getHeader() != null
-							: ((UIColumn) uiComponent).getFooter() != null;
-				}
-			}
-		}
-		UIComponent facet = header ? uiData.getHeader() : uiData.getFooter();
-		if (facet != null || hasColumnFacet) {
-			// Header or Footer present
-//			String elemName = header ? HTML.THEAD_ELEM : HTML.TFOOT_ELEM;
-			String elemName = DIV_ELEM;
-			HtmlRendererUtils.writePrettyLineSeparator(facesContext);
-			writer.startElement(elemName, uiData);
-			if (header) {
-				String headerStyleClass = getHeaderClass(uiData);
-				if (facet != null)
-					renderViewerListHeaderRow(facesContext, writer, uiData, facet, headerStyleClass);
-				if (hasColumnFacet)
-					renderColumnHeaderRow(facesContext, writer, uiData, headerStyleClass);
-			}
-			else {
-				String footerStyleClass = getFooterClass(uiData);
-				if (hasColumnFacet)
-					renderColumnFooterRow(facesContext, writer, uiData, footerStyleClass);
-				if (facet != null)
-					renderViewerListFooterRow(facesContext, writer, uiData, facet, footerStyleClass);
-			}
-			writer.endElement(elemName);
-		}
-	}
-
 	protected void renderViewerListHeaderRow(FacesContext facesContext, ResponseWriter writer, UIData uiData,
 			UIComponent headerFacet, String headerStyleClass) throws IOException {
 		renderViewerListHeaderOrFooterRow(facesContext, writer, uiData, headerFacet, headerStyleClass, DIV_ELEM);
@@ -355,24 +317,6 @@ public class ContentListViewerRenderer extends BaseRenderer {
 //			RendererUtils.renderChild(facesContext, facet);
 //		}
 //		writer.endElement(HTML.TD_ELEM);
-	}
-
-	private static String getHeaderClass(UIData component) {
-//		if (component instanceof HtmlDataTable) {
-//			return ((HtmlDataTable) component).getHeaderClass();
-//		}
-//		else {
-			return (String) component.getAttributes().get(JSFAttr.HEADER_CLASS_ATTR);
-//		}
-	}
-
-	private static String getFooterClass(UIData component) {
-//		if (component instanceof HtmlDataTable) {
-//			return ((HtmlDataTable) component).getFooterClass();
-//		}
-//		else {
-			return (String) component.getAttributes().get(JSFAttr.FOOTER_CLASS_ATTR);
-//		}
 	}
 
 	//-------------------------------------------------------------

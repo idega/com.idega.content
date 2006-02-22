@@ -12,7 +12,6 @@ import javax.faces.*;
 public class SessionBean1 extends AbstractSessionBean {
     // <editor-fold defaultstate="collapsed" desc="Creator-managed Component Definition">
 
-    private int __placeholder;
     // </editor-fold>
     public SessionBean1() {
         // <editor-fold defaultstate="collapsed" desc="Creator-managed Component Initialization">

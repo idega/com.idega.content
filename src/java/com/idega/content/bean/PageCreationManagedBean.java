@@ -1,5 +1,5 @@
 /*
- * $Id: PageCreationManagedBean.java,v 1.2 2005/11/30 09:36:26 laddi Exp $
+ * $Id: PageCreationManagedBean.java,v 1.3 2006/02/22 21:02:21 laddi Exp $
  * Created on 2.5.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -43,10 +43,10 @@ import com.idega.webface.WFTreeNode;
 
 /**
  * 
- *  Last modified: $Date: 2005/11/30 09:36:26 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class PageCreationManagedBean implements ActionListener {
 
@@ -56,7 +56,6 @@ public class PageCreationManagedBean implements ActionListener {
 	private String selectedPageLocationName = "[Select page]";
 	private String pageName = "Untitled";
 	private static final String RELATIVE_LOCATION_BEFORE = "before";
-	private static final String RELATIVE_LOCATION_UNDER = "under";
 	private String relativeLocation = RELATIVE_LOCATION_BEFORE;
 	private String templateIdentifier = SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED;
 	

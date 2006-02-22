@@ -73,13 +73,11 @@ public class WebDAVBean extends Object implements ICTreeNode {
     
     private WebdavExtendedResource me;
     private ICTreeNode parent;
-    private Collection siblings;
     private int siblingCount = 0;
     private Vector children;
     private int childrenCount = -1;
     
-    private static int idCounter = 1;
-	private String previewActionURI;
+    private String previewActionURI;
 	private String permissionActionURI;
 	private boolean renderPermissionLink = true;
 

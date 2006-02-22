@@ -26,7 +26,6 @@ public abstract class ContentBlock extends IWBaseComponent {
 
 	private WebdavExtendedResource resource = null;
 
-	private static IWBundle bundle = null;
 	private IWSlideSession slideSession;
 	
 	// this, parentContentViewer, should not be saved in save state

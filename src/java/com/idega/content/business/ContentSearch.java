@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.18 2005/11/29 15:30:27 laddi Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.19 2006/02/22 21:02:21 laddi Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -49,7 +49,7 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- * Last modified: $Date: 2005/11/29 15:30:27 $ by $Author: laddi $ This class
+ * Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -57,7 +57,7 @@ import com.idega.slide.business.IWSlideSession;
  * a bundle.
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.19 $
  */
 public class ContentSearch implements SearchPlugin {
 
@@ -77,7 +77,6 @@ public class ContentSearch implements SearchPlugin {
 	static final PropertyName CONTENTLENGTH = new PropertyName("DAV:", "getcontentlength");
 	static final PropertyName CREATOR_DISPLAY_NAME = new PropertyName("DAV:", "creator-displayname");
 	static final PropertyName COMMENT = new PropertyName("DAV:", "comment");
-	private IWMainApplication iwma = null;
 	private HttpURL httpURL;
 
 	public ContentSearch() {
@@ -126,7 +125,6 @@ public class ContentSearch implements SearchPlugin {
 	 * @see com.idega.core.search.business.SearchPlugin#initialize(com.idega.idegaweb.IWMainApplication)
 	 */
 	public boolean initialize(IWMainApplication iwma) {
-		this.iwma = iwma;
 		try {
 			IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(iwma.getIWApplicationContext(),
 					IWSlideService.class);

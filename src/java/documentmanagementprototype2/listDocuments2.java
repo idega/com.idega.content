@@ -29,9 +29,6 @@ import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 
 public class listDocuments2 {
-	// <editor-fold defaultstate="collapsed" desc="Creator-managed Component
-	// Definition">
-	private int __placeholder;
 	private String webDavHttpURL = null;
 
 	private HtmlForm form1 = new HtmlForm();
@@ -423,15 +420,6 @@ public class listDocuments2 {
 			}
 			data = new WebDAVBean[] { new WebDAVBean("Nullpointer: "
 					+ traceString) };
-		}
-		return data;
-	}
-
-	private WebDAVBean[] getFileNameList(WebdavResource resource) {
-		String[] d = resource.list();
-		WebDAVBean[] data = new WebDAVBean[d.length];
-		for (int i = 0; i < d.length; i++) {
-			data[i] = new WebDAVBean(d[i]);
 		}
 		return data;
 	}

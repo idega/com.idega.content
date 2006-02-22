@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissionResourceBean.java,v 1.5 2005/11/30 09:36:26 laddi Exp $
+ * $Id: WebDAVFilePermissionResourceBean.java,v 1.6 2006/02/22 21:02:21 laddi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -34,10 +34,10 @@ import com.idega.slide.util.IWSlideConstants;
 
 /**
  * 
- *  Last modified: $Date: 2005/11/30 09:36:26 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements WebDAVFilePermissionResource{
 
@@ -56,10 +56,6 @@ public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements 
 	private final static int BEANTYPE_ROLES = 1;
 	private final static int BEANTYPE_GROUPS = 2;
 	private final static int BEANTYPE_USERS = 3;
-	private final static int BEANTYPE_OTHERS = 4;
-	
-	
-	
 	/**
 	 * 
 	 */
