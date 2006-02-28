@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.11 2006/02/28 14:49:28 tryggvil Exp $
+ * $Id: ContentItemToolbar.java,v 1.12 2006/02/28 17:44:38 laddi Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -14,13 +14,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import javax.faces.component.UIParameter;
 import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
+
 import com.idega.content.business.ContentUtil;
 import com.idega.core.accesscontrol.business.AccessController;
-import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.uri.IWActionURIManager;
 import com.idega.presentation.IWContext;
 import com.idega.webface.WFToolbar;
@@ -31,10 +32,10 @@ import com.idega.webface.WFUtil;
  *  <p>
  *  Toolbar used by new content management system to display editor buttons.
  *  </p>
- *  Last modified: $Date: 2006/02/28 14:49:28 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/02/28 17:44:38 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
