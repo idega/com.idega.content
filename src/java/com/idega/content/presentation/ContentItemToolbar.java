@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.10 2005/12/20 16:42:00 tryggvil Exp $
+ * $Id: ContentItemToolbar.java,v 1.11 2006/02/28 14:49:28 tryggvil Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -18,6 +18,7 @@ import javax.faces.component.UIParameter;
 import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
+import com.idega.content.business.ContentUtil;
 import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.uri.IWActionURIManager;
@@ -30,10 +31,10 @@ import com.idega.webface.WFUtil;
  *  <p>
  *  Toolbar used by new content management system to display editor buttons.
  *  </p>
- *  Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/02/28 14:49:28 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
@@ -47,7 +48,7 @@ public class ContentItemToolbar extends WFToolbar {
 	private IWActionURIManager manager = null;
 	
 	private Map actions;
-	private String[] RolesAllowded = new String[] {StandardRoles.ROLE_KEY_ADMIN,StandardRoles.ROLE_KEY_AUTHOR,StandardRoles.ROLE_KEY_EDITOR};
+	private String[] RolesAllowded = null;
 	private Boolean rendered;
 	private String categories;
 	private String baseFolderPath;
@@ -188,12 +189,17 @@ public class ContentItemToolbar extends WFToolbar {
         Boolean v = vb != null ? (Boolean)vb.getValue(getFacesContext()) : null;
         if(v==null){
         		IWContext iwc = IWContext.getInstance();
-        		AccessController ac = iwc.getAccessController();
-        		for (int i = 0; i < RolesAllowded.length; i++) {
-				if(ac.hasRole(RolesAllowded[i],iwc)){
-					return true;
+        		if(RolesAllowded==null){
+        			return ContentUtil.hasContentEditorRoles(iwc);
+        		}
+        		else{
+	        		AccessController ac = iwc.getAccessController();
+	        		for (int i = 0; i < RolesAllowded.length; i++) {
+					if(ac.hasRole(RolesAllowded[i],iwc)){
+						return true;
+					}
 				}
-			}
+        		}
         } else {
         		return v.booleanValue();
         }

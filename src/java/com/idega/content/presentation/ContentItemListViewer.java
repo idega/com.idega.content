@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.15 2006/01/04 14:33:52 tryggvil Exp $
+ * $Id: ContentItemListViewer.java,v 1.16 2006/02/28 14:49:28 tryggvil Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -22,18 +22,21 @@ import javax.faces.el.ValueBinding;
 import com.idega.content.bean.ContentItem;
 import com.idega.content.bean.ContentListViewerManagedBean;
 import com.idega.content.business.ContentUtil;
+import com.idega.core.cache.CacheableUIComponent;
+import com.idega.core.cache.UIComponentCacher;
+import com.idega.presentation.IWContext;
 import com.idega.webface.WFUtil;
 import com.idega.webface.model.WFDataModel;
 
 
 /**
  * 
- * Last modified: $Date: 2006/01/04 14:33:52 $ by $Author: tryggvil $
+ * Last modified: $Date: 2006/02/28 14:49:28 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
-public class ContentItemListViewer extends UIData {
+public class ContentItemListViewer extends UIData implements CacheableUIComponent{
 
 	private String managedBeanId;
 	private String resourcePath;
@@ -191,18 +194,43 @@ public class ContentItemListViewer extends UIData {
 	}
 	
 	public void encodeBegin(FacesContext context) throws IOException{
-		if(!initialized){
-			initializeInEncodeBegin();
+		UIComponentCacher cacher = getCacher(context);
+		if(cacher.existsInCache(this,context)){
+			// do nothing:
 		}
-		super.encodeBegin(context);
+		else{
+			if(cacher.isCacheEnbled(this,context)){
+				cacher.beginCache(this,context);
+			}
+			
+			if(!initialized){
+				initializeInEncodeBegin();
+			}
+			super.encodeBegin(context);
+		}
 	}
 	
 	public void encodeChildren(FacesContext context) throws IOException{
-		super.encodeChildren(context);
+		UIComponentCacher cacher = getCacher(context);
+		if(cacher.existsInCache(this,context)){
+			// do nothing:
+		}
+		else{
+			super.encodeChildren(context);
+		}	
 	}
 	
 	public void encodeEnd(FacesContext context) throws IOException{
-		super.encodeEnd(context);
+		UIComponentCacher cacher = getCacher(context);
+		if(cacher.existsInCache(this,context)){
+			cacher.encodeCached(this,context);
+		}
+		else{
+			super.encodeEnd(context);
+			if(cacher.isCacheEnbled(this,context)){
+				cacher.endCache(this,context);
+			}
+		}
 	}
 	
 	public String getDefultStyleClass(){
@@ -462,4 +490,19 @@ public class ContentItemListViewer extends UIData {
 		this.maxNumberOfDisplayed = maxNumberOfItems;
 	}
 
+
+	public UIComponentCacher getCacher(FacesContext context){
+		return UIComponentCacher.getDefaultCacher(context);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.idega.core.cache.CacheableUIComponent#getViewState(javax.faces.context.FacesContext)
+	 */
+	public String getViewState(FacesContext context) {
+		IWContext iwc = IWContext.getIWContext(context);
+		if(ContentUtil.hasContentEditorRoles(iwc)){
+			return "edit";
+		}
+		return "view";
+	}
 }

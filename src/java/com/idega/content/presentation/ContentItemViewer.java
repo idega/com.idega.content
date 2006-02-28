@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.15 2005/12/20 16:42:00 tryggvil Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.16 2006/02/28 14:49:28 tryggvil Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -32,10 +32,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
+ * Last modified: $Date: 2006/02/28 14:49:28 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -767,6 +767,18 @@ public class ContentItemViewer extends WFContainer {
 	 */
 	public void setAutoCreateResource(boolean autoCreateResource) {
 		this.autoCreateResource = autoCreateResource;
+	}
+	
+
+	/* (non-Javadoc)
+	 * @see com.idega.core.cache.CacheableUIComponent#getViewState(javax.faces.context.FacesContext)
+	 */
+	public String getViewState(FacesContext context) {
+		IWContext iwc = IWContext.getIWContext(context);
+		if(ContentUtil.hasContentEditorRoles(iwc)){
+			return "edit";
+		}
+		return "view";
 	}
 
 }

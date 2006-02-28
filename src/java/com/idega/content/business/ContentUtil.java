@@ -1,5 +1,5 @@
 /*
- * $Id: ContentUtil.java,v 1.9 2005/12/20 16:42:00 tryggvil Exp $
+ * $Id: ContentUtil.java,v 1.10 2006/02/28 14:49:28 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -10,16 +10,19 @@
 package com.idega.content.business;
 
 import javax.faces.context.FacesContext;
+import com.idega.core.accesscontrol.business.AccessController;
+import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.idegaweb.IWBundle;
+import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 
 
 /**
  * 
- * Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
+ * Last modified: $Date: 2006/02/28 14:49:28 $ by $Author: tryggvil $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class ContentUtil {
 	public static final String CONTENT_PATH = "/files/cms";
@@ -29,6 +32,8 @@ public class ContentUtil {
 	public static final String IW_BUNDLE_IDENTIFIER = "com.idega.content";
 	
 	public static String FAMILY_CONTENT="iw_content";
+	
+	private static String[] defaultContentEditorRoles = new String[] {StandardRoles.ROLE_KEY_ADMIN,StandardRoles.ROLE_KEY_AUTHOR,StandardRoles.ROLE_KEY_EDITOR};
 	
 	private static IWBundle bundle = null;
 	
@@ -73,5 +78,23 @@ public class ContentUtil {
 			return null;
 		}
 		return path;
+	}
+
+	/**
+	 * <p>
+	 * Returns true if the user with the IWUserContext has the necessary roles
+	 * to be an editor for the content system.
+	 * </p>
+	 * @param iwc
+	 * @return
+	 */
+	public static boolean hasContentEditorRoles(IWUserContext iwc) {
+		AccessController ac = iwc.getApplicationContext().getIWMainApplication().getAccessController();
+		for (int i = 0; i < defaultContentEditorRoles.length; i++) {
+			if(ac.hasRole(defaultContentEditorRoles[i],iwc)){
+				return true;
+			}
+		}
+		return false;
 	}
 }
