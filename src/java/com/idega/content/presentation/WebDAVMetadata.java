@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadata.java,v 1.15 2005/10/26 11:44:48 tryggvil Exp $
+ * $Id: WebDAVMetadata.java,v 1.16 2006/03/16 15:39:56 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -47,28 +47,31 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2005/10/26 11:44:48 $ by $Author: tryggvil $
+ * Last modified: $Date: 2006/03/16 15:39:56 $ by $Author: tryggvil $
  * 
  * Display the UI for adding metadata type - values to a file.
  *
  * @author Joakim Johnson
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
 public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	
-	private static final String METADATA_BLOCK_ID = "metadataBlockID";
+	private static final String DEFAULT_METADATA_BLOCK_ID = "metadataBlock";
+	/*
 	private static final String NEW_VALUES_ID = "newValueID";
 	private static final String DROPDOWN_ID = "dropdownID";
 	private static final String ADD_ID = "addID";
+	*/
 	private static final String RESOURCE_PATH = "resourcePath";
 	private static final String METADATA_LIST_BEAN = "MetadataList";
-
 	private String resourcePath = "";
 
 	public WebDAVMetadata() {
+		setId(DEFAULT_METADATA_BLOCK_ID);
 	}
 	
 	public WebDAVMetadata(String path){
+		this();
 		resourcePath = path;
 	}
 	
@@ -80,20 +83,28 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 		
 		if(resourcePath!=null){
 //			System.out.println("Initialize. Setting resourcePath to "+resourcePath);
-			WFUtil.invoke(METADATA_LIST_BEAN, "setResourcePath", resourcePath);
+			//WFUtil.invoke(METADATA_LIST_BEAN, "setResourcePath", resourcePath);
+			getMetadataListBean().setResourcePath(resourcePath);
 		} else {
 			System.err.println("[WARNING]["+getClass().getName()+"]: resource path can not be restored for managed beans");
 		}
-		
-		
-		setId(METADATA_BLOCK_ID);
 		add(ContentBlock.getBundle().getLocalizedText("metadata"));
 		WFList list = new WFList(METADATA_LIST_BEAN);
 		add(list);
-		add(getMetadataTable(resourcePath));
+		//add(getMetadataTable(resourcePath));
 		add(getEditContainer());
 	}
 	
+	/**
+	 * <p>
+	 * TODO tryggvil describe method getMetadataListBean
+	 * </p>
+	 * @return
+	 */
+	private MetadataListManagedBean getMetadataListBean() {
+		return (MetadataListManagedBean) WFUtil.getBeanInstance(METADATA_LIST_BEAN);
+	}
+
 	/**
 	 * @return
 	 */
@@ -124,7 +135,7 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 		
 		//Type dropdown selector
 		UIInput dropdown = new HtmlSelectOneMenu();
-		dropdown.setId(DROPDOWN_ID);
+		dropdown.setId(getDropdownId());
 
 		Locale locale = IWContext.getInstance().getCurrentLocale();
 		
@@ -173,11 +184,11 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 			
 			HtmlInputText newValueInput = new HtmlInputText();
 			newValueInput.setSize(40);
-			newValueInput.setId(NEW_VALUES_ID);
+			newValueInput.setId(getNewInputId());
 			metadataTable.add(newValueInput, 2, row++);
 		}
 		
-		HtmlCommandButton addButton = localizer.getButtonVB(ADD_ID, "save", this);
+		HtmlCommandButton addButton = localizer.getButtonVB(getAddButtonId(), "save", this);
 		addButton.getAttributes().put(RESOURCE_PATH,resourcePath);
 
 		metadataTable.add(addButton, 2, row);
@@ -187,14 +198,44 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	}
 	
 	/**
+	 * <p>
+	 * TODO tryggvil describe method getAddButtonId
+	 * </p>
+	 * @return
+	 */
+	private String getAddButtonId() {
+		return getId()+"_add";
+	}
+
+	/**
+	 * <p>
+	 * TODO tryggvil describe method getNewInputId
+	 * </p>
+	 * @return
+	 */
+	private String getNewInputId() {
+		return getId()+"_newinput";
+	}
+
+	/**
+	 * <p>
+	 * TODO tryggvil describe method getDropdownId
+	 * </p>
+	 * @return
+	 */
+	private String getDropdownId() {
+		return this.getId()+"_dropdown";
+	}
+
+	/**
 	 * Will add the specified type - value metadata as a property to the selected resource.
 	 */
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
 		UIComponent comp = actionEvent.getComponent();
 		resourcePath = (String)comp.getAttributes().get(RESOURCE_PATH);
 
-		HtmlInputText newValueInput = (HtmlInputText) actionEvent.getComponent().getParent().findComponent(NEW_VALUES_ID);
-		UIInput dropdown = (UIInput) comp.getParent().findComponent(DROPDOWN_ID);
+		HtmlInputText newValueInput = (HtmlInputText) actionEvent.getComponent().getParent().findComponent(getNewInputId());
+		UIInput dropdown = (UIInput) comp.getParent().findComponent(getDropdownId());
 		String val = "";
 		String type = "";
 		if(null!=dropdown) {
@@ -284,7 +325,8 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 		resourcePath = ((String) values[1]);
 
 		if(resourcePath!=null){
-				WFUtil.invoke(METADATA_LIST_BEAN, "setResourcePath", resourcePath);
+				//WFUtil.invoke(METADATA_LIST_BEAN, "setResourcePath", resourcePath);
+				getMetadataListBean().setResourcePath(resourcePath);
 		} else {
 			System.err.println("[WARNING]["+getClass().getName()+"]: resource path can not be restored for managed beans");
 		}

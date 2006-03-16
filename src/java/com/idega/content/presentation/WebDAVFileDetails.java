@@ -16,6 +16,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.webdav.lib.util.WebdavStatus;
 import com.idega.business.IBOLookup;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
@@ -54,6 +56,15 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 				// Making sure all properties are set
 				resource.setProperties();
 				userName = getIWSlideSession().getUserFullName();
+			}
+			catch(HttpException he){
+				if(he.getReasonCode()==WebdavStatus.SC_NOT_FOUND){
+					//escape out of the processing if the resource is not found
+					return;
+				}
+				else{
+					he.printStackTrace();
+				}
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -182,6 +193,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 
 				//Categories
 				WebDAVCategories categoriesUI = new WebDAVCategories(getCurrentResourcePath());
+				categoriesUI.setId(this.getId()+"_categories");
 				++row;
 				table.mergeCells(1, row, 2, row);
 				table.add(categoriesUI, 1, row);
@@ -247,8 +259,10 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 					versionPath.setRelativeFilePath(url);
 				}
 				//so we have a sensable name for the file!
-				String fileName = "v"+versionName.replace('.','_')+"-"+resource.getDisplayName();
-				versionPath.setAlternativeFileName(fileName);
+				if(versionName!=null){
+					String fileName = "v"+versionName.replace('.','_')+"-"+resource.getDisplayName();
+					versionPath.setAlternativeFileName(fileName);
+				}
 				//versionPath.getChildren().add(WFUtil.getText("Download/View"));
 				vTable.add(versionPath, ++vColumn, vRow);
 				vTable.add(WFUtil.getText(version.getCreatorDisplayName(),"wf_listtext"), ++vColumn, vRow);

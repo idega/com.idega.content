@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.13 2006/01/04 14:33:52 tryggvil Exp $
+ * $Id: WebDAVCategories.java,v 1.14 2006/03/16 15:39:56 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -47,18 +47,20 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2006/01/04 14:33:52 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/03/16 15:39:56 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
-	public static final String CATEGORIES_BLOCK_ID = "categoriesBlockID";
+	private static final String DEFAULT_CATEGORIES_BLOCK_ID = "categoriesBlock";
+	/*public static final String CATEGORIES_BLOCK_ID = "categoriesBlockID";
 	private static final String ADD_BUTTON_ID = "add_button_ID";
 	private static final String SAVE_ID = "save_category_ID";
 	private static final String ADD_CATEGORY_TEXT_ID = "addCategoryID";
 	private static final String CATEGORY = "category_";		//Prefix for the id in the userinterface
+	*/
 	private static final String RESOURCE_PATH = "resourcePath";	//key
 	private static final int COLLUMNS = 3;		//Number of collumns to display the categories in
 
@@ -71,7 +73,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 //	List categoryStatus = new ArrayList();
 
 	public WebDAVCategories() {
-		setId(CATEGORIES_BLOCK_ID);
+		setId(DEFAULT_CATEGORIES_BLOCK_ID);
 	}
 	
 	public WebDAVCategories(String path){
@@ -159,7 +161,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 					HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
 					setCategory(smc,categoryKey);
 					smc.setValue(new Boolean(true));
-					String id = CATEGORY+count;
+					String id = getCategoryId()+count;
 	//				System.out.println("CATEGORY-COMPONENT-ID:"+id);
 					smc.setId(id);
 					if(resourcePath!=null){
@@ -184,7 +186,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 					HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
 					setCategory(smc,categoryKey);
 					smc.setValue(new Boolean(false));
-					String id = CATEGORY+count;
+					String id = getCategoryId(count);
 //					System.out.println("CATEGORY-COMPONENT-ID:"+id);
 					smc.setId(id);
 					if(resourcePath!=null){
@@ -204,7 +206,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 				//Add the save button
 				if(resourcePath!=null && resourcePath.length()>0) {
 					WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
-					HtmlCommandButton addCategoryButton = localizer.getButtonVB(SAVE_ID, "save", this);
+					HtmlCommandButton addCategoryButton = localizer.getButtonVB(getSaveButtonId(), "save", this);
 					categoriesTable.add(addCategoryButton,1,count/COLLUMNS + 2);
 				}
 			}
@@ -218,6 +220,37 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		return categoriesTable;
 	}
 	
+	/**
+	 * <p>
+	 * TODO tryggvil describe method getSaveButtonId
+	 * </p>
+	 * @return
+	 */
+	private String getSaveButtonId() {
+		return this.getId()+"_save";
+	}
+
+	/**
+	 * <p>
+	 * TODO tryggvil describe method getCategoryId
+	 * </p>
+	 * @param count
+	 * @return
+	 */
+	private String getCategoryId(int count) {
+		return getCategoryId()+count;
+	}
+
+	/**
+	 * <p>
+	 * TODO tryggvil describe method getCategoryId
+	 * </p>
+	 * @return
+	 */
+	private String getCategoryId() {
+		return this.getId()+"_category_";
+	}
+
 	/**
 	 * <p>
 	 * Gets the set categories, either from the resourcePath property or
@@ -261,13 +294,33 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		//Input
 		HtmlInputText newCategoryInput = new HtmlInputText();
 		newCategoryInput.setSize(40);
-		newCategoryInput.setId(ADD_CATEGORY_TEXT_ID);
+		newCategoryInput.setId(getAddCategoryInputId());
 		container.add(newCategoryInput);
 		//Button
-		HtmlCommandButton addCategoryButton = localizer.getButtonVB(ADD_BUTTON_ID, "add", this);
+		HtmlCommandButton addCategoryButton = localizer.getButtonVB(getAddButtonId(), "add", this);
 		container.add(addCategoryButton);
 
 		return container;
+	}
+
+	/**
+	 * <p>
+	 * TODO tryggvil describe method getAddButtonId
+	 * </p>
+	 * @return
+	 */
+	private String getAddButtonId() {
+		return getId()+"_add";
+	}
+
+	/**
+	 * <p>
+	 * TODO tryggvil describe method getAddCategoryTextId
+	 * </p>
+	 * @return
+	 */
+	private String getAddCategoryInputId() {
+		return this.getId()+"_add_cat_input";
 	}
 
 	/**
@@ -286,13 +339,13 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		}
 		
 		if(realCategories==null){
-			realCategories = (WebDAVCategories) superParent.findComponent(CATEGORIES_BLOCK_ID);
+			realCategories = (WebDAVCategories) superParent.findComponent(getId());
 		}
 		
-		if(id.equalsIgnoreCase(ADD_BUTTON_ID)) {
+		if(id.equalsIgnoreCase(getAddButtonId())) {
 			//Add a category to the list of selectable categories
 			//This is input for adding a category
-			HtmlInputText newCategoryInput = (HtmlInputText) comp.getParent().findComponent(ADD_CATEGORY_TEXT_ID);
+			HtmlInputText newCategoryInput = (HtmlInputText) comp.getParent().findComponent(getAddCategoryInputId());
 
 			String newCategoryName=newCategoryInput.getValue().toString();
 			CategoryBean.getInstance().addCategory(newCategoryName);
@@ -301,8 +354,8 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 			}
 			return;
 		}
-		if(id.equalsIgnoreCase(SAVE_ID)) {
-			saveCategoriesSettings(null, comp);
+		if(id.equalsIgnoreCase(getSaveButtonId())) {
+			saveCategoriesSettings(null, realCategories);
 /*			
 			//save the selection of categories to the article
 			//Build together the categories string
@@ -363,7 +416,11 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		}
 	}
 	
-	public void saveCategoriesSettings(String resourcePath, UIComponent comp) {
+	public void saveCategoriesSettings(){
+		saveCategoriesSettings(this.resourcePath,this);
+	}
+	
+	public static void saveCategoriesSettings(String resourcePath, WebDAVCategories categoriesUi) {
 		if(resourcePath==null){
 			throw new RuntimeException("resourcePath is null");
 		}
@@ -379,9 +436,10 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		//while(iter.hasNext()) {
 			//String categoryKey = iter.next().toString();
 			String categoryKey = "";
-			String checkId=CATEGORY+count++;
-			smc = (HtmlSelectBooleanCheckbox)comp.getParent().findComponent(checkId);
-			categoryKey = getCategory(smc);
+			String checkId=categoriesUi.getCategoryId(count++);
+			UIComponent parent = categoriesUi.getParent();
+			smc = (HtmlSelectBooleanCheckbox)parent.findComponent(checkId);//comp.getParent().findComponent(checkId);
+			categoryKey = categoriesUi.getCategory(smc);
 			boolean bool = ((Boolean)smc.getValue()).booleanValue();
 //			System.out.println("Category "+text+" was set to "+bool);
 			if(bool) {
@@ -409,8 +467,8 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 //					System.out.println("Proppatch: filepath="+filePath+" categories value="+categories);
 					rootResource.proppatchMethod(filePath,new PropertyName("DAV:","categories"),categories.toString(),true);
 					//Also set the metadata on the parent folder
-					if(getSetCategoriesOnParent()){
-						String parent = getParentResource(filePath);
+					if(categoriesUi.getSetCategoriesOnParent()){
+						String parent = categoriesUi.getParentResource(filePath);
 //						System.out.println("Proppatch: filepath="+parent+" categories value="+categories);
 						rootResource.proppatchMethod(parent,new PropertyName("DAV:","categories"),categories.toString(),true);
 					}

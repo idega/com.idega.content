@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.17 2006/01/04 14:33:52 tryggvil Exp $
+ * $Id: ContentItemBean.java,v 1.18 2006/03/16 15:39:56 tryggvil Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -34,10 +34,10 @@ import com.idega.util.IWTimestamp;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2006/01/04 14:33:52 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/03/16 15:39:56 $ by $Author: tryggvil $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -47,6 +47,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	private String _itemType = null;
 	private int _createdByUserId = 0;
 	private boolean autoCreateResource;
+	private boolean loaded;
 	
 	private String _pendingLocaleId = null;
 	private String _requestedStatus = null;
@@ -276,11 +277,19 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 * @throws Exception If there is an exception loading
 	 */
 	public void load()throws Exception{
-		String resourcePath = getResourcePath();
-		if(resourcePath==null){
-			throw new Exception("Error loading content Item. No resourcePath set");
+		if(!isLoaded()){
+			String resourcePath = getResourcePath();
+			if(resourcePath==null){
+				throw new Exception("Error loading content Item. No resourcePath set");
+			}
+			load(resourcePath);
+			setLoaded(true);
 		}
-		load(resourcePath);
+	}
+	
+	public void reload()throws Exception{
+		setLoaded(false);
+		load();
 	}
 	
 	/**
@@ -307,12 +316,12 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 			setName(webdavResource.getDisplayName());
 			
 			//String versionName = webdavResource.getVersionName();
-			List versions = VersionHelper.getAllVersions(webdavResource);
+			/*List versions = VersionHelper.getAllVersions(webdavResource);
 			if(versions!=null){
 				setVersions(versions);
 				String latestVersion = VersionHelper.getLatestVersionName(versions);
 				setVersionName(latestVersion);
-			}
+			}*/
 			
 			String createDate = webdavResource.getCreationDateString();
 			if(createDate != null){
@@ -525,6 +534,24 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+
+	
+	/**
+	 * @return Returns the loaded.
+	 */
+	public boolean isLoaded() {
+		return loaded;
+	}
+
+
+	
+	/**
+	 * @param loaded The loaded to set.
+	 */
+	public void setLoaded(boolean loaded) {
+		this.loaded = loaded;
 	}
 
 }

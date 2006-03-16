@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataListManagedBean.java,v 1.12 2006/02/22 21:02:21 laddi Exp $
+ * $Id: MetadataListManagedBean.java,v 1.13 2006/03/16 15:39:56 tryggvil Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -38,12 +38,12 @@ import com.idega.webface.bean.WFListBean;
 
 /**
  * 
- * Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $
+ * Last modified: $Date: 2006/03/16 15:39:56 $ by $Author: tryggvil $
  * Displays all the metadata types and values for the specified resource
  * Typically followed by WebDavMetadata in presentation to enable addeing metadata
  *
  * @author Joakim Johnson
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class MetadataListManagedBean extends AbstractWFEditableListManagedBean implements WFListBean, ActionListener {
 
@@ -157,7 +157,8 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 			default:
 				component = getButtonUIComponent(var);
 		}
-		component.setId(getUIComponentID(var, componentIDToken[index]));
+		String componentId = getUIComponentID(var, componentIDToken[index]);
+		component.setId(componentId);
 		return component;
 	}
 
@@ -165,7 +166,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	 * Creates the UIComponent ID based on the object and the idToken provided
 	 */
 	protected String getUIComponentID(String var, String idToken) {
-		return String.valueOf(var + "." + componentIDToken + ".id");
+		return String.valueOf(var + "_" + idToken + "_id");
 	}
 
 	/**

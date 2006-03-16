@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.16 2006/02/28 14:49:28 tryggvil Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.17 2006/03/16 15:39:56 tryggvil Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -25,6 +25,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 import com.idega.content.bean.ContentItem;
 import com.idega.content.business.ContentUtil;
+import com.idega.core.cache.UIComponentCacher;
 import com.idega.core.uri.IWActionURIManager;
 import com.idega.presentation.IWContext;
 import com.idega.webface.WFContainer;
@@ -32,10 +33,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2006/02/28 14:49:28 $ by $Author: tryggvil $
+ * Last modified: $Date: 2006/03/16 15:39:56 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.17 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -374,7 +375,7 @@ public class ContentItemViewer extends WFContainer {
 	}
 
 	public boolean isRendered() {
-		ContentItem item = getContentItem();
+		/*ContentItem item = getContentItem();
 		if (item != null) {
 			if(isAutoCreateResource()){
 				return true;
@@ -386,7 +387,8 @@ public class ContentItemViewer extends WFContainer {
 				}
 			}
 		}
-		return super.isRendered();
+		return super.isRendered();*/
+		return true;
 	}
 
 	/*
@@ -413,15 +415,61 @@ public class ContentItemViewer extends WFContainer {
 	 * @see javax.faces.component.UIComponent#encodeBegin(javax.faces.context.FacesContext)
 	 */
 	public void encodeBegin(FacesContext context) throws IOException {
-		if (showRequestedItem) {
-			IWContext iwc = IWContext.getIWContext(context);
-			String paramResourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
-			if (paramResourcePath != null) {
-				setResourcePath(paramResourcePath);
-			}
+		
+		UIComponentCacher cacher = getCacher(context);
+		/*if(cacher.existsInCache(this,context)){
+			// do nothing:
 		}
-		super.encodeBegin(context);
-		updateValues();
+		else{
+			if(cacher.isCacheEnbled(this,context)){
+				cacher.beginCache(this,context);
+			}*/
+			if (showRequestedItem) {
+				IWContext iwc = IWContext.getIWContext(context);
+				String paramResourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
+				if(paramResourcePath!=null){
+					setResourcePath(paramResourcePath);
+				}
+			}
+			
+			
+			super.encodeBegin(context);
+			if(cacher.isCacheEnbled(this,context)){
+				if(!cacher.existsInCache(this,context)){
+					updateValues();
+				}
+			}
+			else{
+				updateValues();
+			}
+			
+		/*}*/
+		
+	}
+
+	public void encodeChildren(FacesContext context) throws IOException {
+		/*UIComponentCacher cacher = getCacher(context);
+		if(cacher.existsInCache(this,context)){
+			//do nothing
+		}
+		else{
+			super.encodeChildren(context);
+		}*/
+		super.encodeChildren(context);
+	}
+	
+	public void encodeEnd(FacesContext context) throws IOException {
+		/*UIComponentCacher cacher = getCacher(context);
+		if(cacher.existsInCache(this,context)){
+			cacher.encodeCached(this,context);
+		}
+		else{
+			super.encodeEnd(context);
+			if(cacher.isCacheEnbled(this,context)){
+				cacher.endCache(this,context);
+			}
+		}*/
+		super.encodeEnd(context);
 	}
 
 	/**
@@ -775,10 +823,19 @@ public class ContentItemViewer extends WFContainer {
 	 */
 	public String getViewState(FacesContext context) {
 		IWContext iwc = IWContext.getIWContext(context);
+		String state;
 		if(ContentUtil.hasContentEditorRoles(iwc)){
-			return "edit";
+			state="edit";
 		}
-		return "view";
+		else{
+			state="view";
+		}
+		String resourceUrl = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
+		if(resourceUrl!=null){//&&showRequestedItem){
+			state+="_"+resourceUrl;
+		}
+		return state;
+		
 	}
 
 }
