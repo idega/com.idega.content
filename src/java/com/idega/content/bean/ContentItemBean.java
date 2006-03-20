@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.18 2006/03/16 15:39:56 tryggvil Exp $
+ * $Id: ContentItemBean.java,v 1.19 2006/03/20 09:10:18 laddi Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -16,16 +16,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
 import javax.faces.context.FacesContext;
+
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.util.WebdavStatus;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
-import com.idega.slide.util.VersionHelper;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.IWTimestamp;
 
@@ -34,10 +36,10 @@ import com.idega.util.IWTimestamp;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2006/03/16 15:39:56 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/03/20 09:10:18 $ by $Author: laddi $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.19 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
