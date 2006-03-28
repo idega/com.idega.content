@@ -11,21 +11,21 @@
 .content_viewer_details {
 	width: auto;
 	height: 16px;
-	background: url(../images/details.jpg) no-repeat;
+	background: url(../images/details.gif) no-repeat;
 	padding-left: 18px;
 }
 
 .content_viewer_preview {
 	width: auto;
 	height: 16px;
-	background: url(../images/preview.jpg) no-repeat;
+	background: url(../images/preview.gif) no-repeat;
 	padding-left: 18px;
 }
 
 .content_viewer_document_list {
 	width: auto;
 	height: 16px;
-	background: url(../images/list.jpg) no-repeat;
+	background: url(../images/list.gif) no-repeat;
 	padding-left: 18px;
 }
 
@@ -39,7 +39,7 @@
 .content_viewer_file_details {
 	width: 16px;
 	height: 16px;
-	background: url(../images/details.jpg) no-repeat;
+	background: url(../images/details.gif) no-repeat;
 	float: right;
 	padding-right: 10px;
 }
@@ -47,7 +47,7 @@
 .content_viewer_file_preview {
 	width: 16px;
 	height: 16px;
-	background: url(../images/preview.jpg) no-repeat;
+	background: url(../images/preview.gif) no-repeat;
 	float: right;
 	padding-right: 10px;
 }
@@ -67,6 +67,33 @@
 }
 
 
+/*ContentList (DocumentList/ContentViewer) overriding standard styles*/
+
+.contentListBlock .wf_blockmainarea{
+	padding: 0px;
+}
+
+div.contentListBlock div.wf_blockmainarea div.scrollContainer{
+	height: 285px;
+}
+
+head:first-child+body div[class].contentListBlock div[class].scrollContainer {
+	height: 285px;
+}
+
+
+head:first-child+body div[class].contentListBlock div[class].scrollContainer table thead[class].fixedHeader tr {
+	display: block;
+}
+
+/* define the table content to be scrollable                                              */
+/* set TBODY element to have block level attributes. All other non-IE browsers            */
+/* this enables overflow to work on TBODY element. All other non-IE, non-Mozilla browsers */
+/* induced side effect is that child TDs no longer accept width: auto                     */
+/* Filter out Opera 5.x/6.x and MacIE 5.x                                                 */
+head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea div[class].scrollContainer table tbody {
+	height: 262px;
+}
 
 .cms_permission_matrix {
 	height: 150px;
@@ -100,13 +127,13 @@
 }
 
 .page_create_edit_link {
-	background-image: url(../images/editscript_16.gif);
+	background-image: url(../images/edit_16.gif);
 }
 .page_details_link {
-	background-image: url(../images/runscript_16.gif);
+	background-image: url(../images/details.gif);
 }
-.page_preview_link {
-	background-image: url(../images/table_16.gif);
+.page_save_link {
+	background-image: url(../images/save_16.gif);
 }
 
 .create_page_fieldset {
@@ -132,6 +159,51 @@
 	background-color:#EEEEEE;
 	border: 1px solid #CCCCCC;
 	overflow: auto;
+}
+
+
+/*div.ws_main div.wf_block div.wf_toolbarcontainer {
+	width: 100%;
+	height: 18px;
+	background: #FAFAFA url(images/toolbar/bg_item.gif) repeat-x;
+	border-bottom: 1px solid #D7D7D7;
+}*/
+
+.content_item_toolbar, 
+.content_item_toolbar li{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.content_item_toolbar li{
+	float: left;
+	height: 16px;
+	border: 1px solid #D7D7D7;
+	border-width: 0 1px 0 0;
+}
+.content_item_toolbar li a,
+.content_item_toolbar li span
+{
+	float: left;
+	padding: 0 0 0 16px;
+	height: 18px;
+	font-weight: normal;
+	color: #464646;
+}
+.content_item_toolbar li.wf_toolbarbuttonselected
+{
+	background: #E7E7E7 url(images/tabbar/bg_item_selected.gif) repeat-x;
+}
+
+.content_item_toolbar li a,
+.content_item_toolbar li a:hover,
+.content_item_toolbar li span
+{
+	background-position: 0px 0px;
+	background-repeat: no-repeat;
+}
+.content_item_toolbar li a:hover {
+	background-color: #e7e7e7;
 }
 
 
@@ -163,10 +235,22 @@
 }
 
 .content_item_toolbar li.first{
-
+	clear:left;
 }
 
 .content_item_toolbar li.last{
-	
+	clear:right;
 }
+
+.content_item_toolbar li .edit{
+	background-image: url(images/edit_16.gif);
+}
+.content_item_toolbar li .delete{
+	background-image: url(images/del_16.gif);
+}
+.content_item_toolbar li .create{
+	background-image: url(images/new_16.gif);
+}
+
+
 

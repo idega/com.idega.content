@@ -5,19 +5,20 @@
         xmlns:wf="http://xmlns.idega.com/com.idega.webface"
         xmlns:ws="http://xmlns.idega.com/com.idega.workspace"
         xmlns:b="http://xmlns.idega.com/com.idega.builder"
+        xmlns:ic="http://xmlns.idega.com/com.idega.core"
         xmlns:x="http://myfaces.apache.org/extensions"
 version="1.2">
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 	<f:view>
         <!--ws:page id="contentpages1"-->
-        <b:page id="contentpages1">
+        <ic:page id="contentpages1" styleClass="ws_body centered">
                 <h:form id="contentpagesform1">
 					<wf:wfblock title="#{localizedStrings['com.idega.content']['template_settings']}">
 						<f:facet name="wf_block_toolbar">
 							<wf:toolbar id="toolbar">
 								<wf:toolbarbutton id="button1" displayText="#{localizedStrings['com.idega.builder']['create_simple_template.Create']}/#{localizedStrings['com.idega.builder']['create_simple_template.Edit']}" styleClass="page_create_edit_link"/>
 								<!--wf:toolbarbutton id="button2" displayText="Details" styleClass="page_details_link"/-->
-							   	<h:commandLink id="saveCommand" action="save" actionListener="#{simpleTemplateCreationBean.processAction}" styleClass="page_preview_link">
+							   	<h:commandLink id="saveCommand" action="save" actionListener="#{simpleTemplateCreationBean.processAction}" styleClass="page_save_link">
 			                    		<h:outputText value="#{localizedStrings['com.idega.builder']['create_simple_template.Save']}"/>
 							   	</h:commandLink>
 							   	<!--h:commandLink id="resetCommand" immediate="false" action="reset" actionListener="#{simpleTemplateCreationBean.processAction}" styleClass="page_preview_link">
@@ -87,8 +88,8 @@ version="1.2">
 						<h:outputLabel for="region">
 						  <h:outputText id="regionLabel" value="#{localizedStrings['com.idega.builder']['create_simple_template.Region']}: " styleClass="label"/>
 						</h:outputLabel>
-						<h:selectOneMenu id="region" value="main" styleClass="formInput">
-							<f:selectItem itemValue="main" itemLabel="Main"/>
+						<h:selectOneMenu id="region" value="#{simpleTemplateCreationBean.selectedRegion}" styleClass="formInput">
+							<f:selectItems value="#{simpleTemplateCreationBean.regionSelectItemList}"/>
 						</h:selectOneMenu>
 
 						<f:verbatim>
@@ -108,6 +109,6 @@ version="1.2">
 					</wf:wfblock>
                 </h:form>
         <!--/ws:page-->
-        </b:page>
+        </ic:page>
 	</f:view>
 </jsp:root>

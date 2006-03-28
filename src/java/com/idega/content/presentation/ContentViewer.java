@@ -20,6 +20,8 @@ import com.idega.content.business.WebDAVFilePermissionResource;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.ScrollTable;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.IWSlideConstants;
 import com.idega.webface.WFBlock;
@@ -94,6 +96,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 //		rootFolder ="/files/shared";
 
 		WFBlock listBlock = new WFBlock();
+		listBlock.setStyleClass(listBlock.getStyleClass()+" contentListBlock");
 		WFTitlebar tb = new WFTitlebar();
 		String listBlockId = getId()+"_list";
 		
@@ -520,6 +523,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		list.setId(baseId+"_btnList");
 		list.setStyleClass("content_viewer_document_list");
 		list.setToolTip(getBundle().getLocalizedString("document_list"));
+		list.setDisplayText(getBundle().getLocalizedString("document_list"));
 //		list.setToolTip("Document List");
 		list.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 //		list.setValueBinding("rendered", WFUtil.createValueBinding("#{contentviewerbean.renderListLink}"));

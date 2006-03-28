@@ -3,10 +3,11 @@ package com.idega.content.presentation;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Vector;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import com.idega.presentation.IWBaseComponent;
+import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.ScrollTable;
 import com.idega.webface.WFList;
 import com.idega.webface.WFUtil;
 
@@ -34,43 +35,56 @@ public class WebDAVList extends IWBaseComponent {
 	
 	protected void initializeComponent(FacesContext context) {
 		
+		WebDAVListManagedBean bean = getWebDAVListManagedBean();
+		
 		if (startFolder != null) {
-			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setStartFolder", startFolder);
+			bean.setStartFolder(startFolder);
 		} else {
-			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setStartFolder", "");
+			bean.setStartFolder("");
 		}
 		if (rootFolder != null) {
-			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setRootFolder", rootFolder);
+			bean.setRootFolder(rootFolder);
 		} else {
-			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setRootFolder", "");
+			bean.setRootFolder("");
 		}
 		if (iconTheme != null) {
-			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setIconTheme", iconTheme);
+			bean.setIconTheme(iconTheme);
 		} else {
-			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setIconTheme", "");
+			bean.setIconTheme("");
 		}
 		if (onFileClickEvent != null) {
-			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setOnFileClickEvent", onFileClickEvent);
+			bean.setOnFileClickEvent(onFileClickEvent);
 		} else {
-			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setOnFileClickEvent", "");
+			bean.setOnFileClickEvent("");
 		}
 		
-		WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setShowFolders", new Boolean(showFolders));
-		WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setShowPublicFolder", new Boolean(showPublicFolder));
-		WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setShowDropboxFolder", new Boolean(showDropboxFolder));
+		bean.setShowFolders(new Boolean(showFolders));
+		bean.setShowPublicFolder(new Boolean(showPublicFolder));
+		bean.setShowDropboxFolder(new Boolean(showDropboxFolder));
 		if (columnsToHide != null) {
-			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setColumnsToHide", columnsToHide, Collection.class);
+			bean.addColumnsToHide(columnsToHide);
 		} else {
-			WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setColumnsToHide", new Vector(), Collection.class);
+			//bean.setColumnsToHide(new Vector());
 		}
-		WFUtil.invoke(WEB_DAV_LIST_BEAN_ID, "setUseVersionControl", new Boolean(useVersionControl));
+		bean.setUseVersionControl(new Boolean(useVersionControl));
 		
 		
+		//WFContainer wrapper = new WFContainer();
+		//wrapper.setStyleClass("scrollWrapper");
 		this.setId(this.getId());
 		WFList list = new WFList(WEB_DAV_LIST_BEAN_ID, 0, 0);
+		/*list.setListStyleClass(list.getListStyleClass()+" scrollContainer");
+		list.setId("scrollContainer");
+		list.setStyleClass("scrollTable");*/
+		list.setBodyScrollable(true);
 		list.setId(this.getId()+"_l");
+		//wrapper.getChildren().add(list);
 		getChildren().add(list);
-
+		
+	}
+	
+	protected WebDAVListManagedBean getWebDAVListManagedBean(){
+		return  (WebDAVListManagedBean) WFUtil.getBeanInstance(WEB_DAV_LIST_BEAN_ID);
 	}
 	
 	public void setStartFolder(String start) {

@@ -1,5 +1,5 @@
 /*
- * $Id: HTMLAreaDocumentLinkCreator.java,v 1.1 2005/03/08 10:41:08 gimmi Exp $
+ * $Id: HTMLAreaDocumentLinkCreator.java,v 1.2 2006/03/28 10:11:51 tryggvil Exp $
  * Created on 1.3.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -26,7 +26,7 @@ public class HTMLAreaDocumentLinkCreator implements HTMLAreaLinkType {
 		list.setShowPermissionTab(false);
 		list.setShowUploadComponent(true);
 		list.setRootFolder("/files");
-		list.setOnFileClickEvent("Set()");
+		list.setOnFileClickEvent("SelectDocument()");
 		list.setColumnsToHide(WebDAVListManagedBean.COLUMN_DELETE+","+WebDAVListManagedBean.COLUMN_CHECKOUT+","+WebDAVListManagedBean.COLUMN_LOCK);
 		return list;
 	}

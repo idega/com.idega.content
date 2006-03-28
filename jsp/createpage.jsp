@@ -16,7 +16,7 @@ version="1.2">
 							<wf:toolbar id="toolbar">
 								<wf:toolbarbutton id="button1" displayText="#{localizedStrings['com.idega.content']['createpage.Create']}/#{localizedStrings['com.idega.content']['createpage.Edit']}" styleClass="page_create_edit_link"/>
 								<!--wf:toolbarbutton id="button2" displayText="Details" styleClass="page_details_link"/-->
-							   	<h:commandLink id="saveCommand" action="save" actionListener="#{pageCreationBean.processAction}" styleClass="page_preview_link">
+							   	<h:commandLink id="saveCommand" action="save" actionListener="#{pageCreationBean.processAction}" styleClass="page_save_link">
 			                    		<h:outputText value="#{localizedStrings['com.idega.content']['createpage.Save']}"/>
 							   	</h:commandLink>
 							   	<!--h:commandLink id="resetCommand" immediate="false" action="reset" actionListener="#{pageCreationBean.processAction}" styleClass="page_preview_link">

@@ -1,6 +1,7 @@
 package com.idega.content.presentation;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -80,6 +81,10 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	private String sorter = SORT_BY_NAME;
 
 	public WebDAVListManagedBean() {
+		List hideColumns = new ArrayList();
+		hideColumns.add(COLUMN_CHECKOUT);
+		hideColumns.add(COLUMN_LOCK);
+		setColumnsToHide(hideColumns);
 	}
 	
 	public void resetSorter() {
@@ -143,8 +148,24 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 		this.iconTheme = theme;
 	}
 	
+	public Collection getColumnsToHide(){
+		if(columnsToHide==null){
+			columnsToHide=new ArrayList();
+		}
+		return columnsToHide;
+	}
+	
 	public void setColumnsToHide(Collection columns) {
 		this.columnsToHide = columns;
+	}
+	
+	public void addColumnsToHide(Collection coll){
+		if(columnsToHide==null){
+			setColumnsToHide(coll);
+		}
+		else{
+			columnsToHide.addAll(coll);
+		}
 	}
 	
 	private boolean showColumn(String columnName) {
@@ -154,12 +175,10 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 	public void setUseVersionControl(Boolean useVersionControl) {
 		this.useVersionControl = useVersionControl.booleanValue();
 		if (!this.useVersionControl) {
-			if (columnsToHide == null) {
-				columnsToHide = new Vector();
-			}
-			columnsToHide.add(COLUMN_VERSION);
-			columnsToHide.add(COLUMN_LOCK);
-			columnsToHide.add(COLUMN_CHECKOUT);
+			
+			getColumnsToHide().add(COLUMN_VERSION);
+			getColumnsToHide().add(COLUMN_LOCK);
+			getColumnsToHide().add(COLUMN_CHECKOUT);
 		}
 	}
 	
@@ -317,7 +336,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			
 			if (onFileClickEventName != null) {
 				// Temporary hardcoding (this.href) to the onclick
-				String onClick = onFileClickEventName+"(this.href);return false;";
+				String onClick = onFileClickEventName+"(this);return false;";
 				nameLink.setOnclick(onClick);
 			}
 

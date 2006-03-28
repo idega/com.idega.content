@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbarButton.java,v 1.1 2005/03/11 17:03:05 gummi Exp $
+ * $Id: ContentItemToolbarButton.java,v 1.2 2006/03/28 10:11:51 tryggvil Exp $
  * Created on 9.3.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -9,6 +9,7 @@
  */
 package com.idega.content.presentation;
 
+import java.io.IOException;
 import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
@@ -16,10 +17,10 @@ import javax.faces.el.ValueBinding;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/11 17:03:05 $ by $Author: gummi $
+ *  Last modified: $Date: 2006/03/28 10:11:51 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ContentItemToolbarButton extends HtmlOutputLink {
 
@@ -27,15 +28,13 @@ public class ContentItemToolbarButton extends HtmlOutputLink {
 	private String resourcePath;
 	private String action;
 	private Boolean rendered;
-	
+
 	/**
 	 * 
 	 */
 	public ContentItemToolbarButton() {
 		super();
 	}
-	
-	
 	
 	public boolean isRendered(){
 		if (rendered != null) return rendered.booleanValue();
@@ -63,6 +62,25 @@ public class ContentItemToolbarButton extends HtmlOutputLink {
         //return false; //true when testing, then probably false
 	}
 	
+	/* (non-Javadoc)
+	 * @see javax.faces.component.UIOutput#setValue(java.lang.Object)
+	 */
+	public void setValue(Object value) {
+		// TODO Auto-generated method stub
+		//super.setValue(value);
+		String url = value.toString();
+		//String javascriptUrl = "javascript:openContentEditor('"+url+"')";
+		super.setValue(url);
+	}
+	
+    public Object getValue()
+    {
+        /*if (_value != null) return _value;
+        ValueBinding vb = getValueBinding("value");
+        return vb != null ? (Object)vb.getValue(getFacesContext()) : null;*/
+    		return super.getValue();
+    }
+
 	public void setRendered(boolean value){
 		rendered = Boolean.valueOf(value);
 	}
@@ -113,6 +131,56 @@ public class ContentItemToolbarButton extends HtmlOutputLink {
 		super.restoreState(ctx, values[0]);
 		resourcePath = (String)values[1];
 		action = (String)values[2];
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see javax.faces.component.UIComponentBase#encodeBegin(javax.faces.context.FacesContext)
+	 */
+	public void encodeBegin(FacesContext context) throws IOException {
+		// TODO Auto-generated method stub
+		super.encodeBegin(context);
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see javax.faces.component.UIComponentBase#encodeChildren(javax.faces.context.FacesContext)
+	 */
+	public void encodeChildren(FacesContext context) throws IOException {
+		// TODO Auto-generated method stub
+		super.encodeChildren(context);
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see javax.faces.component.UIComponentBase#encodeEnd(javax.faces.context.FacesContext)
+	 */
+	public void encodeEnd(FacesContext context) throws IOException {
+		// TODO Auto-generated method stub
+		super.encodeEnd(context);
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see javax.faces.component.UIComponentBase#getRendererType()
+	 */
+	public String getRendererType() {
+		// TODO Auto-generated method stub
+		//return super.getRendererType();
+		return "content_item_toolbar_button";
+	}
+	
+
+	/* (non-Javadoc)
+	 * @see javax.faces.component.UIOutput#getFamily()
+	 */
+	public String getFamily() {
+		// TODO Auto-generated method stub
+		return super.getFamily();
 	}
 	
 }
