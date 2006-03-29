@@ -362,8 +362,8 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			nameDetailsLink.setStyleClass("content_viewer_file_details");
 			nameDetailsLink.getAttributes().put(ContentViewer.PARAMETER_ACTION, ContentViewer.ACTION_FILE_DETAILS);
 			nameDetailsLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isFile}"));
-			nameDetailsLink.setValueBinding("alt", ContentViewer.getBundle().getValueBinding("document_details"));
-			nameDetailsLink.setValueBinding("title", ContentViewer.getBundle().getValueBinding("document_details"));
+			nameDetailsLink.setValueBinding("alt", ContentBlock.getBundle().getValueBinding("document_details"));
+			nameDetailsLink.setValueBinding("title", ContentBlock.getBundle().getValueBinding("document_details"));
 			
 			WFUtil.addParameterVB(nameDetailsLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 			WFUtil.addParameterVB(nameDetailsLink, PARAMETER_IS_FOLDER, var + ".isCollection");
@@ -382,8 +382,8 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			//WFUtil.addParameterVB(namePreviewLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 			//WFUtil.addParameterVB(namePreviewLink, PARAMETER_IS_FOLDER, var + ".isCollection");
 			//namePreviewLink.setActionListener(WFUtil.createMethodBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".processAction}", new Class[]{ActionEvent.class}));
-			namePreviewLink.setValueBinding("alt", ContentViewer.getBundle().getValueBinding("preview"));
-			namePreviewLink.setValueBinding("title", ContentViewer.getBundle().getValueBinding("preview"));
+			namePreviewLink.setValueBinding("alt", ContentBlock.getBundle().getValueBinding("preview"));
+			namePreviewLink.setValueBinding("title", ContentBlock.getBundle().getValueBinding("preview"));
 
 			
 			HtmlOutputLink permissionLink = new HtmlOutputLink();
@@ -391,8 +391,8 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean {
 			permissionLink.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".permissionActionURI}"));
 			permissionLink.setStyleClass("content_viewer_file_permissions");
 			permissionLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".renderPermissionLink}"));
-			permissionLink.setValueBinding("alt", ContentViewer.getBundle().getValueBinding("permissions"));
-			permissionLink.setValueBinding("title", ContentViewer.getBundle().getValueBinding("permissions"));
+			permissionLink.setValueBinding("alt", ContentBlock.getBundle().getValueBinding("permissions"));
+			permissionLink.setValueBinding("title", ContentBlock.getBundle().getValueBinding("permissions"));
 			
 			
 			col.getChildren().add(nameLink);
