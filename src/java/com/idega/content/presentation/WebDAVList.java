@@ -3,11 +3,11 @@ package com.idega.content.presentation;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
+
 import com.idega.presentation.IWBaseComponent;
-import com.idega.presentation.text.Text;
-import com.idega.presentation.ui.ScrollTable;
 import com.idega.webface.WFList;
 import com.idega.webface.WFUtil;
 
