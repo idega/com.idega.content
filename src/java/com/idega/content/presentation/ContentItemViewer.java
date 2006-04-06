@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.17 2006/03/16 15:39:56 tryggvil Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.18 2006/04/06 12:58:06 gimmi Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -33,10 +33,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2006/03/16 15:39:56 $ by $Author: tryggvil $
+ * Last modified: $Date: 2006/04/06 12:58:06 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -607,6 +607,19 @@ public class ContentItemViewer extends WFContainer {
 	 */
 	public void setShowRequestedItem(boolean value) {
 		showRequestedItem = value;
+	}
+	/**
+	 * This method decides if this viewer should hande http requests that
+	 * request it to show a spesific content item.
+	 * 
+	 * @param value
+	 */
+	public void setShowRequestedItem(Boolean value) {
+		setShowRequestedItem(value.booleanValue());
+	}
+
+	public void setRenderDetailsCommand(Boolean value) {
+		renderDetailsCommand = value;
 	}
 
 	public void setRenderDetailsCommand(boolean value) {
