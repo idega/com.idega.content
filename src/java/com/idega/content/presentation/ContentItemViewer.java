@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.18 2006/04/06 12:58:06 gimmi Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.19 2006/04/06 13:50:46 gimmi Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -33,10 +33,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2006/04/06 12:58:06 $ by $Author: gimmi $
+ * Last modified: $Date: 2006/04/06 13:50:46 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.19 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -616,6 +616,10 @@ public class ContentItemViewer extends WFContainer {
 	 */
 	public void setShowRequestedItem(Boolean value) {
 		setShowRequestedItem(value.booleanValue());
+	}
+
+	public boolean getShowRequestedItem() {
+		return showRequestedItem;
 	}
 
 	public void setRenderDetailsCommand(Boolean value) {
