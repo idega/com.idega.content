@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.19 2006/04/06 13:50:46 gimmi Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.20 2006/04/06 15:50:31 gimmi Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -33,10 +33,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2006/04/06 13:50:46 $ by $Author: gimmi $
+ * Last modified: $Date: 2006/04/06 15:50:31 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.20 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -564,7 +564,7 @@ public class ContentItemViewer extends WFContainer {
 	 * @return
 	 */
 	public ContentItem getContentItem() {
-		if (resourcePath != null && showRequestedItem) {
+		if (resourcePath != null) {
 			if (contentItemCach == null) {
 				contentItemCach = loadContentItem(resourcePath);
 			}
@@ -607,15 +607,6 @@ public class ContentItemViewer extends WFContainer {
 	 */
 	public void setShowRequestedItem(boolean value) {
 		showRequestedItem = value;
-	}
-	/**
-	 * This method decides if this viewer should hande http requests that
-	 * request it to show a spesific content item.
-	 * 
-	 * @param value
-	 */
-	public void setShowRequestedItem(Boolean value) {
-		setShowRequestedItem(value.booleanValue());
 	}
 
 	public boolean getShowRequestedItem() {
@@ -847,9 +838,11 @@ public class ContentItemViewer extends WFContainer {
 		else{
 			state="view";
 		}
-		String resourceUrl = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
-		if(resourceUrl!=null){//&&showRequestedItem){
-			state+="_"+resourceUrl;
+		if (showRequestedItem) {
+			String resourceUrl = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
+			if(resourceUrl!=null){//&&showRequestedItem){
+				state+="_"+resourceUrl;
+			}
 		}
 		return state;
 		
