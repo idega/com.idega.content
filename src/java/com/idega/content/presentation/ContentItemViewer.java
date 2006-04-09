@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.21 2006/04/07 10:57:51 gimmi Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.22 2006/04/09 12:01:54 laddi Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -33,10 +33,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2006/04/07 10:57:51 $ by $Author: gimmi $
+ * Last modified: $Date: 2006/04/09 12:01:54 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.21 $
+ * @version $Revision: 1.22 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -111,7 +111,7 @@ public class ContentItemViewer extends WFContainer {
 	}
 
 	protected boolean hasLocalValueChanged(String fieldName) {
-		Boolean changed = (Boolean) fieldValueChangedMap.get(fieldName);
+		Boolean changed = (Boolean) this.fieldValueChangedMap.get(fieldName);
 		if (changed != null) {
 			return changed.booleanValue();
 		}
@@ -121,31 +121,31 @@ public class ContentItemViewer extends WFContainer {
 	}
 
 	protected void setLocalValueHasChanged(String fieldName, boolean value) {
-		fieldValueChangedMap.put(fieldName, Boolean.valueOf(value));
+		this.fieldValueChangedMap.put(fieldName, Boolean.valueOf(value));
 	}
 
 	protected void setFieldPrefixValue(String fieldName, Object value) {
-		fieldPrefixValueMap.put(fieldName, value);
+		this.fieldPrefixValueMap.put(fieldName, value);
 	}
 
 	protected Object getFieldPrefixValue(String fieldName) {
-		return fieldPrefixValueMap.get(fieldName);
+		return this.fieldPrefixValueMap.get(fieldName);
 	}
 
 	protected void setFieldLocalValue(String fieldName, Object value) {
-		fieldLocalValueMap.put(fieldName, value);
+		this.fieldLocalValueMap.put(fieldName, value);
 	}
 
 	protected Object getFieldLocalValue(String fieldName) {
-		return fieldLocalValueMap.get(fieldName);
+		return this.fieldLocalValueMap.get(fieldName);
 	}
 
 	protected void setFieldSuffixValue(String fieldName, Object value) {
-		fieldSuffixValueMap.put(fieldName, value);
+		this.fieldSuffixValueMap.put(fieldName, value);
 	}
 
 	protected Object getFieldSuffixValue(String fieldName) {
-		return fieldSuffixValueMap.get(fieldName);
+		return this.fieldSuffixValueMap.get(fieldName);
 	}
 
 	protected ContentItemFieldViewer getFieldViewer(String fieldName) {
@@ -340,7 +340,7 @@ public class ContentItemViewer extends WFContainer {
 	 * @return
 	 */
 	protected boolean isLocalValueSet(String fieldName) {
-		return fieldLocalValueMap.containsKey(fieldName);
+		return this.fieldLocalValueMap.containsKey(fieldName);
 	}
 
 	/**
@@ -399,7 +399,7 @@ public class ContentItemViewer extends WFContainer {
 	public void decode(FacesContext context) {
 		// TODO USE DECODE RATHER THAN ENCODEBEGIN! not working because->NEVER
 		// CALLED!
-		if (showRequestedItem) {
+		if (this.showRequestedItem) {
 			IWContext iwc = IWContext.getIWContext(context);
 			String paramResourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
 			if (paramResourcePath != null) {
@@ -424,7 +424,7 @@ public class ContentItemViewer extends WFContainer {
 			if(cacher.isCacheEnbled(this,context)){
 				cacher.beginCache(this,context);
 			}*/
-			if (showRequestedItem) {
+			if (this.showRequestedItem) {
 				IWContext iwc = IWContext.getIWContext(context);
 				String paramResourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
 				if(paramResourcePath!=null){
@@ -556,7 +556,7 @@ public class ContentItemViewer extends WFContainer {
 			for (int i = 0; i < attr.length; i++) {
 				item.setValue(attr[i], getValue(attr[i]));
 			}
-			resourcePath = item.getResourcePath();
+			this.resourcePath = item.getResourcePath();
 		}
 	}
 
@@ -564,11 +564,11 @@ public class ContentItemViewer extends WFContainer {
 	 * @return
 	 */
 	public ContentItem getContentItem() {
-		if (resourcePath != null) {
-			if (contentItemCach == null) {
-				contentItemCach = loadContentItem(resourcePath);
+		if (this.resourcePath != null) {
+			if (this.contentItemCach == null) {
+				this.contentItemCach = loadContentItem(this.resourcePath);
 			}
-			return contentItemCach;
+			return this.contentItemCach;
 		}
 		ValueBinding vb = getValueBinding("contentItem");
 		return (ContentItem) (vb != null ? (Object) vb.getValue(getFacesContext()) : null);
@@ -606,27 +606,27 @@ public class ContentItemViewer extends WFContainer {
 	 * @param value
 	 */
 	public void setShowRequestedItem(boolean value) {
-		showRequestedItem = value;
+		this.showRequestedItem = value;
 	}
 	public void setShowRequestedItem(Boolean value) {
 		setShowRequestedItem(value.booleanValue());
 	}
 
 	public boolean getShowRequestedItem() {
-		return showRequestedItem;
+		return this.showRequestedItem;
 	}
 
 	public void setRenderDetailsCommand(Boolean value) {
-		renderDetailsCommand = value;
+		this.renderDetailsCommand = value;
 	}
 
 	public void setRenderDetailsCommand(boolean value) {
-		renderDetailsCommand = Boolean.valueOf(value);
+		this.renderDetailsCommand = Boolean.valueOf(value);
 	}
 
 	public boolean getRenderDetailsCommand() {
-		if (renderDetailsCommand != null) {
-			return renderDetailsCommand.booleanValue();
+		if (this.renderDetailsCommand != null) {
+			return this.renderDetailsCommand.booleanValue();
 		}
 		ValueBinding vb = getValueBinding("renderDetailsCommand");
 		Boolean render = (Boolean) (vb != null ? (Object) vb.getValue(getFacesContext()) : null);
@@ -715,15 +715,15 @@ public class ContentItemViewer extends WFContainer {
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[10];
 		values[0] = super.saveState(ctx);
-		values[1] = fieldPrefixValueMap;
-		values[2] = fieldLocalValueMap;
-		values[3] = fieldSuffixValueMap;
-		values[4] = fieldValueChangedMap;
-		values[5] = Boolean.valueOf(showRequestedItem);
-		values[6] = renderDetailsCommand;
-		values[7] = resourcePath;
-		values[8] = detailsViewerPath;
-		values[9] = Boolean.valueOf(autoCreateResource);
+		values[1] = this.fieldPrefixValueMap;
+		values[2] = this.fieldLocalValueMap;
+		values[3] = this.fieldSuffixValueMap;
+		values[4] = this.fieldValueChangedMap;
+		values[5] = Boolean.valueOf(this.showRequestedItem);
+		values[6] = this.renderDetailsCommand;
+		values[7] = this.resourcePath;
+		values[8] = this.detailsViewerPath;
+		values[9] = Boolean.valueOf(this.autoCreateResource);
 		return values;
 	}
 
@@ -734,15 +734,15 @@ public class ContentItemViewer extends WFContainer {
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[]) state;
 		super.restoreState(ctx, values[0]);
-		fieldPrefixValueMap = (Map) values[1];
-		fieldLocalValueMap = (Map) values[2];
-		fieldSuffixValueMap = (Map) values[3];
-		fieldValueChangedMap = (Map) values[4];
-		showRequestedItem = ((Boolean) values[5]).booleanValue();
-		renderDetailsCommand = (Boolean) values[6];
-		resourcePath = (String) values[7];
-		detailsViewerPath=(String)values[8];
-		autoCreateResource=((Boolean)values[9]).booleanValue();
+		this.fieldPrefixValueMap = (Map) values[1];
+		this.fieldLocalValueMap = (Map) values[2];
+		this.fieldSuffixValueMap = (Map) values[3];
+		this.fieldValueChangedMap = (Map) values[4];
+		this.showRequestedItem = ((Boolean) values[5]).booleanValue();
+		this.renderDetailsCommand = (Boolean) values[6];
+		this.resourcePath = (String) values[7];
+		this.detailsViewerPath=(String)values[8];
+		this.autoCreateResource=((Boolean)values[9]).booleanValue();
 	}
 
 	public String getPrefixStyleClass() {
@@ -757,8 +757,9 @@ public class ContentItemViewer extends WFContainer {
 	 * @return Returns the resourcePath.
 	 */
 	public String getResourcePath() {
-		if (resourcePath != null)
-			return resourcePath;
+		if (this.resourcePath != null) {
+			return this.resourcePath;
+		}
 		ContentItem item = getContentItem();
 		if (item != null) {
 			return item.getResourcePath();
@@ -809,7 +810,7 @@ public class ContentItemViewer extends WFContainer {
 	}
 	
 	public String getDetailsViewerPath(){
-		return detailsViewerPath;
+		return this.detailsViewerPath;
 	}
 
 	
@@ -817,7 +818,7 @@ public class ContentItemViewer extends WFContainer {
 	 * @return Returns the autoCreateResource.
 	 */
 	public boolean isAutoCreateResource() {
-		return autoCreateResource;
+		return this.autoCreateResource;
 	}
 
 	
@@ -841,7 +842,7 @@ public class ContentItemViewer extends WFContainer {
 		else{
 			state="view";
 		}
-		if (showRequestedItem) {
+		if (this.showRequestedItem) {
 			String resourceUrl = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
 			if(resourceUrl!=null){//&&showRequestedItem){
 				state+="_"+resourceUrl;

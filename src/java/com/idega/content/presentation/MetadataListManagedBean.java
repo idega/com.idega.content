@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataListManagedBean.java,v 1.13 2006/03/16 15:39:56 tryggvil Exp $
+ * $Id: MetadataListManagedBean.java,v 1.14 2006/04/09 12:01:55 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -38,12 +38,12 @@ import com.idega.webface.bean.WFListBean;
 
 /**
  * 
- * Last modified: $Date: 2006/03/16 15:39:56 $ by $Author: tryggvil $
+ * Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  * Displays all the metadata types and values for the specified resource
  * Typically followed by WebDavMetadata in presentation to enable addeing metadata
  *
  * @author Joakim Johnson
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class MetadataListManagedBean extends AbstractWFEditableListManagedBean implements WFListBean, ActionListener {
 
@@ -58,7 +58,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	}
 
 	public void setResourcePath(String path){
-		resourcePath = path;
+		this.resourcePath = path;
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 //		System.out.println("MetadataList action");
 		UIComponent comp = actionEvent.getComponent();
 		String var = (String)comp.getAttributes().get("var");
-		resourcePath = (String)comp.getAttributes().get("resourcePath");
+		this.resourcePath = (String)comp.getAttributes().get("resourcePath");
 		String type = WFUtil.getStringValue(var,"type");
 		
 		MetadataValueBean[] ret = new MetadataValueBean[0];
@@ -80,17 +80,17 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 
-			String filePath = resourcePath;
+			String filePath = this.resourcePath;
 			String serverURI = service.getWebdavServerURI();
-			if(!resourcePath.startsWith(serverURI)) {
-				filePath = service.getURI(resourcePath);
+			if(!this.resourcePath.startsWith(serverURI)) {
+				filePath = service.getURI(this.resourcePath);
 			}
 			rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),"",true);
 			
 			WebDAVMetadataResource resource;
 			resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
 					iwc, WebDAVMetadataResource.class);
-			ret = resource.getMetadata(resourcePath);
+			ret = resource.getMetadata(this.resourcePath);
 
 			for(int i=0; i<ret.length;i++) {
 //				System.out.println("type="+ret[i].getType()+"  val="+ret[i].getValues());
@@ -111,13 +111,13 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	 */
 	public WFEditableListDataBean[] getData() {
 		MetadataValueBean[] ret = new MetadataValueBean[0];
-		if(resourcePath!=null) {
+		if(this.resourcePath!=null) {
 			IWContext iwc = IWContext.getInstance();
 			WebDAVMetadataResource resource;
 			try {
 				resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
 						iwc, WebDAVMetadataResource.class);
-				ret = resource.getMetadata(resourcePath);
+				ret = resource.getMetadata(this.resourcePath);
 			}
 			catch (IBOLookupException e) {
 				e.printStackTrace();
@@ -136,7 +136,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getNumberOfColumns()
 	 */
 	public int getNumberOfColumns() {
-		return componentIDToken.length;
+		return this.componentIDToken.length;
 	}
 
 	/* (non-Javadoc)
@@ -157,7 +157,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 			default:
 				component = getButtonUIComponent(var);
 		}
-		String componentId = getUIComponentID(var, componentIDToken[index]);
+		String componentId = getUIComponentID(var, this.componentIDToken[index]);
 		component.setId(componentId);
 		return component;
 	}
@@ -209,7 +209,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 
 		HtmlCommandButton deleteButton = localizer.getButtonVB("delete", "delete", this);
 		deleteButton.getAttributes().put("var",var);
-		deleteButton.getAttributes().put("resourcePath",resourcePath);
+		deleteButton.getAttributes().put("resourcePath",this.resourcePath);
 		
 		buttonCol.getChildren().add(deleteButton);
 		return buttonCol;
@@ -223,7 +223,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 			return WFUtil.getText("");
 		}
 		else{
-			return ContentBlock.getBundle().getLocalizedText(localizationKey[columnIndex]);
+			return ContentBlock.getBundle().getLocalizedText(this.localizationKey[columnIndex]);
 		}
 	}
 }

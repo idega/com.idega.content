@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadata.java,v 1.16 2006/03/16 15:39:56 tryggvil Exp $
+ * $Id: WebDAVMetadata.java,v 1.17 2006/04/09 12:01:54 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -47,12 +47,12 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2006/03/16 15:39:56 $ by $Author: tryggvil $
+ * Last modified: $Date: 2006/04/09 12:01:54 $ by $Author: laddi $
  * 
  * Display the UI for adding metadata type - values to a file.
  *
  * @author Joakim Johnson
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.17 $
  */
 public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	
@@ -72,19 +72,19 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	
 	public WebDAVMetadata(String path){
 		this();
-		resourcePath = path;
+		this.resourcePath = path;
 	}
 	
 	public void setResourcePath(String path){
-		resourcePath = path;
+		this.resourcePath = path;
 	}
 	
 	protected void initializeComponent(FacesContext context) {
 		
-		if(resourcePath!=null){
+		if(this.resourcePath!=null){
 //			System.out.println("Initialize. Setting resourcePath to "+resourcePath);
 			//WFUtil.invoke(METADATA_LIST_BEAN, "setResourcePath", resourcePath);
-			getMetadataListBean().setResourcePath(resourcePath);
+			getMetadataListBean().setResourcePath(this.resourcePath);
 		} else {
 			System.err.println("[WARNING]["+getClass().getName()+"]: resource path can not be restored for managed beans");
 		}
@@ -110,7 +110,7 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	 */
 	private UIComponent getEditContainer() {
 		WFContainer mainContainer = new WFContainer();
-		mainContainer.add(getMetadataTable(resourcePath));
+		mainContainer.add(getMetadataTable(this.resourcePath));
 
 		return mainContainer;
 	}
@@ -232,7 +232,7 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	 */
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
 		UIComponent comp = actionEvent.getComponent();
-		resourcePath = (String)comp.getAttributes().get(RESOURCE_PATH);
+		this.resourcePath = (String)comp.getAttributes().get(RESOURCE_PATH);
 
 		HtmlInputText newValueInput = (HtmlInputText) actionEvent.getComponent().getParent().findComponent(getNewInputId());
 		UIInput dropdown = (UIInput) comp.getParent().findComponent(getDropdownId());
@@ -251,10 +251,10 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 
-			String filePath = resourcePath;
+			String filePath = this.resourcePath;
 			String serverURI = service.getWebdavServerURI();
-			if(!resourcePath.startsWith(serverURI)) {
-				filePath = service.getURI(resourcePath);
+			if(!this.resourcePath.startsWith(serverURI)) {
+				filePath = service.getURI(this.resourcePath);
 			}
 
 			//Store new settings
@@ -268,7 +268,7 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 			//Store changes to previously created metadata
 			WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
 					iwc, WebDAVMetadataResource.class);
-			ret = resource.getMetadata(resourcePath);
+			ret = resource.getMetadata(this.resourcePath);
 
 			for(int i=0; i<ret.length;i++) {
 				type=ret[i].getType();
@@ -310,7 +310,7 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[2];
 		values[0] = super.saveState(ctx);
-		values[1] = resourcePath;
+		values[1] = this.resourcePath;
 
 		return values;
 	}
@@ -322,11 +322,11 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[]) state;
 		super.restoreState(ctx, values[0]);
-		resourcePath = ((String) values[1]);
+		this.resourcePath = ((String) values[1]);
 
-		if(resourcePath!=null){
+		if(this.resourcePath!=null){
 				//WFUtil.invoke(METADATA_LIST_BEAN, "setResourcePath", resourcePath);
-				getMetadataListBean().setResourcePath(resourcePath);
+				getMetadataListBean().setResourcePath(this.resourcePath);
 		} else {
 			System.err.println("[WARNING]["+getClass().getName()+"]: resource path can not be restored for managed beans");
 		}

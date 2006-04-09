@@ -25,7 +25,7 @@ public class WebDAVUploadBean{
 	private String comment = null;
 	
 	public UploadedFile getUploadFile() {
-		return uploadFile;
+		return this.uploadFile;
 	}
 
 	public void setUploadFile(UploadedFile uploadFile){
@@ -33,7 +33,7 @@ public class WebDAVUploadBean{
 	}
 
 	public String getFileName(){
-		return name;
+		return this.name;
 	}
 
 	public void setFileName(String name) {
@@ -41,7 +41,7 @@ public class WebDAVUploadBean{
 	}
 	
 	public String getComment(){
-		return comment;
+		return this.comment;
 	}
 
 	public void setComment(String comment) {
@@ -49,10 +49,10 @@ public class WebDAVUploadBean{
 	}
 	
 	public String getUploadFilePath(){
-		if(!uploadFolderPath.endsWith("/")){
-			uploadFolderPath+="/";
+		if(!this.uploadFolderPath.endsWith("/")){
+			this.uploadFolderPath+="/";
 		}
-		return uploadFolderPath;
+		return this.uploadFolderPath;
 	}
 
 	public void setUploadFilePath(String uploadFolderPath) {
@@ -61,14 +61,14 @@ public class WebDAVUploadBean{
 
 	public String upload(ActionEvent event) throws IOException{
 		
-		if(uploadFile!=null){
+		if(this.uploadFile!=null){
 			IWContext iwc = IWContext.getInstance();
 //			Map parameters = ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest()).getParameterMap();
 //			uploadFolderPath = ((String[])parameters.get("uploadForm:uploadPath"))[0];
 			
 			String tempUploadFolderPath = (String) WFUtil.invoke("WebDAVListBean","getWebDAVPath");
 			if(tempUploadFolderPath!=null){
-				uploadFolderPath = tempUploadFolderPath;
+				this.uploadFolderPath = tempUploadFolderPath;
 			}
 			
 			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
@@ -76,7 +76,7 @@ public class WebDAVUploadBean{
 	
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 			String filePath = service.getWebdavServerURI()+getUploadFilePath();
-			String uploadName = uploadFile.getName();
+			String uploadName = this.uploadFile.getName();
 			
 			//FIXME THIS IS A BUG IN THE MYFACES UPLOADER I THINK
 			//The problem is that in IE 6 the filename actually contains the full file path!
@@ -91,8 +91,8 @@ public class WebDAVUploadBean{
 			
 			String fileName = uploadName;
 			
-			if(!"".equals(name)){
-				fileName = name;
+			if(!"".equals(this.name)){
+				fileName = this.name;
 				int lastDot = uploadName.lastIndexOf(".");
 				if(lastDot>0){
 					//just add the suffix if it is missing
@@ -109,7 +109,7 @@ public class WebDAVUploadBean{
 			
 			boolean uploadFileSuccess = false;
 			try {
-				uploadFileSuccess = rootResource.putMethod(filePath+fileName,uploadFile.getInputStream());
+				uploadFileSuccess = rootResource.putMethod(filePath+fileName,this.uploadFile.getInputStream());
 			}
 			catch (HttpException e) {
 				e.printStackTrace();
@@ -125,15 +125,15 @@ public class WebDAVUploadBean{
 			WFUtil.invoke("WebDAVListBean","refresh", event.getSource(), UIComponent.class);
 
 			if(uploadFileSuccess){
-				String contentType = uploadFile.getContentType();
-				downloadPath = filePath+fileName;
+				String contentType = this.uploadFile.getContentType();
+				this.downloadPath = filePath+fileName;
 				if(contentType!=null && MimeTypeUtil.getInstance().isImage(contentType)){
-					imagePath = iwc.getIWMainApplication().getURIFromURL(downloadPath);	
+					this.imagePath = iwc.getIWMainApplication().getURIFromURL(this.downloadPath);	
 				}
 				
-				if(comment!=null && !"".equals(comment)){
+				if(this.comment!=null && !"".equals(this.comment)){
 					
-					rootResource.proppatchMethod(filePath+fileName,new PropertyName("DAV:","comment"),comment,true);
+					rootResource.proppatchMethod(filePath+fileName,new PropertyName("DAV:","comment"),this.comment,true);
 					
 				}
 			}
@@ -153,12 +153,12 @@ public class WebDAVUploadBean{
 	 */
 	public boolean getIsUploaded(){
 		
-		if(downloadPath!=null){
+		if(this.downloadPath!=null){
 			IWSlideSession session;
 			try {
 				session = (IWSlideSession)IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
 
-				return session.getExistence(downloadPath);
+				return session.getExistence(this.downloadPath);
 			}
 			catch (Exception e){
 				e.printStackTrace();
@@ -173,7 +173,7 @@ public class WebDAVUploadBean{
 	 * @return Returns the downloadPath.
 	 */
 	public String getDownloadPath() {
-		return downloadPath;
+		return this.downloadPath;
 	}
 	/**
 	 * @param downloadPath The downloadPath to set.
@@ -185,7 +185,7 @@ public class WebDAVUploadBean{
 	 * @return Returns the imagePath.
 	 */
 	public String getImagePath() {
-		return imagePath;
+		return this.imagePath;
 	}
 	/**
 	 * @param imagePath The imagePath to set.

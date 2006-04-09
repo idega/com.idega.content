@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemFieldBean.java,v 1.1 2005/02/07 10:59:41 gummi Exp $
+ * $Id: ContentItemFieldBean.java,v 1.2 2006/04/09 12:01:55 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -14,10 +14,10 @@ import java.io.Serializable;
 /**
  * Bean for idegaWeb content item fields.   
  * <p>
- * Last modified: $Date: 2005/02/07 10:59:41 $ by $Author: gummi $
+ * Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  *
  * @author Anders Lindman
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 
 public class ContentItemFieldBean implements Serializable, ContentItemField {
@@ -47,40 +47,40 @@ public class ContentItemFieldBean implements Serializable, ContentItemField {
 			Object value,
 			int orderNo,
 			String fieldType) {
-		_contentItemFieldId = contentItemFieldId;
-		_versionId = versionId;
-		_key = key;
+		this._contentItemFieldId = contentItemFieldId;
+		this._versionId = versionId;
+		this._key = key;
 		if("create_date".equals(key)){
 			System.out.println(this.toString());
 			System.out.println(key+": "+value);
 		}
-		_value = value;
-		_orderNo = orderNo;
-		_fieldType = fieldType;
+		this._value = value;
+		this._orderNo = orderNo;
+		this._fieldType = fieldType;
 	}
 		
-	public int getContentItemFieldId() { return _contentItemFieldId; }
-	public int getVersionId() { return _versionId; }
-	public String getKey() { return _key; }
+	public int getContentItemFieldId() { return this._contentItemFieldId; }
+	public int getVersionId() { return this._versionId; }
+	public String getKey() { return this._key; }
 	public Object getValue() {
-		return _value; 
+		return this._value; 
 	}
-	public byte[] getBinaryValue() { return _binaryValue; }
-	public int getOrderNo() { return _orderNo; }
-	public String getOrderNoString() { return String.valueOf(_orderNo); }
-	public String getFieldType() { return _fieldType; }
+	public byte[] getBinaryValue() { return this._binaryValue; }
+	public int getOrderNo() { return this._orderNo; }
+	public String getOrderNoString() { return String.valueOf(this._orderNo); }
+	public String getFieldType() { return this._fieldType; }
 
-	public void setContentItemFieldId(int id) { _contentItemFieldId = id; } 
-	public void setVersionId(int id) { _versionId = id; }
-	public void setKey(String s) { _key = s; }
+	public void setContentItemFieldId(int id) { this._contentItemFieldId = id; } 
+	public void setVersionId(int id) { this._versionId = id; }
+	public void setKey(String s) { this._key = s; }
 	public void setValue(Object obj) {
-		_value = obj; 
+		this._value = obj; 
 	}
-	public void setBinaryValue(byte[] binaryValue) { _binaryValue = binaryValue; _fieldType = FIELD_TYPE_BINARY; } 
-	public void setOrderNo(int n) { _orderNo = n; }
-	public void setFieldType(String s) { _fieldType = s; }
+	public void setBinaryValue(byte[] binaryValue) { this._binaryValue = binaryValue; this._fieldType = FIELD_TYPE_BINARY; } 
+	public void setOrderNo(int n) { this._orderNo = n; }
+	public void setFieldType(String s) { this._fieldType = s; }
 	
-	public String getImageURI() { return "showimg.jsp?image_number=" + _orderNo; }
-	public String getName() { return _name; }
-	public void setName(String s) { _name = s; } 
+	public String getImageURI() { return "showimg.jsp?image_number=" + this._orderNo; }
+	public String getName() { return this._name; }
+	public void setName(String s) { this._name = s; } 
 }

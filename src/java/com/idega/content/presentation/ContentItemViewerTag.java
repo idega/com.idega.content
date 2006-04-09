@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewerTag.java,v 1.1 2005/02/21 16:12:45 gummi Exp $
+ * $Id: ContentItemViewerTag.java,v 1.2 2006/04/09 12:01:55 laddi Exp $
  * Created on 21.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -15,10 +15,10 @@ import javax.faces.webapp.UIComponentTag;
 
 /**
  * 
- *  Last modified: $Date: 2005/02/21 16:12:45 $ by $Author: gummi $
+ *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public abstract class ContentItemViewerTag extends UIComponentTag {
 
@@ -47,8 +47,8 @@ public abstract class ContentItemViewerTag extends UIComponentTag {
 	
 	public void release() {      
 		super.release(); 
-		renderDetailsCommand = null;
-		showRequestedItem = null;
+		this.renderDetailsCommand = null;
+		this.showRequestedItem = null;
 	}
 
 	protected void setProperties(UIComponent component) {      
@@ -56,12 +56,12 @@ public abstract class ContentItemViewerTag extends UIComponentTag {
 		if (component instanceof ContentViewer) {
 			ContentItemViewer viewer = (ContentItemViewer)component;
 			
-			if(renderDetailsCommand != null){
-				viewer.setRenderDetailsCommand(renderDetailsCommand.booleanValue());
+			if(this.renderDetailsCommand != null){
+				viewer.setRenderDetailsCommand(this.renderDetailsCommand.booleanValue());
 			}
 			
-			if(showRequestedItem != null){
-				viewer.setShowRequestedItem(showRequestedItem.booleanValue());
+			if(this.showRequestedItem != null){
+				viewer.setShowRequestedItem(this.showRequestedItem.booleanValue());
 			}
 			
 		}
@@ -70,7 +70,7 @@ public abstract class ContentItemViewerTag extends UIComponentTag {
 	 * @return Returns the renderDetailsCommand.
 	 */
 	public Boolean getRenderDetailsCommand() {
-		return renderDetailsCommand;
+		return this.renderDetailsCommand;
 	}
 	/**
 	 * @param renderDetailsCommand The renderDetailsCommand to set.
@@ -82,7 +82,7 @@ public abstract class ContentItemViewerTag extends UIComponentTag {
 	 * @return Returns the showRequestedItem.
 	 */
 	public Boolean getShowRequestedItem() {
-		return showRequestedItem;
+		return this.showRequestedItem;
 	}
 	/**
 	 * @param showRequestedItem The showRequestedItem to set.

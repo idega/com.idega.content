@@ -22,11 +22,11 @@ public class ContentViewerTag extends UIComponentTag {
 	private String onFileClickEvent;
 	
 	public void setRootPath(String root) {
-		rootFolder = root;
+		this.rootFolder = root;
 	}
 	
 	public String getRootPath() {
-		return rootFolder;
+		return this.rootFolder;
 	}
 	
 	public void setStartPath(String start) {
@@ -34,19 +34,19 @@ public class ContentViewerTag extends UIComponentTag {
 	}
 	
 	public String getStartPath() {
-		return startFolder;
+		return this.startFolder;
 	}
 	
 	public void setUseUserHomeFolder(boolean useUserFolder) {
-		useUserHomeFolder = useUserFolder;
+		this.useUserHomeFolder = useUserFolder;
 	}
 	
 	public void setIconTheme(String themeName) {
-		iconTheme = themeName;
+		this.iconTheme = themeName;
 	}
 	
 	public String getIconTheme() {
-		return iconTheme;
+		return this.iconTheme;
 	}
 	
 	public void setShowFolders(boolean showFolders) {
@@ -77,7 +77,7 @@ public class ContentViewerTag extends UIComponentTag {
 	 * @return Returns the showPermissionTab.
 	 */
 	public boolean getShowPermissionTab() {
-		return showPermissionTab;
+		return this.showPermissionTab;
 	}
 	/**
 	 * @param showPermissionTab The showPermissionTab to set.
@@ -90,7 +90,7 @@ public class ContentViewerTag extends UIComponentTag {
 	 * @return Returns the showUploadComponent.
 	 */
 	public boolean getShowUploadComponent() {
-		return showUploadComponent;
+		return this.showUploadComponent;
 	}
 	/**
 	 * @param showUploadComponent The showUploadComponent to set.
@@ -101,18 +101,18 @@ public class ContentViewerTag extends UIComponentTag {
 	
 	public void release() {      
 		super.release();      
-		rootFolder = null ;
-		startFolder = null;
-		useUserHomeFolder = false;
-		showFolders = true;
-		showPublicFolder = true;
-		showDropboxFolder = true;
-		iconTheme = null;
-		columnsToHide = null;
-		useVersionControl = true;
-		showPermissionTab = true;
-		showUploadComponent = true;
-		onFileClickEvent = null;
+		this.rootFolder = null ;
+		this.startFolder = null;
+		this.useUserHomeFolder = false;
+		this.showFolders = true;
+		this.showPublicFolder = true;
+		this.showDropboxFolder = true;
+		this.iconTheme = null;
+		this.columnsToHide = null;
+		this.useVersionControl = true;
+		this.showPermissionTab = true;
+		this.showUploadComponent = true;
+		this.onFileClickEvent = null;
 	}
 
 	protected void setProperties(UIComponent component) {
@@ -120,18 +120,18 @@ public class ContentViewerTag extends UIComponentTag {
 			ContentViewer viewer = (ContentViewer) component;
 			super.setProperties(component);
 
-			viewer.setRootFolder(rootFolder);
-			viewer.setStartFolder(startFolder);
-			viewer.setUseUserHomeFolder(useUserHomeFolder);
-			viewer.setIconTheme(iconTheme);
-			viewer.setShowFolders(showFolders);
-			viewer.setShowDropboxFolder(showDropboxFolder);
-			viewer.setShowPublicFolder(showPublicFolder);
-			viewer.setColumnsToHide(columnsToHide);
-			viewer.setUseVersionControl(useVersionControl);
-			viewer.setShowPermissionTab(showPermissionTab);
-			viewer.setShowUploadComponent(showUploadComponent);
-			viewer.setOnFileClickEvent(onFileClickEvent);
+			viewer.setRootFolder(this.rootFolder);
+			viewer.setStartFolder(this.startFolder);
+			viewer.setUseUserHomeFolder(this.useUserHomeFolder);
+			viewer.setIconTheme(this.iconTheme);
+			viewer.setShowFolders(this.showFolders);
+			viewer.setShowDropboxFolder(this.showDropboxFolder);
+			viewer.setShowPublicFolder(this.showPublicFolder);
+			viewer.setColumnsToHide(this.columnsToHide);
+			viewer.setUseVersionControl(this.useVersionControl);
+			viewer.setShowPermissionTab(this.showPermissionTab);
+			viewer.setShowUploadComponent(this.showUploadComponent);
+			viewer.setOnFileClickEvent(this.onFileClickEvent);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemFieldViewer.java,v 1.3 2005/11/29 15:30:27 laddi Exp $
+ * $Id: ContentItemFieldViewer.java,v 1.4 2006/04/09 12:01:55 laddi Exp $
  * Created on 3.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -18,10 +18,10 @@ import com.idega.webface.WFContainer;
 
 /**
  * 
- *  Last modified: $Date: 2005/11/29 15:30:27 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 
 public class ContentItemFieldViewer extends WFContainer {
@@ -41,7 +41,7 @@ public class ContentItemFieldViewer extends WFContainer {
 		
 		
 		public void setSuffixClass(String suffixClasses) {
-	        _suffixClass = suffixClasses;
+	        this._suffixClass = suffixClasses;
 	        WFContainer container = (WFContainer)getFacet(FACET_SUFFIX);
 	        if(container != null){
 	        		container.setStyleClass(suffixClasses);
@@ -50,13 +50,15 @@ public class ContentItemFieldViewer extends WFContainer {
 
 	    public String getSuffixClass()
 	    {
-	        if (_suffixClass != null) return _suffixClass;
+	        if (this._suffixClass != null) {
+						return this._suffixClass;
+					}
 	        ValueBinding vb = getValueBinding("suffixClasses");
 	        return vb != null ? (String)vb.getValue(getFacesContext()) : null;
 	    }
 	    
 	    public void setPrefixClass(String prefixClasses) {
-	        _prefixClass = prefixClasses;
+	        this._prefixClass = prefixClasses;
 	        WFContainer container = (WFContainer)getFacet(FACET_PREFIX);
 	        if(container != null){
 	        		container.setStyleClass(prefixClasses);
@@ -64,7 +66,9 @@ public class ContentItemFieldViewer extends WFContainer {
 	    }
 
 	    public String getPrefixClass() {
-	        if (_prefixClass != null) return _prefixClass;
+	        if (this._prefixClass != null) {
+						return this._prefixClass;
+					}
 	        ValueBinding vb = getValueBinding("prefixClasses");
 	        return vb != null ? (String)vb.getValue(getFacesContext()) : null;
 	    }
@@ -137,8 +141,8 @@ public class ContentItemFieldViewer extends WFContainer {
 		public Object saveState(FacesContext ctx) {
 			Object values[] = new Object[3];
 			values[0] = super.saveState(ctx);
-			values[1] = _suffixClass;
-			values[2] = _prefixClass;
+			values[1] = this._suffixClass;
+			values[2] = this._prefixClass;
 			return values;
 		}
 		

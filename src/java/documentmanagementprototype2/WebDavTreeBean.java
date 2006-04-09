@@ -57,7 +57,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
     private String davHost = "localhost";
     private String davPort = "8080";
     WebdavResource cloneResource(WebdavResource resource) throws WebdavException, HttpException, IOException {
-        HttpURL url = new HttpURL("http://"+davHost+":"+davPort+resource.getPath());
+        HttpURL url = new HttpURL("http://"+this.davHost+":"+this.davPort+resource.getPath());
         url.setUserinfo("root","root");
         WebdavResource newResource = new WebdavResource(url);
         if (! newResource.exists()){
@@ -132,7 +132,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
     }
     
     public String getUri(){
-        return _selectedCollectionUri;
+        return this._selectedCollectionUri;
     }
     /*
     private TreeNode getNode(TreeNode tree, String id){
@@ -157,44 +157,44 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
             private SlideTreeNode(){}
             public SlideTreeNode(WebdavResource resource){
                 //super(resource.getDisplayName());
-                _resource = resource;
+                this._resource = resource;
             }
             public WebdavResource getWebdavResource(){
-                return _resource;
+                return this._resource;
             }
             public boolean exists(){
-                return _resource.exists();
+                return this._resource.exists();
             }
             public void addTreeNode(SlideTreeNode child){
                 //super.getChildren().add(child);
-                _children.put(child.getDisplayName(), child);
+                this._children.put(child.getDisplayName(), child);
             }
             public String getDisplayName(){
-                return _resource.getDisplayName();
+                return this._resource.getDisplayName();
             }
             public SlideTreeNode findChild(String displayName){
-                return (SlideTreeNode) _children.get(displayName);
+                return (SlideTreeNode) this._children.get(displayName);
             }
             public boolean hasChild(String displayname){
                 return findChild(displayname) != null;
             }
             public boolean isRefreshed(){
-                return _refreshed ;
+                return this._refreshed ;
             }
             public void setDirty(){
-                _refreshed = false;
+                this._refreshed = false;
             }        
             
             public void refresh() {
                 //mark all children as dirty (not refreshed)
-                java.util.Iterator childNodes = _children.values().iterator();
+                java.util.Iterator childNodes = this._children.values().iterator();
                 while(childNodes.hasNext()){
                     ((SlideTreeNode) childNodes.next()).setDirty();
                 }
                 
                 //adding new nodes and mark existing as refreshed
                 try{ 
-                    WebdavResource[] childResources = _resource.getChildResources().listResources();
+                    WebdavResource[] childResources = this._resource.getChildResources().listResources();
 
                     for (int i =0; i<childResources.length; i++){
                         if (childResources[i].isCollection()){            
@@ -212,7 +212,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
                 }                
                 
                 //remove still dirty (not refreshed) nodes
-                childNodes = _children.values().iterator();
+                childNodes = this._children.values().iterator();
                 while(childNodes.hasNext()){
                     SlideTreeNode childNode = (SlideTreeNode) childNodes.next();
                     if (! childNode.isRefreshed()){
@@ -222,7 +222,7 @@ public class WebDavTreeBean extends AbstractSessionBean implements Serializable,
                     }
                 }
                 
-                _refreshed = true;
+                this._refreshed = true;
             }
 
 

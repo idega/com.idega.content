@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBeanComparator.java,v 1.2 2005/03/10 18:31:29 eiki Exp $
+ * $Id: ContentItemBeanComparator.java,v 1.3 2006/04/09 12:01:55 laddi Exp $
  * Created on 15.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -15,10 +15,10 @@ import java.util.Date;
 
 /**
  * 
- *  Last modified: $Date: 2005/03/10 18:31:29 $ by $Author: eiki $
+ *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ContentItemBeanComparator implements Comparator {
 
@@ -32,7 +32,7 @@ public class ContentItemBeanComparator implements Comparator {
 	}
 	
 	public void setReverseOrder(boolean value){
-		reverse = value;
+		this.reverse = value;
 	}
 
 	/* (non-Javadoc)
@@ -58,6 +58,6 @@ public class ContentItemBeanComparator implements Comparator {
 		else{
 			returner = item1Date.compareTo(item2Date);
 		}
-		return returner*((reverse)?-1:1);
+		return returner*((this.reverse)?-1:1);
 	}
 }

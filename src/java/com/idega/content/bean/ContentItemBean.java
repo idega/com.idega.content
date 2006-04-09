@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.19 2006/03/20 09:10:18 laddi Exp $
+ * $Id: ContentItemBean.java,v 1.20 2006/04/09 12:01:55 laddi Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -36,10 +36,10 @@ import com.idega.util.IWTimestamp;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2006/03/20 09:10:18 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.20 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -81,56 +81,56 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	
 		
 	public Locale getLocale() { 
-		if(_locale==null){
+		if(this._locale==null){
 			FacesContext context = FacesContext.getCurrentInstance();
 			return context.getViewRoot().getLocale();
 		}
-		return _locale;
+		return this._locale;
 	}
-	public String getName() { return _name; }
-	public String getDescription() { return _description; }
-	public String getItemType() { return _itemType; }
+	public String getName() { return this._name; }
+	public String getDescription() { return this._description; }
+	public String getItemType() { return this._itemType; }
 //	public Date getCreatedTimestamp() { return _createdTimestamp; }
-	public int getCreatedByUserId() { return _createdByUserId; }
+	public int getCreatedByUserId() { return this._createdByUserId; }
 
-	public void setName(String s) { _name = s; }
-	public void setDescription(String s) { _description = s; }
-	public void setItemType(String s) { _itemType = s; }
+	public void setName(String s) { this._name = s; }
+	public void setDescription(String s) { this._description = s; }
+	public void setItemType(String s) { this._itemType = s; }
 //	public void setCreatedTimestamp(Date d) { _createdTimestamp = d; }
-	public void setCreatedByUserId(int id) { _createdByUserId = id; }
+	public void setCreatedByUserId(int id) { this._createdByUserId = id; }
 	
 	public void setLocale(Locale locale) {
-		_locale = locale;
-		if (_locales == null) {
-			_locales = new HashMap();
+		this._locale = locale;
+		if (this._locales == null) {
+			this._locales = new HashMap();
 		}
-		_locales.put(locale.getLanguage(), locale);
+		this._locales.put(locale.getLanguage(), locale);
 	}
 	
-	public Map getLocales() { return _locales; }
+	public Map getLocales() { return this._locales; }
 	
-	public String getPendingLocaleId() { return _pendingLocaleId != null ? _pendingLocaleId : _locale.getLanguage(); }
-	public void setPendingLocaleId(String localeId) { _pendingLocaleId = localeId; }
+	public String getPendingLocaleId() { return this._pendingLocaleId != null ? this._pendingLocaleId : this._locale.getLanguage(); }
+	public void setPendingLocaleId(String localeId) { this._pendingLocaleId = localeId; }
 
-	public String getRequestedStatus() { return _requestedStatus; }
-	public void setRequestedStatus(String requestedStatus) { _requestedStatus = requestedStatus; }
+	public String getRequestedStatus() { return this._requestedStatus; }
+	public void setRequestedStatus(String requestedStatus) { this._requestedStatus = requestedStatus; }
 
 	/**
 	 * Clears all attributes for this bean.
 	 */
 	public void clear() {
 		//setLocale(Locale.getDefault());
-		_name = null;
-		_description = null;
-		_itemType = null;
-		_createdByUserId = 0;
+		this._name = null;
+		this._description = null;
+		this._itemType = null;
+		this._createdByUserId = 0;
 
-		_pendingLocaleId = null;
+		this._pendingLocaleId = null;
 	
-		_caseBean = null;
+		this._caseBean = null;
 	
-		_itemFields = null;
-		versions=null;
+		this._itemFields = null;
+		this.versions=null;
 		
 		setStatus(ContentItemCase.STATUS_NEW);
 	}
@@ -139,10 +139,10 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 * Returns the item field with the specified key. 
 	 */
 	public ContentItemField getItemField(String key) {
-		if (_itemFields == null) {
-			_itemFields = new HashMap();
+		if (this._itemFields == null) {
+			this._itemFields = new HashMap();
 		}
-		ContentItemField field = (ContentItemField) _itemFields.get(key + getLanguage());
+		ContentItemField field = (ContentItemField) this._itemFields.get(key + getLanguage());
 		return field;
 	}
 	
@@ -183,38 +183,38 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 *Sets the item field with the specified key. 
 	 */
 	public void setItemField(String key, ContentItemField field) {
-		if (_itemFields == null) {
-			_itemFields = new HashMap();
+		if (this._itemFields == null) {
+			this._itemFields = new HashMap();
 		}
-		_itemFields.put(key + getLanguage(), field);
+		this._itemFields.put(key + getLanguage(), field);
 	}
 	
 	/**
 	 * Returns the list of item fields with the specified key. 
 	 */
 	public List getItemFields(String key) {
-		if (_itemFields == null) {
+		if (this._itemFields == null) {
 			return null;
 		}
-		return (List) _itemFields.get(key + getLanguage());
+		return (List) this._itemFields.get(key + getLanguage());
 	}
 	
 	/**
 	 *Sets the list of item fields with the specified key. 
 	 */
 	public void setItemFields(String key, List fields) {
-		if (_itemFields == null) {
-			_itemFields = new HashMap();
+		if (this._itemFields == null) {
+			this._itemFields = new HashMap();
 		}
-		_itemFields.put(key + getLanguage(), fields);
+		this._itemFields.put(key + getLanguage(), fields);
 	}
 	
 	/**
 	 *Sets the item field value with the specified key. 
 	 */
 	public void setItemFieldValue(String key, Object value) {
-		if (_itemFields == null) {
-			_itemFields = new HashMap();
+		if (this._itemFields == null) {
+			this._itemFields = new HashMap();
 		}
 		ContentItemField field = getItemField(key);
 		if (field == null) {
@@ -236,14 +236,14 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 * Returns the case for this content item.
 	 */
 	public ContentItemCase getCase() {
-		return _caseBean;
+		return this._caseBean;
 	}
 	
 	/**
 	 * Sets the case for this content item. 
 	 */
 	public void setCase(ContentItemCase caseBean) {
-		_caseBean = caseBean;
+		this._caseBean = caseBean;
 	}
 	
 	/**
@@ -265,9 +265,9 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 * Update pending locale change.
 	 */
 	public void updateLocale() {
-		if (_pendingLocaleId != null) {
-			setLocale(new Locale(_pendingLocaleId));
-			_pendingLocaleId = null;
+		if (this._pendingLocaleId != null) {
+			setLocale(new Locale(this._pendingLocaleId));
+			this._pendingLocaleId = null;
 		}
 	}
 	
@@ -400,7 +400,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	}
 	
 	public Boolean getRendered() {
-		return doRender;
+		return this.doRender;
 	}
 	
 	public void setRendered(boolean render){
@@ -408,7 +408,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	}
 	
 	public void setRendered(Boolean render){
-		doRender = render;
+		this.doRender = render;
 	}
 	
 	public void setCreationDate(Timestamp date) {
@@ -429,7 +429,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 * @return Returns the autoCreateResource.
 	 */
 	public boolean isAutoCreateResource() {
-		return autoCreateResource;
+		return this.autoCreateResource;
 	}
 
 	
@@ -448,7 +448,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 * @return Returns the exists.
 	 */
 	public boolean getExists() {
-		return exists;
+		return this.exists;
 	}
 
 	
@@ -482,7 +482,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 * @return Returns the versions.
 	 */
 	public List getVersions() {
-		return versions;
+		return this.versions;
 	}
 
 	/**
@@ -544,7 +544,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 * @return Returns the loaded.
 	 */
 	public boolean isLoaded() {
-		return loaded;
+		return this.loaded;
 	}
 
 

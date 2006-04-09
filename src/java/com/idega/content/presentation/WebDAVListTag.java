@@ -21,11 +21,11 @@ public class WebDAVListTag extends UIComponentTag {
 	private String startFolder;
 	
 	public void setRootPath(String root) {
-		rootFolder = root;
+		this.rootFolder = root;
 	}
 	
 	public String getRootPath() {
-		return rootFolder;
+		return this.rootFolder;
 	}
 	
 	public void setStartPath(String start) {
@@ -33,20 +33,20 @@ public class WebDAVListTag extends UIComponentTag {
 	}
 	
 	public String getStartPath() {
-		return startFolder;
+		return this.startFolder;
 	}
 	
 	public void release() {      
 		super.release();      
-		rootFolder = null ;
-		startFolder = null;
+		this.rootFolder = null ;
+		this.startFolder = null;
 	}
 
 	protected void setProperties(UIComponent component) {      
 		super.setProperties(component);
 		if (component != null) {
-			component.getAttributes().put("rootFolder", rootFolder);
-			component.getAttributes().put("startFolder", startFolder);
+			component.getAttributes().put("rootFolder", this.rootFolder);
+			component.getAttributes().put("startFolder", this.startFolder);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissionsManagedBean.java,v 1.7 2005/05/11 18:32:58 gummi Exp $ Created
+ * $Id: WebDAVFilePermissionsManagedBean.java,v 1.8 2006/04/09 12:01:54 laddi Exp $ Created
  * on 29.12.2004
  * 
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -32,10 +32,10 @@ import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
  * 
- * Last modified: $Date: 2005/05/11 18:32:58 $ by $Author: gummi $
+ * Last modified: $Date: 2006/04/09 12:01:54 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListManagedBean {
 
@@ -61,19 +61,19 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 	}
 
 	public void setResourceType(Integer type){
-		_resourceType = type.intValue();
+		this._resourceType = type.intValue();
 	}
 	
 	public void setResourceType(int type){
-		_resourceType = type;
+		this._resourceType = type;
 	}
 	
 	public void setResourcePath(String path){
 		IWContext iwc = IWContext.getInstance();
-		_resourcePath = path;
+		this._resourcePath = path;
 		try {
 			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
-			_resourcePath = service.getPath(path);
+			this._resourcePath = service.getPath(path);
 		}
 		catch (IBOLookupException e) {
 			e.printStackTrace();
@@ -95,30 +95,30 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 					iwc, WebDAVFilePermissionResource.class);
 			Collection aces = null;
 			
-			switch (_resourceType) {
+			switch (this._resourceType) {
 				case RESOURCE_TYPE_STANDARD:
-					aces = resource.getStandardAces(_resourcePath);
+					aces = resource.getStandardAces(this._resourcePath);
 					break;
 				case RESOURCE_TYPE_ROLE:
-					aces = resource.getRoleAces(_resourcePath);
+					aces = resource.getRoleAces(this._resourcePath);
 					break;
 				case RESOURCE_TYPE_GROUP:
-					aces = resource.getGroupAces(_resourcePath);
+					aces = resource.getGroupAces(this._resourcePath);
 					break;
 				case RESOURCE_TYPE_USER:
-					aces = resource.getUserAces(_resourcePath);
+					aces = resource.getUserAces(this._resourcePath);
 					break;
 				default:
-					aces = resource.getAllAces(_resourcePath);
+					aces = resource.getAllAces(this._resourcePath);
 					break;
 			}
 			
-			if(aces.size() < minRows){
+			if(aces.size() < this.minRows){
 				Collection tmp = aces;
 				aces = new ArrayList();  //!!!!!! Swaping collection behind the aces variable;
 				aces.addAll(tmp);
 				EmptyRow emptyRow = new EmptyRow();
-				for(int i = aces.size(); i <= minRows; i++){
+				for(int i = aces.size(); i <= this.minRows; i++){
 					aces.add(emptyRow);
 				}
 			}
@@ -149,7 +149,7 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 		try {
 			WebDAVFilePermissionResource resource = (WebDAVFilePermissionResource) IBOLookup.getSessionInstance(
 					iwc, WebDAVFilePermissionResource.class);
-			resource.store(_resourcePath);
+			resource.store(this._resourcePath);
 		}
 		catch (IBOLookupException e) {
 			e.printStackTrace();
@@ -181,7 +181,7 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 	}
 
 	protected String getUIComponentID(String var, int columnIndex) {
-		return String.valueOf(var + "_" + localizationKey[columnIndex] + "-id");
+		return String.valueOf(var + "_" + this.localizationKey[columnIndex] + "-id");
 	}
 
 
@@ -228,14 +228,14 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getHeader(int)
 	 */
 	public UIComponent getHeader(int columnIndex) {
-		return ContentBlock.getBundle().getLocalizedText(localizationKey[columnIndex]);
+		return ContentBlock.getBundle().getLocalizedText(this.localizationKey[columnIndex]);
 	}
 	
 	public boolean isAllowedToWriteACL(){
 		try {
 			IWContext iwc = IWContext.getInstance();
 			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-			return session.hasPermission(_resourcePath,IWSlideConstants.PRIVILEGE_WRITE_ACL);
+			return session.hasPermission(this._resourcePath,IWSlideConstants.PRIVILEGE_WRITE_ACL);
 		}
 		catch (IBOLookupException e) {
 			e.printStackTrace();

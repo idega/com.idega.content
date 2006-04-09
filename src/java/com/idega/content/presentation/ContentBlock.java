@@ -40,7 +40,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 	}
 
 	protected WebdavExtendedResource getWebdavExtendedResource() {
-		return resource;
+		return this.resource;
 	}
 		
 	protected boolean useFolders() {
@@ -70,9 +70,9 @@ public abstract class ContentBlock extends IWBaseComponent {
 	}
 
 	protected IWSlideSession getIWSlideSession() {
-		if (slideSession == null) {
+		if (this.slideSession == null) {
 			try {
-				slideSession = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
+				this.slideSession = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
 			}
 			catch (IBOLookupException e) {
 				e.printStackTrace();
@@ -81,7 +81,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 				e.printStackTrace();
 			}
 		}
-		return slideSession;
+		return this.slideSession;
 	}
 	
 	protected boolean removeClickedFile(WebdavExtendedResource resource) {
@@ -104,8 +104,8 @@ public abstract class ContentBlock extends IWBaseComponent {
 	 */
 	public String getCurrentResourcePath() {
 		
-		if (currentResourcePath != null) {
-			return currentResourcePath;
+		if (this.currentResourcePath != null) {
+			return this.currentResourcePath;
 		}
 		ValueBinding vb = getValueBinding("currentResourcePath");
 		String returner = vb != null ? (String)vb.getValue(getFacesContext()) : null;
@@ -122,7 +122,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 	}
 	
 	public ContentViewer getContentViewer(){
-		if(parentContentViewer == null){
+		if(this.parentContentViewer == null){
 			UIComponent tmp = this;
 			ContentViewer v = null;
 			while ( tmp != null && v == null) {
@@ -133,9 +133,9 @@ public abstract class ContentBlock extends IWBaseComponent {
 					tmp = tmp.getParent();
 				}
 			}
-			parentContentViewer = v;
+			this.parentContentViewer = v;
 		}
-		return parentContentViewer;
+		return this.parentContentViewer;
 	}
 	
 	public void encodeBegin(FacesContext context) throws IOException {
@@ -152,15 +152,15 @@ public abstract class ContentBlock extends IWBaseComponent {
 			path = (String) WFUtil.invoke(webDavPath);
 		}
 		try {
-			WebdavExtendedResource oldRes = resource;
+			WebdavExtendedResource oldRes = this.resource;
 			WebdavExtendedResource newRes = getIWSlideSession().getWebdavResource(path);
 			if (oldRes == null || oldRes.getName().equals(newRes.getName())) {
 				if ((!useFolders() && !newRes.isCollection() ) || (useFolders() && newRes.isCollection())) {
-					resource = newRes;
+					this.resource = newRes;
 					this.setInitialized(false);
 					getChildren().clear();
 				} else if ( !useFolders() && newRes.isCollection()) {
-					resource = newRes;
+					this.resource = newRes;
 					this.setInitialized(false);
 					getChildren().clear();
 				}
@@ -217,13 +217,13 @@ public abstract class ContentBlock extends IWBaseComponent {
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[2];
 		values[0] = super.saveState(ctx);
-		values[1] = currentResourcePath;
+		values[1] = this.currentResourcePath;
 		return values;
 	}
 
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[]) state;
 		super.restoreState(ctx, values[0]);
-		currentResourcePath = (String) values[1];
+		this.currentResourcePath = (String) values[1];
 	}
 }

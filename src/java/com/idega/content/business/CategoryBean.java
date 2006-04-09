@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.2 2005/12/20 16:42:00 tryggvil Exp $
+ * $Id: CategoryBean.java,v 1.3 2006/04/09 12:01:55 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -32,10 +32,10 @@ import com.idega.slide.util.WebdavRootResource;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class CategoryBean {
 	
@@ -69,7 +69,7 @@ public class CategoryBean {
 	
 	public IWSlideService getSlideService(){
 		try {
-			return (IWSlideService)IBOLookup.getServiceInstance(iwma.getIWApplicationContext(),IWSlideService.class);
+			return (IWSlideService)IBOLookup.getServiceInstance(this.iwma.getIWApplicationContext(),IWSlideService.class);
 		}
 		catch (IBOLookupException e) {
 			throw new RuntimeException("Error getting IWSlideService");

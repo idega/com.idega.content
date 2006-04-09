@@ -1,5 +1,5 @@
 /*
- * $Id: ACEBean.java,v 1.8 2006/02/22 21:02:21 laddi Exp $
+ * $Id: ACEBean.java,v 1.9 2006/04/09 12:01:55 laddi Exp $
  * Created on 3.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -36,10 +36,10 @@ import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
  * 
- *  Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class ACEBean implements WFEditableListDataBean {
 
@@ -74,12 +74,12 @@ public class ACEBean implements WFEditableListDataBean {
 	private ACEBean() {
 		super();
 		int arraySize = PROPERTY_NAMES.length;
-		privligeInitialValue = new String[arraySize];
+		this.privligeInitialValue = new String[arraySize];
 		for (int i = 0; i < PROPERTY_NAMES.length; i++) {
-			privligeInitialValue[i]=PRIVLIDGE_VALUE_NOT_SET;
+			this.privligeInitialValue[i]=PRIVLIDGE_VALUE_NOT_SET;
 		}
-		inheritedFrom = new String[arraySize];
-		isInherited = new boolean[arraySize];
+		this.inheritedFrom = new String[arraySize];
+		this.isInherited = new boolean[arraySize];
 	}
 	
 	public ACEBean(Locale locale){
@@ -102,8 +102,8 @@ public class ACEBean implements WFEditableListDataBean {
 		this(locale);
 		if(granted!=null && denied!=null){
 			initialize(granted);
-			deniedACE = denied;
-			if(principal.equals(denied.getPrincipal()) && principalType==denied.getPrincipalType() && granted.isNegative()!=denied.isNegative()){
+			this.deniedACE = denied;
+			if(this.principal.equals(denied.getPrincipal()) && this.principalType==denied.getPrincipalType() && granted.isNegative()!=denied.isNegative()){
 				initializePrivlidges(granted);
 				initializePrivlidges(denied);
 			} else {
@@ -146,12 +146,12 @@ public class ACEBean implements WFEditableListDataBean {
 			}
 			if(arrayIndex>-1){
 				boolean granted = !ace.isNegative();
-				privligeInitialValue[arrayIndex]=((granted)?PRIVLIDGE_VALUE_GRANTED:PRIVLIDGE_VALUE_DENIED);
+				this.privligeInitialValue[arrayIndex]=((granted)?PRIVLIDGE_VALUE_GRANTED:PRIVLIDGE_VALUE_DENIED);
 				if(ace.isInherited()){
-					isInherited[arrayIndex]=true;
-					inheritedFrom[arrayIndex]=ace.getInheritedFrom();
+					this.isInherited[arrayIndex]=true;
+					this.inheritedFrom[arrayIndex]=ace.getInheritedFrom();
 				} else {
-					isInherited[arrayIndex]=false;
+					this.isInherited[arrayIndex]=false;
 				}
 			}
 		}
@@ -162,7 +162,7 @@ public class ACEBean implements WFEditableListDataBean {
 	 * @param ace
 	 */
 	private void swapPrivlidges(AccessControlEntry oldAce, AccessControlEntry newAce) {
-		if(!(principal.equals(newAce.getPrincipal()) && principalType==newAce.getPrincipalType() && oldAce.isNegative()==newAce.isNegative())){
+		if(!(this.principal.equals(newAce.getPrincipal()) && this.principalType==newAce.getPrincipalType() && oldAce.isNegative()==newAce.isNegative())){
 			throw new RuntimeException("The old and new objects must be for the same principal and either both negative or both positive.");
 		}
 		
@@ -182,9 +182,9 @@ public class ACEBean implements WFEditableListDataBean {
 				arrayIndex=ARRAYINDEX_WRITE_ACE;
 			}
 			if(arrayIndex>-1){
-				privligeInitialValue[arrayIndex]=null;
-				isInherited[arrayIndex]=false;
-				inheritedFrom[arrayIndex]=null;
+				this.privligeInitialValue[arrayIndex]=null;
+				this.isInherited[arrayIndex]=false;
+				this.inheritedFrom[arrayIndex]=null;
 			}
 		}
 		
@@ -195,9 +195,9 @@ public class ACEBean implements WFEditableListDataBean {
 	protected void initialize(AccessControlEntry ace){
 		boolean granted = !ace.isNegative();
 		if(granted){
-			grantedACE = ace;
+			this.grantedACE = ace;
 		} else {
-			deniedACE = ace;
+			this.deniedACE = ace;
 		}
 		initialize(ace.getPrincipal(), ace.getPrincipalType());
 	}
@@ -216,11 +216,11 @@ public class ACEBean implements WFEditableListDataBean {
 		if(!entry.isNegative()){
 			throw new RuntimeException("ACE is not negative");
 		}
-		if(deniedACE!=null){
-			swapPrivlidges(deniedACE,entry);			
+		if(this.deniedACE!=null){
+			swapPrivlidges(this.deniedACE,entry);			
 //			propertySupport.firePropertyChange()
 		} else {
-			deniedACE=entry;
+			this.deniedACE=entry;
 			initializePrivlidges(entry);
 		}
 	}
@@ -233,24 +233,24 @@ public class ACEBean implements WFEditableListDataBean {
 		if(entry.isNegative()){
 			throw new RuntimeException("ACE is negative");
 		}
-		if(grantedACE!=null){
-			swapPrivlidges(grantedACE,entry);			
+		if(this.grantedACE!=null){
+			swapPrivlidges(this.grantedACE,entry);			
 //			propertySupport.firePropertyChange()
 		} else {
-			grantedACE=entry;
+			this.grantedACE=entry;
 			initializePrivlidges(entry);
 		}
 	}
 	
 	
 	public String getPrincipalName(){
-		return principal;
+		return this.principal;
 	}
 	
 	public String getPrincipalDisplayName(){
-		switch (principalType) {
+		switch (this.principalType) {
 			case AccessControlEntry.PRINCIPAL_TYPE_STANDARD:
-				return ContentUtil.getBundle().getLocalizedString("principal."+principal,locale);
+				return ContentUtil.getBundle().getLocalizedString("principal."+this.principal,this.locale);
 			case AccessControlEntry.PRINCIPAL_TYPE_ROLE:
 				String principal = getPrincipalName();
 				String roleKey = principal;
@@ -300,30 +300,30 @@ public class ACEBean implements WFEditableListDataBean {
 	}
 	
 	public String getPrivilegesAll(){
-		return privligeInitialValue[ARRAYINDEX_ALL];
+		return this.privligeInitialValue[ARRAYINDEX_ALL];
 	}
 	
 	public String getPrivilegesRead(){
-		return privligeInitialValue[ARRAYINDEX_READ];
+		return this.privligeInitialValue[ARRAYINDEX_READ];
 	}
 	
 	public String getPrivilegesWrite(){
-		return privligeInitialValue[ARRAYINDEX_WRITE];
+		return this.privligeInitialValue[ARRAYINDEX_WRITE];
 	}
 	
 	public void setPrivilegesAll(String value){
 		System.out.println(getPrincipalName()+".setPrivilegesAll("+value+")");
-		privligeInitialValue[ARRAYINDEX_ALL]=value;
+		this.privligeInitialValue[ARRAYINDEX_ALL]=value;
 	}
 	
 	public void setPrivilegesRead(String value){
 		System.out.println(getPrincipalName()+".setPrivilegesRead("+value+")");
-		privligeInitialValue[ARRAYINDEX_READ]=value;
+		this.privligeInitialValue[ARRAYINDEX_READ]=value;
 	}
 	
 	public void setPrivilegesWrite(String value){
 		System.out.println(getPrincipalName()+".setPrivilegesRead("+value+")");
-		privligeInitialValue[ARRAYINDEX_WRITE]=value;
+		this.privligeInitialValue[ARRAYINDEX_WRITE]=value;
 	}
 
 	/**
@@ -337,11 +337,11 @@ public class ACEBean implements WFEditableListDataBean {
 			boolean valueChanged = setColumnValue(i,values[i]);
 			if(valueChanged){
 				if(PRIVLIDGE_VALUE_GRANTED.equals(values[i])){
-					grantedACE.setInherited(false);
-					grantedACE.setInheritedFrom(null);
+					this.grantedACE.setInherited(false);
+					this.grantedACE.setInheritedFrom(null);
 				} else if(PRIVLIDGE_VALUE_DENIED.equals(values[i])){
-					deniedACE.setInherited(false);
-					deniedACE.setInheritedFrom(null);
+					this.deniedACE.setInherited(false);
+					this.deniedACE.setInheritedFrom(null);
 				} 
 				else {
 					//ace cannot be inherited! (?)
@@ -349,41 +349,41 @@ public class ACEBean implements WFEditableListDataBean {
 			}
 		}
 		
-		grantedACE.clearPrivileges();
-		deniedACE.clearPrivileges();
+		this.grantedACE.clearPrivileges();
+		this.deniedACE.clearPrivileges();
 		
-		for (int i = 0; i < privligeInitialValue.length; i++) {
-			String value = privligeInitialValue[i];
+		for (int i = 0; i < this.privligeInitialValue.length; i++) {
+			String value = this.privligeInitialValue[i];
 			if(PRIVLIDGE_VALUE_GRANTED.equals(value)){
-				grantedACE.addPrivilege(PRIVILEGES[i]);
-				isInherited[i] = grantedACE.isInherited();
-				inheritedFrom[i] = grantedACE.getInheritedFrom();
+				this.grantedACE.addPrivilege(PRIVILEGES[i]);
+				this.isInherited[i] = this.grantedACE.isInherited();
+				this.inheritedFrom[i] = this.grantedACE.getInheritedFrom();
 			} else if(PRIVLIDGE_VALUE_DENIED.equals(value)){
-				deniedACE.addPrivilege(PRIVILEGES[i]);
-				isInherited[i] = deniedACE.isInherited();
-				inheritedFrom[i] = deniedACE.getInheritedFrom();
+				this.deniedACE.addPrivilege(PRIVILEGES[i]);
+				this.isInherited[i] = this.deniedACE.isInherited();
+				this.inheritedFrom[i] = this.deniedACE.getInheritedFrom();
 			} else {
-				isInherited[i] = false;
-				inheritedFrom[i] = null;
+				this.isInherited[i] = false;
+				this.inheritedFrom[i] = null;
 			}
 		}
 	}
 	
 	
 	public boolean hasPositiveAccessControlEntry(){
-		return grantedACE!=null;
+		return this.grantedACE!=null;
 	}
 	
 	public boolean hasNegativeAccessControlEntry(){
-		return deniedACE!=null;
+		return this.deniedACE!=null;
 	}
 	
 	public AccessControlEntry getPositiveAccessControlEntry(){
-		return grantedACE;
+		return this.grantedACE;
 	}
 	
 	public AccessControlEntry getNegativeAccessControlEntry(){
-		return deniedACE;
+		return this.deniedACE;
 	}
 	
 	public List getSelectItemList(int index){
@@ -397,7 +397,7 @@ public class ACEBean implements WFEditableListDataBean {
 		List l = new ArrayList();
 		l.add(item);
 		l.add(item2);
-		if(!isInherited[index]){
+		if(!this.isInherited[index]){
 			String label3 = ContentBlock.getBundle().getLocalizedString("permission.option."+ACEBean.PRIVLIDGE_VALUE_NOT_SET,locale);
 			SelectItem item3 = new SelectItem(ACEBean.PRIVLIDGE_VALUE_NOT_SET, label3,"Inherited", false);
 			l.add(item3);
@@ -410,7 +410,7 @@ public class ACEBean implements WFEditableListDataBean {
 			case 0:
 				return getPrincipalDisplayName();
 			default:
-				return privligeInitialValue[index-1];
+				return this.privligeInitialValue[index-1];
 		}
 	}
 	
@@ -426,12 +426,12 @@ public class ACEBean implements WFEditableListDataBean {
 				return false;
 			default:
 				boolean toReturn = false;
-				if(privligeInitialValue[index-1]!=null){
-					toReturn = privligeInitialValue[index-1].equals(obj);
+				if(this.privligeInitialValue[index-1]!=null){
+					toReturn = this.privligeInitialValue[index-1].equals(obj);
 				} else {
 					toReturn = obj != null;
 				}
-				privligeInitialValue[index-1]=((String)obj);
+				this.privligeInitialValue[index-1]=((String)obj);
 				return toReturn;
 		}
 	}
@@ -440,27 +440,27 @@ public class ACEBean implements WFEditableListDataBean {
 	 * @see com.idega.webface.bean.WFEditableListDataBean#getSelectItemListArray()
 	 */
 	public Object[] getSelectItemListArray(){
-		if(selectItemArray==null){
+		if(this.selectItemArray==null){
 			//+1 because the first column has no UIInput item
-			selectItemArray = new Object[PROPERTY_NAMES.length+1];
-			for (int i = 0; i < selectItemArray.length-1; i++) {
-				selectItemArray[i+1]=getSelectItemList(i);
+			this.selectItemArray = new Object[PROPERTY_NAMES.length+1];
+			for (int i = 0; i < this.selectItemArray.length-1; i++) {
+				this.selectItemArray[i+1]=getSelectItemList(i);
 			}
 		}
-		return selectItemArray;
+		return this.selectItemArray;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.idega.webface.bean.WFEditableListDataBean#getValues()
 	 */
 	public Object[] getValues() {
-		if(columnValueArray==null){
-			columnValueArray = new Object[PROPERTY_NAMES.length+1];
-			for (int i = 0; i < columnValueArray.length; i++) {
-				columnValueArray[i]=getColumnValue(i);
+		if(this.columnValueArray==null){
+			this.columnValueArray = new Object[PROPERTY_NAMES.length+1];
+			for (int i = 0; i < this.columnValueArray.length; i++) {
+				this.columnValueArray[i]=getColumnValue(i);
 			}
 		}
-		return columnValueArray;
+		return this.columnValueArray;
 	}
 
 	
@@ -468,7 +468,7 @@ public class ACEBean implements WFEditableListDataBean {
 	 * @return Returns the principalType.
 	 */
 	public int getPrincipalType() {
-		return principalType;
+		return this.principalType;
 	}
 
 	/* (non-Javadoc)

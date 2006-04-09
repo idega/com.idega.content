@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.19 2006/03/08 11:37:27 tryggvil Exp $
+ * $Id: ContentViewManager.java,v 1.20 2006/04/09 12:01:55 laddi Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -26,10 +26,10 @@ import com.idega.repository.data.Singleton;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2006/03/08 11:37:27 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.20 $
  */
 public class ContentViewManager implements Singleton  {
 
@@ -58,17 +58,17 @@ public class ContentViewManager implements Singleton  {
 	}
 	
 	public ViewManager getViewManager(){
-		return ViewManager.getInstance(iwma);
+		return ViewManager.getInstance(this.iwma);
 	}
 	
 	
 	public ViewNode getContentNode(){
-		IWBundle iwb = iwma.getBundle(CONTENT_BUNDLE_IDENTIFIER);
+		IWBundle iwb = this.iwma.getBundle(CONTENT_BUNDLE_IDENTIFIER);
 		//ViewNode content = root.getChild(CONTENT_ID);
-		if(contentRootNode==null){
-			contentRootNode = initalizeContentNode(iwb);
+		if(this.contentRootNode==null){
+			this.contentRootNode = initalizeContentNode(iwb);
 		}
-		return contentRootNode;
+		return this.contentRootNode;
 	}
 	
 	public ViewNode initalizeContentNode(IWBundle contentBundle){
@@ -83,8 +83,8 @@ public class ContentViewManager implements Singleton  {
 		contentNode.setJspUri(contentBundle.getJSPURI("content.jsp"));
 		contentNode.setKeyboardShortcut(new KeyboardShortcut("4"));
 		
-		contentRootNode = contentNode;
-		return contentRootNode;
+		this.contentRootNode = contentNode;
+		return this.contentRootNode;
 	}
 	
 	

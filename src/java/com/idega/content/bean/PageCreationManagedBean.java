@@ -1,5 +1,5 @@
 /*
- * $Id: PageCreationManagedBean.java,v 1.3 2006/02/22 21:02:21 laddi Exp $
+ * $Id: PageCreationManagedBean.java,v 1.4 2006/04/09 12:01:55 laddi Exp $
  * Created on 2.5.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -43,10 +43,10 @@ import com.idega.webface.WFTreeNode;
 
 /**
  * 
- *  Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class PageCreationManagedBean implements ActionListener {
 
@@ -57,7 +57,7 @@ public class PageCreationManagedBean implements ActionListener {
 	private String pageName = "Untitled";
 	private static final String RELATIVE_LOCATION_BEFORE = "before";
 	private String relativeLocation = RELATIVE_LOCATION_BEFORE;
-	private String templateIdentifier = SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED;
+	private String templateIdentifier = this.SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED;
 	
 	
 	/**
@@ -71,15 +71,15 @@ public class PageCreationManagedBean implements ActionListener {
 		try {
 			IWContext iwc = IWContext.getInstance();
 			BuilderService bservice = BuilderServiceFactory.getBuilderService(iwc);
-			if (pageSelectorTopNode == -1) {
-				pageSelectorTopNode = bservice.getRootPageId();
+			if (this.pageSelectorTopNode == -1) {
+				this.pageSelectorTopNode = bservice.getRootPageId();
 			}
 			int currentUserId = -1;
 			try {
 				currentUserId = iwc.getCurrentUserId();
 			} catch (NotLoggedOnException nle) {
 			}
-			ICTreeNode node = bservice.getPageTree(pageSelectorTopNode, currentUserId);
+			ICTreeNode node = bservice.getPageTree(this.pageSelectorTopNode, currentUserId);
 			return new WFTreeNode(node);
 		}
 		catch (UnavailableIWContext e) {
@@ -105,7 +105,7 @@ public class PageCreationManagedBean implements ActionListener {
 	 * @return Returns the pageName.
 	 */
 	public String getPageName() {
-		return pageName;
+		return this.pageName;
 	}
 	/**
 	 * @param pageName The pageName to set.
@@ -117,7 +117,7 @@ public class PageCreationManagedBean implements ActionListener {
 	 * @return Returns the relativeLocation.
 	 */
 	public String getRelativeLocation() {
-		return relativeLocation;
+		return this.relativeLocation;
 	}
 	/**
 	 * @param relativeLocation The relativeLocation to set.
@@ -129,7 +129,7 @@ public class PageCreationManagedBean implements ActionListener {
 	 * @return Returns the selectedPageLocationIdentifier.
 	 */
 	public String getSelectedPageLocationIdentifier() {
-		return selectedPageLocationIdentifier;
+		return this.selectedPageLocationIdentifier;
 	}
 	/**
 	 * @param selectedPageLocation The selectedPageLocationIdentifier to set.
@@ -161,21 +161,21 @@ public class PageCreationManagedBean implements ActionListener {
 	
 	public void reset(){
 		System.out.println("Reset-Action processed!!!!!");
-		selectedPageLocationIdentifier = null;
-		selectedPageLocationName = "[Select page]";
-		pageName = "Untitled";
-		relativeLocation = RELATIVE_LOCATION_BEFORE;
+		this.selectedPageLocationIdentifier = null;
+		this.selectedPageLocationName = "[Select page]";
+		this.pageName = "Untitled";
+		this.relativeLocation = RELATIVE_LOCATION_BEFORE;
 		
 	}
 	
 
 	public void savePage(IWContext iwc) {
 		System.out.println("Save-Action processed!!!!!");
-		System.out.println("pageSelectorTopNode: "+pageSelectorTopNode);
-		System.out.println("selectedPageLocationIdentifier: "+selectedPageLocationIdentifier);
-		System.out.println("selectedPageLocationName: "+selectedPageLocationName);
-		System.out.println("pageName: "+pageName);
-		System.out.println("relativeLocation: "+relativeLocation );
+		System.out.println("pageSelectorTopNode: "+this.pageSelectorTopNode);
+		System.out.println("selectedPageLocationIdentifier: "+this.selectedPageLocationIdentifier);
+		System.out.println("selectedPageLocationName: "+this.selectedPageLocationName);
+		System.out.println("pageName: "+this.pageName);
+		System.out.println("relativeLocation: "+this.relativeLocation );
 		
 
 		String stringSourceMarkup = getPageSource();
@@ -184,7 +184,7 @@ public class PageCreationManagedBean implements ActionListener {
 		System.out.println(stringSourceMarkup);
 		System.out.println("---------JSP Page Ends----------");
 
-		if(!SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED.equals(getTemplateIdentifier())){
+		if(!this.SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED.equals(getTemplateIdentifier())){
 			//Create new page
 			String templateID = getTemplateIdentifier();
 			createSimpleTemplatePage(iwc, getParentPageIdentifier(), getPageName(), templateID,getBuilderLogic().PAGE_FORMAT_JSP_1_2,stringSourceMarkup);
@@ -195,7 +195,7 @@ public class PageCreationManagedBean implements ActionListener {
 	 * @return
 	 */
 	private String getPageSource() {
-		if(!SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED.equals(getTemplateIdentifier())){
+		if(!this.SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED.equals(getTemplateIdentifier())){
 			return getBuilderLogic().getPageSource(getTemplateIdentifier());
 		} else {
 			return null;
@@ -230,7 +230,7 @@ public class PageCreationManagedBean implements ActionListener {
 	 * @return Returns the selectedPageLocationName.
 	 */
 	public String getSelectedPageLocationName() {
-		return selectedPageLocationName;
+		return this.selectedPageLocationName;
 	}
 	/**
 	 * @param selectedPageLocationName The selectedPageLocationName to set.
@@ -241,7 +241,7 @@ public class PageCreationManagedBean implements ActionListener {
 	
 	public List getSimpleTemplateSelectItemList(){
 		List l = new ArrayList();
-		l.add(new SelectItem(SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED,"[Select Template]"));
+		l.add(new SelectItem(this.SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED,"[Select Template]"));
 		try {
 			IWContext iwc = IWContext.getInstance();
 			
@@ -265,7 +265,7 @@ public class PageCreationManagedBean implements ActionListener {
 	 * @return Returns the templateIdentifier.
 	 */
 	public String getTemplateIdentifier() {
-		return templateIdentifier;
+		return this.templateIdentifier;
 	}
 	/**
 	 * @param templateIdentifier The templateIdentifier to set.

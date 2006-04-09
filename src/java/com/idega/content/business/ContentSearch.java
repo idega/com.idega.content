@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.19 2006/02/22 21:02:21 laddi Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.20 2006/04/09 12:01:55 laddi Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -49,7 +49,7 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- * Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $ This class
+ * Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -57,7 +57,7 @@ import com.idega.slide.business.IWSlideSession;
  * a bundle.
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.20 $
  */
 public class ContentSearch implements SearchPlugin {
 
@@ -128,9 +128,9 @@ public class ContentSearch implements SearchPlugin {
 		try {
 			IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(iwma.getIWApplicationContext(),
 					IWSlideService.class);
-			httpURL = service.getWebdavServerURL();
+			this.httpURL = service.getWebdavServerURL();
 			IWContext iwc = IWContext.getInstance();
-			tempCurrentUserPath = TEMP_ILLEGAL_PATH + iwc.getRemoteUser();
+			this.tempCurrentUserPath = TEMP_ILLEGAL_PATH + iwc.getRemoteUser();
 		}
 		catch (IBOLookupException e) {
 			e.printStackTrace();
@@ -169,11 +169,11 @@ public class ContentSearch implements SearchPlugin {
 			HttpClient client = new HttpClient();
 			client.setState(new WebdavState());
 			HostConfiguration hostConfig = client.getHostConfiguration();
-			hostConfig.setHost(httpURL);
+			hostConfig.setHost(this.httpURL);
 			Credentials hostCredentials = session.getUserCredentials();
 			if (hostCredentials != null) {
 				HttpState clientState = client.getState();
-				clientState.setCredentials(null, httpURL.getHost(), hostCredentials);
+				clientState.setCredentials(null, this.httpURL.getHost(), hostCredentials);
 				clientState.setAuthenticationPreemptive(true);
 			}
 			for (Iterator iter = searchRequests.iterator(); iter.hasNext();) {
@@ -419,14 +419,14 @@ public class ContentSearch implements SearchPlugin {
 		// }
 		// todo remove when access control is ok, also change search to ignore
 		// folders?
-		tempCurrentUserPath = servletMapping + tempCurrentUserPath;
+		this.tempCurrentUserPath = servletMapping + this.tempCurrentUserPath;
 		String tempUsersRootPath = servletMapping + TEMP_ILLEGAL_PATH;
 		Enumeration enumerator = method.getAllResponseURLs();
 		while (enumerator.hasMoreElements()) {
 			String fileURI = (String) enumerator.nextElement();
 			if (!fileURI.equalsIgnoreCase(servletMapping)) {
 				// TODO remove temp stuff when accesscontrol is fixed
-				if (fileURI.startsWith(tempUsersRootPath) && !fileURI.startsWith(tempCurrentUserPath)) {
+				if (fileURI.startsWith(tempUsersRootPath) && !fileURI.startsWith(this.tempCurrentUserPath)) {
 					continue;
 				}
 				else {

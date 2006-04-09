@@ -85,12 +85,12 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	 * @return Returns the isCheckedOut.
 	 */
 	public boolean isCheckedOut() {
-		return isCheckedOut;
+		return this.isCheckedOut;
 	}
     
     public WebDAVBean() {
     	
-    	propertySupport = new PropertyChangeSupport(this);
+    	this.propertySupport = new PropertyChangeSupport(this);
 	    setId((int) (Math.random()*1000));
     }
    
@@ -138,71 +138,71 @@ public class WebDAVBean extends Object implements ICTreeNode {
     }
         
 	public int getId() {
-        return id;
+        return this.id;
     }
     
     public void setId(int value) {
-        int oldValue = id;
-        id = value;
-        propertySupport.firePropertyChange(PROP_ID, oldValue, id);
+        int oldValue = this.id;
+        this.id = value;
+        this.propertySupport.firePropertyChange(PROP_ID, oldValue, this.id);
     }
     
     public long getLengthLong() {
-    	return length;
+    	return this.length;
     }
    
     public String getLength() {
-        return (!isCollection)? FileUtil.getHumanReadableSize(length) : " ";
+        return (!this.isCollection)? FileUtil.getHumanReadableSize(this.length) : " ";
     }
     
     public void setLength(long value) {
 //        long oldValue = length;
-        length = value;
+        this.length = value;
 //        propertySupport.firePropertyChange(PROP_LENGTH, oldValue, length);
     }
     
     public String getName() {
-        return name;
+        return this.name;
     }
     
     public void setName(String value) {
-        String oldValue = name;
-        name = value;
-        propertySupport.firePropertyChange(PROP_NAME, oldValue, name);
+        String oldValue = this.name;
+        this.name = value;
+        this.propertySupport.firePropertyChange(PROP_NAME, oldValue, this.name);
     }
     
     public String getEncodedURL() {
-    	return encodedUrl;
+    	return this.encodedUrl;
     }
     
     public void setEncodedURL(String value) {
-    	String old = encodedUrl;
-    	encodedUrl = value;
-    	propertySupport.firePropertyChange(PROP_ENCODED_URL, old, encodedUrl);
+    	String old = this.encodedUrl;
+    	this.encodedUrl = value;
+    	this.propertySupport.firePropertyChange(PROP_ENCODED_URL, old, this.encodedUrl);
     }
     
     public String getPreviewActionURI() {
-    		return previewActionURI;
+    		return this.previewActionURI;
     }
     
     public void setPreviewActionURI(String value) {
-	    	String old = previewActionURI;
-	    	previewActionURI = value;
-	    	propertySupport.firePropertyChange(PROP_ENCODED_URL, old, previewActionURI);
+	    	String old = this.previewActionURI;
+	    	this.previewActionURI = value;
+	    	this.propertySupport.firePropertyChange(PROP_ENCODED_URL, old, this.previewActionURI);
     }
     
     public String getPermissionActionURI() {
-			return permissionActionURI;
+			return this.permissionActionURI;
 	}
 	
 	public void setPermissionActionURI(String value) {
-	    	String old = permissionActionURI;
-	    	permissionActionURI = value;
-	    	propertySupport.firePropertyChange(PROP_ENCODED_URL, old, permissionActionURI);
+	    	String old = this.permissionActionURI;
+	    	this.permissionActionURI = value;
+	    	this.propertySupport.firePropertyChange(PROP_ENCODED_URL, old, this.permissionActionURI);
 	}
 	
 	public boolean getRenderPermissionLink(){
-		if(getIsFile() && renderPermissionLink){
+		if(getIsFile() && this.renderPermissionLink){
 			try {
 				IWContext iwc = IWContext.getInstance();
 				IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
@@ -222,47 +222,47 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	}
 	
 	public void setRenderPermissionLink(boolean value){
-		renderPermissionLink = value;
+		this.renderPermissionLink = value;
 	}
     
     public String getModifiedDate() {
-        return modifiedDate;
+        return this.modifiedDate;
     }
     
     public long getModifiedDateLong() {
-    	if (modifiedDateLong != null) {
-    		return modifiedDateLong.longValue();
+    	if (this.modifiedDateLong != null) {
+    		return this.modifiedDateLong.longValue();
     	} else {
     		return 0;
     	}
     }
     
     public boolean getIsReal() {
-    	return real;
+    	return this.real;
     }
     
     public void setIsReal(boolean isReal) {
-    	real = isReal;
+    	this.real = isReal;
     }
     
     public void setModifiedDate(long value) {
-    	Long oldValue = modifiedDateLong;
-    	modifiedDateLong = new Long(value);
-        propertySupport.firePropertyChange(PROP_MODIFIED_DATE_LONG, oldValue, modifiedDateLong);
+    	Long oldValue = this.modifiedDateLong;
+    	this.modifiedDateLong = new Long(value);
+        this.propertySupport.firePropertyChange(PROP_MODIFIED_DATE_LONG, oldValue, this.modifiedDateLong);
 
         setModifiedDate(new java.util.Date(value).toString());
     }
     
     public void setModifiedDate(String value) {
-        String oldValue = modifiedDate;
-        modifiedDate = value;
-        propertySupport.firePropertyChange(PROP_MODIFIED_DATE, oldValue, modifiedDate);
+        String oldValue = this.modifiedDate;
+        this.modifiedDate = value;
+        this.propertySupport.firePropertyChange(PROP_MODIFIED_DATE, oldValue, this.modifiedDate);
     }
     
     
     
     public String getCreationDate() {
-      return creationDate;
+      return this.creationDate;
     }
   
 	  public void setCreationDate(long value) {
@@ -270,23 +270,23 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	  }
 
 	  public void setCreationDate(String value) {
-	      String oldValue = creationDate;
-	      creationDate = value;
-	      propertySupport.firePropertyChange(PROP_CREATION_DATE, oldValue, creationDate);
+	      String oldValue = this.creationDate;
+	      this.creationDate = value;
+	      this.propertySupport.firePropertyChange(PROP_CREATION_DATE, oldValue, this.creationDate);
 	  }
     
     public String getMime() {
-        return mime;
+        return this.mime;
     }
     
     public void setMime(String value) {
-        String oldValue = mime;
-        mime = value;
-        propertySupport.firePropertyChange(PROP_MIME, oldValue, mime);
+        String oldValue = this.mime;
+        this.mime = value;
+        this.propertySupport.firePropertyChange(PROP_MIME, oldValue, this.mime);
     }
     
     public boolean getIsCollection() {
-        return isCollection;
+        return this.isCollection;
     }
     
     public boolean getIsFile() {
@@ -294,66 +294,66 @@ public class WebDAVBean extends Object implements ICTreeNode {
     }
     
     public void setIsCollection(boolean value) {
-        boolean oldValue = isCollection;
-        isCollection = value; 
-        propertySupport.firePropertyChange(PROP_IS_COLLECTION, oldValue, isCollection); 
+        boolean oldValue = this.isCollection;
+        this.isCollection = value; 
+        this.propertySupport.firePropertyChange(PROP_IS_COLLECTION, oldValue, this.isCollection); 
     }
     
     public String getWebDavUrl() {
-    		return webDavUrl;
+    		return this.webDavUrl;
     }
     
     public void setWebDavHttpURL(String webDavUrl) {
 	    	String oldValue = this.webDavUrl;
 	    	this.webDavUrl = webDavUrl;
-	    	propertySupport.firePropertyChange(PROP_WEB_DAV_URL, oldValue, webDavUrl);
+	    	this.propertySupport.firePropertyChange(PROP_WEB_DAV_URL, oldValue, webDavUrl);
     }    
     
     public String getVersion() {
-    	if (version == null) {
-    		version = " "; 
+    	if (this.version == null) {
+    		this.version = " "; 
     	}
-    	return version;
+    	return this.version;
     }
     
     public void setVersion(String version) {
     	String oldVersion = this.version;
     	this.version = version;
-    	propertySupport.firePropertyChange(PROP_VERSION, oldVersion, version);
+    	this.propertySupport.firePropertyChange(PROP_VERSION, oldVersion, version);
     }
     
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-        propertySupport.addPropertyChangeListener(listener);
+        this.propertySupport.addPropertyChangeListener(listener);
     }
     
     public void removePropertyChangeListener(PropertyChangeListener listener) {
-        propertySupport.removePropertyChangeListener(listener);
+        this.propertySupport.removePropertyChangeListener(listener);
     }
     
 	public String getIconURL() {
-		if(iconURL==null){
-			if (iconTheme == null) {
+		if(this.iconURL==null){
+			if (this.iconTheme == null) {
 				FileIconSupplier iconSupplier = FileIconSupplier.getInstance();
-				iconURL = iconSupplier.getFileIconURIByMimeType(mime);
+				this.iconURL = iconSupplier.getFileIconURIByMimeType(this.mime);
 			} else {
-				FileIconSupplier iconSupplier = FileIconSupplier.getInstance(iconTheme);
-				iconURL = iconSupplier.getFileIconURIByMimeType(mime);
+				FileIconSupplier iconSupplier = FileIconSupplier.getInstance(this.iconTheme);
+				this.iconURL = iconSupplier.getFileIconURIByMimeType(this.mime);
 			}
 		}
-		return iconURL;
+		return this.iconURL;
 	}
 	
 	
 	public void setIconURL(String iconURL) {
 	  	String oldValue = this.iconURL;
 	  	this.iconURL = iconURL;
-	  	propertySupport.firePropertyChange(PROP_ICON_URL, oldValue, iconURL);
+	  	this.propertySupport.firePropertyChange(PROP_ICON_URL, oldValue, iconURL);
 	}
 	/**
 	 * @return Returns the isLocked.
 	 */
 	public boolean getIsLocked() {
-		return isLocked;
+		return this.isLocked;
 	}
 	
 	public boolean getIsUnlocked() {
@@ -367,7 +367,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	}
 	
 	private WebdavExtendedResource getMe() {
-		if (me == null) {
+		if (this.me == null) {
 			try {
 				IWContext iwc = IWContext.getInstance();
 				IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(iwc, IWSlideSession.class);
@@ -378,7 +378,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
 				setName("Error getting resource ("+getWebDavUrl()+")");
 			}
 		}
-		return me;
+		return this.me;
 	}
 
 	/* (non-Javadoc)
@@ -386,26 +386,26 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	 */
 	public Collection getChildren() {
 		try {
-			if (children == null) {
+			if (this.children == null) {
 				if (getMe() != null) {
 					WebdavResources resources = getMe().getChildResources();
 		  		Enumeration enumer = resources.getResources();
-		  		children = new Vector();
-		  		childrenCount = 0; 
+		  		this.children = new Vector();
+		  		this.childrenCount = 0; 
 		  		while (enumer.hasMoreElements()) {
 		  			WebdavExtendedResource element = (WebdavExtendedResource) enumer.nextElement();
 		  			if (element.isCollection()) {
 		  				WebDAVBean bean = new WebDAVBean(element);
-		    			children.add(bean);
-		    			++childrenCount;
+		    			this.children.add(bean);
+		    			++this.childrenCount;
 		  			}
 		  		}
 				} else { 
-					children = new Vector();
-					childrenCount = 0;
+					this.children = new Vector();
+					this.childrenCount = 0;
 				}
 			} 
-			return children;
+			return this.children;
 		} catch (HttpException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -429,27 +429,27 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	 * @see com.idega.core.data.ICTreeNode#getAllowsChildren()
 	 */
 	public boolean getAllowsChildren() {
-		return isCollection;
+		return this.isCollection;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.idega.core.data.ICTreeNode#getChildAtIndex(int)
 	 */
 	public ICTreeNode getChildAtIndex(int childIndex) {
-		if (children == null) {
+		if (this.children == null) {
 			getChildren();
 		}
-		return (ICTreeNode) children.get(childIndex);
+		return (ICTreeNode) this.children.get(childIndex);
 	}
 
 	/* (non-Javadoc)
 	 * @see com.idega.core.data.ICTreeNode#getChildCount()
 	 */
 	public int getChildCount() {
-		if (children == null) {
+		if (this.children == null) {
 			getChildren();
 		}
-		return childrenCount;
+		return this.childrenCount;
 //		System.out.print("Children for "+webDavUrl);
 //		try {
 //			if (childrenCount < 0) {
@@ -479,17 +479,17 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	 * @see com.idega.core.data.ICTreeNode#getIndex(com.idega.core.data.ICTreeNode)
 	 */
 	public int getIndex(ICTreeNode node) {
-		if (children == null) {
+		if (this.children == null) {
 			getChildren();
 		}
-		return children.indexOf(node);
+		return this.children.indexOf(node);
 	}
 
 	/* (non-Javadoc)
 	 * @see com.idega.core.data.ICTreeNode#getParentNode()
 	 */
 	public ICTreeNode getParentNode() {
-		if (parent == null) {
+		if (this.parent == null) {
 			try {
 				if (getMe() != null) {
 					String url = getMe().getParentPath();
@@ -497,15 +497,15 @@ public class WebDAVBean extends Object implements ICTreeNode {
 					IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(iwc, IWSlideSession.class);
 					url = url.replaceFirst(ss.getWebdavServerURI(), "");
 					WebdavExtendedResource selectedNode = ss.getWebdavResource(url);
-					parent = new WebDAVBean(selectedNode);
+					this.parent = new WebDAVBean(selectedNode);
 				} else {
-					parent = null;
+					this.parent = null;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		return parent;
+		return this.parent;
 	}
 
 	/* (non-Javadoc)
@@ -540,22 +540,22 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	 * @see com.idega.core.data.ICTreeNode#getNodeID()
 	 */
 	public int getNodeID() {
-		return id;
+		return this.id;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.idega.core.data.ICTreeNode#getSiblingCount()
 	 */
 	public int getSiblingCount() {
-		return siblingCount;
+		return this.siblingCount;
 	}
 
 	/**
 	 * @return Returns the comment.
 	 */
 	public String getComment() {
-		if(comment!=null && !"".equals(comment)){
-			return comment;
+		if(this.comment!=null && !"".equals(this.comment)){
+			return this.comment;
 		}
 		else{
 			if(isCheckedOut()){
@@ -581,7 +581,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	 * @return Returns the checkedOutString.
 	 */
 	public String getCheckedOutString() {
-		return checkedOutString;
+		return this.checkedOutString;
 	}
 	
     /**
@@ -590,7 +590,7 @@ public class WebDAVBean extends Object implements ICTreeNode {
 	private void setCheckedOutString(String checkedOut) {
 		if(checkedOut!=null && !"".equals(checkedOut)){
 			setCheckedOut(true);
-			checkedOutString = checkedOut;
+			this.checkedOutString = checkedOut;
 		}
 		
 	}

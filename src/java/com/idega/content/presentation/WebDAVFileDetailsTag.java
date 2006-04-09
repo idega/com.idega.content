@@ -29,13 +29,13 @@ public class WebDAVFileDetailsTag extends UIComponentTag {
 	
 	public void release() {      
 		super.release();      
-		path = null ; 
+		this.path = null ; 
 	}
 
 	protected void setProperties(UIComponent component) {      
 		super.setProperties(component);
 		if (component != null) {
-			component.getAttributes().put("path", path);
+			component.getAttributes().put("path", this.path);
 		}
 	}
 	
@@ -44,7 +44,7 @@ public class WebDAVFileDetailsTag extends UIComponentTag {
 	}
 	
 	public String getWebDAVPath() {
-		return path;
+		return this.path;
 	}
 
 }

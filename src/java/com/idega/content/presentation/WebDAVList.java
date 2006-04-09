@@ -37,36 +37,36 @@ public class WebDAVList extends IWBaseComponent {
 		
 		WebDAVListManagedBean bean = getWebDAVListManagedBean();
 		
-		if (startFolder != null) {
-			bean.setStartFolder(startFolder);
+		if (this.startFolder != null) {
+			bean.setStartFolder(this.startFolder);
 		} else {
 			bean.setStartFolder("");
 		}
-		if (rootFolder != null) {
-			bean.setRootFolder(rootFolder);
+		if (this.rootFolder != null) {
+			bean.setRootFolder(this.rootFolder);
 		} else {
 			bean.setRootFolder("");
 		}
-		if (iconTheme != null) {
-			bean.setIconTheme(iconTheme);
+		if (this.iconTheme != null) {
+			bean.setIconTheme(this.iconTheme);
 		} else {
 			bean.setIconTheme("");
 		}
-		if (onFileClickEvent != null) {
-			bean.setOnFileClickEvent(onFileClickEvent);
+		if (this.onFileClickEvent != null) {
+			bean.setOnFileClickEvent(this.onFileClickEvent);
 		} else {
 			bean.setOnFileClickEvent("");
 		}
 		
-		bean.setShowFolders(new Boolean(showFolders));
-		bean.setShowPublicFolder(new Boolean(showPublicFolder));
-		bean.setShowDropboxFolder(new Boolean(showDropboxFolder));
-		if (columnsToHide != null) {
-			bean.addColumnsToHide(columnsToHide);
+		bean.setShowFolders(new Boolean(this.showFolders));
+		bean.setShowPublicFolder(new Boolean(this.showPublicFolder));
+		bean.setShowDropboxFolder(new Boolean(this.showDropboxFolder));
+		if (this.columnsToHide != null) {
+			bean.addColumnsToHide(this.columnsToHide);
 		} else {
 			//bean.setColumnsToHide(new Vector());
 		}
-		bean.setUseVersionControl(new Boolean(useVersionControl));
+		bean.setUseVersionControl(new Boolean(this.useVersionControl));
 		
 		
 		//WFContainer wrapper = new WFContainer();

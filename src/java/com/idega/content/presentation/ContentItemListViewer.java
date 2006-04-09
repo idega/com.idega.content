@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.16 2006/02/28 14:49:28 tryggvil Exp $
+ * $Id: ContentItemListViewer.java,v 1.17 2006/04/09 12:01:55 laddi Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -31,10 +31,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- * Last modified: $Date: 2006/02/28 14:49:28 $ by $Author: tryggvil $
+ * Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.17 $
  */
 public class ContentItemListViewer extends UIData implements CacheableUIComponent{
 
@@ -126,7 +126,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 				addAttachmentViewer(attachmentViewer,index);
 			}
 		}
-		initialized = true;
+		this.initialized = true;
 	}
 	
 	
@@ -147,7 +147,9 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	}
 	
 	public String getBaseFolderPath(){
-		if (resourcePath != null) return resourcePath;
+		if (this.resourcePath != null) {
+			return this.resourcePath;
+		}
         ValueBinding vb = getValueBinding("baseFolderPath");
         String path = vb != null ? (String)vb.getValue(getFacesContext()) : null;
         if(path==null){
@@ -175,22 +177,22 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	}
 	
 	public Object getValue(){
-		if(model==null){
+		if(this.model==null){
 			//List items = (List)WFUtil.invoke(this.managedBeanId,"getContentItems");
 			List items = getManagedBean().getContentItems();
 			if(items!=null){
-				model = new WFDataModel();
+				this.model = new WFDataModel();
 				for (ListIterator iter = items.listIterator(); iter.hasNext();) {
 					int index = iter.nextIndex();
 					ContentItem item = (ContentItem) iter.next();
 					ContentItemBindingBean bean = new ContentItemBindingBean(item);
-					model.set(bean,index);
+					this.model.set(bean,index);
 				}
-				return model;
+				return this.model;
 			}
 			return super.getValue();
 		}
-		return model;
+		return this.model;
 	}
 	
 	public void encodeBegin(FacesContext context) throws IOException{
@@ -203,7 +205,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 				cacher.beginCache(this,context);
 			}
 			
-			if(!initialized){
+			if(!this.initialized){
 				initializeInEncodeBegin();
 			}
 			super.encodeBegin(context);
@@ -248,24 +250,28 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	
 	public void setStyle(String style)
     {
-        _style = style;
+        this._style = style;
     }
 
     public String getStyle()
     {
-        if (_style != null) return _style;
+        if (this._style != null) {
+					return this._style;
+				}
         ValueBinding vb = getValueBinding("style");
         return vb != null ? (String)vb.getValue(getFacesContext()) : null;
     }
 
     public void setStyleClass(String styleClass)
     {
-        _styleClass = styleClass;
+        this._styleClass = styleClass;
     }
 
     public String getStyleClass()
     {
-        if (_styleClass != null) return _styleClass;
+        if (this._styleClass != null) {
+					return this._styleClass;
+				}
         ValueBinding vb = getValueBinding("styleClass");
         String sClass = vb != null ? (String)vb.getValue(getFacesContext()) : null;
         return (sClass != null)? sClass : getDefultStyleClass(); 
@@ -273,24 +279,28 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	
 	public void setColumnClasses(String columnClasses)
     {
-        _columnClasses = columnClasses;
+        this._columnClasses = columnClasses;
     }
 
     public String getColumnClasses()
     {
-        if (_columnClasses != null) return _columnClasses;
+        if (this._columnClasses != null) {
+					return this._columnClasses;
+				}
         ValueBinding vb = getValueBinding("columnClasses");
         return vb != null ? (String)vb.getValue(getFacesContext()) : null;
     }
     
     public void setRowClasses(String rowClasses)
     {
-        _rowClasses = rowClasses;
+        this._rowClasses = rowClasses;
     }
 
     public String getRowClasses()
     {
-        if (_rowClasses != null) return _rowClasses;
+        if (this._rowClasses != null) {
+					return this._rowClasses;
+				}
         ValueBinding vb = getValueBinding("rowClasses");
         String sClass = vb != null ? (String)vb.getValue(getFacesContext()) : null;
         return (sClass != null)? sClass : getDefultRowClass();
@@ -304,14 +314,14 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		values[0] = super.saveState(ctx);
 		values[1] = this.managedBeanId;
 		values[2] = this.resourcePath;
-		values[3] = _styleClass;
-		values[4] = _style;
-		values[5] = _columnClasses;
-		values[6] = _rowClasses;
-		values[7] = detailsViewerPath;
-		values[8] = Boolean.valueOf(initialized);
-		values[9] = categoriesList;
-		values[10] = new Integer(maxNumberOfDisplayed);
+		values[3] = this._styleClass;
+		values[4] = this._style;
+		values[5] = this._columnClasses;
+		values[6] = this._rowClasses;
+		values[7] = this.detailsViewerPath;
+		values[8] = Boolean.valueOf(this.initialized);
+		values[9] = this.categoriesList;
+		values[10] = new Integer(this.maxNumberOfDisplayed);
 		return values;
 	}
 	
@@ -361,7 +371,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	private void notifyManagedBeanOfDetailsViewerPath(String path) {
 		if(this.managedBeanId!=null){
 			//WFUtil.invoke(this.managedBeanId,"setDetailsViewerPath",path,String.class);
-			getManagedBean().setDetailsViewerPath(detailsViewerPath);
+			getManagedBean().setDetailsViewerPath(this.detailsViewerPath);
 		}
 	}
 	
@@ -384,7 +394,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		}
 		
 		public ContentItem getContentItem(){
-			return item;
+			return this.item;
 		}
 		
 		public void setContentItem(Object obj){
@@ -401,20 +411,20 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	 * @return Returns the detailsViewerPath.
 	 */
 	public String getDetailsViewerPath() {
-		return detailsViewerPath;
+		return this.detailsViewerPath;
 	}
 	/**
 	 * @param detailsViewerPath The path to set.
 	 */
 	public void setDetailsViewerPath(String path) {
 		this.detailsViewerPath = path;
-		notifyManagedBeanOfDetailsViewerPath(detailsViewerPath);
+		notifyManagedBeanOfDetailsViewerPath(this.detailsViewerPath);
 	}
 	/**
 	 * @return Returns the categoriesList.
 	 */
 	public List getCategoriesList() {
-		return categoriesList;
+		return this.categoriesList;
 	}
 	/**
 	 * <p>
@@ -437,8 +447,8 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	}
 	
 	public String getCategories() {
-		if(categoriesList!=null){
-			Iterator iter = categoriesList.iterator();
+		if(this.categoriesList!=null){
+			Iterator iter = this.categoriesList.iterator();
 			if(iter.hasNext()){
 				StringBuffer catString = new StringBuffer();
 				catString.append((String)iter.next());
@@ -462,7 +472,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	}
 
 	public String getFirstArticleItemStyleClass() {
-		return firstArticleItemStyleClass;
+		return this.firstArticleItemStyleClass;
 	}
 
 	public void setFirstArticleItemStyleClass(String firstArticleItemStyleClass) {
@@ -470,7 +480,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	}
 	
 	public ContentListViewerManagedBean getManagedBean(){
-		ContentListViewerManagedBean bean = (ContentListViewerManagedBean) WFUtil.getBeanInstance(managedBeanId);
+		ContentListViewerManagedBean bean = (ContentListViewerManagedBean) WFUtil.getBeanInstance(this.managedBeanId);
 		return bean;
 	}
 
@@ -479,7 +489,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	 * @return Returns the maxNumberOfItems.
 	 */
 	public int getMaxNumberOfDisplayed() {
-		return maxNumberOfDisplayed;
+		return this.maxNumberOfDisplayed;
 	}
 
 	

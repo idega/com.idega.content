@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadataResourceBean.java,v 1.10 2005/12/21 14:25:28 laddi Exp $
+ * $Id: WebDAVMetadataResourceBean.java,v 1.11 2006/04/09 12:01:55 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -29,10 +29,10 @@ import com.idega.slide.util.WebdavRootResource;
 /**
  * A resource bean that holds metadata info for the selected resouce
  * 
- * Last modified: $Date: 2005/12/21 14:25:28 $ by $Author: laddi $
+ * Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class WebDAVMetadataResourceBean extends IBOSessionBean 
 implements WebDAVMetadataResource
@@ -53,20 +53,20 @@ implements WebDAVMetadataResource
 	 * Clears the metadata beans (cashe) 
 	 */
 	public void clear() {
-		metadataBeans = null;
-		selectedCategories=null;
-		currentPath=null;
+		this.metadataBeans = null;
+		this.selectedCategories=null;
+		this.currentPath=null;
 	}
 	
 	private void setMetadataBeans(String resourcePath, Collection meta) {
-		metadataBeans = meta;
-		currentPath = resourcePath;
+		this.metadataBeans = meta;
+		this.currentPath = resourcePath;
 	}
 	
 	private void setMetadataBeans(String resourcePath, Collection meta, Collection categories) {
-		metadataBeans = meta;
-		selectedCategories = categories;
-		currentPath = resourcePath;
+		this.metadataBeans = meta;
+		this.selectedCategories = categories;
+		this.currentPath = resourcePath;
 	}
 	
 	/**
@@ -74,10 +74,10 @@ implements WebDAVMetadataResource
 	 * @return a collection of MetadataValueBeans
 	 */
 	public Collection getMetadataBeans(String resourcePath) throws RemoteException, IOException {
-		if(metadataBeans == null || !checkPath(resourcePath)) {
+		if(this.metadataBeans == null || !checkPath(resourcePath)) {
 			setMetadataBeans(resourcePath,getMetadataFromRepository(resourcePath));
 		}
-		return metadataBeans;
+		return this.metadataBeans;
 	}
 	
 
@@ -93,11 +93,11 @@ implements WebDAVMetadataResource
 			setMetadataBeans(resourcePath,getMetadataFromRepository(resourcePath),getCategoriesFromRepository(resourcePath));
 		}
 //		}
-		return selectedCategories;
+		return this.selectedCategories;
 	}
 	
 	public MetadataValueBean[] getMetadata(String resourcePath) throws RemoteException, IOException {
-		return (MetadataValueBean[])getMetadataBeans(resourcePath).toArray(new MetadataValueBean[metadataBeans.size()]);
+		return (MetadataValueBean[])getMetadataBeans(resourcePath).toArray(new MetadataValueBean[this.metadataBeans.size()]);
 	}
 	
 	/**
@@ -108,7 +108,7 @@ implements WebDAVMetadataResource
 	 * @throws IOException
 	 */
 	protected Collection getMetadataFromRepository(String resourcePath) throws RemoteException, IOException {
-		metadataBeans = new ArrayList();
+		this.metadataBeans = new ArrayList();
 	
 		IWContext iwc = IWContext.getInstance();
 		IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
@@ -138,7 +138,7 @@ implements WebDAVMetadataResource
 //				System.out.println("Value is "+value);
 				if(value.length()>0) {
 					MetadataValueBean mvb = new MetadataValueBean(type, value.toString());
-					metadataBeans.add(mvb);
+					this.metadataBeans.add(mvb);
 				}
 			}catch (HttpException e) {
 				System.out.println("Warning could not load metadata '"+type+"' for "+filePath);
@@ -146,7 +146,7 @@ implements WebDAVMetadataResource
 
 		}
 			
-		return metadataBeans;
+		return this.metadataBeans;
 	}
 
 	/**
@@ -181,26 +181,26 @@ implements WebDAVMetadataResource
 				value.append(enumerator.nextElement());
 			}
 			
-			selectedCategories=CategoryBean.getCategoriesFromString(value.toString());
+			this.selectedCategories=CategoryBean.getCategoriesFromString(value.toString());
 			
 		}catch (HttpException e) {
 			System.out.println("Warning could not load categories for "+filePath);
 		}
 		
-		return selectedCategories;
+		return this.selectedCategories;
 	}
 
 	protected boolean checkPath(String path){
 		//PATCH-HACK
-		if(null==currentPath) {
-			currentPath=path;
+		if(null==this.currentPath) {
+			this.currentPath=path;
 			return false;
 		}
-		if(currentPath.startsWith(path)) {
+		if(this.currentPath.startsWith(path)) {
 			return true;
 		}
-		if(!path.equalsIgnoreCase(currentPath)) {
-			currentPath=path;
+		if(!path.equalsIgnoreCase(this.currentPath)) {
+			this.currentPath=path;
 			return false;
 		}
 //		if(currentPath!=null){ 

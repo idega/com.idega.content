@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVBeanComparator.java,v 1.2 2005/01/13 15:54:22 gimmi Exp $
+ * $Id: WebDAVBeanComparator.java,v 1.3 2006/04/09 12:01:55 laddi Exp $
  * Created on 11.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -17,10 +17,10 @@ import com.idega.core.business.ICTreeNodeComparator;
 
 /**
  * 
- *  Last modified: $Date: 2005/01/13 15:54:22 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class WebDAVBeanComparator extends ICTreeNodeComparator implements Comparator {
 
@@ -39,19 +39,19 @@ public class WebDAVBeanComparator extends ICTreeNodeComparator implements Compar
 		super(locale);
 		this.sortBy = sortBy;
 		if (desending) {
-			multiplier = -1;
+			this.multiplier = -1;
 		}
 	}
 	
 	public int compare(Object o1, Object o2) {
 		
-		switch (sortBy) {
+		switch (this.sortBy) {
 			case SORT_BY_NAME :
-				return multiplier * super.compare(o1, o2);
+				return this.multiplier * super.compare(o1, o2);
 			case SORT_BY_SIZE :
-				return multiplier * sizeCompare(o1, o2);
+				return this.multiplier * sizeCompare(o1, o2);
 			case SORT_BY_MODIFICATION_DATE :
-				return multiplier * modDateCompare(o1, o2);
+				return this.multiplier * modDateCompare(o1, o2);
 			default :
 				return 0;
 		}

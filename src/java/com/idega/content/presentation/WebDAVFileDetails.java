@@ -103,9 +103,9 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 			
 			table.add(getText("modification_date"), 1, ++row);
 			table.add(WFUtil.getText(new IWTimestamp(resource.getGetLastModified()).getLocaleDateAndTime(locale, IWTimestamp.MEDIUM, IWTimestamp.MEDIUM),"wf_listtext"), 2, row);
-			if (detailed) {
+			if (this.detailed) {
 				
-				if (useVersionControl) {
+				if (this.useVersionControl) {
 					// Lock/Unlock
 					table.add(getText("locked_unlocked"), 1, ++row);
 					if (resource.isLocked()) {
@@ -136,7 +136,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 					table.add(lockToggler, 2, row);
 				}
 				
-				if (useVersionControl) {
+				if (this.useVersionControl) {
 					//Checkout/in
 					table.add(getText("checkout_status"), 1, ++row);
 					String checkedOut = resource.getCheckedOut();
@@ -198,7 +198,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 				table.mergeCells(1, row, 2, row);
 				table.add(categoriesUI, 1, row);
 								
-				if (useVersionControl) {
+				if (this.useVersionControl) {
 					//Then add the version table
 					Table vTable = getVersionReportTable(resource);
 				
@@ -340,16 +340,16 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[3];
 		values[0] = super.saveState(ctx);
-		values[1] = new Boolean(detailed);
-		values[2] = new Boolean(useVersionControl);
+		values[1] = new Boolean(this.detailed);
+		values[2] = new Boolean(this.useVersionControl);
 		return values;
 	}
 
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[]) state;
 		super.restoreState(ctx, values[0]);
-		detailed = ((Boolean) values[1]).booleanValue();
+		this.detailed = ((Boolean) values[1]).booleanValue();
 
-		useVersionControl = ((Boolean) values[2]).booleanValue();
+		this.useVersionControl = ((Boolean) values[2]).booleanValue();
 	}	
 }

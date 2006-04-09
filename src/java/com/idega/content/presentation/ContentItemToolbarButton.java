@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbarButton.java,v 1.2 2006/03/28 10:11:51 tryggvil Exp $
+ * $Id: ContentItemToolbarButton.java,v 1.3 2006/04/09 12:01:54 laddi Exp $
  * Created on 9.3.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -17,10 +17,10 @@ import javax.faces.el.ValueBinding;
 
 /**
  * 
- *  Last modified: $Date: 2006/03/28 10:11:51 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/04/09 12:01:54 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ContentItemToolbarButton extends HtmlOutputLink {
 
@@ -37,7 +37,9 @@ public class ContentItemToolbarButton extends HtmlOutputLink {
 	}
 	
 	public boolean isRendered(){
-		if (rendered != null) return rendered.booleanValue();
+		if (this.rendered != null) {
+			return this.rendered.booleanValue();
+		}
         ValueBinding vb = getValueBinding("rendered");
         Boolean v = vb != null ? (Boolean)vb.getValue(getFacesContext()) : null;
         if(v==null){
@@ -82,14 +84,14 @@ public class ContentItemToolbarButton extends HtmlOutputLink {
     }
 
 	public void setRendered(boolean value){
-		rendered = Boolean.valueOf(value);
+		this.rendered = Boolean.valueOf(value);
 	}
 	
 	/**
 	 * @return Returns the action.
 	 */
 	public String getAction() {
-		return action;
+		return this.action;
 	}
 	/**
 	 * @param action The action to set.
@@ -102,7 +104,7 @@ public class ContentItemToolbarButton extends HtmlOutputLink {
 	 * @return Returns the resourcePath.
 	 */
 	public String getResourcePath() {
-		return resourcePath;
+		return this.resourcePath;
 	}
 	/**
 	 * @param resourcePath The resourcePath to set.
@@ -118,8 +120,8 @@ public class ContentItemToolbarButton extends HtmlOutputLink {
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[9];
 		values[0] = super.saveState(ctx);
-		values[1] = resourcePath;
-		values[2] = action;
+		values[1] = this.resourcePath;
+		values[2] = this.action;
 		return values;
 	}
 	
@@ -129,8 +131,8 @@ public class ContentItemToolbarButton extends HtmlOutputLink {
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[])state;
 		super.restoreState(ctx, values[0]);
-		resourcePath = (String)values[1];
-		action = (String)values[2];
+		this.resourcePath = (String)values[1];
+		this.action = (String)values[2];
 	}
 
 

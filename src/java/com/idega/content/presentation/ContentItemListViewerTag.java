@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewerTag.java,v 1.8 2005/12/20 16:42:00 tryggvil Exp $
+ * $Id: ContentItemListViewerTag.java,v 1.9 2006/04/09 12:01:54 laddi Exp $
  * Created on 31.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -15,10 +15,10 @@ import javax.faces.webapp.UIComponentTag;
 
 /**
  * 
- *  Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/04/09 12:01:54 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class ContentItemListViewerTag extends UIComponentTag {
 
@@ -47,24 +47,24 @@ public class ContentItemListViewerTag extends UIComponentTag {
 	
 	public void release() {      
 		super.release();      
-		baseFolderPath = null; 
-		managedBeanId = null;
-		detailsViewerPath = null;
-		categories = null;
-		firstArticleItemStyleClass = null;
+		this.baseFolderPath = null; 
+		this.managedBeanId = null;
+		this.detailsViewerPath = null;
+		this.categories = null;
+		this.firstArticleItemStyleClass = null;
 	}
 
 	protected void setProperties(UIComponent component) {      
 		super.setProperties(component);
 		if (component != null) {
 			ContentItemListViewer viewer = ((ContentItemListViewer)component);
-			if(managedBeanId!=null){
-				viewer.setBeanIdentifier(managedBeanId);
+			if(this.managedBeanId!=null){
+				viewer.setBeanIdentifier(this.managedBeanId);
 			}
 			viewer.setBaseFolderPath(getBaseFolderPath());
-			viewer.setDetailsViewerPath(detailsViewerPath);
-			viewer.setCategories(categories);
-			viewer.setFirstArticleItemStyleClass(firstArticleItemStyleClass);
+			viewer.setDetailsViewerPath(this.detailsViewerPath);
+			viewer.setCategories(this.categories);
+			viewer.setFirstArticleItemStyleClass(this.firstArticleItemStyleClass);
 		}
 	}
 	
@@ -86,7 +86,7 @@ public class ContentItemListViewerTag extends UIComponentTag {
 	}
 	
 	public String getBaseFolderPath() {
-		return baseFolderPath;
+		return this.baseFolderPath;
 	}
 	
 	public void setBeanIdentifier(String identifier) {
@@ -94,13 +94,13 @@ public class ContentItemListViewerTag extends UIComponentTag {
 	}
 	
 	public String getBeanIdentifier() {
-		return managedBeanId;
+		return this.managedBeanId;
 	}
 	/**
 	 * @return Returns the detailsViewerPath.
 	 */
 	public String getDetailsViewerPath() {
-		return detailsViewerPath;
+		return this.detailsViewerPath;
 	}
 	/**
 	 * @param detailsViewerPath The detailsViewerPath to set.
@@ -112,7 +112,7 @@ public class ContentItemListViewerTag extends UIComponentTag {
 	 * @return Returns the categories.
 	 */
 	public String getCategories() {
-		return categories;
+		return this.categories;
 	}
 	/**
 	 * @param categories The categories to set.
@@ -125,7 +125,7 @@ public class ContentItemListViewerTag extends UIComponentTag {
 	 * @return Returns the style class for first article list item.
 	 */	
 	public String getFirstArticleItemStyleClass() {
-		return firstArticleItemStyleClass;
+		return this.firstArticleItemStyleClass;
 	}
 
 	/**

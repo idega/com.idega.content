@@ -1,5 +1,5 @@
 /*
- * $Id: ContentListViewerRenderer.java,v 1.8 2006/02/22 21:02:21 laddi Exp $ Created on
+ * $Id: ContentListViewerRenderer.java,v 1.9 2006/04/09 12:01:55 laddi Exp $ Created on
  * 27.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -34,10 +34,10 @@ import com.idega.webface.renderkit.BaseRenderer;
 
 /**
  * 
- * Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $
+ * Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class ContentListViewerRenderer extends BaseRenderer {
 	
@@ -121,8 +121,9 @@ public class ContentListViewerRenderer extends BaseRenderer {
 			rows = rowCount - first;
 		}
 		int last = first + rows;
-		if (last > rowCount)
+		if (last > rowCount) {
 			last = rowCount;
+		}
 		for (int i = first; i < last; i++) {
 			uiData.setRowIndex(i);   
 			
@@ -333,9 +334,9 @@ public class ContentListViewerRenderer extends BaseRenderer {
 		//~ Constructors
 		// ---------------------------------------------------------------------------
 		Styles(String rowStyles, String columnStyles) {
-			_rowStyle = (rowStyles == null) ? ArrayUtils.EMPTY_STRING_ARRAY
+			this._rowStyle = (rowStyles == null) ? ArrayUtils.EMPTY_STRING_ARRAY
 					: StringUtils.trim(StringUtils.splitShortString(rowStyles, ','));
-			_columnStyle = (columnStyles == null) ? ArrayUtils.EMPTY_STRING_ARRAY
+			this._columnStyle = (columnStyles == null) ? ArrayUtils.EMPTY_STRING_ARRAY
 					: StringUtils.trim(StringUtils.splitShortString(columnStyles, ','));
 		}
 
@@ -343,22 +344,22 @@ public class ContentListViewerRenderer extends BaseRenderer {
 			if (!hasRowStyle()) {
 				return null;
 			}
-			return _rowStyle[idx % _rowStyle.length];
+			return this._rowStyle[idx % this._rowStyle.length];
 		}
 
 		public String getColumnStyle(int idx) {
 			if (!hasColumnStyle()) {
 				return null;
 			}
-			return _columnStyle[idx % _columnStyle.length];
+			return this._columnStyle[idx % this._columnStyle.length];
 		}
 
 		public boolean hasRowStyle() {
-			return _rowStyle.length > 0;
+			return this._rowStyle.length > 0;
 		}
 
 		public boolean hasColumnStyle() {
-			return _columnStyle.length > 0;
+			return this._columnStyle.length > 0;
 		}
 	}
 }

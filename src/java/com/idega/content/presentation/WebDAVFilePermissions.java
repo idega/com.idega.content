@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissions.java,v 1.9 2006/02/22 21:02:21 laddi Exp $
+ * $Id: WebDAVFilePermissions.java,v 1.10 2006/04/09 12:01:55 laddi Exp $
  * Created on 29.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -19,10 +19,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class WebDAVFilePermissions extends ContentBlock {
 
@@ -114,8 +114,8 @@ public class WebDAVFilePermissions extends ContentBlock {
 		super.processRestoreState(ctx, state);
 		String resourcePath = getCurrentResourcePath();
 		if(resourcePath!=null){
-			for (int i = 0; i < permissionMatrixIDs.length; i++) {
-				WFUtil.invoke(permissionMatrixIDs[i], "setResourcePath", resourcePath);
+			for (int i = 0; i < this.permissionMatrixIDs.length; i++) {
+				WFUtil.invoke(this.permissionMatrixIDs[i], "setResourcePath", resourcePath);
 			}
 		} else {
 			System.err.println("[WARNING]["+getClass().getName()+"]: resource path can not be restored for managed beans");

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.13 2006/03/28 10:11:51 tryggvil Exp $
+ * $Id: ContentItemToolbar.java,v 1.14 2006/04/09 12:01:54 laddi Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -29,10 +29,10 @@ import com.idega.webface.WFToolbar;
  *  <p>
  *  Toolbar used by new content management system to display editor buttons.
  *  </p>
- *  Last modified: $Date: 2006/03/28 10:11:51 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/04/09 12:01:54 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
@@ -62,10 +62,10 @@ public class ContentItemToolbar extends WFToolbar {
 	}
 	
 	public IWActionURIManager getIWActionURIManager(){
-		if(manager==null){
-			manager = IWActionURIManager.getInstance();
+		if(this.manager==null){
+			this.manager = IWActionURIManager.getInstance();
 		}
-		return manager;
+		return this.manager;
 	}
 	
 	public HtmlOutputLink addToolbarButton(String action, String url, String menuItemId){
@@ -151,10 +151,10 @@ public class ContentItemToolbar extends WFToolbar {
 	}
 	
 	public Map getActions(){
-		if(actions==null){
-			actions=new HashMap();
+		if(this.actions==null){
+			this.actions=new HashMap();
 		}
-		return actions;
+		return this.actions;
 	}
 	
 	
@@ -166,7 +166,7 @@ public class ContentItemToolbar extends WFToolbar {
 	 * @return Returns the resourcePath.
 	 */
 	public String getResourcePath() {
-		return resourcePath;
+		return this.resourcePath;
 	}
 	/**
 	 * @param resourcePath The resourcePath to set.
@@ -181,22 +181,24 @@ public class ContentItemToolbar extends WFToolbar {
 	}
 	
 	public String[] getRolesAllowed(){
-		return RolesAllowded;
+		return this.RolesAllowded;
 	}
 	
 	public boolean isRendered(){
-		if (rendered != null) return rendered.booleanValue();
+		if (this.rendered != null) {
+			return this.rendered.booleanValue();
+		}
         ValueBinding vb = getValueBinding("rendered");
         Boolean v = vb != null ? (Boolean)vb.getValue(getFacesContext()) : null;
         if(v==null){
         		IWContext iwc = IWContext.getInstance();
-        		if(RolesAllowded==null){
+        		if(this.RolesAllowded==null){
         			return ContentUtil.hasContentEditorRoles(iwc);
         		}
         		else{
 	        		AccessController ac = iwc.getAccessController();
-	        		for (int i = 0; i < RolesAllowded.length; i++) {
-					if(ac.hasRole(RolesAllowded[i],iwc)){
+	        		for (int i = 0; i < this.RolesAllowded.length; i++) {
+					if(ac.hasRole(this.RolesAllowded[i],iwc)){
 						return true;
 					}
 				}
@@ -208,14 +210,14 @@ public class ContentItemToolbar extends WFToolbar {
 	}
 	
 	public void setRendered(boolean value){
-		rendered = Boolean.valueOf(value);
+		this.rendered = Boolean.valueOf(value);
 	}
 	
 	/**
 	 * @return Returns the actionHandlerIdentifier.
 	 */
 	public String getActionHandlerIdentifier() {
-		return actionHandlerIdentifier;
+		return this.actionHandlerIdentifier;
 	}
 	/**
 	 * @param handlerIdentifier The actionHandlerIdentifier to set.
@@ -231,10 +233,10 @@ public class ContentItemToolbar extends WFToolbar {
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[5];
 		values[0] = super.saveState(ctx);
-		values[1] = resourcePath;
-		values[2] = actionHandlerIdentifier;
-		values[3] = categories;
-		values[4] = baseFolderPath;
+		values[1] = this.resourcePath;
+		values[2] = this.actionHandlerIdentifier;
+		values[3] = this.categories;
+		values[4] = this.baseFolderPath;
 		return values;
 	}
 	
@@ -244,10 +246,10 @@ public class ContentItemToolbar extends WFToolbar {
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[])state;
 		super.restoreState(ctx, values[0]);
-		resourcePath = (String)values[1];
-		actionHandlerIdentifier = (String)values[2];
-		categories=(String)values[3];
-		baseFolderPath=(String)values[4];
+		this.resourcePath = (String)values[1];
+		this.actionHandlerIdentifier = (String)values[2];
+		this.categories=(String)values[3];
+		this.baseFolderPath=(String)values[4];
 	}
 	
 	
@@ -256,7 +258,7 @@ public class ContentItemToolbar extends WFToolbar {
 	 * @return Returns the categories.
 	 */
 	public String getCategories() {
-		return categories;
+		return this.categories;
 	}
 
 	
@@ -272,7 +274,7 @@ public class ContentItemToolbar extends WFToolbar {
 	 * @return Returns the basePath.
 	 */
 	public String getBaseFolderPath() {
-		return baseFolderPath;
+		return this.baseFolderPath;
 	}
 
 	

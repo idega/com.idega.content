@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.14 2006/03/16 15:39:56 tryggvil Exp $
+ * $Id: WebDAVCategories.java,v 1.15 2006/04/09 12:01:54 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -47,10 +47,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2006/03/16 15:39:56 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/04/09 12:01:54 $ by $Author: laddi $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -78,11 +78,11 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	
 	public WebDAVCategories(String path){
 		this();
-		resourcePath = path;
+		this.resourcePath = path;
 	}
 	
 	public void setResourcePath(String path){
-		resourcePath = path;
+		this.resourcePath = path;
 	}
 	
 	protected void initializeComponent(FacesContext context) {
@@ -124,7 +124,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	 * @return
 	 */
 	private boolean getDisplayHeader() {
-		return displayHeader;
+		return this.displayHeader;
 	}
 	
 	public void setDisplayHeader(boolean display){
@@ -164,8 +164,8 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 					String id = getCategoryId()+count;
 	//				System.out.println("CATEGORY-COMPONENT-ID:"+id);
 					smc.setId(id);
-					if(resourcePath!=null){
-						smc.getAttributes().put(RESOURCE_PATH,resourcePath);
+					if(this.resourcePath!=null){
+						smc.getAttributes().put(RESOURCE_PATH,this.resourcePath);
 					}
 					categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					//Text
@@ -189,8 +189,8 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 					String id = getCategoryId(count);
 //					System.out.println("CATEGORY-COMPONENT-ID:"+id);
 					smc.setId(id);
-					if(resourcePath!=null){
-						smc.getAttributes().put(RESOURCE_PATH,resourcePath);
+					if(this.resourcePath!=null){
+						smc.getAttributes().put(RESOURCE_PATH,this.resourcePath);
 					}
 					categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					//Text
@@ -204,7 +204,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 			count--;
 			if(getDisplaySaveButton()){
 				//Add the save button
-				if(resourcePath!=null && resourcePath.length()>0) {
+				if(this.resourcePath!=null && this.resourcePath.length()>0) {
 					WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
 					HtmlCommandButton addCategoryButton = localizer.getButtonVB(getSaveButtonId(), "save", this);
 					categoriesTable.add(addCategoryButton,1,count/COLLUMNS + 2);
@@ -259,23 +259,23 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	 * @return
 	 */
 	private Collection getSetCategoriesList() {
-		if(resourcePath!=null){
+		if(this.resourcePath!=null){
 			IWContext iwc = IWContext.getInstance();
 			//if resourcepath is iset
 			//Get all the selected categories for this article and display them as selected
 			WebDAVMetadataResource resource = getWebDAVMetadataResource(iwc);
 			Collection selectedResourceCategories;
 			try {
-				selectedResourceCategories = resource.getCategories(resourcePath);
+				selectedResourceCategories = resource.getCategories(this.resourcePath);
 			}
 			catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 			return selectedResourceCategories;
 		}
-		else if(setCategories!=null){
+		else if(this.setCategories!=null){
 			Collection selectedCategories=null;
-			selectedCategories = CategoryBean.getCategoriesFromString(setCategories);
+			selectedCategories = CategoryBean.getCategoriesFromString(this.setCategories);
 			return selectedCategories;
 		}
 		return null;
@@ -510,11 +510,11 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[6];
 		values[0] = super.saveState(ctx);
-		values[1] = resourcePath;
-		values[2] = Boolean.valueOf(setOnParent);
-		values[3] = Boolean.valueOf(displaySaveButton);
-		values[4] = setCategories;
-		values[5] = Boolean.valueOf(displayHeader);
+		values[1] = this.resourcePath;
+		values[2] = Boolean.valueOf(this.setOnParent);
+		values[3] = Boolean.valueOf(this.displaySaveButton);
+		values[4] = this.setCategories;
+		values[5] = Boolean.valueOf(this.displayHeader);
 		return values;
 	}
 
@@ -525,11 +525,11 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[]) state;
 		super.restoreState(ctx, values[0]);
-		resourcePath = ((String) values[1]);
-		setOnParent = ((Boolean) values[2]).booleanValue();
-		displaySaveButton = ((Boolean) values[3]).booleanValue();
-		setCategories=(String)values[4];
-		displayHeader=((Boolean)values[5]).booleanValue();
+		this.resourcePath = ((String) values[1]);
+		this.setOnParent = ((Boolean) values[2]).booleanValue();
+		this.displaySaveButton = ((Boolean) values[3]).booleanValue();
+		this.setCategories=(String)values[4];
+		this.displayHeader=((Boolean)values[5]).booleanValue();
 	}
 	
 	
@@ -557,7 +557,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	}
 	
 	public boolean getSetCategoriesOnParent(){
-		return setOnParent;
+		return this.setOnParent;
 	}
 	
 	public void setDisplaySaveButton(boolean displaySave){
@@ -565,7 +565,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	}
 	
 	public boolean getDisplaySaveButton(){
-		return displaySaveButton;
+		return this.displaySaveButton;
 	}
 
 	/**

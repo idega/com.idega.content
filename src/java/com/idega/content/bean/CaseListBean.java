@@ -1,5 +1,5 @@
 /*
- * $Id: CaseListBean.java,v 1.3 2006/02/22 21:02:21 laddi Exp $
+ * $Id: CaseListBean.java,v 1.4 2006/04/09 12:01:55 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -26,10 +26,10 @@ import com.idega.webface.model.WFDataModel;
 /**
  * Bean for content item case list rows.   
  * <p>
- * Last modified: $Date: 2006/02/22 21:02:21 $ by $Author: laddi $
+ * Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
  *
  * @author Anders Lindman
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 
 public class CaseListBean implements WFListBean, Serializable {
@@ -70,37 +70,37 @@ public class CaseListBean implements WFListBean, Serializable {
 	 * Constructs a new case list bean with the specified parameters. 
 	 */
 	public CaseListBean(String id, String description, Date created, Date lastModified, String author, String status) {
-		_id = id;
-		_description = description;
-		_created = created;
-		_lastModified = lastModified;
-		_author = author;
-		_status = status;
+		this._id = id;
+		this._description = description;
+		this._created = created;
+		this._lastModified = lastModified;
+		this._author = author;
+		this._status = status;
 	}
 		
-	public String getId() { return _id; }
-	public String getDescription() { return _description; }
-	public Date getCreated() { return _created; }
-	public Date getLastModified() { return _lastModified; }
-	public String getAuthor() { return _author; }
-	public String getStatus() { return _status; }
+	public String getId() { return this._id; }
+	public String getDescription() { return this._description; }
+	public Date getCreated() { return this._created; }
+	public Date getLastModified() { return this._lastModified; }
+	public String getAuthor() { return this._author; }
+	public String getStatus() { return this._status; }
 
-	public void setId(String s) { _id = s; }
-	public void setDescription(String s) { _description = s; }
-	public void setCreated(Date d) { _created = d; }
-	public void setLastModified(Date d) { _lastModified = d; }
-	public void setAuthor(String s) { _author = s; }
-	public void setStatus(String s) { _status = s; }
+	public void setId(String s) { this._id = s; }
+	public void setDescription(String s) { this._description = s; }
+	public void setCreated(Date d) { this._created = d; }
+	public void setLastModified(Date d) { this._lastModified = d; }
+	public void setAuthor(String s) { this._author = s; }
+	public void setStatus(String s) { this._status = s; }
 	
-	public ActionListener getCaseLinkListener() { return _caseLinkListener; }
-	public void setCaseLinkListener(ActionListener l) { _caseLinkListener = l; }
+	public ActionListener getCaseLinkListener() { return this._caseLinkListener; }
+	public void setCaseLinkListener(ActionListener l) { this._caseLinkListener = l; }
 	
 	/**
 	 * @see com.idega.webface.bean.WFListBean#updateDataModel() 
 	 */
 	public void updateDataModel(Integer start, Integer rows) {
-		if (_dataModel == null) {
-			_dataModel = new WFDataModel();
+		if (this._dataModel == null) {
+			this._dataModel = new WFDataModel();
 		}
 		int availableRows=0;
 		/*int availableRows = testDescriptions.length;
@@ -116,25 +116,25 @@ public class CaseListBean implements WFListBean, Serializable {
 			CaseListBean c = new CaseListBean(String.valueOf(i), testDescriptions[i], testCreated[i], testLastModified[i], testAuthors[i], testStatus[i]);
 			_dataModel.set(c, i);
 		}*/
-		_dataModel.setRowCount(availableRows);
+		this._dataModel.setRowCount(availableRows);
 	}
 	
 	/**
 	 * @see com.idega.webface.bean.WFListBean#createColumns() 
 	 */
 	public UIColumn[] createColumns(String var) {
-		int cols = testColumnHeaders.length;
+		int cols = this.testColumnHeaders.length;
 		UIColumn[] columns = new UIColumn[cols];
 
 		for (int i = 0; i < cols; i++) {
 			UIColumn c = new UIColumn();
-			c.setHeader(WFUtil.getTextVB(testColumnHeaders[i]));
+			c.setHeader(WFUtil.getTextVB(this.testColumnHeaders[i]));
 			columns[i] = c;
 		}
 		
 		HtmlCommandLink l = WFUtil.getListLinkVB(var + ".description");
 		l.setId(CASE_ID);
-		l.addActionListener(_caseLinkListener);
+		l.addActionListener(this._caseLinkListener);
 		WFUtil.addParameterVB(l, "id", var + ".id");
 		columns[0].getChildren().add(l);
 		HtmlOutputText t = WFUtil.getListTextVB(var + ".created");
@@ -153,13 +153,13 @@ public class CaseListBean implements WFListBean, Serializable {
 	 * @see com.idega.webface.bean.WFListBean#getDataModel() 
 	 */
 	public DataModel getDataModel() {
-		return _dataModel;
+		return this._dataModel;
 	}
 	
 	/**
 	 * @see com.idega.webface.bean.WFListBean#setDataModel() 
 	 */
 	public void setDataModel(DataModel dataModel) {
-		_dataModel = (WFDataModel) dataModel;
+		this._dataModel = (WFDataModel) dataModel;
 	}
 }

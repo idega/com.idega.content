@@ -10,7 +10,7 @@ public class WebDAVFolderCreationMB {
 	String errorMessage = null;
 	
 	public String getErrorMessage() {
-		return errorMessage;
+		return this.errorMessage;
 	}
 	
 	public void setErrorMessage(String errorMessage) {
@@ -18,7 +18,7 @@ public class WebDAVFolderCreationMB {
 	}
 	
 	public Boolean getFolderCreated() {
-		return folderCreated;
+		return this.folderCreated;
 	}
 	
 	public void setFolderCreated(Boolean folderCreated) {
@@ -26,7 +26,7 @@ public class WebDAVFolderCreationMB {
 	}
 	
 	public String getFolderName() {
-		return folderName;
+		return this.folderName;
 	}
 	
 	public void setFolderName(String folderName) {
