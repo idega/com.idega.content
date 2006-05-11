@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbarButtonRenderer.java,v 1.1 2006/03/28 10:11:51 tryggvil Exp $
+ * $Id: ContentItemToolbarButtonRenderer.java,v 1.2 2006/05/11 16:09:47 eiki Exp $
  * Created on 9.3.2005
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -19,20 +19,20 @@ import javax.faces.component.UIParameter;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.convert.ConverterException;
-import org.apache.myfaces.renderkit.RendererUtils;
-import org.apache.myfaces.renderkit.html.HTML;
-import org.apache.myfaces.renderkit.html.HtmlLinkRendererBase;
-import org.apache.myfaces.renderkit.html.HtmlRendererUtils;
+import org.apache.myfaces.shared_tomahawk.renderkit.RendererUtils;
+import org.apache.myfaces.shared_tomahawk.renderkit.html.HTML;
+import org.apache.myfaces.shared_tomahawk.renderkit.html.HtmlLinkRendererBase;
+import org.apache.myfaces.shared_tomahawk.renderkit.html.HtmlRendererUtils;
 
 
 /**
  * <p>
  * Renderer for the ContentItemToolbarButton
  * </p>
- * Last modified: $Date: 2006/03/28 10:11:51 $ by $Author: tryggvil $
+ * Last modified: $Date: 2006/05/11 16:09:47 $ by $Author: eiki $
  * 
  * @author <a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ContentItemToolbarButtonRenderer extends HtmlLinkRendererBase {
 
@@ -73,7 +73,7 @@ public class ContentItemToolbarButtonRenderer extends HtmlLinkRendererBase {
 	 */
 	protected void renderLinkEnd(FacesContext facesContext, UIComponent component) throws IOException {
 		// TODO Auto-generated method stub
-		super.renderLinkEnd(facesContext, component);
+		super.renderOutputLinkEnd(facesContext, component);
 	}
 
 	/* (non-Javadoc)
