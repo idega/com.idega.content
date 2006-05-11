@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbarButtonRenderer.java,v 1.2 2006/05/11 16:09:47 eiki Exp $
+ * $Id: ContentItemToolbarButtonRenderer.java,v 1.3 2006/05/11 16:12:46 eiki Exp $
  * Created on 9.3.2005
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -29,10 +29,10 @@ import org.apache.myfaces.shared_tomahawk.renderkit.html.HtmlRendererUtils;
  * <p>
  * Renderer for the ContentItemToolbarButton
  * </p>
- * Last modified: $Date: 2006/05/11 16:09:47 $ by $Author: eiki $
+ * Last modified: $Date: 2006/05/11 16:12:46 $ by $Author: eiki $
  * 
  * @author <a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ContentItemToolbarButtonRenderer extends HtmlLinkRendererBase {
 
@@ -69,9 +69,9 @@ public class ContentItemToolbarButtonRenderer extends HtmlLinkRendererBase {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.apache.myfaces.renderkit.html.HtmlLinkRendererBase#renderLinkEnd(javax.faces.context.FacesContext, javax.faces.component.UIComponent)
+	 * @see org.apache.myfaces.renderkit.html.HtmlLinkRendererBase#renderOutputLinkEnd(javax.faces.context.FacesContext, javax.faces.component.UIComponent)
 	 */
-	protected void renderLinkEnd(FacesContext facesContext, UIComponent component) throws IOException {
+	protected void renderOutputLinkEnd(FacesContext facesContext, UIComponent component) throws IOException {
 		// TODO Auto-generated method stub
 		super.renderOutputLinkEnd(facesContext, component);
 	}

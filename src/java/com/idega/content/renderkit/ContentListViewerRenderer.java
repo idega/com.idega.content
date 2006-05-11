@@ -1,5 +1,5 @@
 /*
- * $Id: ContentListViewerRenderer.java,v 1.9 2006/04/09 12:01:55 laddi Exp $ Created on
+ * $Id: ContentListViewerRenderer.java,v 1.10 2006/05/11 16:09:47 eiki Exp $ Created on
  * 27.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -13,20 +13,17 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.faces.component.UIColumn;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIData;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
-
-import org.apache.myfaces.renderkit.JSFAttr;
-import org.apache.myfaces.renderkit.RendererUtils;
-import org.apache.myfaces.renderkit.html.HTML;
-import org.apache.myfaces.renderkit.html.HtmlRendererUtils;
-import org.apache.myfaces.util.ArrayUtils;
-import org.apache.myfaces.util.StringUtils;
-
+import org.apache.myfaces.shared_tomahawk.renderkit.JSFAttr;
+import org.apache.myfaces.shared_tomahawk.renderkit.RendererUtils;
+import org.apache.myfaces.shared_tomahawk.renderkit.html.HTML;
+import org.apache.myfaces.shared_tomahawk.renderkit.html.HtmlRendererUtils;
+import org.apache.myfaces.shared_tomahawk.util.ArrayUtils;
+import org.apache.myfaces.shared_tomahawk.util.StringUtils;
 import com.idega.content.presentation.ContentItemListViewer;
 import com.idega.util.RenderUtils;
 import com.idega.webface.WFContainer;
@@ -34,10 +31,10 @@ import com.idega.webface.renderkit.BaseRenderer;
 
 /**
  * 
- * Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
+ * Last modified: $Date: 2006/05/11 16:09:47 $ by $Author: eiki $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class ContentListViewerRenderer extends BaseRenderer {
 	
