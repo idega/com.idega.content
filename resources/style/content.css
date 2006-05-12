@@ -211,10 +211,8 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 
 	padding: 1px;
 	margin: 4px;
-	font-style: Verdana, Helvetica, Sans-Serif;
+	font-family: Verdana, Helvetica, Sans-Serif;
 	font-size:0.9em;
-	font-style:none;
-	
 	overflow:none;
 }
 
