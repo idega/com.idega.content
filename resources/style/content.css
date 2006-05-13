@@ -213,14 +213,14 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	margin: 4px;
 	font-family: Verdana, Helvetica, Sans-Serif;
 	font-size:0.9em;
-	overflow:none;
+	overflow: hidden;
 }
 
 .content_item_toolbar ul{
 
 	padding: 0px;
 	margin: 0px;
-	overflow:none;
+	overflow: hidden;
 }
 
 .content_item_toolbar li{
