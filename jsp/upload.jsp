@@ -12,7 +12,7 @@ xmlns:c="http://xmlns.idega.com/com.idega.content">
     <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
     <f:view>
     <ws:page id="contentuploadpage1">
-               <h:form id="uploadForm" name="uploadForm" enctype="multipart/form-data">
+               <h:form id="uploadForm" enctype="multipart/form-data">
                	<c:WebDAVList id="giT"/>
                <f:verbatim><br/></f:verbatim>
                     <h:outputText value="Select a file to upload : "/>

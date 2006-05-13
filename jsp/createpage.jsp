@@ -10,7 +10,7 @@ version="1.2">
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 	<f:view>
         <ws:page id="createpage">
-                <h:form id="createpageform" name="createpageform">
+                <h:form id="createpageform">
 					<wf:wfblock title="#{localizedStrings['com.idega.content']['create_page']}">
 						<f:facet name="wf_block_toolbar">
 							<wf:toolbar id="toolbar">

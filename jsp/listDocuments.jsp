@@ -9,7 +9,7 @@
     <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
     <f:view>
     		<ws:page id="listdocuments1">
-               <h:form id="uploadForm" name="uploadForm" enctype="multipart/form-data">
+               <h:form id="uploadForm" enctype="multipart/form-data">
 				<co:ContentViewer rootPath="/files" startPath="/files" id="gt"/>
 			</h:form>
 		</ws:page>
