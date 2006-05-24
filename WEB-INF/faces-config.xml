@@ -29,7 +29,7 @@
 			<property-name>startPath</property-name>
 		</property>
 		<property>
-			<display-name>Start Path</display-name>
+			<display-name>Start in users home folder</display-name>
 			<property-class>boolean</property-class>
 			<property-name>useUserHomeFolder</property-name>
 		</property>
