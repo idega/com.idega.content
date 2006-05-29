@@ -6,7 +6,7 @@ xmlns:jsp="http://java.sun.com/JSP/Page"
 xmlns:owt="http://www.otrix.com/faces/webtree" 
 xmlns:w="http://xmlns.idega.com/com.idega.webface"
 xmlns:ws="http://xmlns.idega.com/com.idega.workspace"
-xmlns:cmf="http://myfaces.apache.org/extensions"
+xmlns:cmf="http://myfaces.apache.org/tomahawk"
 xmlns:c="http://xmlns.idega.com/com.idega.content">
 
     <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>

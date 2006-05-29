@@ -6,7 +6,7 @@
         xmlns:ws="http://xmlns.idega.com/com.idega.workspace"
         xmlns:b="http://xmlns.idega.com/com.idega.builder"
         xmlns:ic="http://xmlns.idega.com/com.idega.core"
-        xmlns:x="http://myfaces.apache.org/extensions"
+        xmlns:x="http://myfaces.apache.org/tomahawk"
 version="1.2">
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 	<f:view>

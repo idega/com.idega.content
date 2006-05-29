@@ -119,20 +119,8 @@
           <eclipse.dependency>${idegaweb.project.source.dependent}</eclipse.dependency>
       </properties>
     </dependency>
-    <dependency>
-      <groupId>bundles</groupId>
-      <artifactId>com.idega.builder</artifactId>
-      <!--version>1.4.3</version-->
-      <version>SNAPSHOT</version>
 
-      <type>jar</type>
-      <url>http://www.idega.com/</url>
-      <properties>
-          <eclipse.dependency>${idegaweb.project.source.dependent}</eclipse.dependency>
-      </properties>
-    </dependency>
-    <!-- already included in core -->
-
+	<!--duplicated slide dependencies -->
     <dependency>
       <groupId>slide</groupId>
       <artifactId>jakarta-slide-webdavlib</artifactId>

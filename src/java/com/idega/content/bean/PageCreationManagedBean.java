@@ -1,5 +1,5 @@
 /*
- * $Id: PageCreationManagedBean.java,v 1.4 2006/04/09 12:01:55 laddi Exp $
+ * $Id: PageCreationManagedBean.java,v 1.5 2006/05/29 18:26:39 tryggvil Exp $
  * Created on 2.5.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -23,9 +23,6 @@ import javax.faces.event.ActionListener;
 import javax.faces.model.SelectItem;
 import org.apache.myfaces.custom.tree2.TreeNode;
 import org.apache.myfaces.custom.tree2.TreeNodeBase;
-import com.idega.builder.business.BuilderLogic;
-import com.idega.builder.business.IBPageHelper;
-import com.idega.builder.business.PageTreeNode;
 import com.idega.content.business.ContentUtil;
 import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.builder.business.BuilderService;
@@ -43,10 +40,10 @@ import com.idega.webface.WFTreeNode;
 
 /**
  * 
- *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/05/29 18:26:39 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class PageCreationManagedBean implements ActionListener {
 
@@ -167,8 +164,21 @@ public class PageCreationManagedBean implements ActionListener {
 		this.relativeLocation = RELATIVE_LOCATION_BEFORE;
 		
 	}
-	
 
+	/**
+	 * @return
+	 */
+	public String getParentPageIdentifier() {
+		return getSelectedPageLocationIdentifier();
+	}
+
+	public void savePage(IWContext iwc) {
+		throw new RuntimeException("Function Disabled");
+	}
+	
+	/*
+	 * Temporarily commented out because of dependency problem on com.idega.builder
+	 * 
 	public void savePage(IWContext iwc) {
 		System.out.println("Save-Action processed!!!!!");
 		System.out.println("pageSelectorTopNode: "+this.pageSelectorTopNode);
@@ -191,22 +201,12 @@ public class PageCreationManagedBean implements ActionListener {
 		}
 	}
 	
-	/**
-	 * @return
-	 */
 	private String getPageSource() {
 		if(!this.SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED.equals(getTemplateIdentifier())){
 			return getBuilderLogic().getPageSource(getTemplateIdentifier());
 		} else {
 			return null;
 		}
-	}
-
-	/**
-	 * @return
-	 */
-	public String getParentPageIdentifier() {
-		return getSelectedPageLocationIdentifier();
 	}
 
 	private String createSimpleTemplatePage(IWContext iwc, String parentPageId, String name, String templateKey, String format, String sourceMarkup) {
@@ -224,7 +224,7 @@ public class PageCreationManagedBean implements ActionListener {
 	protected BuilderLogic getBuilderLogic(){
 		return BuilderLogic.getInstance();
 	}
-	
+	*/
 	
 	/**
 	 * @return Returns the selectedPageLocationName.
