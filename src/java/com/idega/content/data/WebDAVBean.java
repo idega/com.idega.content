@@ -137,8 +137,8 @@ public class WebDAVBean extends Object implements ICTreeNode {
     		}
     }
         
-	public int getId() {
-        return this.id;
+	public String getId() {
+        return Integer.toString(getNodeID());
     }
     
     public void setId(int value) {
