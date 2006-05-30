@@ -20,63 +20,63 @@
 		<component-class>com.idega.content.presentation.ContentViewer</component-class>
 		<property>
 			<display-name>Item Resource Path</display-name>
-			<property-class>java.lang.String</property-class>
 			<property-name>rootPath</property-name>
+			<property-class>java.lang.String</property-class>
 		</property>
 		<property>
 			<display-name>Start Path</display-name>
-			<property-class>java.lang.String</property-class>
 			<property-name>startPath</property-name>
+			<property-class>java.lang.String</property-class>
 		</property>
 		<property>
 			<display-name>Start in users home folder</display-name>
-			<property-class>boolean</property-class>
 			<property-name>useUserHomeFolder</property-name>
+			<property-class>boolean</property-class>
 		</property>
 		<property>
 			<display-name>Icon theme name</display-name>
-			<property-class>java.lang.String</property-class>
 			<property-name>iconTheme</property-name>
+			<property-class>java.lang.String</property-class>
 		</property>
 		<property>
 			<display-name>Show folders</display-name>
-			<property-class>boolean</property-class>
 			<property-name>showFolders</property-name>
+			<property-class>boolean</property-class>
 		</property>
 		<property>
 			<display-name>Show drop box folder</display-name>
-			<property-class>boolean</property-class>
 			<property-name>showDropboxFolder</property-name>
+			<property-class>boolean</property-class>
 		</property>
 		<property>
 			<display-name>Show public folder</display-name>
-			<property-class>boolean</property-class>
 			<property-name>showPublicFolder</property-name>
+			<property-class>boolean</property-class>
 		</property>
 		<property>
 			<display-name>Columns to hide (CSV)</display-name>
-			<property-class>java.lang.String</property-class>
 			<property-name>columnsToHide</property-name>
+			<property-class>java.lang.String</property-class>
 		</property>
 		<property>
 			<display-name>Use version control</display-name>
-			<property-class>boolean</property-class>
 			<property-name>useVersionControl</property-name>
+			<property-class>boolean</property-class>
 		</property>
 		<property>
 			<display-name>Show permissions</display-name>
-			<property-class>boolean</property-class>
 			<property-name>showPermissionTab</property-name>
+			<property-class>boolean</property-class>
 		</property>
 		<property>
 			<display-name>Show upload form</display-name>
-			<property-class>boolean</property-class>
 			<property-name>showUploadComponent</property-name>
+			<property-class>boolean</property-class>
 		</property>
 		<property>
 			<display-name>On file click event</display-name>
-			<property-class>java.lang.String</property-class>
 			<property-name>onFileClickEvent</property-name>
+			<property-class>java.lang.String</property-class>
 		</property>
 	</component>
 	
