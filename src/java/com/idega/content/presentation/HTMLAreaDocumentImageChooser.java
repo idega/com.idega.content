@@ -1,5 +1,5 @@
 /*
- * $Id: HTMLAreaDocumentImageChooser.java,v 1.2 2006/03/28 10:11:51 tryggvil Exp $
+ * $Id: HTMLAreaDocumentImageChooser.java,v 1.3 2006/05/31 23:31:24 eiki Exp $
  * Created on 8.3.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -25,7 +25,7 @@ public class HTMLAreaDocumentImageChooser implements HTMLAreaImageType {
 		ContentViewer list = new ContentViewer();
 		list.setShowPermissionTab(false);
 		list.setShowUploadComponent(true);
-		list.setRootFolder("/files");
+		list.setRootPath("/files");
 		list.setOnFileClickEvent("SelectDocument()");
 		list.setColumnsToHide(WebDAVListManagedBean.COLUMN_DELETE+","+WebDAVListManagedBean.COLUMN_CHECKOUT+","+WebDAVListManagedBean.COLUMN_LOCK);
 		return list;

@@ -120,8 +120,8 @@ public class ContentViewerTag extends UIComponentTag {
 			ContentViewer viewer = (ContentViewer) component;
 			super.setProperties(component);
 
-			viewer.setRootFolder(this.rootFolder);
-			viewer.setStartFolder(this.startFolder);
+			viewer.setRootPath(this.rootFolder);
+			viewer.setStartPath(this.startFolder);
 			viewer.setUseUserHomeFolder(this.useUserHomeFolder);
 			viewer.setIconTheme(this.iconTheme);
 			viewer.setShowFolders(this.showFolders);

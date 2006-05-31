@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIParameter;
 import javax.faces.component.html.HtmlCommandLink;
@@ -15,7 +14,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
-
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.WebDAVFilePermissionResource;
@@ -24,6 +22,7 @@ import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.IWSlideConstants;
+import com.idega.util.ListUtil;
 import com.idega.webface.WFBlock;
 import com.idega.webface.WFTitlebar;
 import com.idega.webface.WFToolbar;
@@ -121,6 +120,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		list.setColumnsToHide(this.columnsToHide);
 		list.setUseVersionControl(this.useVersionControl);
 		list.setOnFileClickEvent(this.onFileClickEvent);
+		
 		listBlock.add(list);
 		
 		WFBlock detailsBlock = new WFBlock();
@@ -220,7 +220,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		
 	}
 	
-	public void setRootFolder(String rootFolder) {
+	public void setRootPath(String rootFolder) {
 		this.rootFolder = rootFolder;
 	}
 	
@@ -228,7 +228,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		this.useUserHomeFolder = useUserHomeFolder;
 	}
 	
-	public void setStartFolder(String startFolder) {
+	public void setStartPath(String startFolder) {
 		this.startFolder = startFolder;
 	}
 	
@@ -264,7 +264,13 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		}
 	}
 	
-	
+	public String getColumnsToHide(){
+		if(this.columnsToHide!=null){
+			return ListUtil.convertListOfStringsToCommaseparatedString((List)this.columnsToHide);
+		}
+		
+		return null;
+	}
 	
 	/* (non-Javadoc)
 	 * @see javax.faces.component.UIComponent#decode(javax.faces.context.FacesContext)
@@ -875,6 +881,110 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	 */
 	public void setOnFileClickEvent(String event) {
 		this.onFileClickEvent = event;
+	}
+
+	
+	/**
+	 * @return the currentAction
+	 */
+	public String getCurrentAction() {
+		return currentAction;
+	}
+
+	
+	/**
+	 * @param currentAction the currentAction to set
+	 */
+	public void setCurrentAction(String currentAction) {
+		this.currentAction = currentAction;
+	}
+
+	
+	/**
+	 * @return the iconTheme
+	 */
+	public String getIconTheme() {
+		return iconTheme;
+	}
+
+	
+	/**
+	 * @return the onFileClickEvent
+	 */
+	public String getOnFileClickEvent() {
+		return onFileClickEvent;
+	}
+
+	
+	/**
+	 * @return the rootFolder
+	 */
+	public String getRootPath() {
+		return rootFolder;
+	}
+
+	
+	/**
+	 * @return the showDropboxFolder
+	 */
+	public boolean isShowDropboxFolder() {
+		return showDropboxFolder;
+	}
+
+	
+	/**
+	 * @return the showFolders
+	 */
+	public boolean isShowFolders() {
+		return showFolders;
+	}
+
+	
+	/**
+	 * @return the showPublicFolder
+	 */
+	public boolean isShowPublicFolder() {
+		return showPublicFolder;
+	}
+
+	
+	/**
+	 * @return the startFolder
+	 */
+	public String getStartPath() {
+		return startFolder;
+	}
+
+	
+	/**
+	 * @return the useUserHomeFolder
+	 */
+	public boolean isUseUserHomeFolder() {
+		return useUserHomeFolder;
+	}
+
+	
+	/**
+	 * @return the useVersionControl
+	 */
+	public boolean isUseVersionControl() {
+		return useVersionControl;
+	}
+
+	
+	/**
+	 * @param currentResourceName the currentResourceName to set
+	 */
+	public void setCurrentResourceName(String currentResourceName) {
+		this.currentResourceName = currentResourceName;
+	}
+
+	
+	/**
+	 * @param maintainPath the maintainPath to set
+	 */
+	public void setMaintainPath(boolean maintainPath) {
+		this.maintainPath = maintainPath;
 	}
 	
 }
