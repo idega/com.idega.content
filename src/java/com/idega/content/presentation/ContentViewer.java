@@ -888,7 +888,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	 * @return the currentAction
 	 */
 	public String getCurrentAction() {
-		return currentAction;
+		return this.currentAction;
 	}
 
 	
@@ -904,7 +904,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	 * @return the iconTheme
 	 */
 	public String getIconTheme() {
-		return iconTheme;
+		return this.iconTheme;
 	}
 
 	
@@ -912,7 +912,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	 * @return the onFileClickEvent
 	 */
 	public String getOnFileClickEvent() {
-		return onFileClickEvent;
+		return this.onFileClickEvent;
 	}
 
 	
@@ -920,7 +920,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	 * @return the rootFolder
 	 */
 	public String getRootPath() {
-		return rootFolder;
+		return this.rootFolder;
 	}
 
 	
@@ -928,7 +928,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	 * @return the showDropboxFolder
 	 */
 	public boolean isShowDropboxFolder() {
-		return showDropboxFolder;
+		return this.showDropboxFolder;
 	}
 
 	
@@ -936,7 +936,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	 * @return the showFolders
 	 */
 	public boolean isShowFolders() {
-		return showFolders;
+		return this.showFolders;
 	}
 
 	
@@ -944,7 +944,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	 * @return the showPublicFolder
 	 */
 	public boolean isShowPublicFolder() {
-		return showPublicFolder;
+		return this.showPublicFolder;
 	}
 
 	
@@ -952,7 +952,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	 * @return the startFolder
 	 */
 	public String getStartPath() {
-		return startFolder;
+		return this.startFolder;
 	}
 
 	
@@ -960,7 +960,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	 * @return the useUserHomeFolder
 	 */
 	public boolean isUseUserHomeFolder() {
-		return useUserHomeFolder;
+		return this.useUserHomeFolder;
 	}
 
 	
@@ -968,7 +968,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	 * @return the useVersionControl
 	 */
 	public boolean isUseVersionControl() {
-		return useVersionControl;
+		return this.useVersionControl;
 	}
 
 	
