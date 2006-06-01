@@ -19,7 +19,7 @@
 		<component-type>ContentViewer</component-type>
 		<component-class>com.idega.content.presentation.ContentViewer</component-class>
 		<property>
-			<display-name>Item Resource Path</display-name>
+			<display-name>Root path</display-name>
 			<property-name>rootPath</property-name>
 			<property-class>java.lang.String</property-class>
 		</property>
@@ -64,8 +64,28 @@
 			<property-class>boolean</property-class>
 		</property>
 		<property>
-			<display-name>Show permissions</display-name>
+			<display-name>Show new folder tab</display-name>
+			<property-name>renderNewFolderLink</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Show permissions tab</display-name>
 			<property-name>showPermissionTab</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Show file list tab</display-name>
+			<property-name>renderListLink</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Show file preview link</display-name>
+			<property-name>renderPreviewLink</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Show file details link</display-name>
+			<property-name>renderDetailsLink</property-name>
 			<property-class>boolean</property-class>
 		</property>
 		<property>
@@ -113,7 +133,7 @@
     <managed-bean>
     		<managed-bean-name>WebDAVListBean</managed-bean-name>
         <managed-bean-class>com.idega.content.presentation.WebDAVListManagedBean</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
+        <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
     <managed-bean>
         <managed-bean-name>WebDAVUploadBean</managed-bean-name>
