@@ -9,6 +9,7 @@ package com.idega.content.data;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -34,7 +35,7 @@ import com.idega.util.FileUtil;
 /**
  * @author Roar
  */
-public class WebDAVBean extends Object implements ICTreeNode {
+public class WebDAVBean extends Object implements ICTreeNode,Serializable {
     
     public static final String PROP_ID = "id";
     public static final String PROP_NAME = "name";

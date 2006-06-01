@@ -1,6 +1,7 @@
 package com.idega.content.presentation;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,7 +41,7 @@ import com.idega.webface.model.WFDataModel;
  * A managed bean for the WebDAVList component
  * @author gimmi
  */
-public class WebDAVListManagedBean implements ActionListener, WFListBean {
+public class WebDAVListManagedBean implements ActionListener, WFListBean,Serializable {
 
 	private static final String P_ID = "wb_list";
 	public static final String PARAMETER_WEB_DAV_URL = "wdurl";

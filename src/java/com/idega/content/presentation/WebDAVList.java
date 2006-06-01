@@ -3,10 +3,10 @@ package com.idega.content.presentation;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
-
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
-
+import javax.faces.el.ValueBinding;
+import org.apache.myfaces.custom.savestate.UISaveState;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.webface.WFList;
 import com.idega.webface.WFUtil;
@@ -79,7 +79,17 @@ public class WebDAVList extends IWBaseComponent {
 		list.setBodyScrollable(true);
 		list.setId(this.getId()+"_l");
 		//wrapper.getChildren().add(list);
-		getChildren().add(list);
+		add(list);
+		
+		
+		//to make this object request safe, extension from myfaces
+		//ask Tryggvi
+		UISaveState beanSaveState = new UISaveState();
+		ValueBinding binding = WFUtil.createValueBinding("#{"+WEB_DAV_LIST_BEAN_ID+"}");
+		beanSaveState.setId("WebDavListBeanSaveState");
+		beanSaveState.setValueBinding("value",binding);
+		add(beanSaveState);
+
 		
 	}
 	

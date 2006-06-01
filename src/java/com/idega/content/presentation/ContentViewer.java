@@ -986,5 +986,117 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	public void setMaintainPath(boolean maintainPath) {
 		this.maintainPath = maintainPath;
 	}
+
+	
+	/**
+	 * @return the renderDetailsLink
+	 */
+	public boolean isRenderDetailsLink() {
+		return this.renderDetailsLink;
+	}
+
+	
+	/**
+	 * @param renderDetailsLink the renderDetailsLink to set
+	 */
+	public void setRenderDetailsLink(boolean renderDetailsLink) {
+		this.renderDetailsLink = renderDetailsLink;
+	}
+
+	
+	/**
+	 * @return the renderListLink
+	 */
+	public boolean isRenderListLink() {
+		return this.renderListLink;
+	}
+
+	
+	/**
+	 * @param renderListLink the renderListLink to set
+	 */
+	public void setRenderListLink(boolean renderListLink) {
+		this.renderListLink = renderListLink;
+	}
+
+	
+	/**
+	 * @return the renderNewFolderLink
+	 */
+	public boolean isRenderNewFolderLink() {
+		return this.renderNewFolderLink;
+	}
+
+	
+	/**
+	 * @param renderNewFolderLink the renderNewFolderLink to set
+	 */
+	public void setRenderNewFolderLink(boolean renderNewFolderLink) {
+		this.renderNewFolderLink = renderNewFolderLink;
+	}
+
+	
+	/**
+	 * @return the renderPermissionsLink
+	 */
+	public boolean isRenderPermissionsLink() {
+		return this.renderPermissionsLink;
+	}
+
+	
+	/**
+	 * @param renderPermissionsLink the renderPermissionsLink to set
+	 */
+	public void setRenderPermissionsLink(boolean renderPermissionsLink) {
+		this.renderPermissionsLink = renderPermissionsLink;
+	}
+
+	
+	/**
+	 * @return the renderPreviewLink
+	 */
+	public boolean isRenderPreviewLink() {
+		return this.renderPreviewLink;
+	}
+
+	
+	/**
+	 * @param renderPreviewLink the renderPreviewLink to set
+	 */
+	public void setRenderPreviewLink(boolean renderPreviewLink) {
+		this.renderPreviewLink = renderPreviewLink;
+	}
+
+	
+	/**
+	 * @return the renderWebDAVDeleter
+	 */
+	public boolean isRenderWebDAVDeleter() {
+		return this.renderWebDAVDeleter;
+	}
+
+	
+	/**
+	 * @param renderWebDAVDeleter the renderWebDAVDeleter to set
+	 */
+	public void setRenderWebDAVDeleter(boolean renderWebDAVDeleter) {
+		this.renderWebDAVDeleter = renderWebDAVDeleter;
+	}
+
+	
+	/**
+	 * @return the renderWebDAVNewFolder
+	 */
+	public boolean isRenderWebDAVNewFolder() {
+		return this.renderWebDAVNewFolder;
+	}
+
+	
+	/**
+	 * @param renderWebDAVNewFolder the renderWebDAVNewFolder to set
+	 */
+	public void setRenderWebDAVNewFolder(boolean renderWebDAVNewFolder) {
+		this.renderWebDAVNewFolder = renderWebDAVNewFolder;
+	}
 	
 }
