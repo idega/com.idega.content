@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.22 2006/04/09 12:01:54 laddi Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.23 2006/06/08 15:38:10 tryggvil Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -33,10 +33,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2006/04/09 12:01:54 $ by $Author: laddi $
+ * Last modified: $Date: 2006/06/08 15:38:10 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.22 $
+ * @version $Revision: 1.23 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -835,21 +835,26 @@ public class ContentItemViewer extends WFContainer {
 	 */
 	public String getViewState(FacesContext context) {
 		IWContext iwc = IWContext.getIWContext(context);
-		String state;
+		StringBuffer state = new StringBuffer();
 		if(ContentUtil.hasContentEditorRoles(iwc)){
-			state="edit";
+			state.append("edit");
 		}
 		else{
-			state="view";
+			state.append("view");
 		}
 		if (this.showRequestedItem) {
 			String resourceUrl = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
 			if(resourceUrl!=null){//&&showRequestedItem){
-				state+="_"+resourceUrl;
+				state.append(resourceUrl);
 			}
 		}
-		return state;
-		
+		if (this.detailsViewerPath!=null) {
+			state.append(detailsViewerPath);
+		}
+		if (this.resourcePath!=null) {
+			state.append(resourcePath);
+		}
+		return state.toString();
 	}
 
 }

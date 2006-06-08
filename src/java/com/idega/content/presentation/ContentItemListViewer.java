@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.17 2006/04/09 12:01:55 laddi Exp $
+ * $Id: ContentItemListViewer.java,v 1.18 2006/06/08 15:38:10 tryggvil Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -31,10 +31,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- * Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
+ * Last modified: $Date: 2006/06/08 15:38:10 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 public class ContentItemListViewer extends UIData implements CacheableUIComponent{
 
@@ -510,9 +510,44 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	 */
 	public String getViewState(FacesContext context) {
 		IWContext iwc = IWContext.getIWContext(context);
+		StringBuffer buf = new StringBuffer();
 		if(ContentUtil.hasContentEditorRoles(iwc)){
-			return "edit";
+			buf.append("edit");
 		}
-		return "view";
+		else{
+			buf.append("view");
+		}
+		String categories = this.getCategories();
+		if(categories!=null){
+			buf.append(UIComponentCacher.UNDERSCORE);
+			buf.append(categories);
+		}
+		buf.append(UIComponentCacher.UNDERSCORE);
+		buf.append(this.maxNumberOfDisplayed);
+		if(this.detailsViewerPath!=null){
+			buf.append(UIComponentCacher.UNDERSCORE);
+			buf.append(this.detailsViewerPath);
+		}
+		if(this._columnClasses!=null){
+			buf.append(UIComponentCacher.UNDERSCORE);
+			buf.append(this._columnClasses);
+		}
+		if(this._style!=null){
+			buf.append(UIComponentCacher.UNDERSCORE);
+			buf.append(this._style);
+		}
+		if(this._styleClass!=null){
+			buf.append(UIComponentCacher.UNDERSCORE);
+			buf.append(this._styleClass);
+		}
+		if(this.firstArticleItemStyleClass!=null){
+			buf.append(UIComponentCacher.UNDERSCORE);
+			buf.append(this.firstArticleItemStyleClass);
+		}
+		if(this.resourcePath!=null){
+			buf.append(UIComponentCacher.UNDERSCORE);
+			buf.append(this.resourcePath);
+		}
+		return buf.toString();
 	}
 }
