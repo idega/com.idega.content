@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.23 2006/06/08 15:38:10 tryggvil Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.24 2006/06/09 07:50:19 laddi Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -33,10 +33,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2006/06/08 15:38:10 $ by $Author: tryggvil $
+ * Last modified: $Date: 2006/06/09 07:50:19 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.23 $
+ * @version $Revision: 1.24 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -849,10 +849,10 @@ public class ContentItemViewer extends WFContainer {
 			}
 		}
 		if (this.detailsViewerPath!=null) {
-			state.append(detailsViewerPath);
+			state.append(this.detailsViewerPath);
 		}
 		if (this.resourcePath!=null) {
-			state.append(resourcePath);
+			state.append(this.resourcePath);
 		}
 		return state.toString();
 	}
