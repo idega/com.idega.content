@@ -34,6 +34,11 @@
       <name>1.0</name>
       <tag>CONTENT_1_0</tag>
     </version>
+    <version>
+      <id>3.1.0</id>
+      <name>3.1.0</name>
+      <tag>CONTENT_3_1_0</tag>
+    </version>
   </versions>
   <branches/>
   <developers>
@@ -88,7 +93,7 @@
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
-          <eclipse.dependency>${idegaweb.project.source.dependent}</eclipse.dependency>
+        <eclipse.dependency>${idegaweb.project.source.dependent}</eclipse.dependency>
       </properties>
     </dependency>
     <dependency>
@@ -98,7 +103,7 @@
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
-          <eclipse.dependency>${idegaweb.project.source.dependent}</eclipse.dependency>
+        <eclipse.dependency>${idegaweb.project.source.dependent}</eclipse.dependency>
       </properties>
     </dependency>
     <dependency>
@@ -108,10 +113,11 @@
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
-          <eclipse.dependency>${idegaweb.project.source.dependent}</eclipse.dependency>
+        <eclipse.dependency>${idegaweb.project.source.dependent}</eclipse.dependency>
       </properties>
     </dependency>
-	<!--duplicated slide dependencies -->
+    <!--duplicated slide dependencies -->
+
     <dependency>
       <groupId>slide</groupId>
       <artifactId>jakarta-slide-webdavlib</artifactId>
