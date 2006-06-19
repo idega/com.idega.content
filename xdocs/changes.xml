@@ -4,7 +4,28 @@
     <author email="tryggvi@idega.com">Tryggvi Larusson</author>
   </properties>
   <body>
-       	<release version="1.0" date="2005-09-15">
+  
+    <release version="3.1.0" date="2006-06-19">
+      <action dev="tryggvil" type="update">
+      	New version to be included in ePlatform 3.1 Release.
+      </action>
+      <action dev="tryggvil" type="update">
+      	Update of UI of ContentViewer (DocumentList) to be scrollable and better layout and style.
+      </action>
+      <action dev="eiki" type="update">
+      	Changing scope of managedbean of ContentViewer to be possible to have multiple viewers within
+      	one session.
+      </action>
+      <action dev="eiki" type="update">
+      	Update of ContentViewer (DocumentList) to be registered as a JSF component in Builder with properties.
+      </action>
+      <action dev="tryggvil" type="update">
+      	Updating base classes used by article module to support cacheing, support javascript editor buttons
+      	and other smaller UI changes.
+      </action>
+    </release>
+  
+	<release version="1.0" date="2005-09-15">
       <action dev="tryggvil" type="update">
         Declaration of version for use with core 3.0.5
       </action>              
