@@ -1,5 +1,5 @@
 /*
- * $Id: WhatIsNew.java,v 1.1 2006/06/29 11:14:04 eiki Exp $
+ * $Id: WhatIsNew.java,v 1.1.2.1 2006/06/30 15:14:17 eiki Exp $
  * Created on Jun 21, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -19,10 +19,10 @@ import com.idega.presentation.IWContext;
  * It extends SearchResults block and forces it to only use a DASL search (ContentSearch) with specific settings<br>
  * and the query is by default set to "*" and the path to "files" but that can be changed.
  * 
- *  Last modified: $Date: 2006/06/29 11:14:04 $ by $Author: eiki $
+ *  Last modified: $Date: 2006/06/30 15:14:17 $ by $Author: eiki $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.1.2.1 $
  */
 public class WhatIsNew extends SearchResults {
 	

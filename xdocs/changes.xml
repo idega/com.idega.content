@@ -5,6 +5,17 @@
   </properties>
   <body>
   
+   <release version="3.1.1" date="2006-06-30">
+      <action dev="eiki" type="add">
+      	Added a new block called WhatIsNew. It displays the latest or all entries in the file repository 
+      	ordered by creation date. It extends SearchResults and forces it to only use a DASL search (ContentSearch) 
+      	with specific settings and the query is by default set to "*" and the path to "files" but that can be changed.
+      </action>
+      <action dev="eiki" type="update">
+      	Changed ContentSearch to support ordering and limiting.
+      </action>
+   </release>
+  
     <release version="3.1.0" date="2006-06-19">
       <action dev="tryggvil" type="update">
       	New version to be included in ePlatform 3.1 Release.
