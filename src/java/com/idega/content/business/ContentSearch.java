@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.20.2.1 2006/06/30 15:15:51 eiki Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.20.2.2 2006/07/03 14:56:51 laddi Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -51,7 +51,7 @@ import com.idega.slide.business.IWSlideSession;
 
 /**
  * 
- * Last modified: $Date: 2006/06/30 15:15:51 $ by $Author: eiki $ This class
+ * Last modified: $Date: 2006/07/03 14:56:51 $ by $Author: laddi $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -61,7 +61,7 @@ import com.idega.slide.business.IWSlideSession;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.20.2.1 $
+ * @version $Revision: 1.20.2.2 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -99,7 +99,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 * @return the scopeURI
 	 */
 	public String getScopeURI() {
-		return scopeURI;
+		return this.scopeURI;
 	}
 
 	
@@ -575,7 +575,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 * @return the propertyToOrderBy
 	 */
 	public String getPropertyToOrderBy() {
-		return propertyToOrderBy;
+		return this.propertyToOrderBy;
 	}
 
 
@@ -593,7 +593,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 * @return the numberOfResultItems
 	 */
 	public int getNumberOfResultItemsToReturn() {
-		return numberOfResultItems;
+		return this.numberOfResultItems;
 	}
 
 
@@ -623,7 +623,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 * @return the useRootAccessForSearch
 	 */
 	public boolean isUsingRootAccessForSearch() {
-		return useRootAccessForSearch;
+		return this.useRootAccessForSearch;
 	}
 
 

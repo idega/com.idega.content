@@ -1,5 +1,5 @@
 /*
- * $Id: WhatIsNew.java,v 1.1.2.1 2006/06/30 15:14:17 eiki Exp $
+ * $Id: WhatIsNew.java,v 1.1.2.2 2006/07/03 14:56:34 laddi Exp $
  * Created on Jun 21, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -19,10 +19,10 @@ import com.idega.presentation.IWContext;
  * It extends SearchResults block and forces it to only use a DASL search (ContentSearch) with specific settings<br>
  * and the query is by default set to "*" and the path to "files" but that can be changed.
  * 
- *  Last modified: $Date: 2006/06/30 15:14:17 $ by $Author: eiki $
+ *  Last modified: $Date: 2006/07/03 14:56:34 $ by $Author: laddi $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.1.2.1 $
+ * @version $Revision: 1.1.2.2 $
  */
 public class WhatIsNew extends SearchResults {
 	
@@ -73,7 +73,7 @@ public class WhatIsNew extends SearchResults {
 			return query;
 		}
 		else{
-			return searchQueryString;
+			return this.searchQueryString;
 		}
 	}
 
@@ -96,7 +96,7 @@ public class WhatIsNew extends SearchResults {
 	 * @return the ignoreFolders
 	 */
 	public boolean isIgnoreFolders() {
-		return ignoreFolders;
+		return this.ignoreFolders;
 	}
 
 	
@@ -112,7 +112,7 @@ public class WhatIsNew extends SearchResults {
 	 * @return the numberOfResultItemsToDisplay
 	 */
 	public int getNumberOfResultItemsToDisplay() {
-		return numberOfResultItemsToDisplay;
+		return this.numberOfResultItemsToDisplay;
 	}
 
 	
@@ -128,7 +128,7 @@ public class WhatIsNew extends SearchResults {
 	 * @return the orderByProperty
 	 */
 	public String getOrderByProperty() {
-		return orderByProperty;
+		return this.orderByProperty;
 	}
 
 	
@@ -144,10 +144,10 @@ public class WhatIsNew extends SearchResults {
 	 * @return the startingPointURI
 	 */
 	public String getStartingPointURI() {
-		if(startingPointURI!=null && startingPointURI.startsWith("/")){
-			return startingPointURI.substring(1);
+		if (this.startingPointURI!=null && this.startingPointURI.startsWith("/")) {
+			return this.startingPointURI.substring(1);
 		}
-		else return startingPointURI;
+		else return this.startingPointURI;
 	}
 
 	
@@ -163,7 +163,7 @@ public class WhatIsNew extends SearchResults {
 	 * @return the useDescendingOrder
 	 */
 	public boolean isUsingDescendingOrder() {
-		return useDescendingOrder;
+		return this.useDescendingOrder;
 	}
 
 	
@@ -179,7 +179,7 @@ public class WhatIsNew extends SearchResults {
 	 * @return the useRootAccessForSearch
 	 */
 	public boolean isUsingRootAccessForSearch() {
-		return useRootAccessForSearch ;
+		return this.useRootAccessForSearch ;
 	}
 
 
