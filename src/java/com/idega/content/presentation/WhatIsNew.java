@@ -1,5 +1,5 @@
 /*
- * $Id: WhatIsNew.java,v 1.1.2.2 2006/07/03 14:56:34 laddi Exp $
+ * $Id: WhatIsNew.java,v 1.1.2.3 2006/07/06 16:55:47 eiki Exp $
  * Created on Jun 21, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -15,25 +15,32 @@ import com.idega.core.search.presentation.SearchResults;
 import com.idega.presentation.IWContext;
 
 /**
- * A block that displays the latest or all entries in the file repository ordered by creation date<br>
+ * A block that displays the latest or all entries in the file repository ordered by modification date<br>
  * It extends SearchResults block and forces it to only use a DASL search (ContentSearch) with specific settings<br>
  * and the query is by default set to "*" and the path to "files" but that can be changed.
  * 
- *  Last modified: $Date: 2006/07/03 14:56:34 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/07/06 16:55:47 $ by $Author: eiki $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.1.2.2 $
+ * @version $Revision: 1.1.2.3 $
  */
 public class WhatIsNew extends SearchResults {
 	
+	public static final String STYLE_CLASS_WHATISNEW = "whatisnew";
 	protected String startingPointURI = "files";
-	protected String orderByProperty = "creationdate";
+	protected String orderByProperty = "getlastmodified";
 	protected boolean useDescendingOrder = true;
 	protected int numberOfResultItemsToDisplay = -1;
 	protected boolean ignoreFolders = true;
-	private boolean useRootAccessForSearch = false;
+	protected boolean useRootAccessForSearch = false;
+	protected boolean hideParentFolderPath = false;
+	protected boolean hideFileExtension = false;
 	
-	
+
+	public WhatIsNew(){
+		super();
+		this.setStyleClass(STYLE_CLASS_WHATISNEW);
+	}
 
 	/* (non-Javadoc)
 	 * @see com.idega.core.search.presentation.SearchResults#configureSearchPlugin(com.idega.core.search.business.SearchPlugin)
@@ -50,6 +57,9 @@ public class WhatIsNew extends SearchResults {
 			contentSearch.setNumberOfResultItemsToReturn(getNumberOfResultItemsToDisplay());
 			contentSearch.setToIgnoreFolders(isIgnoreFolders());
 			contentSearch.setToUseRootAccessForSearch(isUsingRootAccessForSearch());
+			contentSearch.setToHideParentFolderPath(isSetToHideParentFolderPath());
+			contentSearch.setToHideFileExtensions(isSetToHideFileExtension());
+			
 			return contentSearch;
 		}
 		else {
@@ -193,6 +203,29 @@ public class WhatIsNew extends SearchResults {
 		this.useRootAccessForSearch = useRootAccessForSearch;
 	}
 	
+
+	/**
+	 * @return the hideFolderPath
+	 */
+	public boolean isSetToHideParentFolderPath() {
+		return hideParentFolderPath;
+	}
+
 	
+	/**
+	 * If set to true the result will only state the parent folder of the result itm and not the full path
+	 * @param hideParentFolderPath 
+	 */
+	public void setToHideParentFolderPath(boolean hideParentFolderPath) {
+		this.hideParentFolderPath = hideParentFolderPath;
+	}
 	
+	public boolean isSetToHideFileExtension() {
+		return hideFileExtension;
+	}
+
+	public void setToHideFileExtension(boolean hideFileExtension) {
+		this.hideFileExtension = hideFileExtension;
+	}
+		
 }

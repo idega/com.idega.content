@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.20.2.2 2006/07/03 14:56:51 laddi Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.20.2.3 2006/07/06 16:55:47 eiki Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -12,12 +12,19 @@ package com.idega.content.business;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.rmi.RemoteException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
+
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
@@ -34,6 +41,7 @@ import org.apache.webdav.lib.search.SearchException;
 import org.apache.webdav.lib.search.SearchExpression;
 import org.apache.webdav.lib.search.SearchRequest;
 import org.apache.webdav.lib.search.SearchScope;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.core.search.business.Search;
@@ -45,13 +53,15 @@ import com.idega.core.search.data.BasicSearchResult;
 import com.idega.core.search.data.SimpleSearchQuery;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
+import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2006/07/03 14:56:51 $ by $Author: laddi $ This class
+ * Last modified: $Date: 2006/07/06 16:55:47 $ by $Author: eiki $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -61,7 +71,7 @@ import com.idega.slide.business.IWSlideSession;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.20.2.2 $
+ * @version $Revision: 1.20.2.3 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -89,12 +99,40 @@ public class ContentSearch extends Object implements SearchPlugin{
 	protected boolean ignoreFolders = true;
 	protected int numberOfResultItems = -1;
 	protected boolean useRootAccessForSearch = false;
+	protected boolean hideParentFolderPath = false;
+	protected boolean hideFileExtension = false;
 	
 	protected static final String ORDER_ASCENDING = "ascending";
 	protected static final String ORDER_DESCENDING = "descending";
 	
+	/* STUFF FROM WebdavResource to handle better dates from slide */
+	 /**
+    * Date formats using for Date parsing.
+    */
+   public static final SimpleDateFormat formats[] = {
+       new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US),
+           new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US),
+           new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
+           new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US),
+           new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US),
+           new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss'Z'", Locale.US)
+   };
 
-	
+
+   /**
+    * GMT timezone.
+    */
+   protected final static TimeZone gmtZone = TimeZone.getTimeZone("GMT");
+
+
+   static {
+       for (int i = 0; i < formats.length; i++) {
+           formats[i].setTimeZone(gmtZone);
+       }
+   }
+
+	/* STUFF ENDS FROM WebdavResource to handle better dates from slide */
+   
 	/**
 	 * @return the scopeURI
 	 */
@@ -415,7 +453,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 		//TODO allow AND search also in for loop
 		String queryString = ((SimpleSearchQuery) searchQuery).getSimpleSearchQuery();
 		StringBuffer searchXML = new StringBuffer();
-		searchXML.append("<D:searchrequest xmlns:D='DAV:' xmlns:S='http://jakarta.apache.org/slide/'><D:basicsearch><D:select><D:prop><D:getcontentlength/><D:creationdate/><D:displayname/><D:getlastmodifieddate/></D:prop></D:select>")
+		searchXML.append("<D:searchrequest xmlns:D='DAV:' xmlns:S='http://jakarta.apache.org/slide/'><D:basicsearch><D:select><D:prop><D:getcontentlength/><D:creationdate/><D:displayname/><D:getlastmodified/></D:prop></D:select>")
 		.append("<D:from>")
 		.append("<D:scope><D:href>").append(getScopeURI()).append("</D:href><D:depth>infinity</D:depth></D:scope>")
 		.append("</D:from>")
@@ -501,26 +539,42 @@ public class ContentSearch extends Object implements SearchPlugin{
 	}
 
 	protected void executeSearch(List results, String servletMapping, SearchMethod method, HttpClient client)
-			throws IOException, HttpException {
+	throws IOException, HttpException {
 		int state = client.executeMethod(method);
-		// todo remove
+//		todo remove
 		System.out.println("DASL Search result status code: " + state);
 		System.out.println("DASL Search result status text: " + method.getStatusText());
-		// Header[] headers = method.getResponseHeaders();
-		// for (int i = 0; i < headers.length; i++) {
-		// System.out.println(headers[i].toString());
-		// }
-		// todo remove when access control is ok, also change search to ignore
-		// folders?
+//		Header[] headers = method.getResponseHeaders();
+//		for (int i = 0; i < headers.length; i++) {
+//		System.out.println(headers[i].toString());
+//		}
+//		todo remove when access control is ok, also change search to ignore
+//		folders?
 		this.tempCurrentUserPath = servletMapping + this.tempCurrentUserPath;
 		String tempUsersRootPath = servletMapping + TEMP_ILLEGAL_PATH;
 		Enumeration enumerator = method.getResponses();
+		String fileName;
+		String fileURI;
+		String lastModifiedDate;
+		String parentFolderPath;
+		BasicSearchResult result;
+		Property prop;
+		
+		Locale locale = null;
+		
+		
+		try {
+			IWContext iwc = IWContext.getInstance();
+			locale = iwc.getCurrentLocale();
+		} catch (UnavailableIWContext e) {
+			//not being run by a user, e.g. backend search
+			locale = IWMainApplication.getDefaultIWApplicationContext().getApplicationSettings().getDefaultLocale();
+		}
+
 		while (enumerator.hasMoreElements()) {
 			ResponseEntity entity = (ResponseEntity) enumerator.nextElement();
-			String fileURI = entity.getHref();
-			
-			
-			
+			fileURI = entity.getHref();
+
 			if (!fileURI.equalsIgnoreCase(servletMapping)) {
 				// TODO remove temp stuff when accesscontrol is fixed
 				if (fileURI.startsWith(tempUsersRootPath) && !fileURI.startsWith(this.tempCurrentUserPath)) {
@@ -528,19 +582,40 @@ public class ContentSearch extends Object implements SearchPlugin{
 				}
 				else {
 					Enumeration props = entity.getProperties();
-					
+					Map properties = new HashMap();
 					while (props.hasMoreElements()) {
-						Property prop = (Property) props.nextElement();
+						prop = (Property) props.nextElement();
 						String name = prop.getLocalName();
 						String value = prop.getPropertyAsString();
-						System.out.println(name+":"+value);
+						properties.put(name,value);
 					}
-					BasicSearchResult result = new BasicSearchResult();
+					
+					
+					fileName = URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/") + 1));
+					if(isSetToHideFileExtensions()){
+						int dotIndex = fileName.lastIndexOf(".");
+						if(dotIndex>-1){
+							fileName = fileName.substring(0,dotIndex);
+						}
+					}
+					
+					parentFolderPath = URLDecoder.decode(fileURI.substring(0,fileURI.lastIndexOf("/") + 1));
+
+					if(isSetToHideParentFolderPath()){
+						parentFolderPath = (parentFolderPath.endsWith("/"))? parentFolderPath.substring(0,parentFolderPath.lastIndexOf("/")):parentFolderPath;
+						parentFolderPath = parentFolderPath.substring(parentFolderPath.lastIndexOf("/")+1);
+					}
+					String modDate = (String)properties.get("getlastmodified");		
+					lastModifiedDate = new IWTimestamp(parseDate(modDate)).getLocaleDate(locale, IWTimestamp.MEDIUM);
+					
+					result = new BasicSearchResult();
 					result.setSearchResultType(SEARCH_TYPE);
 					result.setSearchResultURI(fileURI);
-					result.setSearchResultName(URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/") + 1)));
-					result.setSearchResultExtraInformation(URLDecoder.decode(fileURI.substring(0,
-							fileURI.lastIndexOf("/") + 1)));
+					result.setSearchResultName(fileName);
+					result.setSearchResultExtraInformation(parentFolderPath);
+					result.setSearchResultAbstract(lastModifiedDate);
+					result.setSearchResultAttributes(properties);
+					
 					results.add(result);
 				}
 			}
@@ -636,4 +711,59 @@ public class ContentSearch extends Object implements SearchPlugin{
 	public void setToUseRootAccessForSearch(boolean useRootAccessForSearch) {
 		this.useRootAccessForSearch = useRootAccessForSearch;
 	}
+	
+	/**
+	 * @return the hideFolderPath
+	 */
+	public boolean isSetToHideParentFolderPath() {
+		return hideParentFolderPath;
+	}
+
+
+	
+	/**
+	 * If set to true the result will only state the parent folder of the result itm and not the full path
+	 * @param hideParentFolderPath 
+	 */
+	public void setToHideParentFolderPath(boolean hideParentFolderPath) {
+		this.hideParentFolderPath = hideParentFolderPath;
+	}
+
+
+	/**
+	 * @return if we are hiding the file extension or not
+	 */
+	public boolean isSetToHideFileExtensions() {
+		return hideFileExtension;
+	}
+
+
+	/**
+	 * If true the everything after the last "." of a file name is cut away
+	 * @param hideFileExtension the hideFileExtension to set
+	 */
+	public void setToHideFileExtensions(boolean hideFileExtensions) {
+		this.hideFileExtension = hideFileExtensions;
+	}
+	
+    /**
+     * Parse the <code>java.util.Date</code> string for HTTP-date.
+     *
+     * @return The parsed date.
+     */
+    protected Date parseDate(String dateValue) {
+        // TODO: move to the common util package related to http.
+        Date date = null;
+        for (int i = 0; (date == null) && (i < formats.length); i++) {
+            try {
+                synchronized (formats[i]) {
+                    date = formats[i].parse(dateValue);
+                }
+            } catch (ParseException e) {
+            }
+        }
+
+        return date;
+    }
+
 }
