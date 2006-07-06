@@ -5,6 +5,13 @@
   </properties>
   <body>
   
+  <release version="3.1.3" date="2006-07-06">
+      <action dev="eiki" type="fix">
+      	Fixed nullpointer bug that was created with the combination of ArticleList and ContentSearch. The folder in the article path do not have creation or modification dates!
+      	Declaring v. 3.1.3	
+      </action>
+   </release>
+   
   <release version="3.1.2" date="2006-07-06">
       <action dev="eiki" type="update">
       	Updated WhatIsNew to use features from core v. 3.1.3 and ContentSearch

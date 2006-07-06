@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.20.2.3 2006/07/06 16:55:47 eiki Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.20.2.4 2006/07/06 18:29:04 eiki Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -61,7 +61,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2006/07/06 16:55:47 $ by $Author: eiki $ This class
+ * Last modified: $Date: 2006/07/06 18:29:04 $ by $Author: eiki $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -71,7 +71,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.20.2.3 $
+ * @version $Revision: 1.20.2.4 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -605,17 +605,22 @@ public class ContentSearch extends Object implements SearchPlugin{
 						parentFolderPath = (parentFolderPath.endsWith("/"))? parentFolderPath.substring(0,parentFolderPath.lastIndexOf("/")):parentFolderPath;
 						parentFolderPath = parentFolderPath.substring(parentFolderPath.lastIndexOf("/")+1);
 					}
-					String modDate = (String)properties.get("getlastmodified");		
-					lastModifiedDate = new IWTimestamp(parseDate(modDate)).getLocaleDate(locale, IWTimestamp.MEDIUM);
-					
+					String modDate = (String)properties.get("getlastmodified");	
+					if(modDate==null){
+						modDate =  (String)properties.get("creationdate");	
+					}
+				
 					result = new BasicSearchResult();
 					result.setSearchResultType(SEARCH_TYPE);
 					result.setSearchResultURI(fileURI);
 					result.setSearchResultName(fileName);
 					result.setSearchResultExtraInformation(parentFolderPath);
-					result.setSearchResultAbstract(lastModifiedDate);
-					result.setSearchResultAttributes(properties);
+					if(modDate!=null){
+						lastModifiedDate = new IWTimestamp(parseDate(modDate)).getLocaleDate(locale, IWTimestamp.MEDIUM);
+						result.setSearchResultAbstract(lastModifiedDate);
+					}
 					
+					result.setSearchResultAttributes(properties);
 					results.add(result);
 				}
 			}
@@ -752,17 +757,18 @@ public class ContentSearch extends Object implements SearchPlugin{
      * @return The parsed date.
      */
     protected Date parseDate(String dateValue) {
-        // TODO: move to the common util package related to http.
+        
         Date date = null;
-        for (int i = 0; (date == null) && (i < formats.length); i++) {
-            try {
-                synchronized (formats[i]) {
-                    date = formats[i].parse(dateValue);
-                }
-            } catch (ParseException e) {
-            }
+        if(dateValue!=null){
+	        for (int i = 0; (date == null) && (i < formats.length); i++) {
+	            try {
+	                synchronized (formats[i]) {
+	                    date = formats[i].parse(dateValue);
+	                }
+	            } catch (ParseException e) {
+	            }
+	        }
         }
-
         return date;
     }
 
