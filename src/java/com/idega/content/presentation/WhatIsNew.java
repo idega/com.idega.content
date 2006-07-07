@@ -1,5 +1,5 @@
 /*
- * $Id: WhatIsNew.java,v 1.1 2006/06/29 11:14:04 eiki Exp $
+ * $Id: WhatIsNew.java,v 1.2 2006/07/07 12:48:33 eiki Exp $
  * Created on Jun 21, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -15,25 +15,32 @@ import com.idega.core.search.presentation.SearchResults;
 import com.idega.presentation.IWContext;
 
 /**
- * A block that displays the latest or all entries in the file repository ordered by creation date<br>
+ * A block that displays the latest or all entries in the file repository ordered by modification date<br>
  * It extends SearchResults block and forces it to only use a DASL search (ContentSearch) with specific settings<br>
  * and the query is by default set to "*" and the path to "files" but that can be changed.
  * 
- *  Last modified: $Date: 2006/06/29 11:14:04 $ by $Author: eiki $
+ *  Last modified: $Date: 2006/07/07 12:48:33 $ by $Author: eiki $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class WhatIsNew extends SearchResults {
 	
+	public static final String STYLE_CLASS_WHATISNEW = "whatisnew";
 	protected String startingPointURI = "files";
-	protected String orderByProperty = "creationdate";
+	protected String orderByProperty = "getlastmodified";
 	protected boolean useDescendingOrder = true;
 	protected int numberOfResultItemsToDisplay = -1;
 	protected boolean ignoreFolders = true;
-	private boolean useRootAccessForSearch = false;
+	protected boolean useRootAccessForSearch = false;
+	protected boolean hideParentFolderPath = false;
+	protected boolean hideFileExtension = false;
 	
-	
+
+	public WhatIsNew(){
+		super();
+		this.setStyleClass(STYLE_CLASS_WHATISNEW);
+	}
 
 	/* (non-Javadoc)
 	 * @see com.idega.core.search.presentation.SearchResults#configureSearchPlugin(com.idega.core.search.business.SearchPlugin)
@@ -50,6 +57,9 @@ public class WhatIsNew extends SearchResults {
 			contentSearch.setNumberOfResultItemsToReturn(getNumberOfResultItemsToDisplay());
 			contentSearch.setToIgnoreFolders(isIgnoreFolders());
 			contentSearch.setToUseRootAccessForSearch(isUsingRootAccessForSearch());
+			contentSearch.setToHideParentFolderPath(isSetToHideParentFolderPath());
+			contentSearch.setToHideFileExtensions(isSetToHideFileExtension());
+			
 			return contentSearch;
 		}
 		else {
@@ -73,7 +83,7 @@ public class WhatIsNew extends SearchResults {
 			return query;
 		}
 		else{
-			return searchQueryString;
+			return this.searchQueryString;
 		}
 	}
 
@@ -96,7 +106,7 @@ public class WhatIsNew extends SearchResults {
 	 * @return the ignoreFolders
 	 */
 	public boolean isIgnoreFolders() {
-		return ignoreFolders;
+		return this.ignoreFolders;
 	}
 
 	
@@ -112,7 +122,7 @@ public class WhatIsNew extends SearchResults {
 	 * @return the numberOfResultItemsToDisplay
 	 */
 	public int getNumberOfResultItemsToDisplay() {
-		return numberOfResultItemsToDisplay;
+		return this.numberOfResultItemsToDisplay;
 	}
 
 	
@@ -128,7 +138,7 @@ public class WhatIsNew extends SearchResults {
 	 * @return the orderByProperty
 	 */
 	public String getOrderByProperty() {
-		return orderByProperty;
+		return this.orderByProperty;
 	}
 
 	
@@ -144,10 +154,10 @@ public class WhatIsNew extends SearchResults {
 	 * @return the startingPointURI
 	 */
 	public String getStartingPointURI() {
-		if(startingPointURI!=null && startingPointURI.startsWith("/")){
-			return startingPointURI.substring(1);
+		if (this.startingPointURI!=null && this.startingPointURI.startsWith("/")) {
+			return this.startingPointURI.substring(1);
 		}
-		else return startingPointURI;
+		else return this.startingPointURI;
 	}
 
 	
@@ -163,7 +173,7 @@ public class WhatIsNew extends SearchResults {
 	 * @return the useDescendingOrder
 	 */
 	public boolean isUsingDescendingOrder() {
-		return useDescendingOrder;
+		return this.useDescendingOrder;
 	}
 
 	
@@ -179,7 +189,7 @@ public class WhatIsNew extends SearchResults {
 	 * @return the useRootAccessForSearch
 	 */
 	public boolean isUsingRootAccessForSearch() {
-		return useRootAccessForSearch ;
+		return this.useRootAccessForSearch ;
 	}
 
 
@@ -193,6 +203,29 @@ public class WhatIsNew extends SearchResults {
 		this.useRootAccessForSearch = useRootAccessForSearch;
 	}
 	
+
+	/**
+	 * @return the hideFolderPath
+	 */
+	public boolean isSetToHideParentFolderPath() {
+		return hideParentFolderPath;
+	}
+
 	
+	/**
+	 * If set to true the result will only state the parent folder of the result itm and not the full path
+	 * @param hideParentFolderPath 
+	 */
+	public void setToHideParentFolderPath(boolean hideParentFolderPath) {
+		this.hideParentFolderPath = hideParentFolderPath;
+	}
 	
+	public boolean isSetToHideFileExtension() {
+		return hideFileExtension;
+	}
+
+	public void setToHideFileExtension(boolean hideFileExtension) {
+		this.hideFileExtension = hideFileExtension;
+	}
+		
 }
