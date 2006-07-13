@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.22 2006/07/07 12:48:33 eiki Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.23 2006/07/13 14:48:57 eiki Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -45,6 +45,7 @@ import com.idega.business.IBOLookupException;
 import com.idega.core.search.business.Search;
 import com.idega.core.search.business.SearchPlugin;
 import com.idega.core.search.business.SearchQuery;
+import com.idega.core.search.business.SearchResultComparator;
 import com.idega.core.search.data.AdvancedSearchQuery;
 import com.idega.core.search.data.BasicSearch;
 import com.idega.core.search.data.BasicSearchResult;
@@ -59,7 +60,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2006/07/07 12:48:33 $ by $Author: eiki $ This class
+ * Last modified: $Date: 2006/07/13 14:48:57 $ by $Author: eiki $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -69,7 +70,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.22 $
+ * @version $Revision: 1.23 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -322,7 +323,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 //				l.add(propertySearchXML);
 				//Searches both at the same time
 				String combinedSearch = getCombinedContentAndPropertySearch(searchQuery);
-				System.out.println(combinedSearch);
+				//System.out.println(combinedSearch);
 				
 				l.add(combinedSearch);
 				
@@ -540,8 +541,8 @@ public class ContentSearch extends Object implements SearchPlugin{
 	throws IOException, HttpException {
 		int state = client.executeMethod(method);
 //		todo remove
-		System.out.println("DASL Search result status code: " + state);
-		System.out.println("DASL Search result status text: " + method.getStatusText());
+		//System.out.println("DASL Search result status code: " + state);
+		//System.out.println("DASL Search result status text: " + method.getStatusText());
 //		Header[] headers = method.getResponseHeaders();
 //		for (int i = 0; i < headers.length; i++) {
 //		System.out.println(headers[i].toString());
@@ -559,15 +560,20 @@ public class ContentSearch extends Object implements SearchPlugin{
 		Property prop;
 		
 		Locale locale = null;
-		
+		//FIXME EIKI once ordering works withing DASL in Slide we won't need this comparator
 		
 		try {
 			IWContext iwc = IWContext.getInstance();
 			locale = iwc.getCurrentLocale();
+			
 		} catch (UnavailableIWContext e) {
 			//not being run by a user, e.g. backend search
 			locale = IWMainApplication.getDefaultIWApplicationContext().getApplicationSettings().getDefaultLocale();
 		}
+		
+		//ONLY NEEDED UNTIL ORDERING / SORTING WORKS IN SLIDE!!
+		SearchResultComparator comparator = new SearchResultComparator(locale,getPropertyToOrderBy(),isSetToUseDescendingOrder());
+		//
 
 		while (enumerator.hasMoreElements()) {
 			ResponseEntity entity = (ResponseEntity) enumerator.nextElement();
@@ -588,7 +594,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 						properties.put(name,value);
 					}
 					
-					
+					// PARSE PROPERTIES AND CONVERT SOME
 					fileName = URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/") + 1));
 					if(isSetToHideFileExtensions()){
 						int dotIndex = fileName.lastIndexOf(".");
@@ -604,17 +610,26 @@ public class ContentSearch extends Object implements SearchPlugin{
 						parentFolderPath = parentFolderPath.substring(parentFolderPath.lastIndexOf("/")+1);
 					}
 					String modDate = (String)properties.get("getlastmodified");	
+					String createdDate =  (String)properties.get("creationdate");
+					
 					if(modDate==null){
-						modDate =  (String)properties.get("creationdate");	
+						modDate =  createdDate;	
 					}
+					
+					Date modifiedDate = parseDate(modDate);
+					properties.put("getlastmodified",modifiedDate);
+					Date creationDate = parseDate(createdDate);
+					properties.put("creationdate",creationDate);
 				
+					// PARSING DONE
+					
 					result = new BasicSearchResult();
 					result.setSearchResultType(SEARCH_TYPE);
 					result.setSearchResultURI(fileURI);
 					result.setSearchResultName(fileName);
 					result.setSearchResultExtraInformation(parentFolderPath);
-					if(modDate!=null){
-						lastModifiedDate = new IWTimestamp(parseDate(modDate)).getLocaleDate(locale, IWTimestamp.MEDIUM);
+					if(modifiedDate!=null){
+						lastModifiedDate = new IWTimestamp(modifiedDate).getLocaleDate(locale, IWTimestamp.MEDIUM);
 						result.setSearchResultAbstract(lastModifiedDate);
 					}
 					
@@ -623,6 +638,9 @@ public class ContentSearch extends Object implements SearchPlugin{
 				}
 			}
 		}
+		
+		
+		Collections.sort(results,comparator);
 	}
 
 	/*
@@ -769,5 +787,6 @@ public class ContentSearch extends Object implements SearchPlugin{
         }
         return date;
     }
+    
 
 }
