@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.20 2006/04/09 12:01:55 laddi Exp $
+ * $Id: ContentItemBean.java,v 1.20.2.1 2006/07/24 10:52:19 laddi Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -9,7 +9,6 @@
  */
 package com.idega.content.bean;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -36,10 +35,10 @@ import com.idega.util.IWTimestamp;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/07/24 10:52:19 $ by $Author: laddi $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.20 $
+ * @version $Revision: 1.20.2.1 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	

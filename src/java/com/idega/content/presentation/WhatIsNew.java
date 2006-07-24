@@ -1,5 +1,5 @@
 /*
- * $Id: WhatIsNew.java,v 1.1.2.3 2006/07/06 16:55:47 eiki Exp $
+ * $Id: WhatIsNew.java,v 1.1.2.4 2006/07/24 10:52:19 laddi Exp $
  * Created on Jun 21, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -19,10 +19,10 @@ import com.idega.presentation.IWContext;
  * It extends SearchResults block and forces it to only use a DASL search (ContentSearch) with specific settings<br>
  * and the query is by default set to "*" and the path to "files" but that can be changed.
  * 
- *  Last modified: $Date: 2006/07/06 16:55:47 $ by $Author: eiki $
+ *  Last modified: $Date: 2006/07/24 10:52:19 $ by $Author: laddi $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.1.2.3 $
+ * @version $Revision: 1.1.2.4 $
  */
 public class WhatIsNew extends SearchResults {
 	
@@ -208,7 +208,7 @@ public class WhatIsNew extends SearchResults {
 	 * @return the hideFolderPath
 	 */
 	public boolean isSetToHideParentFolderPath() {
-		return hideParentFolderPath;
+		return this.hideParentFolderPath;
 	}
 
 	
@@ -221,7 +221,7 @@ public class WhatIsNew extends SearchResults {
 	}
 	
 	public boolean isSetToHideFileExtension() {
-		return hideFileExtension;
+		return this.hideFileExtension;
 	}
 
 	public void setToHideFileExtension(boolean hideFileExtension) {

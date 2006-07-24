@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.20.2.5 2006/07/07 16:22:27 eiki Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.20.2.6 2006/07/24 10:52:19 laddi Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -62,7 +62,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2006/07/07 16:22:27 $ by $Author: eiki $ 
+ * Last modified: $Date: 2006/07/24 10:52:19 $ by $Author: laddi $ 
  * This class implements the Searchplugin interface and can therefore be used in a Search block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
  * system. To use it simply register this class as a iw.searchable component in
@@ -71,7 +71,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.20.2.5 $
+ * @version $Revision: 1.20.2.6 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -541,7 +541,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 
 	protected void executeSearch(List results, String servletMapping, SearchMethod method, HttpClient client)
 	throws IOException, HttpException {
-		int state = client.executeMethod(method);
+		/*int state =*/ client.executeMethod(method);
 //		todo remove
 		//System.out.println("DASL Search result status code: " + state);
 		//System.out.println("DASL Search result status text: " + method.getStatusText());
@@ -739,7 +739,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 * @return the hideFolderPath
 	 */
 	public boolean isSetToHideParentFolderPath() {
-		return hideParentFolderPath;
+		return this.hideParentFolderPath;
 	}
 
 
@@ -757,7 +757,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 * @return if we are hiding the file extension or not
 	 */
 	public boolean isSetToHideFileExtensions() {
-		return hideFileExtension;
+		return this.hideFileExtension;
 	}
 
 
