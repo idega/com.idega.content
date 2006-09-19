@@ -1,25 +1,40 @@
 package com.idega.content.business;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 import javax.faces.component.UIComponent;
 import javax.faces.event.ActionEvent;
+
 import org.apache.myfaces.custom.fileupload.UploadedFile;
 import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.core.file.util.MimeTypeUtil;
+import com.idega.io.ZipInstaller;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavRootResource;
 import com.idega.webface.WFUtil;
 
-public class WebDAVUploadBean{
-	
+public class WebDAVUploadBean implements Serializable{
+
+	private static final long serialVersionUID = -1760819218959402747L;
+	private static final Log log = LogFactory.getLog(WebDAVUploadBean.class);
 	private static String DEFAULT_PATH = "/files/documents/";
 	private UploadedFile uploadFile;
 	private String name = "";
-	private String uploadFolderPath = DEFAULT_PATH;
+	private String uploadFilePath = DEFAULT_PATH;
 	private String downloadPath = null;
 	private String imagePath = null;
 	private String comment = null;
@@ -49,14 +64,14 @@ public class WebDAVUploadBean{
 	}
 	
 	public String getUploadFilePath(){
-		if(!this.uploadFolderPath.endsWith("/")){
-			this.uploadFolderPath+="/";
+		if(!this.uploadFilePath.endsWith("/")){
+			this.uploadFilePath+="/";
 		}
-		return this.uploadFolderPath;
+		return this.uploadFilePath;
 	}
 
 	public void setUploadFilePath(String uploadFolderPath) {
-		this.uploadFolderPath = uploadFolderPath;
+		this.uploadFilePath = uploadFolderPath;
 	}
 
 	public String upload(ActionEvent event) throws IOException{
@@ -68,7 +83,7 @@ public class WebDAVUploadBean{
 			
 			String tempUploadFolderPath = (String) WFUtil.invoke("WebDAVListBean","getWebDAVPath");
 			if(tempUploadFolderPath!=null){
-				this.uploadFolderPath = tempUploadFolderPath;
+				this.uploadFilePath = tempUploadFolderPath;
 			}
 			
 			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
@@ -117,7 +132,7 @@ public class WebDAVUploadBean{
 			catch (IOException e) {
 				e.printStackTrace();
 			}
-			System.out.println("Uploading file success "+uploadFileSuccess);
+			log.info("Uploading file success "+uploadFileSuccess);
 			
 			
 			
@@ -138,7 +153,7 @@ public class WebDAVUploadBean{
 				}
 			}
 			else{
-				System.err.println("Error code :"+rootResource.getStatusMessage()+", message: "+rootResource.getStatusMessage());
+				log.error("Error code :"+rootResource.getStatusMessage()+", message: "+rootResource.getStatusMessage());
 				return "upload_failed";
 			}
 		
@@ -193,4 +208,82 @@ public class WebDAVUploadBean{
 	public void setImagePath(String imagePath) {
 		this.imagePath = imagePath;
 	}
+	
+	/**
+	 * Uploads zip file's contents to slide. Note: only *.zip file allowed!
+	 * @param event: ActionEvent
+	 * @return result: success (true) or failure (false) while uploading file
+	 * @throws IOException
+	 */
+	public boolean uploadZipFileContents(ActionEvent event) throws IOException {
+		// Got a file to upload?
+		boolean result = uploadFile == null ? false : true;
+		if (!result) {
+			log.error("No file to upload");
+			return result;
+		}
+		// Is it a *.zip file?
+		result = uploadFile.getName().toLowerCase().endsWith(".zip");
+		if (!result) {
+			log.error("Only zip file accepting!");
+			return result;
+		}
+		result = doZipUploading(new ZipInputStream(new BufferedInputStream(uploadFile.getInputStream())), getUploadFilePath());
+		log.info("Success uploading zip file's contents: " + result);
+		return result;
+	}
+	
+	/**
+	 * Uploads zip file's contents to slide. Note: only *.zip file allowed!
+	 * @param zipInputStream: a stream to read the file and its content from
+	 * @param uploadPath: a path in slide where to store files (for example: "/files/public/")
+	 * @return result: success (true) or failure (false) while uploading file
+	 * @throws IOException
+	 */
+	public boolean doZipUploading(ZipInputStream zipInputStream, String uploadPath) throws IOException {
+		// Checking if parameters are valid
+		boolean result = (uploadPath == null || "".equals(uploadPath)) ? false : true;
+		if (!result) {
+			log.error("Invalid upload path!");
+			return result;
+		}
+		result = zipInputStream == null ? false : true;
+		if (!result) {
+			log.error("ZipInputStream is closed!");
+			return result;
+		}
+		
+		IWSlideService service = null;
+		try {
+			service = (IWSlideService) IBOLookup.getServiceInstance(IWContext.getInstance(), IWSlideService.class);
+		} catch (IBOLookupException e) {
+			log.error(e);
+		}
+		result = service == null ? false : true;
+		if (!result) {
+			log.info("Unable to get IWSlideServiceBean instance.");
+			return result;
+		}
+		ZipEntry entry = null;
+		ZipInstaller zip = new ZipInstaller();
+		ByteArrayOutputStream memory = null;
+		InputStream is = null;
+		try {
+			while ((entry = zipInputStream.getNextEntry()) != null && result) {
+				memory = new ByteArrayOutputStream();
+				zip.writeFromStreamToStream(zipInputStream, memory);
+				is = new ByteArrayInputStream(memory.toByteArray());
+				result = service.uploadFileAndCreateFoldersFromStringAsRoot(uploadPath, entry.getName(), is, null, true);
+				memory.close();
+				is.close();
+				zip.closeEntry(zipInputStream);
+			}
+		} catch (IOException e) {
+			log.error(e);
+			result = false;
+		}
+		zip.closeEntry(zipInputStream);
+		return result;
+	}
+
 }
