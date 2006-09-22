@@ -250,5 +250,34 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	background-image: url(images/new_16.gif);
 }
 
+.tree_drag_drop ul {
+	list-style-type:none;
+	padding-left: 0px;
+	padding: 0;
+	margin: 0;
 
+}
+
+.tree_drag_drop li {
+	list-style-type:none;
+}
+
+.tree_drag_drop input {
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+
+.tree_drag_drop a {
+	vertical-align: 20%;
+	border: 0px;
+	padding: 0px;
+	margin: 0px;
+}
+
+.tree_drag_drop img {
+	padding: 0px;
+	margin: -1px 0px -1px 0px; 
+	border: 0px;
+}
 

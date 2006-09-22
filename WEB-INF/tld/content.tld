@@ -12,6 +12,213 @@
     <display-name>Content Tag Library</display-name>
     <description>JSF Idega Content Management Tag Library</description>
 
+
+   <!-- tree3 -->
+
+   <tag>
+      <name>tree3</name>
+      <tag-class>com.idega.content.tree.TreeTagNew</tag-class>
+      <body-content>JSP</body-content>
+      <description>
+            A component that provides an HTML-based tree from data supplied
+            by a backing bean. The tree is highly customizable and allows
+            for fine-grained control over the appearance of each of the
+            nodes depending on their type. Almost any type of JSF component
+            (text, image, checkbox, etc.) can be rendered inside the nodes
+            and there is an option for client-side or server-side toggling
+            of the expand/collapse state.
+            Unless otherwise specified, all attributes accept static values or EL expressions.
+        </description>
+      <attribute>
+         <name>value</name>
+         <required>true</required>
+         <rtexprvalue>false</rtexprvalue>
+      </attribute>
+      <attribute>
+         <name>var</name>
+         <required>false</required>
+         <rtexprvalue>false</rtexprvalue>
+      </attribute>
+      <attribute>
+         <name>varNodeToggler</name>
+         <required>false</required>
+         <rtexprvalue>false</rtexprvalue>
+      </attribute>
+      <attribute>
+         <name>showNav</name>
+         <required>false</required>
+         <rtexprvalue>false</rtexprvalue>
+         <description>
+                Show the "plus" and "minus" navigation icons (default is true.) Value is ignored if
+                clientSideToggle is true.
+            </description>
+      </attribute>
+      <attribute>
+         <name>showLines</name>
+         <required>false</required>
+         <rtexprvalue>false</rtexprvalue>
+         <description>Show the connecting lines (default is true.)</description>
+      </attribute>
+      <attribute>
+         <name>clientSideToggle</name>
+         <required>false</required>
+         <rtexprvalue>false</rtexprvalue>
+         <description>Perform client-side toggling of expand/collapse state via javascript (default is true.)</description>
+
+      </attribute>
+
+      <attribute>
+
+         <name>showRootNode</name>
+
+         <required>false</required>
+
+         <rtexprvalue>false</rtexprvalue>
+
+         <description>Include the root node when rendering the tree (default is true.)</description>
+
+      </attribute>
+
+      <attribute>
+
+         <name>preserveToggle</name>
+
+         <required>false</required>
+
+         <rtexprvalue>false</rtexprvalue>
+
+         <description>Preserve changes in client-side toggle information between requests (default is true.)</description>
+
+      </attribute>
+
+      <attribute>
+
+         <name>javascriptLocation</name>
+
+         <required>false</required>
+
+         <rtexprvalue>false</rtexprvalue>
+
+         <type>java.lang.String</type>
+
+         <description>
+
+                An alternate location to find javascript resources.  If no values is specified, javascript will
+
+                be loaded from the resources directory using AddResource and ExtensionsFilter.
+
+            </description>
+
+      </attribute>
+
+      <attribute>
+
+         <name>imageLocation</name>
+
+         <required>false</required>
+
+         <rtexprvalue>false</rtexprvalue>
+
+         <type>java.lang.String</type>
+
+         <description>
+
+                An alternate location to find image resources.  If no values is specified, images will
+
+                be loaded from the resources directory using AddResource and ExtensionsFilter.
+
+            </description>
+
+      </attribute>
+
+      <attribute>
+
+         <name>styleLocation</name>
+
+         <required>false</required>
+
+         <rtexprvalue>false</rtexprvalue>
+
+         <type>java.lang.String</type>
+
+         <description>
+
+                An alternate location to find stylesheet resources.  If no values is specified, stylesheets will
+
+                be loaded from the resources directory using AddResource and ExtensionsFilter.
+
+            </description>
+
+      </attribute>
+
+      <!-- UIComponent attributes -->
+
+      <attribute>
+
+         <name>id</name>
+
+         <required>false</required>
+
+         <rtexprvalue>false</rtexprvalue>
+
+         <type>java.lang.String</type>
+
+         <description>
+
+        The developer-assigned ID of this component.  The ID must be unique
+
+        within the scope of the tag's enclosing naming container (e.g. 
+
+        h:form or f:subview).  This value must be a static value.
+
+    </description>
+
+      </attribute>
+
+      <attribute>
+
+         <name>binding</name>
+
+         <required>false</required>
+
+         <rtexprvalue>false</rtexprvalue>
+
+         <type>java.lang.String</type>
+
+         <description>
+
+        Identifies a backing bean property (of type UIComponent or appropriate
+
+        subclass) to bind to this component instance.  This value must be an
+
+        EL expression.
+
+    </description>
+
+      </attribute>
+
+      <attribute>
+
+         <name>rendered</name>
+
+         <required>false</required>
+
+         <rtexprvalue>false</rtexprvalue>
+
+         <type>java.lang.String</type>
+
+         <description>
+
+        A boolean value that indicates whether this component should be rendered.
+
+        Default value: true.
+
+    </description>
+
+      </attribute>
+
+   </tag>
+
 	<tag>
 		<name>WebDAVList</name>
 		<tag-class>com.idega.content.presentation.WebDAVListTag</tag-class>

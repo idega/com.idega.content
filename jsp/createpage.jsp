@@ -25,8 +25,7 @@ version="1.2">
 						
 						<wf:container id="create_page_fieldset" styleClass="create_page_fieldset">
 						
-						<h:panelGroup id="createPagePanelGroup">
-						
+						<h:panelGroup id="createPagePanelGroup">						
 
 						<h:outputLabel for="pageType">
 						  <h:outputText id="pageTypeLabel" value="Page Type: " styleClass="label"/>
