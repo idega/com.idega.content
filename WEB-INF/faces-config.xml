@@ -110,6 +110,106 @@
 		<component-class>com.idega.content.presentation.ContentItemListViewer</component-class>
 	</component>
 	
+	<component>
+		<component-type>WebDAVUpload</component-type>
+		<component-class>com.idega.content.presentation.WebDAVUpload</component-class>
+		<property>
+			<display-name>Method that will be used to upload a file</display-name>
+			<property-name>uploadMethod</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Select file style class</display-name>
+			<property-name>styleClassSelectFile</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>File upload style class</display-name>
+			<property-name>styleClassFileUploadInput</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>HtmlInputFileUpload accept type</display-name>
+			<property-name>accept</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>HtmlInputFileUpload storage type</display-name>
+			<property-name>storage</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>File name class name</display-name>
+			<property-name>styleClassGiveName</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Version text style class</display-name>
+			<property-name>styleClassVersionText</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Upload folder class name</display-name>
+			<property-name>styleClassFolder</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>File link target</display-name>
+			<property-name>fileLinkTarget</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Button's style class</display-name>
+			<property-name>styleClassButton</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>WFContainer line's element style class</display-name>
+			<property-name>styleClassWFContainerLine</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Show file name</display-name>
+			<property-name>useFileName</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Show version comment</display-name>
+			<property-name>useVersionComment</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Show upload path</display-name>
+			<property-name>useUploadPath</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Show file link</display-name>
+			<property-name>useFileLink</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Show image preview</display-name>
+			<property-name>useImagePreview</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Bean with method name, that provides upload folder</display-name>
+			<property-name>pathProviderBeanWithMethod</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>JavaScript action</display-name>
+			<property-name>onClickAction</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+	</component>
+	
+	<component>
+		<component-type>ThemesManager</component-type>
+		<component-class>com.idega.content.presentation.ThemesManager</component-class>
+	</component>
+	
     <managed-bean>
         <managed-bean-name>SessionBean1</managed-bean-name>
         <managed-bean-class>documentmanagementprototype2.SessionBean1</managed-bean-class>
@@ -231,6 +331,12 @@
 	<managed-bean>
 		<managed-bean-name>pageCreationBean</managed-bean-name>
 		<managed-bean-class>com.idega.content.bean.PageCreationManagedBean</managed-bean-class>
+		<managed-bean-scope>request</managed-bean-scope>
+	</managed-bean>
+	
+	<managed-bean>
+		<managed-bean-name>themesManagerBean</managed-bean-name>
+		<managed-bean-class>com.idega.content.bean.ThemesManagerBean</managed-bean-class>
 		<managed-bean-scope>request</managed-bean-scope>
 	</managed-bean>
 

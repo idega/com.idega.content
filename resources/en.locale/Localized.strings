@@ -171,3 +171,7 @@ values=Values
 version=Version
 version_comment=and a version comment (optional)
 yes=Yes
+themes_manager=Themes Manager
+upload_theme=Upload theme
+select_zip_file=Please select a zip file!
+incorrect_file_type=Unsupported file type! Only zip files allowed.

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.21 2006/09/22 12:36:38 justinas Exp $
+ * $Id: ContentViewManager.java,v 1.22 2006/09/25 14:28:17 valdas Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -26,10 +26,10 @@ import com.idega.repository.data.Singleton;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2006/09/22 12:36:38 $ by $Author: justinas $
+ *  Last modified: $Date: 2006/09/25 14:28:17 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.21 $
+ * @version $Revision: 1.22 $
  */
 public class ContentViewManager implements Singleton  {
 
@@ -120,6 +120,10 @@ public class ContentViewManager implements Singleton  {
 		simpleTemplateNode.setName("#{localizedStrings['com.idega.content']['template_settings']}");
 //		simpleTemplateNode.setVisibleInMenus(false);
 		
+		DefaultViewNode themeManager = new DefaultViewNode("themes_manager", pagesNode);
+		themeManager.setJspUri(bundle.getJSPURI("themesManager.jsp"));
+		themeManager.setName("#{localizedStrings['com.idega.content']['themes_manager']}");
+		
 //my code begins
 		
 		DefaultViewNode treeTemplateNode = new DefaultViewNode("tree",pagesNode);
@@ -135,7 +139,7 @@ public class ContentViewManager implements Singleton  {
 		templatesTemplateNode.setName("#{localizedStrings['com.idega.content']['Templates']}");
 
 //my code ends
-		
+
 		/* Page nodes end */
 		
 		
