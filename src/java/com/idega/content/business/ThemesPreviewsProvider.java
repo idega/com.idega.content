@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.idega.business.IBOService;
 import com.idega.slide.business.IWSlideService;
+import com.idega.graphics.PreviewGenerator;
 
 public interface ThemesPreviewsProvider extends IBOService {
 
@@ -23,9 +24,9 @@ public interface ThemesPreviewsProvider extends IBOService {
 	public String getResourcePath();
 
 	/**
-	 * @see com.idega.content.business.ThemesPreviewsProviderBean#getSldSrv()
+	 * @see com.idega.content.business.ThemesPreviewsProviderBean#getSlideService()
 	 */
-	public IWSlideService getSldSrv();
+	public IWSlideService getSlideService();
 
 	/**
 	 * @see com.idega.content.business.ThemesPreviewsProviderBean#getThemesPath()
@@ -38,9 +39,9 @@ public interface ThemesPreviewsProvider extends IBOService {
 	public String getThemesPreviewPath();
 
 	/**
-	 * @see com.idega.content.business.ThemesPreviewsProviderBean#getImagesInfo()
+	 * @see com.idega.content.business.ThemesPreviewsProviderBean#getThemesPreviewsInfo()
 	 */
-	public String getImagesInfo();
+	public String getThemesPreviewsInfo();
 
 	/**
 	 * @see com.idega.content.business.ThemesPreviewsProviderBean#getFileName(java.lang.String)
@@ -63,8 +64,18 @@ public interface ThemesPreviewsProvider extends IBOService {
 	public String getWebRootWithoutContent(String webRoot);
 	
 	/**
-	 * @ com.idega.content.business.ThemesPreviewsProviderBean#getFullWebRoot()
+	 * @see com.idega.content.business.ThemesPreviewsProviderBean#getFullWebRoot()
 	 */
 	public String getFullWebRoot();
-
+	
+	/**
+	 * @see com.idega.content.business.ThemesPreviewsProviderBean#getPagePreview()
+	 */
+	public String getPagePreview();
+	
+	/**
+	 * @see com.idega.content.business.ThemesPreviewsProviderBean#getPreviewGenerator()
+	 */
+	public PreviewGenerator getPreviewGenerator();
+	
 }

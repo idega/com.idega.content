@@ -179,6 +179,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WebDAVUpload upload = new WebDAVUpload();
 //		upload.setRendered(renderWebDAVUpload);
 		upload.setId(getId()+"_upload");
+		upload.setUseVersionComment(true);
 		uploadBlock.add(upload);
 		
 		WFBlock deleteBlock = new WFBlock();
