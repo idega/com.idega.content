@@ -188,6 +188,14 @@
 	
 	<dependency>
       <groupId>rome</groupId>
+      <artifactId>rome-fetcher</artifactId>
+      <version>0.7</version>
+      <type>jar</type>
+      <url>https://rome.dev.java.net/</url>
+    </dependency>
+	
+	<dependency>
+      <groupId>rome</groupId>
       <artifactId>rome-modules</artifactId>
       <version>0.2</version>
       <type>jar</type>
