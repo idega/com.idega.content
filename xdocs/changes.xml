@@ -5,6 +5,13 @@
   </properties>
   <body>
   
+   <release version="3.1.5" date="2006-09-28">
+      <action dev="eiki" type="update">
+     	Adding a dependency to RSS block and to Rome.
+		Added first version of ContentRSSProducer that creates RSS feeds from the Slide file system.
+      </action>
+   </release>
+   
     <release version="3.1.4" date="2006-07-07">
       <action dev="eiki" type="fix">
      	ContentSearch sorting / ordering is now done with the new SearchResultComparator.

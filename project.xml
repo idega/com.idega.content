@@ -4,7 +4,7 @@
   <extend>${base.project.dir}/base-dependencies.xml</extend>
   <name>idegaWeb Content</name>
   <artifactId>com.idega.content</artifactId>
-  <currentVersion>3.1.4</currentVersion>
+  <currentVersion>3.1.5</currentVersion>
   <inceptionYear>2004</inceptionYear>
   <shortDescription>idegaWeb is the new ContentManagement System and Framework</shortDescription>
   <issueTrackingUrl>http://issues.idega.is</issueTrackingUrl>
@@ -136,6 +136,16 @@
         <eclipse.dependency>${idegaweb.project.source.dependent}</eclipse.dependency>
       </properties>
     </dependency>
+	<dependency>
+      <groupId>bundles</groupId>
+      <artifactId>com.idega.block.rss</artifactId>
+      <version>3.1.4</version>
+      <type>jar</type>
+      <url>http://www.idega.com/</url>
+      <properties>
+        <eclipse.dependency>${idegaweb.project.source.dependent}</eclipse.dependency>
+      </properties>
+    </dependency>
     <!--duplicated slide dependencies -->
 
     <dependency>
@@ -144,6 +154,13 @@
       <version>2.2pre1.iwbuild4</version>
       <type>jar</type>
       <url>http://www.slide.com/</url>
+    </dependency>
+	<dependency>
+      <groupId>slide</groupId>
+      <artifactId>slide-kernel</artifactId>
+      <version>2.2pre1.iwbuild4</version>
+      <type>jar</type>
+      <url>http://jakarta.apache.org/slide/</url>
     </dependency>
     <dependency>
       <groupId>commons-httpclient</groupId>
@@ -159,5 +176,34 @@
       <type>jar</type>
       <url>http://commons.apache.org/</url>
     </dependency>
+	
+	<!-- duplicate ROME jars, included with the platform from com.idega.block.rss -->
+	<dependency>
+      <groupId>rome</groupId>
+      <artifactId>rome</artifactId>
+      <version>0.8</version>
+      <type>jar</type>
+      <url>https://rome.dev.java.net/</url>
+    </dependency>
+	
+	<dependency>
+      <groupId>rome</groupId>
+      <artifactId>rome-modules</artifactId>
+      <version>0.2</version>
+      <type>jar</type>
+      <url>https://rome.dev.java.net/</url>
+    </dependency>
+	
+	 <dependency>
+      <groupId>jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <version>1.0</version>
+      <type>jar</type>
+      <url>http://jdom.sourceforge.net/</url>
+    </dependency>
+	
+	<!-- end rome depend. -->
+	
+	
   </dependencies>
 </project>
