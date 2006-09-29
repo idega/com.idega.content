@@ -47,7 +47,7 @@ import java.util.HashMap;
  * @author Sean Schofield
  * @author Chris Barlow
  * @author Hans Bergsten (Some code taken from an example in his O'Reilly JavaServer Faces book. Copied with permission)
- * @version $Revision: 1.1 $ $Date: 2006/09/22 12:35:00 $
+ * @version $Revision: 1.2 $ $Date: 2006/09/29 09:07:06 $
  */
 public class HtmlTreeRenderer extends Renderer
 {
@@ -329,8 +329,7 @@ public class HtmlTreeRenderer extends Renderer
         String[] pathInfo = tree.getPathInformation(tree.getNodeId());
         int paddingLevel = pathInfo.length - 1;
 
-        for (int i = (showRootNode ? 0 : 1); i < paddingLevel; i++)
-        {
+        for (int i = (showRootNode ? 0 : 1); i < paddingLevel; i++) {
             boolean lastChild = tree.isLastChild((String)pathInfo[i]);
             String lineSrc = (!lastChild && showLines)
                              ? getImageSrc(context, tree, "line-trunk.gif", true)
@@ -347,18 +346,6 @@ public class HtmlTreeRenderer extends Renderer
             out.writeAttribute(HTML.BORDER_ATTR, "0", null);
             out.endElement(HTML.IMG_ELEM);
             out.endElement(HTML.TD_ELEM);
-
- /*
-                             out.startElement(HTML.LI_ELEM, tree);
-                             out.writeURIAttribute("background", lineSrc, null);
-                             out.startElement(HTML.IMG_ELEM, tree);
-                             out.writeURIAttribute(HTML.SRC_ATTR, lineSrc, null);
-
-                             out.endElement(HTML.IMG_ELEM);
-                             out.endElement(HTML.LI_ELEM);
-*/                             
-                             
-                             
         }
 
         if (showNav)

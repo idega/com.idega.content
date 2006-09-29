@@ -6,6 +6,9 @@
     <create creator="ibo" javascript="ThemesPreviewsProvider" scope="application">
       <param name="class" value="com.idega.content.business.ThemesPreviewsProvider"/>
     </create>
+    <create creator="ibo" javascript="NodeID" scope="application">
+      <param name="class" value="com.idega.content.tree.NodeID"/>
+    </create>
   </allow>
   <signatures>
   </signatures>
