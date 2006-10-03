@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.20 2006/04/09 12:01:55 laddi Exp $
+ * $Id: ContentItemBean.java,v 1.21 2006/10/03 15:58:45 gediminas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -9,6 +9,7 @@
  */
 package com.idega.content.bean;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -36,10 +37,10 @@ import com.idega.util.IWTimestamp;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/10/03 15:58:45 $ by $Author: gediminas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.20 $
+ * @version $Revision: 1.21 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -276,20 +277,21 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 * <p>
 	 * Loads this resource from the folder set by setResourcepath();
 	 * </p>
+	 * @throws IOException 
 	 * @throws Exception If there is an exception loading
 	 */
-	public void load()throws Exception{
+	public void load() throws IOException {
 		if(!isLoaded()){
 			String resourcePath = getResourcePath();
 			if(resourcePath==null){
-				throw new Exception("Error loading content Item. No resourcePath set");
+				throw new FileNotFoundException("Error loading content Item. No resourcePath set");
 			}
 			load(resourcePath);
 			setLoaded(true);
 		}
 	}
 	
-	public void reload()throws Exception{
+	public void reload() throws IOException {
 		setLoaded(false);
 		load();
 	}
@@ -298,10 +300,11 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 * Loads all xml files in the given folder
 	 * @param folder
 	 * @return List containing ArticleItemBean
+	 * @throws IOException 
 	 * @throws XmlException
 	 * @throws IOException
 	 */
-	protected boolean load(String path) throws Exception{
+	protected boolean load(String path) throws IOException {
 //		System.out.print("["+this.toString()+"]:");
 //		System.out.println("Attempting to load path "+path);
 		clear();
@@ -339,7 +342,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 			setExists(true);
 //			System.out.print("["+this.toString()+"]:");
 //			System.out.println("Load "+((returner)?"":"not")+" successful of path "+path);
-		}catch(HttpException e) {
+		} catch(HttpException e) {
 			if(e.getReasonCode()==WebdavStatus.SC_NOT_FOUND) {
 				/*if(isAutoCreateResource()){
 					//in this case ignore the error message that it isn't fount
@@ -361,8 +364,9 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 
 	/**
 	 * @param webdavResource
+	 * @throws IOException 
 	 */
-	protected boolean load(WebdavExtendedResource webdavResource) throws Exception {
+	protected boolean load(WebdavExtendedResource webdavResource) throws IOException {
 		return true;
 	}
 
