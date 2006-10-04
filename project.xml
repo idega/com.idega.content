@@ -64,6 +64,11 @@
       <name>3.1.5</name>
       <tag>CONTENT_3_1_5</tag>
     </version>
+    <version>
+      <id>3.1.6</id>
+      <name>3.1.6</name>
+      <tag>CONTENT_3_1_6</tag>
+    </version>
   </versions>
   <branches/>
   <developers>
@@ -141,7 +146,7 @@
         <eclipse.dependency>${idegaweb.project.source.dependent}</eclipse.dependency>
       </properties>
     </dependency>
-	<dependency>
+    <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.block.rss</artifactId>
       <version>3.1.4</version>
@@ -160,7 +165,7 @@
       <type>jar</type>
       <url>http://www.slide.com/</url>
     </dependency>
-	<dependency>
+    <dependency>
       <groupId>slide</groupId>
       <artifactId>slide-kernel</artifactId>
       <version>2.2pre1.iwbuild4</version>
@@ -181,42 +186,37 @@
       <type>jar</type>
       <url>http://commons.apache.org/</url>
     </dependency>
-	
-	<!-- duplicate ROME jars, included with the platform from com.idega.block.rss -->
-	<dependency>
+    <!-- duplicate ROME jars, included with the platform from com.idega.block.rss -->
+
+    <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
       <version>0.8</version>
       <type>jar</type>
       <url>https://rome.dev.java.net/</url>
     </dependency>
-	
-	<dependency>
+    <dependency>
       <groupId>rome</groupId>
       <artifactId>rome-fetcher</artifactId>
       <version>0.7</version>
       <type>jar</type>
       <url>https://rome.dev.java.net/</url>
     </dependency>
-	
-	<dependency>
+    <dependency>
       <groupId>rome</groupId>
       <artifactId>rome-modules</artifactId>
       <version>0.2j1.4</version>
       <type>jar</type>
       <url>https://rome.dev.java.net/</url>
     </dependency>
-	
-	 <dependency>
+    <dependency>
       <groupId>jdom</groupId>
       <artifactId>jdom</artifactId>
       <version>1.0</version>
       <type>jar</type>
       <url>http://jdom.sourceforge.net/</url>
     </dependency>
-	
-	<!-- end rome depend. -->
-	
-	
+    <!-- end rome depend. -->
+
   </dependencies>
 </project>
