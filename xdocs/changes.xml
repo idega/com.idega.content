@@ -5,6 +5,13 @@
   </properties>
   <body>
   	
+    <release version="3.1.7" date="2006-10-10">
+      <action dev="eiki" type="fix">
+      	Same as last time, the new jar was not really built with 1.4.
+		Updated rss to v. 3.1.6
+      </action>
+    </release>
+  
     <release version="3.1.6" date="2006-10-04">
       <action dev="eiki" type="fix">
       	Added a new rome-modules-0.2.jar because the old one was made with java 1.5. The new one was built with jdk 1.4

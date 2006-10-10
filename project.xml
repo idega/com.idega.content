@@ -4,7 +4,7 @@
   <extend>${base.project.dir}/base-dependencies.xml</extend>
   <name>idegaWeb Content</name>
   <artifactId>com.idega.content</artifactId>
-  <currentVersion>3.1.6</currentVersion>
+  <currentVersion>3.1.7</currentVersion>
   <inceptionYear>2004</inceptionYear>
   <shortDescription>idegaWeb is the new ContentManagement System and Framework</shortDescription>
   <issueTrackingUrl>http://issues.idega.is</issueTrackingUrl>
@@ -149,7 +149,7 @@
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.block.rss</artifactId>
-      <version>3.1.4</version>
+      <version>3.1.6</version>
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
@@ -205,7 +205,7 @@
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome-modules</artifactId>
-      <version>0.2j1.4</version>
+      <version>0.2j1.4.2</version>
       <type>jar</type>
       <url>https://rome.dev.java.net/</url>
     </dependency>
