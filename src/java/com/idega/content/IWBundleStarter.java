@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.5 2005/03/06 13:17:42 tryggvil Exp $
+ * $Id: IWBundleStarter.java,v 1.6 2006/10/12 17:49:24 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -9,21 +9,28 @@
  */
 package com.idega.content;
 
+import java.rmi.RemoteException;
+
+import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentIWActionURIHandler;
 import com.idega.content.business.ContentUtil;
+import com.idega.content.themes.business.ThemesService;
 import com.idega.content.view.ContentViewManager;
 import com.idega.core.uri.IWActionURIManager;
+import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWBundleStartable;
 import com.idega.idegaweb.include.GlobalIncludeManager;
+import com.idega.slide.business.IWSlideService;
 
 
 /**
  * 
- *  Last modified: $Date: 2005/03/06 13:17:42 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/10/12 17:49:24 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class IWBundleStarter implements IWBundleStartable {
 
@@ -44,6 +51,21 @@ public class IWBundleStarter implements IWBundleStartable {
 		ContentViewManager cViewManager = ContentViewManager.getInstance(starterBundle.getApplication());
 		cViewManager.initializeStandardNodes(starterBundle);
 		GlobalIncludeManager.getInstance().addBundleStyleSheet(ContentUtil.IW_BUNDLE_IDENTIFIER,"/style/content.css");
+		
+		
+		IWApplicationContext iwac = starterBundle.getApplication().getIWApplicationContext();
+	    try {
+	    	IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(iwac,IWSlideService.class);
+	           
+	        ThemesService themesService = (ThemesService) IBOLookup.getServiceInstance(iwac, ThemesService.class);
+	        service.addIWSlideChangeListeners(themesService);
+	    } catch (IBOLookupException e) {
+	    	e.printStackTrace();
+	    } catch (RemoteException e) {
+	    	e.printStackTrace();
+	    }
+		  
+
 	}
 
 	/* (non-Javadoc)
