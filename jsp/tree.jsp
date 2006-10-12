@@ -6,88 +6,92 @@
         xmlns:ws="http://xmlns.idega.com/com.idega.workspace"
         xmlns:b="http://xmlns.idega.com/com.idega.builder"
         xmlns:x="http://myfaces.apache.org/tomahawk"
-               xmlns:builder="http://xmlns.idega.com/com.idega.builder"
+        xmlns:builder="http://xmlns.idega.com/com.idega.builder"
         xmlns:tr="http://xmlns.idega.com/com.idega.content"
+        xmlns:a="http://java.sun.com/jmaki-jsf"
+        xmlns:ui="http://www.sun.com/web/ui"
 version="1.2">	
+	
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
         	
-    <f:view>
-        <ws:page id="createpage" javascripturls="/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ajax.js,/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,/idegaweb/bundles/com.idega.builder.bundle/scripts/BuilderService.js,/idegaweb/bundles/com.idega.builder.bundle/scripts/DWREngine.js,/idegaweb/bundles/com.idega.content.bundle/scripts/NodeID.js,/idegaweb/bundles/com.idega.content.bundle/scripts/DWREngine.js">
-                <h:form id="createpageform">
+	<f:view>
+    	<ws:page id="createpage" javascripturls="/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ajax.js,
+    											 /idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
+    											 /idegaweb/bundles/com.idega.content.bundle/resources/javascript/prototype.js,
+    											 /idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js,
+    											 /idegaweb/bundles/com.idega.content.bundle/resources/javascript/unittest.js,
+    											 /idegaweb/bundles/com.idega.content.bundle/resources/javascript/scriptaculous.js,
+    											 /idegaweb/bundles/com.idega.builder.bundle/scripts/BuilderService.js,
+    											 /idegaweb/bundles/com.idega.content.bundle/scripts/PagePreview.js,
+    											 /idegaweb/bundles/com.idega.content.bundle/scripts/ThemesPreviewsProvider.js,
+    											 /dwr/engine.js">
+        	<h:form id="createpageform">
 
-                <f:verbatim>
-                	<script type="text/javascript">
+                <wf:container id="page_tree_div" styleClass="current_structure">
+	                <f:verbatim>
+	                	<h3>Current structure</h3>
+						<a href="#" onclick="treeObj.collapseAll()">Collapse all</a> | 
+						<a href="#" onclick="treeObj.expandAll()">Expand all</a>
+					</f:verbatim>
+		 			<x:tree2 value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">
+						<f:facet name="PageTreeNode"> 							
+							<h:panelGroup>
+					   			<h:outputLink onclick="getPrewUrl(this.parentNode.id);return false;">
+			             	 		<h:outputText value="#{node.description}"/>   
+					             <!--	<h:outputText title="#{node.identifier}" value="#{node.description}"/> --> 
+			             		</h:outputLink>
+			                </h:panelGroup>
+			            </f:facet>
+			        </x:tree2>    
+	 	            <iframe id="treePages" width= "100%" height = "400px" style="left: 500px; top: 150px; position: absolute;" scrolling = "no"/>
+				</wf:container>
 
-	//--------------------------------
+                <wf:container id="dhtmlgoodies_tree2" styleClass="template_tree">
+                <f:verbatim> 
+						<ul id="dhtmlgoodies_tree2" class="dhtmlgoodies_tree2">
+							<li id="103" noChildren="true" noRemoving="true" typeOfTemplate="page"><a href="#">Page</a></li>
+							<li id="106" noChildren="true" noRemoving="true" typeOfTemplate="blog"><a href="#">Blog</a></li>								
+							<li id="107" noChildren="true" noRemoving="true" typeOfTemplate="eShop"><a href="#">eShop</a></li>						
+							<li id="108" noChildren="true" noRemoving="true" typeOfTemplate="flashIntro"><a href="#">Flash intro</a></li>						
 
-	// Save functions
+							<li id="103" noChildren="true" noRemoving="true" typeOfTemplate="forum"><a href="#">Forum</a></li>
+							<li id="106" noChildren="true" noRemoving="true" typeOfTemplate="guestbook"><a href="#">Guestbook</a></li>								
+							<li id="107" noChildren="true" noRemoving="true" typeOfTemplate="imageGallery"><a href="#">Image gallery</a></li>						
+							<li id="108" noChildren="true" noRemoving="true" typeOfTemplate="login"><a href="#">Login</a></li>						
+						</ul>              
+                </f:verbatim>
+                
+        <ui:panelGroup binding="#{Sidebar.groupPanel1}" 
+            id="groupPanel1" 
+            style="height: 382px; left: 0px; top: 0px; position: absolute">
+            <f:verbatim>
+                <a:ajax type="spry" style="templates_style" name="spry.plainAccordion" />       
+            </f:verbatim>
+    	</ui:panelGroup>
+                
+				</wf:container>
+				
+				<f:verbatim>				
+					<script type="text/javascript">	
+						treeObj = new JSDragDropTree();
+						treeObj.setTreeId('page_tree_div');
+						treeObj.setMaximumDepth(7);
+						treeObj.setMessageMaximumDepthReached('Maximum depth reached'); // If you want to show a message when maximum depth is reached, i.e. on drop.
+						treeObj.initTree(); 
+						treeObj.getNodeOrders();
+						treeObj.expandAll();
+						
+						treeObj2 = new JSDragDropTree();
+						treeObj2.setTreeId('dhtmlgoodies_tree2');
+						treeObj2.initTree(); 
 
-	//--------------------------------
+						treeObj3 = new JSDragDropTree();
+						treeObj3.setTreeId('dhtmlgoodies_tree3');
+						treeObj3.initTree(); 
 
-	var ajaxObjects = new Array();
-
-	 
-
-	// Use something like this if you want to save data by Ajax.
-
-	function saveComplete(index)
-
-	{
-
-//		alert(ajaxObjects[index].response);			
-
-	}
-
-	// Call this function if you want to save it by a form.
-	
-	function saveMyTree(newParentNodeId, sourceNodeId) {
-		BuilderService.moveTreeNodes(newParentNodeId, sourceNodeId, empty);
-	}
-
-	function empty(result) {}
-	
-	function saveMyTree_byForm() {
-		document.myForm.elements['saveString'].value = treeObj.getNodeOrders();
-		document.myForm.submit();		
-	}
-
-	</script>
-
-		<a href="#" onclick="treeObj.collapseAll()">Collapse all</a> | 
-		<a href="#" onclick="treeObj.expandAll()">Expand all</a>
-
-
-	</f:verbatim>
-	                <!-- 		<wf:container id="page_tree_div" styleClass="page_tree">   
-	                <wf:container id="page_tree_div">          page_chooser      		-->
-	                <wf:container id="page_tree_div">
-	                
- 
-			 			<x:tree2 value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">
- 							<f:facet name="PageTreeNode"> 							
-			                  <h:panelGroup>	
-			                     <!--  <h:commandButton image="#{pageCreationBean.coreBundle.resourcesPath}/treeviewer/ui/iw/treeviewer_node_leaf.gif"/>  -->
-							   <h:commandLink onclick="document.forms['createpageform'].elements['createpageform:selectedPageLocationIdentifier'].value='#{node.identifier}';document.forms['createpageform'].elements['createpageform:selectedPageLocationName'].value='#{node.description}';document.forms['createpageform'].elements['createpageform:pageLocation'].value='#{node.description}'">
-			             		<h:outputText value="#{node.description}" styleClass="nodeFolder"/>   
-							   </h:commandLink>
-			                  </h:panelGroup>
-			              	</f:facet>
-			              </x:tree2>    
-	 	                 
-						</wf:container>
-						<f:verbatim>
-								<script type="text/javascript">	
-								treeObj = new JSDragDropTree();
-								treeObj.setTreeId('page_tree_div');
-
-	treeObj.setMaximumDepth(7);
-
-	treeObj.setMessageMaximumDepthReached('Maximum depth reached'); // If you want to show a message when maximum depth is reached, i.e. on drop.
-	treeObj.initTree(); 
-	treeObj.getNodeOrders();
-//alert(treeObj.getNodeOrders());
-	</script>
-						</f:verbatim>
+						
+					</script>
+				</f:verbatim>
 					<!-- 	
 						<wf:container id="page_tree_div" styleClass="page_tree">                		
 						<x:tree2 value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="false">
@@ -103,9 +107,7 @@ version="1.2">
 			              	</f:facet>
 			              </x:tree2>
 						</wf:container> -->
-                </h:form>
-    
-						 </ws:page>
-
+        	</h:form>    
+    	</ws:page>
 	</f:view>
 </jsp:root>
