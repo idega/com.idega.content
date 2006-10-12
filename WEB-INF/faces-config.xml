@@ -109,7 +109,7 @@
 		<component-type>ContentItemListViewer</component-type>
 		<component-class>com.idega.content.presentation.ContentItemListViewer</component-class>
 	</component>
-	
+    
 	<component>
 		<component-type>WebDAVUpload</component-type>
 		<component-class>com.idega.content.presentation.WebDAVUpload</component-class>
@@ -334,6 +334,12 @@
 		<managed-bean-scope>request</managed-bean-scope>
 	</managed-bean>
 	
+   <managed-bean> 
+      <managed-bean-name>treeIframe</managed-bean-name>
+      <managed-bean-class>com.idega.content.tree.TreeIframe</managed-bean-class> 
+      <managed-bean-scope>request</managed-bean-scope> 
+   </managed-bean>
+
 	<managed-bean>
 		<managed-bean-name>themesManagerBean</managed-bean-name>
 		<managed-bean-class>com.idega.content.bean.ThemesManagerBean</managed-bean-class>

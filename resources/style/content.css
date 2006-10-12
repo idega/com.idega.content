@@ -250,7 +250,18 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	background-image: url(images/new_16.gif);
 }
 
-.tree_drag_drop ul {
+.current_structure {
+	position:absolute;
+	right:0;
+	top:90px;
+	border-left:0px; 
+	border-bottom:0px;
+	float:right;
+	width:20%; 
+	margin:0px 0px 10px 10px;
+}
+
+.current_structure ul {
 	list-style-type:none;
 	padding-left: 15px;
 /*	padding: 0;
@@ -258,7 +269,7 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 */
 }
 
-.tree_drag_drop li {
+.current_structure li {
 	list-style-type:none;
 	vertical-align:middle;
 }
@@ -274,22 +285,42 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	font-family:arial;
 }
 
-.tree_drag_drop input {
+.current_structure input {
 	border: 0;
 	padding: 0;
 	margin: 0;
 }
 
-.tree_drag_drop a {
-	vertical-align: 20%;
+.current_structure a {
+/*	vertical-align: 20%;*/
 	border: 0px;
 	padding: 0px;
 	margin: 0px;
 }
 
-.tree_drag_drop img {
+.current_structure img {
 	padding: 0px;
 	margin: -1px 0px -1px 0px; 
 	border: 0px;
+}
+
+.template_tree{
+/*
+	position:absolute;
+	right:0;
+	top:90px;
+	border-left:0px; 
+	border-bottom:0px;
+
+	float:right;
+*/	width:70%;
+	background:#fff;
+	margin:0px 0px 10px 10px;
+}
+
+.template_tree ul {
+	list-style-type:none;
+	text-decoration:none;
+	padding-left: 15px;
 }
 
