@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewerTag.java,v 1.2 2006/04/09 12:01:55 laddi Exp $
+ * $Id: ContentItemViewerTag.java,v 1.3 2006/10/12 11:02:56 gediminas Exp $
  * Created on 21.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -15,10 +15,10 @@ import javax.faces.webapp.UIComponentTag;
 
 /**
  * 
- *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/10/12 11:02:56 $ by $Author: gediminas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public abstract class ContentItemViewerTag extends UIComponentTag {
 
@@ -53,7 +53,7 @@ public abstract class ContentItemViewerTag extends UIComponentTag {
 
 	protected void setProperties(UIComponent component) {      
 		super.setProperties(component);
-		if (component instanceof ContentViewer) {
+		if (component instanceof ContentItemViewer) {
 			ContentItemViewer viewer = (ContentItemViewer)component;
 			
 			if(this.renderDetailsCommand != null){
