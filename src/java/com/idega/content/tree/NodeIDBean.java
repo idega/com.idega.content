@@ -62,7 +62,7 @@ public class NodeIDBean extends IBOServiceBean implements NodeID{
 		IDsArray.add(PairOfIDs);
 	}
 	
-	public int countPairs(){
+	public int countPairs(){		
 		return IDsArray.size();
 	}
 	

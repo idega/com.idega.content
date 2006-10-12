@@ -30,10 +30,9 @@ import org.apache.myfaces.shared_tomahawk.renderkit.html.HtmlRendererUtils;
  * @author Sean Schofield
  * @author Chris Barlow
  * @author Hans Bergsten (Some code taken from an example in his O'Reilly JavaServer Faces book. Copied with permission)
- * @version $Revision: 1.2 $ $Date: 2006/09/29 09:03:28 $
+ * @version $Revision: 1.3 $ $Date: 2006/10/12 17:14:23 $
  */
-public class HtmlTreeRendererNew extends HtmlTreeRenderer
-{
+public class HtmlTreeRendererNew extends HtmlTreeRenderer {
 	
     private static final String NAV_COMMAND = "org.apache.myfaces.tree.NAV_COMMAND";
     private static final String ENCODING = "UTF-8";
@@ -53,6 +52,8 @@ public class HtmlTreeRendererNew extends HtmlTreeRenderer
 	
     private static int node = 0;
     
+    private String currentNodeId;
+    
     public String getNode(){
     	node++;
     	return "node"+node;
@@ -64,6 +65,7 @@ public class HtmlTreeRendererNew extends HtmlTreeRenderer
     	throws IOException {
     	out.startElement(HTML.LI_ELEM, tree);
     	out.writeAttribute(HTML.ID_ATTR,tree.getDataModel().getNodeById(tree.getNodeId()).getIdentifier(),null);
+    	currentNodeId = tree.getDataModel().getNodeById(tree.getNodeId()).getIdentifier();
     }
 
     protected void afterNodeEncode(FacesContext context, ResponseWriter out)
@@ -72,7 +74,9 @@ public class HtmlTreeRendererNew extends HtmlTreeRenderer
     }
 
     public void encodeChildren(FacesContext context, UIComponent component) throws IOException{
-
+    	
+//    	component.restoreState(context, component);
+    	
     	HtmlTree tree = (HtmlTree)component;
     	
     	tree.setShowLines(false);
@@ -131,8 +135,7 @@ public class HtmlTreeRendererNew extends HtmlTreeRenderer
 
         // now encode each of the nodes in the level immediately below the root
     		for (int i=0; i < rootNode.getChildCount(); i++) {
-    			if (walker.next()){
-    				System.out.println("walker.next()"+tree.getNodeId());  
+    			if (walker.next()){  
     				encodeRoot(context, out, tree, walker);
     			}
     		}
@@ -160,9 +163,11 @@ public class HtmlTreeRendererNew extends HtmlTreeRenderer
     
     		String spanId = TOGGLE_SPAN + ":" + tree.getId() + ":" + tree.getNodeId();
     		out.startElement(HTML.SPAN_ELEM, tree);
-    		out.writeAttribute(HTML.ID_ATTR, spanId, null);
+//    		out.writeAttribute(HTML.ID_ATTR, spanId, null);
+    		out.writeAttribute(HTML.ID_ATTR, tree.getDataModel().getNodeById(tree.getNodeId()).getIdentifier(), null);
 
-    		if (tree.isNodeExpanded()) {
+//    		if (tree.isNodeExpanded()) {
+    		if (!tree.getDataModel().getNodeById(tree.getNodeId()).isLeaf()) {
     			out.writeAttribute(HTML.STYLE_ATTR, "display:block", null);
     		}
     		else {
@@ -198,28 +203,7 @@ public class HtmlTreeRendererNew extends HtmlTreeRenderer
     		}       			
     		out.endElement(HTML.LI_ELEM); 	
     	}
-
-    	// OLD VERSION OF ENCODING TREE
-    	
-    	//encodeTree(context, out, tree, walker);
-//        if (walker.next()) {    											//WALKER.NEXT	
-//        	IDafter = tree.getNodeId();        	        	
-//       		if (IDafter.length() < IDbefore.length()){
-//        		for (int j = 0; j < ((IDbefore.length()-IDafter.length())/2); j++ ){
-//        			
-//        			out.endElement(HTML.UL_ELEM);
-//        			
-//        		    if (clientSideToggle){
-//        		        out.endElement(HTML.SPAN_ELEM);
-//        		    }       			
-//        			
-//        			out.endElement(HTML.LI_ELEM);
-//        		}
-//        	}
-//        	encodeTree(context, out, tree, walker);        	
-//        }
-//    }
-}
+    }
 
     protected void encodeRoot(FacesContext context, ResponseWriter out, HtmlTree tree, TreeWalker walker) throws IOException {
 
@@ -235,13 +219,15 @@ public class HtmlTreeRendererNew extends HtmlTreeRenderer
     	encodeRootNode(context, out, tree);
 
     	if (clientSideToggle){
-    		String spanId = TOGGLE_SPAN + ":" + tree.getId() + ":" + tree.getNodeId();
+//    		String spanId = TOGGLE_SPAN + ":" + tree.getId() + ":" + tree.getNodeId();
+    		String spanId = "spanId2" + tree.getDataModel().getNodeById(tree.getNodeId()).getIdentifier();
 
     		out.startElement(HTML.SPAN_ELEM, tree);
-    		out.writeAttribute(HTML.ID_ATTR, spanId, null);
-
-    		if (tree.isNodeExpanded()) {
-    			out.writeAttribute(HTML.STYLE_ATTR, "display:block", null);
+//    		out.writeAttribute(HTML.ID_ATTR, spanId, null);
+    		out.writeAttribute(HTML.ID_ATTR, tree.getDataModel().getNodeById(tree.getNodeId()).getIdentifier(), null);
+//    		if (tree.isNodeExpanded()) {
+    		if (!tree.getDataModel().getNodeById(tree.getNodeId()).isLeaf()) {
+    		out.writeAttribute(HTML.STYLE_ATTR, "display:block", null);
     		}
     		else {
     			out.writeAttribute(HTML.STYLE_ATTR, "display:none", null);
@@ -556,62 +542,7 @@ if (clientSideToggle)
         }
     }
 
-//    image.setParent(tree);
-//    if (node.getChildCount() > 0)
-//    {
-//        String onClick = new StringBuffer()
-//            .append("treeNavClick('")
-//            .append(spanId)
-//            .append("', '")
-//            .append(image.getClientId(context))
-//            .append("', '")
-//            .append(navSrc)
-//            .append("', '")
-//            .append(altSrc)
-//            .append("', '")
-//            .append(nodeImageId)
-//            .append("', '")
-//            .append(expandImgSrc)
-//            .append("', '")
-//            .append(collapseImgSrc)
-//            .append("', '")
-//            .append(tree.getId())
-//            .append("', '")
-//            .append(nodeId)
-//            .append("');")
-//            .toString();
-//
-//        imageAttrs.put(HTML.ONCLICK_ATTR, onClick);
-//        imageAttrs.put(HTML.STYLE_ATTR, "cursor:hand;cursor:pointer");
-//    }
-//    RendererUtils.renderChild(context, image);
-
 }
-else
-{
-//	System.out.println("not client side toggle");
-	
-//    if (node.getChildCount() > 0)
-//    {  	
-//        // set up the expand control and remove whatever children (if any) this control had previously
-//        UICommand expandControl = tree.getExpandControl();
-//        expandControl.getChildren().clear();
-//        expandControl.setId(TOGGLE_ID);
-//
-//        UIParameter param = new UIParameter();
-//        param.setName(tree.getId() + NamingContainer.SEPARATOR_CHAR + NAV_COMMAND);
-//        param.setValue(tree.getNodeId());
-//        expandControl.getChildren().add(param);
-//        expandControl.getChildren().add(image);
-//
-//        RendererUtils.renderChild(context, expandControl);
-//    }
-//    else
-//    {
-//    	RendererUtils.renderChild(context, image);
-//    }
-}
-//out.endElement(HTML.TD_ELEM);
 
 return nodeImgFacet;
 }
