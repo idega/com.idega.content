@@ -1,5 +1,5 @@
 /*
- * $Id: ContentListViewerManagedBean.java,v 1.5 2005/12/20 16:42:00 tryggvil Exp $
+ * $Id: ContentListViewerManagedBean.java,v 1.6 2006/10/12 12:46:55 gediminas Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -16,10 +16,10 @@ import com.idega.content.presentation.ContentItemViewer;
 
 /**
  * 
- *  Last modified: $Date: 2005/12/20 16:42:00 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/10/12 12:46:55 $ by $Author: gediminas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public interface ContentListViewerManagedBean {
 	/**
@@ -44,13 +44,17 @@ public interface ContentListViewerManagedBean {
 	 * @return can return null to indicate that default handler should be used
 	 */
 	public String getIWActionURIHandlerIdentifier();
+	
 	/**
-	 * <p>
-	 * TODO tryggvil describe method setMaxNumberOfDisplayed
-	 * </p>
-	 * @param maxItems
+	 * 
+	 * @param maxItems max number of items to display, or -1 to display all
 	 */
 	public void setMaxNumberOfDisplayed(int maxItems);
+	
+	/**
+	 * 
+	 * @return max number of items to display, or -1 to display all
+	 */
 	public int getMaxNumberOfDisplayed();
 	
 }
