@@ -2,8 +2,7 @@ package com.idega.content.bean;
 
 import java.io.Serializable;
 
-import com.idega.content.business.ThemesPreviewsProvider;
-import com.idega.content.business.ThemesPreviewsProviderBean;
+import com.idega.content.themes.helpers.ThemesConstants;
 
 public class ThemesManagerBean implements Serializable {
 	
@@ -11,25 +10,12 @@ public class ThemesManagerBean implements Serializable {
 	
 	public final static String THEMES_MANAGER_BEAN_ID = "ThemesManagerBean";
 	
-	private volatile static ThemesPreviewsProvider themesProvider = null;
-	
-	public ThemesPreviewsProvider getThemesProvider() {
-		if (themesProvider == null) {
-			synchronized (ThemesManagerBean.class) { // Using synchronization only once
-				if (themesProvider == null) {
-					themesProvider = new ThemesPreviewsProviderBean();
-				}
-			}
-		}
-		return themesProvider;
-	}
-	
 	public String getThemesPath() {
-		return getThemesProvider().getThemesPath();
+		return ThemesConstants.THEMES_PATH;
 	}
 	
 	public String getThemesPreviewPath() {
-		return getThemesProvider().getThemesPreviewPath();
+		return ThemesConstants.THEMES_PREVIEW_PATH;
 	}
 
 	public String getBeanId() {

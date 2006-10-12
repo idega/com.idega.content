@@ -3,6 +3,7 @@ package com.idega.content.business;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.zip.ZipInputStream;
 
 import javax.faces.component.UIComponent;
@@ -211,6 +212,14 @@ public class WebDAVUploadBean implements Serializable{
 	 * @throws IOException
 	 */
 	public boolean uploadZipFileContents(ActionEvent event) throws IOException {
+		if (canUploadZipFile()) {
+			return doUploading();
+		}		
+		log.info("Unable to upload zip file's contents");
+		return false;
+	}
+	
+	private boolean canUploadZipFile() {
 		// Got a file to upload?
 		boolean result = uploadFile == null ? false : true;
 		if (!result) {
@@ -218,25 +227,52 @@ public class WebDAVUploadBean implements Serializable{
 			return result;
 		}
 		// Is it a *.zip file?
-		result = uploadFile.getName().toLowerCase().endsWith(".zip") && (uploadFile.getContentType().toLowerCase().indexOf("zip") != -1);
+		result = uploadFile.getName().toLowerCase().endsWith(".zip");
 		if (!result) {
 			log.error("Only zip file accepting!");
 			return result;
 		}
+		return result;
+	}
+	
+	private boolean doUploading () throws IOException {
 		IWSlideService service = null;
 		try {
 			service = (IWSlideService) IBOLookup.getServiceInstance(IWContext.getInstance(), IWSlideService.class);
 		} catch (IBOLookupException e) {
+			log.info("Unable to get IWSlideServiceBean instance.");
+			log.error(e);
+			return false;
+		}
+		changeFileUploadPath(service);
+		if (service.uploadZipFileContents(new ZipInputStream(new BufferedInputStream(uploadFile.getInputStream())), getUploadFilePath())) {
+			log.info("Success uploading zip file's contents");
+			return true;
+		}
+		log.info("Unable to upload zip file's contents");
+		return false;
+	}
+	
+	private void changeFileUploadPath(IWSlideService service) {
+		String changedPath = getUploadFilePath() + uploadFile.getName().substring(0, uploadFile.getName().lastIndexOf("."));
+		try {
+			if (service.getExistence(changedPath)) {
+				int i = 1;
+				String tempPath = changedPath + i;
+				while (service.getExistence(tempPath)) {
+					i++;
+					tempPath = changedPath + i;
+				}
+				changedPath = tempPath;
+			}
+		} catch (RemoteException e) {
+			log.error(e);
+		} catch (HttpException e) {
+			log.error(e);
+		} catch (IOException e) {
 			log.error(e);
 		}
-		result = service == null ? false : true;
-		if (!result) {
-			log.info("Unable to get IWSlideServiceBean instance.");
-			return result;
-		}
-		result = service.uploadZipFileContents(new ZipInputStream(new BufferedInputStream(uploadFile.getInputStream())), getUploadFilePath());
-		log.info("Success uploading zip file's contents: " + result);
-		return result;
+		uploadFilePath = changedPath;
 	}
 
 }

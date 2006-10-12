@@ -9,3 +9,15 @@ ThemesPreviewsProvider.getThemesPreviewsInfo = function(callback) {
 ThemesPreviewsProvider.getPagePreview = function(callback) {
     DWREngine._execute(ThemesPreviewsProvider._path, 'ThemesPreviewsProvider', 'getPagePreview', callback);
 }
+
+ThemesPreviewsProvider.getThemeStyleVariations = function(p0, callback) {
+    DWREngine._execute(ThemesPreviewsProvider._path, 'ThemesPreviewsProvider', 'getThemeStyleVariations', p0, callback);
+}
+
+ThemesPreviewsProvider.changeTheme = function(p0, p1, p2, callback) {
+    DWREngine._execute(ThemesPreviewsProvider._path, 'ThemesPreviewsProvider', 'changeTheme', p0, p1, p2, callback);
+}
+
+ThemesPreviewsProvider.saveTheme = function(p0, callback) {
+    DWREngine._execute(ThemesPreviewsProvider._path, 'ThemesPreviewsProvider', 'saveTheme', p0, callback);
+}

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.23 2006/07/13 14:48:57 eiki Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.24 2006/10/12 17:52:05 valdas Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -15,6 +15,7 @@ import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
@@ -40,6 +42,7 @@ import org.apache.webdav.lib.search.SearchException;
 import org.apache.webdav.lib.search.SearchExpression;
 import org.apache.webdav.lib.search.SearchRequest;
 import org.apache.webdav.lib.search.SearchScope;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.core.search.business.Search;
@@ -60,7 +63,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2006/07/13 14:48:57 $ by $Author: eiki $ This class
+ * Last modified: $Date: 2006/10/12 17:52:05 $ by $Author: valdas $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -70,7 +73,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.23 $
+ * @version $Revision: 1.24 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -788,5 +791,45 @@ public class ContentSearch extends Object implements SearchPlugin{
         return date;
     }
     
+	/**
+	 * Does a simple DASL search and returns a collection of SearchResult objects. ContentSearch must have been initialized!
+	 * @param searchString The text you want to search for
+	 * @param scope from what point in Slide you want to start e.g. /files/public
+	 * @return returns a collection of SearchResult objects
+	 */
+	public Collection doSimpleDASLSearch(String searchString, String scope){
+	
+		Map<String, String> queryMap = new HashMap<String, String>();
+		queryMap.put("mysearchstring", searchString);
+		SearchQuery query = new SimpleSearchQuery(queryMap);	
+		
+		
+		this.setScopeURI(scope);
+		Search search = this.createSearch(query);
+		Collection results = search.getSearchResults();
+		
+//		MORE OPTIONS FOR ANOTHER METHOD YOU COULD CREATE
+//		contentSearch.setScopeURI(getStartingPointURI());
+//		contentSearch.setPropertyToOrderBy(getOrderByProperty());
+//		contentSearch.setToUseDescendingOrder(isUsingDescendingOrder());
+//		contentSearch.setNumberOfResultItemsToReturn(getNumberOfResultItemsToDisplay());
+//		contentSearch.setToIgnoreFolders(isIgnoreFolders());
+//		contentSearch.setToUseRootAccessForSearch(isUsingRootAccessForSearch());
+//		contentSearch.setToHideParentFolderPath(isSetToHideParentFolderPath());
+//		contentSearch.setToHideFileExtensions(isSetToHideFileExtension());
+		
+//		while (iterator.hasNext()) {
+//			SearchResult result = (SearchResult) iterator.next();
+//			String textOnLink = result.getSearchResultName();
+//			String uri = result.getSearchResultURI();
+//			String abstractText = result.getSearchResultAbstract();
+//			String extraInfo = result.getSearchResultExtraInformation();
+//			Map extraParameters = result.getSearchResultAttributes();
+//		...
+//		}
+		
+		return results;
+		
+	}
 
 }
