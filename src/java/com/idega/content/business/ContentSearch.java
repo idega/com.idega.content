@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.24 2006/10/12 17:52:05 valdas Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.25 2006/10/19 14:47:29 gimmi Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -63,7 +63,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2006/10/12 17:52:05 $ by $Author: valdas $ This class
+ * Last modified: $Date: 2006/10/19 14:47:29 $ by $Author: gimmi $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.24 $
+ * @version $Revision: 1.25 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -87,8 +87,6 @@ public class ContentSearch extends Object implements SearchPlugin{
 	public static final String DOCUMENT_ORDERING_BY_DATE = "doc_order_date";
 	public static final String DOCUMENT_ORDERING_BY_NAME = "doc_order_name";
 	public static final String DOCUMENT_ORDERING_BY_SIZE = "doc_order_size";
-	private static final String TEMP_ILLEGAL_PATH = "/files/users/";
-	private String tempCurrentUserPath;
 	static final PropertyName DISPLAYNAME = new PropertyName("DAV:", "displayname");
 	static final PropertyName CONTENTLENGTH = new PropertyName("DAV:", "getcontentlength");
 	static final PropertyName CREATOR_DISPLAY_NAME = new PropertyName("DAV:", "creator-displayname");
@@ -200,8 +198,6 @@ public class ContentSearch extends Object implements SearchPlugin{
 			IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(iwma.getIWApplicationContext(),
 					IWSlideService.class);
 			this.httpURL = service.getWebdavServerURL();
-			IWContext iwc = IWContext.getInstance();
-			this.tempCurrentUserPath = TEMP_ILLEGAL_PATH + iwc.getRemoteUser();
 		}
 		catch (IBOLookupException e) {
 			e.printStackTrace();
@@ -552,8 +548,6 @@ public class ContentSearch extends Object implements SearchPlugin{
 //		}
 //		todo remove when access control is ok, also change search to ignore
 //		folders?
-		this.tempCurrentUserPath = servletMapping + this.tempCurrentUserPath;
-		String tempUsersRootPath = servletMapping + TEMP_ILLEGAL_PATH;
 		Enumeration enumerator = method.getResponses();
 		String fileName;
 		String fileURI;
@@ -584,61 +578,56 @@ public class ContentSearch extends Object implements SearchPlugin{
 
 			if (!fileURI.equalsIgnoreCase(servletMapping)) {
 				// TODO remove temp stuff when accesscontrol is fixed
-				if (fileURI.startsWith(tempUsersRootPath) && !fileURI.startsWith(this.tempCurrentUserPath)) {
-					continue;
+				Enumeration props = entity.getProperties();
+				Map properties = new HashMap();
+				while (props.hasMoreElements()) {
+					prop = (Property) props.nextElement();
+					String name = prop.getLocalName();
+					String value = prop.getPropertyAsString();
+					properties.put(name,value);
 				}
-				else {
-					Enumeration props = entity.getProperties();
-					Map properties = new HashMap();
-					while (props.hasMoreElements()) {
-						prop = (Property) props.nextElement();
-						String name = prop.getLocalName();
-						String value = prop.getPropertyAsString();
-						properties.put(name,value);
-					}
-					
-					// PARSE PROPERTIES AND CONVERT SOME
-					fileName = URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/") + 1));
-					if(isSetToHideFileExtensions()){
-						int dotIndex = fileName.lastIndexOf(".");
-						if(dotIndex>-1){
-							fileName = fileName.substring(0,dotIndex);
-						}
-					}
-					
-					parentFolderPath = URLDecoder.decode(fileURI.substring(0,fileURI.lastIndexOf("/") + 1));
-
-					if(isSetToHideParentFolderPath()){
-						parentFolderPath = (parentFolderPath.endsWith("/"))? parentFolderPath.substring(0,parentFolderPath.lastIndexOf("/")):parentFolderPath;
-						parentFolderPath = parentFolderPath.substring(parentFolderPath.lastIndexOf("/")+1);
-					}
-					String modDate = (String)properties.get("getlastmodified");	
-					String createdDate =  (String)properties.get("creationdate");
-					
-					if(modDate==null){
-						modDate =  createdDate;	
-					}
-					
-					Date modifiedDate = parseDate(modDate);
-					properties.put("getlastmodified",modifiedDate);
-					Date creationDate = parseDate(createdDate);
-					properties.put("creationdate",creationDate);
 				
-					// PARSING DONE
-					
-					result = new BasicSearchResult();
-					result.setSearchResultType(SEARCH_TYPE);
-					result.setSearchResultURI(fileURI);
-					result.setSearchResultName(fileName);
-					result.setSearchResultExtraInformation(parentFolderPath);
-					if(modifiedDate!=null){
-						lastModifiedDate = new IWTimestamp(modifiedDate).getLocaleDate(locale, IWTimestamp.MEDIUM);
-						result.setSearchResultAbstract(lastModifiedDate);
+				// PARSE PROPERTIES AND CONVERT SOME
+				fileName = URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/") + 1));
+				if(isSetToHideFileExtensions()){
+					int dotIndex = fileName.lastIndexOf(".");
+					if(dotIndex>-1){
+						fileName = fileName.substring(0,dotIndex);
 					}
-					
-					result.setSearchResultAttributes(properties);
-					results.add(result);
 				}
+				
+				parentFolderPath = URLDecoder.decode(fileURI.substring(0,fileURI.lastIndexOf("/") + 1));
+
+				if(isSetToHideParentFolderPath()){
+					parentFolderPath = (parentFolderPath.endsWith("/"))? parentFolderPath.substring(0,parentFolderPath.lastIndexOf("/")):parentFolderPath;
+					parentFolderPath = parentFolderPath.substring(parentFolderPath.lastIndexOf("/")+1);
+				}
+				String modDate = (String)properties.get("getlastmodified");	
+				String createdDate =  (String)properties.get("creationdate");
+				
+				if(modDate==null){
+					modDate =  createdDate;	
+				}
+				
+				Date modifiedDate = parseDate(modDate);
+				properties.put("getlastmodified",modifiedDate);
+				Date creationDate = parseDate(createdDate);
+				properties.put("creationdate",creationDate);
+			
+				// PARSING DONE
+				
+				result = new BasicSearchResult();
+				result.setSearchResultType(SEARCH_TYPE);
+				result.setSearchResultURI(fileURI);
+				result.setSearchResultName(fileName);
+				result.setSearchResultExtraInformation(parentFolderPath);
+				if(modifiedDate!=null){
+					lastModifiedDate = new IWTimestamp(modifiedDate).getLocaleDate(locale, IWTimestamp.MEDIUM);
+					result.setSearchResultAbstract(lastModifiedDate);
+				}
+				
+				result.setSearchResultAttributes(properties);
+				results.add(result);
 			}
 		}
 		
