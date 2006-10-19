@@ -5,6 +5,13 @@
   </properties>
   <body>
   	
+    <release version="3.1.8" date="2006-10-19">
+      <action dev="eiki" type="fix">
+		removed the tempCurrentUserPath hack cause the permissions work correctly now
+		Updated core to v.3.1.13
+      </action>
+    </release>
+ 
     <release version="3.1.7" date="2006-10-10">
       <action dev="eiki" type="fix">
       	Same as last time, the new jar was not really built with 1.4.
