@@ -12,6 +12,18 @@
     <display-name>Content Tag Library</display-name>
     <description>JSF Idega Content Management Tag Library</description>
 
+  <tag>
+    <name>div</name>
+    <tag-class>com.idega.content.presentation.DivTag</tag-class>
+    <attribute>
+      <name>id</name>
+    </attribute>
+    <attribute>
+      <name>styleclass</name>
+    </attribute>
+  </tag>
+
+
 
    <!-- tree3 -->
 
