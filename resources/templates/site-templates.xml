@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site-templates>
+	<site name="Current structure" site-category="Business">
+		<structure>
+			<page name="Home" type="text" iconfile="/bundle/images...">
+				<page name="test1" type="imagegallery" iconfile="/bundle/images...">
+					<page name="test1.1" type="imagegallery" iconfile="/bundle/images..."></page>
+					<page name="test1.2" type="imagegallery" iconfile="/bundle/images..."></page>
+					<page name="test1.3" type="imagegallery" iconfile="/bundle/images..."></page>					
+				</page>
+				<page name="test2" type="imagegallery" iconfile="/bundle/images...">
+					<page name="test2.1" type="imagegallery" iconfile="/bundle/images..."></page>
+					<page name="test2.2" type="imagegallery" iconfile="/bundle/images..."></page>				
+				</page>
+			</page>
+		</structure>		
+		<variables>
+			<variable name="site_title" value="my business site"/>
+		</variables>
+	</site>
+	<site name="Software company" site-category="Business">
+		<structure>
+			<page name="Home" type="text" iconfile="/bundle/images...">
+				<page name="company pr photos" type="imagegallery" iconfile="/bundle/images..."></page>
+			</page>
+		</structure>		
+		<variables>
+			<variable name="site_title" value="my business site"/>
+		</variables>
+	</site>
+	
+	<site name="New Page" site-category="IdegaWebstructure">
+		<structure>
+			<page name="Text" type="text" iconfile="/bundle/images..."></page>
+			<page name="Image Gallery" type="imagegallery" iconfile="/bundle/images..."></page>
+			<page name="Blog" type="articlelist" iconfile="/bundle/images..."></page>			
+		</structure>		
+		<variables>
+			<variable name="site_title" value="my business site"/>
+		</variables>
+	</site>
+</site-templates>
