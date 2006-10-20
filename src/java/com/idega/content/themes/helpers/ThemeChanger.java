@@ -521,26 +521,26 @@ public class ThemeChanger {
 			return false;
 		}
 		
+		int index = 4;
+		List <Element> uselessStyles = new ArrayList <Element> ();
+		
 		if (oldStyle != null) {
 			
-		}
-
-		if (oldStyle.getStyleFiles() == null) {
-			return false;
-		}
-		
-		int index = 0;
-		
-		List <Element> uselessStyles = new ArrayList <Element> ();
-		Element style = null;
-		String attributeValue = null;
-		for (int i = 0; i < styles.size(); i++) {
-			style = (Element) styles.get(i);
-			attributeValue = style.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_HREF);
-			if (oldStyle.getStyleFiles().contains(attributeValue)) {
-				uselessStyles.add(style);
-				index = getElementIndex(head.getChildren(), ThemesConstants.TAG_ATTRIBUTE_HREF, attributeValue);
+			if (oldStyle.getStyleFiles() == null) {
+				return false;
 			}
+			
+			Element style = null;
+			String attributeValue = null;
+			for (int i = 0; i < styles.size(); i++) {
+				style = (Element) styles.get(i);
+				attributeValue = style.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_HREF);
+				if (oldStyle.getStyleFiles().contains(attributeValue)) {
+					uselessStyles.add(style);
+					index = getElementIndex(head.getChildren(), ThemesConstants.TAG_ATTRIBUTE_HREF, attributeValue);
+				}
+			}
+			
 		}
 		
 		if (newStyle != null) {
