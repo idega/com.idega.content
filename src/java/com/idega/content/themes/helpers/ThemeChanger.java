@@ -1,9 +1,9 @@
 package com.idega.content.themes.helpers;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +27,30 @@ public class ThemeChanger {
 	
 	private static final Log log = LogFactory.getLog(ThemeChanger.class);
 	
+	// These are defaults in RapidWeaver, we are using its to generate good preview
+	private static final String TITLE_REPLACE = "My company";
+	private static final String SLOGAN_REPLACE = "Changing the world, one site at a time...";
+	private static final String TOOLBAR_REPLACE = "<ul><li><a href=\"index.html\" rel=\"self\" id=\"current\">Untitled Page 1</a></li></ul>";
+	private static final String SIDEBAR_REPLACE = "<div id=\"blog-categories\"><div class=\"blog-category-link-disabled\">Personal</div><div class=\"blog-category-link-disabled\">Work</div><div class=\"blog-category-link-disabled\">Humor</div><div class=\"blog-category-link-disabled\">Apple</div></div><div id=\"blog-archives\"></div>";
+	private static final String BREADCRUMB_REPLACE = "<ul><li><a href=\"index.html\">Untitled Page 1</a>&nbsp;>&nbsp;</li></ul>";
+	private static final String FOOTER_REPLACE = "&copy; My company";
+	
+	// Default keywords
+	private static final String TITLE = "site_title";
+	private static final String SLOGAN = "site_slogan";
+	private static final String TOOLBAR = "toolbar";
+	private static final String SIDEBAR = "sidebar";
+	private static final String BREADCRUMB = "breadcrumb";
+	private static final String FOOTER = "footer";
+	
+	// These are defaults in RapidWeaver style files, we need to change directories to images
+	private static final String CSS_IMAGE_URL = "url(";
+	private static final String DIRECTORIES = "../../";
+	private static final String IMAGES = "images";
+	private static final String CSS_REPLACE = CSS_IMAGE_URL + DIRECTORIES + IMAGES;
+	
 	private ThemesHelper helper = ThemesHelper.getInstance();
+	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
 	
 	/**
 	 * Prepares importing theme for usage (removes needless content, adds regions, extracts properties)
@@ -43,7 +66,6 @@ public class ThemeChanger {
 		if (doc == null) {
 			return false;
 		}
-		Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
 		Element root = doc.getRootElement();
 		Element head = root.getChild("head", namespace);
 		
@@ -70,7 +92,79 @@ public class ThemeChanger {
 			return false;
 		}
 		
-		theme.setNewTheme(false);
+		return true;
+	}
+	
+	/**
+	 * 
+	 * @param theme
+	 * @return
+	 */
+	public boolean prepareThemeStyleFiles(ThemeInfo theme) {
+		if (!theme.isNewTheme()) {
+			return true; // Theme allready prepared
+		}
+		
+		Map styles = theme.getStyleGroupsMembers();
+		if (styles == null) {
+			return false;
+		}
+		Iterator it = styles.values().iterator();
+		ThemeStyleGroupMember member = null;
+		List <String> files = null;
+		int index = theme.getLinkToBase().indexOf(ThemesConstants.THEMES);
+		if (index != -1) {
+			index++;
+		}
+		String addToCss = helper.extractValueFromString(theme.getLinkToBase(), index, theme.getLinkToBase().length());
+		while (it.hasNext()) {
+			member = (ThemeStyleGroupMember) it.next();
+			files = member.getStyleFiles();
+			for (index = 0; index < files.size(); index++) {
+				if (!proceedStyleFile(theme.getLinkToBase() + files.get(index), addToCss)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	private boolean proceedStyleFile(String linkToStyle, String addToCss) {
+		// Getting css file
+		InputStream is = helper.getInputStream(helper.getFullWebRoot() + linkToStyle);
+		InputStreamReader isr = new InputStreamReader(is);
+		BufferedReader buf = new BufferedReader(isr);
+		StringBuffer sb = new StringBuffer();
+		String line;
+		try {
+			while ((line = buf.readLine()) != null) {
+			     sb.append(line);
+			}
+		} catch (IOException e) {
+			log.error(e);
+			return false;
+		} finally {
+			helper.closeInputStream(is);
+		}
+		
+		// Changing content
+		String content = sb.toString();
+		if (content.indexOf(CSS_REPLACE) == -1) {
+			return true;
+		}
+
+		while (content.indexOf(CSS_REPLACE) != -1) {
+			content = content.replace(CSS_REPLACE, CSS_IMAGE_URL + DIRECTORIES + addToCss + IMAGES);
+		}
+
+		try {
+			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(helper.getLinkToBase(linkToStyle), helper.getFileNameWithExtension(linkToStyle), content, null, true)) {
+				return false;
+			}
+		} catch (RemoteException e) {
+			log.error(e);
+			return false;
+		}
 		
 		return true;
 	}
@@ -130,9 +224,9 @@ public class ThemeChanger {
 	 * @return String
 	 */
 	private String getFixedDocumentContent(String documentContent) {
-		for (int i = 0; i < ThemesConstants.USELESS_CONTENT.length; i++) {
-			if (documentContent.indexOf(ThemesConstants.USELESS_CONTENT[i]) != -1) {
-				documentContent = documentContent.replaceAll(ThemesConstants.USELESS_CONTENT[i], ThemesConstants.EMPTY);
+		for (int i = 0; i < ThemesConstants.USELESS_CONTENT.size(); i++) {
+			if (documentContent.indexOf(ThemesConstants.USELESS_CONTENT.get(i)) != -1) {
+				documentContent = documentContent.replaceAll(ThemesConstants.USELESS_CONTENT.get(i), ThemesConstants.EMPTY);
 			}
 		}
 		return documentContent;
@@ -221,14 +315,14 @@ public class ThemeChanger {
 	 * @param value
 	 * @return boolean
 	 */
-	private boolean needAddRegion(String[] regions, String value) {
-		boolean add = false;
-		for (int i = 0; (i < regions.length && !add); i++) {
-			if (value.equals(regions[i])) {
-				add = true;
-			}
+	private boolean needAddRegion(List <String> regions, String value) {
+		if (regions == null) {
+			return false;
 		}
-		return add;
+		if (regions.contains(value)) {
+			return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -266,10 +360,30 @@ public class ThemeChanger {
 	 * @return String
 	 */
 	private String getRegion(String value) {
-		return ThemesConstants.COMMENT_BEGIN + ThemesConstants.TEMPLATE_REGION_BEGIN + value +
+		String region = ThemesConstants.COMMENT_BEGIN + ThemesConstants.TEMPLATE_REGION_BEGIN + value +
 			ThemesConstants.TEMPLATE_REGION_MIDDLE + ThemesConstants.COMMENT_END + ThemesConstants.COMMENT_BEGIN +
 			ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 		
+		if (value.equals(TITLE)) {
+			return region + TITLE_REPLACE;
+		}
+		if (value.equals(SLOGAN)) {
+			return region + SLOGAN_REPLACE;
+		}
+		if (value.equals(TOOLBAR)) {
+			return region + TOOLBAR_REPLACE;
+		}
+		if (value.equals(SIDEBAR)) {
+			return region + SIDEBAR_REPLACE;
+		}
+		if (value.equals(BREADCRUMB)) {
+			return region + BREADCRUMB_REPLACE;
+		}
+		if (value.equals(FOOTER)) {
+			return region + FOOTER_REPLACE;
+		}
+		
+		return region;
 	}
 	
 	/**
@@ -279,10 +393,10 @@ public class ThemeChanger {
 	 */
 	private String addRegions(String docContent) {
 		String fixedValue = null;
-		for (int i = 0; i < ThemesConstants.REGIONS.length; i++) {
-			fixedValue = fixValue(ThemesConstants.REGIONS[i]);
-			while (docContent.indexOf(ThemesConstants.REGIONS[i]) != -1) {
-				docContent = docContent.replace(ThemesConstants.REGIONS[i], getRegion(fixedValue));
+		for (int i = 0; i < ThemesConstants.REGIONS.size(); i++) {
+			fixedValue = fixValue(ThemesConstants.REGIONS.get(i));
+			while (docContent.indexOf(ThemesConstants.REGIONS.get(i)) != -1) {
+				docContent = docContent.replace(ThemesConstants.REGIONS.get(i), getRegion(fixedValue));
 			}
 		}
 		return docContent;
@@ -294,9 +408,9 @@ public class ThemeChanger {
 	 * @return String
 	 */
 	private String fixValue(String value) {
-		for (int i = 0; i < ThemesConstants.USELESS_CONTENT.length; i++) {
-			while (value.indexOf(ThemesConstants.USELESS_CONTENT[i]) != -1) {
-				value = value.replace(ThemesConstants.USELESS_CONTENT[i], ThemesConstants.EMPTY);
+		for (int i = 0; i < ThemesConstants.USELESS_CONTENT.size(); i++) {
+			while (value.indexOf(ThemesConstants.USELESS_CONTENT.get(i)) != -1) {
+				value = value.replace(ThemesConstants.USELESS_CONTENT.get(i), ThemesConstants.EMPTY);
 			}
 		}
 		return value;
@@ -317,7 +431,7 @@ public class ThemeChanger {
 			return false;
 		}
 		
-		if (needAddRegion(ThemesConstants.BASICS_IDS_FOR_REGIONS, regionID)) {
+		if (needAddRegion(ThemesConstants.BASIC_IDS_FOR_REGIONS, regionID)) {
 			e.addContent(0, getCommentsCollection(regionID));
 		}
 		return true;
@@ -327,11 +441,11 @@ public class ThemeChanger {
 	 * Changes theme with new style variation, creates draft and creates new preview image
 	 * @param themeID
 	 * @param styleGroupName
-	 * @param newStyleMember
+	 * @param styleMember
 	 * @return String
 	 */
-	public String changeTheme(String themeID, String styleGroupName, String newStyleMember) {
-		if (themeID == null || styleGroupName == null || newStyleMember == null) {
+	public String changeTheme(String themeID, String styleGroupName, String styleMember, boolean radio, boolean checked) {
+		if (themeID == null || styleGroupName == null || styleMember == null) {
 			return null;
 		}
 		
@@ -347,19 +461,35 @@ public class ThemeChanger {
 			return null;
 		}
 		
-		ThemeStyleGroupMember oldStyle = getEnabledStyleMember(theme, styleGroupName);
-		ThemeStyleGroupMember newStyle = getStyleMember(theme, styleGroupName, newStyleMember);
-		if (oldStyle == null || newStyle == null) {
+		ThemeStyleGroupMember oldStyle = null;
+		ThemeStyleGroupMember newStyle = null;
+		if (radio) {
+			oldStyle = getEnabledStyleMember(theme, styleGroupName);
+			newStyle = getStyleMember(theme, styleGroupName, styleMember);
+		}
+		else {
+			if (checked) {
+				newStyle = getStyleMember(theme, styleGroupName, styleMember);
+			}
+			else {
+				oldStyle = getStyleMember(theme, styleGroupName, styleMember);
+			}
+		}
+
+		if (oldStyle == null) {
 			return null;
 		}
 		
-		Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
 		Element root = doc.getRootElement();
-		if (!changeThemeStyle(root.getChild("head", namespace), oldStyle, newStyle, namespace)) {
+		if (!changeThemeStyle(root.getChild("head", namespace), oldStyle, newStyle)) {
 			return null;
 		}
-		oldStyle.setEnabled(false);
-		newStyle.setEnabled(true);
+		if (oldStyle != null) {
+			oldStyle.setEnabled(false);
+		}
+		if (newStyle != null) {
+			newStyle.setEnabled(true);
+		}
 		
 		String draft = helper.getFileName(theme.getLinkToSkeleton()) + ThemesConstants.DRAFT;
 		theme.setLinkToDraft(theme.getLinkToBase() + draft);
@@ -381,17 +511,21 @@ public class ThemeChanger {
 	 * @param newStyle
 	 * @return boolean
 	 */
-	private boolean changeThemeStyle(Element head, ThemeStyleGroupMember oldStyle, ThemeStyleGroupMember newStyle, Namespace n) {
+	private boolean changeThemeStyle(Element head, ThemeStyleGroupMember oldStyle, ThemeStyleGroupMember newStyle) {
 		if (head == null) {
 			return false;
 		}
 		
-		List styles = head.getChildren(ThemesConstants.ELEMENT_LINK, n);
+		List styles = head.getChildren(ThemesConstants.ELEMENT_LINK, namespace);
 		if (styles == null) {
 			return false;
 		}
+		
+		if (oldStyle != null) {
+			
+		}
 
-		if (oldStyle.getStyleFiles() == null || newStyle.getStyleFiles() == null) {
+		if (oldStyle.getStyleFiles() == null) {
 			return false;
 		}
 		
@@ -409,7 +543,9 @@ public class ThemeChanger {
 			}
 		}
 		
-		head.addContent(index, getNewStyleElement(newStyle));
+		if (newStyle != null) {
+			head.addContent(index, getNewStyleElement(newStyle));
+		}
 		
 		Iterator <Element> it = uselessStyles.iterator();
 		while (it.hasNext()) {
@@ -432,7 +568,7 @@ public class ThemeChanger {
 			attributes = getBasicAttributesList();			
 			attributes.add(new Attribute(ThemesConstants.TAG_ATTRIBUTE_HREF, newStyle.getStyleFiles().get(i)));
 
-			newStyleHref = new Element(ThemesConstants.ELEMENT_LINK);
+			newStyleHref = new Element(ThemesConstants.ELEMENT_LINK, namespace);
 			newStyleHref.setAttributes(attributes);
 			newStyleElements.add(newStyleHref);
 		}
@@ -482,11 +618,17 @@ public class ThemeChanger {
 		List <String> groupNames = theme.getStyleGroupsNames();
 		ThemeStyleGroupMember member = null;
 		String styleGroupName = null;
+		Map <String, ThemeStyleGroupMember> styleMembers = theme.getStyleGroupsMembers();
 		for (int i = 0; i < groupNames.size(); i++) {
 			styleGroupName = groupNames.get(i);
-			member = getEnabledStyleMember(theme, styleGroupName);
-			if (member != null) {
-				members.add(member);
+			int j = 0;
+			member = styleMembers.get(styleGroupName + ThemesConstants.AT + j);
+			while (member != null) {
+				if (member.isEnabled()) {
+					members.add(member);
+				}
+				j++;
+				member = styleMembers.get(styleGroupName + ThemesConstants.AT + j);
 			}
 		}
 		return members;
@@ -519,32 +661,29 @@ public class ThemeChanger {
 	 * @param themeID
 	 * @return boolean
 	 */
-	public boolean saveTheme(String themeID) {
+	public boolean saveTheme(String themeID, String themeName) {
 		if (themeID == null) {
 			return false;
 		}
 		
 		ThemeInfo theme = helper.getThemeInfo(themeID);
-		if (theme.getLinkToDraft() == null) {
-			return false;
+		
+		if (!theme.getName().equals(themeName)) {
+			log.info("Create a new theme");
+			// TODO: new theme under old
+			return true;
 		}
 		
-		URL url = null;
-		try {
-			url = new URL(helper.getFullWebRoot() + theme.getLinkToDraft());
-		} catch (MalformedURLException e) {
-			log.error(e);
+		if (theme.getLinkToDraft() == null) {
+			log.info("No draft for theme: " + themeID);
 			return false;
 		}
+
 		InputStream is = null;
-		try {
-			is = url.openStream();
-		} catch (IOException e) {
-			log.error(e);
-			return false;
-		}
+		is = helper.getInputStream(helper.getFullWebRoot() + theme.getLinkToDraft());
 		
 		String fileName = helper.getFileNameWithExtension(theme.getLinkToSkeleton());
+		theme.setLocked(true);
 		try {
 			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBase(), fileName, is, null, true)) {
 				return false;
@@ -552,14 +691,13 @@ public class ThemeChanger {
 		} catch (RemoteException e) {
 			log.error(e);
 			return false;
+		} finally {
+			helper.closeInputStream(is);
 		}
+		theme.setLocked(false);
 		
 		theme.setLinkToDraft(null);
-		try {
-			is.close();
-		} catch (IOException e) {
-			log.error(e);
-		}
+
 		return true;
 	}
 

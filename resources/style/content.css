@@ -324,3 +324,10 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	padding-left: 15px;
 }
 
+.theme_container {
+	display:inline;
+	position: absolute;
+	float: right;
+	top: 22px;
+	right: 1px;
+}

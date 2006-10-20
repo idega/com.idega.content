@@ -35,7 +35,7 @@ function getThemeStyleVariations(themeID) {
 }
 
 function insertStyleVariations(variations) {
-	document.getElementById('themeSaveButton').disabled = true;
+	//document.getElementById('themeSaveButton').disabled = true;
 	var oldVariation = document.getElementById("themeStyleVariations");
 	if (oldVariation.childNodes) {
 		while (oldVariation.childNodes.length > 0) {
@@ -45,18 +45,22 @@ function insertStyleVariations(variations) {
 	oldVariation.innerHTML = variations;
 }
 
-function changeTheme(themeID, styleGroupName, newStyleMember) {
+function changeTheme(themeID, styleGroupName, newStyleMember, type, checked) {
 	showLoadingMessage('Changing theme...');
-	ThemesPreviewsProvider.changeTheme(themeID, styleGroupName, newStyleMember, changeThemeCallback);
+	var radio = true;
+	if (type == "checkbox") {
+		radio = false;
+	}
+	ThemesPreviewsProvider.changeTheme(themeID, styleGroupName, newStyleMember, radio, checked, changeThemeCallback);
 }
 
 function changeThemeCallback(result) {
 	closeLoadingMessage();
-	globalThemeID = result;
 	if (result == null) {
 		document.getElementById('themeSaveButton').disabled = true;
 	}
 	else {
+		globalThemeID = result;
 		document.getElementById('themeSaveButton').disabled = false;
 	}
 }
@@ -64,10 +68,27 @@ function changeThemeCallback(result) {
 function saveTheme() {
 	if (globalThemeID != null) {
 		showLoadingMessage('Saving theme...');
-		ThemesPreviewsProvider.saveTheme(globalThemeID, saveThemeCallback);
+		ThemesPreviewsProvider.saveTheme(globalThemeID, document.getElementById('theme_name').value, saveThemeCallback);
 	}
 }
 
 function saveThemeCallback(result) {
 	closeLoadingMessage();
+}
+
+function enableButton(inputId) {
+	/*alert(document.getElementById(inputId).value);
+	if (document.getElementById(inputId).value != "") {
+		document.getElementById('themeSaveButton').disabled = false;
+	}*/
+}
+
+function setGlobalId(themeId) {
+	//alert('global id:' + themeId);
+	globalThemeID = themeId;
+}
+
+function setThemeName(themeName) {
+	//alert('name: ' + themeName);
+	document.getElementById('theme_name').value = themeName;
 }

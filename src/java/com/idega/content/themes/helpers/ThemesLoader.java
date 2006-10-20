@@ -7,7 +7,11 @@ public class ThemesLoader {
 	
 	private ThemeInfo theme = null;
 	private Random generator = new Random();
-	private ThemesHelper helper = ThemesHelper.getInstance();
+	private ThemesHelper helper = null;
+	
+	public ThemesLoader(ThemesHelper helper) {
+		this.helper = helper;
+	}
 	
 	public synchronized boolean loadTheme(String uriToTheme, boolean newTheme) {
 		if (uriToTheme == null) {

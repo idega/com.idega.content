@@ -18,6 +18,7 @@ public class ThemeInfo {
 	private String linkToProperties;
 	private String linkToBase;
 	private String linkToPreview;
+	private String linkToSmallPreview;
 	
 	private String name;
 	
@@ -122,4 +123,12 @@ public class ThemeInfo {
 		this.newTheme = newTheme;
 	}
 
+	public String getLinkToSmallPreview() {
+		return linkToSmallPreview;
+	}
+
+	public void setLinkToSmallPreview(String linkToSmallPreview) {
+		this.linkToSmallPreview = linkToSmallPreview;
+	}
+	
 }

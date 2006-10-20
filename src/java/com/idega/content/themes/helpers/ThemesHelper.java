@@ -1,6 +1,7 @@
 package com.idega.content.themes.helpers;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
@@ -16,6 +17,7 @@ import org.apache.commons.httpclient.URIException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
@@ -43,14 +45,22 @@ public class ThemesHelper implements Singleton {
 	private volatile ThemesLoader loader = null;
 	
 	private Map <String, ThemeInfo> themes = null;
+	private Map <String, ThemeSettings> settings = null;
 	private List <String> urisToThemes = null;
 	
 	private IWSlideService service;
 	private boolean checkedFromSlide;
+	private boolean loadedThemeSettings;
+	
+	private String fullWebRoot; // For cache
+	private String webRoot;
 	
 	private ThemesHelper() {
 		themes = new HashMap <String, ThemeInfo> ();
+		settings = new HashMap <String, ThemeSettings> ();
 		urisToThemes = new ArrayList <String> ();
+		loadThemeSettings();
+		searchForThemes();
 	}
 	
 	public static ThemesHelper getInstance() {
@@ -128,7 +138,7 @@ public class ThemesHelper implements Singleton {
 		if (loader == null) {
 			synchronized (ThemesHelper.class) {
 				if (loader == null) {
-					loader = new ThemesLoader();
+					loader = new ThemesLoader(this);
 				}
 			}
 		}
@@ -144,8 +154,12 @@ public class ThemesHelper implements Singleton {
 			}
 			Iterator it = results.iterator();
 			List <String> urisToThemes = new ArrayList<String>();
+			String uri = null;
 			while (it.hasNext()) {
-				urisToThemes.add(((SearchResult) it.next()).getSearchResultURI());
+				uri = ((SearchResult) it.next()).getSearchResultURI();
+				if (isCorrectFile(uri)) {
+					urisToThemes.add(uri);
+				}
 			}
 			checkedFromSlide = getThemesLoader().loadThemes(urisToThemes, false);
 		}
@@ -219,20 +233,25 @@ public class ThemesHelper implements Singleton {
 		return getWebRootWithoutContent(getFullWebRoot());
 	}
 	
-	public String getWebRootWithoutContent(String webRoot) {
+	public String getWebRootWithoutContent(String fullWebRoot) {
+		if (webRoot != null) {
+			return webRoot;
+		}
 		String webDAVServerURI = ThemesConstants.EMPTY;
 		try {
 			webDAVServerURI = getSlideService().getWebdavServerURI();
 		} catch (RemoteException e) {
 			log.error(e);
 		}
-		int contentIndex = webRoot.indexOf(webDAVServerURI);
-		webRoot = extractValueFromString(webRoot, 0, contentIndex);
+		int contentIndex = fullWebRoot.indexOf(webDAVServerURI);
+		webRoot = extractValueFromString(fullWebRoot, 0, contentIndex);
 		return webRoot;
 	}
 	
 	public String getFullWebRoot() {
-		String webRoot = null;
+		if (fullWebRoot != null) {
+			return fullWebRoot;
+		}
 		HttpURL root = null;
 		try {
 			root = getSlideService().getWebdavServerURL();
@@ -241,12 +260,12 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		try {
-			webRoot = root.getURI();
+			fullWebRoot = root.getURI();
 		} catch (URIException e) {
 			log.error(e);
 			return null;
 		}
-		return webRoot;
+		return fullWebRoot;
 	}
 	
 	public boolean isCorrectFile(String fileName, String nameTemplate) {
@@ -269,8 +288,8 @@ public class ThemesHelper implements Singleton {
 			return result;
 		}
 		String fileExtension = fileName.substring(index + 1).toLowerCase();
-		for (int i = 0; (i < ThemesConstants.FILTER.length && !result); i++) {
-			if (isCorrectFile(fileExtension, ThemesConstants.FILTER[i])) {
+		for (int i = 0; (i < ThemesConstants.FILTER.size() && !result); i++) {
+			if (isCorrectFile(fileExtension, ThemesConstants.FILTER.get(i))) {
 				result = true;
 			}
 		}
@@ -288,14 +307,10 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public boolean isPropertiesFile(String uri) {
-		boolean result = false;
-		String fileName = getFileNameWithExtension(uri);
-		for (int i = 0; (i < ThemesConstants.PROPERTIES_FILES.length && !result); i++) {
-			if (fileName.equals(ThemesConstants.PROPERTIES_FILES[i])) {
-				result = true;
-			}
+		if (ThemesConstants.PROPERTIES_FILES.contains(uri)) {
+			return true;
 		}
-		return result;
+		return false;
 	}
 	
 	public void addTheme(ThemeInfo themeInfo) {
@@ -366,6 +381,62 @@ public class ThemesHelper implements Singleton {
 
 	protected List<String> getUrisToThemes() {
 		return urisToThemes;
+	}
+	
+	private void loadThemeSettings() {
+		if (loadedThemeSettings) {
+			return;
+		}
+		String url = getWebRootWithoutContent() + ThemesConstants.THEME_SETTINGS;
+		Document doc = getXMLDocument(url);
+		if (doc == null) {
+			return;
+		}
+		Element root = doc.getRootElement();
+		if (root == null) {
+			return;
+		}
+		List keys = root.getChildren();
+		if (keys == null) {
+			return;
+		}
+		Element key = null;
+		ThemeSettings setting = null;
+		for (int i = 0; i < keys.size(); i++) {
+			key = (Element) keys.get(i);
+			setting = new ThemeSettings();
+			
+			setting.setCode(key.getChildTextNormalize(ThemesConstants.THEME_SETTING_CODE));
+			setting.setLabel(key.getChildTextNormalize(ThemesConstants.THEME_SETTING_LABEL));
+			setting.setDefaultValue(key.getChildTextNormalize(ThemesConstants.THEME_SETTING_DEFAULT_VALUE));
+			setting.setType(key.getChildTextNormalize(ThemesConstants.THEME_SETTING_TYPE));
+			setting.setMethod(key.getChildTextNormalize(ThemesConstants.THEME_SETTING_METHOD));
+			
+			settings.put(setting.getCode(), setting);
+		}
+		loadedThemeSettings = true;
+	}
+	
+	public InputStream getInputStream(String url) {
+		InputStream is = null;
+        try {
+            is = new URL(url).openStream();
+        } catch (java.net.MalformedURLException e) {
+            log.error(e);
+        } catch (java.io.IOException e) {
+            log.error(e);
+        }
+        return is;
+	}
+	
+	public boolean closeInputStream(InputStream is) {
+		try {
+			is.close();
+		} catch (IOException e) {
+			log.error(e);
+			return false;
+		}
+		return true;
 	}
 
 }

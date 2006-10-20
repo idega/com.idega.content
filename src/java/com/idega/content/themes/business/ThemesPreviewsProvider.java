@@ -6,22 +6,22 @@ import java.rmi.RemoteException;
 
 public interface ThemesPreviewsProvider extends IBOService {
 	/**
-	 * @see com.idega.content.business.ThemesPreviewsProviderBean#getThemesPreviewsInfo
+	 * @see com.idega.content.themes.business.ThemesPreviewsProviderBean#getThemesPreviewsInfo
 	 */
 	public String getThemesPreviewsInfo() throws RemoteException;
 
 	/**
-	 * @see com.idega.content.business.ThemesPreviewsProviderBean#getThemeStyleVariations
+	 * @see com.idega.content.themes.business.ThemesPreviewsProviderBean#getThemeStyleVariations
 	 */
 	public String getThemeStyleVariations(String themeID) throws RemoteException;
 
 	/**
-	 * @see com.idega.content.business.ThemesPreviewsProviderBean#changeTheme
+	 * @see com.idega.content.themes.business.ThemesPreviewsProviderBean#changeTheme
 	 */
-	public String changeTheme(String themeID, String styleGroupName, String newStyleMember) throws RemoteException;
+	public String changeTheme(String themeID, String styleGroupName, String styleMember, boolean radio, boolean checked) throws RemoteException;
 
 	/**
-	 * @see com.idega.content.business.ThemesPreviewsProviderBean#saveTheme
+	 * @see com.idega.content.themes.business.ThemesPreviewsProviderBean#saveTheme
 	 */
-	public boolean saveTheme(String themeID) throws RemoteException;
+	public boolean saveTheme(String themeID, String themeName) throws RemoteException;
 }

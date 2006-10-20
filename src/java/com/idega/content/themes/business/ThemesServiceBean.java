@@ -25,43 +25,42 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 
 	private static final long serialVersionUID = -1765120426660957585L;
 	private static final Log log = LogFactory.getLog(ThemesServiceBean.class);
-	
-	private ThemesHelper helper = ThemesHelper.getInstance();
 
 	public void onSlideChange(IWContentEvent idegaWebContentEvent) {
 		String uri = idegaWebContentEvent.getContentEvent().getUri();
-		if (uri.indexOf(ThemesConstants.THEMES_PATH) != -1) { // If proccesing theme
-			if (ContentEvent.REMOVE.equals(idegaWebContentEvent.getMethod())) {
-				if (helper.isCorrectFile(uri)) {
-					Iterator <ThemeInfo> allThemes = helper.getThemesCollection().iterator();
-					boolean foundTheme = false;
-					ThemeInfo theme = null;
-					while (allThemes.hasNext() && !foundTheme) {
-						theme = allThemes.next();
-						if (uri.equals(theme.getLinkToSkeleton())) {
-							foundTheme = true;
-						}
+		if (uri.indexOf(ThemesConstants.THEMES_PATH) == -1) { // If not proccesing theme
+			return;
+		}
+		if (ContentEvent.REMOVE.equals(idegaWebContentEvent.getMethod())) {
+			if (ThemesHelper.getInstance().isCorrectFile(uri)) {
+				Iterator <ThemeInfo> allThemes = ThemesHelper.getInstance().getThemesCollection().iterator();
+				boolean foundTheme = false;
+				ThemeInfo theme = null;
+				while (allThemes.hasNext() && !foundTheme) {
+					theme = allThemes.next();
+					if (uri.equals(theme.getLinkToSkeleton())) {
+						foundTheme = true;
 					}
-					if (foundTheme && !theme.isLocked()) {
-						String themeID = theme.getThemeId();
-						helper.removeTheme(uri, themeID);
-					}
+				}
+				if (foundTheme && !theme.isLocked()) {
+					String themeID = theme.getThemeId();
+					ThemesHelper.getInstance().removeTheme(uri, themeID);
 				}
 			}
-			else {
-				if (helper.isCorrectFile(uri) && isNewTheme(uri)) {
-					helper.getThemesLoader().loadTheme(uri, true);
-					//TODO: proceed creating IBPage
-				}
+		}
+		else {
+			if (ThemesHelper.getInstance().isCorrectFile(uri) && isNewTheme(uri)) {
+				ThemesHelper.getInstance().getThemesLoader().loadTheme(uri, true);
+				//TODO: proceed creating IBPage
 			}
 		}
 	}
 	
 	private boolean isNewTheme(String uri) {
-		if (helper.existTheme(uri)) {
+		if (ThemesHelper.getInstance().existTheme(uri)) {
 			return false;
 		}
-		helper.addUriToTheme(uri);
+		ThemesHelper.getInstance().addUriToTheme(uri);
 		return true;
 	}
 	

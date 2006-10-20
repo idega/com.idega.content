@@ -6,6 +6,7 @@
         xmlns:ws="http://xmlns.idega.com/com.idega.workspace"
         xmlns:a="http://java.sun.com/jmaki-jsf"
         xmlns:c="http://xmlns.idega.com/com.idega.content"
+        xmlns:x="http://myfaces.apache.org/tomahawk"
 version="1.2">
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 <jsf:view>
@@ -15,13 +16,21 @@ version="1.2">
 						<wf:container id="themesGallery">
 							<a:ajax name="ibrowser" template="themesPreview" style="themesPreview" script="themesPreview" args="{type: 'ibrowser'}"/>
 						</wf:container>
-						<div id="themeStyleVariations" style="display: block; position: relative; float: right; top: 110px; right: 30px; z-index: 100;">
-						</div>
-						<div id="themeSaveArea" style="display: block; position: relative; float: right; top: 500px; right: 30px; z-index: 100;">
-							<input type="button" id="themeSaveButton" onclick="saveTheme();" disabled="true" value="Save"/>
-						</div>
+						<x:div styleClass="theme_container">
+							<wf:wfblock title="Theme variations">
+								<x:div id="themeStyleVariations" forceId="true"></x:div>
+								
+								<x:div>
+									<x:div id="themeSaveArea" forceId="true" styleClass="wf_webdav_upload">
+										<h:outputText value="#{localizedStrings['com.idega.content']['theme_name']}"></h:outputText>
+										<x:inputText id="theme_name" onblur="enableButton(this.id)" forceId="true"></x:inputText>
+										<x:commandButton id="themeSaveButton" type="button" forceId="true" onclick="saveTheme()" value="Save"></x:commandButton>
+									</x:div>
+								</x:div>
+							</wf:wfblock>
+							<c:ThemesManager id="uploadBlock"></c:ThemesManager>
+						</x:div>
                 	</wf:wfblock>
-                	<c:ThemesManager id="uploadBlock"></c:ThemesManager>
                 </h:form>
         </ws:page>
 </jsf:view>

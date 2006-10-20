@@ -9,6 +9,7 @@ public class ThemeStyleGroupMember {
 	private String type;
 	
 	private boolean enabled;
+	private boolean limitedSelection;
 
 	private List <String> styleFiles;
 	
@@ -47,5 +48,13 @@ public class ThemeStyleGroupMember {
 	public void setType(String type) {
 		this.type = type;
 	}
-	
+
+	public boolean isLimitedSelection() {
+		return limitedSelection;
+	}
+
+	public void setLimitedSelection(boolean limitedSelection) {
+		this.limitedSelection = limitedSelection;
+	}
+
 }

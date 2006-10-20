@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<theme>
+	<key>
+		<code>title</code>
+		<label>Title</label>
+		<defaultValue>Untitled Page 1</defaultValue>
+		<type>text</type>
+		<method>setPageTitle</method>
+	</key>
+	<key>
+		<code>site_title</code>
+		<label>Site title</label>
+		<defaultValue>My website</defaultValue>
+		<type>text</type>
+		<method>setTitle</method>
+	</key>
+	<key>
+		<code>site_slogan</code>
+		<label>Site slogan</label>
+		<defaultValue>Changing the world, one site at a time...</defaultValue>
+		<type>text</type>
+		<method>setSlogan</method>
+	</key>
+	<key>
+		<code>content</code>
+		<label>Content</label>
+		<defaultValue></defaultValue>
+		<type>text</type>
+		<method>setContent</method>
+	</key>
+	<key>
+		<code>toolbar</code>
+		<label>Toolbar</label>
+		<defaultValue>Untitled Page 1</defaultValue>
+		<type>text</type>
+		<method>getPageTitle</method>
+	</key>
+	<key>
+		<code>sidebar_title</code>
+		<label>Sidebar title</label>
+		<defaultValue></defaultValue>
+		<type>text</type>
+		<method>setSidebarTitle</method>
+	</key>
+	<key>
+		<code>sidebar</code>
+		<label>Sidebar</label>
+		<defaultValue>Personal;Work;Humor</defaultValue>
+		<type>text</type>
+		<method>setSidebar</method>
+	</key>
+	<key>
+		<code>breadcrumb</code>
+		<label>Breadcrumb</label>
+		<defaultValue>Untitled Page 1</defaultValue>
+		<type>text</type>
+		<method>getPageTitle</method>
+	</key>
+	<key>
+		<code>footer</code>
+		<label>Footer</label>
+		<defaultValue>User</defaultValue>
+		<type>text</type>
+		<method>setFooter</method>
+	</key>
+</theme>
