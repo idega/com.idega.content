@@ -7,11 +7,6 @@
 <faces-config>
 
 	<component>
-    	<component-type>com.idega.content.presentation.Panel</component-type>
-    	<component-class>com.idega.content.presentation.UIDiv</component-class>
-	</component>
-
-	<component>
 		<component-type>WebDAVList</component-type>
 		<component-class>com.idega.content.presentation.WebDAVList</component-class>
 	</component>
@@ -349,6 +344,12 @@
 	<managed-bean>
 		<managed-bean-name>themesManagerBean</managed-bean-name>
 		<managed-bean-class>com.idega.content.bean.ThemesManagerBean</managed-bean-class>
+		<managed-bean-scope>request</managed-bean-scope>
+	</managed-bean>
+
+	<managed-bean>
+		<managed-bean-name>siteTemplateBean</managed-bean-name>
+		<managed-bean-class>com.idega.content.bean.SiteTemplateBean</managed-bean-class>
 		<managed-bean-scope>request</managed-bean-scope>
 	</managed-bean>
 
