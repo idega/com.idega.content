@@ -64,16 +64,26 @@ version="1.2">
                 </f:verbatim>
 <!-- jsp accordion -->                        
 
-          <tr:div id="accordionDiv">
-            <tr:div id="overviewPanel">
-              <tr:div id="overviewHeader">
+          <x:div id="accordionDiv" forceId="true">
+            <x:div id="overviewPanel" forceId="true">
+              <x:div id="overviewHeader" forceId="true">
                 <h:outputText value="testing DIV tags"/>                
-              </tr:div>
-              <tr:div id="overviewContent">
-                <h:outputText value="#{siteTemplateBean.siteTree}"/>             
-              </tr:div>
-            </tr:div>
-          </tr:div>
+              </x:div>
+              <x:div id="overviewContent" forceId="true">
+<!--                  
+		 			<x:tree2 value="#{siteTemplateBean.siteTree}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">
+						<f:facet name="PageTreeNode"> 							
+							<h:panelGroup>
+					   			<h:outputLink onclick="getPrewUrl(this.parentNode.id);return false;">
+			             	 		<h:outputText value="#{node.description}"/>   
+			             		</h:outputLink>
+			                </h:panelGroup>
+			            </f:facet>
+			        </x:tree2>                             
+ -->
+              </x:div>
+            </x:div>
+          </x:div>
 
 
 <!-- html accordion -->                
