@@ -30,7 +30,7 @@ import org.apache.myfaces.shared_tomahawk.renderkit.html.HtmlRendererUtils;
  * @author Sean Schofield
  * @author Chris Barlow
  * @author Hans Bergsten (Some code taken from an example in his O'Reilly JavaServer Faces book. Copied with permission)
- * @version $Revision: 1.3 $ $Date: 2006/10/12 17:14:23 $
+ * @version $Revision: 1.4 $ $Date: 2006/10/20 12:44:17 $
  */
 public class HtmlTreeRendererNew extends HtmlTreeRenderer {
 	
@@ -98,7 +98,14 @@ public class HtmlTreeRendererNew extends HtmlTreeRenderer {
     	if (clientId != null){
     		isOuterSpanUsed = true;
     		out.startElement("span", component);
-    		out.writeAttribute("id", clientId, "id");        
+//    		out.writeAttribute("id", clientId, "id");
+    		
+    		out.writeAttribute("id", component.getId(), "id");
+System.out.println("span Id = "+ component.getId());    		
+
+out.startElement("div", component);
+out.writeAttribute("id", "div_id_"+component.getId(), "id");
+    		
     	}
 
     	boolean clientSideToggle = tree.isClientSideToggle();
@@ -147,6 +154,7 @@ public class HtmlTreeRendererNew extends HtmlTreeRenderer {
     	tree.setNodeId(null);
 
     	if (isOuterSpanUsed) {
+    		out.endElement("div");
     		out.endElement("span");
     	}
     }
