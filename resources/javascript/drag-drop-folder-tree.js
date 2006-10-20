@@ -20,11 +20,14 @@
 	var JSTreeObj;
 	var treeUlCounter = 0;
 	var nodeId = 1;
+	var thisTree;
+	var divClass = '';
+	var globalDivId = null;
 		
 	/* Constructor */
 	function JSDragDropTree()
 	{
-
+		var thisTree = false;
 		var idOfTree;
 		var imageFolder;
 		var folderImage;
@@ -54,9 +57,7 @@
 		this.minusImage = 'nav-minus.gif';
 		this.maximumDepth = 6;
 		var messageMaximumDepthReached;
-		
-		
-		
+				
 		this.floatingContainer = document.createElement('UL');
 		this.floatingContainer.style.position = 'absolute';
 		this.floatingContainer.style.display='none';
@@ -141,7 +142,7 @@
 		,		
 		setTreeId : function(idOfTree)
 		{
-			this.idOfTree = idOfTree;			
+			this.idOfTree = idOfTree;		
 		}	
 		,
 		expandAll : function()
@@ -225,12 +226,18 @@
 			return false;						
 		}
 		,
-		/* Initialize drag */
+		
+		
+		/* Initialize drag */ 
 		initDrag : function(e)
 		{
-			if(document.all)e = event;	
 			
+			
+			
+//alert('thisTree = true');			
+			if(document.all)e = event;
 			var subs = JSTreeObj.floatingContainer.getElementsByTagName('LI');
+
 			if(subs.length>0){
 				if(JSTreeObj.dragNode_sourceNextSib){
 					JSTreeObj.dragNode_parent.insertBefore(JSTreeObj.dragNode_source,JSTreeObj.dragNode_sourceNextSib);
@@ -241,8 +248,29 @@
 			
 			JSTreeObj.dragNode_source = this.parentNode;
 			JSTreeObj.dragNode_parent = this.parentNode.parentNode;
-			JSTreeObj.dragNode_sourceNextSib = false;
+			
+			var parentDiv = JSTreeObj.dragNode_parent;
+			while(true){
+				if (parentDiv.getElementsByTagName('DIV')[0]){
+//alert('parentDiv = '+parentDiv.getElementsByTagName('DIV')[0].id);
+					globalDivId = parentDiv.getElementsByTagName('DIV')[0].id;
+					break;					
+				}
+				parentDiv = parentDiv.parentNode;
+			}
+			
+/*
+var temp = JSTreeObj.dragNode_parent.getElementsByTagName('DIV');
+//alert(temp.length);
+for (var i = 0; i < temp.length; i++) {
+	alert(temp[i]);
+}
+alert('divClass = ' + JSTreeObj.dragNode_parent.getElementsByTagName('DIV'));			
 
+			
+//alert('div = ' + JSTreeObj.dragNode_source.getElementsByTagName('DIV')[0]);			
+*/			
+			JSTreeObj.dragNode_sourceNextSib = false;
 			
 			if(JSTreeObj.dragNode_source.nextSibling)JSTreeObj.dragNode_sourceNextSib = JSTreeObj.dragNode_source.nextSibling;
 			JSTreeObj.dragNode_destination = false;
@@ -314,19 +342,44 @@
 		,
 		dropDragableNodes:function()
 		{			
+			
+//alert('id of tree = ' + this.idOfTree);			
+/*			
+			if(thisTree == true)	
+				alert('drag node');
+			else
+				alert('create a new one');
+
+alert('thisTree = false');
+thisTree = false;			
+*/
+/*			
+			if(this.thisTree){
+				alert('moving node');
+				thisTree = false;
+			}
+			else
+				alert('creating new one');
+*/			
+			
 			var parent;
 			if(JSTreeObj.dragDropTimer<10){				
 				JSTreeObj.dragDropTimer = -1;
 				return;
 			}
+//mcb			
+
+// 			alert('noRemoving = ' + JSTreeObj.dragNode_source.getAttribute('noRemoving'));
+//alert(tmpObj.dragNode_parent.getAttribute('div'));
+/*			if (JSTreeObj.dragNode_source.getAttribute('noRemoving'))
+				alert('create');			
+			else 
+				alert('move');									
+*/	
+//mce	
+			
 			var showMessage = false;
 			if(JSTreeObj.dragNode_destination){	// Check depth
-			
-				
-				
-				
-				
-				
 				var countUp = JSTreeObj.dragDropCountLevels(JSTreeObj.dragNode_destination,'up');
 				var countDown = JSTreeObj.dragDropCountLevels(JSTreeObj.dragNode_source,'down');
 				var countLevels = countUp/1 + countDown/1 + (JSTreeObj.insertAsSub?1:0);		
@@ -344,12 +397,10 @@
 						ul = uls[0];
 						ul.style.display='block';
 						
-						var lis = ul.getElementsByTagName('LI');
+						var lis = ul.getElementsByTagName('LI');						
 						
-if (JSTreeObj.dragNode_source)						
-	alert('JSTreeObj.dragNode_source = '+ JSTreeObj.dragNode_source);
-	
 						var li = JSTreeObj.dragNode_source.getElementsByTagName('LI')[0];
+						
 /*						
 alert('li = '+ li);
 if(li.noRemoving)
@@ -418,6 +469,22 @@ if(li.noRemoving)
 //			saveMyTree(JSTreeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id), JSTreeObj.dragNode_source.id);		
 //			saveMyTree(JSTreeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);		
 			saveMyTree(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);		
+			
+//			JSTreeObj.initTree();
+			
+			var parentDiv = JSTreeObj.dragNode_destination;
+			while(true){
+				if (parentDiv.getElementsByTagName('DIV')){
+					if (parentDiv.getElementsByTagName('DIV')[0]){
+						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id)
+							alert('moving node');
+						else
+							alert('creating node');
+						break;					
+					}
+					parentDiv = parentDiv.parentNode;
+				}
+			}			
 		}
 		,
 		createDropIndicator : function()
@@ -518,7 +585,6 @@ if(li.noRemoving)
 			if(!saveString)var saveString = '';
 			if(!initObj){
 				initObj = document.getElementById(this.idOfTree);
-
 			}
 			var lis = initObj.getElementsByTagName('LI');
 
@@ -568,14 +634,14 @@ if(li.noRemoving)
 				var tmpVar = menuItems[no].getAttribute('noChildren');
 				if(!tmpVar)tmpVar = menuItems[no].noChildren;
 				if(tmpVar=='true')noChildren=true;
-
+/*
 				// No remove var set?
 				var noRemove = false;
 				var tmpVar = menuItems[no].getAttribute('noRemoving');
 
 				if(!tmpVar)tmpVar = menuItems[no].noRemoving;
 				if(tmpVar=='true')noRemoving=true;								
-
+*/
 				// No drag var set ?
 				var noDrag = false;
 				var tmpVar = menuItems[no].getAttribute('noDrag');
