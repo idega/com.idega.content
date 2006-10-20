@@ -24,6 +24,7 @@ version="1.2">
     											 /idegaweb/bundles/com.idega.builder.bundle/scripts/BuilderService.js,
     											 /idegaweb/bundles/com.idega.content.bundle/scripts/PagePreview.js,
     											 /idegaweb/bundles/com.idega.content.bundle/scripts/ThemesPreviewsProvider.js,
+    											 /idegaweb/bundles/com.idega.content.bundle/resources/javascript/rico.js,
     											 /dwr/engine.js">
         	<h:form id="createpageform">
 
@@ -38,7 +39,6 @@ version="1.2">
 							<h:panelGroup>
 					   			<h:outputLink onclick="getPrewUrl(this.parentNode.id);return false;">
 			             	 		<h:outputText value="#{node.description}"/>   
-					             <!--	<h:outputText title="#{node.identifier}" value="#{node.description}"/> --> 
 			             		</h:outputLink>
 			                </h:panelGroup>
 			            </f:facet>
@@ -47,7 +47,8 @@ version="1.2">
 				</wf:container>
 
                 <wf:container id="dhtmlgoodies_tree2" styleClass="template_tree">
-                <f:verbatim> 
+                <f:verbatim>
+                	<div id="dhtmlgoodies_tree2_div">
 						<ul id="dhtmlgoodies_tree2" class="dhtmlgoodies_tree2">
 							<li id="103" noChildren="true" noRemoving="true" typeOfTemplate="page"><a href="#">Page</a></li>
 							<li id="106" noChildren="true" noRemoving="true" typeOfTemplate="blog"><a href="#">Blog</a></li>								
@@ -58,21 +59,32 @@ version="1.2">
 							<li id="106" noChildren="true" noRemoving="true" typeOfTemplate="guestbook"><a href="#">Guestbook</a></li>								
 							<li id="107" noChildren="true" noRemoving="true" typeOfTemplate="imageGallery"><a href="#">Image gallery</a></li>						
 							<li id="108" noChildren="true" noRemoving="true" typeOfTemplate="login"><a href="#">Login</a></li>						
-						</ul>              
+						</ul>
+					</div>          
                 </f:verbatim>
-                
-        <ui:panelGroup binding="#{Sidebar.groupPanel1}" 
-            id="groupPanel1" 
-            style="height: 382px; left: 0px; top: 0px; position: absolute">
-            <f:verbatim>
-                <a:ajax type="spry" style="templates_style" name="spry.plainAccordion" />       
-            </f:verbatim>
-    	</ui:panelGroup>
-                
+<!-- jsp accordion -->                        
+
+          <tr:div id="accordionDiv">
+            <tr:div id="overviewPanel">
+              <tr:div id="overviewHeader">
+                <h:outputText value="testing DIV tags"/>                
+              </tr:div>
+              <tr:div id="overviewContent">
+                <h:outputText value="#{siteTemplateBean.siteTree}"/>             
+              </tr:div>
+            </tr:div>
+          </tr:div>
+
+
+<!-- html accordion -->                
+
 				</wf:container>
 				
 				<f:verbatim>				
 					<script type="text/javascript">	
+					
+					new Rico.Accordion( $('accordionDiv'), {panelHeight:300} );
+					
 						treeObj = new JSDragDropTree();
 						treeObj.setTreeId('page_tree_div');
 						treeObj.setMaximumDepth(7);
@@ -85,9 +97,9 @@ version="1.2">
 						treeObj2.setTreeId('dhtmlgoodies_tree2');
 						treeObj2.initTree(); 
 
-						treeObj3 = new JSDragDropTree();
-						treeObj3.setTreeId('dhtmlgoodies_tree3');
-						treeObj3.initTree(); 
+//						treeObj3 = new JSDragDropTree();
+//						treeObj3.setTreeId('dhtmlgoodies_tree3');
+//						treeObj3.initTree(); 
 
 						
 					</script>
