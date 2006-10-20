@@ -324,6 +324,14 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	padding-left: 15px;
 }
 
+.template_accordion {
+	list-style-type:none;
+	text-decoration:none;
+	padding-bottom: 15px;
+	top: 50%;
+	
+}
+
 .theme_container {
 	display:inline;
 	position: absolute;
