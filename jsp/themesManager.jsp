@@ -10,21 +10,21 @@
 version="1.2">
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 <jsf:view>
-        <ws:page id="themeManager" javascripturls="/idegaweb/bundles/com.idega.content.bundle/scripts/ThemesPreviewsProvider.js,/dwr/engine.js,/idegaweb/bundles/com.idega.content.bundle/scripts/ThemesManagerHelper.js">
+        <ws:page id="themeManager" javascripturls="/dwr/engine.js,/dwr/interface/ThemesPreviewsProvider.js,/idegaweb/bundles/com.idega.content.bundle/scripts/ThemesManagerHelper.js">
                 <h:form id="uploadForm" enctype="multipart/form-data" onsubmit="showLoadingMessage('Uploading theme...');">
 					<wf:wfblock id="themeManagerBlock" title="#{localizedStrings['com.idega.content']['themes_manager']}" >
 						<wf:container id="themesGallery">
 							<a:ajax name="ibrowser" template="themesPreview" style="themesPreview" script="themesPreview" args="{type: 'ibrowser'}"/>
 						</wf:container>
 						<x:div styleClass="theme_container">
-							<wf:wfblock title="Theme variations">
+							<wf:wfblock title="#{localizedStrings['com.idega.content']['theme_variations']}">
 								<x:div id="themeStyleVariations" forceId="true"></x:div>
 								
 								<x:div>
 									<x:div id="themeSaveArea" forceId="true" styleClass="wf_webdav_upload">
 										<h:outputText value="#{localizedStrings['com.idega.content']['theme_name']}"></h:outputText>
 										<x:inputText id="theme_name" onblur="enableButton(this.id)" forceId="true"></x:inputText>
-										<x:commandButton id="themeSaveButton" type="button" forceId="true" onclick="saveTheme()" value="Save"></x:commandButton>
+										<x:commandButton id="themeSaveButton" type="button" forceId="true" onclick="saveTheme()" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
 									</x:div>
 								</x:div>
 							</wf:wfblock>

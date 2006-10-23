@@ -77,18 +77,15 @@ function saveThemeCallback(result) {
 }
 
 function enableButton(inputId) {
-	/*alert(document.getElementById(inputId).value);
-	if (document.getElementById(inputId).value != "") {
+	/*if (document.getElementById(inputId).value != "") {
 		document.getElementById('themeSaveButton').disabled = false;
 	}*/
 }
 
 function setGlobalId(themeId) {
-	//alert('global id:' + themeId);
 	globalThemeID = themeId;
 }
 
 function setThemeName(themeName) {
-	//alert('name: ' + themeName);
 	document.getElementById('theme_name').value = themeName;
 }
