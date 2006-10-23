@@ -28,16 +28,19 @@ public class ThemeChanger {
 	private static final Log log = LogFactory.getLog(ThemeChanger.class);
 	
 	// These are defaults in RapidWeaver, we are using its to generate good preview
-	private static final String TITLE_REPLACE = "My company";
-	private static final String SLOGAN_REPLACE = "Changing the world, one site at a time...";
-	private static final String TOOLBAR_REPLACE = "<ul><li><a href=\"index.html\" rel=\"self\" id=\"current\">Untitled Page 1</a></li></ul>";
-	private static final String SIDEBAR_REPLACE = "<div id=\"blog-categories\"><div class=\"blog-category-link-disabled\">Personal</div><div class=\"blog-category-link-disabled\">Work</div><div class=\"blog-category-link-disabled\">Humor</div><div class=\"blog-category-link-disabled\">Apple</div></div><div id=\"blog-archives\"></div>";
-	private static final String BREADCRUMB_REPLACE = "<ul><li><a href=\"index.html\">Untitled Page 1</a>&nbsp;>&nbsp;</li></ul>";
-	private static final String FOOTER_REPLACE = "&copy; My company";
+	private static final String TOOLBAR_REPLACE_BEGIN = "<ul><li><a href=\"index.html\" rel=\"self\" id=\"current\">";
+	private static final String TOOLBAR_REPLACE_END = "</a></li></ul>";
+	
+	private static final String SIDEBAR_REPLACE_BEGIN = "<div id=\"blog-categories\">";
+	private static final String SIDEBAR_REPLACE_ELEMENT_BEGIN = "<div class=\"blog-category-link-disabled\">";
+	private static final String SIDEBAR_REPLACE_ELEMENT_END = "</div>";
+	
+	private static final String BREADCRUMB_REPLACE_BEGIN = "<ul><li><a href=\"index.html\">";
+	private static final String BREADCRUMB_REPLACE_END = "</a>&nbsp;>&nbsp;</li></ul>";
+
+	private static final String FOOTER_REPLACE = "&copy;&nbsp;";
 	
 	// Default keywords
-	private static final String TITLE = "site_title";
-	private static final String SLOGAN = "site_slogan";
 	private static final String TOOLBAR = "toolbar";
 	private static final String SIDEBAR = "sidebar";
 	private static final String BREADCRUMB = "breadcrumb";
@@ -45,9 +48,9 @@ public class ThemeChanger {
 	
 	// These are defaults in RapidWeaver style files, we need to change directories to images
 	private static final String CSS_IMAGE_URL = "url(";
-	private static final String DIRECTORIES = "../../";
+	private static final String DIRECTORY = "../";
 	private static final String IMAGES = "images";
-	private static final String CSS_REPLACE = CSS_IMAGE_URL + DIRECTORIES + IMAGES;
+	private static final String CSS_REPLACE = CSS_IMAGE_URL + DIRECTORY + DIRECTORY + IMAGES;
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
@@ -152,9 +155,20 @@ public class ThemeChanger {
 		if (content.indexOf(CSS_REPLACE) == -1) {
 			return true;
 		}
+		
+		String[] dirLevels = addToCss.split(ThemesConstants.SLASH);
+		
+		StringBuffer replacement = new StringBuffer();
+		replacement.append(CSS_IMAGE_URL);
+		for (int i = 0; i < dirLevels.length; i++) {
+			replacement.append(DIRECTORY);
+		}
+		replacement.append(addToCss);
+		replacement.append(IMAGES);
+		
 
 		while (content.indexOf(CSS_REPLACE) != -1) {
-			content = content.replace(CSS_REPLACE, CSS_IMAGE_URL + DIRECTORIES + addToCss + IMAGES);
+			content = content.replace(CSS_REPLACE, replacement.toString());
 		}
 
 		try {
@@ -354,6 +368,30 @@ public class ThemeChanger {
 		return true;
 	}
 	
+	private String getBasicReplace(String begin, String defaultValue, String end) {
+		String value = ThemesConstants.EMPTY;
+		if (begin != null) {
+			value += begin;
+		}
+		value += defaultValue;
+		if (end != null) {
+			value += end;
+		}
+		return value;
+	}
+	
+	private String getSidebarReplace(String defaultValue) {
+		String[] elements = defaultValue.split(ThemesConstants.COMMA);
+		if (elements == null) {
+			return ThemesConstants.EMPTY;
+		}
+		String sidebar = SIDEBAR_REPLACE_BEGIN;
+		for (int i = 0; i < elements.length; i++) {
+			sidebar += SIDEBAR_REPLACE_ELEMENT_BEGIN + elements[i] + SIDEBAR_REPLACE_ELEMENT_END;
+		}
+		return sidebar + SIDEBAR_REPLACE_ELEMENT_END;
+	}
+	
 	/**
 	 * Creates String, thats represens Builder's region
 	 * @param value
@@ -361,29 +399,30 @@ public class ThemeChanger {
 	 */
 	private String getRegion(String value) {
 		String region = ThemesConstants.COMMENT_BEGIN + ThemesConstants.TEMPLATE_REGION_BEGIN + value +
-			ThemesConstants.TEMPLATE_REGION_MIDDLE + ThemesConstants.COMMENT_END + ThemesConstants.COMMENT_BEGIN +
-			ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
+			ThemesConstants.TEMPLATE_REGION_MIDDLE + ThemesConstants.COMMENT_END;
 		
-		if (value.equals(TITLE)) {
-			return region + TITLE_REPLACE;
-		}
-		if (value.equals(SLOGAN)) {
-			return region + SLOGAN_REPLACE;
-		}
-		if (value.equals(TOOLBAR)) {
-			return region + TOOLBAR_REPLACE;
-		}
-		if (value.equals(SIDEBAR)) {
-			return region + SIDEBAR_REPLACE;
-		}
-		if (value.equals(BREADCRUMB)) {
-			return region + BREADCRUMB_REPLACE;
-		}
-		if (value.equals(FOOTER)) {
-			return region + FOOTER_REPLACE;
+		ThemeSettings settings = helper.getSettings().get(value);
+		if (settings != null) {
+			if (value.equals(TOOLBAR)) {
+				return region + getBasicReplace(TOOLBAR_REPLACE_BEGIN, settings.getDefaultValue(), TOOLBAR_REPLACE_END) +
+					ThemesConstants.COMMENT_BEGIN +	ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
+			}
+			if (value.equals(SIDEBAR)) {
+				return region + getSidebarReplace(settings.getDefaultValue()) + ThemesConstants.COMMENT_BEGIN +
+					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
+			}
+			if (value.equals(BREADCRUMB)) {
+				return region + getBasicReplace(BREADCRUMB_REPLACE_BEGIN, settings.getDefaultValue(), BREADCRUMB_REPLACE_END) +
+					ThemesConstants.COMMENT_BEGIN +	ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
+			}
+			if (value.equals(FOOTER)) {
+				return region + getBasicReplace(FOOTER_REPLACE, settings.getDefaultValue(), null) + ThemesConstants.COMMENT_BEGIN +
+					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
+			}
+			region += settings.getDefaultValue();
 		}
 		
-		return region;
+		return region + ThemesConstants.COMMENT_BEGIN +	ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 	}
 	
 	/**
@@ -474,10 +513,6 @@ public class ThemeChanger {
 			else {
 				oldStyle = getStyleMember(theme, styleGroupName, styleMember);
 			}
-		}
-
-		if (oldStyle == null) {
-			return null;
 		}
 		
 		Element root = doc.getRootElement();

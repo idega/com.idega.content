@@ -18,6 +18,7 @@ public class ThemesConstants {
 	protected static final String SLASH = "/";
 	public static final String AT = "@";
 	protected static final String EMPTY = "";
+	protected static final String COMMA = ",";
 	
 	protected static final String PREVIEW_IMAGE = "theme_preview";
 	protected static final String SMALL_PREVIEW_IMAGE = "small_theme_preview";
@@ -35,7 +36,7 @@ public class ThemesConstants {
 	private static final String[] _USELESS_CONTENT = new String[] {"%pathto(", ")%", "%"};
 	protected static final List <String> USELESS_CONTENT = Collections.unmodifiableList(Arrays.asList(_USELESS_CONTENT));
 	
-	private static final String[] _REGIONS = new String[] {"%header%", "%user_styles%", "%user_javascript%",
+	private static final String[] _REGIONS = new String[] {"%title%", "%header%", "%user_styles%", "%user_javascript%",
 		"%logo%", "%site_title%", "%site_slogan%", "%content%", "%toolbar%", "%sidebar_title%", "%sidebar%", "%plugin_sidebar%",
 		"%breadcrumb%", "%footer%"};
 	protected static final List <String> REGIONS = Collections.unmodifiableList(Arrays.asList(_REGIONS));

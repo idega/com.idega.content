@@ -145,7 +145,7 @@ public class ThemesHelper implements Singleton {
 		return loader;
 	}
 	
-	public void searchForThemes() {
+	private void searchForThemes() {
 		if (!checkedFromSlide) {
 			ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
 			Collection results = search.doSimpleDASLSearch(ThemesConstants.THEME_SEARCH_KEY, ThemesConstants.CONTENT + ThemesConstants.THEMES_PATH);
@@ -375,8 +375,12 @@ public class ThemesHelper implements Singleton {
 		themes.remove(themeID);
 	}
 
-	protected Map<String, ThemeInfo> getThemes() {
+	protected Map <String, ThemeInfo> getThemes() {
 		return themes;
+	}
+	
+	protected Map <String, ThemeSettings> getSettings() {
+		return settings;
 	}
 
 	protected List<String> getUrisToThemes() {

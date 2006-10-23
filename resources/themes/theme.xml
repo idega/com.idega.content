@@ -46,7 +46,7 @@
 	<key>
 		<code>sidebar</code>
 		<label>Sidebar</label>
-		<defaultValue>Personal;Work;Humor</defaultValue>
+		<defaultValue>Personal,Work,Humor</defaultValue>
 		<type>text</type>
 		<method>setSidebar</method>
 	</key>
