@@ -51,7 +51,7 @@ function changeTheme(themeID, styleGroupName, newStyleMember, type, checked) {
 	if (type == "checkbox") {
 		radio = false;
 	}
-	ThemesPreviewsProvider.changeTheme(themeID, styleGroupName, newStyleMember, radio, checked, changeThemeCallback);
+	ThemesPreviewsProvider.changeTheme(themeID, styleGroupName, newStyleMember, document.getElementById("theme_name").value, radio, checked, changeThemeCallback);
 }
 
 function changeThemeCallback(result) {
