@@ -10,12 +10,13 @@
 version="1.2">
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 <jsf:view>
-        <ws:page id="themeManager" javascripturls="/dwr/engine.js,/dwr/interface/ThemesPreviewsProvider.js,/idegaweb/bundles/com.idega.content.bundle/scripts/ThemesManagerHelper.js">
+        <ws:page id="themeManager" javascripturls="/dwr/engine.js,/dwr/interface/ThemesPreviewsProvider.js,/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js">
                 <h:form id="uploadForm" enctype="multipart/form-data" onsubmit="showLoadingMessage('Uploading theme...');">
 					<wf:wfblock id="themeManagerBlock" title="#{localizedStrings['com.idega.content']['themes_manager']}" >
 						<wf:container id="themesGallery">
 							<a:ajax name="ibrowser" template="themesPreview" style="themesPreview" script="themesPreview" args="{type: 'ibrowser'}"/>
 						</wf:container>
+						
 						<x:div styleClass="theme_container">
 							<wf:wfblock title="#{localizedStrings['com.idega.content']['theme_variations']}">
 								<x:div id="themeStyleVariations" forceId="true"></x:div>
