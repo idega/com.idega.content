@@ -36,7 +36,7 @@ public class ThemeChanger {
 	private static final String SIDEBAR_REPLACE_ELEMENT_END = "</div>";
 	
 	private static final String BREADCRUMB_REPLACE_BEGIN = "<ul><li><a href=\"index.html\">";
-	private static final String BREADCRUMB_REPLACE_END = "</a>></li></ul>";
+	private static final String BREADCRUMB_REPLACE_END = "</a></li></ul>";
 
 	private static final String FOOTER_REPLACE = "&copy;&nbsp;";
 	

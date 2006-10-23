@@ -44,8 +44,8 @@ public class ThemesPreviewsProviderBean extends IBOServiceBean implements Themes
 		return helper.getThemeStyleVariations().getThemeStyleVariations(themeID);
 	}
 	
-	public String changeTheme(String themeID, String styleGroupName, String styleMember, boolean radio, boolean checked) {
-		return helper.getThemeChanger().changeTheme(themeID, styleGroupName, styleMember, radio, checked);
+	public String changeTheme(String themeID, String styleGroupName, String styleMember, String themeName, boolean radio, boolean checked) {
+		return helper.getThemeChanger().changeTheme(themeID, styleGroupName, styleMember, themeName, radio, checked);
 	}
 	
 	public boolean saveTheme(String themeID, String themeName) {
