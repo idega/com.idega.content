@@ -36,7 +36,7 @@ public class ThemeChanger {
 	private static final String SIDEBAR_REPLACE_ELEMENT_END = "</div>";
 	
 	private static final String BREADCRUMB_REPLACE_BEGIN = "<ul><li><a href=\"index.html\">";
-	private static final String BREADCRUMB_REPLACE_END = "</a>&nbsp;>&nbsp;</li></ul>";
+	private static final String BREADCRUMB_REPLACE_END = "</a>></li></ul>";
 
 	private static final String FOOTER_REPLACE = "&copy;&nbsp;";
 	
@@ -239,8 +239,8 @@ public class ThemeChanger {
 	 */
 	private String getFixedDocumentContent(String documentContent) {
 		for (int i = 0; i < ThemesConstants.USELESS_CONTENT.size(); i++) {
-			if (documentContent.indexOf(ThemesConstants.USELESS_CONTENT.get(i)) != -1) {
-				documentContent = documentContent.replaceAll(ThemesConstants.USELESS_CONTENT.get(i), ThemesConstants.EMPTY);
+			while (documentContent.indexOf(ThemesConstants.USELESS_CONTENT.get(i)) != -1) {
+				documentContent = documentContent.replace(ThemesConstants.USELESS_CONTENT.get(i), ThemesConstants.EMPTY);
 			}
 		}
 		return documentContent;
@@ -483,12 +483,14 @@ public class ThemeChanger {
 	 * @param styleMember
 	 * @return String
 	 */
-	public String changeTheme(String themeID, String styleGroupName, String styleMember, boolean radio, boolean checked) {
+	public String changeTheme(String themeID, String styleGroupName, String styleMember, String themeName, boolean radio, boolean checked) {
 		if (themeID == null || styleGroupName == null || styleMember == null) {
 			return null;
 		}
 		
 		ThemeInfo theme = helper.getThemeInfo(themeID);
+		
+		theme.setName(themeName);
 		
 		String linkToDoc = theme.getLinkToDraft();
 		if (linkToDoc == null) {
