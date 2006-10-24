@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.7 2006/10/24 14:38:47 gimmi Exp $
+ * $Id: WebDAVUpload.java,v 1.8 2006/10/24 15:23:26 tryggvil Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -33,10 +33,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/10/24 14:38:47 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/10/24 15:23:26 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class WebDAVUpload extends ContentBlock {
 
@@ -282,7 +282,9 @@ public class WebDAVUpload extends ContentBlock {
 			return;
 		}
 		if (embedInForm) {
-			getForm().getChildren().add(WFContainerLines.get(i));
+			for (int i = 0; i < WFContainerLines.size(); i++) {
+				getForm().getChildren().add(WFContainerLines.get(i));
+			}
 		} else {
 		for (int i = 0; i < WFContainerLines.size(); i++) {
 			getChildren().add(WFContainerLines.get(i));
