@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.5 2005/10/26 11:44:48 tryggvil Exp $
+ * $Id: WebDAVUpload.java,v 1.5.2.1 2006/10/24 10:26:23 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -9,156 +9,477 @@
  */
 package com.idega.content.presentation;
 
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.faces.component.html.HtmlCommandButton;
+import javax.faces.component.html.HtmlForm;
 import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
+import javax.faces.el.ValueBinding;
 import javax.faces.event.ActionEvent;
+
 import org.apache.myfaces.custom.fileupload.HtmlInputFileUpload;
-import com.idega.presentation.Table;
+import org.apache.myfaces.custom.savestate.UISaveState;
+
+import com.idega.content.business.WebDAVUploadBean;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFUtil;
 
 
 /**
  * 
- *  Last modified: $Date: 2005/10/26 11:44:48 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2006/10/24 10:26:23 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.5.2.1 $
  */
 public class WebDAVUpload extends ContentBlock {
 
 	protected static final String BEAN_ID = "WebDAVUploadBean";
 	
-	protected void initializeComponent(FacesContext context) {
+	protected static final String DEFAULT_OUTPUT_TEXT_STYLE = "wf_inputtext";
+	
+	protected static final String DEFAULT_BUTTON_STYLE = "wf_webdav_upload_button";
+	
+	protected static final String DEFAULT_INPUT_FILE_STYLE = "fileUploadInput";
+	
+	protected static final String DEFAULT_WF_CONTAINER_LINE_STYLE = "wf_webdav_upload";
+	
+	protected static final String DEFAULT_FILE_ACCEPT_PATTERN = "*";
+	
+	protected static final String DEFAULT_FILE_LINK_TARGET = "_new";
+	
+	protected static final String DEFAULT_STORAGE = "file";
+	
+	protected static final String DEFAULT_UPLOAD_METHOD = "upload";
+	
+	private String uploadMethod = null;
+	
+	private String styleClassSelectFile = null;
+	
+	private String styleClassFileUploadInput = null;
+	
+	private String accept = null;
+	
+	private String storage = null;
+	
+	private String styleClassGiveName = null;
+	
+	private String styleClassVersionText = null;
+	
+	private String styleClassFolder = null;
+	
+	private String fileLinkTarget = null;
+	
+	private String styleClassButton = null;
+	
+	private String styleClassWFContainerLine = null;
+	
+	private boolean useFileName;
+	
+	private boolean useVersionComment;
+	
+	private boolean useUploadPath;
+	
+	private boolean useFileLink;
+	
+	private boolean useImagePreview;
+	
+	private String pathProviderBeanWithMethod;
+	
+	private String onClickAction;
+	
+	private List WFContainerLines = null;
+	
+	private String uploadPath;
+	
+	private boolean embedInForm = false;
+	
+	private boolean useUserHomeFolder = false;
+	
+	private HtmlForm form;
 
-		Table table = new Table();
-		int row = 1;
-		HtmlOutputText selectFile = getText("select_a_file_to_upload","wf_inputtext");
+	
+	protected void initializeComponent(FacesContext context) {
+		
+		HtmlOutputText selectFile = getText("select_a_file_to_upload", getStyleClassSelectFile());
 		selectFile.setId(getId()+"_sel");
 		
-		HtmlInputFileUpload fileupload = new HtmlInputFileUpload();
-		fileupload.setId(getId()+"_fileupload");
-		fileupload.setAccept("*");
-		fileupload.setValueBinding("value", WFUtil.createValueBinding("#{"+BEAN_ID+".uploadFile}"));
-		fileupload.setStorage("file");
-		fileupload.setStyleClass("fileUploadInput");
+		HtmlInputFileUpload fileUpload = new HtmlInputFileUpload();
+		fileUpload.setId(getId()+"_fileupload");
+		fileUpload.setAccept(getAccept());
+		fileUpload.setValueBinding("value", WFUtil.createValueBinding("#{"+BEAN_ID+".uploadFile}"));
+		fileUpload.setStorage(getStorage());
+		fileUpload.setStyleClass(getStyleClassFileUploadInput());
 
-		HtmlOutputText giveName = getText("give_it_a_name_optional", "wf_inputtext");
-		giveName.setId(getId()+"_giveName");
-		HtmlInputText fileName = new HtmlInputText();
-		fileName.setId(getId()+"_fileName");
-		fileName.setValueBinding("value", WFUtil.createValueBinding("#{"+BEAN_ID+".fileName}"));
+		HtmlOutputText giveName = null;
+		HtmlInputText fileName = null;
+		if (useFileName) {
+			giveName = getText("give_it_a_name_optional", getStyleClassGiveName());
+			giveName.setId(getId()+"_giveName");
+			
+			fileName = new HtmlInputText();
+			fileName.setId(getId()+"_fileName");
+			fileName.setValueBinding("value", WFUtil.createValueBinding("#{"+BEAN_ID+".fileName}"));
+		}
 		
-		HtmlOutputText versionText = getText("version_comment", "wf_inputtext");
-		versionText.setId(getId()+"_versionText");
-		HtmlInputText comment = new HtmlInputText();
-		comment.setId(getId()+"_comment");
-		comment.setValueBinding("value", WFUtil.createValueBinding("#{"+BEAN_ID+".comment}"));
+		HtmlOutputText versionText = null;
+		HtmlInputText comment = null;
+		if (useVersionComment) {
+			versionText = getText("version_comment", getStyleClassVersionText());
+			versionText.setId(getId()+"_versionText");
+			
+			comment = new HtmlInputText();
+			comment.setId(getId()+"_comment");
+			comment.setValueBinding("value", WFUtil.createValueBinding("#{"+BEAN_ID+".comment}"));
+		}
 
-		HtmlOutputText folder = getText("select_folder_optional", "wf_inputtext");
-		folder.setId(getId()+"_folder");
-		HtmlInputText uploadPath = new HtmlInputText();
-		uploadPath.setId(getId()+"_uploadPath");
-		uploadPath.setValueBinding("value", WFUtil.createValueBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".webDAVPath}"));
+		HtmlOutputText folder = null;
+		HtmlInputText uploadPath = null;
+		if (useUploadPath) {
+			folder = getText("select_folder_optional", getStyleClassFolder());
+			folder.setId(getId()+"_folder");
+			
+			uploadPath = getUploadPathElement(getId()+"_uploadPath", WFUtil.createValueBinding("#{"+WebDAVList.WEB_DAV_LIST_BEAN_ID+".webDAVPath}"));
+		}
+		if (pathProviderBeanWithMethod != null) {
+			String path = (String) WFUtil.invoke(pathProviderBeanWithMethod);
+			WFUtil.invoke(BEAN_ID, "setUploadFilePath", path, String.class);
+		}
+		if (this.useUserHomeFolder) {
+			try {
+				WebDAVUploadBean bean = (WebDAVUploadBean) WFUtil.getBeanInstance(BEAN_ID);
+				String homeFolder = getIWSlideSession().getUserHomeFolder();
+				bean.setUploadFilePath(homeFolder);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+
+		} else if (this.uploadPath != null) {
+			WebDAVUploadBean bean = (WebDAVUploadBean) WFUtil.getBeanInstance(BEAN_ID);
+			bean.setUploadFilePath(this.uploadPath);
+		}
 		
-		HtmlOutputLink fileLink = new HtmlOutputLink();
-		fileLink.setId(getId()+"_fileLink");
-		fileLink.setValueBinding("value", WFUtil.createValueBinding("#{"+BEAN_ID+".downloadPath}"));
-		fileLink.setTarget("_new");
-		fileLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+BEAN_ID+".isUploaded}"));
-		fileLink.getChildren().add(getText("click_to_get_the_file"));
+		HtmlOutputLink fileLink = null;
+		if (useFileLink) {
+			fileLink = new HtmlOutputLink();
+			fileLink.setId(getId()+"_fileLink");
+			fileLink.setValueBinding("value", WFUtil.createValueBinding("#{"+BEAN_ID+".downloadPath}"));
+			fileLink.setTarget(getFileLinkTarget());
+			fileLink.setValueBinding("rendered", WFUtil.createValueBinding("#{"+BEAN_ID+".isUploaded}"));
+			fileLink.getChildren().add(getText("click_to_get_the_file"));
+		}
 		
-		HtmlGraphicImage imagePreview = new HtmlGraphicImage();
-		imagePreview.setId(getId()+"_imagePreview");
-		imagePreview.setValueBinding("value", WFUtil.createValueBinding("#{"+BEAN_ID+".imagePath}"));
+		HtmlGraphicImage imagePreview = null;
+		if (useImagePreview) {
+			imagePreview = new HtmlGraphicImage();
+			imagePreview.setId(getId()+"_imagePreview");
+			imagePreview.setValueBinding("value", WFUtil.createValueBinding("#{"+BEAN_ID+".imagePath}"));
+		}
 		
 		HtmlCommandButton upload = new HtmlCommandButton();
 		upload.setId(getId()+"_uploadCmd");
-		upload.setStyleClass("wf_webdav_upload_button");
-		upload.setActionListener(WFUtil.createMethodBinding("#{WebDAVUploadBean.upload}", new Class[]{ActionEvent.class}));
+		upload.setStyleClass(getStyleClassButton());
+		upload.setActionListener(WFUtil.createMethodBinding("#{"+BEAN_ID+"."+getUploadMethod()+"}", new Class[]{ActionEvent.class}));
+		if (onClickAction != null) {
+			upload.setOnclick(onClickAction);
+		}
 		getBundle().getLocalizedUIComponent("upload", upload);
 		
-//		form.getChildren().add("<br>");
-		table.add(selectFile, 1, row);
-		table.add(fileupload, 2, row++);
-//		table.add(giveName, 1, row);
-//		table.add(fileName, 2, row++);
-		table.add(versionText, 1, row);
-		table.add(comment, 2, row++);
-		table.add(folder, 1, row);
-		table.add(uploadPath, 2, row++);
-		table.add(upload, 2, row++);
-		table.setBorder(1);
+		WFContainerLines = new ArrayList();
 		
-		WFContainer line1 = new WFContainer();
-		line1.setStyleClass("wf_webdav_upload");
-		line1.setId("upload_file");
-		line1.getChildren().add(selectFile);
-		line1.getChildren().add(fileupload);
+		addLineToContainer(new Object[] {selectFile, fileUpload}, getStyleClassWFContainerLine(), "upload_file");
+		
+		if (useFileName) {
+			addLineToContainer(new Object[] {giveName, fileName}, getStyleClassWFContainerLine(), "file_name");
+		}
+		
+		if (useVersionComment) {
+			addLineToContainer(new Object[] {versionText, comment}, getStyleClassWFContainerLine(), "upload_comment");
+		}
+		
+		if (useUploadPath) {
+			addLineToContainer(new Object[] {folder, uploadPath}, getStyleClassWFContainerLine(), "upload_path");
+		}
+		
+		if (useFileLink && useImagePreview) {
+			addLineToContainer(new Object[] {fileLink, imagePreview}, getStyleClassWFContainerLine(), "file_link_image_preview");
+		}
+		else {
+			if (useFileLink) {
+				addLineToContainer(new Object[] {fileLink}, getStyleClassWFContainerLine(), "file_link");
+			}
+			if (useImagePreview) {
+				addLineToContainer(new Object[] {imagePreview}, getStyleClassWFContainerLine(), "image_preview");
+			}
+		}
+		
+		addElementToLastLine(upload);
 
-		WFContainer line2 = new WFContainer();
-		line2.setStyleClass("wf_webdav_upload");
-		line2.setId("upload_comment");
-		line2.getChildren().add(versionText);
-		line2.getChildren().add(comment);
-		
-//		WFContainer line4 = new WFContainer();
-//		line4.setStyleClass("wf_webdav_upload");
-//		line4.setId("upload_button");
-		line2.getChildren().add(upload);
+		if (embedInForm) {
+			add(getForm());
+		}
 
-//		WFContainer line3 = new WFContainer();
-//		line3.setStyleClass("wf_webdav_upload");
-//		line3.setId("upload_path");
-//		line3.getChildren().add(folder);
-//		line3.getChildren().add(uploadPath);
+		addLines();
 		
 		
+//		Saving the state of the webuploadbean specially because the scope
+		//of this bean now is 'request' not 'session'
+		UISaveState beanSaveState = new UISaveState();
+		ValueBinding binding = WFUtil.createValueBinding("#{"+BEAN_ID+"}");
+		beanSaveState.setId("webdavuploadIds");
+		beanSaveState.setValueBinding("value",binding);
 		
-//		WFContainer line5 = new WFContainer();
-//		line5.getChildren().add(fileLink);
-//		line5.getChildren().add(imagePreview);
+		if (embedInForm) {
+			form.getChildren().add(beanSaveState);
+		} else {
+			add(beanSaveState);
+		}
+	}
+	
+	private HtmlForm getForm() {
+		if (form == null) {
+			form = new HtmlForm();
+			form.setId("webdavuploadform_"+getId());
+			form.setEnctype("multipart/form-data");
+		}
+		return form;
+	}
+	
+	private HtmlInputText getUploadPathElement(String ID, ValueBinding valueBinding) {
+		HtmlInputText uploadPath = new HtmlInputText();
+		uploadPath.setId(ID);
+		uploadPath.setValueBinding("value", valueBinding);
+		return uploadPath;
+	}
+	
+	private void addLineToContainer(Object[] lineElements, String styleClass, String ID) {
+		if (lineElements == null) {
+			return;
+		}
+		WFContainer line = new WFContainer();
+		line.setStyleClass(styleClass);
+		line.setId(ID);
+		for (int i = 0; i < lineElements.length; i++) {
+			line.getChildren().add(lineElements[i]);
+		}
+		WFContainerLines.add(line);
+	}
+	
+	private void addElementToLastLine(Object element) {
+		if (WFContainerLines == null) {
+			return;
+		}
+		WFContainer line = (WFContainer) WFContainerLines.get(WFContainerLines.size() - 1);
+		line.getChildren().add(element);
+	}
+	
+	private void addLines() {
+		if (WFContainerLines == null) {
+			return;
+		}
 		
-		getChildren().add(line1);
-		getChildren().add(line2);
-//		getChildren().add(line3);
-		//getChildren().add(line4);
-		//getChildren().add(line5);
-
-//    <f:verbatim><br/></f:verbatim>
-//    <h:outputText value="Select a file to upload : "/>
-// <cmf:inputFileUpload id="fileupload"
-//                       accept="*"
-//                       value="#{WebDAVUploadBean.uploadFile}"
-//                       storage="file"
-//                       styleClass="fileUploadInput"/>
-//<f:verbatim><br/></f:verbatim>
-//    <h:outputText id ="nametext" value="and give it a name (optional) : "/>
-//    <h:inputText id="filename" value="#{WebDAVUploadBean.fileName}"/>
-//       <f:verbatim><br/></f:verbatim>
-//    <h:outputText id="versiontext" value="and a version comment : "/>
-//       <h:inputText id="comment" value="#{WebDAVUploadBean.comment}"/>
-//    <f:verbatim><br/></f:verbatim>
-//    <h:outputText id ="outtext" value="and select the folder to upload to (optional) : "/>
-//     <h:inputText id="uploadPath" value="#{WebDAVListBean.webDAVPath}"/>
-//    <h:commandButton value="Upload" action="#{WebDAVUploadBean.upload}"/>
-//
-//<f:verbatim><br/></f:verbatim>
-//<c:WebDAVFileDetails id="id" webDAVPath="#{WebDAVListBean.getClickedFilePath}"/>
-//
-//<h:outputLink id="filelink" value="#{WebDAVUploadBean.downloadPath}" target="_new" rendered="#{WebDAVUploadBean.isUploaded}" >
-//<f:verbatim>Click here to get the file</f:verbatim>
-//</h:outputLink>
-//<f:verbatim><br/></f:verbatim>
-//<h:graphicImage id="imagePreview" value="#{WebDAVUploadBean.imagePath}"/>
-		
-		
-		
+		if (embedInForm) {
+			for (int i = 0; i < WFContainerLines.size(); i++) {
+				getForm().getChildren().add(WFContainerLines.get(i));
+			}
+		} else {
+			for (int i = 0; i < WFContainerLines.size(); i++) {
+				getChildren().add(WFContainerLines.get(i));
+			}
+		}
 	}
 
+	public String getUploadMethod() {
+		return uploadMethod == null ? DEFAULT_UPLOAD_METHOD : uploadMethod;
+	}
 
+	public void setUploadMethod(String uploadMethod) {
+		this.uploadMethod = uploadMethod;
+	}
+
+	public String getAccept() {
+		return accept == null ? DEFAULT_FILE_ACCEPT_PATTERN : accept;
+	}
+
+	public void setAccept(String accept) {
+		this.accept = accept;
+	}
+
+	public String getFileLinkTarget() {
+		return fileLinkTarget == null ? DEFAULT_FILE_LINK_TARGET : fileLinkTarget;
+	}
+
+	public void setFileLinkTarget(String fileLinkTarget) {
+		this.fileLinkTarget = fileLinkTarget;
+	}
+
+	public String getStyleClassFileUploadInput() {
+		return styleClassFileUploadInput == null ? DEFAULT_INPUT_FILE_STYLE : styleClassFileUploadInput;
+	}
+
+	public void setStyleClassFileUploadInput(String styleClassFileUploadInput) {
+		this.styleClassFileUploadInput = styleClassFileUploadInput;
+	}
+
+	public String getStyleClassFolder() {
+		return styleClassFolder == null ? DEFAULT_OUTPUT_TEXT_STYLE : styleClassFolder;
+	}
+
+	public void setStyleClassFolder(String styleClassFolder) {
+		this.styleClassFolder = styleClassFolder;
+	}
+
+	public String getStyleClassGiveName() {
+		return styleClassGiveName == null ? DEFAULT_OUTPUT_TEXT_STYLE : styleClassGiveName;
+	}
+
+	public void setStyleClassGiveName(String styleClassGiveName) {
+		this.styleClassGiveName = styleClassGiveName;
+	}
+
+	public String getStyleClassSelectFile() {
+		return styleClassSelectFile == null ? DEFAULT_OUTPUT_TEXT_STYLE : styleClassSelectFile;
+	}
+
+	public void setStyleClassSelectFile(String styleClassSelectFile) {
+		this.styleClassSelectFile = styleClassSelectFile;
+	}
+
+	public String getStyleClassButton() {
+		return styleClassButton == null ? DEFAULT_BUTTON_STYLE : styleClassButton;
+	}
+
+	public void setStyleClassButton(String styleClassButton) {
+		this.styleClassButton = styleClassButton;
+	}
+
+	public String getStyleClassVersionText() {
+		return styleClassVersionText == null ? DEFAULT_OUTPUT_TEXT_STYLE : styleClassVersionText;
+	}
+
+	public void setStyleClassVersionText(String styleClassVersionText) {
+		this.styleClassVersionText = styleClassVersionText;
+	}
+
+	public String getStyleClassWFContainerLine() {
+		return styleClassWFContainerLine == null ? DEFAULT_WF_CONTAINER_LINE_STYLE : styleClassWFContainerLine;
+	}
+
+	public void setStyleClassWFContainerLine(String styleClassWFContainerLine) {
+		this.styleClassWFContainerLine = styleClassWFContainerLine;
+	}
+
+	public String getStorage() {
+		return storage == null ? DEFAULT_STORAGE : storage;
+	}
+
+	public void setStorage(String storage) {
+		this.storage = storage;
+	}
+
+	public boolean isUseFileLink() {
+		return useFileLink;
+	}
+
+	public void setUseFileLink(boolean useFileLink) {
+		this.useFileLink = useFileLink;
+	}
+
+	public boolean isUseFileName() {
+		return useFileName;
+	}
+
+	public void setUseFileName(boolean useFileName) {
+		this.useFileName = useFileName;
+	}
+
+	public boolean isUseImagePreview() {
+		return useImagePreview;
+	}
+
+	public void setUseImagePreview(boolean useImagePreview) {
+		this.useImagePreview = useImagePreview;
+	}
+
+	public boolean isUseUploadPath() {
+		return useUploadPath;
+	}
+
+	public void setUseUploadPath(boolean useUploadPath) {
+		this.useUploadPath = useUploadPath;
+	}
+
+	public boolean isUseVersionComment() {
+		return useVersionComment;
+	}
+
+	public void setUseVersionComment(boolean useVersionComment) {
+		this.useVersionComment = useVersionComment;
+	}
+
+	public String getPathProviderBeanWithMethod() {
+		return pathProviderBeanWithMethod;
+	}
+
+	public void setPathProviderBeanWithMethod(String fileUploadFolder) {
+		this.pathProviderBeanWithMethod = fileUploadFolder;
+	}
+
+	public String getOnClickAction() {
+		return onClickAction;
+	}
+
+	public void setOnClickAction(String onClickAction) {
+		this.onClickAction = onClickAction;
+	}
+	
+	public void setUploadPath(String uploadPath) {
+		this.uploadPath = uploadPath;
+	}
+
+	public String getUploadPath() {
+		return uploadPath;
+	}
+
+	public boolean getEmbeddedInForm() {
+		return embedInForm;
+	}
+
+	public void setEmbeddedInForm(boolean embedInForm) {
+		this.embedInForm = embedInForm;
+	}
+	
+	/**
+	 * Sets the viewer to view the current users home folder content. Overrides
+	 * the setStartingPointURI method
+	 * @param useUserHomeFolder
+	 */
+	public void setUseUserHomeFolder(boolean useUserHomeFolder) {
+		this.useUserHomeFolder = useUserHomeFolder;
+	}
+	
+	
+	public boolean getUseUserHomeFolder() {
+		return useUserHomeFolder;
+	}
+	public Object saveState(FacesContext ctx) {
+		Object values[] = new Object[3];
+		values[0] = super.saveState(ctx);
+		values[1] = new Boolean(useUserHomeFolder);
+		values[2] = new Boolean(embedInForm);
+		return values;
+	}
+
+	public void restoreState(FacesContext ctx, Object state) {
+		Object values[] = (Object[]) state;
+		super.restoreState(ctx, values[0]);
+		this.useUserHomeFolder = ((Boolean) values[1]).booleanValue();
+		this.embedInForm = ((Boolean) values[2]).booleanValue();
+	}
 }
