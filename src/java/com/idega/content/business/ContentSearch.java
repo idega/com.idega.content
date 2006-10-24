@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.20.2.7 2006/10/19 14:27:18 gimmi Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.20.2.8 2006/10/24 10:32:26 gimmi Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -15,6 +15,7 @@ import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.Vector;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HostConfiguration;
@@ -44,25 +46,34 @@ import org.apache.webdav.lib.search.SearchScope;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.content.presentation.WebDAVDocumentDeleter;
+import com.idega.core.builder.data.ICPage;
 import com.idega.core.search.business.Search;
 import com.idega.core.search.business.SearchPlugin;
 import com.idega.core.search.business.SearchQuery;
+import com.idega.core.search.business.SearchResult;
 import com.idega.core.search.business.SearchResultComparator;
 import com.idega.core.search.data.AdvancedSearchQuery;
 import com.idega.core.search.data.BasicSearch;
 import com.idega.core.search.data.BasicSearchResult;
 import com.idega.core.search.data.SimpleSearchQuery;
+import com.idega.core.search.presentation.SearchResults;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.Layer;
+import com.idega.presentation.Span;
+import com.idega.presentation.text.Link;
+import com.idega.presentation.text.Text;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2006/10/19 14:27:18 $ by $Author: gimmi $ 
+ * Last modified: $Date: 2006/10/24 10:32:26 $ by $Author: gimmi $ 
  * This class implements the Searchplugin interface and can therefore be used in a Search block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
  * system. To use it simply register this class as a iw.searchable component in
@@ -71,7 +82,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.20.2.7 $
+ * @version $Revision: 1.20.2.8 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -102,6 +113,8 @@ public class ContentSearch extends Object implements SearchPlugin{
 	
 	protected static final String ORDER_ASCENDING = "ascending";
 	protected static final String ORDER_DESCENDING = "descending";
+	private boolean showDeleteLink = false;
+	private ICPage deletePage = null;
 
 	
 	/* STUFF FROM WebdavResource to handle better dates from slide */
@@ -630,9 +643,47 @@ public class ContentSearch extends Object implements SearchPlugin{
 		}
 		
 		
+		
 		Collections.sort(results,comparator);
 	}
 
+	public void setToShowDeleteLink(boolean show) {
+		this.showDeleteLink = show;
+	}
+	
+	public boolean isSetToShowDeleteLink() {
+		return showDeleteLink;
+	}
+
+	public ICPage getDeletePage() {
+		return deletePage;
+	}
+
+	public void setDeletePage(ICPage deletePage) {
+		this.deletePage = deletePage;
+	}
+
+	
+	public Collection getExtraRowElements(SearchResult result, IWResourceBundle iwrb) {
+		Collection coll = new Vector();
+		if (isSetToShowDeleteLink()) {
+			Layer deleteL = (Layer) new Layer();
+			deleteL.setStyleClass(SearchResults.DEFAULT_LINK_STYLE_CLASS+"_delete");
+			Link dLink = new Link(new Span(new Text(iwrb.getLocalizedString("search_results.delete", "Delete"))));
+			if (deletePage != null) {
+				dLink.setPage(deletePage);
+			}
+			String uri =  result.getSearchResultURI();
+			if (uri != null) {
+				dLink.addParameter(WebDAVDocumentDeleter.PARAMETER_PATH, uri);
+			}
+			deleteL.add(dLink);
+			coll.add(deleteL);
+		}
+		
+		return coll;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
