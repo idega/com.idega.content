@@ -1,5 +1,5 @@
 /*
- * $Id: WhatIsNew.java,v 1.2 2006/07/07 12:48:33 eiki Exp $
+ * $Id: WhatIsNew.java,v 1.3 2006/10/24 14:53:26 gimmi Exp $
  * Created on Jun 21, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -9,23 +9,30 @@
  */
 package com.idega.content.presentation;
 
+import java.rmi.RemoteException;
+
+import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
+import com.idega.business.IBORuntimeException;
 import com.idega.content.business.ContentSearch;
+import com.idega.core.builder.data.ICPage;
 import com.idega.core.search.business.SearchPlugin;
 import com.idega.core.search.presentation.SearchResults;
 import com.idega.presentation.IWContext;
+import com.idega.slide.business.IWSlideSession;
 
 /**
  * A block that displays the latest or all entries in the file repository ordered by modification date<br>
  * It extends SearchResults block and forces it to only use a DASL search (ContentSearch) with specific settings<br>
  * and the query is by default set to "*" and the path to "files" but that can be changed.
  * 
- *  Last modified: $Date: 2006/07/07 12:48:33 $ by $Author: eiki $
+ *  Last modified: $Date: 2006/10/24 14:53:26 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class WhatIsNew extends SearchResults {
-	
+
 	public static final String STYLE_CLASS_WHATISNEW = "whatisnew";
 	protected String startingPointURI = "files";
 	protected String orderByProperty = "getlastmodified";
@@ -35,7 +42,9 @@ public class WhatIsNew extends SearchResults {
 	protected boolean useRootAccessForSearch = false;
 	protected boolean hideParentFolderPath = false;
 	protected boolean hideFileExtension = false;
-	
+	protected boolean useUserHomeFolder = false;
+	protected boolean showDeleteLink = false;
+	protected ICPage deletePage = null;
 
 	public WhatIsNew(){
 		super();
@@ -46,11 +55,10 @@ public class WhatIsNew extends SearchResults {
 	 * @see com.idega.core.search.presentation.SearchResults#configureSearchPlugin(com.idega.core.search.business.SearchPlugin)
 	 */
 	protected SearchPlugin configureSearchPlugin(SearchPlugin searchPlugin) {
-		
 		if(searchPlugin instanceof ContentSearch){
 			//Get a copy of the plugin
 			ContentSearch contentSearch = (ContentSearch) ((ContentSearch)searchPlugin).clone();
-			
+			System.out.println("WhatsNew : "+getStartingPointURI());
 			contentSearch.setScopeURI(getStartingPointURI());
 			contentSearch.setPropertyToOrderBy(getOrderByProperty());
 			contentSearch.setToUseDescendingOrder(isUsingDescendingOrder());
@@ -59,11 +67,20 @@ public class WhatIsNew extends SearchResults {
 			contentSearch.setToUseRootAccessForSearch(isUsingRootAccessForSearch());
 			contentSearch.setToHideParentFolderPath(isSetToHideParentFolderPath());
 			contentSearch.setToHideFileExtensions(isSetToHideFileExtension());
-			
+			contentSearch.setToShowDeleteLink(showDeleteLink);
+			contentSearch.setDeletePage(deletePage);
 			return contentSearch;
 		}
 		else {
 			return super.configureSearchPlugin(searchPlugin);
+		}
+	}
+
+	protected IWSlideSession getIWSlideSession() {
+		try {
+			return (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
+		} catch (IBOLookupException e) {
+			throw new IBORuntimeException(e);
 		}
 	}
 
@@ -101,7 +118,7 @@ public class WhatIsNew extends SearchResults {
 		return "ContentSearch";
 	}
 
-	
+
 	/**
 	 * @return the ignoreFolders
 	 */
@@ -109,7 +126,7 @@ public class WhatIsNew extends SearchResults {
 		return this.ignoreFolders;
 	}
 
-	
+
 	/**
 	 * @param ignoreFolders the ignoreFolders to set
 	 */
@@ -117,7 +134,7 @@ public class WhatIsNew extends SearchResults {
 		this.ignoreFolders = ignoreFolders;
 	}
 
-	
+
 	/**
 	 * @return the numberOfResultItemsToDisplay
 	 */
@@ -125,7 +142,7 @@ public class WhatIsNew extends SearchResults {
 		return this.numberOfResultItemsToDisplay;
 	}
 
-	
+
 	/**
 	 * @param numberOfResultItemsToDisplay the numberOfResultItemsToDisplay to set
 	 */
@@ -133,7 +150,7 @@ public class WhatIsNew extends SearchResults {
 		this.numberOfResultItemsToDisplay = numberOfResultItemsToDisplay;
 	}
 
-	
+
 	/**
 	 * @return the orderByProperty
 	 */
@@ -141,7 +158,7 @@ public class WhatIsNew extends SearchResults {
 		return this.orderByProperty;
 	}
 
-	
+
 	/**
 	 * @param orderByProperty the orderByProperty to set
 	 */
@@ -149,18 +166,40 @@ public class WhatIsNew extends SearchResults {
 		this.orderByProperty = orderByProperty;
 	}
 
-	
+
 	/**
+	 * Returns the StartingPointURI, if block is set to use User home folder, that is returned instead
 	 * @return the startingPointURI
 	 */
 	public String getStartingPointURI() {
-		if (this.startingPointURI!=null && this.startingPointURI.startsWith("/")) {
-			return this.startingPointURI.substring(1);
+
+		if (useUserHomeFolder) {
+			try {
+				String homeFolder = getIWSlideSession().getUserHomeFolder();
+				if (homeFolder != null) {
+					if (homeFolder.indexOf("/") == 0) {
+						homeFolder = homeFolder.substring(1);
+					}
+					return homeFolder;
+				} else {
+					useUserHomeFolder = false;
+					return getStartingPointURI();
+				}
+			}
+			catch (RemoteException e) {
+				useUserHomeFolder = false;
+				return getStartingPointURI();
+			}
+		} else {
+			if (this.startingPointURI!=null && this.startingPointURI.startsWith("/")) {
+				return this.startingPointURI.substring(1);
+			}
+			else return this.startingPointURI;
 		}
-		else return this.startingPointURI;
+
 	}
 
-	
+
 	/**
 	 * @param startingPointURI the startingPointURI to set
 	 */
@@ -168,7 +207,14 @@ public class WhatIsNew extends SearchResults {
 		this.startingPointURI = startingPointURI;
 	}
 
-	
+	/**
+	 * Sets the viewer to view the current users home folder content. Overrides
+	 * the setStartingPointURI method
+	 * @param useUserHomeFolder
+	 */
+	public void setUseUserHomeFolder(boolean useUserHomeFolder) {
+		this.useUserHomeFolder = useUserHomeFolder;
+	}
 	/**
 	 * @return the useDescendingOrder
 	 */
@@ -176,15 +222,15 @@ public class WhatIsNew extends SearchResults {
 		return this.useDescendingOrder;
 	}
 
-	
+
 	/**
 	 * @param useDescendingOrder the useDescendingOrder to set
 	 */
 	public void setToUseDescendingOrder(boolean useDescendingOrder) {
 		this.useDescendingOrder = useDescendingOrder;
 	}
-	
-	
+
+
 	/**
 	 * @return the useRootAccessForSearch
 	 */
@@ -193,7 +239,7 @@ public class WhatIsNew extends SearchResults {
 	}
 
 
-	
+
 	/**
 	 * Set to true if the content search should use the ROOT access for searching.<br>
 	 * Does not give the user rights to open files beyond his access though.
@@ -202,16 +248,16 @@ public class WhatIsNew extends SearchResults {
 	public void setToUseRootAccessForSearch(boolean useRootAccessForSearch) {
 		this.useRootAccessForSearch = useRootAccessForSearch;
 	}
-	
+
 
 	/**
 	 * @return the hideFolderPath
 	 */
 	public boolean isSetToHideParentFolderPath() {
-		return hideParentFolderPath;
+		return this.hideParentFolderPath;
 	}
 
-	
+
 	/**
 	 * If set to true the result will only state the parent folder of the result itm and not the full path
 	 * @param hideParentFolderPath 
@@ -219,13 +265,29 @@ public class WhatIsNew extends SearchResults {
 	public void setToHideParentFolderPath(boolean hideParentFolderPath) {
 		this.hideParentFolderPath = hideParentFolderPath;
 	}
-	
+
 	public boolean isSetToHideFileExtension() {
-		return hideFileExtension;
+		return this.hideFileExtension;
 	}
 
 	public void setToHideFileExtension(boolean hideFileExtension) {
 		this.hideFileExtension = hideFileExtension;
 	}
-		
+	
+	public void setToShowDeleteLink(boolean show) {
+		this.showDeleteLink = show;
+	}
+	
+	public boolean isSetToShowDeleteLink() {
+		return showDeleteLink;
+	}
+
+	public ICPage getDeletePage() {
+		return deletePage;
+	}
+
+	public void setDeletePage(ICPage deletePage) {
+		this.deletePage = deletePage;
+	}
+
 }
