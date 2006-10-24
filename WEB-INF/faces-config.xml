@@ -2,7 +2,34 @@
 
 <!DOCTYPE faces-config PUBLIC
   "-//Sun Microsystems, Inc.//DTD JavaServer Faces Config 1.0//EN"
-  "http://java.sun.com/dtd/web-facesconfig_1_0.dtd">
+  "http://java.sun.com/dtd/web-facesconfig_1_0.dtd"
+[
+ <!ELEMENT idegaweb-info ANY>
+ <!ELEMENT builder-visible (#PCDATA)>
+ <!ELEMENT object-type (#PCDATA)>
+ <!ELEMENT component-metadata ANY>
+ <!ATTLIST component-metadata
+     component-type CDATA #IMPLIED>
+ <!ELEMENT facet-metadata ANY>
+ <!ELEMENT attribute-metadata ANY>
+ <!ELEMENT property-metadata ANY>
+ <!ELEMENT accepts-child-components (#PCDATA)>
+ <!ELEMENT attribute-values (#PCDATA)>
+ <!ELEMENT base-component-type  (#PCDATA)>
+ <!ELEMENT deprecated  (#PCDATA)>
+ <!ELEMENT display-order  (#PCDATA)>
+ <!ELEMENT expert  (#PCDATA)>
+ <!ELEMENT favorite-property  (#PCDATA)>
+ <!ELEMENT group  (#PCDATA)>
+ <!ELEMENT help-topic  (#PCDATA)>
+ <!ELEMENT hidden  (#PCDATA)>
+ <!ELEMENT initial-value  (#PCDATA)>
+ <!ELEMENT preferred  (#PCDATA)>
+ <!ELEMENT preferred-child-tags  (#PCDATA)>
+ <!ELEMENT property-editor  (#PCDATA)>
+ <!ELEMENT short-description  (#PCDATA)>
+ <!ELEMENT writable  (#PCDATA)> 
+]> 
 
 <faces-config>
 	<component>
@@ -103,6 +130,138 @@
 	<component>
 		<component-type>ContentItemListViewer</component-type>
 		<component-class>com.idega.content.presentation.ContentItemListViewer</component-class>
+	</component>
+
+	<component>
+		<component-type>WebDAVDocumentDeleter</component-type>
+		<component-class>com.idega.content.presentation.WebDAVDocumentDeleter</component-class>
+		<property>
+			<display-name>Embed upload elements in Form</display-name>
+			<property-name>embeddedInForm</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<component-extension>
+			<idegaweb-info>
+				<builder-visible>true</builder-visible>
+				<object-type>jsf.uicomponent</object-type>
+			</idegaweb-info>
+		</component-extension>
+	</component>
+	
+	<component>
+		<component-type>WebDAVUpload</component-type>
+		<component-class>com.idega.content.presentation.WebDAVUpload</component-class>
+		<property>
+			<display-name>Method that will be used to upload a file</display-name>
+			<property-name>uploadMethod</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Select file style class</display-name>
+			<property-name>styleClassSelectFile</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>File upload style class</display-name>
+			<property-name>styleClassFileUploadInput</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>HtmlInputFileUpload accept type</display-name>
+			<property-name>accept</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>HtmlInputFileUpload storage type</display-name>
+			<property-name>storage</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>File name class name</display-name>
+			<property-name>styleClassGiveName</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Version text style class</display-name>
+			<property-name>styleClassVersionText</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Upload folder class name</display-name>
+			<property-name>styleClassFolder</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>File link target</display-name>
+			<property-name>fileLinkTarget</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Button's style class</display-name>
+			<property-name>styleClassButton</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>WFContainer line's element style class</display-name>
+			<property-name>styleClassWFContainerLine</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Show file name</display-name>
+			<property-name>useFileName</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Show version comment</display-name>
+			<property-name>useVersionComment</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Show upload path</display-name>
+			<property-name>useUploadPath</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Show file link</display-name>
+			<property-name>useFileLink</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Show image preview</display-name>
+			<property-name>useImagePreview</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Bean with method name, that provides upload folder</display-name>
+			<property-name>pathProviderBeanWithMethod</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>JavaScript action</display-name>
+			<property-name>onClickAction</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Upload path</display-name>
+			<property-name>uploadPath</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Embed upload elements in Form</display-name>
+			<property-name>embeddedInForm</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Set Users home folder as startingURI</display-name>
+			<property-name>useUserHomeFolder</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<component-extension>
+			<idegaweb-info>
+				<builder-visible>true</builder-visible>
+				<object-type>jsf.uicomponent</object-type>
+			</idegaweb-info>
+		</component-extension>
 	</component>
 	
     <managed-bean>
