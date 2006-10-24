@@ -41,6 +41,12 @@ public class WebDAVUploadTag extends UIComponentTag {
 	
 	private String onClickAction;
 	
+	private String uploadPath;
+	
+	private boolean embedInForm;
+	
+	private boolean useUserHomeFolder;
+	
 	public String getComponentType() {
 		return "WebDAVUpload";
 	}
@@ -192,8 +198,32 @@ public class WebDAVUploadTag extends UIComponentTag {
 	public void setOnClickAction(String onClickAction) {
 		this.onClickAction = onClickAction;
 	}
+	
+	public void setUploadPath(String uploadPath) {
+		this.uploadPath = uploadPath;
+	}
 
-	public void release() {   
+	public String getUploadPath() {
+		return uploadPath;
+	}
+	
+	public boolean getEmbeddedInForm() {
+		return embedInForm;
+	}
+
+	public void setEmbeddedInForm(boolean embedInForm) {
+		this.embedInForm = embedInForm;
+	}
+	
+	public void setUseUserHomeFolder(boolean useUserHomeFolder) {
+		this.useUserHomeFolder = useUserHomeFolder;
+	}
+	
+	
+	public boolean getUseUserHomeFolder() {
+		return useUserHomeFolder;
+	}
+		public void release() {   
 		super.release();      
 		this.uploadMethod = null;
 		this.styleClassSelectFile = null;
@@ -213,6 +243,9 @@ public class WebDAVUploadTag extends UIComponentTag {
 		this.useImagePreview = false;
 		this.pathProviderBeanWithMethod = null;
 		this.onClickAction = null;
+		this.uploadPath = null;
+		this.embedInForm = false;
+		this.useUserHomeFolder = false;
 	}
 
 	protected void setProperties(UIComponent component) {      
@@ -239,6 +272,9 @@ public class WebDAVUploadTag extends UIComponentTag {
 			upload.setUseImagePreview(useImagePreview);
 			upload.setPathProviderBeanWithMethod(pathProviderBeanWithMethod);
 			upload.setOnClickAction(onClickAction);
+			upload.setUploadPath(uploadPath);
+			upload.setEmbeddedInForm(embedInForm);
+			upload.setUseUserHomeFolder(useUserHomeFolder);
 		}
 	}
 

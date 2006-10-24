@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.6 2006/09/25 14:20:00 valdas Exp $
+ * $Id: WebDAVUpload.java,v 1.7 2006/10/24 14:38:47 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -9,10 +9,12 @@
  */
 package com.idega.content.presentation;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.faces.component.html.HtmlCommandButton;
+import javax.faces.component.html.HtmlForm;
 import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputLink;
@@ -24,16 +26,17 @@ import javax.faces.event.ActionEvent;
 import org.apache.myfaces.custom.fileupload.HtmlInputFileUpload;
 import org.apache.myfaces.custom.savestate.UISaveState;
 
+import com.idega.content.business.WebDAVUploadBean;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFUtil;
 
 
 /**
  * 
- *  Last modified: $Date: 2006/09/25 14:20:00 $ by $Author: valdas $
+ *  Last modified: $Date: 2006/10/24 14:38:47 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class WebDAVUpload extends ContentBlock {
 
@@ -92,7 +95,15 @@ public class WebDAVUpload extends ContentBlock {
 	private String onClickAction;
 	
 	private List <WFContainer> WFContainerLines = null;
+
+	private String uploadPath;
 	
+	private boolean embedInForm = false;
+	
+	private boolean useUserHomeFolder = false;
+	
+	private HtmlForm form;
+		
 	protected void initializeComponent(FacesContext context) {
 		
 		HtmlOutputText selectFile = getText("select_a_file_to_upload", getStyleClassSelectFile());
@@ -139,7 +150,20 @@ public class WebDAVUpload extends ContentBlock {
 			String path = (String) WFUtil.invoke(pathProviderBeanWithMethod);
 			WFUtil.invoke(BEAN_ID, "setUploadFilePath", path, String.class);
 		}
-		
+		if (this.useUserHomeFolder) {
+			try {
+				WebDAVUploadBean bean = (WebDAVUploadBean) WFUtil.getBeanInstance(BEAN_ID);
+				String homeFolder = getIWSlideSession().getUserHomeFolder();
+				bean.setUploadFilePath(homeFolder);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+
+		} else if (this.uploadPath != null) {
+			WebDAVUploadBean bean = (WebDAVUploadBean) WFUtil.getBeanInstance(BEAN_ID);
+			bean.setUploadFilePath(this.uploadPath);
+		}		
+
 		HtmlOutputLink fileLink = null;
 		if (useFileLink) {
 			fileLink = new HtmlOutputLink();
@@ -196,6 +220,10 @@ public class WebDAVUpload extends ContentBlock {
 		
 		addElementToLastLine(upload);
 
+		if (embedInForm) {
+			add(getForm());
+		}
+		
 		addLines();
 		
 		
@@ -205,9 +233,22 @@ public class WebDAVUpload extends ContentBlock {
 		ValueBinding binding = WFUtil.createValueBinding("#{"+BEAN_ID+"}");
 		beanSaveState.setId("webdavuploadIds");
 		beanSaveState.setValueBinding("value",binding);
-		add(beanSaveState);
+
+		if (embedInForm) {
+			form.getChildren().add(beanSaveState);
+		} else {
+			add(beanSaveState);
+		}
 	}
-	
+
+	private HtmlForm getForm() {
+		if (form == null) {
+			form = new HtmlForm();
+			form.setId("webdavuploadform_"+getId());
+			form.setEnctype("multipart/form-data");
+		}
+		return form;
+	}	
 	private HtmlInputText getUploadPathElement(String ID, ValueBinding valueBinding) {
 		HtmlInputText uploadPath = new HtmlInputText();
 		uploadPath.setId(ID);
@@ -240,8 +281,12 @@ public class WebDAVUpload extends ContentBlock {
 		if (WFContainerLines == null) {
 			return;
 		}
+		if (embedInForm) {
+			getForm().getChildren().add(WFContainerLines.get(i));
+		} else {
 		for (int i = 0; i < WFContainerLines.size(); i++) {
 			getChildren().add(WFContainerLines.get(i));
+		}
 		}
 	}
 
@@ -387,6 +432,50 @@ public class WebDAVUpload extends ContentBlock {
 
 	public void setOnClickAction(String onClickAction) {
 		this.onClickAction = onClickAction;
+	}
+
+	public void setUploadPath(String uploadPath) {
+		this.uploadPath = uploadPath;
+	}
+
+	public String getUploadPath() {
+		return uploadPath;
+	}
+
+	public boolean getEmbeddedInForm() {
+		return embedInForm;
+	}
+
+	public void setEmbeddedInForm(boolean embedInForm) {
+		this.embedInForm = embedInForm;
+	}
+	
+	/**
+	 * Sets the viewer to view the current users home folder content. Overrides
+	 * the setStartingPointURI method
+	 * @param useUserHomeFolder
+	 */
+	public void setUseUserHomeFolder(boolean useUserHomeFolder) {
+		this.useUserHomeFolder = useUserHomeFolder;
+	}
+	
+	
+	public boolean getUseUserHomeFolder() {
+		return useUserHomeFolder;
+	}
+	public Object saveState(FacesContext ctx) {
+		Object values[] = new Object[3];
+		values[0] = super.saveState(ctx);
+		values[1] = new Boolean(useUserHomeFolder);
+		values[2] = new Boolean(embedInForm);
+		return values;
+	}
+
+	public void restoreState(FacesContext ctx, Object state) {
+		Object values[] = (Object[]) state;
+		super.restoreState(ctx, values[0]);
+		this.useUserHomeFolder = ((Boolean) values[1]).booleanValue();
+		this.embedInForm = ((Boolean) values[2]).booleanValue();
 	}
 
 }
