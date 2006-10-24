@@ -15,16 +15,18 @@ public class ThemesConstants {
 	public static final String THEMES_PREVIEW_PATH = THEMES_PATH + "preview/";
 	
 	protected static final String DOT = ".";
-	protected static final String SLASH = "/";
+	public static final String SLASH = "/";
 	public static final String AT = "@";
-	protected static final String EMPTY = "";
+	public static final String EMPTY = "";
 	protected static final String COMMA = ",";
+	public static final String PLUS = "+";
+	public static final String SPACE = " ";
+	public static final String SPACE_ENCODED = "%20";
+	public static final String ENCODING = "UTF-8";
 	
 	protected static final String PREVIEW_IMAGE = "theme_preview";
 	protected static final String SMALL_PREVIEW_IMAGE = "small_theme_preview";
 	
-	protected static final String PNG_IMG_FILE_EXTENSION = ".png";
-	protected static final String JPG_IMG_FILE_EXTENSION = ".jpeg";
 	protected static final String THEME_SEARCH_KEY = "*.htm*";
 	
 	private static final String[] _FILTER = new String[] {"htm", "html", "xhtml", "ibxml", "jsp"};
@@ -70,7 +72,9 @@ public class ThemesConstants {
 	protected static final String RW_SELECTION_LIMIT = "GroupSelectionLimit";
 	protected static final String RW_GROUP_MEMBERS = "GroupMembers";
 	
-	protected static final String DRAFT = ".draft";
+	protected static final String DRAFT = "_idega_draft.html";
+	
+	protected static final String THEME_INFO = "theme_info.xml";
 	
 	protected static final String ELEMENT_LINK = "link";
 	protected static final String TAG_ATTRIBUTE_HREF = "href";
@@ -84,5 +88,8 @@ public class ThemesConstants {
 	protected static final String THEME_SETTING_DEFAULT_VALUE = "defaultValue";
 	protected static final String THEME_SETTING_TYPE = "type";
 	protected static final String THEME_SETTING_METHOD = "method";
+	
+	private static final String[] _DEFAULT_STYLE_FILES = new String[] {"styles.css", "handheld.css", "print.css"};
+	protected static final List <String> DEFAULT_STYLE_FILES = Collections.unmodifiableList(Arrays.asList(_DEFAULT_STYLE_FILES));
 	
 }

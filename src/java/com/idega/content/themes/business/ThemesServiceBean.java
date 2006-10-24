@@ -38,7 +38,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 				ThemeInfo theme = null;
 				while (allThemes.hasNext() && !foundTheme) {
 					theme = allThemes.next();
-					if (uri.equals(theme.getLinkToSkeleton())) {
+					if (uri.equals(ThemesHelper.getInstance().decodeUrl(theme.getLinkToSkeleton()))) {
 						foundTheme = true;
 					}
 				}
@@ -50,7 +50,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		else {
 			if (ThemesHelper.getInstance().isCorrectFile(uri) && isNewTheme(uri)) {
-				ThemesHelper.getInstance().getThemesLoader().loadTheme(uri, true);
+				ThemesHelper.getInstance().getThemesLoader().loadTheme(uri, ThemesHelper.getInstance().urlEncode(uri), true);
 				//TODO: proceed creating IBPage
 			}
 		}
@@ -60,7 +60,6 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		if (ThemesHelper.getInstance().existTheme(uri)) {
 			return false;
 		}
-		ThemesHelper.getInstance().addUriToTheme(uri);
 		return true;
 	}
 	

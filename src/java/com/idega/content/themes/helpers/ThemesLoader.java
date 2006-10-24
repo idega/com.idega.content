@@ -13,15 +13,19 @@ public class ThemesLoader {
 		this.helper = helper;
 	}
 	
-	public synchronized boolean loadTheme(String uriToTheme, boolean newTheme) {
-		if (uriToTheme == null) {
+	public synchronized boolean loadTheme(String originalUri, String encodedUri, boolean newTheme) {
+		if (encodedUri == null || originalUri == null) {
 			return false;
 		}
-		uriToTheme = getUriWithoutContent(uriToTheme);
+		encodedUri = getUriWithoutContent(encodedUri);
+		originalUri = getUriWithoutContent(originalUri);
+		
+		helper.addUriToTheme(originalUri);
 		
 		initThemeInfo(newTheme);
-		theme.setLinkToSkeleton(uriToTheme);
-		theme.setLinkToBase(helper.getLinkToBase(uriToTheme));
+		theme.setLinkToSkeleton(encodedUri);
+		theme.setLinkToBase(helper.getLinkToBase(encodedUri));
+		theme.setLinkToBaseAsItIs(helper.getLinkToBase(originalUri));
 		addThemeInfo();
 		
 		return true;
@@ -34,7 +38,7 @@ public class ThemesLoader {
 		
 		boolean result = true;
 		for (int i = 0; (i < urisToThemes.size() && result); i++) {
-			result = loadTheme(urisToThemes.get(i), newThemes);
+			result = loadTheme(helper.decodeUrl(urisToThemes.get(i)), urisToThemes.get(i), newThemes);
 		}
 			
 		return result;

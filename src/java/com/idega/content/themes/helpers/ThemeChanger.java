@@ -37,8 +37,6 @@ public class ThemeChanger {
 	
 	private static final String BREADCRUMB_REPLACE_BEGIN = "<ul><li><a href=\"index.html\">";
 	private static final String BREADCRUMB_REPLACE_END = "</a></li></ul>";
-
-	private static final String FOOTER_REPLACE = "&copy;&nbsp;";
 	
 	// Default keywords
 	private static final String TOOLBAR = "toolbar";
@@ -50,7 +48,11 @@ public class ThemeChanger {
 	private static final String CSS_IMAGE_URL = "url(";
 	private static final String DIRECTORY = "../";
 	private static final String IMAGES = "images";
-	private static final String CSS_REPLACE = CSS_IMAGE_URL + DIRECTORY + DIRECTORY + IMAGES;
+	private static final String CUSTOM_CSS_REPLACE = CSS_IMAGE_URL + DIRECTORY + DIRECTORY + IMAGES;
+	private static final String[] CUSTOM_REPLACE = new String[] {CUSTOM_CSS_REPLACE};
+
+	private static final String[] DEFAULT_REPLACE = new String[] {"href^=", "href$="};
+	private static final String DEFAULT_CSS_REPLACEMENT = "href~=";
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
@@ -91,7 +93,7 @@ public class ThemeChanger {
 			index++;
 		}
 		
-		if (!uploadDocument(doc, theme.getLinkToBase(), helper.getFileNameWithExtension(theme.getLinkToSkeleton()), theme)) {
+		if (!uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.getFileNameWithExtension(theme.getLinkToSkeleton()), theme)) {
 			return false;
 		}
 		
@@ -108,10 +110,15 @@ public class ThemeChanger {
 			return true; // Theme allready prepared
 		}
 		
+		if (!prepareThemeDefaultStyleFiles(theme)) {
+			return false;
+		}
+		
 		Map styles = theme.getStyleGroupsMembers();
 		if (styles == null) {
 			return false;
 		}
+
 		Iterator it = styles.values().iterator();
 		ThemeStyleGroupMember member = null;
 		List <String> files = null;
@@ -119,12 +126,23 @@ public class ThemeChanger {
 		if (index != -1) {
 			index++;
 		}
+		
+		// Constructin correct path to images folder
 		String addToCss = helper.extractValueFromString(theme.getLinkToBase(), index, theme.getLinkToBase().length());
+		String[] dirLevels = addToCss.split(ThemesConstants.SLASH);
+		StringBuffer replacement = new StringBuffer();
+		replacement.append(CSS_IMAGE_URL);
+		for (int i = 0; i < dirLevels.length; i++) {
+			replacement.append(DIRECTORY);
+		}
+		replacement.append(addToCss);
+		replacement.append(IMAGES);
+		
 		while (it.hasNext()) {
 			member = (ThemeStyleGroupMember) it.next();
 			files = member.getStyleFiles();
 			for (index = 0; index < files.size(); index++) {
-				if (!proceedStyleFile(theme.getLinkToBase() + files.get(index), addToCss)) {
+				if (!proceedStyleFile(theme.getLinkToBase() + files.get(index), CUSTOM_REPLACE, replacement.toString())) {
 					return false;
 				}
 			}
@@ -132,9 +150,19 @@ public class ThemeChanger {
 		return true;
 	}
 	
-	private boolean proceedStyleFile(String linkToStyle, String addToCss) {
+	private boolean prepareThemeDefaultStyleFiles(ThemeInfo theme) {
+		List <String> defaultStyles = ThemesConstants.DEFAULT_STYLE_FILES;
+		for (int i = 0; i < defaultStyles.size(); i++) {
+			if (!proceedStyleFile(theme.getLinkToBase() + defaultStyles.get(i), DEFAULT_REPLACE, DEFAULT_CSS_REPLACEMENT)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean proceedStyleFile(String linkToStyle, String[] replaces, String replacement) {
 		// Getting css file
-		InputStream is = helper.getInputStream(helper.getFullWebRoot() + linkToStyle);
+		InputStream is = helper.getInputStream(helper.getFullWebRoot(), linkToStyle);
 		InputStreamReader isr = new InputStreamReader(is);
 		BufferedReader buf = new BufferedReader(isr);
 		StringBuffer sb = new StringBuffer();
@@ -152,27 +180,21 @@ public class ThemeChanger {
 		
 		// Changing content
 		String content = sb.toString();
-		if (content.indexOf(CSS_REPLACE) == -1) {
+		boolean needToReplace = false;
+		for (int i = 0; i < replaces.length; i++) {
+			while (content.indexOf(replaces[i]) != -1) {
+				content = content.replace(replaces[i], replacement);
+				needToReplace = true;
+			}
+		}
+
+		if (!needToReplace) {
 			return true;
 		}
-		
-		String[] dirLevels = addToCss.split(ThemesConstants.SLASH);
-		
-		StringBuffer replacement = new StringBuffer();
-		replacement.append(CSS_IMAGE_URL);
-		for (int i = 0; i < dirLevels.length; i++) {
-			replacement.append(DIRECTORY);
-		}
-		replacement.append(addToCss);
-		replacement.append(IMAGES);
-		
 
-		while (content.indexOf(CSS_REPLACE) != -1) {
-			content = content.replace(CSS_REPLACE, replacement.toString());
-		}
-
+		// Uploading modified file
 		try {
-			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(helper.getLinkToBase(linkToStyle), helper.getFileNameWithExtension(linkToStyle), content, null, true)) {
+			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(helper.getLinkToBase(helper.decodeUrl(linkToStyle)), helper.getFileNameWithExtension(linkToStyle), content, null, true)) {
 				return false;
 			}
 		} catch (RemoteException e) {
@@ -416,7 +438,7 @@ public class ThemeChanger {
 					ThemesConstants.COMMENT_BEGIN +	ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
 			if (value.equals(FOOTER)) {
-				return region + getBasicReplace(FOOTER_REPLACE, settings.getDefaultValue(), null) + ThemesConstants.COMMENT_BEGIN +
+				return region + getBasicReplace(null, settings.getDefaultValue(), null) + ThemesConstants.COMMENT_BEGIN +
 					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
 			region += settings.getDefaultValue();
@@ -490,7 +512,7 @@ public class ThemeChanger {
 		
 		ThemeInfo theme = helper.getThemeInfo(themeID);
 		
-		theme.setName(themeName);
+		theme.setChangedName(themeName);
 		
 		String linkToDoc = theme.getLinkToDraft();
 		if (linkToDoc == null) {
@@ -530,11 +552,11 @@ public class ThemeChanger {
 		
 		String draft = helper.getFileName(theme.getLinkToSkeleton()) + ThemesConstants.DRAFT;
 		theme.setLinkToDraft(theme.getLinkToBase() + draft);
-		if (!uploadDocument(doc, theme.getLinkToBase(), draft, theme)) {
+		if (!uploadDocument(doc, theme.getLinkToBaseAsItIs(), draft, theme)) {
 			return null;
 		}
 
-		if (helper.getPreviewGenerator().generatePreview(helper.getFullWebRoot() + theme.getLinkToDraft(), ThemesConstants.PREVIEW_IMAGE, theme.getLinkToBase(), 800, 600)) {
+		if (helper.getPreviewGenerator().generatePreview(helper.getFullWebRoot() + theme.getLinkToDraft(), ThemesConstants.PREVIEW_IMAGE, theme.getLinkToBaseAsItIs(), 800, 600)) {
 			theme.setLinkToPreview(ThemesConstants.PREVIEW_IMAGE + ThemesConstants.DOT + helper.getPreviewGenerator().getFileType());
 			return themeID;
 		}
@@ -706,9 +728,7 @@ public class ThemeChanger {
 		ThemeInfo theme = helper.getThemeInfo(themeID);
 		
 		if (!theme.getName().equals(themeName)) {
-			log.info("Create a new theme");
-			// TODO: new theme under old
-			return true;
+			return createNewTheme(theme);
 		}
 		
 		if (theme.getLinkToDraft() == null) {
@@ -717,12 +737,12 @@ public class ThemeChanger {
 		}
 
 		InputStream is = null;
-		is = helper.getInputStream(helper.getFullWebRoot() + theme.getLinkToDraft());
+		is = helper.getInputStream(helper.getFullWebRoot(), theme.getLinkToDraft());
 		
 		String fileName = helper.getFileNameWithExtension(theme.getLinkToSkeleton());
 		theme.setLocked(true);
 		try {
-			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBase(), fileName, is, null, true)) {
+			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), fileName, is, null, true)) {
 				return false;
 			}
 		} catch (RemoteException e) {
@@ -735,6 +755,10 @@ public class ThemeChanger {
 		
 		theme.setLinkToDraft(null);
 
+		return true;
+	}
+	
+	private boolean createNewTheme(ThemeInfo parentTheme) {
 		return true;
 	}
 

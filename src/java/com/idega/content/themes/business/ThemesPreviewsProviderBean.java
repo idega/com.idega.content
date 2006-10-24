@@ -28,7 +28,12 @@ public class ThemesPreviewsProviderBean extends IBOServiceBean implements Themes
 		for (int i = 0; i < themes.size(); i++) {
 			theme = themes.get(i);
 			
-			info.append(theme.getName());
+			if (theme.getChangedName() != null) {
+				info.append(theme.getChangedName());
+			}
+			else {
+				info.append(theme.getName());
+			}
 			info.append(ThemesConstants.AT);
 			info.append(webRoot + theme.getLinkToBase() + theme.getLinkToPreview());
 			info.append(ThemesConstants.AT);

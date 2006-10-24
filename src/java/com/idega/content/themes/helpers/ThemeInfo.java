@@ -17,10 +17,12 @@ public class ThemeInfo {
 	private String linkToDraft;
 	private String linkToProperties;
 	private String linkToBase;
+	private String linkToBaseAsItIs;
 	private String linkToPreview;
 	private String linkToSmallPreview;
 	
 	private String name;
+	private String changedName;
 	
 	private List <String> styleGroupsNames;
 	private Map <String, ThemeStyleGroupMember> styleGroupsMembers;
@@ -129,6 +131,22 @@ public class ThemeInfo {
 
 	public void setLinkToSmallPreview(String linkToSmallPreview) {
 		this.linkToSmallPreview = linkToSmallPreview;
+	}
+
+	public String getLinkToBaseAsItIs() {
+		return linkToBaseAsItIs;
+	}
+
+	public void setLinkToBaseAsItIs(String linkToBaseAsItIs) {
+		this.linkToBaseAsItIs = linkToBaseAsItIs;
+	}
+
+	public String getChangedName() {
+		return changedName;
+	}
+
+	public void setChangedName(String changedName) {
+		this.changedName = changedName;
 	}
 	
 }

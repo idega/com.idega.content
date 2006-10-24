@@ -1,6 +1,7 @@
 package com.idega.content.themes.helpers;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.jdom.Document;
@@ -18,8 +19,8 @@ public class ThemesPropertiesExtractor {
 //	private static final int SMALL_WIDTH = 115;
 //	private static final int SMALL_HEIGHT = 125;
 	
-	public void proceedFileExtractor(ThemeInfo theme) {
-		List files = helper.getFiles(theme.getLinkToBase());
+	public synchronized void proceedFileExtractor(ThemeInfo theme) {
+		List files = helper.getFiles(theme.getLinkToBaseAsItIs());
 		String webRoot = helper.getFullWebRoot();
 		String url = helper.getWebRootWithoutContent(webRoot);
 		if (!theme.isPropertiesExtracted() && files != null) {
@@ -43,8 +44,12 @@ public class ThemesPropertiesExtractor {
 				}
 			}
 			
+			if (theme.getLinkToPreview() == null) {
+				searchForPreviews(theme, files);
+			}
+			
 			if (theme.getLinkToPreview() == null) { // Big preview
-				if (generatePreview(webRoot, theme, ThemesConstants.PREVIEW_IMAGE, BIG_WIDTH, BIG_HEIGHT)) {
+				if (helper.getPreviewGenerator().generatePreview(webRoot + theme.getLinkToSkeleton(), ThemesConstants.PREVIEW_IMAGE, theme.getLinkToBaseAsItIs(), BIG_WIDTH, BIG_HEIGHT)) {
 					theme.setLinkToPreview(ThemesConstants.PREVIEW_IMAGE + ThemesConstants.DOT + helper.getPreviewGenerator().getFileType());
 				}
 			}
@@ -64,18 +69,27 @@ public class ThemesPropertiesExtractor {
 		}
 	}
 	
-	private boolean generatePreview(String webRoot, ThemeInfo theme, String previewName, int width, int height) {
-		if (helper.getPreviewGenerator().generatePreview(webRoot + theme.getLinkToSkeleton(), previewName, theme.getLinkToBase(), width, height)) {
-			return true;
+	private void searchForPreviews(ThemeInfo theme, List files) {
+		if (theme == null || files == null) {
+			return;
 		}
-		return false;
+		String uri = null;
+		for (int i = 0; i < files.size(); i++) {
+			uri = files.get(i).toString();
+			if (ThemesConstants.PREVIEW_IMAGE.equals(helper.getFileName(uri))) {
+				theme.setLinkToPreview(helper.getFileNameWithExtension(uri));
+				return;
+			}
+		}
 	}
 	
-	public void proceedFileExtractor() {
+	public synchronized void proceedFileExtractor() {
+		System.out.println("started file extractor: " + new Date());
 		List <ThemeInfo> themes = new ArrayList <ThemeInfo> (helper.getThemesCollection());
 		for (int i = 0; i < themes.size(); i++) {
 			proceedFileExtractor(themes.get(i));
 		}
+		System.out.println("finished file extractor: " + new Date());
 	}
 	
 	public void extractProperties(ThemeInfo theme, String link) {

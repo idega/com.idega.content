@@ -2,8 +2,11 @@ package com.idega.content.themes.helpers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -283,6 +286,10 @@ public class ThemesHelper implements Singleton {
 		if (isSystemFile(fileName)) {
 			return false;
 		}
+		if (isDraft(fileName)) {
+			return false;
+		}
+		
 		int index = fileName.lastIndexOf(ThemesConstants.DOT);
 		if (index == -1) {
 			return result;
@@ -294,6 +301,16 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		return result;
+	}
+	
+	public boolean isDraft(String fileName) {
+		if (fileName == null) {
+			return true;
+		}
+		if (fileName.endsWith(ThemesConstants.DRAFT)) {
+			return true;
+		}
+		return false;
 	}
 	
 	public boolean isSystemFile(String fileName) {
@@ -382,10 +399,6 @@ public class ThemesHelper implements Singleton {
 	protected Map <String, ThemeSettings> getSettings() {
 		return settings;
 	}
-
-	protected List<String> getUrisToThemes() {
-		return urisToThemes;
-	}
 	
 	private void loadThemeSettings() {
 		if (loadedThemeSettings) {
@@ -421,10 +434,14 @@ public class ThemesHelper implements Singleton {
 		loadedThemeSettings = true;
 	}
 	
-	public InputStream getInputStream(String url) {
+	public InputStream getInputStream(String webRoot, String link) {
 		InputStream is = null;
         try {
-            is = new URL(url).openStream();
+        	URL url = getUrl(webRoot + link);
+        	if (url == null) {
+        		return null;
+        	}
+            is = url.openStream();
         } catch (java.net.MalformedURLException e) {
             log.error(e);
         } catch (java.io.IOException e) {
@@ -442,5 +459,89 @@ public class ThemesHelper implements Singleton {
 		}
 		return true;
 	}
+	
+	public URL getUrl(String link) {
+		URL url = null;
+		try {
+			url = new URL(link);
+		} catch (MalformedURLException e) {
+			log.error(e);
+		}
+		return url;
+	}
+	
+	public String urlEncode(String value) {
+		String[] fileParts = value.split(ThemesConstants.SLASH);
+		StringBuffer encoded = new StringBuffer();
+		encoded.append(ThemesConstants.SLASH);
+		for (int i = 0; i < fileParts.length; i++) {
+			if (!fileParts[i].equals(ThemesConstants.EMPTY)) {
+				try {
+					encoded.append(URLEncoder.encode(fileParts[i], ThemesConstants.ENCODING));
+				} catch (UnsupportedEncodingException e) {
+					log.error(e);
+					return value;
+				}
+				if (i + 1 < fileParts.length) {
+					encoded.append(ThemesConstants.SLASH);
+				}
+			}
+		}
+		value = encoded.toString();
+		while (value.indexOf(ThemesConstants.PLUS) != -1) {
+			value = value.replace(ThemesConstants.PLUS, ThemesConstants.SPACE_ENCODED);
+		}
+		return value;
+	}
+	
+	public String decodeUrl(String value) {
+		while (value.indexOf(ThemesConstants.SPACE_ENCODED) != -1) {
+			value = value.replace(ThemesConstants.SPACE_ENCODED, ThemesConstants.PLUS);
+		}
+		String[] fileParts = value.split(ThemesConstants.SLASH);
+		StringBuffer encoded = new StringBuffer();
+		encoded.append(ThemesConstants.SLASH);
+		for (int i = 0; i < fileParts.length; i++) {
+			if (!fileParts[i].equals(ThemesConstants.EMPTY)) {
+				try {
+					encoded.append(URLDecoder.decode(fileParts[i], ThemesConstants.ENCODING));
+				} catch (UnsupportedEncodingException e) {
+					log.error(e);
+					return value;
+				}
+				if (i + 1 < fileParts.length) {
+					encoded.append(ThemesConstants.SLASH);
+				}
+			}
+		}
+		return encoded.toString();
+	}
+
+//	  public final static String encode(String URL) {
+//		String safeURLCharacters = "@*-.:/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
+//	    StringBuffer enc = new StringBuffer(URL.length());
+//	    for (int i = 0; i < URL.length(); ++i) {
+//	      char c = URL.charAt(i);
+//	      if (safeURLCharacters.indexOf(c) >= 0) {
+//	        enc.append(c);
+//	      } else {
+//	        // Too harsh.
+//	        // if (c < 0 || c > 255)
+//	        //    throw new RuntimeException("illegal code "+c+" of char '"+URL.charAt(i)+"'");
+//	        // else
+//
+//	        // Just keep lsb like:
+//	        // http://java.sun.com/j2se/1.3/docs/api/java/net/URLEncoder.html
+//	        c = (char) (c & '\u00ff');
+//	        if (c < 16) {
+//	          enc.append("%0");
+//	        } else {
+//	          enc.append("%");
+//	        }
+//	        enc.append(Integer.toHexString(c));
+//	      }
+//	    }
+//	    return enc.toString();
+//	  }
 
 }
