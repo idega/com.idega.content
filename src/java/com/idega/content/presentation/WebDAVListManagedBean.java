@@ -9,6 +9,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+
 import javax.faces.component.UIColumn;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
@@ -21,11 +22,14 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import javax.faces.model.DataModel;
+
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.WebdavResources;
+
 import com.idega.business.IBOLookup;
 import com.idega.content.business.WebDAVBeanComparator;
 import com.idega.content.data.WebDAVBean;
+import com.idega.core.search.presentation.SearchResults;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
@@ -41,7 +45,7 @@ import com.idega.webface.model.WFDataModel;
  * A managed bean for the WebDAVList component
  * @author gimmi
  */
-public class WebDAVListManagedBean implements ActionListener, WFListBean,Serializable {
+public class WebDAVListManagedBean extends SearchResults implements ActionListener, WFListBean,Serializable {
 
 	private static final String P_ID = "wb_list";
 	public static final String PARAMETER_WEB_DAV_URL = "wdurl";
@@ -188,7 +192,10 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean,Seriali
 		while (comp != null && block == null) {
 			if (comp instanceof ContentBlock) {
 				block = (ContentBlock) comp;
-				block.getContentViewer().maintainPath(true);
+				ContentViewer cv = block.getContentViewer();
+				if (cv != null) { 
+					cv.maintainPath(true);
+				}
 			} else {
 				comp = comp.getParent();
 			}
@@ -753,5 +760,7 @@ public class WebDAVListManagedBean implements ActionListener, WFListBean,Seriali
 			}
 		}
 	}
+	
+	
 
 }
