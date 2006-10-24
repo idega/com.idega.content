@@ -78,7 +78,7 @@ public class WebDAVUploadBean implements Serializable{
 //			uploadFolderPath = ((String[])parameters.get("uploadForm:uploadPath"))[0];
 			
 			String tempUploadFolderPath = (String) WFUtil.invoke("WebDAVListBean","getWebDAVPath");
-			if(tempUploadFolderPath!=null){
+			if(tempUploadFolderPath!=null && !tempUploadFolderPath.equals("")){
 				this.uploadFilePath = tempUploadFolderPath;
 			}
 			
