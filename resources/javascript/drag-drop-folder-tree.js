@@ -473,18 +473,22 @@ if(li.noRemoving)
 //			JSTreeObj.initTree();
 			
 			var parentDiv = JSTreeObj.dragNode_destination;
+/*
 			while(true){
 				if (parentDiv.getElementsByTagName('DIV')){
 					if (parentDiv.getElementsByTagName('DIV')[0]){
+
 						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id)
 							alert('moving node');
 						else
 							alert('creating node');
-						break;					
+						break;	
+										
 					}
 					parentDiv = parentDiv.parentNode;
 				}
 			}			
+*/
 		}
 		,
 		createDropIndicator : function()

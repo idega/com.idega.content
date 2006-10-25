@@ -21,9 +21,9 @@ version="1.2">
     											 /idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js,
     											 /idegaweb/bundles/com.idega.content.bundle/resources/javascript/unittest.js,
     											 /idegaweb/bundles/com.idega.content.bundle/resources/javascript/scriptaculous.js,
-    											 /idegaweb/bundles/com.idega.builder.bundle/scripts/BuilderService.js,
-    											 /idegaweb/bundles/com.idega.content.bundle/scripts/PagePreview.js,
-    											 /idegaweb/bundles/com.idega.content.bundle/scripts/ThemesPreviewsProvider.js,
+    											 /dwr/interface/BuilderService.js,
+    											 /dwr/interface/PagePreview.js,
+    											 /dwr/interface/ThemesPreviewsProvider.js,
     											 /idegaweb/bundles/com.idega.content.bundle/resources/javascript/rico.js,
     											 /dwr/engine.js">
         	<h:form id="createpageform">
@@ -34,7 +34,7 @@ version="1.2">
 						<a href="#" onclick="treeObj.collapseAll()">Collapse all</a> | 
 						<a href="#" onclick="treeObj.expandAll()">Expand all</a>
 					</f:verbatim>
-		 			<x:tree2 value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">
+		 			<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">
 						<f:facet name="PageTreeNode"> 							
 							<h:panelGroup>
 					   			<h:outputLink onclick="getPrewUrl(this.parentNode.id);return false;">
@@ -42,7 +42,7 @@ version="1.2">
 			             		</h:outputLink>
 			                </h:panelGroup>
 			            </f:facet>
-			        </x:tree2>    
+			        </wf:iwtree>    
 	 	            <iframe id="treePages" width= "100%" height = "400px" style="left: 500px; top: 150px; position: absolute;" scrolling = "no"/>
 				</wf:container>
 
@@ -69,9 +69,9 @@ version="1.2">
               <x:div id="overviewHeader" forceId="true">
                 <h:outputText value="testing DIV tags"/>                
               </x:div>
-              <x:div id="overviewContent" forceId="true">
-<!--                  
-		 			<x:tree2 value="#{siteTemplateBean.siteTree}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">
+              <x:div id="overviewContent" forceId="true"> 
+<!--  		 			<wf:iwtree value="#{siteTemplateBean.siteTree}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">-->
+	  		 			<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">
 						<f:facet name="PageTreeNode"> 							
 							<h:panelGroup>
 					   			<h:outputLink onclick="getPrewUrl(this.parentNode.id);return false;">
@@ -79,8 +79,9 @@ version="1.2">
 			             		</h:outputLink>
 			                </h:panelGroup>
 			            </f:facet>
-			        </x:tree2>                             
- -->
+			        </wf:iwtree>                             
+
+
               </x:div>
             </x:div>
           </x:div>
