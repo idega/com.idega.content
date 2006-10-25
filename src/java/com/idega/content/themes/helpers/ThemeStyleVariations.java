@@ -25,7 +25,7 @@ public class ThemeStyleVariations {
 		if (themeID == null) {
 			return buffer.toString();
 		}
-		ThemeInfo theme = ThemesHelper.getInstance().getThemeInfo(themeID);
+		Theme theme = ThemesHelper.getInstance().getTheme(themeID);
 		buffer.append("<p>Theme variations for ");
 		buffer.append(theme.getName());
 		buffer.append(":</p>");
@@ -44,7 +44,7 @@ public class ThemeStyleVariations {
 		return buffer.toString();
 	}
 	
-	private String getStyleGroupMembers(ThemeInfo theme, String styleGroupName) {
+	private String getStyleGroupMembers(Theme theme, String styleGroupName) {
 		StringBuffer result = new StringBuffer();
 		result.append("<ul style='list-style-type: none;'>");
 		

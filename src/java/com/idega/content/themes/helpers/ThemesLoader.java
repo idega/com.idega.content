@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class ThemesLoader {
 	
-	private ThemeInfo theme = null;
+	private Theme theme = null;
 	private Random generator = new Random();
 	private ThemesHelper helper = null;
 	
@@ -20,13 +20,7 @@ public class ThemesLoader {
 		encodedUri = getUriWithoutContent(encodedUri);
 		originalUri = getUriWithoutContent(originalUri);
 		
-		helper.addUriToTheme(originalUri);
-		
-		initThemeInfo(newTheme);
-		theme.setLinkToSkeleton(encodedUri);
-		theme.setLinkToBase(helper.getLinkToBase(encodedUri));
-		theme.setLinkToBaseAsItIs(helper.getLinkToBase(originalUri));
-		addThemeInfo();
+		createNewTheme(originalUri, encodedUri, newTheme);
 		
 		return true;
 	}
@@ -44,9 +38,9 @@ public class ThemesLoader {
 		return result;
 	}
 	
-	private void initThemeInfo(boolean newTheme) {
+	private void initTheme(boolean newTheme) {
 		if (theme == null) {
-			theme = new ThemeInfo(String.valueOf(generator.nextInt(Integer.MAX_VALUE)));
+			theme = new Theme(String.valueOf(generator.nextInt(Integer.MAX_VALUE)));
 			theme.setNewTheme(newTheme);
 		}
 	}
@@ -68,6 +62,23 @@ public class ThemesLoader {
 		}
 		index += ThemesConstants.CONTENT.length();
 		return helper.extractValueFromString(uri, index, uri.length());
+	}
+	
+	public synchronized String createNewTheme(String originalUri, String encodedUri, boolean newTheme) {
+		String themeID = null;
+		
+		helper.addUriToTheme(originalUri);
+		
+		initTheme(newTheme);
+		
+		themeID = theme.getThemeId();
+		
+		theme.setLinkToSkeleton(encodedUri);
+		theme.setLinkToBase(helper.getLinkToBase(encodedUri));
+		theme.setLinkToBaseAsItIs(helper.getLinkToBase(originalUri));
+		addThemeInfo();
+		
+		return themeID;
 	}
 
 }

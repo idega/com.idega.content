@@ -47,7 +47,7 @@ public class ThemesHelper implements Singleton {
 	private volatile ThemesPropertiesExtractor extractor = null;
 	private volatile ThemesLoader loader = null;
 	
-	private Map <String, ThemeInfo> themes = null;
+	private Map <String, Theme> themes = null;
 	private Map <String, ThemeSettings> settings = null;
 	private List <String> urisToThemes = null;
 	
@@ -59,7 +59,7 @@ public class ThemesHelper implements Singleton {
 	private String webRoot;
 	
 	private ThemesHelper() {
-		themes = new HashMap <String, ThemeInfo> ();
+		themes = new HashMap <String, Theme> ();
 		settings = new HashMap <String, ThemeSettings> ();
 		urisToThemes = new ArrayList <String> ();
 		loadThemeSettings();
@@ -303,6 +303,16 @@ public class ThemesHelper implements Singleton {
 		return result;
 	}
 	
+	public boolean isCreatedManually(String fileName) {
+		if (fileName == null) {
+			return true;
+		}
+		if (fileName.endsWith(ThemesConstants.THEME)) {
+			return true;
+		}
+		return false;
+	}
+	
 	public boolean isDraft(String fileName) {
 		if (fileName == null) {
 			return true;
@@ -330,11 +340,11 @@ public class ThemesHelper implements Singleton {
 		return false;
 	}
 	
-	public void addTheme(ThemeInfo themeInfo) {
+	public void addTheme(Theme themeInfo) {
 		themes.put(themeInfo.getThemeId(), themeInfo);
 	}
 	
-	public Collection <ThemeInfo> getThemesCollection() {
+	public Collection <Theme> getThemesCollection() {
 		return themes.values();
 	}
 	
@@ -380,8 +390,8 @@ public class ThemesHelper implements Singleton {
 		return link;
 	}
 	
-	public ThemeInfo getThemeInfo(String themeInfoID) {
-		return themes.get(themeInfoID);
+	public Theme getTheme(String themeID) {
+		return themes.get(themeID);
 	}
 	
 	public void removeTheme(String uri, String themeID) {
@@ -392,7 +402,7 @@ public class ThemesHelper implements Singleton {
 		themes.remove(themeID);
 	}
 
-	protected Map <String, ThemeInfo> getThemes() {
+	protected Map <String, Theme> getThemes() {
 		return themes;
 	}
 	
@@ -470,8 +480,26 @@ public class ThemesHelper implements Singleton {
 		return url;
 	}
 	
-	public String urlEncode(String value) {
-		String[] fileParts = value.split(ThemesConstants.SLASH);
+	public String encode(String value, boolean fullyEncode) {
+		if (value == null) {
+			return null;
+		}
+		if (fullyEncode) {
+			try {
+				value = URLEncoder.encode(value, ThemesConstants.ENCODING);
+			} catch (UnsupportedEncodingException e) {
+				log.error(e);
+				return value;
+			}
+		}
+		while (value.indexOf(ThemesConstants.PLUS) != -1) {
+			value = value.replace(ThemesConstants.PLUS, ThemesConstants.SPACE_ENCODED);
+		}
+		return value;
+	}
+	
+	public String urlEncode(String url) {
+		String[] fileParts = url.split(ThemesConstants.SLASH);
 		StringBuffer encoded = new StringBuffer();
 		encoded.append(ThemesConstants.SLASH);
 		for (int i = 0; i < fileParts.length; i++) {
@@ -480,25 +508,37 @@ public class ThemesHelper implements Singleton {
 					encoded.append(URLEncoder.encode(fileParts[i], ThemesConstants.ENCODING));
 				} catch (UnsupportedEncodingException e) {
 					log.error(e);
-					return value;
+					return url;
 				}
 				if (i + 1 < fileParts.length) {
 					encoded.append(ThemesConstants.SLASH);
 				}
 			}
 		}
-		value = encoded.toString();
-		while (value.indexOf(ThemesConstants.PLUS) != -1) {
-			value = value.replace(ThemesConstants.PLUS, ThemesConstants.SPACE_ENCODED);
+		return encode(encoded.toString(), false);
+	}
+	
+	public String decode(String value, boolean fullyDecode) {
+		if (value == null) {
+			return null;
+		}
+		while (value.indexOf(ThemesConstants.SPACE_ENCODED) != -1) {
+			value = value.replace(ThemesConstants.SPACE_ENCODED, ThemesConstants.PLUS);
+		}
+		if (fullyDecode) {
+			try {
+				value = URLDecoder.decode(value, ThemesConstants.ENCODING);
+			} catch (UnsupportedEncodingException e) {
+				log.error(e);
+				return value;
+			}
 		}
 		return value;
 	}
 	
-	public String decodeUrl(String value) {
-		while (value.indexOf(ThemesConstants.SPACE_ENCODED) != -1) {
-			value = value.replace(ThemesConstants.SPACE_ENCODED, ThemesConstants.PLUS);
-		}
-		String[] fileParts = value.split(ThemesConstants.SLASH);
+	public String decodeUrl(String url) {
+		url = decode(url, false);
+		String[] fileParts = url.split(ThemesConstants.SLASH);
 		StringBuffer encoded = new StringBuffer();
 		encoded.append(ThemesConstants.SLASH);
 		for (int i = 0; i < fileParts.length; i++) {
@@ -507,7 +547,7 @@ public class ThemesHelper implements Singleton {
 					encoded.append(URLDecoder.decode(fileParts[i], ThemesConstants.ENCODING));
 				} catch (UnsupportedEncodingException e) {
 					log.error(e);
-					return value;
+					return url;
 				}
 				if (i + 1 < fileParts.length) {
 					encoded.append(ThemesConstants.SLASH);
@@ -516,32 +556,5 @@ public class ThemesHelper implements Singleton {
 		}
 		return encoded.toString();
 	}
-
-//	  public final static String encode(String URL) {
-//		String safeURLCharacters = "@*-.:/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
-//	    StringBuffer enc = new StringBuffer(URL.length());
-//	    for (int i = 0; i < URL.length(); ++i) {
-//	      char c = URL.charAt(i);
-//	      if (safeURLCharacters.indexOf(c) >= 0) {
-//	        enc.append(c);
-//	      } else {
-//	        // Too harsh.
-//	        // if (c < 0 || c > 255)
-//	        //    throw new RuntimeException("illegal code "+c+" of char '"+URL.charAt(i)+"'");
-//	        // else
-//
-//	        // Just keep lsb like:
-//	        // http://java.sun.com/j2se/1.3/docs/api/java/net/URLEncoder.html
-//	        c = (char) (c & '\u00ff');
-//	        if (c < 16) {
-//	          enc.append("%0");
-//	        } else {
-//	          enc.append("%");
-//	        }
-//	        enc.append(Integer.toHexString(c));
-//	      }
-//	    }
-//	    return enc.toString();
-//	  }
 
 }

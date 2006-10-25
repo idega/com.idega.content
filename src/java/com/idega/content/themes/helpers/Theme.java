@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class ThemeInfo {
+public class Theme {
 	
 	private boolean propertiesExtracted;
 	private boolean locked;
@@ -18,17 +18,20 @@ public class ThemeInfo {
 	private String linkToProperties;
 	private String linkToBase;
 	private String linkToBaseAsItIs;
-	private String linkToPreview;
+	private String linkToThemePreview;
+	private String linkToDraftPreview;
 	private String linkToSmallPreview;
 	
 	private String name;
 	private String changedName;
 	
 	private List <String> styleGroupsNames;
+	private List <ThemeChange> changes;
 	private Map <String, ThemeStyleGroupMember> styleGroupsMembers;
 	
-	public ThemeInfo(String themeId) {
+	public Theme(String themeId) {
 		styleGroupsNames = new ArrayList<String>();
+		changes = new ArrayList<ThemeChange>();
 		styleGroupsMembers = new HashMap<String, ThemeStyleGroupMember>();
 		this.themeId = themeId;
 	}
@@ -69,12 +72,12 @@ public class ThemeInfo {
 		this.propertiesExtracted = propertiesExtracted;
 	}
 
-	public String getLinkToPreview() {
-		return linkToPreview;
+	public String getLinkToThemePreview() {
+		return linkToThemePreview;
 	}
 
-	public void setLinkToPreview(String linkToImage) {
-		this.linkToPreview = linkToImage;
+	public void setLinkToThemePreview(String linkToImage) {
+		this.linkToThemePreview = linkToImage;
 	}
 
 	public String getName() {
@@ -147,6 +150,26 @@ public class ThemeInfo {
 
 	public void setChangedName(String changedName) {
 		this.changedName = changedName;
+	}
+
+	public List<ThemeChange> getChanges() {
+		return changes;
+	}
+
+	public void setChanges(List<ThemeChange> changes) {
+		this.changes = changes;
+	}
+	
+	public void addThemeChange(ThemeChange change) {
+		changes.add(0, change);
+	}
+
+	public String getLinkToDraftPreview() {
+		return linkToDraftPreview;
+	}
+
+	public void setLinkToDraftPreview(String linkToDraftPreview) {
+		this.linkToDraftPreview = linkToDraftPreview;
 	}
 	
 }

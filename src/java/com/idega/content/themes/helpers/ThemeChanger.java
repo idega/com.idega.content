@@ -62,7 +62,7 @@ public class ThemeChanger {
 	 * @param theme
 	 * @return boolean
 	 */
-	public boolean prepareThemeForUsage(ThemeInfo theme) {
+	public boolean prepareThemeForUsage(Theme theme) {
 		if (!theme.isNewTheme()) {
 			return true; // Theme allready prepared
 		}
@@ -93,7 +93,7 @@ public class ThemeChanger {
 			index++;
 		}
 		
-		if (!uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.getFileNameWithExtension(theme.getLinkToSkeleton()), theme)) {
+		if (!uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.getFileNameWithExtension(theme.getLinkToSkeleton()), theme, true)) {
 			return false;
 		}
 		
@@ -105,7 +105,7 @@ public class ThemeChanger {
 	 * @param theme
 	 * @return
 	 */
-	public boolean prepareThemeStyleFiles(ThemeInfo theme) {
+	public boolean prepareThemeStyleFiles(Theme theme) {
 		if (!theme.isNewTheme()) {
 			return true; // Theme allready prepared
 		}
@@ -150,7 +150,7 @@ public class ThemeChanger {
 		return true;
 	}
 	
-	private boolean prepareThemeDefaultStyleFiles(ThemeInfo theme) {
+	private boolean prepareThemeDefaultStyleFiles(Theme theme) {
 		List <String> defaultStyles = ThemesConstants.DEFAULT_STYLE_FILES;
 		for (int i = 0; i < defaultStyles.size(); i++) {
 			if (!proceedStyleFile(theme.getLinkToBase() + defaultStyles.get(i), DEFAULT_REPLACE, DEFAULT_CSS_REPLACEMENT)) {
@@ -236,10 +236,13 @@ public class ThemeChanger {
 	 * @param fileName
 	 * @return boolean
 	 */
-	private boolean uploadDocument(Document doc, String linkToBase, String fileName, ThemeInfo theme) {
+	private boolean uploadDocument(Document doc, String linkToBase, String fileName, Theme theme, boolean isTheme) {
 		XMLOutputter out = new XMLOutputter();
-		String docContent = addRegions(out.outputString(doc));
-		docContent = getFixedDocumentContent(docContent);
+		String docContent = out.outputString(doc);
+		if (isTheme) {
+			docContent = addRegions(docContent);
+			docContent = getFixedDocumentContent(docContent);
+		}
 		theme.setLocked(true);
 		try {
 			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(linkToBase, fileName, docContent, null, true)) {
@@ -510,7 +513,7 @@ public class ThemeChanger {
 			return null;
 		}
 		
-		ThemeInfo theme = helper.getThemeInfo(themeID);
+		Theme theme = helper.getTheme(themeID);
 		
 		theme.setChangedName(themeName);
 		
@@ -524,18 +527,25 @@ public class ThemeChanger {
 			return null;
 		}
 		
+		boolean limitedSelection = true;
+		
 		ThemeStyleGroupMember oldStyle = null;
 		ThemeStyleGroupMember newStyle = null;
-		if (radio) {
+		ThemeStyleGroupMember styleChanger = null;
+		if (radio) { // Simply changing CSS files
 			oldStyle = getEnabledStyleMember(theme, styleGroupName);
 			newStyle = getStyleMember(theme, styleGroupName, styleMember);
+			styleChanger = newStyle;
 		}
-		else {
-			if (checked) {
+		else { //Need to know either add CSS or remove
+			limitedSelection = false;
+			if (checked) { // Need to add
 				newStyle = getStyleMember(theme, styleGroupName, styleMember);
+				styleChanger = newStyle;
 			}
-			else {
+			else { //Need to remove
 				oldStyle = getStyleMember(theme, styleGroupName, styleMember);
+				styleChanger = oldStyle;
 			}
 		}
 		
@@ -552,15 +562,28 @@ public class ThemeChanger {
 		
 		String draft = helper.getFileName(theme.getLinkToSkeleton()) + ThemesConstants.DRAFT;
 		theme.setLinkToDraft(theme.getLinkToBase() + draft);
-		if (!uploadDocument(doc, theme.getLinkToBaseAsItIs(), draft, theme)) {
+		if (!uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.decode(draft, true), theme, false)) {
 			return null;
 		}
 
-		if (helper.getPreviewGenerator().generatePreview(helper.getFullWebRoot() + theme.getLinkToDraft(), ThemesConstants.PREVIEW_IMAGE, theme.getLinkToBaseAsItIs(), 800, 600)) {
-			theme.setLinkToPreview(ThemesConstants.PREVIEW_IMAGE + ThemesConstants.DOT + helper.getPreviewGenerator().getFileType());
+		String uploadDir = helper.getFullWebRoot() + theme.getLinkToDraft();
+		String fileName = theme.getName() +	ThemesConstants.DRAFT_PREVIEW;
+		if (helper.getPreviewGenerator().generatePreview(uploadDir, fileName, theme.getLinkToBaseAsItIs(), 800, 600)) {
+//			theme.setLinkToThemePreview(fileName + ThemesConstants.DOT + helper.getPreviewGenerator().getFileType());
+			addThemeChange(theme, styleChanger, limitedSelection);
+			theme.setLinkToDraftPreview(fileName + ThemesConstants.DOT + helper.getPreviewGenerator().getFileType());
 			return themeID;
 		}
 		return null;
+	}
+
+	private void addThemeChange(Theme theme, ThemeStyleGroupMember style, boolean limitedSelection) {
+		ThemeChange change = new ThemeChange();
+		change.setLimitedSelection(limitedSelection);
+		change.setEnabled(style.isEnabled());
+		change.setStyleGroupName(style.getGroupName());
+		change.setStyleGroupMember(style.getName());
+		theme.addThemeChange(change);
 	}
 	
 	/**
@@ -652,7 +675,7 @@ public class ThemeChanger {
 	 * @param styleGroupName
 	 * @return ThemeStyleGroupMember
 	 */
-	private ThemeStyleGroupMember getEnabledStyleMember(ThemeInfo theme, String styleGroupName) {
+	private ThemeStyleGroupMember getEnabledStyleMember(Theme theme, String styleGroupName) {
 		Map <String, ThemeStyleGroupMember> styleMembers = theme.getStyleGroupsMembers();
 		int i = 0;
 		ThemeStyleGroupMember member = styleMembers.get(styleGroupName + ThemesConstants.AT + i);
@@ -672,7 +695,7 @@ public class ThemeChanger {
 	 * @param theme
 	 * @return List
 	 */
-	private List <ThemeStyleGroupMember> getEnabledStyles(ThemeInfo theme) {
+	private List <ThemeStyleGroupMember> getEnabledStyles(Theme theme) {
 		List <ThemeStyleGroupMember> members = new ArrayList<ThemeStyleGroupMember>();
 		List <String> groupNames = theme.getStyleGroupsNames();
 		ThemeStyleGroupMember member = null;
@@ -697,15 +720,15 @@ public class ThemeChanger {
 	 * Searches and returns style group member (theme's variation)
 	 * @param theme
 	 * @param styleGroupName
-	 * @param newStyleMember
+	 * @param styleVariation
 	 * @return ThemeStyleGroupMember
 	 */
-	private ThemeStyleGroupMember getStyleMember(ThemeInfo theme, String styleGroupName, String newStyleMember) {
+	public ThemeStyleGroupMember getStyleMember(Theme theme, String styleGroupName, String styleVariation) {
 		Map <String, ThemeStyleGroupMember> styleMembers = theme.getStyleGroupsMembers();
 		int i = 0;
 		ThemeStyleGroupMember member = styleMembers.get(styleGroupName + ThemesConstants.AT + i);
 		while (member != null) {
-			if (newStyleMember.equals(member.getName())) {
+			if (styleVariation.equals(member.getName())) {
 				return member;
 			}
 			i++;
@@ -718,17 +741,18 @@ public class ThemeChanger {
 	/**
 	 * Saves theme
 	 * @param themeID
+	 * @param themeName
 	 * @return boolean
 	 */
 	public boolean saveTheme(String themeID, String themeName) {
-		if (themeID == null) {
+		if (themeID == null || themeName == null) {
 			return false;
 		}
 		
-		ThemeInfo theme = helper.getThemeInfo(themeID);
+		Theme theme = helper.getTheme(themeID);
 		
 		if (!theme.getName().equals(themeName)) {
-			return createNewTheme(theme);
+			return createNewTheme(theme, themeName);
 		}
 		
 		if (theme.getLinkToDraft() == null) {
@@ -753,13 +777,168 @@ public class ThemeChanger {
 		}
 		theme.setLocked(false);
 		
+		theme.setChanges(new ArrayList<ThemeChange>());
 		theme.setLinkToDraft(null);
-
-		return true;
+		theme.setLinkToThemePreview(theme.getLinkToDraftPreview());
+		theme.setLinkToDraftPreview(null);
+		
+		return createThemeConfig(theme);
 	}
 	
-	private boolean createNewTheme(ThemeInfo parentTheme) {
-		return true;
+	private void restoreTheme(Theme theme) {
+		if (theme == null) {
+			return;
+		}
+		List <ThemeChange> changes = theme.getChanges();
+		ThemeChange change = null;
+		ThemeStyleGroupMember member = null;
+		for (int i = 0; i < changes.size(); i++) {
+			change = changes.get(i);
+			member = getStyleMember(theme, change.getStyleGroupName(), change.getStyleGroupMember());
+			if (member != null) {
+				if (change.isLimitedSelection()) {
+					disableStyle(theme, member.getGroupName());
+				}
+				member.setEnabled(!change.isEnabled());
+			}
+		}
+	}
+	
+	private void disableStyle(Theme theme, String styleGroupName) {
+		ThemeStyleGroupMember member = null;
+		Iterator <ThemeStyleGroupMember> it = theme.getStyleGroupsMembers().values().iterator();
+		while (it.hasNext()) {
+			member = it.next();
+			if (member.getGroupName().equals(styleGroupName)) {
+				member.setEnabled(false);
+			}
+		}
+	}
+	
+	private boolean createNewTheme(Theme parent, String newName) {
+		String linkToTheme = parent.getLinkToDraft();
+		parent.setLinkToDraft(null);
+		if (linkToTheme == null) {
+			linkToTheme = parent.getLinkToSkeleton();
+		}
+		if (linkToTheme == null) {
+			return false;
+		}
+		InputStream is = helper.getInputStream(helper.getFullWebRoot(), linkToTheme);
+		if (is == null) {
+			return false;
+		}
+		String linkToBase = helper.getLinkToBase(linkToTheme);
+		if (!linkToBase.endsWith(ThemesConstants.SLASH)) {
+			linkToBase += ThemesConstants.SLASH;
+		}
+		String decodedLinkToBase = helper.decodeUrl(linkToBase);
+		if (!decodedLinkToBase.endsWith(ThemesConstants.SLASH)) {
+			decodedLinkToBase += ThemesConstants.SLASH;
+		}
+		String themeName = newName + ThemesConstants.THEME;
+		try {
+			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(decodedLinkToBase,	themeName, is, null, true)) {
+				return false;
+			}
+		} catch (RemoteException e) {
+			log.error(e);
+			return false;
+		} finally {
+			helper.closeInputStream(is);
+		}
+		
+		String themeID = helper.getThemesLoader().createNewTheme(decodedLinkToBase + themeName, linkToBase + helper.encode(themeName,
+				true), true);
+		if (themeID == null) {
+			return false;
+		}
+		Theme child = helper.getTheme(themeID);
+		child.setName(newName);
+
+		copyTheme(parent, child);
+		
+		if (parent.getLinkToDraftPreview() != null) {
+			child.setLinkToThemePreview(parent.getLinkToDraftPreview());
+			parent.setLinkToDraftPreview(null);
+		}
+		else {
+			child.setLinkToThemePreview(parent.getLinkToThemePreview());
+		}
+		
+		child.setPropertiesExtracted(true);
+		
+		restoreTheme(parent);
+		
+		return createThemeConfig(child);
+	}
+	
+	private void copyTheme(Theme parent, Theme child) {
+		// Copying style groups and variations
+		List <String> groupNames = parent.getStyleGroupsNames();
+		ThemeStyleGroupMember member = null;
+		ThemeStyleGroupMember parentMember = null;
+		String styleGroupName = null;
+		Map <String, ThemeStyleGroupMember> styleMembers = parent.getStyleGroupsMembers();
+		for (int i = 0; i < groupNames.size(); i++) {
+			styleGroupName = groupNames.get(i);
+			child.addStyleGroupName(styleGroupName);
+			int j = 0;
+			parentMember = styleMembers.get(styleGroupName + ThemesConstants.AT + j);
+			while (parentMember != null) {
+				member = new ThemeStyleGroupMember(parentMember);
+				child.addStyleGroupMember(styleGroupName + ThemesConstants.AT + j, member);
+				j++;
+				parentMember = styleMembers.get(styleGroupName + ThemesConstants.AT + j);
+			}
+		}
+	}
+	
+	private boolean createThemeConfig(Theme theme) {
+		Document doc = new Document();
+		Element root = new Element(ThemesConstants.CON_THEME);
+		Collection <Element> rootElements = new ArrayList<Element>();
+		
+		Element name = new Element(ThemesConstants.CON_NAME);
+		name.setText(theme.getName());
+		rootElements.add(name);
+		
+		Element styles = new Element(ThemesConstants.CON_STYLES);
+		Collection <Element> stylesElements = new ArrayList<Element>();
+		
+		List <ThemeStyleGroupMember> enabled = getEnabledStyles(theme);
+		ThemeStyleGroupMember member = null;
+		
+		Element style = null;
+		Collection <Element> styleElements = null;
+		Element groupName = null;
+		Element variation = null;
+		for (int i = 0; i < enabled.size(); i++) {
+			member = enabled.get(i);
+			style = new Element(ThemesConstants.CON_STYLE);
+			styleElements = new ArrayList<Element>();
+
+			groupName = new Element(ThemesConstants.CON_GROUP);
+			groupName.setText(member.getGroupName());
+			styleElements.add(groupName);
+			
+			variation = new Element(ThemesConstants.CON_VARIATION);
+			variation.setText(member.getName());
+			styleElements.add(variation);
+
+			style.setContent(styleElements);
+			stylesElements.add(style);
+		}
+		styles.setContent(stylesElements);
+		rootElements.add(styles);
+		
+		Element preview = new Element(ThemesConstants.CON_PREVIEW);
+		preview.setText(theme.getLinkToThemePreview());
+		rootElements.add(preview);
+		
+		root.setContent(rootElements);
+		doc.setRootElement(root);
+		return uploadDocument(doc, theme.getLinkToBaseAsItIs(), theme.getName() + ThemesConstants.IDEGA_THEME_INFO, theme, false);
 	}
 
 }

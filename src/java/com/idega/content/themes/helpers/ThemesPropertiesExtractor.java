@@ -3,6 +3,7 @@ package com.idega.content.themes.helpers;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -19,65 +20,130 @@ public class ThemesPropertiesExtractor {
 //	private static final int SMALL_WIDTH = 115;
 //	private static final int SMALL_HEIGHT = 125;
 	
-	public synchronized void proceedFileExtractor(ThemeInfo theme) {
+	public synchronized void proceedFileExtractor(Theme theme) {
 		List files = helper.getFiles(theme.getLinkToBaseAsItIs());
 		String webRoot = helper.getFullWebRoot();
 		String url = helper.getWebRootWithoutContent(webRoot);
-		if (!theme.isPropertiesExtracted() && files != null) {
-			String linkToProperties = null;
-			boolean foundedPropertiesFile = false;
-			for (int j = 0; (j < files.size() && !foundedPropertiesFile); j++) {
-				linkToProperties = files.get(j).toString();
-				for (int k = 0; (k < ThemesConstants.PROPERTIES_FILES.size() && !foundedPropertiesFile); k++) {
-					if (helper.isCorrectFile(helper.getFileNameWithExtension(linkToProperties), ThemesConstants.PROPERTIES_FILES.get(k))) {
-						foundedPropertiesFile = true;
-					}
+		if (theme.isPropertiesExtracted() || files == null) {
+			return;
+		}
+		String linkToProperties = null;
+		boolean foundedPropertiesFile = false;
+		for (int j = 0; (j < files.size() && !foundedPropertiesFile); j++) {
+			linkToProperties = files.get(j).toString();
+			for (int k = 0; (k < ThemesConstants.PROPERTIES_FILES.size() && !foundedPropertiesFile); k++) {
+				if (helper.isCorrectFile(helper.getFileNameWithExtension(linkToProperties), ThemesConstants.PROPERTIES_FILES.get(k))) {
+					foundedPropertiesFile = true;
 				}
 			}
-			
-			if (foundedPropertiesFile) { // Extraxting properties and preparing theme, style files for usage
-				theme.setLinkToProperties(linkToProperties);
-				extractProperties(theme, url + linkToProperties);
-				if (theme.isNewTheme()) {
-					helper.getThemeChanger().prepareThemeForUsage(theme);
-					helper.getThemeChanger().prepareThemeStyleFiles(theme);
-				}
+		}
+		
+		if (foundedPropertiesFile) { // Extraxting properties and preparing theme, style files for usage
+			theme.setLinkToProperties(linkToProperties);
+			extractProperties(theme, url + linkToProperties);
+			if (theme.isNewTheme()) {
+				helper.getThemeChanger().prepareThemeForUsage(theme);
+				helper.getThemeChanger().prepareThemeStyleFiles(theme);
 			}
-			
-			if (theme.getLinkToPreview() == null) {
-				searchForPreviews(theme, files);
+		}
+		
+		String searchName = theme.getName();
+		String skeletonName = null;
+		if (theme.getLinkToSkeleton().indexOf(ThemesConstants.THEME) != -1) {
+			skeletonName = helper.decode(helper.getFileNameWithExtension(theme.getLinkToSkeleton()), true);
+			searchName = helper.extractValueFromString(skeletonName, 0, skeletonName.indexOf(ThemesConstants.THEME));
+		}
+		
+		String linkToConfig = null;
+		for (int i = 0; (i < files.size() && linkToConfig == null); i++) {
+			if (files.get(i).toString().endsWith(searchName + ThemesConstants.IDEGA_THEME_INFO)) {
+				linkToConfig = files.get(i).toString();
 			}
-			
-			if (theme.getLinkToPreview() == null) { // Big preview
-				if (helper.getPreviewGenerator().generatePreview(webRoot + theme.getLinkToSkeleton(), ThemesConstants.PREVIEW_IMAGE, theme.getLinkToBaseAsItIs(), BIG_WIDTH, BIG_HEIGHT)) {
-					theme.setLinkToPreview(ThemesConstants.PREVIEW_IMAGE + ThemesConstants.DOT + helper.getPreviewGenerator().getFileType());
-				}
+		}
+		if (linkToConfig != null) {
+			extractConfiguration(theme, url + linkToConfig);
+		}
+		
+		if (theme.getLinkToThemePreview() == null) {
+			searchForPreviews(theme, files);
+		}
+		
+		if (theme.getLinkToThemePreview() == null) { // Big preview
+			if (helper.getPreviewGenerator().generatePreview(webRoot + theme.getLinkToSkeleton(), theme.getName() +
+					ThemesConstants.THEME_PREVIEW, theme.getLinkToBaseAsItIs(), BIG_WIDTH, BIG_HEIGHT)) {
+				theme.setLinkToThemePreview(theme.getName() + ThemesConstants.THEME_PREVIEW + ThemesConstants.DOT +
+						helper.getPreviewGenerator().getFileType());
 			}
-			
-			if (theme.getLinkToSmallPreview() == null) { // Small preview
-//				if (generatePreview(webRoot, theme, ThemesConstants.SMALL_PREVIEW_IMAGE, SMALL_WIDTH, SMALL_HEIGHT)) {
-//					theme.setLinkToSmallPreview(ThemesConstants.SMALL_PREVIEW_IMAGE + ThemesConstants.DOT + helper.getPreviewGenerator().getFileType());
-//				}
-			}
-			
-			if (theme.getName() == null) {
-				theme.setName(helper.getFileName(theme.getLinkToSkeleton()));
-			}
-			theme.setNewTheme(false);
-			
-			theme.setPropertiesExtracted(true);
+		}
+		
+		// TODO: small preview = big preview's thumbnail
+		
+		if (theme.getName() == null) {
+			theme.setName(helper.getFileName(theme.getLinkToSkeleton()));
+		}
+		theme.setNewTheme(false);
+		
+		theme.setPropertiesExtracted(true);	
+	}
+	
+	private void extractConfiguration(Theme theme, String link) {
+		Document doc = helper.getXMLDocument(link);
+		if (doc == null || theme == null) {
+			return;
+		}
+		disableAllStyles(theme);
+		
+		Element root = doc.getRootElement();
+		Element name = root.getChild(ThemesConstants.CON_NAME);
+		theme.setName(name.getTextNormalize());
+		
+		List <Element> styles = root.getChild(ThemesConstants.CON_STYLES).getChildren();
+		if (styles == null) {
+			return;
+		}
+		for (int i = 0; i < styles.size(); i++) {
+			setEnabledStyles(theme, styles.get(i));
+		}
+		
+		Element preview = root.getChild(ThemesConstants.CON_PREVIEW);
+		theme.setLinkToThemePreview(preview.getTextNormalize());
+	}
+	
+	private void setEnabledStyles(Theme theme, Element style) {
+		String styleGroupName = style.getChildTextNormalize(ThemesConstants.CON_GROUP);
+		String variation = style.getChildTextNormalize(ThemesConstants.CON_VARIATION);
+		ThemeStyleGroupMember member = helper.getThemeChanger().getStyleMember(theme, styleGroupName, variation);
+		if (member != null) {
+			member.setEnabled(true);
 		}
 	}
 	
-	private void searchForPreviews(ThemeInfo theme, List files) {
+	private void disableAllStyles(Theme theme) {
+		List <String> groupNames = theme.getStyleGroupsNames();
+		ThemeStyleGroupMember member = null;
+		String styleGroupName = null;
+		Map <String, ThemeStyleGroupMember> styleMembers = theme.getStyleGroupsMembers();
+		for (int i = 0; i < groupNames.size(); i++) {
+			styleGroupName = groupNames.get(i);
+			int j = 0;
+			member = styleMembers.get(styleGroupName + ThemesConstants.AT + j);
+			while (member != null) {
+				member.setEnabled(false);
+				j++;
+				member = styleMembers.get(styleGroupName + ThemesConstants.AT + j);
+			}
+		}
+	}
+	
+	private void searchForPreviews(Theme theme, List files) {
 		if (theme == null || files == null) {
 			return;
 		}
 		String uri = null;
 		for (int i = 0; i < files.size(); i++) {
 			uri = files.get(i).toString();
-			if (ThemesConstants.PREVIEW_IMAGE.equals(helper.getFileName(uri))) {
-				theme.setLinkToPreview(helper.getFileNameWithExtension(uri));
+			if ((theme.getName() + ThemesConstants.THEME_PREVIEW).equals(helper.getFileName(uri))) {
+				theme.setLinkToThemePreview(helper.getFileNameWithExtension(uri));
 				return;
 			}
 		}
@@ -85,14 +151,14 @@ public class ThemesPropertiesExtractor {
 	
 	public synchronized void proceedFileExtractor() {
 		System.out.println("started file extractor: " + new Date());
-		List <ThemeInfo> themes = new ArrayList <ThemeInfo> (helper.getThemesCollection());
+		List <Theme> themes = new ArrayList <Theme> (helper.getThemesCollection());
 		for (int i = 0; i < themes.size(); i++) {
 			proceedFileExtractor(themes.get(i));
 		}
 		System.out.println("finished file extractor: " + new Date());
 	}
 	
-	public void extractProperties(ThemeInfo theme, String link) {
+	public void extractProperties(Theme theme, String link) {
 		Document doc = helper.getXMLDocument(link);
 		if (doc == null) {
 			return;
@@ -105,7 +171,7 @@ public class ThemesPropertiesExtractor {
 		}
 	}
 	
-	private boolean extractStyles(ThemeInfo theme, String elementSearchKey, List <Element> elements) {
+	private boolean extractStyles(Theme theme, String elementSearchKey, List <Element> elements) {
 		if (theme == null || elementSearchKey == null || elements == null) {
 			return false;
 		}
@@ -170,7 +236,7 @@ public class ThemesPropertiesExtractor {
 		return true;
 	}
 	
-	private boolean extractStyleVariations(ThemeInfo theme, String styleGroupName, List <Element> styleVariations, boolean limitedSelection) {
+	private boolean extractStyleVariations(Theme theme, String styleGroupName, List <Element> styleVariations, boolean limitedSelection) {
 		if (styleVariations == null) {
 			return false;
 		}
@@ -182,6 +248,7 @@ public class ThemesPropertiesExtractor {
 			member = new ThemeStyleGroupMember();
 			member.setName(getValueFromNextElement(ThemesConstants.TAG_NAME, styleMember));
 			member.setType(getValueFromNextElement(ThemesConstants.TAG_TYPE, styleMember));
+			member.setGroupName(styleGroupName);
 			
 			Element enabledValue = getNextElement(ThemesConstants.TAG_ENABLED, styleMember.getChildren());
 			if (enabledValue == null) {

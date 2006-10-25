@@ -10,7 +10,7 @@ import org.apache.slide.event.ContentEvent;
 
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBOServiceBean;
-import com.idega.content.themes.helpers.ThemeInfo;
+import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.builder.business.BuilderService;
@@ -33,9 +33,9 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		if (ContentEvent.REMOVE.equals(idegaWebContentEvent.getMethod())) {
 			if (ThemesHelper.getInstance().isCorrectFile(uri)) {
-				Iterator <ThemeInfo> allThemes = ThemesHelper.getInstance().getThemesCollection().iterator();
+				Iterator <Theme> allThemes = ThemesHelper.getInstance().getThemesCollection().iterator();
 				boolean foundTheme = false;
-				ThemeInfo theme = null;
+				Theme theme = null;
 				while (allThemes.hasNext() && !foundTheme) {
 					theme = allThemes.next();
 					if (uri.equals(ThemesHelper.getInstance().decodeUrl(theme.getLinkToSkeleton()))) {
@@ -49,7 +49,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			}
 		}
 		else {
-			if (ThemesHelper.getInstance().isCorrectFile(uri) && isNewTheme(uri)) {
+			if (ThemesHelper.getInstance().isCorrectFile(uri) && isNewTheme(uri) && !ThemesHelper.getInstance().isCreatedManually(uri)) {
 				ThemesHelper.getInstance().getThemesLoader().loadTheme(uri, ThemesHelper.getInstance().urlEncode(uri), true);
 				//TODO: proceed creating IBPage
 			}

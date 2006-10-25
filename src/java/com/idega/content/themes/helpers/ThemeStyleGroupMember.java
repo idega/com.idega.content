@@ -7,6 +7,7 @@ public class ThemeStyleGroupMember {
 	
 	private String name;
 	private String type;
+	private String groupName;
 	
 	private boolean enabled;
 	private boolean limitedSelection;
@@ -15,6 +16,17 @@ public class ThemeStyleGroupMember {
 	
 	public ThemeStyleGroupMember() {
 		styleFiles = new ArrayList <String> ();
+	}
+	
+	public ThemeStyleGroupMember(ThemeStyleGroupMember parent) {
+		this.name = parent.getName();
+		this.type = parent.getType();
+		this.groupName = parent.getGroupName();
+		
+		this.enabled = parent.isEnabled();
+		this.limitedSelection = parent.isLimitedSelection();
+		
+		this.styleFiles = new ArrayList <String> (parent.getStyleFiles());
 	}
 
 	public boolean isEnabled() {
@@ -55,6 +67,14 @@ public class ThemeStyleGroupMember {
 
 	public void setLimitedSelection(boolean limitedSelection) {
 		this.limitedSelection = limitedSelection;
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
 	}
 
 }

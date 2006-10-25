@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.idega.business.IBOServiceBean;
-import com.idega.content.themes.helpers.ThemeInfo;
+import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 
@@ -20,10 +20,10 @@ public class ThemesPreviewsProviderBean extends IBOServiceBean implements Themes
 	public String getThemesPreviewsInfo() {
 		helper.getThemesPropertiesExtractor().proceedFileExtractor();
 		
-		List <ThemeInfo> themes = new ArrayList <ThemeInfo> (helper.getThemesCollection());
+		List <Theme> themes = new ArrayList <Theme> (helper.getThemesCollection());
 		StringBuffer info = new StringBuffer();
 		
-		ThemeInfo theme = null;
+		Theme theme = null;
 		String webRoot = helper.getFullWebRoot();
 		for (int i = 0; i < themes.size(); i++) {
 			theme = themes.get(i);
@@ -35,7 +35,13 @@ public class ThemesPreviewsProviderBean extends IBOServiceBean implements Themes
 				info.append(theme.getName());
 			}
 			info.append(ThemesConstants.AT);
-			info.append(webRoot + theme.getLinkToBase() + theme.getLinkToPreview());
+			info.append(webRoot + theme.getLinkToBase());
+			if (theme.getLinkToDraftPreview() != null) {
+				info.append(helper.encode(theme.getLinkToDraftPreview(), true));
+			}
+			else {
+				info.append(helper.encode(theme.getLinkToThemePreview(), true));
+			}
 			info.append(ThemesConstants.AT);
 			info.append(theme.getThemeId());
 			if (i + 1 < themes.size()) {
