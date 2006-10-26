@@ -173,7 +173,7 @@ public class ThemeChanger {
 	
 	private boolean proceedStyleFile(String linkToStyle, String[] replaces, String replacement) {
 		// Getting css file
-		InputStream is = helper.getInputStream(helper.getFullWebRoot(), linkToStyle);
+		InputStream is = helper.getInputStream(helper.getFullWebRoot() + linkToStyle);
 		InputStreamReader isr = new InputStreamReader(is);
 		BufferedReader buf = new BufferedReader(isr);
 		StringBuffer sb = new StringBuffer();
@@ -577,7 +577,6 @@ public class ThemeChanger {
 		String uploadDir = helper.getFullWebRoot() + theme.getLinkToDraft();
 		String fileName = theme.getName() +	ThemesConstants.DRAFT_PREVIEW;
 		if (helper.getPreviewGenerator().generatePreview(uploadDir, fileName, theme.getLinkToBaseAsItIs(), 800, 600)) {
-//			theme.setLinkToThemePreview(fileName + ThemesConstants.DOT + helper.getPreviewGenerator().getFileType());
 			addThemeChange(theme, styleChanger, limitedSelection);
 			theme.setLinkToDraftPreview(fileName + ThemesConstants.DOT + helper.getPreviewGenerator().getFileType());
 			return themeID;
@@ -769,7 +768,7 @@ public class ThemeChanger {
 		}
 
 		InputStream is = null;
-		is = helper.getInputStream(helper.getFullWebRoot(), theme.getLinkToDraft());
+		is = helper.getInputStream(helper.getFullWebRoot() + theme.getLinkToDraft());
 		
 		String fileName = helper.decode(helper.getFileNameWithExtension(theme.getLinkToSkeleton()), true);
 		theme.setLocked(true);
@@ -832,7 +831,7 @@ public class ThemeChanger {
 		if (linkToTheme == null) {
 			return false;
 		}
-		InputStream is = helper.getInputStream(helper.getFullWebRoot(), linkToTheme);
+		InputStream is = helper.getInputStream(helper.getFullWebRoot() + linkToTheme);
 		if (is == null) {
 			return false;
 		}
@@ -875,7 +874,7 @@ public class ThemeChanger {
 		if (!linkToBase.endsWith(ThemesConstants.SLASH)) {
 			linkToBase += ThemesConstants.SLASH;
 		}
-		is = helper.getInputStream(helper.getFullWebRoot(), linkToBase +  helper.encode(linkToPreview, true));
+		is = helper.getInputStream(helper.getFullWebRoot() + linkToBase +  helper.encode(linkToPreview, true));
 		String fileName = child.getName() + ThemesConstants.THEME_PREVIEW + ThemesConstants.DOT + helper.getFileExtension(linkToPreview);
 		try {
 			if (helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(decodedLinkToBase, fileName, is, null, true)) {

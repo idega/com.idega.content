@@ -444,10 +444,10 @@ public class ThemesHelper implements Singleton {
 		loadedThemeSettings = true;
 	}
 	
-	public InputStream getInputStream(String webRoot, String link) {
+	public InputStream getInputStream(String link) {
 		InputStream is = null;
         try {
-        	URL url = getUrl(webRoot + link);
+        	URL url = getUrl(link);
         	if (url == null) {
         		return null;
         	}
