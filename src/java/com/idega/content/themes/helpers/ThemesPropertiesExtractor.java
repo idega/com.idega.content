@@ -1,7 +1,7 @@
 package com.idega.content.themes.helpers;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -97,12 +97,12 @@ public class ThemesPropertiesExtractor {
 		Element name = root.getChild(ThemesConstants.CON_NAME);
 		theme.setName(name.getTextNormalize());
 		
-		List <Element> styles = root.getChild(ThemesConstants.CON_STYLES).getChildren();
+		List styles = root.getChild(ThemesConstants.CON_STYLES).getChildren();
 		if (styles == null) {
 			return;
 		}
 		for (int i = 0; i < styles.size(); i++) {
-			setEnabledStyles(theme, styles.get(i));
+			setEnabledStyles(theme, (Element) styles.get(i));
 		}
 		
 		Element preview = root.getChild(ThemesConstants.CON_PREVIEW);
@@ -151,9 +151,9 @@ public class ThemesPropertiesExtractor {
 	
 	public synchronized void proceedFileExtractor() {
 		System.out.println("started file extractor: " + new Date());
-		List <Theme> themes = new ArrayList <Theme> (helper.getThemesCollection());
-		for (int i = 0; i < themes.size(); i++) {
-			proceedFileExtractor(themes.get(i));
+		Iterator <Theme> it = helper.getThemesCollection().iterator();
+		while (it.hasNext()) {
+			proceedFileExtractor(it.next());
 		}
 		System.out.println("finished file extractor: " + new Date());
 	}
@@ -171,11 +171,11 @@ public class ThemesPropertiesExtractor {
 		}
 	}
 	
-	private boolean extractStyles(Theme theme, String elementSearchKey, List <Element> elements) {
+	private boolean extractStyles(Theme theme, String elementSearchKey, List elements) {
 		if (theme == null || elementSearchKey == null || elements == null) {
 			return false;
 		}
-		List <Element> styleGroups = getStyleGroups(elementSearchKey, elements);
+		List styleGroups = getStyleGroups(elementSearchKey, elements);
 		if (styleGroups == null) {
 			return false;
 		}
@@ -184,7 +184,7 @@ public class ThemesPropertiesExtractor {
 		String styleGroupName = null;
 		String selectionLimit = null;
 		for (int i = 0; i < styleGroups.size(); i++) {
-			style = styleGroups.get(i);
+			style = (Element) styleGroups.get(i);
 			
 			styleGroupName = getValueFromNextElement(ThemesConstants.RW_GROUP_NAME, style);
 			theme.addStyleGroupName(styleGroupName);
@@ -199,7 +199,7 @@ public class ThemesPropertiesExtractor {
 		return true;
 	}
 	
-	private List <Element> getStyleGroups(String elementSearchKey, List <Element> children) {
+	private List getStyleGroups(String elementSearchKey, List children) {
 		Element styleBaseElement = getNextElement(elementSearchKey, children);
 		if (styleBaseElement == null) {
 			return null;
@@ -211,7 +211,7 @@ public class ThemesPropertiesExtractor {
 		return styleGroupsBase.getChildren(ThemesConstants.TAG_DICT);
 	}
 	
-	private List <Element> getStyleGroupElements(Element style) {
+	private List getStyleGroupElements(Element style) {
 		if (style == null) {
 			return null;
 		}
@@ -229,21 +229,21 @@ public class ThemesPropertiesExtractor {
 		if (styleFiles == null) {
 			return false;
 		}
-		List <Element> files = styleFiles.getChildren();
+		List files = styleFiles.getChildren();
 		for (int k = 0; k < files.size(); k++) {
-			member.addStyleFile(files.get(k).getText());
+			member.addStyleFile(((Element)files.get(k)).getText());
 		}
 		return true;
 	}
 	
-	private boolean extractStyleVariations(Theme theme, String styleGroupName, List <Element> styleVariations, boolean limitedSelection) {
+	private boolean extractStyleVariations(Theme theme, String styleGroupName, List styleVariations, boolean limitedSelection) {
 		if (styleVariations == null) {
 			return false;
 		}
 		
 		ThemeStyleGroupMember member = null; 
 		for (int i = 0; i < styleVariations.size(); i++) {
-			Element styleMember = styleVariations.get(i);
+			Element styleMember = (Element) styleVariations.get(i);
 			
 			member = new ThemeStyleGroupMember();
 			member.setName(getValueFromNextElement(ThemesConstants.TAG_NAME, styleMember));
@@ -269,14 +269,14 @@ public class ThemesPropertiesExtractor {
 		return true;
 	}
 	
-	private int getNextElementIndex(String parentElementValue, List <Element> parentElementChildren) {
+	private int getNextElementIndex(String parentElementValue, List parentElementChildren) {
 		if (parentElementChildren == null) {
 			return -1;
 		}
 		int i = 0;
 		boolean foundParentElement = false;
 		for (i = 0; (i < parentElementChildren.size() && !foundParentElement); i++) {
-			if (parentElementChildren.get(i).getText().equals(parentElementValue)) {
+			if (((Element) parentElementChildren.get(i)).getText().equals(parentElementValue)) {
 				foundParentElement = true;
 			}
 		}
@@ -286,12 +286,12 @@ public class ThemesPropertiesExtractor {
 		return -1;
 	}
 	
-	private Element getNextElement(String searchKey, List <Element> elements) {
+	private Element getNextElement(String searchKey, List elements) {
 		int index = getNextElementIndex(searchKey, elements);
 		if (index == -1) {
 			return null;
 		}
-		return elements.get(index);
+		return (Element) elements.get(index);
 	}
 	
 	private String getValueFromNextElement(String parentElementValue, Element baseElement) {
@@ -299,12 +299,12 @@ public class ThemesPropertiesExtractor {
 		if (baseElement == null) {
 			return value;
 		}
-		List <Element> children = baseElement.getChildren();
+		List children = baseElement.getChildren();
 		int index = getNextElementIndex(parentElementValue, children);
 		if (index == -1) {
 			return value;
 		}
-		return children.get(index).getText();
+		return ((Element) children.get(index)).getTextNormalize();
 	}
 
 }

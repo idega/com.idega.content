@@ -51,8 +51,19 @@ public class ThemeChanger {
 	private static final String CUSTOM_CSS_REPLACE = CSS_IMAGE_URL + DIRECTORY + DIRECTORY + IMAGES;
 	private static final String[] CUSTOM_REPLACE = new String[] {CUSTOM_CSS_REPLACE};
 
+	// Incorrect CSS syntax needs to be replaced
 	private static final String[] DEFAULT_REPLACE = new String[] {"href^=", "href$="};
 	private static final String DEFAULT_CSS_REPLACEMENT = "href~=";
+	
+	private static final String HTML_HEAD = "head";
+	private static final String HTML_BODY = "body";
+	
+	// Element's attributes and values
+	private static final String TAG_ATTRIBUTE_REL = "rel";
+	private static final String TAG_ATTRIBUTE_MEDIA = "media";
+	private static final String TAG_ATTRIBUTE_VALUE_STYLESHEET = "stylesheet";
+	private static final String TAG_ATTRIBUTE_VALUE_CSS = "text/css";
+	private static final String TAG_ATTRIBUTE_VALUE_SCREEN = "screen";
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
@@ -72,7 +83,7 @@ public class ThemeChanger {
 			return false;
 		}
 		Element root = doc.getRootElement();
-		Element head = root.getChild("head", namespace);
+		Element head = root.getChild(HTML_HEAD, namespace);
 		
 		// Removing needles content (like "%pathto")
 		if (!proceedHeadContent(head)) {
@@ -80,12 +91,12 @@ public class ThemeChanger {
 		}
 		
 		// Adding IBPage regions
-		if (!proceedBodyContent(root.getChild("body", namespace))) {
+		if (!proceedBodyContent(root.getChild(HTML_BODY, namespace))) {
 			return false;
 		}
 		
 		// Finding where to insert element
-		int index = getElementIndex(head.getChildren(), ThemesConstants.TAG_ATTRIBUTE_TYPE, "text/css");
+		int index = getElementIndex(head.getChildren(), ThemesConstants.TAG_ATTRIBUTE_TYPE, TAG_ATTRIBUTE_VALUE_CSS);
 		// Adding enabled styles
 		List <ThemeStyleGroupMember> members = getEnabledStyles(theme);
 		for (int i = 0; i < members.size(); i++) {
@@ -127,7 +138,7 @@ public class ThemeChanger {
 			index++;
 		}
 		
-		// Constructin correct path to images folder
+		// Constructing correct path to images folder
 		String addToCss = helper.extractValueFromString(theme.getLinkToBase(), index, theme.getLinkToBase().length());
 		String[] dirLevels = addToCss.split(ThemesConstants.SLASH);
 		StringBuffer replacement = new StringBuffer();
@@ -278,7 +289,6 @@ public class ThemeChanger {
 	 */
 	private boolean proceedHeadContent(Element head) {
 		if (head == null) {
-			log.info("head is null");
 			return false;
 		}
 		List headElements = head.getContent();
@@ -371,7 +381,6 @@ public class ThemeChanger {
 	 */
 	private boolean proceedBodyContent(Element root) {
 		if (root == null) {
-			log.info("root is null");
 			return false;
 		}
 		List nodes = null;
@@ -487,7 +496,6 @@ public class ThemeChanger {
 	 */
 	private boolean addRegion(Element e) {
 		if (e == null) {
-			log.info("Element is null");
 			return false;
 		}
 		String regionID = e.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_ID);
@@ -535,7 +543,7 @@ public class ThemeChanger {
 		if (radio) { // Simply changing CSS files
 			oldStyle = getEnabledStyleMember(theme, styleGroupName);
 			newStyle = getStyleMember(theme, styleGroupName, styleMember);
-			styleChanger = newStyle;
+			styleChanger = oldStyle;
 		}
 		else { //Need to know either add CSS or remove
 			limitedSelection = false;
@@ -550,7 +558,7 @@ public class ThemeChanger {
 		}
 		
 		Element root = doc.getRootElement();
-		if (!changeThemeStyle(root.getChild("head", namespace), oldStyle, newStyle)) {
+		if (!changeThemeStyle(root.getChild(HTML_HEAD, namespace), oldStyle, newStyle)) {
 			return null;
 		}
 		if (oldStyle != null) {
@@ -663,9 +671,9 @@ public class ThemeChanger {
 	 */
 	private List <Attribute> getBasicAttributesList() {
 		List <Attribute> attributes = new ArrayList <Attribute> ();
-		attributes.add(new Attribute("rel", "stylesheet"));
-		attributes.add(new Attribute(ThemesConstants.TAG_ATTRIBUTE_TYPE, "text/css"));
-		attributes.add(new Attribute("media", "screen"));
+		attributes.add(new Attribute(TAG_ATTRIBUTE_REL, TAG_ATTRIBUTE_VALUE_STYLESHEET));
+		attributes.add(new Attribute(ThemesConstants.TAG_ATTRIBUTE_TYPE, TAG_ATTRIBUTE_VALUE_CSS));
+		attributes.add(new Attribute(TAG_ATTRIBUTE_MEDIA, TAG_ATTRIBUTE_VALUE_SCREEN));
 		return attributes;
 	}
 	
@@ -763,7 +771,7 @@ public class ThemeChanger {
 		InputStream is = null;
 		is = helper.getInputStream(helper.getFullWebRoot(), theme.getLinkToDraft());
 		
-		String fileName = helper.getFileNameWithExtension(theme.getLinkToSkeleton());
+		String fileName = helper.decode(helper.getFileNameWithExtension(theme.getLinkToSkeleton()), true);
 		theme.setLocked(true);
 		try {
 			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), fileName, is, null, true)) {
@@ -858,12 +866,25 @@ public class ThemeChanger {
 
 		copyTheme(parent, child);
 		
-		if (parent.getLinkToDraftPreview() != null) {
-			child.setLinkToThemePreview(parent.getLinkToDraftPreview());
-			parent.setLinkToDraftPreview(null);
+		String linkToPreview = parent.getLinkToDraftPreview();
+		parent.setLinkToDraftPreview(null);
+		if (linkToPreview == null) {
+			linkToPreview = parent.getLinkToThemePreview();
 		}
-		else {
-			child.setLinkToThemePreview(parent.getLinkToThemePreview());
+		linkToBase = child.getLinkToBase();
+		if (!linkToBase.endsWith(ThemesConstants.SLASH)) {
+			linkToBase += ThemesConstants.SLASH;
+		}
+		is = helper.getInputStream(helper.getFullWebRoot(), linkToBase +  helper.encode(linkToPreview, true));
+		String fileName = child.getName() + ThemesConstants.THEME_PREVIEW + ThemesConstants.DOT + helper.getFileExtension(linkToPreview);
+		try {
+			if (helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(decodedLinkToBase, fileName, is, null, true)) {
+				child.setLinkToThemePreview(fileName);
+			}
+		} catch (RemoteException e) {
+			log.error(e);
+		} finally {
+			helper.closeInputStream(is);
 		}
 		
 		child.setPropertiesExtracted(true);

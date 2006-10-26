@@ -213,7 +213,7 @@ public class ThemesHelper implements Singleton {
 		return false;
 	}
 	
-	public String getFileType(String uri) {
+	public String getFileExtension(String uri) {
 		String type = null;
 		int begin = uri.lastIndexOf(ThemesConstants.DOT);
 		if (begin != -1) {

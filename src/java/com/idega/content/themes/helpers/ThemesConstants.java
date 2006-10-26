@@ -19,6 +19,7 @@ public class ThemesConstants {
 	public static final String AT = "@";
 	public static final String EMPTY = "";
 	protected static final String COMMA = ",";
+	public static final String SEMICOLON = ";";
 	public static final String PLUS = "+";
 	public static final String SPACE = " ";
 	public static final String SPACE_ENCODED = "%20";

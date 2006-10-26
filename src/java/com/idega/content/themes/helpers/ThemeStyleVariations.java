@@ -13,6 +13,8 @@ public class ThemeStyleVariations {
 	private static final String INPUT_ONCLICK = "' onclick=\"changeTheme('";
 	private static final String INPUT_CHECKED = "checked='true'";
 	
+	private static final String PARAM_CHECKED = "', this.checked";
+	
 	private static final String SEPERATOR = "', '";
 	private static final String CLOSING_ONCLICK = ");\"";
 	private static final String CLOSING_TAG = "/>";
@@ -76,7 +78,7 @@ public class ThemeStyleVariations {
 			result.append(member.getName());
 			result.append(SEPERATOR);
 			result.append(type);
-			result.append("', this.checked");
+			result.append(PARAM_CHECKED);
 			result.append(CLOSING_ONCLICK);
 			if (member.isEnabled()) {
 				result.append(INPUT_CHECKED);
