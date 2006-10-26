@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page-templates>
+	<page name="Page" type="Page" iconfile="/bundle/images..."></page>
+	<page name="Blog" type="Blog" iconfile="/bundle/images..."></page>
+	<page name="eShop" type="eShop" iconfile="/bundle/images..."></page>					
+	<page name="flashIntro" type="flashIntro" iconfile="/bundle/images..."></page>
+	<page name="forum" type="forum" iconfile="/bundle/images..."></page>
+	<page name="guestbook" type="guestbook" iconfile="/bundle/images..."></page>				
+	<page name="imageGallery" type="imageGallery" iconfile="/bundle/images..."></page>
+	<page name="login" type="login" iconfile="/bundle/images..."></page>				
+</page-templates>
