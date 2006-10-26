@@ -48,20 +48,20 @@ version="1.2">
 
                 <wf:container id="dhtmlgoodies_tree2" styleClass="template_tree">
                 <f:verbatim>
-                	<div id="dhtmlgoodies_tree2_div">
-						<ul id="dhtmlgoodies_tree2" class="dhtmlgoodies_tree2">
-							<li id="103" noChildren="true" noRemoving="true" typeOfTemplate="page"><a href="#">Page</a></li>
-							<li id="106" noChildren="true" noRemoving="true" typeOfTemplate="blog"><a href="#">Blog</a></li>								
-							<li id="107" noChildren="true" noRemoving="true" typeOfTemplate="eShop"><a href="#">eShop</a></li>						
-							<li id="108" noChildren="true" noRemoving="true" typeOfTemplate="flashIntro"><a href="#">Flash intro</a></li>						
-
-							<li id="103" noChildren="true" noRemoving="true" typeOfTemplate="forum"><a href="#">Forum</a></li>
-							<li id="106" noChildren="true" noRemoving="true" typeOfTemplate="guestbook"><a href="#">Guestbook</a></li>								
-							<li id="107" noChildren="true" noRemoving="true" typeOfTemplate="imageGallery"><a href="#">Image gallery</a></li>						
-							<li id="108" noChildren="true" noRemoving="true" typeOfTemplate="login"><a href="#">Login</a></li>						
-						</ul>
-					</div>          
+                <h3>Page types</h3>
                 </f:verbatim>
+                
+  		 			<wf:iwtree value="#{siteTemplateBean.pageTree}" id="page_chooser2" var="node" varNodeToggler="t" clientSideToggle="true">
+<!--	  		 			<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">-->
+						<f:facet name="PageTreeNode"> 							
+							<h:panelGroup>
+					   			<h:outputLink onclick="getPrewUrl(this.parentNode.id);return false;">
+			             	 		<h:outputText value="#{node.description}"/>   
+			             		</h:outputLink>
+			                </h:panelGroup>
+			            </f:facet>
+			        </wf:iwtree>   
+
 <!-- jsp accordion -->                        
 
           <x:div id="accordionDiv" forceId="true">
@@ -70,8 +70,8 @@ version="1.2">
                 <h:outputText value="testing DIV tags"/>                
               </x:div>
               <x:div id="overviewContent" forceId="true"> 
-<!--  		 			<wf:iwtree value="#{siteTemplateBean.siteTree}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">-->
-	  		 			<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">
+  		 			<wf:iwtree value="#{siteTemplateBean.siteTree}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">
+<!--	  		 			<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">-->
 						<f:facet name="PageTreeNode"> 							
 							<h:panelGroup>
 					   			<h:outputLink onclick="getPrewUrl(this.parentNode.id);return false;">
@@ -80,11 +80,9 @@ version="1.2">
 			                </h:panelGroup>
 			            </f:facet>
 			        </wf:iwtree>                             
-
-
               </x:div>
-            </x:div>
-          </x:div>
+            </x:div>          
+ 		</x:div>
 
 
 <!-- html accordion -->                
