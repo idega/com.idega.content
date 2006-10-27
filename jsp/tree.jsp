@@ -39,7 +39,7 @@ version="1.2">
 							<h:panelGroup>
 					   			<h:outputLink onclick="getPrewUrl(this.parentNode.id);return false;">
 			             	 		<h:outputText value="#{node.description}"/>   
-			             		</h:outputLink>
+			             		</h:outputLink> 
 			                </h:panelGroup>
 			            </f:facet>
 			        </wf:iwtree>    
@@ -51,7 +51,7 @@ version="1.2">
                 <h3>Page types</h3>
                 </f:verbatim>
                 
-  		 			<wf:iwtree value="#{siteTemplateBean.pageTree}" id="page_chooser2" var="node" varNodeToggler="t" clientSideToggle="true">
+  		 			<wf:iwtree value="#{siteTemplateBean.pageTree}" id="page_chooser22" var="node" varNodeToggler="t" clientSideToggle="true" showRootNode="false">
 <!--	  		 			<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">-->
 						<f:facet name="PageTreeNode"> 							
 							<h:panelGroup>
@@ -70,7 +70,7 @@ version="1.2">
                 <h:outputText value="Business"/>                
               </x:div>
               <x:div id="overviewContent" forceId="true"> 
-  		 			<wf:iwtree value="#{siteTemplateBean.siteTree}" id="page_chooser4" var="node" varNodeToggler="t" clientSideToggle="true">
+  		 			<wf:iwtree value="#{siteTemplateBean.siteTree}" id="page_chooser4" var="node" varNodeToggler="t" clientSideToggle="true" showRootNode="false">
 <!--	  		 			<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">-->
 						<f:facet name="PageTreeNode"> 							
 							<h:panelGroup>
@@ -88,7 +88,7 @@ version="1.2">
                 <h:outputText value="Personal"/>                
               </x:div>
               <x:div id="overviewContent2" forceId="true"> 
-  		 			<wf:iwtree value="#{siteTemplateBean.siteTree}" id="page_chooser3" var="node" varNodeToggler="t" clientSideToggle="true">
+  		 			<wf:iwtree value="#{siteTemplateBean.siteTree}" id="page_chooser3" var="node" varNodeToggler="t" clientSideToggle="true" showRootNode="false">
 <!--	  		 			<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">-->
 						<f:facet name="PageTreeNode"> 							
 							<h:panelGroup>
@@ -119,11 +119,10 @@ version="1.2">
 						treeObj.setMessageMaximumDepthReached('Maximum depth reached'); // If you want to show a message when maximum depth is reached, i.e. on drop.
 						treeObj.initTree(); 
 						treeObj.getNodeOrders();
-						treeObj.expandAll();
-						
+						treeObj.expandAll();						
 
 						treeObj2 = new JSDragDropTree();
-						treeObj2.setTreeId('page_chooser2');
+						treeObj2.setTreeId('page_chooser22');
 						treeObj2.initTree(); 
 						treeObj2.expandAll();
 
