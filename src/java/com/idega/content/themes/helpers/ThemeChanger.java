@@ -21,6 +21,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.Text;
+import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 public class ThemeChanger {
@@ -67,6 +68,12 @@ public class ThemeChanger {
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
+	private XMLOutputter out = null;
+	
+	public ThemeChanger() {
+		out = new XMLOutputter();
+		out.setFormat(Format.getPrettyFormat());
+	}
 	
 	/**
 	 * Prepares importing theme for usage (removes needless content, adds regions, extracts properties)
@@ -172,8 +179,15 @@ public class ThemeChanger {
 	}
 	
 	private boolean proceedStyleFile(String linkToStyle, String[] replaces, String replacement) {
+		if (linkToStyle == null || replaces == null || replacement == null) {
+			return false;
+		}
+		
 		// Getting css file
 		InputStream is = helper.getInputStream(helper.getFullWebRoot() + linkToStyle);
+		if (is == null) {
+			return false;
+		}
 		InputStreamReader isr = new InputStreamReader(is);
 		BufferedReader buf = new BufferedReader(isr);
 		StringBuffer sb = new StringBuffer();
@@ -248,8 +262,9 @@ public class ThemeChanger {
 	 * @return boolean
 	 */
 	private boolean uploadDocument(Document doc, String linkToBase, String fileName, Theme theme, boolean isTheme) {
-		XMLOutputter out = new XMLOutputter();
+		out.setFormat(Format.getCompactFormat());
 		String docContent = out.outputString(doc);
+		
 		if (isTheme) {
 			docContent = addRegions(docContent);
 			docContent = getFixedDocumentContent(docContent);
@@ -306,10 +321,7 @@ public class ThemeChanger {
 			o = headElements.get(i);
 			if (o instanceof Element) {
 				e = (Element) o;
-				if (needAddRegion(ThemesConstants.REGIONS, e.getTextNormalize())) {
-					//elementsNeedsRegions.add(e);
-				}
-				else {
+				if (!needAddRegion(ThemesConstants.REGIONS, e.getTextNormalize())) {
 					e.setText(fixValue(e.getTextNormalize()));
 				}
 				a = e.getAttribute(ThemesConstants.TAG_ATTRIBUTE_HREF);
@@ -331,7 +343,6 @@ public class ThemeChanger {
 		while (ite.hasNext()) {
 			e = ite.next();
 			e.addContent(getCommentsCollection(fixValue(e.getTextNormalize())));
-			e.setText(ThemesConstants.EMPTY);
 		}
 
 		Iterator <Text> itt = textElements.iterator();
@@ -343,6 +354,17 @@ public class ThemeChanger {
 			}
 			t.detach();
 		}
+		
+		/*head.addContent(0, getCommentsCollection("header"));
+		head.addContent(getCommentsCollection("user_javascript"));
+		
+		Collection <Element> c = new ArrayList<Element>();
+		Element meta = new Element("script", namespace);
+		meta.setAttribute(new Attribute("type", "text/javascript"));
+		meta.setAttribute(new Attribute("src", "noScriptActually.js"));
+		c.add(meta);
+		head.addContent(c);*/
+		
 		return true;
 	}
 	
@@ -389,8 +411,8 @@ public class ThemeChanger {
 			xp = new JDOMXPath(ThemesConstants.DIV_TAG_INSTRUCTION);
 			xp.addNamespace(ThemesConstants.NAMESPACE_ID, ThemesConstants.NAMESPACE);
 			nodes = xp.selectNodes(root);
-		} catch (JaxenException e1) {
-			log.error(e1);
+		} catch (JaxenException e) {
+			log.error(e);
 		}
 		if (nodes == null) {
 			return false;
@@ -432,6 +454,7 @@ public class ThemeChanger {
 	 * @return String
 	 */
 	private String getRegion(String value) {
+		//String region = helper.getRegionBegin();
 		String region = ThemesConstants.COMMENT_BEGIN + ThemesConstants.TEMPLATE_REGION_BEGIN + value +
 			ThemesConstants.TEMPLATE_REGION_MIDDLE + ThemesConstants.COMMENT_END;
 		
@@ -450,7 +473,7 @@ public class ThemeChanger {
 					ThemesConstants.COMMENT_BEGIN +	ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
 			if (value.equals(FOOTER)) {
-				return region + getBasicReplace(null, settings.getDefaultValue(), null) + ThemesConstants.COMMENT_BEGIN +
+				return region + "&copy;&nbsp;" + getBasicReplace(null, settings.getDefaultValue(), null) + ThemesConstants.COMMENT_BEGIN +
 					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
 			region += settings.getDefaultValue();
@@ -570,7 +593,7 @@ public class ThemeChanger {
 		
 		String draft = helper.getFileName(theme.getLinkToSkeleton()) + ThemesConstants.DRAFT;
 		theme.setLinkToDraft(theme.getLinkToBase() + draft);
-		if (!uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.decode(draft, true), theme, false)) {
+		if (!uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.decode(draft, true), theme, true)) {
 			return null;
 		}
 
@@ -769,6 +792,9 @@ public class ThemeChanger {
 
 		InputStream is = null;
 		is = helper.getInputStream(helper.getFullWebRoot() + theme.getLinkToDraft());
+		if (is == null) {
+			return false;
+		}
 		
 		String fileName = helper.decode(helper.getFileNameWithExtension(theme.getLinkToSkeleton()), true);
 		theme.setLocked(true);
@@ -875,6 +901,9 @@ public class ThemeChanger {
 			linkToBase += ThemesConstants.SLASH;
 		}
 		is = helper.getInputStream(helper.getFullWebRoot() + linkToBase +  helper.encode(linkToPreview, true));
+		if (is == null) {
+			return false;
+		}
 		String fileName = child.getName() + ThemesConstants.THEME_PREVIEW + ThemesConstants.DOT + helper.getFileExtension(linkToPreview);
 		try {
 			if (helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(decodedLinkToBase, fileName, is, null, true)) {

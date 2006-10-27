@@ -2,6 +2,8 @@ package com.idega.content.themes.helpers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -58,11 +60,19 @@ public class ThemesHelper implements Singleton {
 	private String fullWebRoot; // For cache
 	private String webRoot;
 	
+//	private String containerReplace;
+//	private String regionBegin;
+//	private String regionEnd;
+//	private String commentShortBegin;
+//	private String commentShortMiddle;
+//	private String commentShortEnd;
+	
 	private ThemesHelper() {
 		themes = new HashMap <String, Theme> ();
 		settings = new HashMap <String, ThemeSettings> ();
 		urisToThemes = new ArrayList <String> ();
 		loadThemeSettings();
+		loadRegionSyntax();
 		searchForThemes();
 	}
 	
@@ -360,23 +370,36 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public Document getXMLDocument(String link) {
-		URL url = null;
+		InputStream stream = getInputStream(link);
+		if(stream == null){
+			return null;
+		}
+		
+		Reader r = null;
 		try {
-			url = new URL(link);
-		} catch (MalformedURLException e) {
+			r = new InputStreamReader(stream, ThemesConstants.ENCODING);
+		} catch (UnsupportedEncodingException e) {
 			log.error(e);
 			return null;
 		}
+		
 		SAXBuilder builder = new SAXBuilder();
 		Document document = null;
 		try {
-			document = builder.build(url);
+			document = builder.build(r);
 		} catch (JDOMException e) {
 			log.error(e);
 			return null;
 		} catch (IOException e) {
 			log.error(e);
 			return null;
+		} finally {
+			closeInputStream(stream);
+		}
+		try {
+			r.close();
+		} catch (IOException e) {
+			log.error(e);
 		}
 		return document;
 	}
@@ -408,6 +431,28 @@ public class ThemesHelper implements Singleton {
 	
 	protected Map <String, ThemeSettings> getSettings() {
 		return settings;
+	}
+	
+	private void loadRegionSyntax() {
+		// TODO: when reading comment (<!-- some text -->) from xml, i get incorrect value, so need add Strings.
+		//Because of it i see no point to read from xml
+		
+		/*String url = getWebRootWithoutContent() + ThemesConstants.REGION_SYNTAX;
+		Document doc = getXMLDocument(url);
+		if (doc == null) {
+			return;
+		}
+		Element root = doc.getRootElement();
+		if (root == null) {
+			return;
+		}
+		
+		containerReplace = root.getChildTextNormalize("container");
+		regionBegin = root.getChildTextNormalize("comment-begin");
+		regionEnd = root.getChildTextNormalize("comment-end");
+		commentShortBegin = root.getChildTextNormalize("comment-short-begin");
+		commentShortMiddle = root.getChildTextNormalize("comment-short-middle");
+		commentShortEnd = root.getChildTextNormalize("comment-short-end");*/
 	}
 	
 	private void loadThemeSettings() {
@@ -556,5 +601,29 @@ public class ThemesHelper implements Singleton {
 		}
 		return encoded.toString();
 	}
+
+//	protected String getContainerReplace() {
+//		return containerReplace;
+//	}
+//
+//	protected String getRegionBegin() {
+//		return regionBegin;
+//	}
+//
+//	protected String getRegionEnd() {
+//		return regionEnd;
+//	}
+//
+//	protected String getCommentShortBegin() {
+//		return commentShortBegin;
+//	}
+//
+//	protected String getCommentShortEnd() {
+//		return commentShortEnd;
+//	}
+//
+//	protected String getCommentShortMiddle() {
+//		return commentShortMiddle;
+//	}
 
 }

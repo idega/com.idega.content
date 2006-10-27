@@ -1,7 +1,7 @@
 package com.idega.content.themes.helpers;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +16,8 @@ public class ThemesPropertiesExtractor {
 	
 	private static final int BIG_WIDTH = 800;
 	private static final int BIG_HEIGHT = 600;
+	
+	private static final String CSS_EXTENSION = ".css";
 	
 //	private static final int SMALL_WIDTH = 115;
 //	private static final int SMALL_HEIGHT = 125;
@@ -151,9 +153,9 @@ public class ThemesPropertiesExtractor {
 	
 	public synchronized void proceedFileExtractor() {
 		System.out.println("started file extractor: " + new Date());
-		Iterator <Theme> it = helper.getThemesCollection().iterator();
-		while (it.hasNext()) {
-			proceedFileExtractor(it.next());
+		List <Theme> themes = new ArrayList<Theme>(helper.getThemesCollection());
+		for (int i = 0; i < themes.size(); ) {
+			proceedFileExtractor(themes.get(i));
 		}
 		System.out.println("finished file extractor: " + new Date());
 	}
@@ -230,8 +232,13 @@ public class ThemesPropertiesExtractor {
 			return false;
 		}
 		List files = styleFiles.getChildren();
+		String file = null;
 		for (int k = 0; k < files.size(); k++) {
-			member.addStyleFile(((Element)files.get(k)).getText());
+			file = ((Element)files.get(k)).getText();
+			if (!file.endsWith(CSS_EXTENSION)) { // In Theme.plist sometimes occurs errors, e.g. css file with .png extension
+				file = helper.getFileName(file) + CSS_EXTENSION;
+			}
+			member.addStyleFile(file);
 		}
 		return true;
 	}

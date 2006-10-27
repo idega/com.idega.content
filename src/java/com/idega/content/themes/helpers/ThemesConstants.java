@@ -39,7 +39,7 @@ public class ThemesConstants {
 	private static final String[] _PROPERTIES_FILES = new String[] {"Theme.plist", IDEGA_THEME_INFO};
 	protected static final List <String> PROPERTIES_FILES = Collections.unmodifiableList(Arrays.asList(_PROPERTIES_FILES));
 	
-	private static final String[] _USELESS_CONTENT = new String[] {"%pathto(", ")%", "%"};
+	private static final String[] _USELESS_CONTENT = new String[] {"%pathto(", ")%", "%", " xml:space=\"preserve\""};
 	protected static final List <String> USELESS_CONTENT = Collections.unmodifiableList(Arrays.asList(_USELESS_CONTENT));
 	
 	private static final String[] _REGIONS = new String[] {"%title%", "%header%", "%user_styles%", "%user_javascript%",
@@ -101,5 +101,7 @@ public class ThemesConstants {
 	
 	private static final String[] _DEFAULT_STYLE_FILES = new String[] {"styles.css", "handheld.css", "print.css"};
 	protected static final List <String> DEFAULT_STYLE_FILES = Collections.unmodifiableList(Arrays.asList(_DEFAULT_STYLE_FILES));
+	
+	protected static final String REGION_SYNTAX = "/idegaweb/bundles/com.idega.content.bundle/resources/themes/region.xml";
 	
 }

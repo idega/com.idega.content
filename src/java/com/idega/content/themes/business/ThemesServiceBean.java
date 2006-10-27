@@ -2,7 +2,8 @@ package com.idega.content.themes.business;
 
 import java.rmi.RemoteException;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,11 +34,11 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		if (ContentEvent.REMOVE.equals(idegaWebContentEvent.getMethod())) {
 			if (ThemesHelper.getInstance().isCorrectFile(uri)) {
-				Iterator <Theme> allThemes = ThemesHelper.getInstance().getThemesCollection().iterator();
+				List <Theme> themes = new ArrayList<Theme>(ThemesHelper.getInstance().getThemesCollection());
 				boolean foundTheme = false;
 				Theme theme = null;
-				while (allThemes.hasNext() && !foundTheme) {
-					theme = allThemes.next();
+				for (int i = 0; (i < themes.size() && !foundTheme); i++) {
+					theme = themes.get(i);
 					if (uri.equals(ThemesHelper.getInstance().decodeUrl(theme.getLinkToSkeleton()))) {
 						foundTheme = true;
 					}

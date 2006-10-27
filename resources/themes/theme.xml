@@ -60,7 +60,7 @@
 	<key>
 		<code>footer</code>
 		<label>Footer</label>
-		<defaultValue>Copyright User</defaultValue>
+		<defaultValue>User</defaultValue>
 		<type>text</type>
 		<method>setFooter</method>
 	</key>

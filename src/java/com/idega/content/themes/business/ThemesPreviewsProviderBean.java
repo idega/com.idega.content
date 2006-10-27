@@ -1,6 +1,7 @@
 package com.idega.content.themes.business;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.idega.business.IBOServiceBean;
 import com.idega.content.themes.helpers.Theme;
@@ -19,13 +20,13 @@ public class ThemesPreviewsProviderBean extends IBOServiceBean implements Themes
 	public String getThemesPreviewsInfo() {
 		helper.getThemesPropertiesExtractor().proceedFileExtractor();
 		
-		Iterator <Theme> it = helper.getThemesCollection().iterator();
+		List <Theme> themes = new ArrayList<Theme>(helper.getThemesCollection());
 		StringBuffer info = new StringBuffer();
 		
 		Theme theme = null;
 		String webRoot = helper.getFullWebRoot();
-		while (it.hasNext()) {
-			theme = it.next();
+		for (int i = 0; i < themes.size(); i++) {
+			theme = themes.get(i);
 			
 			if (theme.getChangedName() != null) {
 				info.append(theme.getChangedName());
@@ -43,7 +44,7 @@ public class ThemesPreviewsProviderBean extends IBOServiceBean implements Themes
 			}
 			info.append(ThemesConstants.AT);
 			info.append(theme.getThemeId());
-			if (it.hasNext()) {
+			if (i + 1 < themes.size()) {
 				info.append(ThemesConstants.SEMICOLON);
 			}
 		}
