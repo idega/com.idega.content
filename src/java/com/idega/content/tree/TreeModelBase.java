@@ -24,7 +24,7 @@ import java.util.ArrayList;
  *
  * @author Sean Schofield
  * @author Hans Bergsten (Some code taken from an example in his O'Reilly JavaServer Faces book. Copied with permission)
- * @version $Revision: 1.1 $ $Date: 2006/09/22 12:35:00 $
+ * @version $Revision: 1.2 $ $Date: 2006/10/27 06:45:46 $
  */
 public class TreeModelBase implements TreeModel
 {
@@ -34,7 +34,6 @@ public class TreeModelBase implements TreeModel
 
     private TreeNode root;
     private TreeState treeState = new TreeStateBase();
-
 
     /**
      * Constructor

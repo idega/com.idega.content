@@ -44,6 +44,9 @@ public class SiteTemplateBean {
 //		rootNode = (ICTreeNodeAddable)(new IWTreeNode(currentElement.getAttributeValue("name")));
 		IWTreeNode rootNode = new IWTreeNode(currentElement.getAttributeValue("name"));
 		
+//		rootNode = new IWTreeNode(currentElement.getAttributeValue("name"));
+//		
+//		currentElement = (Element)currentElement.getChildren().get(0);
 		
 		rootNode = getPage(currentElement, rootNode);
 //		ICTreeNode icnode = rootNode.getParentNode();

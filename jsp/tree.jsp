@@ -67,10 +67,10 @@ version="1.2">
           <x:div id="accordionDiv" forceId="true">
             <x:div id="overviewPanel" forceId="true">
               <x:div id="overviewHeader" forceId="true">
-                <h:outputText value="testing DIV tags"/>                
+                <h:outputText value="Business"/>                
               </x:div>
               <x:div id="overviewContent" forceId="true"> 
-  		 			<wf:iwtree value="#{siteTemplateBean.siteTree}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">
+  		 			<wf:iwtree value="#{siteTemplateBean.siteTree}" id="page_chooser4" var="node" varNodeToggler="t" clientSideToggle="true">
 <!--	  		 			<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">-->
 						<f:facet name="PageTreeNode"> 							
 							<h:panelGroup>
@@ -82,6 +82,25 @@ version="1.2">
 			        </wf:iwtree>                             
               </x:div>
             </x:div>          
+            
+            <x:div id="overviewPanel2" forceId="true">
+              <x:div id="overviewHeader2" forceId="true">
+                <h:outputText value="Personal"/>                
+              </x:div>
+              <x:div id="overviewContent2" forceId="true"> 
+  		 			<wf:iwtree value="#{siteTemplateBean.siteTree}" id="page_chooser3" var="node" varNodeToggler="t" clientSideToggle="true">
+<!--	  		 			<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">-->
+						<f:facet name="PageTreeNode"> 							
+							<h:panelGroup>
+					   			<h:outputLink onclick="getPrewUrl(this.parentNode.id);return false;">
+			             	 		<h:outputText value="#{node.description}"/>   
+			             		</h:outputLink>
+			                </h:panelGroup>
+			            </f:facet>
+			        </wf:iwtree>                             
+              </x:div>
+            </x:div>                
+            
  		</x:div>
 
 
@@ -102,9 +121,21 @@ version="1.2">
 						treeObj.getNodeOrders();
 						treeObj.expandAll();
 						
+
 						treeObj2 = new JSDragDropTree();
-						treeObj2.setTreeId('dhtmlgoodies_tree2');
+						treeObj2.setTreeId('page_chooser2');
 						treeObj2.initTree(); 
+						treeObj2.expandAll();
+
+						treeObj3 = new JSDragDropTree();
+						treeObj3.setTreeId('page_chooser3');
+						treeObj3.initTree(); 
+						treeObj3.expandAll();
+
+						treeObj4 = new JSDragDropTree();
+						treeObj4.setTreeId('page_chooser4');
+						treeObj4.initTree(); 
+						treeObj4.expandAll();
 
 //						treeObj3 = new JSDragDropTree();
 //						treeObj3.setTreeId('dhtmlgoodies_tree3');

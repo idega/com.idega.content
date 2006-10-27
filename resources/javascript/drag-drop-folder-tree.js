@@ -371,7 +371,8 @@ thisTree = false;
 
 // 			alert('noRemoving = ' + JSTreeObj.dragNode_source.getAttribute('noRemoving'));
 //alert(tmpObj.dragNode_parent.getAttribute('div'));
-/*			if (JSTreeObj.dragNode_source.getAttribute('noRemoving'))
+/*
+ 			if (JSTreeObj.dragNode_source.getAttribute('noRemoving'))
 				alert('create');			
 			else 
 				alert('move');									
