@@ -87,6 +87,7 @@ images=Images
 initial_version=INITIAL VERSION.
 is=Icelandic
 iw.component.com.idega.content.presentation.ContentViewer.name=ContentViewer
+iw.component.com.idega.content.presentation.WhatIsNew.name=WhatIsNew
 keywords=Keywords
 language=Language
 last_modified=Last modified
