@@ -4,7 +4,7 @@
   <extend>${base.project.dir}/base-dependencies.xml</extend>
   <name>idegaWeb Content</name>
   <artifactId>com.idega.content</artifactId>
-  <currentVersion>3.1.9</currentVersion>
+  <currentVersion>3.1.10</currentVersion>
   <inceptionYear>2004</inceptionYear>
   <shortDescription>idegaWeb is the new ContentManagement System and Framework</shortDescription>
   <issueTrackingUrl>http://issues.idega.is</issueTrackingUrl>
