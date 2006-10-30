@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissions.java,v 1.10 2006/04/09 12:01:55 laddi Exp $
+ * $Id: WebDAVFilePermissions.java,v 1.10.2.1 2006/10/30 13:25:19 gimmi Exp $
  * Created on 29.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -19,10 +19,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/10/30 13:25:19 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.10.2.1 $
  */
 public class WebDAVFilePermissions extends ContentBlock {
 
@@ -46,6 +46,7 @@ public class WebDAVFilePermissions extends ContentBlock {
 		String resourcePath = getCurrentResourcePath();
 		if(resourcePath!=null){
 			WFUtil.invoke(BEANID_SHARED_MATRIX_BEAN, "setResourcePath", resourcePath);
+			setCurrentResourcePath(resourcePath);
 		} else {
 			System.err.println("[WARNING]["+getClass().getName()+"]: resource path is null");
 		}
