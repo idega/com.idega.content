@@ -42,6 +42,7 @@ public class ThemesLoader {
 		if (theme == null) {
 			theme = new Theme(String.valueOf(generator.nextInt(Integer.MAX_VALUE)));
 			theme.setNewTheme(newTheme);
+			theme.setLoading(true);
 		}
 	}
 	
@@ -51,6 +52,7 @@ public class ThemesLoader {
 		}
 		if (!helper.getThemesCollection().contains(theme)) {
 			helper.addTheme(theme);
+			theme.setLoading(false);
 		}
 		theme = null;
 	}

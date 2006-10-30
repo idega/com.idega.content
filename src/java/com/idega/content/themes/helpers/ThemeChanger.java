@@ -66,6 +66,8 @@ public class ThemeChanger {
 	private static final String TAG_ATTRIBUTE_VALUE_CSS = "text/css";
 	private static final String TAG_ATTRIBUTE_VALUE_SCREEN = "screen";
 	
+	private static final String COPY_AND_SPACE = "&copy;&nbsp;";
+	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
 	private XMLOutputter out = null;
@@ -473,7 +475,7 @@ public class ThemeChanger {
 					ThemesConstants.COMMENT_BEGIN +	ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
 			if (value.equals(FOOTER)) {
-				return region + "&copy;&nbsp;" + getBasicReplace(null, settings.getDefaultValue(), null) + ThemesConstants.COMMENT_BEGIN +
+				return region + COPY_AND_SPACE + getBasicReplace(null, settings.getDefaultValue(), null) + ThemesConstants.COMMENT_BEGIN +
 					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
 			region += settings.getDefaultValue();

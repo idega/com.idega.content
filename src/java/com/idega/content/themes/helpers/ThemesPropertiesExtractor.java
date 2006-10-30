@@ -1,7 +1,6 @@
 package com.idega.content.themes.helpers;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -22,13 +21,13 @@ public class ThemesPropertiesExtractor {
 //	private static final int SMALL_WIDTH = 115;
 //	private static final int SMALL_HEIGHT = 125;
 	
-	public synchronized void proceedFileExtractor(Theme theme) {
+	public synchronized boolean proceedFileExtractor(Theme theme) {
 		List files = helper.getFiles(theme.getLinkToBaseAsItIs());
+		if ((theme.isPropertiesExtracted() && !theme.isLoading()) || files == null) {
+			return true;
+		}
 		String webRoot = helper.getFullWebRoot();
 		String url = helper.getWebRootWithoutContent(webRoot);
-		if (theme.isPropertiesExtracted() || files == null) {
-			return;
-		}
 		String linkToProperties = null;
 		boolean foundedPropertiesFile = false;
 		for (int j = 0; (j < files.size() && !foundedPropertiesFile); j++) {
@@ -71,10 +70,8 @@ public class ThemesPropertiesExtractor {
 		}
 		
 		if (theme.getLinkToThemePreview() == null) { // Big preview
-			if (helper.getPreviewGenerator().generatePreview(webRoot + theme.getLinkToSkeleton(), theme.getName() +
-					ThemesConstants.THEME_PREVIEW, theme.getLinkToBaseAsItIs(), BIG_WIDTH, BIG_HEIGHT)) {
-				theme.setLinkToThemePreview(theme.getName() + ThemesConstants.THEME_PREVIEW + ThemesConstants.DOT +
-						helper.getPreviewGenerator().getFileType());
+			if (helper.getPreviewGenerator().generatePreview(webRoot + theme.getLinkToSkeleton(), theme.getName() + ThemesConstants.THEME_PREVIEW, theme.getLinkToBaseAsItIs(), BIG_WIDTH, BIG_HEIGHT)) {
+				theme.setLinkToThemePreview(theme.getName() + ThemesConstants.THEME_PREVIEW + ThemesConstants.DOT +	helper.getPreviewGenerator().getFileType());
 			}
 		}
 		
@@ -84,8 +81,8 @@ public class ThemesPropertiesExtractor {
 			theme.setName(helper.getFileName(theme.getLinkToSkeleton()));
 		}
 		theme.setNewTheme(false);
-		
-		theme.setPropertiesExtracted(true);	
+		theme.setPropertiesExtracted(true);
+		return true;
 	}
 	
 	private void extractConfiguration(Theme theme, String link) {
@@ -151,16 +148,16 @@ public class ThemesPropertiesExtractor {
 		}
 	}
 	
-	public synchronized void proceedFileExtractor() {
-		System.out.println("started file extractor: " + new Date());
+	public synchronized boolean proceedFileExtractor() {
+		boolean result = true;
 		List <Theme> themes = new ArrayList<Theme>(helper.getThemesCollection());
-		for (int i = 0; i < themes.size(); ) {
-			proceedFileExtractor(themes.get(i));
+		for (int i = 0; (i < themes.size() && result); i++) {
+			result = proceedFileExtractor(themes.get(i));
 		}
-		System.out.println("finished file extractor: " + new Date());
+		return result;
 	}
 	
-	public void extractProperties(Theme theme, String link) {
+	private void extractProperties(Theme theme, String link) {
 		Document doc = helper.getXMLDocument(link);
 		if (doc == null) {
 			return;
@@ -168,9 +165,10 @@ public class ThemesPropertiesExtractor {
 		Element base = doc.getRootElement().getChild(ThemesConstants.TAG_DICT);
 		theme.setName(getValueFromNextElement(ThemesConstants.RW_THEME_NAME, base));
 		
-		if (extractStyles(theme, ThemesConstants.RW_STYLE_VARIATIONS, base.getChildren())) {
+		/*if (extractStyles(theme, ThemesConstants.RW_STYLE_VARIATIONS, base.getChildren())) {
 			theme.setPropertiesExtracted(true);
-		}
+		}*/
+		extractStyles(theme, ThemesConstants.RW_STYLE_VARIATIONS, base.getChildren());
 	}
 	
 	private boolean extractStyles(Theme theme, String elementSearchKey, List elements) {

@@ -11,6 +11,7 @@ public class Theme {
 	private boolean propertiesExtracted;
 	private boolean locked;
 	private boolean newTheme;
+	private boolean loading;
 	
 	private String themeId;
 	private String linkToSkeleton;
@@ -170,6 +171,14 @@ public class Theme {
 
 	public void setLinkToDraftPreview(String linkToDraftPreview) {
 		this.linkToDraftPreview = linkToDraftPreview;
+	}
+
+	protected boolean isLoading() {
+		return loading;
+	}
+
+	protected void setLoading(boolean loading) {
+		this.loading = loading;
 	}
 	
 }
