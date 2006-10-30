@@ -33,6 +33,8 @@ public class WebDAVUploadBean implements Serializable, ActionListener{
 	private String downloadPath = null;
 	private String imagePath = null;
 	private String comment = null;
+	private Boolean uploadSuccessful = null;
+	private String uploadMessage = null;
 	
 	public UploadedFile getUploadFile() {
 		return this.uploadFile;
@@ -68,7 +70,7 @@ public class WebDAVUploadBean implements Serializable, ActionListener{
 	public void setUploadFilePath(String uploadFolderPath) {
 		this.uploadFilePath = uploadFolderPath;
 	}
-
+	
 	public String upload(ActionEvent event) throws IOException{
 		
 		if(this.uploadFile!=null){
@@ -146,8 +148,12 @@ public class WebDAVUploadBean implements Serializable, ActionListener{
 					rootResource.proppatchMethod(filePath+fileName,new PropertyName("DAV:","comment"),this.comment,true);
 					
 				}
+				uploadSuccessful = new Boolean(true);
+				uploadMessage = rootResource.getStatusMessage();
 			}
 			else{
+				uploadSuccessful = new Boolean(false);
+				uploadMessage = rootResource.getStatusMessage();
 				log.error("Error code :"+rootResource.getStatusMessage()+", message: "+rootResource.getStatusMessage());
 				return "upload_failed";
 			}
@@ -206,6 +212,22 @@ public class WebDAVUploadBean implements Serializable, ActionListener{
 
 	public void processAction(ActionEvent event) throws AbortProcessingException {
 		System.out.println("WebDAVUploadBean actionlistener event = "+event.toString());
+	}
+
+	public String getUploadMessage() {
+		return uploadMessage;
+	}
+
+	public void setUploadMessage(String uploadMessage) {
+		this.uploadMessage = uploadMessage;
+	}
+
+	public Boolean isUploadSuccessful() {
+		return uploadSuccessful;
+	}
+
+	public boolean wasUploadAttemped() {
+		return uploadSuccessful != null;
 	}
 	
 	

@@ -47,6 +47,8 @@ public class WebDAVUploadTag extends UIComponentTag {
 	
 	private boolean useUserHomeFolder;
 	
+	private boolean showStatusAfterUploadAttempt;
+	
 	public String getComponentType() {
 		return "WebDAVUpload";
 	}
@@ -223,6 +225,14 @@ public class WebDAVUploadTag extends UIComponentTag {
 	public boolean getUseUserHomeFolder() {
 		return useUserHomeFolder;
 	}
+
+	public boolean setShowStatusAfterUploadAttempt() {
+		return showStatusAfterUploadAttempt;
+	}
+
+	public void setShowStatusAfterUploadAttempt(boolean showStatusAfterUploadAttempt) {
+		this.showStatusAfterUploadAttempt = showStatusAfterUploadAttempt;
+	}
 	
 	public void release() {   
 		super.release();      
@@ -247,6 +257,7 @@ public class WebDAVUploadTag extends UIComponentTag {
 		this.uploadPath = null;
 		this.embedInForm = false;
 		this.useUserHomeFolder = false;
+		this.showStatusAfterUploadAttempt = false;
 	}
 
 	protected void setProperties(UIComponent component) {      
@@ -276,7 +287,9 @@ public class WebDAVUploadTag extends UIComponentTag {
 			upload.setUploadPath(uploadPath);
 			upload.setEmbeddedInForm(embedInForm);
 			upload.setUseUserHomeFolder(useUserHomeFolder);
+			upload.setShowStatusAfterUploadAttempt(showStatusAfterUploadAttempt);
 		}
 	}
+
 
 }

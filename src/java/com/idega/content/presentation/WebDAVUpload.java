@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.5.2.1 2006/10/24 10:26:23 gimmi Exp $
+ * $Id: WebDAVUpload.java,v 1.5.2.2 2006/10/30 16:40:55 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -33,10 +33,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/10/24 10:26:23 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/10/30 16:40:55 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.5.2.1 $
+ * @version $Revision: 1.5.2.2 $
  */
 public class WebDAVUpload extends ContentBlock {
 
@@ -104,9 +104,29 @@ public class WebDAVUpload extends ContentBlock {
 	
 	private HtmlForm form;
 
+	private boolean showStatusAfterUploadAttempt = false;
 	
 	protected void initializeComponent(FacesContext context) {
 		
+		WebDAVUploadBean bean = (WebDAVUploadBean) WFUtil.getBeanInstance(BEAN_ID);
+		WFContainerLines = new ArrayList();
+
+		if ( showStatusAfterUploadAttempt && bean.wasUploadAttemped()) {
+			String message = bean.getUploadMessage();
+			Boolean success = bean.isUploadSuccessful();
+
+			HtmlOutputText status = null;
+			if (success.booleanValue()) {
+				status = getText("file_uploaded_successfully", getStyleClassGiveName());
+			} else {
+				status = getText("file_upload_failed", getStyleClassGiveName());
+			}
+			status.setId(getId()+"_status");
+			status.setTitle(message);
+
+			addLineToContainer(new Object[] {status}, getStyleClassWFContainerLine(), "status");
+		}
+				
 		HtmlOutputText selectFile = getText("select_a_file_to_upload", getStyleClassSelectFile());
 		selectFile.setId(getId()+"_sel");
 		
@@ -153,7 +173,6 @@ public class WebDAVUpload extends ContentBlock {
 		}
 		if (this.useUserHomeFolder) {
 			try {
-				WebDAVUploadBean bean = (WebDAVUploadBean) WFUtil.getBeanInstance(BEAN_ID);
 				String homeFolder = getIWSlideSession().getUserHomeFolder();
 				bean.setUploadFilePath(homeFolder);
 			} catch (RemoteException e) {
@@ -161,7 +180,6 @@ public class WebDAVUpload extends ContentBlock {
 			}
 
 		} else if (this.uploadPath != null) {
-			WebDAVUploadBean bean = (WebDAVUploadBean) WFUtil.getBeanInstance(BEAN_ID);
 			bean.setUploadFilePath(this.uploadPath);
 		}
 		
@@ -190,8 +208,6 @@ public class WebDAVUpload extends ContentBlock {
 			upload.setOnclick(onClickAction);
 		}
 		getBundle().getLocalizedUIComponent("upload", upload);
-		
-		WFContainerLines = new ArrayList();
 		
 		addLineToContainer(new Object[] {selectFile, fileUpload}, getStyleClassWFContainerLine(), "upload_file");
 		
@@ -226,7 +242,7 @@ public class WebDAVUpload extends ContentBlock {
 		}
 
 		addLines();
-		
+
 		
 //		Saving the state of the webuploadbean specially because the scope
 		//of this bean now is 'request' not 'session'
@@ -464,15 +480,24 @@ public class WebDAVUpload extends ContentBlock {
 		this.useUserHomeFolder = useUserHomeFolder;
 	}
 	
-	
 	public boolean getUseUserHomeFolder() {
 		return useUserHomeFolder;
 	}
+
+	public boolean getShowStatusAfterUploadAttempt() {
+		return showStatusAfterUploadAttempt;
+	}
+
+	public void setShowStatusAfterUploadAttempt(boolean showStatusAfterUploadAttempt) {
+		this.showStatusAfterUploadAttempt = showStatusAfterUploadAttempt;
+	}
+	
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[3];
+		Object values[] = new Object[4];
 		values[0] = super.saveState(ctx);
 		values[1] = new Boolean(useUserHomeFolder);
 		values[2] = new Boolean(embedInForm);
+		values[3] = new Boolean(showStatusAfterUploadAttempt);
 		return values;
 	}
 
@@ -481,5 +506,8 @@ public class WebDAVUpload extends ContentBlock {
 		super.restoreState(ctx, values[0]);
 		this.useUserHomeFolder = ((Boolean) values[1]).booleanValue();
 		this.embedInForm = ((Boolean) values[2]).booleanValue();
+		showStatusAfterUploadAttempt = ((Boolean) values[3]).booleanValue();
 	}
+
+
 }
