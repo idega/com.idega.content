@@ -34,6 +34,8 @@ public class WebDAVUploadBean implements Serializable{
 	private String downloadPath = null;
 	private String imagePath = null;
 	private String comment = null;
+	private Boolean uploadSuccessful = null;
+	private String uploadMessage = null;
 	
 	public UploadedFile getUploadFile() {
 		return this.uploadFile;
@@ -147,8 +149,12 @@ public class WebDAVUploadBean implements Serializable{
 					rootResource.proppatchMethod(filePath+fileName,new PropertyName("DAV:","comment"),this.comment,true);
 					
 				}
+				uploadSuccessful = new Boolean(true);
+				uploadMessage = rootResource.getStatusMessage();
 			}
 			else{
+				uploadSuccessful = new Boolean(false);
+				uploadMessage = rootResource.getStatusMessage();
 				log.error("Error code :"+rootResource.getStatusMessage()+", message: "+rootResource.getStatusMessage());
 				return "upload_failed";
 			}
@@ -204,6 +210,24 @@ public class WebDAVUploadBean implements Serializable{
 	public void setImagePath(String imagePath) {
 		this.imagePath = imagePath;
 	}
+	
+	public String getUploadMessage() {
+		return uploadMessage;
+	}
+
+	public void setUploadMessage(String uploadMessage) {
+		this.uploadMessage = uploadMessage;
+	}
+
+	public Boolean isUploadSuccessful() {
+		return uploadSuccessful;
+	}
+
+	public boolean wasUploadAttemped() {
+		return uploadSuccessful != null;
+	}
+	
+	
 	
 	/**
 	 * Uploads zip file's contents to slide. Note: only *.zip file allowed!
