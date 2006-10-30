@@ -369,8 +369,12 @@ public class ThemesHelper implements Singleton {
 		return false;
 	}
 	
-	public Document getXMLDocument(String link) {
-		InputStream stream = getInputStream(link);
+	public Document getXMLDocument(String url) {
+		if (url == null) {
+			return null;
+		}
+			
+		InputStream stream = getInputStream(url);
 		if(stream == null){
 			return null;
 		}
@@ -546,9 +550,11 @@ public class ThemesHelper implements Singleton {
 	public String urlEncode(String url) {
 		String[] fileParts = url.split(ThemesConstants.SLASH);
 		StringBuffer encoded = new StringBuffer();
-		encoded.append(ThemesConstants.SLASH);
 		for (int i = 0; i < fileParts.length; i++) {
-			if (!fileParts[i].equals(ThemesConstants.EMPTY)) {
+			if (fileParts[i].equals(ThemesConstants.EMPTY)) {
+				encoded.append(ThemesConstants.SLASH);
+			}
+			else {
 				try {
 					encoded.append(URLEncoder.encode(fileParts[i], ThemesConstants.ENCODING));
 				} catch (UnsupportedEncodingException e) {

@@ -40,6 +40,9 @@ public class ThemesPropertiesExtractor {
 		}
 		
 		if (foundedPropertiesFile) { // Extraxting properties and preparing theme, style files for usage
+			if (linkToProperties.indexOf(ThemesConstants.SPACE) != -1) {
+				linkToProperties = helper.urlEncode(linkToProperties);
+			}
 			theme.setLinkToProperties(linkToProperties);
 			extractProperties(theme, url + linkToProperties);
 			if (theme.isNewTheme()) {
@@ -62,6 +65,9 @@ public class ThemesPropertiesExtractor {
 			}
 		}
 		if (linkToConfig != null) {
+			if (linkToConfig.indexOf(ThemesConstants.SPACE) != -1) {
+				linkToConfig = helper.urlEncode(linkToConfig);
+			}
 			extractConfiguration(theme, url + linkToConfig);
 		}
 		
@@ -165,9 +171,6 @@ public class ThemesPropertiesExtractor {
 		Element base = doc.getRootElement().getChild(ThemesConstants.TAG_DICT);
 		theme.setName(getValueFromNextElement(ThemesConstants.RW_THEME_NAME, base));
 		
-		/*if (extractStyles(theme, ThemesConstants.RW_STYLE_VARIATIONS, base.getChildren())) {
-			theme.setPropertiesExtracted(true);
-		}*/
 		extractStyles(theme, ThemesConstants.RW_STYLE_VARIATIONS, base.getChildren());
 	}
 	

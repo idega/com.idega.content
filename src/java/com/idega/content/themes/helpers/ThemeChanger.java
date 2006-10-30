@@ -87,7 +87,11 @@ public class ThemeChanger {
 			return true; // Theme allready prepared
 		}
 		
-		Document doc = helper.getXMLDocument(helper.getFullWebRoot() + theme.getLinkToSkeleton());
+		String skeleton = theme.getLinkToSkeleton();
+		if (skeleton.indexOf(ThemesConstants.SPACE) != -1) {
+			skeleton = helper.urlEncode(skeleton);
+		}
+		Document doc = helper.getXMLDocument(helper.getFullWebRoot() + skeleton);
 		if (doc == null) {
 			return false;
 		}
@@ -555,6 +559,9 @@ public class ThemeChanger {
 			linkToDoc = theme.getLinkToSkeleton();
 		}
 		
+		if (linkToDoc.indexOf(ThemesConstants.SPACE) != -1) {
+			linkToDoc = helper.urlEncode(linkToDoc);
+		}
 		Document doc = helper.getXMLDocument(helper.getFullWebRoot() + linkToDoc);
 		if (doc == null) {
 			return null;
