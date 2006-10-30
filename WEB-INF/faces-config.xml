@@ -256,6 +256,12 @@
 			<property-name>useUserHomeFolder</property-name>
 			<property-class>boolean</property-class>
 		</property>
+		<property>
+			<display-name>Show status after a upload attampt</display-name>
+			<property-name>showStatusAfterUploadAttempt</property-name>
+			<property-class>boolean</property-class>
+		</property>
+
 		<component-extension>
 			<idegaweb-info>
 				<builder-visible>true</builder-visible>
