@@ -71,7 +71,7 @@ public class ThemesPropertiesExtractor {
 			extractConfiguration(theme, url + linkToConfig);
 		}
 		
-		if (theme.getLinkToThemePreview() == null) {
+		if (theme.getLinkToThemePreview() == null || theme.getLinkToSmallPreview() == null) {
 			searchForPreviews(theme, files);
 		}
 		
@@ -81,7 +81,9 @@ public class ThemesPropertiesExtractor {
 			}
 		}
 		
-		// TODO: small preview = big preview's thumbnail
+		if (theme.getLinkToSmallPreview() == null) {
+			helper.createSmallImage(theme, theme.getLinkToThemePreview());
+		}
 		
 		if (theme.getName() == null) {
 			theme.setName(helper.getFileName(theme.getLinkToSkeleton()));
@@ -112,6 +114,9 @@ public class ThemesPropertiesExtractor {
 		
 		Element preview = root.getChild(ThemesConstants.CON_PREVIEW);
 		theme.setLinkToThemePreview(preview.getTextNormalize());
+		
+		Element smallPreview = root.getChild(ThemesConstants.CON_SMALL_PREVIEW);
+		theme.setLinkToSmallPreview(smallPreview.getTextNormalize());
 	}
 	
 	private void setEnabledStyles(Theme theme, Element style) {
@@ -145,11 +150,17 @@ public class ThemesPropertiesExtractor {
 			return;
 		}
 		String uri = null;
-		for (int i = 0; i < files.size(); i++) {
+		boolean foundBig = false;
+		boolean foundSmall = false;
+		for (int i = 0; (i < files.size() && !foundBig && !foundSmall); i++) {
 			uri = files.get(i).toString();
 			if ((theme.getName() + ThemesConstants.THEME_PREVIEW).equals(helper.getFileName(uri))) {
 				theme.setLinkToThemePreview(helper.getFileNameWithExtension(uri));
-				return;
+			}
+			else {
+				if ((theme.getName() + ThemesConstants.THEME_SMALL_PREVIEW).equals(helper.getFileName(uri))) {
+					theme.setLinkToSmallPreview(helper.getFileNameWithExtension(uri));
+				}
 			}
 		}
 	}

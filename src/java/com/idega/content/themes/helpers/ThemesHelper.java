@@ -1,5 +1,10 @@
 package com.idega.content.themes.helpers;
 
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,6 +21,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.httpclient.HttpURL;
 import org.apache.commons.httpclient.URIException;
@@ -606,6 +613,52 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		return encoded.toString();
+	}
+	
+	private InputStream getScaledImage(int width, int height, URL originalImage, String fileType) {
+		BufferedImage original = null;
+		try {
+			original = ImageIO.read(originalImage);
+		} catch (IOException e) {
+			log.trace(e);
+			return null;
+		}
+		BufferedImage scaled = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = scaled.createGraphics();
+		AffineTransform at = AffineTransform.getScaleInstance(width, height);
+		g.drawRenderedImage(original, at);
+		ByteArrayOutputStream baos = new  ByteArrayOutputStream();
+		try {
+			ImageIO.write(scaled, fileType, baos);
+		} catch (IOException e) {
+			log.trace(e);
+			return null;
+		}
+		InputStream is = new ByteArrayInputStream(baos.toByteArray());
+		return is;
+	}
+	
+	public boolean createSmallImage(Theme theme, String linkToOriginal) {
+		String fileExtension = getFileExtension(linkToOriginal);
+		URL url = getUrl(getFullWebRoot() + theme.getLinkToBase() + encode(linkToOriginal, true));
+		if (url == null) {
+			return false;
+		}
+		InputStream is = getScaledImage(ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT, url, fileExtension);
+		if (is == null) {
+			return false;
+		}
+		try {
+			if (getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), theme.getName() + ThemesConstants.THEME_SMALL_PREVIEW + ThemesConstants.DOT + fileExtension, is, null, true)) {
+				theme.setLinkToSmallPreview(theme.getName() + ThemesConstants.THEME_SMALL_PREVIEW + ThemesConstants.DOT + fileExtension);
+			}
+		} catch (RemoteException e) {
+			log.error(e);
+			return false;
+		} finally {
+			closeInputStream(is);
+		}
+		return true;
 	}
 
 //	protected String getContainerReplace() {

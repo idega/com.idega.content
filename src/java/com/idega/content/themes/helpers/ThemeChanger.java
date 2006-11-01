@@ -608,9 +608,15 @@ public class ThemeChanger {
 
 		String uploadDir = helper.getFullWebRoot() + theme.getLinkToDraft();
 		String fileName = theme.getName() +	ThemesConstants.DRAFT_PREVIEW;
-		if (helper.getPreviewGenerator().generatePreview(uploadDir, fileName, theme.getLinkToBaseAsItIs(), 800, 600)) {
-			addThemeChange(theme, styleChanger, limitedSelection);
-			theme.setLinkToDraftPreview(fileName + ThemesConstants.DOT + helper.getPreviewGenerator().getFileType());
+		boolean result = helper.getPreviewGenerator().generatePreview(uploadDir, fileName, theme.getLinkToBaseAsItIs(), 800, 600);
+		if (!result) {
+			return null;
+		}
+		addThemeChange(theme, styleChanger, limitedSelection);
+		theme.setLinkToDraftPreview(fileName + ThemesConstants.DOT + helper.getPreviewGenerator().getFileType());
+		result = helper.createSmallImage(theme, theme.getLinkToDraftPreview());
+		
+		if (result) {
 			return themeID;
 		}
 		return null;
@@ -923,6 +929,9 @@ public class ThemeChanger {
 		} finally {
 			helper.closeInputStream(is);
 		}
+		if (!helper.createSmallImage(child, child.getLinkToThemePreview())) {
+			return false;
+		}
 		
 		child.setPropertiesExtracted(true);
 		
@@ -931,8 +940,12 @@ public class ThemeChanger {
 		return createThemeConfig(child);
 	}
 	
+	/**
+	 * Copies parent theme's style groups and variations to child theme
+	 * @param parent
+	 * @param child
+	 */
 	private void copyTheme(Theme parent, Theme child) {
-		// Copying style groups and variations
 		List <String> groupNames = parent.getStyleGroupsNames();
 		ThemeStyleGroupMember member = null;
 		ThemeStyleGroupMember parentMember = null;
@@ -993,6 +1006,10 @@ public class ThemeChanger {
 		Element preview = new Element(ThemesConstants.CON_PREVIEW);
 		preview.setText(theme.getLinkToThemePreview());
 		rootElements.add(preview);
+		
+		Element smallPreview = new Element(ThemesConstants.CON_SMALL_PREVIEW);
+		smallPreview.setText(theme.getLinkToSmallPreview());
+		rootElements.add(smallPreview);
 		
 		root.setContent(rootElements);
 		doc.setRootElement(root);

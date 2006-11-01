@@ -26,8 +26,8 @@ public class ThemesConstants {
 	public static final String ENCODING = "UTF-8";
 	
 	protected static final String THEME_PREVIEW = "_theme_preview";
+	protected static final String THEME_SMALL_PREVIEW = "_small" + THEME_PREVIEW;
 	protected static final String DRAFT_PREVIEW = "_draft_preview";
-	protected static final String SMALL_PREVIEW_IMAGE = "small_theme_preview";
 	
 	protected static final String THEME_SEARCH_KEY = "*.htm*";
 	
@@ -98,10 +98,14 @@ public class ThemesConstants {
 	protected static final String CON_GROUP = "group";
 	protected static final String CON_VARIATION = "variation";
 	protected static final String CON_PREVIEW = "preview";
+	protected static final String CON_SMALL_PREVIEW = "small-preview";
 	
 	private static final String[] _DEFAULT_STYLE_FILES = new String[] {"styles.css", "handheld.css", "print.css"};
 	protected static final List <String> DEFAULT_STYLE_FILES = Collections.unmodifiableList(Arrays.asList(_DEFAULT_STYLE_FILES));
 	
 	protected static final String REGION_SYNTAX = "/idegaweb/bundles/com.idega.content.bundle/resources/themes/region.xml";
+	
+	protected static final short SMALL_PREVIEW_WIDTH = 120;
+	protected static final short SMALL_PREVIEW_HEIGHT = 140;
 	
 }

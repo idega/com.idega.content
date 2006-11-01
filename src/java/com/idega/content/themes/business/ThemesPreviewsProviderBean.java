@@ -50,6 +50,9 @@ public class ThemesPreviewsProviderBean extends IBOServiceBean implements Themes
 				}
 				info.append(ThemesConstants.AT);
 				info.append(webRoot + theme.getLinkToBase());
+				info.append(helper.encode(theme.getLinkToSmallPreview(), true));
+				info.append(ThemesConstants.AT);
+				info.append(webRoot + theme.getLinkToBase());
 				if (theme.getLinkToDraftPreview() != null) {
 					info.append(helper.encode(theme.getLinkToDraftPreview(), true));
 				}

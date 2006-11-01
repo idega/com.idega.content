@@ -169,7 +169,7 @@ function getThemesCallback(themes) {
 	var info = themes.split(";");
 	for (var i = 0; i < info.length; i++) {
 		var themeFields = info[i].split("@");
-		var theme = new Theme(themeFields[0], themeFields[1] + "?" + new Date().getTime(), themeFields[2]);
+		var theme = new Theme(themeFields[0], themeFields[1] + "?" + new Date().getTime(), themeFields[2] + "?" + new Date().getTime(), themeFields[3]);
 		var div = document.createElement("div");
 		div.className = "imageGallery";
 		
@@ -219,9 +219,10 @@ function getThemesCallback(themes) {
 	closeLoadingMessage();
 }
 
-function Theme(themeName, url, id) {
+function Theme(themeName, url, urlToBig, id) {
 	this.themeName = themeName;
 	this.url = url;
+	this.urlToBig = urlToBig;
 	this.id = id;
 	this.applyStyle = false;
 }
@@ -247,7 +248,7 @@ function getTheme(themeID) {
 function setThemeForPreview(themeID) {
 	var theme = getTheme(themeID);
 	if (theme != null) {
-		setPreview(theme.url);
+		setPreview(theme.urlToBig);
 		setThemeName(theme.themeName);
 	}
 }
@@ -380,4 +381,12 @@ function insertStyle(themeID, page) {
 
 function setSelectedStyleCallback(result) {
 
+}
+
+function insertStyleFile() {
+	var style=document.createElement("link");
+	style.setAttribute("type","text/css");
+	style.setAttribute("href", "/idegaweb/bundles/com.idega.content.bundle/resources/style/themes_manager.css");
+	style.setAttribute("rel","stylesheet");
+	document.getElementsByTagName("head")[0].appendChild(style); 
 }
