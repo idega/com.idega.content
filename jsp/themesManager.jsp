@@ -10,34 +10,50 @@
 version="1.2">
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 <jsf:view>
-        <ws:page id="themeManager" javascripturls="/dwr/engine.js,/dwr/interface/ThemesPreviewsProvider.js,/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js">
+        <ws:page id="themeManager" javascripturls="/dwr/engine.js,
+        				/dwr/interface/ThemesPreviewsProvider.js,
+        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous-js-1.6.2/lib/prototype.js,
+        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous-js-1.6.2/src/scriptaculous.js,
+        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
+						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/reflection.js">
                 <h:form id="uploadForm" enctype="multipart/form-data" onsubmit="showLoadingMessage('Uploading theme...');">
-                	<x:div id="themesContainer" forceId="true" styleClass="themesContainer">
-						<wf:wfblock id="themeManagerBlock" title="#{localizedStrings['com.idega.content']['themes_manager']}" >
-							<wf:container id="themesGallery"> <!-- This container will be replaced with new image slider -->
-								<a:ajax name="ibrowser" template="themesPreview" style="themesPreview" script="themesPreview" args="{type: 'ibrowser'}"/>
-							</wf:container>
+                	<jsf:verbatim>
+                		<script type="text/javascript">getThemes(null);</script>
+                	</jsf:verbatim>
+					<wf:wfblock id="themeManagerBlock" title="#{localizedStrings['com.idega.content']['themes_manager']}" >
+						<x:div>
+							<x:graphicImage id="themePreview" forceId="true" styleClass="bigThemePreview" url="noImage.png"></x:graphicImage>
+						</x:div>
+						
+						<x:div styleClass="theme_slider">
+							<x:div id="leftScrollerContainer" forceId="true" styleClass="leftThemeScroller">	
+								<x:graphicImage url="/idegaweb/bundles/com.idega.content.bundle/resources/images/left.gif" onclick="scroll(this.id)" id="leftScroller" forceId="true"></x:graphicImage>
+							</x:div>	
 							
-							<x:div styleClass="theme_container">
-								<x:div styleClass="variationsAndSaveBox">
-									<wf:wfblock title="#{localizedStrings['com.idega.content']['theme_variations']}">
-										<x:div id="themeStyleVariations" forceId="true" styleClass="variationsBox"></x:div>
-										
-										<x:div styleClass="wf_webdav_upload"> <!-- Theme name input and save button -->
-											<h:outputText value="#{localizedStrings['com.idega.content']['theme_name']}"></h:outputText>
-											<x:inputText id="theme_name" onblur="enableButton(this.id)" forceId="true"></x:inputText>
-											<x:commandButton id="themeSaveButton" type="button" forceId="true" onclick="saveTheme()" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
-										</x:div>
-									</wf:wfblock>
-								</x:div>
-								
-								<x:div id="themeUploadContainer" forceId="true" styleClass="themeUploadBox">
-									<c:ThemesManager id="uploadBlock"></c:ThemesManager> <!-- Style classes are set in tag -->
-								</x:div>
+							<x:div styleClass="themesTicker">
+								<x:div id="themes" forceId="true" styleClass="multiImageGallery"></x:div>
 							</x:div>
 							
-                		</wf:wfblock>
-                	</x:div>
+							<x:div id="rightScrollerContainer" forceId="true" styleClass="rightThemeScroller">
+								<x:graphicImage url="/idegaweb/bundles/com.idega.content.bundle/resources/images/right.gif" onclick="scroll(this.id)" id="rightScroller" forceId="true"></x:graphicImage>
+							</x:div>
+						</x:div>
+						
+						<x:div styleClass="theme_container">
+							<wf:wfblock title="#{localizedStrings['com.idega.content']['theme_variations']}">
+								<x:div id="themeStyleVariations" forceId="true"></x:div>
+								
+								<x:div>
+									<x:div id="themeSaveArea" forceId="true" styleClass="wf_webdav_upload">
+										<h:outputText value="#{localizedStrings['com.idega.content']['theme_name']}"></h:outputText>
+										<x:inputText id="theme_name" onblur="enableButton(this.id)" forceId="true"></x:inputText>
+										<x:commandButton id="themeSaveButton" type="button" forceId="true" onclick="saveTheme()" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
+									</x:div>
+								</x:div>
+							</wf:wfblock>
+							<c:ThemesManager id="uploadBlock"></c:ThemesManager>
+						</x:div>
+                	</wf:wfblock>
                 </h:form>
         </ws:page>
 </jsf:view>

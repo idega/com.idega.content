@@ -24,4 +24,9 @@ public interface ThemesPreviewsProvider extends IBOService {
 	 * @see com.idega.content.themes.business.ThemesPreviewsProviderBean#saveTheme
 	 */
 	public boolean saveTheme(String themeID, String themeName) throws RemoteException;
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesPreviewsProviderBean#setSelectedStyle
+	 */
+	public String setSelectedStyle(String themeID, boolean applyToPage) throws RemoteException;
 }

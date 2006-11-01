@@ -333,9 +333,129 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 }
 
 .theme_container {
-	display:inline;
+	display: inline;
 	position: absolute;
 	float: right;
 	top: 22px;
 	right: 1px;
+}
+
+.theme_slider {
+}
+
+.leftThemeScroller {
+	position: absolute;
+	cursor: pointer;
+}
+
+.rightThemeScroller{
+	position: absolute;
+	cursor: pointer;
+	left: 568px;
+}
+
+.themes_gallery {
+}
+
+.theme_image {
+}
+
+.themeName {
+	text-align: center;
+	color: #FFFFFF;
+	clear: left;
+}
+
+.themesTicker {
+	position: absolute;
+	left: 35px;
+	width: 528px;
+	height: 190px;
+	overflow: hidden;
+}
+
+.themesTicker .multiImageGallery{
+	position: relative;
+}
+
+.themesTicker .multiImageGallery .imageGallery{
+	background-color: #000000;
+	cursor: pointer;
+	float: left;
+}
+
+.imageGallery{
+}
+
+.multiImageGallery{
+}
+
+.galleryImage{
+	float: left;
+	border-width: 2px;
+	border-style: solid;
+    border-color: white;
+}
+
+.galleryImage .firstInRow{
+	clear: left;
+}
+
+.galleryImage .lastInRow{
+	clear: right;
+}
+
+.bigThemePreview {
+	width: 70%;
+}
+
+.themeChooseStyle {
+    width: 122px;
+    height: 142px;
+    		
+	visibility: hidden;
+	
+	background-color: #D3D3D3;
+	opacity: 0.7;
+}
+
+.themeChooseStyleText {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 9pt;
+    font-weight: bold;
+    text-align: center;
+}
+
+/*from Eiki*/
+.ws_body{
+	overflow: auto;
+}
+
+.ws_functionmenu{
+	width: 145px !important;
+}
+
+.ws_main{
+	position: absolute;
+	left: -55px !important;
+	width: 850px;
+}
+
+
+.theme_container .variationsAndSaveBox .wf_blockmainarea{
+	height: 316px;
+	overflow: auto;
+}
+
+.wf_webdav_upload{
+	width: 192px !important;
+}
+
+.wf_webdav_upload .wf_inputtext{
+	margin-bottom: 8px !important;
+	display: block;
+}
+
+.wf_webdav_upload .wf_webdav_upload_button{
+	margin-top: 4px !important;
 }

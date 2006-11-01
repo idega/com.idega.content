@@ -77,5 +77,14 @@ public class ThemesPreviewsProviderBean extends IBOServiceBean implements Themes
 	public boolean saveTheme(String themeID, String themeName) {
 		return helper.getThemeChanger().saveTheme(themeID, themeName);
 	}
+	
+	public String setSelectedStyle(String themeID, boolean applyToPage) {
+		if (applyToPage) {
+			return "page";
+		}
+		else {
+			return "site";
+		}
+	}
 
 }
