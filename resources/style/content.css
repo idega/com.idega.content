@@ -425,37 +425,3 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
     font-weight: bold;
     text-align: center;
 }
-
-/*from Eiki*/
-.ws_body{
-	overflow: auto;
-}
-
-.ws_functionmenu{
-	width: 145px !important;
-}
-
-.ws_main{
-	position: absolute;
-	left: -55px !important;
-	width: 850px;
-}
-
-
-.theme_container .variationsAndSaveBox .wf_blockmainarea{
-	height: 316px;
-	overflow: auto;
-}
-
-.wf_webdav_upload{
-	width: 192px !important;
-}
-
-.wf_webdav_upload .wf_inputtext{
-	margin-bottom: 8px !important;
-	display: block;
-}
-
-.wf_webdav_upload .wf_webdav_upload_button{
-	margin-top: 4px !important;
-}
