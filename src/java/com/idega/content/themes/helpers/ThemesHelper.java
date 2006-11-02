@@ -1,13 +1,9 @@
 package com.idega.content.themes.helpers;
 
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -22,8 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
-
 import org.apache.commons.httpclient.HttpURL;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.logging.Log;
@@ -33,6 +27,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
+import com.idega.block.image.business.ImageEncoder;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentSearch;
@@ -40,6 +35,9 @@ import com.idega.core.search.business.SearchResult;
 import com.idega.graphics.PreviewGenerator;
 import com.idega.graphics.WebPagePreviewGenerator;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.io.MemoryFileBuffer;
+import com.idega.io.MemoryInputStream;
+import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
 import com.idega.repository.data.Singleton;
 import com.idega.slide.business.IWSlideService;
@@ -61,6 +59,7 @@ public class ThemesHelper implements Singleton {
 	private List <String> urisToThemes = null;
 	
 	private IWSlideService service;
+	private ImageEncoder encoder = null;
 	private boolean checkedFromSlide;
 	private boolean loadedThemeSettings;
 	
@@ -141,6 +140,19 @@ public class ThemesHelper implements Singleton {
 	/**
 	 * Returns instance of IWSlideService
 	 */
+	public ImageEncoder getImageEncoder() {
+		if (encoder == null) {
+			synchronized (ThemesHelper.class) {
+				try {
+					encoder = (ImageEncoder) IBOLookup.getServiceInstance(IWContext.getInstance(), ImageEncoder.class);
+				} catch (IBOLookupException e) {
+					log.error(e);
+				}
+			}
+		}
+		return encoder;
+	}
+	
 	public IWSlideService getSlideService() {
 		if (service == null) {
 			synchronized (ThemesHelper.class) {
@@ -526,6 +538,16 @@ public class ThemesHelper implements Singleton {
 		return true;
 	}
 	
+	public boolean closeOutputStream(OutputStream os) {
+		try {
+			os.close();
+		} catch (IOException e) {
+			log.error(e);
+			return false;
+		}
+		return true;
+	}
+	
 	public URL getUrl(String link) {
 		URL url = null;
 		try {
@@ -615,48 +637,52 @@ public class ThemesHelper implements Singleton {
 		return encoded.toString();
 	}
 	
-	private InputStream getScaledImage(int width, int height, URL originalImage, String fileType) {
-		BufferedImage original = null;
-		try {
-			original = ImageIO.read(originalImage);
-		} catch (IOException e) {
-			log.trace(e);
-			return null;
+	protected boolean processThemeImages(Theme theme, boolean useDraftPreview) {
+		String encodedUriToImage = null;
+		String uriToImage = null;
+		if (useDraftPreview) {
+			uriToImage = theme.getLinkToDraftPreview();
+			encodedUriToImage = encode(theme.getLinkToDraftPreview(), true);
 		}
-		BufferedImage scaled = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = scaled.createGraphics();
-		AffineTransform at = AffineTransform.getScaleInstance(width, height);
-		g.drawRenderedImage(original, at);
-		ByteArrayOutputStream baos = new  ByteArrayOutputStream();
-		try {
-			ImageIO.write(scaled, fileType, baos);
-		} catch (IOException e) {
-			log.trace(e);
-			return null;
+		else {
+			uriToImage = theme.getLinkToThemePreview();
+			encodedUriToImage = encode(theme.getLinkToThemePreview(), true);
 		}
-		InputStream is = new ByteArrayInputStream(baos.toByteArray());
-		return is;
+		String extension = helper.getFileExtension(uriToImage).toLowerCase();
+		String mimeType = ThemesConstants.DEFAULT_MIME_TYPE + extension;
+		
+		// Encoding original image
+		InputStream input = getInputStream(getFullWebRoot() + theme.getLinkToBase() + encodedUriToImage);
+		encodeAndUploadImage(theme.getLinkToBaseAsItIs(), uriToImage, mimeType, input, ThemesConstants.REDUCED_PREVIEW_WIDTH, ThemesConstants.REDUCED_PREVIEW_HEIGHT);
+		closeInputStream(input);
+		
+		// Reducing and encoding original image, saving as new image
+		input = getInputStream(getFullWebRoot() + theme.getLinkToBase() + encodedUriToImage);
+		String newName = theme.getName() + ThemesConstants.THEME_SMALL_PREVIEW + ThemesConstants.DOT + extension;
+		encodeAndUploadImage(theme.getLinkToBaseAsItIs(), newName, mimeType, input, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
+		theme.setLinkToSmallPreview(newName);
+		closeInputStream(input);
+		
+		return true;
 	}
 	
-	public boolean createSmallImage(Theme theme, String linkToOriginal) {
-		String fileExtension = getFileExtension(linkToOriginal);
-		URL url = getUrl(getFullWebRoot() + theme.getLinkToBase() + encode(linkToOriginal, true));
-		if (url == null) {
-			return false;
-		}
-		InputStream is = getScaledImage(ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT, url, fileExtension);
-		if (is == null) {
-			return false;
-		}
+	protected boolean encodeAndUploadImage(String imageBase, String imageName, String mimeType, InputStream input, int width, int height) {
+		MemoryFileBuffer buff = new MemoryFileBuffer();
+		OutputStream output = new MemoryOutputStream(buff);
+		InputStream is = null;
 		try {
-			if (getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), theme.getName() + ThemesConstants.THEME_SMALL_PREVIEW + ThemesConstants.DOT + fileExtension, is, null, true)) {
-				theme.setLinkToSmallPreview(theme.getName() + ThemesConstants.THEME_SMALL_PREVIEW + ThemesConstants.DOT + fileExtension);
-			}
+			getImageEncoder().encode(mimeType, input, output, width, height);
+			is = new MemoryInputStream(buff);
+			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(imageBase, imageName, is, mimeType, true);
 		} catch (RemoteException e) {
 			log.error(e);
 			return false;
+		} catch (IOException e) {
+			log.error(e);
+			return false;
 		} finally {
-			closeInputStream(is);
+			helper.closeInputStream(is);
+			helper.closeOutputStream(output);
 		}
 		return true;
 	}

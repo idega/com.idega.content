@@ -13,13 +13,7 @@ public class ThemesPropertiesExtractor {
 	
 	private static final String LIMITED_SELECTION = "1";
 	
-	private static final int BIG_WIDTH = 800;
-	private static final int BIG_HEIGHT = 600;
-	
 	private static final String CSS_EXTENSION = ".css";
-	
-//	private static final int SMALL_WIDTH = 115;
-//	private static final int SMALL_HEIGHT = 125;
 	
 	public synchronized boolean proceedFileExtractor(Theme theme) {
 		List files = helper.getFiles(theme.getLinkToBaseAsItIs());
@@ -76,13 +70,13 @@ public class ThemesPropertiesExtractor {
 		}
 		
 		if (theme.getLinkToThemePreview() == null) { // Big preview
-			if (helper.getPreviewGenerator().generatePreview(webRoot + theme.getLinkToSkeleton(), theme.getName() + ThemesConstants.THEME_PREVIEW, theme.getLinkToBaseAsItIs(), BIG_WIDTH, BIG_HEIGHT)) {
+			if (helper.getPreviewGenerator().generatePreview(webRoot + theme.getLinkToSkeleton(), theme.getName() + ThemesConstants.THEME_PREVIEW, theme.getLinkToBaseAsItIs(), ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT)) {
 				theme.setLinkToThemePreview(theme.getName() + ThemesConstants.THEME_PREVIEW + ThemesConstants.DOT +	helper.getPreviewGenerator().getFileType());
 			}
 		}
 		
 		if (theme.getLinkToSmallPreview() == null) {
-			helper.createSmallImage(theme, theme.getLinkToThemePreview());
+			helper.processThemeImages(theme, false);
 		}
 		
 		if (theme.getName() == null) {

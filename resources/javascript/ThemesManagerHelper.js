@@ -191,12 +191,12 @@ function getThemesCallback(themes) {
 		image.className = "reflect rheight20 ropacity50";
    		if (typeof container.attachEvent != 'undefined') {
             image.attachEvent('onclick', function(e){getThemeStyleVariations(this.id);});
-            image.attachEvent('onmouseover', function(e){applyStyle(this.id);});
-            image.attachEvent('onmouseout', function(e){notApplyStyle(this.id);});
+            image.attachEvent('onmouseover', function(e){chooseStyle(this.id);});
+            image.attachEvent('onmouseout', function(e){recallStyle(this.id);});
         } else {
         	image.addEventListener('click', function(e){getThemeStyleVariations(this.id);}, true);
-        	image.addEventListener('mouseover', function(e){applyStyle(this.id);}, true);
-        	image.addEventListener('mouseout', function(e){notApplyStyle(this.id);}, true);
+        	image.addEventListener('mouseover', function(e){chooseStyle(this.id);}, true);
+        	image.addEventListener('mouseout', function(e){recallStyle(this.id);}, true);
         }
         div1.className = "galleryImage firstInRow";
         div1.appendChild(image);
@@ -229,9 +229,13 @@ function Theme(themeName, url, urlToBig, id) {
 
 function setPreview(url) {
 	var preview = document.getElementById("themePreview");
-	if (preview != null) {
-		preview.src = url;
+	if (preview == null) {
+		preview = document.createElement("img");
+		preview.setAttribute("id", "themePreview");
+		preview.className = "bigThemePreview";
+		document.getElementById("themePreviewContainer").appendChild(preview);
 	}
+	preview.src = url;
 }
 
 function getTheme(themeID) {
@@ -264,7 +268,7 @@ function getThemeIndex(themeID) {
 	return -1;
 }
 
-function applyStyle(themeID) {
+function chooseStyle(themeID) {
 	if (themeID == null) {
 		return;
 	}
@@ -275,7 +279,7 @@ function applyStyle(themeID) {
 	}
 }
 
-function notApplyStyle(themeID) {
+function recallStyle(themeID) {
 	if (themeID == null) {
 		return;
 	}
@@ -376,11 +380,12 @@ function insertStyle(themeID, page) {
 	if (themeID == null) {
 		return;
 	}
+	showLoadingMessage("Applying style...");
 	ThemesPreviewsProvider.setSelectedStyle(themeID, page, setSelectedStyleCallback);
 }
 
 function setSelectedStyleCallback(result) {
-
+	closeLoadingMessage();
 }
 
 function insertStyleFile() {

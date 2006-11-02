@@ -21,7 +21,7 @@ version="1.2">
                 		<script type="text/javascript">insertStyleFile();getThemes(null);</script>
                 	</jsf:verbatim>
 					<wf:wfblock id="themeManagerBlock" title="#{localizedStrings['com.idega.content']['themes_manager']}" >
-						<x:div>
+						<x:div id="themePreviewContainer" forceId="true">
 							<x:graphicImage id="themePreview" forceId="true" styleClass="bigThemePreview" url="noImage.png"></x:graphicImage>
 						</x:div>
 						

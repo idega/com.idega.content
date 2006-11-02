@@ -608,13 +608,13 @@ public class ThemeChanger {
 
 		String uploadDir = helper.getFullWebRoot() + theme.getLinkToDraft();
 		String fileName = theme.getName() +	ThemesConstants.DRAFT_PREVIEW;
-		boolean result = helper.getPreviewGenerator().generatePreview(uploadDir, fileName, theme.getLinkToBaseAsItIs(), 800, 600);
+		boolean result = helper.getPreviewGenerator().generatePreview(uploadDir, fileName, theme.getLinkToBaseAsItIs(), ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT);
 		if (!result) {
 			return null;
 		}
 		addThemeChange(theme, styleChanger, limitedSelection);
 		theme.setLinkToDraftPreview(fileName + ThemesConstants.DOT + helper.getPreviewGenerator().getFileType());
-		result = helper.createSmallImage(theme, theme.getLinkToDraftPreview());
+		helper.processThemeImages(theme, true);
 		
 		if (result) {
 			return themeID;
@@ -850,6 +850,12 @@ public class ThemeChanger {
 				member.setEnabled(!change.isEnabled());
 			}
 		}
+		InputStream is = helper.getInputStream(helper.getFullWebRoot() + theme.getLinkToBase() + helper.encode(theme.getLinkToThemePreview(), true));
+		String extension = helper.getFileExtension(theme.getLinkToThemePreview());
+		String fileName = theme.getName() + ThemesConstants.THEME_SMALL_PREVIEW + ThemesConstants.DOT + extension;
+		helper.encodeAndUploadImage(theme.getLinkToBaseAsItIs(), fileName, ThemesConstants.DEFAULT_MIME_TYPE + extension, is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
+		theme.setLinkToSmallPreview(fileName);
+		helper.closeInputStream(is);
 	}
 	
 	private void disableStyle(Theme theme, String styleGroupName) {
@@ -864,6 +870,7 @@ public class ThemeChanger {
 	}
 	
 	private boolean createNewTheme(Theme parent, String newName) {
+		// Copying Theme skeleton
 		String linkToTheme = parent.getLinkToDraft();
 		parent.setLinkToDraft(null);
 		if (linkToTheme == null) {
@@ -906,20 +913,23 @@ public class ThemeChanger {
 
 		copyTheme(parent, child);
 		
+		// Copying Theme preview image
 		String linkToPreview = parent.getLinkToDraftPreview();
 		parent.setLinkToDraftPreview(null);
 		if (linkToPreview == null) {
 			linkToPreview = parent.getLinkToThemePreview();
 		}
+		String endodedLinkToPreview = helper.encode(linkToPreview, true);
 		linkToBase = child.getLinkToBase();
 		if (!linkToBase.endsWith(ThemesConstants.SLASH)) {
 			linkToBase += ThemesConstants.SLASH;
 		}
-		is = helper.getInputStream(helper.getFullWebRoot() + linkToBase +  helper.encode(linkToPreview, true));
+		is = helper.getInputStream(helper.getFullWebRoot() + linkToBase + endodedLinkToPreview);
 		if (is == null) {
 			return false;
 		}
-		String fileName = child.getName() + ThemesConstants.THEME_PREVIEW + ThemesConstants.DOT + helper.getFileExtension(linkToPreview);
+		String extension = helper.getFileExtension(linkToPreview);
+		String fileName = child.getName() + ThemesConstants.THEME_PREVIEW + ThemesConstants.DOT + extension;
 		try {
 			if (helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(decodedLinkToBase, fileName, is, null, true)) {
 				child.setLinkToThemePreview(fileName);
@@ -929,14 +939,16 @@ public class ThemeChanger {
 		} finally {
 			helper.closeInputStream(is);
 		}
-		if (!helper.createSmallImage(child, child.getLinkToThemePreview())) {
-			return false;
-		}
+		
+		// Setting Theme small preview
+		is = helper.getInputStream(helper.getFullWebRoot() + linkToBase + endodedLinkToPreview);
+		fileName = child.getName() + ThemesConstants.THEME_SMALL_PREVIEW + ThemesConstants.DOT + extension;
+		helper.encodeAndUploadImage(decodedLinkToBase, fileName, ThemesConstants.DEFAULT_MIME_TYPE + extension, is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
+		child.setLinkToSmallPreview(fileName);
+		helper.closeInputStream(is);
 		
 		child.setPropertiesExtracted(true);
-		
 		restoreTheme(parent);
-		
 		return createThemeConfig(child);
 	}
 	
