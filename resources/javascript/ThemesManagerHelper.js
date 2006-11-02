@@ -8,6 +8,8 @@ var waitForStyle = 2500;
 
 var containerID = "themes";
 
+var enableStyleFunctions = true;
+
 function isCorrectFileType(id, fileType, noFileMsg, invalidFileTypeMsg) {
 	var input = document.getElementById(id);
 	if (input) {
@@ -191,12 +193,16 @@ function getThemesCallback(themes) {
 		image.className = "reflect rheight20 ropacity50";
    		if (typeof container.attachEvent != 'undefined') {
             image.attachEvent('onclick', function(e){getThemeStyleVariations(this.id);});
-            image.attachEvent('onmouseover', function(e){chooseStyle(this.id);});
-            image.attachEvent('onmouseout', function(e){recallStyle(this.id);});
+            if (enableStyleFunctions) {
+	            image.attachEvent('onmouseover', function(e){chooseStyle(this.id);});
+	            image.attachEvent('onmouseout', function(e){recallStyle(this.id);});
+            }
         } else {
         	image.addEventListener('click', function(e){getThemeStyleVariations(this.id);}, true);
-        	image.addEventListener('mouseover', function(e){chooseStyle(this.id);}, true);
-        	image.addEventListener('mouseout', function(e){recallStyle(this.id);}, true);
+        	if (enableStyleFunctions) {
+	        	image.addEventListener('mouseover', function(e){chooseStyle(this.id);}, true);
+	        	image.addEventListener('mouseout', function(e){recallStyle(this.id);}, true);
+        	}
         }
         div1.className = "galleryImage firstInRow";
         div1.appendChild(image);
@@ -336,8 +342,8 @@ function chooseOption(themeID) {
 		div.appendChild(divs);
 		document.body.appendChild(div);
 	}
+	new Effect.Move(div, {x: getAbsoluteLeft(themeID + "_container") + 2, y: getAbsoluteTop(themeID + "_container") - Math.round(imageHeight * 0.62), mode: 'absolute'});
 	div.style.visibility = "visible";
-	new Effect.Move (div, {x: getAbsoluteLeft(themeID + "_container") + 2, y: getAbsoluteTop(themeID + "_container") - Math.round(imageHeight * 0.62), mode: 'absolute'});
 }
 
 function getAbsoluteLeft(objectId) {
@@ -394,4 +400,8 @@ function insertStyleFile() {
 	style.setAttribute("href", "/idegaweb/bundles/com.idega.content.bundle/resources/style/themes_manager.css");
 	style.setAttribute("rel","stylesheet");
 	document.getElementsByTagName("head")[0].appendChild(style); 
+}
+
+function initScript(useStyling) {
+	enableStyleFunctions = useStyling;
 }
