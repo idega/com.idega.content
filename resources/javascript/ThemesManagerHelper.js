@@ -62,7 +62,10 @@ function changeTheme(themeID, styleGroupName, newStyleMember, type, checked) {
 	if (type == "checkbox") {
 		radio = false;
 	}
-	ThemesPreviewsProvider.changeTheme(themeID, styleGroupName, newStyleMember, document.getElementById("theme_name").value, radio, checked, changeThemeCallback);
+	var themeNameObj = document.getElementById("theme_name");
+	if (themeNameObj != null) {
+		ThemesPreviewsProvider.changeTheme(themeID, styleGroupName, newStyleMember, themeNameObj.value, radio, checked, changeThemeCallback);
+	}
 }
 
 function changeThemeCallback(themeID) {
@@ -80,7 +83,10 @@ function changeThemeCallback(themeID) {
 function saveTheme() {
 	if (globalThemeID != null) {
 		showLoadingMessage('Saving theme...');
-		ThemesPreviewsProvider.saveTheme(globalThemeID, document.getElementById('theme_name').value, saveThemeCallback);
+		var themeNameObj = document.getElementById("theme_name");
+		if (themeNameObj != null) {
+			ThemesPreviewsProvider.saveTheme(globalThemeID, themeNameObj.value, saveThemeCallback);
+		}
 	}
 }
 
@@ -105,7 +111,10 @@ function setGlobalId(themeId) {
 
 function setThemeName(themeName) {
 	removeStyleOptions();
-	document.getElementById('theme_name').value = themeName;
+	var themeNameObj = document.getElementById("theme_name");
+	if (themeNameObj != null) {
+		themeNameObj.value = themeName;
+	}
 }
 
 function scroll(id) {
@@ -190,7 +199,6 @@ function getThemesCallback(themes) {
    		image.setAttribute("width", imageWidth + "px");
    		image.setAttribute("height", imageHeight + "px");
    		image.setAttribute("title", theme.themeName);
-		image.className = "reflect rheight20 ropacity50";
    		if (typeof container.attachEvent != 'undefined') {
             image.attachEvent('onclick', function(e){getThemeStyleVariations(this.id);});
             if (enableStyleFunctions) {
@@ -204,6 +212,7 @@ function getThemesCallback(themes) {
 	        	image.addEventListener('mouseout', function(e){recallStyle(this.id);}, true);
         	}
         }
+        image.className = "reflect rheight20 ropacity50";
         div1.className = "galleryImage firstInRow";
         div1.appendChild(image);
         div.appendChild(div1);
