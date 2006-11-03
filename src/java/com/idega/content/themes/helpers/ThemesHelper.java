@@ -27,13 +27,13 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-import com.idega.block.image.business.ImageEncoder;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentSearch;
 import com.idega.core.search.business.SearchResult;
 import com.idega.graphics.PreviewGenerator;
 import com.idega.graphics.WebPagePreviewGenerator;
+import com.idega.graphics.image.business.ImageEncoder;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.io.MemoryFileBuffer;
 import com.idega.io.MemoryInputStream;
@@ -135,22 +135,6 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		return extractor;
-	}
-	
-	/**
-	 * Returns instance of IWSlideService
-	 */
-	public ImageEncoder getImageEncoder() {
-		if (encoder == null) {
-			synchronized (ThemesHelper.class) {
-				try {
-					encoder = (ImageEncoder) IBOLookup.getServiceInstance(IWContext.getInstance(), ImageEncoder.class);
-				} catch (IBOLookupException e) {
-					log.error(e);
-				}
-			}
-		}
-		return encoder;
 	}
 	
 	public IWSlideService getSlideService() {
@@ -666,7 +650,7 @@ public class ThemesHelper implements Singleton {
 		return true;
 	}
 	
-	protected boolean encodeAndUploadImage(String imageBase, String imageName, String mimeType, InputStream input, int width, int height) {
+	public boolean encodeAndUploadImage(String imageBase, String imageName, String mimeType, InputStream input, int width, int height) {
 		MemoryFileBuffer buff = new MemoryFileBuffer();
 		OutputStream output = new MemoryOutputStream(buff);
 		InputStream is = null;
@@ -681,10 +665,23 @@ public class ThemesHelper implements Singleton {
 			log.error(e);
 			return false;
 		} finally {
-			helper.closeInputStream(is);
-			helper.closeOutputStream(output);
+			closeInputStream(is);
+			closeOutputStream(output);
 		}
 		return true;
+	}
+	
+	public ImageEncoder getImageEncoder() {
+		if (encoder == null) {
+			synchronized (ThemesHelper.class) {
+				try {
+					encoder = (ImageEncoder) IBOLookup.getServiceInstance(IWContext.getInstance(), ImageEncoder.class);
+				} catch (IBOLookupException e) {
+					log.error(e);
+				}
+			}
+		}
+		return encoder;
 	}
 
 //	protected String getContainerReplace() {

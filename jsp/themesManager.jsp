@@ -9,7 +9,7 @@
         xmlns:x="http://myfaces.apache.org/tomahawk"
 version="1.2">
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
-<jsf:view>
+	<jsf:view>
         <ws:page id="themeManager" javascripturls="/dwr/engine.js,
         				/dwr/interface/ThemesPreviewsProvider.js,
         				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous-js-1.6.2/lib/prototype.js,
@@ -56,5 +56,5 @@ version="1.2">
                 	</wf:wfblock>
                 </h:form>
         </ws:page>
-</jsf:view>
+	</jsf:view>
 </jsp:root>
