@@ -75,10 +75,10 @@
       <artifactId>com.idega.graphics</artifactId>
       <version>3.5.0</version>
     </dependency>
-    <dependency>
+  	<dependency>
       <groupId>com.idega.block.platform</groupId>
-      <artifactId>com.idega.block.image</artifactId>
+      <artifactId>com.idega.builder</artifactId>
       <version>3.5.0</version>
-    </dependency>
+    </dependency>    
   </dependencies>
 </project>
