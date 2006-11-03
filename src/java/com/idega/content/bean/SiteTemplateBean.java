@@ -21,11 +21,14 @@ public class SiteTemplateBean {
 	
 	TreeNode siteTree = null;
 	TreeNode pageTree = null;
+	String path = null;
+	Document siteDocument = null;
 //	ICTreeNodeAddable iwnode = null;
 	
 	public TreeNode getSiteTree(){
 //	public IWTreeNode getSiteTree(){
 //		TreeNode result = getSiteStructure();
+//		System.out.println("SITE_LINK = "+ThemesHelper.getInstance().getWebRootWithoutContent());
 		return getSiteStructure();
 	}
 
@@ -90,4 +93,20 @@ public class SiteTemplateBean {
 		ICTreeNode icnode = rootNode;
 		return new WFTreeNode(icnode);
 		}
+
+	public String getPath() {
+		return ThemesHelper.getInstance().getWebRootWithoutContent() + "/idegaweb/bundles/com.idega.content.bundle/resources/templates/site-templates.xml";
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public Document getSiteDocument() {
+		return ThemesHelper.getInstance().getXMLDocument(SITE_LINK);
+	}
+
+	public void setSiteDocument(Document siteDocument) {
+		this.siteDocument = siteDocument;
+	}
 }

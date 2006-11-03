@@ -29,6 +29,7 @@
 	{
 		var thisTree = false;
 		var idOfTree;
+		
 		var imageFolder;
 		var folderImage;
 		var plusImage;
@@ -231,8 +232,6 @@
 		/* Initialize drag */ 
 		initDrag : function(e)
 		{
-			
-			
 			
 //alert('thisTree = true');			
 			if(document.all)e = event;
@@ -474,22 +473,22 @@ if(li.noRemoving)
 //			JSTreeObj.initTree();
 			
 			var parentDiv = JSTreeObj.dragNode_destination;
-/*
+//
 			while(true){
 				if (parentDiv.getElementsByTagName('DIV')){
 					if (parentDiv.getElementsByTagName('DIV')[0]){
 
 						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id)
-							alert('moving node');
+							alert('moving node node ID = '+JSTreeObj.dragNode_source.id+" newParent = "+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
 						else
-							alert('creating node');
+							alert('creating node newParent = '+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
 						break;	
 										
 					}
 					parentDiv = parentDiv.parentNode;
 				}
 			}			
-*/
+//
 		}
 		,
 		createDropIndicator : function()

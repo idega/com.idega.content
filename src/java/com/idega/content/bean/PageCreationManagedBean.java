@@ -1,5 +1,5 @@
 /*
- * $Id: PageCreationManagedBean.java,v 1.6 2006/05/31 11:12:23 laddi Exp $
+ * $Id: PageCreationManagedBean.java,v 1.7 2006/11/03 14:35:13 justinas Exp $
  * Created on 2.5.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -25,32 +25,51 @@ import javax.faces.model.SelectItem;
 import org.apache.myfaces.custom.tree2.TreeNode;
 import org.apache.myfaces.custom.tree2.TreeNodeBase;
 
+////import com.idega.builder.business.BuilderLogic;
+//import com.idega.builder.business.DomainTree;
+//import com.idega.builder.business.PageTreeNode;
+//import com.idega.builder.business.BuilderLogic;
+//import com.idega.builder.business.DomainTree;
 import com.idega.content.business.ContentUtil;
 import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
+import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.builder.data.ICPageHome;
 import com.idega.core.data.ICTreeNode;
+import com.idega.core.data.ICTreeNodeAddable;
+import com.idega.core.data.IWTreeNode;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
+import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.Page;
+import com.idega.presentation.text.Link;
+import com.idega.presentation.ui.TreeViewer;
 import com.idega.webface.WFTreeNode;
+
+//import com.idega.builder.business;
 
 
 /**
  * 
- *  Last modified: $Date: 2006/05/31 11:12:23 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/11/03 14:35:13 $ by $Author: justinas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class PageCreationManagedBean implements ActionListener {
 
 	private String SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED = "no_template_selected";
+	private final String LINK_STYLE = "font-family:Arial,Helvetica,sans-serif;font-size:8pt;color:#000000;text-decoration:none;";
+	private static String DOMAIN_TREE_KEY="ic_domain_tree_";
 	private int pageSelectorTopNode = -1;
+	
+	private int pageSelectorTopNodes = -1;	
+	
 	private String selectedPageLocationIdentifier = null;
 	private String selectedPageLocationName = "[Select page]";
 	private String pageName = "Untitled";
@@ -66,30 +85,97 @@ public class PageCreationManagedBean implements ActionListener {
 		super();
 	}
 	
+//	public TreeNode getPageSelectorTopNode(){
+//	public TreeNode getPageSelectorTopNodeOld(){
+//		try {
+//			IWContext iwc = IWContext.getInstance();
+//			BuilderService bservice = BuilderServiceFactory.getBuilderService(iwc);
+//			if (this.pageSelectorTopNode == -1) {
+//				this.pageSelectorTopNode = bservice.getRootPageId();
+//			}
+//			int currentUserId = -1;
+//			try {
+//				currentUserId = iwc.getCurrentUserId();
+//			} catch (NotLoggedOnException nle) {
+//			}
+//			ICTreeNode node = bservice.getPageTree(this.pageSelectorTopNode, currentUserId);
+//			return new WFTreeNode(node);
+//		}
+//		catch (UnavailableIWContext e) {
+//			e.printStackTrace();
+//		}
+//		catch (RemoteException e) {
+//			e.printStackTrace();
+//		}
+//				
+//		return new TreeNodeBase("type","description",true);
+//	}
+
+	
 	public TreeNode getPageSelectorTopNode(){
 		try {
-			IWContext iwc = IWContext.getInstance();
-			BuilderService bservice = BuilderServiceFactory.getBuilderService(iwc);
-			if (this.pageSelectorTopNode == -1) {
-				this.pageSelectorTopNode = bservice.getRootPageId();
-			}
-			int currentUserId = -1;
+			System.out.println("getPageSelectorTopNode");
+		IWContext iwc = IWContext.getInstance();
+		BuilderService bservice = BuilderServiceFactory.getBuilderService(iwc);
+		ICDomain domain = BuilderServiceFactory.getBuilderService(iwc).getCurrentDomain();
+
+		if (this.pageSelectorTopNode == -1) {
+			this.pageSelectorTopNode = bservice.getRootPageId();
+		}
+		int currentUserId = -1;
+		Collection coll = null;
+		coll = BuilderServiceFactory.getBuilderService(iwc).getTopLevelPages(iwc);
+//		coll = DomainTree.getDomainTree(iwc).getPagesNode().getChildren();//getStartPages(domain);
+		Iterator it = coll.iterator();
+		int id = domain.getStartPageID();
+		WFTreeNode node = new WFTreeNode();
+		
+		while (it.hasNext()) {
+			ICTreeNode startPage;
 			try {
-				currentUserId = iwc.getCurrentUserId();
-			} catch (NotLoggedOnException nle) {
+				startPage = (ICTreeNode)it.next();
+				System.out.println("id = "+ startPage.getId());			
+//				if(!startPage.getId().equals(Integer.toString(id))){
+//					if(node == null){
+//						node = (WFTreeNode)(bservice.getPageTree(bservice.getRootPageId(), currentUserId));
+//						int childCount = node.getChildCount();
+//						for (int i = 0; i < childCount; i++) {
+//							System.out.println("removing "+i);
+//							System.out.println("removing "+node.getChildren());
+//							node.getChildren().remove(0);
+//							
+//							
+//						}
+//				 		System.out.println("after clear children = " + node.getChildCount());
+//				 		System.out.println("after clear children2222 = " + node.getChildren().size());
+//					}
+//					node.
+//					System.out.println("before node.getChildCount()"+node.getChildCount());
+//					Collection col = bservice.getPageTree(Integer.parseInt(startPage.getId()), currentUserId);
+System.out.println("childs before = "+node.getChildCount());
+					node.addChild(bservice.getPageTree(Integer.parseInt(startPage.getId()), currentUserId));
+					
+System.out.println("node has children = "+(bservice.getPageTree(Integer.parseInt(startPage.getId()), currentUserId)).getChildCount());					
+			} catch (Exception e) {
+				// TODO: handle exception
+				System.out.println("have exception");
+				e.printStackTrace();
 			}
-			ICTreeNode node = bservice.getPageTree(this.pageSelectorTopNode, currentUserId);
-			return new WFTreeNode(node);
 		}
-		catch (UnavailableIWContext e) {
-			e.printStackTrace();
-		}
-		catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		return new TreeNodeBase("type","description",true);
+		try {
+			currentUserId = iwc.getCurrentUserId();
+		} catch (NotLoggedOnException nle) {}
+		return node;
 	}
-	
+	catch (UnavailableIWContext e) {
+		e.printStackTrace();
+	}
+	catch (RemoteException e) {
+		e.printStackTrace();
+	}
+			
+	return new TreeNodeBase("type","description",true);
+	}	
 	
 	public String getResourceRealPath(){
 		return ContentUtil.getBundle().getResourcesRealPath();
