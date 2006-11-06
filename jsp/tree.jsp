@@ -77,7 +77,7 @@
 					</wf:iwtree>
 
   
-<wf:siteTemplatesViewer id="siteTemplates"/>
+<tr:siteTemplatesViewer id="siteTemplates"/>
 
 					<!-- jsp accordion 
 

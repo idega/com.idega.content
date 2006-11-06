@@ -275,6 +275,11 @@
 		<component-class>com.idega.content.presentation.ThemesManager</component-class>
 	</component>
 	
+	<component> 
+  		<component-type>siteTemplatesViewer</component-type> 
+  		<component-class>com.idega.content.tree.SiteTemplatesViewer</component-class> 
+ 	</component> 
+	
     <managed-bean>
         <managed-bean-name>SessionBean1</managed-bean-name>
         <managed-bean-class>documentmanagementprototype2.SessionBean1</managed-bean-class>
