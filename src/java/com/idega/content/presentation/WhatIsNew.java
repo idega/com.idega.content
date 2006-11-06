@@ -1,5 +1,5 @@
 /*
- * $Id: WhatIsNew.java,v 1.1.2.5 2006/10/24 10:32:26 gimmi Exp $
+ * $Id: WhatIsNew.java,v 1.1.2.6 2006/11/06 11:11:49 gimmi Exp $
  * Created on Jun 21, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -10,7 +10,11 @@
 package com.idega.content.presentation;
 
 import java.rmi.RemoteException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Vector;
 
+import com.idega.block.web2.presentation.Accordion;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
@@ -19,6 +23,8 @@ import com.idega.core.builder.data.ICPage;
 import com.idega.core.search.business.SearchPlugin;
 import com.idega.core.search.presentation.SearchResults;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.Layer;
+import com.idega.presentation.text.Text;
 import com.idega.slide.business.IWSlideSession;
 
 /**
@@ -26,10 +32,10 @@ import com.idega.slide.business.IWSlideSession;
  * It extends SearchResults block and forces it to only use a DASL search (ContentSearch) with specific settings<br>
  * and the query is by default set to "*" and the path to "files" but that can be changed.
  * 
- *  Last modified: $Date: 2006/10/24 10:32:26 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/11/06 11:11:49 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.1.2.5 $
+ * @version $Revision: 1.1.2.6 $
  */
 public class WhatIsNew extends SearchResults {
 
@@ -45,6 +51,8 @@ public class WhatIsNew extends SearchResults {
 	protected boolean useUserHomeFolder = false;
 	protected boolean showDeleteLink = false;
 	protected ICPage deletePage = null;
+	protected boolean groupByExtraInfo = false;
+	protected String groupHeight = null;
 
 	public WhatIsNew(){
 		super();
@@ -58,7 +66,6 @@ public class WhatIsNew extends SearchResults {
 		if(searchPlugin instanceof ContentSearch){
 			//Get a copy of the plugin
 			ContentSearch contentSearch = (ContentSearch) ((ContentSearch)searchPlugin).clone();
-			System.out.println("WhatsNew : "+getStartingPointURI());
 			contentSearch.setScopeURI(getStartingPointURI());
 			contentSearch.setPropertyToOrderBy(getOrderByProperty());
 			contentSearch.setToUseDescendingOrder(isUsingDescendingOrder());
@@ -75,7 +82,58 @@ public class WhatIsNew extends SearchResults {
 			return super.configureSearchPlugin(searchPlugin);
 		}
 	}
+	
+	private HashMap groups = null;
+	
+	protected void addResultRow(Layer container, Layer rowContainer, String rowKey) {
+		if (groupByExtraInfo) {
+			if (rowKey.endsWith("/")) {
+				rowKey = rowKey.substring(0, rowKey.length()-1);
+			}
+			rowKey = rowKey.substring(rowKey.lastIndexOf('/')+1);
+			if (!groups.containsKey(rowKey)) {
+				groups.put(rowKey, new Vector());
+			}
+			
+			((Vector) groups.get(rowKey)).add(rowContainer);
+		} else {
+			super.addResultRow(container, rowContainer, rowKey);
+		}
+	}
+	
+	protected void beforeAddingResultRows(Layer container) {
+		// CREATE THE MAP FOR THE CONTAINER
+		if (groupByExtraInfo) {
+			groups = new HashMap();
+		}
+	
+	}
+	protected void afterAddingResultRows(Layer container) {
+		if (groupByExtraInfo) {
+			Iterator keys = groups.keySet().iterator();
+			Accordion acc = new Accordion(getId()+"_acc");
+			if (groupHeight != null) {
+				acc.setHeight(groupHeight);
+			}
+			container.add(acc);
+			while (keys.hasNext()) {
+				String key = (String) keys.next();
+				Vector v = (Vector) groups.get(key);
+				if (v != null) {
+					Iterator iter = v.iterator();
+					Layer la = new Layer();
+					
+					while (iter.hasNext()) {
+						Layer l =  (Layer) iter.next();
+						la.add(l);
+					}
+					acc.addPanel(new Text(key), la);
+				}
+			}
+		}
+	}
 
+	
 	protected IWSlideSession getIWSlideSession() {
 		try {
 			return (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
@@ -289,5 +347,18 @@ public class WhatIsNew extends SearchResults {
 	public void setDeletePage(ICPage deletePage) {
 		this.deletePage = deletePage;
 	}
+
+	public boolean isGroupByExtraInfo() {
+		return groupByExtraInfo;
+	}
+	
+	public void setGroupByExtraInfo(boolean groupByExtraInfo) {
+		this.groupByExtraInfo = groupByExtraInfo;
+	}
+	
+	public void setGroupHeight(String height) {
+		this.groupHeight = height;
+	}
+
 
 }
