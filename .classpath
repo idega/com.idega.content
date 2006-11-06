@@ -9,9 +9,9 @@
   </classpathentry>
   <classpathentry kind="src" path="/com.idega.slide">
   </classpathentry>
-  <classpathentry kind="src" path="/com.idega.webface">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.webface-3.1.0.jar">
   </classpathentry>
-  <classpathentry kind="src" path="/com.idega.block.rss">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.rss-3.1.6.jar">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/slide/jars/jakarta-slide-webdavlib-2.2pre1.iwbuild4.jar">
   </classpathentry>
@@ -25,7 +25,7 @@
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/rome/jars/rome-fetcher-0.7.jar">
   </classpathentry>
-  <classpathentry kind="var" path="MAVEN_REPO/rome/jars/rome-modules-0.2.jar">
+  <classpathentry kind="var" path="MAVEN_REPO/rome/jars/rome-modules-0.2j1.4.2.jar">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/jdom/jars/jdom-1.0.jar">
   </classpathentry>
