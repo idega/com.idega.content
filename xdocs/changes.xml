@@ -5,6 +5,13 @@
   </properties>
   <body>
   	
+    <release version="3.1.12" date="2006-11-06">
+      <action dev="gimmi" type="update">
+      	WhatIsNew can now be setup to group the results.
+      	[com.idega.core] updated to 3.1.17
+      </action>
+    </release>
+
     <release version="3.1.11" date="2006-10-30">
       <action dev="gimmi" type="update">
       	Added a set method to uploader to display status after an upload attempt (default false)
