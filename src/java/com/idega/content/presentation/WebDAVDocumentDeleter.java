@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVDocumentDeleter.java,v 1.6.2.2 2006/11/09 17:13:54 gimmi Exp $
+ * $Id: WebDAVDocumentDeleter.java,v 1.6.2.3 2006/11/09 18:34:43 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -29,10 +29,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/09 17:13:54 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/11/09 18:34:43 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.6.2.2 $
+ * @version $Revision: 1.6.2.3 $
  */
 public class WebDAVDocumentDeleter extends ContentBlock implements ActionListener {
 
@@ -125,6 +125,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 		if (table != null) {
 			if (embedInForm) {
 				HtmlForm form = new HtmlForm();
+				form.setStyleClass("wf_webdav_deleter_form");
 				form.setId("webdavdeleterform_"+getId());
 				form.setEnctype("multipart/form-data");
 				form.getChildren().add(table);

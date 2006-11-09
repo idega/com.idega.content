@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.5.2.3 2006/11/09 17:13:54 gimmi Exp $
+ * $Id: WebDAVUpload.java,v 1.5.2.4 2006/11/09 18:33:41 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -33,10 +33,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/09 17:13:54 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/11/09 18:33:41 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.5.2.3 $
+ * @version $Revision: 1.5.2.4 $
  */
 public class WebDAVUpload extends ContentBlock {
 
@@ -45,6 +45,8 @@ public class WebDAVUpload extends ContentBlock {
 	protected static final String DEFAULT_OUTPUT_TEXT_STYLE = "wf_inputtext";
 	
 	protected static final String DEFAULT_BUTTON_STYLE = "wf_webdav_upload_button";
+	
+	protected static final String DEFAULT_FORM_STYLE = "wf_webdav_upload_form";
 	
 	protected static final String DEFAULT_INPUT_FILE_STYLE = "fileUploadInput";
 	
@@ -264,6 +266,7 @@ public class WebDAVUpload extends ContentBlock {
 	private HtmlForm getForm() {
 		if (form == null) {
 			form = new HtmlForm();
+			form.setStyleClass(DEFAULT_FORM_STYLE);
 			form.setId("webdavuploadform_"+getId());
 			form.setEnctype("multipart/form-data");
 		}
