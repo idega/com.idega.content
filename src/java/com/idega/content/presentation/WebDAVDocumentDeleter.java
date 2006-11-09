@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVDocumentDeleter.java,v 1.6.2.3 2006/11/09 18:34:43 gimmi Exp $
+ * $Id: WebDAVDocumentDeleter.java,v 1.6.2.4 2006/11/09 19:09:50 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -12,7 +12,9 @@ package com.idega.content.presentation;
 import java.io.IOException;
 import java.rmi.RemoteException;
 
+import javax.faces.component.UICommand;
 import javax.faces.component.html.HtmlCommandButton;
+import javax.faces.component.html.HtmlCommandLink;
 import javax.faces.component.html.HtmlForm;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
@@ -29,10 +31,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/09 18:34:43 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/11/09 19:09:50 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.6.2.3 $
+ * @version $Revision: 1.6.2.4 $
  */
 public class WebDAVDocumentDeleter extends ContentBlock implements ActionListener {
 
@@ -42,6 +44,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	
 	private boolean embedInForm = false;
 	private String redirectOnSuccessURI = null;
+	private boolean useLinkAsSubmit = false;
 
 	protected void initializeComponent(FacesContext context) {
 		String pathToUse = IWContext.getIWContext(context).getParameter(PARAMETER_PATH);
@@ -95,11 +98,18 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 				table.add(getText("are_you_sure_you_want_to_delete_file"), 1, row++);
 			}
 			
-			HtmlCommandButton button = new HtmlCommandButton();
+			UICommand button = null;
+			if (useLinkAsSubmit) {
+				button = new HtmlCommandLink();
+				button.getChildren().add(getBundle().getLocalizedText("yes"));
+			} else {
+				button = new HtmlCommandButton();
+				getBundle().getLocalizedUIComponent("yes", button);
+			}
 			button.getAttributes().put(ACTION, ACTION_YES);
 			button.getAttributes().put(PARAMETER_PATH, resource.getPath());
 			button.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
-			getBundle().getLocalizedUIComponent("yes", button);
+
 			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
 			table.add(button, 1, row);
 			
@@ -191,12 +201,21 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	public String getRedirectOnSuccessURI() {
 		return redirectOnSuccessURI;
 	}
+	
+	public boolean getUseLinkAsSubmit() {
+		return useLinkAsSubmit;
+	}
 
+	public void setUseLinkAsSubmit(boolean useLinkAsSubmit) {
+		this.useLinkAsSubmit = useLinkAsSubmit;
+	}
+	
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[3];
+		Object values[] = new Object[4];
 		values[0] = super.saveState(ctx);
 		values[1] = new Boolean(embedInForm);
 		values[2] = redirectOnSuccessURI;
+		values[3] = new Boolean(useLinkAsSubmit);
 		return values;
 	}
 
@@ -205,6 +224,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 		super.restoreState(ctx, values[0]);
 		this.embedInForm = ((Boolean) values[1]).booleanValue();
 		redirectOnSuccessURI = (String) values[2];
+		this.useLinkAsSubmit = ((Boolean) values[3]).booleanValue();
 	}	
 
 }

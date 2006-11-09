@@ -7,6 +7,7 @@ public class WebDAVDocumentDeleterTag extends UIComponentTag {
 
 	private boolean embedInForm;
 	private String redirectOnSuccessURI;
+	private boolean useLinkAsSubmit;
 	
 	public String getComponentType() {
 		return "WebDAVDocumentDeleter";
@@ -23,13 +24,6 @@ public class WebDAVDocumentDeleterTag extends UIComponentTag {
 	public boolean getEmbeddedInForm() {
 		return embedInForm;
 	}
-	
-	public void release() {   
-		super.release();      
-
-		this.embedInForm = false;
-		this.redirectOnSuccessURI = null;
-	}
 
 	public void setRedirectOnSuccessURI(String uri) {
 		this.redirectOnSuccessURI = uri;
@@ -39,6 +33,22 @@ public class WebDAVDocumentDeleterTag extends UIComponentTag {
 		return redirectOnSuccessURI;
 	}
 	
+	public boolean getUseLinkAsSubmit() {
+		return useLinkAsSubmit;
+	}
+
+	public void setUseLinkAsSubmit(boolean useLinkAsSubmit) {
+		this.useLinkAsSubmit = useLinkAsSubmit;
+	}
+	
+	public void release() {   
+		super.release();      
+
+		this.embedInForm = false;
+		this.redirectOnSuccessURI = null;
+		useLinkAsSubmit = false;
+	}
+	
 	protected void setProperties(UIComponent component) {      
 		if (component instanceof WebDAVUpload) {
 			super.setProperties(component);
@@ -46,6 +56,7 @@ public class WebDAVDocumentDeleterTag extends UIComponentTag {
 			WebDAVDocumentDeleter deleter = (WebDAVDocumentDeleter) component;
 			deleter.setEmbeddedInForm(embedInForm);
 			deleter.setRedirectOnSuccessURI(redirectOnSuccessURI);
+			deleter.setUseLinkAsSubmit(useLinkAsSubmit);
 		}
 	}
 

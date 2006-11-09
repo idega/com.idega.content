@@ -46,9 +46,10 @@ public class WebDAVUploadTag extends UIComponentTag {
 	private boolean embedInForm;
 	
 	private boolean useUserHomeFolder;
-	
 	private boolean showStatusAfterUploadAttempt;
 	private String redirectOnSuccessURI;
+	private boolean useLinkAsSubmit;
+
 	public String getComponentType() {
 		return "WebDAVUpload";
 	}
@@ -242,6 +243,14 @@ public class WebDAVUploadTag extends UIComponentTag {
 		return redirectOnSuccessURI;
 	}
 	
+	public boolean getUseLinkAsSubmit() {
+		return useLinkAsSubmit;
+	}
+
+	public void setUseLinkAsSubmit(boolean useLinkAsSubmit) {
+		this.useLinkAsSubmit = useLinkAsSubmit;
+	}
+
 	public void release() {   
 		super.release();      
 		this.uploadMethod = null;
@@ -267,6 +276,7 @@ public class WebDAVUploadTag extends UIComponentTag {
 		this.useUserHomeFolder = false;
 		this.showStatusAfterUploadAttempt = false;
 		this.redirectOnSuccessURI = null;
+		this.useLinkAsSubmit = false;
 	}
 
 	protected void setProperties(UIComponent component) {      
@@ -298,6 +308,7 @@ public class WebDAVUploadTag extends UIComponentTag {
 			upload.setUseUserHomeFolder(useUserHomeFolder);
 			upload.setShowStatusAfterUploadAttempt(showStatusAfterUploadAttempt);
 			upload.setRedirectOnSuccessURI(redirectOnSuccessURI);
+			upload.setUseFileLink(useLinkAsSubmit);
 		}
 	}
 

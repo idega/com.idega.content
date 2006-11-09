@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.5.2.5 2006/11/09 18:45:03 gimmi Exp $
+ * $Id: WebDAVUpload.java,v 1.5.2.6 2006/11/09 19:09:51 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -13,7 +13,9 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.faces.component.UICommand;
 import javax.faces.component.html.HtmlCommandButton;
+import javax.faces.component.html.HtmlCommandLink;
 import javax.faces.component.html.HtmlForm;
 import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.component.html.HtmlInputText;
@@ -33,10 +35,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/09 18:45:03 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/11/09 19:09:51 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.5.2.5 $
+ * @version $Revision: 1.5.2.6 $
  */
 public class WebDAVUpload extends ContentBlock {
 
@@ -108,6 +110,7 @@ public class WebDAVUpload extends ContentBlock {
 
 	private boolean showStatusAfterUploadAttempt = false;
 	private String redirectOnSuccessURI = null;
+	private boolean useLinkAsSubmit = false;
 	
 	protected void initializeComponent(FacesContext context) {
 		
@@ -207,14 +210,26 @@ public class WebDAVUpload extends ContentBlock {
 			imagePreview.setValueBinding("value", WFUtil.createValueBinding("#{"+BEAN_ID+".imagePath}"));
 		}
 		
-		HtmlCommandButton upload = new HtmlCommandButton();
-		upload.setId(getId()+"_uploadCmd");
-		upload.setStyleClass(getStyleClassButton());
-		upload.setActionListener(WFUtil.createMethodBinding("#{"+BEAN_ID+"."+getUploadMethod()+"}", new Class[]{ActionEvent.class}));
-		if (onClickAction != null) {
-			upload.setOnclick(onClickAction);
+		UICommand upload = null;
+		if (useLinkAsSubmit) {
+			upload = new HtmlCommandButton();
+			((HtmlCommandButton) upload).setStyleClass(getStyleClassButton());
+			if (onClickAction != null) {
+				((HtmlCommandButton) upload).setOnclick(onClickAction);
+			}
+			getBundle().getLocalizedUIComponent("upload", upload);
+		} else {
+			upload = new HtmlCommandLink();
+			((HtmlCommandLink) upload).setStyleClass(getStyleClassButton());
+			if (onClickAction != null) {
+				((HtmlCommandLink) upload).setOnclick(onClickAction);
+			}
+			HtmlOutputText text = new HtmlOutputText();
+			getBundle().getLocalizedUIComponent("upload", text);
+			upload.getChildren().add(text);
 		}
-		getBundle().getLocalizedUIComponent("upload", upload);
+		upload.setId(getId()+"_uploadCmd");
+		upload.setActionListener(WFUtil.createMethodBinding("#{"+BEAN_ID+"."+getUploadMethod()+"}", new Class[]{ActionEvent.class}));
 		
 		addLineToContainer(new Object[] {selectFile, fileUpload}, getStyleClassWFContainerLine(), "upload_file");
 		
@@ -508,13 +523,21 @@ public class WebDAVUpload extends ContentBlock {
 		return redirectOnSuccessURI;
 	}
 
+	public boolean getUseLinkAsSubmit() {
+		return useLinkAsSubmit;
+	}
+
+	public void setUseLinkAsSubmit(boolean useLinkAsSubmit) {
+		this.useLinkAsSubmit = useLinkAsSubmit;
+	}
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[5];
+		Object values[] = new Object[6];
 		values[0] = super.saveState(ctx);
 		values[1] = new Boolean(useUserHomeFolder);
 		values[2] = new Boolean(embedInForm);
 		values[3] = new Boolean(showStatusAfterUploadAttempt);
 		values[4] = redirectOnSuccessURI;
+		values[5] = new Boolean(useLinkAsSubmit);
 		return values;
 	}
 
@@ -525,7 +548,10 @@ public class WebDAVUpload extends ContentBlock {
 		this.embedInForm = ((Boolean) values[2]).booleanValue();
 		showStatusAfterUploadAttempt = ((Boolean) values[3]).booleanValue();
 		redirectOnSuccessURI = (String) values[4];
+		useLinkAsSubmit = ((Boolean) values[5]).booleanValue();
 	}
+
+
 
 
 }

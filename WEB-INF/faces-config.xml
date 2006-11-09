@@ -145,6 +145,11 @@
 			<property-name>redirectOnSuccessURI</property-name>
 			<property-class>java.lang.String</property-class>
 		</property>
+		<property>
+			<display-name>Use Link as Submit object</display-name>
+			<property-name>useLinkAsSubmit</property-name>
+			<property-class>boolean</property-class>
+		</property>
 		<component-extension>
 			<idegaweb-info>
 				<builder-visible>true</builder-visible>
@@ -271,7 +276,12 @@
 			<property-name>redirectOnSuccessURI</property-name>
 			<property-class>java.lang.String</property-class>
 		</property>
-
+		<property>
+			<display-name>Use Link as Submit object</display-name>
+			<property-name>useLinkAsSubmit</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		
 		<component-extension>
 			<idegaweb-info>
 				<builder-visible>true</builder-visible>
