@@ -1,5 +1,5 @@
 /*
- * $Id: WhatIsNew.java,v 1.1.2.6 2006/11/06 11:11:49 gimmi Exp $
+ * $Id: WhatIsNew.java,v 1.1.2.7 2006/11/09 10:09:03 gimmi Exp $
  * Created on Jun 21, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -10,8 +10,11 @@
 package com.idega.content.presentation;
 
 import java.rmi.RemoteException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import com.idega.block.web2.presentation.Accordion;
@@ -32,10 +35,10 @@ import com.idega.slide.business.IWSlideSession;
  * It extends SearchResults block and forces it to only use a DASL search (ContentSearch) with specific settings<br>
  * and the query is by default set to "*" and the path to "files" but that can be changed.
  * 
- *  Last modified: $Date: 2006/11/06 11:11:49 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/11/09 10:09:03 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.1.2.6 $
+ * @version $Revision: 1.1.2.7 $
  */
 public class WhatIsNew extends SearchResults {
 
@@ -53,6 +56,7 @@ public class WhatIsNew extends SearchResults {
 	protected ICPage deletePage = null;
 	protected boolean groupByExtraInfo = false;
 	protected String groupHeight = null;
+	protected boolean orderGroups = true;
 
 	public WhatIsNew(){
 		super();
@@ -110,12 +114,21 @@ public class WhatIsNew extends SearchResults {
 	}
 	protected void afterAddingResultRows(Layer container) {
 		if (groupByExtraInfo) {
-			Iterator keys = groups.keySet().iterator();
+			Set keySet = groups.keySet();
 			Accordion acc = new Accordion(getId()+"_acc");
 			if (groupHeight != null) {
 				acc.setHeight(groupHeight);
 			}
 			container.add(acc);
+
+			List keyList = new Vector();
+			keyList.addAll(keySet);
+			if (orderGroups) {
+				// sorting the keys.
+				Collections.sort(keyList);
+			}
+			
+			Iterator keys = keyList.iterator();
 			while (keys.hasNext()) {
 				String key = (String) keys.next();
 				Vector v = (Vector) groups.get(key);
@@ -359,6 +372,9 @@ public class WhatIsNew extends SearchResults {
 	public void setGroupHeight(String height) {
 		this.groupHeight = height;
 	}
-
+	
+	public void setOrderGroups(boolean orderGroups) {
+		this.orderGroups = orderGroups;
+	}
 
 }
