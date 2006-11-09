@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.5.2.4 2006/11/09 18:33:41 gimmi Exp $
+ * $Id: WebDAVUpload.java,v 1.5.2.5 2006/11/09 18:45:03 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -33,10 +33,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/09 18:33:41 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/11/09 18:45:03 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.5.2.4 $
+ * @version $Revision: 1.5.2.5 $
  */
 public class WebDAVUpload extends ContentBlock {
 
@@ -119,17 +119,19 @@ public class WebDAVUpload extends ContentBlock {
 			Boolean success = bean.isUploadSuccessful();
 
 			HtmlOutputText status = null;
+			String sStatus = "failed";
 			if (success.booleanValue()) {
 				status = getText("file_uploaded_successfully", getStyleClassGiveName());
+				sStatus = "success";
 			} else {
 				status = getText("file_upload_failed", getStyleClassGiveName());
 			}
 			status.setId(getId()+"_status");
 			status.setTitle(message);
 
-			addLineToContainer(new Object[] {status}, getStyleClassWFContainerLine(), "status");
+			addLineToContainer(new Object[] {status}, getStyleClassWFContainerLine() + " "+sStatus, "status");
 		}
-				
+
 		HtmlOutputText selectFile = getText("select_a_file_to_upload", getStyleClassSelectFile());
 		selectFile.setId(getId()+"_sel");
 		
@@ -217,26 +219,26 @@ public class WebDAVUpload extends ContentBlock {
 		addLineToContainer(new Object[] {selectFile, fileUpload}, getStyleClassWFContainerLine(), "upload_file");
 		
 		if (useFileName) {
-			addLineToContainer(new Object[] {giveName, fileName}, getStyleClassWFContainerLine(), "file_name");
+			addLineToContainer(new Object[] {giveName, fileName}, getStyleClassWFContainerLine()+" filename", "file_name");
 		}
 		
 		if (useVersionComment) {
-			addLineToContainer(new Object[] {versionText, comment}, getStyleClassWFContainerLine(), "upload_comment");
+			addLineToContainer(new Object[] {versionText, comment}, getStyleClassWFContainerLine()+" comment", "upload_comment");
 		}
 		
 		if (useUploadPath) {
-			addLineToContainer(new Object[] {folder, uploadPath}, getStyleClassWFContainerLine(), "upload_path");
+			addLineToContainer(new Object[] {folder, uploadPath}, getStyleClassWFContainerLine() +" uploadpath", "upload_path");
 		}
 		
 		if (useFileLink && useImagePreview) {
-			addLineToContainer(new Object[] {fileLink, imagePreview}, getStyleClassWFContainerLine(), "file_link_image_preview");
+			addLineToContainer(new Object[] {fileLink, imagePreview}, getStyleClassWFContainerLine()+" filelink_imgprev", "file_link_image_preview");
 		}
 		else {
 			if (useFileLink) {
-				addLineToContainer(new Object[] {fileLink}, getStyleClassWFContainerLine(), "file_link");
+				addLineToContainer(new Object[] {fileLink}, getStyleClassWFContainerLine()+" filelink", "file_link");
 			}
 			if (useImagePreview) {
-				addLineToContainer(new Object[] {imagePreview}, getStyleClassWFContainerLine(), "image_preview");
+				addLineToContainer(new Object[] {imagePreview}, getStyleClassWFContainerLine() +"imgprev", "image_preview");
 			}
 		}
 		
