@@ -4,6 +4,14 @@
     <author email="tryggvi@idega.com">Tryggvi Larusson</author>
   </properties>
   <body>
+  
+      <release version="3.1.14" date="2006-11-09">
+      <action dev="gimmi" type="update">
+		Redirect on success added to upload and deleter objects
+      	Tooltip on delete link
+      </action>
+    </release>
+  
   	
     <release version="3.1.13" date="2006-11-09">
       <action dev="gimmi" type="update">
