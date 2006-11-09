@@ -1,5 +1,6 @@
 package com.idega.content.themes.helpers;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,12 @@ public class ThemesPropertiesExtractor {
 			if (theme.isNewTheme()) {
 				helper.getThemeChanger().prepareThemeForUsage(theme);
 				helper.getThemeChanger().prepareThemeStyleFiles(theme);
+				try {
+					helper.getThemesService().createIBPage(theme);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+					return false;
+				}
 			}
 		}
 		
@@ -82,6 +89,7 @@ public class ThemesPropertiesExtractor {
 		if (theme.getName() == null) {
 			theme.setName(helper.getFileName(theme.getLinkToSkeleton()));
 		}
+		helper.createThemeConfig(theme);
 		theme.setNewTheme(false);
 		theme.setPropertiesExtracted(true);
 		return true;
@@ -111,6 +119,9 @@ public class ThemesPropertiesExtractor {
 		
 		Element smallPreview = root.getChild(ThemesConstants.CON_SMALL_PREVIEW);
 		theme.setLinkToSmallPreview(smallPreview.getTextNormalize());
+		
+		Element pageId = root.getChild(ThemesConstants.CON_PAGE_ID);
+		theme.setIBPageID(Integer.valueOf(pageId.getTextNormalize()).intValue());
 	}
 	
 	private void setEnabledStyles(Theme theme, Element style) {
@@ -264,11 +275,10 @@ public class ThemesPropertiesExtractor {
 			member.setGroupName(styleGroupName);
 			
 			Element enabledValue = getNextElement(ThemesConstants.TAG_ENABLED, styleMember.getChildren());
-			if (enabledValue == null) {
-				return false;
-			}
-			if (ThemesConstants.TAG_TRUE.equals(enabledValue.getName())) {
-				member.setEnabled(true);
+			if (enabledValue != null) {
+				if (ThemesConstants.TAG_TRUE.equals(enabledValue.getName())) {
+					member.setEnabled(true);
+				}
 			}
 			
 			if (!extractStyleVariationFiles(member, getNextElement(ThemesConstants.TAG_FILES, styleMember.getChildren()))) {

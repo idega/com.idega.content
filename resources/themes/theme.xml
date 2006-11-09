@@ -9,18 +9,18 @@
 		<method>setPageTitle</method>
 	</key>
 	<key>
-		<code>site_title</code>
+		<code>siteTitle</code>
 		<label>Site title</label>
 		<defaultValue>My website</defaultValue>
 		<type>text</type>
-		<method>setTitle</method>
+		<method>setSiteTitle</method>
 	</key>
 	<key>
-		<code>site_slogan</code>
+		<code>siteSlogan</code>
 		<label>Site slogan</label>
 		<defaultValue>Changing the world, one site at a time...</defaultValue>
 		<type>text</type>
-		<method>setSlogan</method>
+		<method>setSiteSlogan</method>
 	</key>
 	<key>
 		<code>content</code>
@@ -34,10 +34,10 @@
 		<label>Toolbar</label>
 		<defaultValue>Untitled Page 1</defaultValue>
 		<type>text</type>
-		<method>getPageTitle</method>
+		<method>setToolbar</method>
 	</key>
 	<key>
-		<code>sidebar_title</code>
+		<code>sidebarTitle</code>
 		<label>Sidebar title</label>
 		<defaultValue></defaultValue>
 		<type>text</type>
@@ -55,7 +55,7 @@
 		<label>Breadcrumb</label>
 		<defaultValue>Untitled Page 1</defaultValue>
 		<type>text</type>
-		<method>getPageTitle</method>
+		<method>setBreadcrumb</method>
 	</key>
 	<key>
 		<code>footer</code>

@@ -9,7 +9,7 @@ public class ThemesConstants {
 	protected static final String NAMESPACE = "http://www.w3.org/1999/xhtml";
 	protected static final String NAMESPACE_ID = "xmlns";
 	
-	protected static final String CONTENT = "/content";
+	public static final String CONTENT = "/content";
 	protected static final String THEMES = "/themes/";
 	public static final String THEMES_PATH = "/files/cms" + THEMES;
 	public static final String THEMES_PREVIEW_PATH = THEMES_PATH + "preview/";
@@ -84,7 +84,7 @@ public class ThemesConstants {
 	protected static final String TAG_ATTRIBUTE_ID = "id";
 	protected static final String TAG_ATTRIBUTE_TYPE = "type";
 	
-	protected static final String THEME_SETTINGS = "/idegaweb/bundles/com.idega.content.bundle/resources/themes/theme.xml";
+	public static final String THEME_SETTINGS = "/resources/themes/theme.xml";
 	protected static final String THEME_SETTING_CODE = "code";
 	protected static final String THEME_SETTING_LABEL = "label";
 	protected static final String THEME_SETTING_DEFAULT_VALUE = "defaultValue";
@@ -99,6 +99,7 @@ public class ThemesConstants {
 	protected static final String CON_VARIATION = "variation";
 	protected static final String CON_PREVIEW = "preview";
 	protected static final String CON_SMALL_PREVIEW = "small-preview";
+	protected static final String CON_PAGE_ID = "page-id";
 	
 	private static final String[] _DEFAULT_STYLE_FILES = new String[] {"styles.css", "handheld.css", "print.css"};
 	protected static final List <String> DEFAULT_STYLE_FILES = Collections.unmodifiableList(Arrays.asList(_DEFAULT_STYLE_FILES));
@@ -115,5 +116,10 @@ public class ThemesConstants {
 	protected static final int REDUCED_PREVIEW_HEIGHT = 435;
 	
 	protected static final String DEFAULT_MIME_TYPE = "image/";
+	
+	public static final String INCORRECT_PARENT_ID = "-1";
+	
+	public static final String THEMES_PROPERTY_START = "theme.";
+	public static final String THEMES_PROPERTY_END = ".default";
 	
 }

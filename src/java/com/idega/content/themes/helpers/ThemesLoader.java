@@ -40,10 +40,18 @@ public class ThemesLoader {
 	
 	private void initTheme(boolean newTheme) {
 		if (theme == null) {
-			theme = new Theme(String.valueOf(generator.nextInt(Integer.MAX_VALUE)));
+			theme = new Theme(getThemeId());
 			theme.setNewTheme(newTheme);
 			theme.setLoading(true);
 		}
+	}
+	
+	private String getThemeId() {
+		String id = String.valueOf(generator.nextInt(Integer.MAX_VALUE));
+		while (helper.getTheme(id) != null) { // Checking if exists Theme with the same ID
+			id = String.valueOf(generator.nextInt(Integer.MAX_VALUE));
+		}
+		return id;
 	}
 	
 	private void addThemeInfo() {

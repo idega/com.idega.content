@@ -30,6 +30,8 @@ public class Theme {
 	private List <ThemeChange> changes;
 	private Map <String, ThemeStyleGroupMember> styleGroupsMembers;
 	
+	private int IBPageID = -1;
+
 	public Theme(String themeId) {
 		styleGroupsNames = new ArrayList<String>();
 		changes = new ArrayList<ThemeChange>();
@@ -179,6 +181,14 @@ public class Theme {
 
 	protected void setLoading(boolean loading) {
 		this.loading = loading;
+	}
+	
+	public int getIBPageID() {
+		return IBPageID;
+	}
+
+	public void setIBPageID(int pageID) {
+		IBPageID = pageID;
 	}
 	
 }

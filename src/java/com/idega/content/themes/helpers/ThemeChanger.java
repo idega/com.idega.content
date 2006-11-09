@@ -24,6 +24,9 @@ import org.jdom.Text;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+import com.idega.idegaweb.IWMainApplication;
+import com.idega.idegaweb.IWMainApplicationSettings;
+
 public class ThemeChanger {
 	
 	private static final Log log = LogFactory.getLog(ThemeChanger.class);
@@ -267,8 +270,7 @@ public class ThemeChanger {
 	 * @param fileName
 	 * @return boolean
 	 */
-	private boolean uploadDocument(Document doc, String linkToBase, String fileName, Theme theme, boolean isTheme) {
-		out.setFormat(Format.getCompactFormat());
+	public boolean uploadDocument(Document doc, String linkToBase, String fileName, Theme theme, boolean isTheme) {
 		String docContent = out.outputString(doc);
 		
 		if (isTheme) {
@@ -435,7 +437,9 @@ public class ThemeChanger {
 		if (begin != null) {
 			value += begin;
 		}
-		value += defaultValue;
+		if (defaultValue != null) {
+			value += defaultValue;
+		}
 		if (end != null) {
 			value += end;
 		}
@@ -443,6 +447,9 @@ public class ThemeChanger {
 	}
 	
 	private String getSidebarReplace(String defaultValue) {
+		if (defaultValue == null) {
+			return ThemesConstants.EMPTY;
+		}
 		String[] elements = defaultValue.split(ThemesConstants.COMMA);
 		if (elements == null) {
 			return ThemesConstants.EMPTY;
@@ -460,29 +467,28 @@ public class ThemeChanger {
 	 * @return String
 	 */
 	private String getRegion(String value) {
-		//String region = helper.getRegionBegin();
 		String region = ThemesConstants.COMMENT_BEGIN + ThemesConstants.TEMPLATE_REGION_BEGIN + value +
 			ThemesConstants.TEMPLATE_REGION_MIDDLE + ThemesConstants.COMMENT_END;
-		
-		ThemeSettings settings = helper.getSettings().get(value);
-		if (settings != null) {
+		IWMainApplicationSettings settings  = IWMainApplication.getDefaultIWMainApplication().getSettings();
+		String propertyValue = settings.getProperty(ThemesConstants.THEMES_PROPERTY_START + value + ThemesConstants.THEMES_PROPERTY_END);
+		if (propertyValue != null) {
 			if (value.equals(TOOLBAR)) {
-				return region + getBasicReplace(TOOLBAR_REPLACE_BEGIN, settings.getDefaultValue(), TOOLBAR_REPLACE_END) +
+				return region + getBasicReplace(TOOLBAR_REPLACE_BEGIN, propertyValue, TOOLBAR_REPLACE_END) +
 					ThemesConstants.COMMENT_BEGIN +	ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
 			if (value.equals(SIDEBAR)) {
-				return region + getSidebarReplace(settings.getDefaultValue()) + ThemesConstants.COMMENT_BEGIN +
+				return region + getSidebarReplace(propertyValue) + ThemesConstants.COMMENT_BEGIN +
 					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
 			if (value.equals(BREADCRUMB)) {
-				return region + getBasicReplace(BREADCRUMB_REPLACE_BEGIN, settings.getDefaultValue(), BREADCRUMB_REPLACE_END) +
+				return region + getBasicReplace(BREADCRUMB_REPLACE_BEGIN, propertyValue, BREADCRUMB_REPLACE_END) +
 					ThemesConstants.COMMENT_BEGIN +	ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
 			if (value.equals(FOOTER)) {
-				return region + COPY_AND_SPACE + getBasicReplace(null, settings.getDefaultValue(), null) + ThemesConstants.COMMENT_BEGIN +
+				return region + COPY_AND_SPACE + getBasicReplace(null, propertyValue, null) + ThemesConstants.COMMENT_BEGIN +
 					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
-			region += settings.getDefaultValue();
+			region += propertyValue;
 		}
 		
 		return region + ThemesConstants.COMMENT_BEGIN +	ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
@@ -740,7 +746,7 @@ public class ThemeChanger {
 	 * @param theme
 	 * @return List
 	 */
-	private List <ThemeStyleGroupMember> getEnabledStyles(Theme theme) {
+	public List <ThemeStyleGroupMember> getEnabledStyles(Theme theme) {
 		List <ThemeStyleGroupMember> members = new ArrayList<ThemeStyleGroupMember>();
 		List <String> groupNames = theme.getStyleGroupsNames();
 		ThemeStyleGroupMember member = null;
@@ -796,6 +802,13 @@ public class ThemeChanger {
 		
 		Theme theme = helper.getTheme(themeID);
 		
+		try {
+			helper.getThemesService().createIBPage(theme);
+		} catch (RemoteException e) {
+			log.error(e);
+			return false;
+		}
+		
 		if (!theme.getName().equals(themeName)) {
 			return createNewTheme(theme, themeName);
 		}
@@ -830,7 +843,7 @@ public class ThemeChanger {
 		theme.setLinkToThemePreview(theme.getLinkToDraftPreview());
 		theme.setLinkToDraftPreview(null);
 		
-		return createThemeConfig(theme);
+		return helper.createThemeConfig(theme);
 	}
 	
 	private void restoreTheme(Theme theme) {
@@ -949,7 +962,7 @@ public class ThemeChanger {
 		
 		child.setPropertiesExtracted(true);
 		restoreTheme(parent);
-		return createThemeConfig(child);
+		return helper.createThemeConfig(child);
 	}
 	
 	/**
@@ -975,57 +988,6 @@ public class ThemeChanger {
 				parentMember = styleMembers.get(styleGroupName + ThemesConstants.AT + j);
 			}
 		}
-	}
-	
-	private boolean createThemeConfig(Theme theme) {
-		Document doc = new Document();
-		Element root = new Element(ThemesConstants.CON_THEME);
-		Collection <Element> rootElements = new ArrayList<Element>();
-		
-		Element name = new Element(ThemesConstants.CON_NAME);
-		name.setText(theme.getName());
-		rootElements.add(name);
-		
-		Element styles = new Element(ThemesConstants.CON_STYLES);
-		Collection <Element> stylesElements = new ArrayList<Element>();
-		
-		List <ThemeStyleGroupMember> enabled = getEnabledStyles(theme);
-		ThemeStyleGroupMember member = null;
-		
-		Element style = null;
-		Collection <Element> styleElements = null;
-		Element groupName = null;
-		Element variation = null;
-		for (int i = 0; i < enabled.size(); i++) {
-			member = enabled.get(i);
-			style = new Element(ThemesConstants.CON_STYLE);
-			styleElements = new ArrayList<Element>();
-
-			groupName = new Element(ThemesConstants.CON_GROUP);
-			groupName.setText(member.getGroupName());
-			styleElements.add(groupName);
-			
-			variation = new Element(ThemesConstants.CON_VARIATION);
-			variation.setText(member.getName());
-			styleElements.add(variation);
-
-			style.setContent(styleElements);
-			stylesElements.add(style);
-		}
-		styles.setContent(stylesElements);
-		rootElements.add(styles);
-		
-		Element preview = new Element(ThemesConstants.CON_PREVIEW);
-		preview.setText(theme.getLinkToThemePreview());
-		rootElements.add(preview);
-		
-		Element smallPreview = new Element(ThemesConstants.CON_SMALL_PREVIEW);
-		smallPreview.setText(theme.getLinkToSmallPreview());
-		rootElements.add(smallPreview);
-		
-		root.setContent(rootElements);
-		doc.setRootElement(root);
-		return uploadDocument(doc, theme.getLinkToBaseAsItIs(), theme.getName() + ThemesConstants.IDEGA_THEME_INFO, theme, false);
 	}
 
 }

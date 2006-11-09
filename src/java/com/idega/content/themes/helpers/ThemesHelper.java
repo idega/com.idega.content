@@ -30,6 +30,7 @@ import org.jdom.input.SAXBuilder;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentSearch;
+import com.idega.content.themes.business.ThemesService;
 import com.idega.core.search.business.SearchResult;
 import com.idega.graphics.PreviewGenerator;
 import com.idega.graphics.WebPagePreviewGenerator;
@@ -60,6 +61,7 @@ public class ThemesHelper implements Singleton {
 	
 	private IWSlideService service;
 	private ImageEncoder encoder = null;
+	private ThemesService themesService = null;
 	private boolean checkedFromSlide;
 	private boolean loadedThemeSettings;
 	
@@ -73,20 +75,31 @@ public class ThemesHelper implements Singleton {
 //	private String commentShortMiddle;
 //	private String commentShortEnd;
 	
-	private ThemesHelper() {
+	private ThemesHelper(boolean searchForThemes) {
 		themes = new HashMap <String, Theme> ();
 		settings = new HashMap <String, ThemeSettings> ();
 		urisToThemes = new ArrayList <String> ();
-		loadThemeSettings();
-		loadRegionSyntax();
-		searchForThemes();
+		if (searchForThemes) {
+			searchForThemes();
+		}
 	}
 	
 	public static ThemesHelper getInstance() {
 		if (helper == null) {
 			synchronized (ThemesHelper.class) {
 				if (helper == null) {
-					helper = new ThemesHelper();
+					helper = new ThemesHelper(true);
+				}
+			}
+		}
+		return helper;
+	}
+	
+	public static ThemesHelper getInstance(boolean searchForThemes) {
+		if (helper == null) {
+			synchronized (ThemesHelper.class) {
+				if (helper == null) {
+					helper = new ThemesHelper(searchForThemes);
 				}
 			}
 		}
@@ -161,7 +174,7 @@ public class ThemesHelper implements Singleton {
 		return loader;
 	}
 	
-	private void searchForThemes() {
+	public void searchForThemes() {
 		if (!checkedFromSlide) {
 			ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
 			Collection results = search.doSimpleDASLSearch(ThemesConstants.THEME_SEARCH_KEY, ThemesConstants.CONTENT + ThemesConstants.THEMES_PATH);
@@ -376,8 +389,11 @@ public class ThemesHelper implements Singleton {
 		if (url == null) {
 			return null;
 		}
-			
-		InputStream stream = getInputStream(url);
+		
+		return getXMLDocument(getInputStream(url));
+	}
+	
+	public Document getXMLDocument(InputStream stream) {
 		if(stream == null){
 			return null;
 		}
@@ -436,38 +452,22 @@ public class ThemesHelper implements Singleton {
 		return themes;
 	}
 	
-	protected Map <String, ThemeSettings> getSettings() {
+	public Map <String, ThemeSettings> getSettings() {
 		return settings;
 	}
 	
-	private void loadRegionSyntax() {
-		// TODO: when reading comment (<!-- some text -->) from xml, i get incorrect value, so need add Strings.
-		//Because of it i see no point to read from xml
-		
-		/*String url = getWebRootWithoutContent() + ThemesConstants.REGION_SYNTAX;
-		Document doc = getXMLDocument(url);
-		if (doc == null) {
-			return;
-		}
-		Element root = doc.getRootElement();
-		if (root == null) {
-			return;
-		}
-		
-		containerReplace = root.getChildTextNormalize("container");
-		regionBegin = root.getChildTextNormalize("comment-begin");
-		regionEnd = root.getChildTextNormalize("comment-end");
-		commentShortBegin = root.getChildTextNormalize("comment-short-begin");
-		commentShortMiddle = root.getChildTextNormalize("comment-short-middle");
-		commentShortEnd = root.getChildTextNormalize("comment-short-end");*/
-	}
-	
-	private void loadThemeSettings() {
+	public void loadThemeSettings(InputStream stream) {
 		if (loadedThemeSettings) {
 			return;
 		}
-		String url = getWebRootWithoutContent() + ThemesConstants.THEME_SETTINGS;
-		Document doc = getXMLDocument(url);
+		loadThemeSettings(getXMLDocument(stream));
+		loadedThemeSettings = true;
+	}
+	
+	public void loadThemeSettings(Document doc) {
+		if (loadedThemeSettings) {
+			return;
+		}
 		if (doc == null) {
 			return;
 		}
@@ -493,7 +493,6 @@ public class ThemesHelper implements Singleton {
 			
 			settings.put(setting.getCode(), setting);
 		}
-		loadedThemeSettings = true;
 	}
 	
 	public InputStream getInputStream(String link) {
@@ -683,29 +682,73 @@ public class ThemesHelper implements Singleton {
 		}
 		return encoder;
 	}
+	
+	public ThemesService getThemesService() {
+		if (themesService == null) {
+			synchronized (ThemesHelper.class) {
+				try {
+					themesService = (ThemesService) IBOLookup.getServiceInstance(IWContext.getInstance(), ThemesService.class);
+				} catch (IBOLookupException e) {
+					log.error(e);
+				}
+			}
+		}
+		return themesService;
+	}
 
-//	protected String getContainerReplace() {
-//		return containerReplace;
-//	}
-//
-//	protected String getRegionBegin() {
-//		return regionBegin;
-//	}
-//
-//	protected String getRegionEnd() {
-//		return regionEnd;
-//	}
-//
-//	protected String getCommentShortBegin() {
-//		return commentShortBegin;
-//	}
-//
-//	protected String getCommentShortEnd() {
-//		return commentShortEnd;
-//	}
-//
-//	protected String getCommentShortMiddle() {
-//		return commentShortMiddle;
-//	}
+	public boolean createThemeConfig(Theme theme) {
+		Document doc = new Document();
+		Element root = new Element(ThemesConstants.CON_THEME);
+		Collection <Element> rootElements = new ArrayList<Element>();
+		
+		Element name = new Element(ThemesConstants.CON_NAME);
+		name.setText(theme.getName());
+		rootElements.add(name);
+		
+		Element styles = new Element(ThemesConstants.CON_STYLES);
+		Collection <Element> stylesElements = new ArrayList<Element>();
+		
+		List <ThemeStyleGroupMember> enabled = getThemeChanger().getEnabledStyles(theme);
+		ThemeStyleGroupMember member = null;
+		
+		Element style = null;
+		Collection <Element> styleElements = null;
+		Element groupName = null;
+		Element variation = null;
+		for (int i = 0; i < enabled.size(); i++) {
+			member = enabled.get(i);
+			style = new Element(ThemesConstants.CON_STYLE);
+			styleElements = new ArrayList<Element>();
+
+			groupName = new Element(ThemesConstants.CON_GROUP);
+			groupName.setText(member.getGroupName());
+			styleElements.add(groupName);
+			
+			variation = new Element(ThemesConstants.CON_VARIATION);
+			variation.setText(member.getName());
+			styleElements.add(variation);
+
+			style.setContent(styleElements);
+			stylesElements.add(style);
+		}
+		styles.setContent(stylesElements);
+		rootElements.add(styles);
+		
+		Element preview = new Element(ThemesConstants.CON_PREVIEW);
+		preview.setText(theme.getLinkToThemePreview());
+		rootElements.add(preview);
+		
+		Element smallPreview = new Element(ThemesConstants.CON_SMALL_PREVIEW);
+		smallPreview.setText(theme.getLinkToSmallPreview());
+		rootElements.add(smallPreview);
+		
+		Element pageId = new Element(ThemesConstants.CON_PAGE_ID);
+		pageId.setText(String.valueOf(theme.getIBPageID()));
+		rootElements.add(pageId);
+		
+		root.setContent(rootElements);
+		doc.setRootElement(root);
+		return getThemeChanger().uploadDocument(doc, theme.getLinkToBaseAsItIs(), theme.getName() + ThemesConstants.IDEGA_THEME_INFO, theme, false);
+	}
 
 }
