@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.5.2.2 2006/10/30 16:40:55 gimmi Exp $
+ * $Id: WebDAVUpload.java,v 1.5.2.3 2006/11/09 17:13:54 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -33,10 +33,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/10/30 16:40:55 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/11/09 17:13:54 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.5.2.2 $
+ * @version $Revision: 1.5.2.3 $
  */
 public class WebDAVUpload extends ContentBlock {
 
@@ -105,6 +105,7 @@ public class WebDAVUpload extends ContentBlock {
 	private HtmlForm form;
 
 	private boolean showStatusAfterUploadAttempt = false;
+	private String redirectOnSuccessURI = null;
 	
 	protected void initializeComponent(FacesContext context) {
 		
@@ -182,7 +183,9 @@ public class WebDAVUpload extends ContentBlock {
 		} else if (this.uploadPath != null) {
 			bean.setUploadFilePath(this.uploadPath);
 		}
-		
+		if (redirectOnSuccessURI != null) {
+			bean.setRedirectOnSuccessURI(redirectOnSuccessURI);
+		}
 		HtmlOutputLink fileLink = null;
 		if (useFileLink) {
 			fileLink = new HtmlOutputLink();
@@ -492,12 +495,21 @@ public class WebDAVUpload extends ContentBlock {
 		this.showStatusAfterUploadAttempt = showStatusAfterUploadAttempt;
 	}
 	
+	public void setRedirectOnSuccessURI(String uri) {
+		this.redirectOnSuccessURI = uri;
+	}
+
+	public String getRedirectOnSuccessURI() {
+		return redirectOnSuccessURI;
+	}
+
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[4];
+		Object values[] = new Object[5];
 		values[0] = super.saveState(ctx);
 		values[1] = new Boolean(useUserHomeFolder);
 		values[2] = new Boolean(embedInForm);
 		values[3] = new Boolean(showStatusAfterUploadAttempt);
+		values[4] = redirectOnSuccessURI;
 		return values;
 	}
 
@@ -507,6 +519,7 @@ public class WebDAVUpload extends ContentBlock {
 		this.useUserHomeFolder = ((Boolean) values[1]).booleanValue();
 		this.embedInForm = ((Boolean) values[2]).booleanValue();
 		showStatusAfterUploadAttempt = ((Boolean) values[3]).booleanValue();
+		redirectOnSuccessURI = (String) values[4];
 	}
 
 

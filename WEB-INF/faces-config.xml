@@ -140,6 +140,11 @@
 			<property-name>embeddedInForm</property-name>
 			<property-class>boolean</property-class>
 		</property>
+		<property>
+			<display-name>Redirect on Successful update URI</display-name>
+			<property-name>redirectOnSuccessURI</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
 		<component-extension>
 			<idegaweb-info>
 				<builder-visible>true</builder-visible>
@@ -260,6 +265,11 @@
 			<display-name>Show status after a upload attampt</display-name>
 			<property-name>showStatusAfterUploadAttempt</property-name>
 			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Redirect on Successful update URI</display-name>
+			<property-name>redirectOnSuccessURI</property-name>
+			<property-class>java.lang.String</property-class>
 		</property>
 
 		<component-extension>

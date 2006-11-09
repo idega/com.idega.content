@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVDocumentDeleter.java,v 1.6.2.1 2006/10/24 10:27:40 gimmi Exp $
+ * $Id: WebDAVDocumentDeleter.java,v 1.6.2.2 2006/11/09 17:13:54 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -29,10 +29,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/10/24 10:27:40 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/11/09 17:13:54 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.6.2.1 $
+ * @version $Revision: 1.6.2.2 $
  */
 public class WebDAVDocumentDeleter extends ContentBlock implements ActionListener {
 
@@ -41,7 +41,8 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	public static final String PARAMETER_PATH = "dd_pp";
 	
 	private boolean embedInForm = false;
-	
+	private String redirectOnSuccessURI = null;
+
 	protected void initializeComponent(FacesContext context) {
 		String pathToUse = IWContext.getIWContext(context).getParameter(PARAMETER_PATH);
 		Boolean deleted = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getDeleted");
@@ -168,6 +169,9 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 			}
 			WFUtil.invoke("webdavdocumentdeleterbean", "setDeleted", deleted, Boolean.class);
 			WFUtil.invoke("webdavdocumentdeleterbean", "setWasFolder", wasFolder, Boolean.class);
+			if (deleted != null && deleted.booleanValue() && redirectOnSuccessURI != null) {
+				IWContext.getInstance().sendRedirect(redirectOnSuccessURI);
+			}
 		}
 	}
 
@@ -178,6 +182,28 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	public boolean getEmbeddedInForm() {
 		return embedInForm;
 	}
-	
+
+	public void setRedirectOnSuccessURI(String uri) {
+		this.redirectOnSuccessURI = uri;
+	}
+
+	public String getRedirectOnSuccessURI() {
+		return redirectOnSuccessURI;
+	}
+
+	public Object saveState(FacesContext ctx) {
+		Object values[] = new Object[3];
+		values[0] = super.saveState(ctx);
+		values[1] = new Boolean(embedInForm);
+		values[2] = redirectOnSuccessURI;
+		return values;
+	}
+
+	public void restoreState(FacesContext ctx, Object state) {
+		Object values[] = (Object[]) state;
+		super.restoreState(ctx, values[0]);
+		this.embedInForm = ((Boolean) values[1]).booleanValue();
+		redirectOnSuccessURI = (String) values[2];
+	}	
 
 }

@@ -35,6 +35,7 @@ public class WebDAVUploadBean implements Serializable, ActionListener{
 	private String comment = null;
 	private Boolean uploadSuccessful = null;
 	private String uploadMessage = null;
+	private String redirectOnSuccessURI = null;
 	
 	public UploadedFile getUploadFile() {
 		return this.uploadFile;
@@ -157,6 +158,10 @@ public class WebDAVUploadBean implements Serializable, ActionListener{
 				log.error("Error code :"+rootResource.getStatusMessage()+", message: "+rootResource.getStatusMessage());
 				return "upload_failed";
 			}
+			
+			if (uploadFileSuccess && redirectOnSuccessURI != null) {
+				IWContext.getInstance().sendRedirect(redirectOnSuccessURI);
+			}
 		
 		}
 		
@@ -230,7 +235,9 @@ public class WebDAVUploadBean implements Serializable, ActionListener{
 		return uploadSuccessful != null;
 	}
 	
-	
+	public void setRedirectOnSuccessURI(String uri) {
+		this.redirectOnSuccessURI = uri;
+	}
 //	
 //	/**
 //	 * Uploads zip file's contents to slide. Note: only *.zip file allowed!
