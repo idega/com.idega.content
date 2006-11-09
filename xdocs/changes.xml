@@ -5,6 +5,12 @@
   </properties>
   <body>
   	
+    <release version="3.1.13" date="2006-11-09">
+      <action dev="gimmi" type="update">
+      	WhatIsNew can now be setup to group the results. (I know I thought I already did this.)
+      </action>
+    </release>
+
     <release version="3.1.12" date="2006-11-06">
       <action dev="gimmi" type="update">
       	WhatIsNew can now be setup to group the results.
