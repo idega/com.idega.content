@@ -56,28 +56,24 @@ public class ThemesHelper implements Singleton {
 	private volatile ThemesLoader loader = null;
 	
 	private Map <String, Theme> themes = null;
-	private Map <String, ThemeSettings> settings = null;
+	private Map <String, Setting> themeSettings = null;
+	private Map <String, Setting> pageSettings = null;
 	private List <String> urisToThemes = null;
 	
-	private IWSlideService service;
+	private IWSlideService service = null;
 	private ImageEncoder encoder = null;
 	private ThemesService themesService = null;
-	private boolean checkedFromSlide;
-	private boolean loadedThemeSettings;
+	private boolean checkedFromSlide = false;
+	private boolean loadedThemeSettings = false;
+	private boolean loadedPageSettings = false;
 	
 	private String fullWebRoot; // For cache
 	private String webRoot;
 	
-//	private String containerReplace;
-//	private String regionBegin;
-//	private String regionEnd;
-//	private String commentShortBegin;
-//	private String commentShortMiddle;
-//	private String commentShortEnd;
-	
 	private ThemesHelper(boolean searchForThemes) {
 		themes = new HashMap <String, Theme> ();
-		settings = new HashMap <String, ThemeSettings> ();
+		themeSettings = new HashMap <String, Setting> ();
+		pageSettings = new HashMap <String, Setting> ();
 		urisToThemes = new ArrayList <String> ();
 		if (searchForThemes) {
 			searchForThemes();
@@ -452,22 +448,32 @@ public class ThemesHelper implements Singleton {
 		return themes;
 	}
 	
-	public Map <String, ThemeSettings> getSettings() {
-		return settings;
+	public Map <String, Setting> getThemeSettings() {
+		return themeSettings;
+	}
+	
+	public Map <String, Setting> getPageSettings() {
+		return pageSettings;
 	}
 	
 	public void loadThemeSettings(InputStream stream) {
 		if (loadedThemeSettings) {
+			closeInputStream(stream);
 			return;
 		}
-		loadThemeSettings(getXMLDocument(stream));
+		loadSettings(themeSettings, getXMLDocument(stream));
 		loadedThemeSettings = true;
 	}
 	
-	public void loadThemeSettings(Document doc) {
-		if (loadedThemeSettings) {
+	public void loadPageSettings(String url) {
+		if (loadedPageSettings) {
 			return;
 		}
+		loadSettings(pageSettings, getXMLDocument(getInputStream(url)));
+		loadedPageSettings = true;
+	}
+	
+	private void loadSettings(Map <String, Setting> settings, Document doc) {
 		if (doc == null) {
 			return;
 		}
@@ -480,16 +486,16 @@ public class ThemesHelper implements Singleton {
 			return;
 		}
 		Element key = null;
-		ThemeSettings setting = null;
+		Setting setting = null;
 		for (int i = 0; i < keys.size(); i++) {
 			key = (Element) keys.get(i);
-			setting = new ThemeSettings();
+			setting = new Setting();
 			
-			setting.setCode(key.getChildTextNormalize(ThemesConstants.THEME_SETTING_CODE));
-			setting.setLabel(key.getChildTextNormalize(ThemesConstants.THEME_SETTING_LABEL));
-			setting.setDefaultValue(key.getChildTextNormalize(ThemesConstants.THEME_SETTING_DEFAULT_VALUE));
-			setting.setType(key.getChildTextNormalize(ThemesConstants.THEME_SETTING_TYPE));
-			setting.setMethod(key.getChildTextNormalize(ThemesConstants.THEME_SETTING_METHOD));
+			setting.setCode(key.getChildTextNormalize(ThemesConstants.SETTING_CODE));
+			setting.setLabel(key.getChildTextNormalize(ThemesConstants.SETTING_LABEL));
+			setting.setDefaultValue(key.getChildTextNormalize(ThemesConstants.SETTING_DEFAULT_VALUE));
+			setting.setType(key.getChildTextNormalize(ThemesConstants.SETTING_TYPE));
+			setting.setMethod(key.getChildTextNormalize(ThemesConstants.SETTING_METHOD));
 			
 			settings.put(setting.getCode(), setting);
 		}
@@ -749,6 +755,27 @@ public class ThemesHelper implements Singleton {
 		root.setContent(rootElements);
 		doc.setRootElement(root);
 		return getThemeChanger().uploadDocument(doc, theme.getLinkToBaseAsItIs(), theme.getName() + ThemesConstants.IDEGA_THEME_INFO, theme, false);
+	}
+	
+	public String[] getPageValues(Setting s, String value) {
+		if (ThemesConstants.EMPTY.equals(s.getDefaultValue()) && value == null) {
+			return new String[] {ThemesConstants.EMPTY};
+		}
+		String[] settingValues = null;
+		if (s.getDefaultValue() != null) {
+			if (!ThemesConstants.EMPTY.equals(s.getDefaultValue())) {
+				settingValues = s.getDefaultValue().split(ThemesConstants.SEPARATOR);
+			}
+		}
+		if (settingValues == null) {
+			 return new String[] {value.trim()};
+		}
+		String[] parsedValues = new String[settingValues.length + 1];
+		for (int i = 0; i < settingValues.length; i++) {
+			parsedValues[i] = settingValues[i];
+		}
+		parsedValues[parsedValues.length - 1] = value.trim();
+		return parsedValues;
 	}
 
 }

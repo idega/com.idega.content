@@ -2,7 +2,7 @@ package com.idega.content.themes.block;
 
 import java.util.Iterator;
 
-import com.idega.content.themes.helpers.ThemeSettings;
+import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.localisation.presentation.LocalePresentationUtil;
@@ -45,7 +45,7 @@ public class SiteInfo extends Block {
 			locale = iwc.getCurrentLocale().getLanguage();
 			locales.setSelectedElement(locale);
 		}
-		doBusiness(iwc, ThemesHelper.getInstance().getSettings().values().iterator());
+		doBusiness(iwc, ThemesHelper.getInstance().getThemeSettings().values().iterator());
 		
 		IWMainApplicationSettings applicationSettings  = iwc.getApplicationSettings();
 		
@@ -62,8 +62,6 @@ public class SiteInfo extends Block {
 		
 		form.add(getText("Locale: "));
 		form.add(locales);
-		
-		locales.getIndex();
 
 		TableCell2 cell = row.createHeaderCell();
 		cell.add(new Text("Region"));
@@ -73,10 +71,10 @@ public class SiteInfo extends Block {
 		
 		group = table.createBodyRowGroup();
 		
-		ThemeSettings setting = null;
+		Setting setting = null;
 		String value = null;
 		TextInput regionValue = null;
-		Iterator <ThemeSettings> it = ThemesHelper.getInstance().getSettings().values().iterator();
+		Iterator <Setting> it = ThemesHelper.getInstance().getThemeSettings().values().iterator();
 		while(it.hasNext()) {
 			setting = it.next();
 			row = group.createRow();
@@ -99,11 +97,11 @@ public class SiteInfo extends Block {
 		add(form);
 	}
 	
-	private void doBusiness(IWContext iwc, Iterator <ThemeSettings> it) {
+	private void doBusiness(IWContext iwc, Iterator <Setting> it) {
 		if (!SAVE_ACTION.equals(iwc.getParameter(SAVE_PARAMETER))) {
 			return;
 		}
-		ThemeSettings setting = null;
+		Setting setting = null;
 		IWMainApplicationSettings applicationSettings  = iwc.getApplicationSettings();
 		String value = null;
 		while (it.hasNext()) {

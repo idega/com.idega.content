@@ -8,6 +8,8 @@ import com.idega.business.IBOHomeImpl;
 
 public class ThemesServiceImpl extends IBOHomeImpl implements ThemesServiceHome {
 
+	private static final long serialVersionUID = 2386262075752356249L;
+
 	public Class getBeanInterfaceClass() {
 		return ThemesService.class;
 	}

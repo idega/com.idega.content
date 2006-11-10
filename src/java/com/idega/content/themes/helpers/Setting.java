@@ -1,6 +1,6 @@
 package com.idega.content.themes.helpers;
 
-public class ThemeSettings {
+public class Setting {
 	
 	private String code;
 	private String label;

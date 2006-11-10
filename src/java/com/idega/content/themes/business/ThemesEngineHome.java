@@ -5,6 +5,6 @@ import javax.ejb.CreateException;
 import com.idega.business.IBOHome;
 import java.rmi.RemoteException;
 
-public interface ThemesPreviewsProviderHome extends IBOHome {
-	public ThemesPreviewsProvider create() throws CreateException, RemoteException;
+public interface ThemesEngineHome extends IBOHome {
+	public ThemesEngine create() throws CreateException, RemoteException;
 }

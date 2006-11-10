@@ -24,6 +24,7 @@ public class ThemesConstants {
 	public static final String SPACE = " ";
 	public static final String SPACE_ENCODED = "%20";
 	public static final String ENCODING = "UTF-8";
+	public static final String SEPARATOR = COMMA;
 	
 	protected static final String THEME_PREVIEW = "_theme_preview";
 	protected static final String THEME_SMALL_PREVIEW = "_small" + THEME_PREVIEW;
@@ -85,11 +86,12 @@ public class ThemesConstants {
 	protected static final String TAG_ATTRIBUTE_TYPE = "type";
 	
 	public static final String THEME_SETTINGS = "/resources/themes/theme.xml";
-	protected static final String THEME_SETTING_CODE = "code";
-	protected static final String THEME_SETTING_LABEL = "label";
-	protected static final String THEME_SETTING_DEFAULT_VALUE = "defaultValue";
-	protected static final String THEME_SETTING_TYPE = "type";
-	protected static final String THEME_SETTING_METHOD = "method";
+	public static final String PAGE_SETTINGS = "/idegaweb/bundles/com.idega.content.bundle/resources/themes/page.xml";
+	protected static final String SETTING_CODE = "code";
+	protected static final String SETTING_LABEL = "label";
+	protected static final String SETTING_DEFAULT_VALUE = "defaultValue";
+	protected static final String SETTING_TYPE = "type";
+	protected static final String SETTING_METHOD = "method";
 	
 	protected static final String CON_THEME = "theme";
 	protected static final String CON_NAME = "name";
@@ -104,7 +106,7 @@ public class ThemesConstants {
 	private static final String[] _DEFAULT_STYLE_FILES = new String[] {"styles.css", "handheld.css", "print.css"};
 	protected static final List <String> DEFAULT_STYLE_FILES = Collections.unmodifiableList(Arrays.asList(_DEFAULT_STYLE_FILES));
 	
-	protected static final String REGION_SYNTAX = "/idegaweb/bundles/com.idega.content.bundle/resources/themes/region.xml";
+	//protected static final String REGION_SYNTAX = "/idegaweb/bundles/com.idega.content.bundle/resources/themes/region.xml";
 	
 	protected static final int SMALL_PREVIEW_WIDTH = 120;
 	protected static final int SMALL_PREVIEW_HEIGHT = 140;

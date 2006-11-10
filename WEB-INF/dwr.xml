@@ -3,16 +3,15 @@
 
 <dwr>
   <allow>
-    <create creator="ibo" javascript="ThemesPreviewsProvider" scope="application">
-      <param name="class" value="com.idega.content.themes.business.ThemesPreviewsProvider"/>
+    <create creator="ibo" javascript="ThemesEngine" scope="application">
+      <param name="class" value="com.idega.content.themes.business.ThemesEngine"/>
     </create>
     <create creator="ibo" javascript="NodeID" scope="application">
       <param name="class" value="com.idega.content.tree.NodeID"/>
     </create>
-    
     <create creator="ibo" javascript="PagePreview" scope="application">
       <param name="class" value="com.idega.content.tree.PagePreview"/>
-    </create>    
+    </create>
   </allow>
   <signatures>
   </signatures>

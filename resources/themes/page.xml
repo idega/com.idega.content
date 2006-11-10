@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+	<key>
+		<code>pageTitle</code>
+		<label>Page Title</label>
+		<defaultValue></defaultValue>
+		<type>text</type>
+		<method>:method:1:implied:void:setTitle:java.lang.String:</method>
+	</key>
+	<key>
+		<code>searchKeywords</code>
+		<label>Search Keywords</label>
+		<defaultValue>keywords</defaultValue>
+		<type>metatext</type>
+		<method>:method:1:implied:void:setMetaTag:java.lang.String:java.lang.String:</method>
+	</key>
+	<key>
+		<code>pageDescription</code>
+		<label>Page Description</label>
+		<defaultValue></defaultValue>
+		<type>metatext</type>
+		<method>:method:1:implied:void:setDescriptionMetaTag:java.lang.String:</method>
+	</key>
+</config>

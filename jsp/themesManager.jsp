@@ -4,14 +4,13 @@
         xmlns:jsf="http://java.sun.com/jsf/core"
         xmlns:wf="http://xmlns.idega.com/com.idega.webface"
         xmlns:ws="http://xmlns.idega.com/com.idega.workspace"
-        xmlns:a="http://java.sun.com/jmaki-jsf"
         xmlns:c="http://xmlns.idega.com/com.idega.content"
         xmlns:x="http://myfaces.apache.org/tomahawk"
 version="1.2">
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 	<jsf:view>
         <ws:page id="themeManager" javascripturls="/dwr/engine.js,
-        				/dwr/interface/ThemesPreviewsProvider.js,
+        				/dwr/interface/ThemesEngine.js,
         				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous-js-1.6.2/lib/prototype.js,
         				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous-js-1.6.2/src/scriptaculous.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
@@ -25,7 +24,7 @@ version="1.2">
 							<x:graphicImage id="themePreview" forceId="true" styleClass="bigThemePreview" url="noImage.png"></x:graphicImage>
 						</x:div>
 						
-						<x:div styleClass="theme_slider">
+						<x:div id="themesSliderContainer" forceId="true" styleClass="theme_slider">
 							<x:div id="leftScrollerContainer" forceId="true" styleClass="leftThemeScroller">	
 								<x:graphicImage url="/idegaweb/bundles/com.idega.content.bundle/resources/images/left.gif" onclick="scroll(this.id)" id="leftScroller" forceId="true"></x:graphicImage>
 							</x:div>	

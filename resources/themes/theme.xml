@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<theme>
+<config>
 	<key>
 		<code>title</code>
 		<label>Title</label>
@@ -64,4 +64,4 @@
 		<type>text</type>
 		<method>setFooter</method>
 	</key>
-</theme>
+</config>

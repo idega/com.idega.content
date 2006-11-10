@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.7 2006/11/09 07:57:51 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.8 2006/11/10 14:43:24 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -24,7 +24,7 @@ import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentIWActionURIHandler;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.business.ThemesService;
-import com.idega.content.themes.helpers.ThemeSettings;
+import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.content.view.ContentViewManager;
@@ -40,15 +40,13 @@ import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/09 07:57:51 $ by $Author: valdas $
+ *  Last modified: $Date: 2006/11/10 14:43:24 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class IWBundleStarter implements IWBundleStartable {
 	
-	private static final URI SETTINGS = URI.create("bundle://" + ContentUtil.IW_BUNDLE_IDENTIFIER + ThemesConstants.THEME_SETTINGS);
-
 	/**
 	 * 
 	 */
@@ -104,18 +102,18 @@ public class IWBundleStarter implements IWBundleStartable {
 		ResourceResolver resolver = new BundleResourceResolver(application);
 		InputStream stream = null;
 		try {
-			stream = resolver.resolve(SETTINGS).getInputStream();
+			stream = resolver.resolve(URI.create("bundle://" + ContentUtil.IW_BUNDLE_IDENTIFIER + ThemesConstants.THEME_SETTINGS)).getInputStream();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
 		ThemesHelper.getInstance(false).loadThemeSettings(stream);
-		Map <String, ThemeSettings> settings = ThemesHelper.getInstance(false).getSettings();
+		Map <String, Setting> settings = ThemesHelper.getInstance(false).getThemeSettings();
 		if (settings == null) {
 			return;
 		}
-		Iterator<ThemeSettings> it = settings.values().iterator();
-		ThemeSettings setting = null;
+		Iterator<Setting> it = settings.values().iterator();
+		Setting setting = null;
 		IWMainApplicationSettings applicationSettings  = application.getSettings();
 		while (it.hasNext()) {
 			setting = it.next();

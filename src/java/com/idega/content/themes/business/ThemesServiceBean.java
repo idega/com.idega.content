@@ -122,12 +122,6 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		return sHome;
 	}
 	
-	/*public ICFileHome getICFileHome() throws RemoteException {
-		ICFileHome sHome = (ICFileHome) getIDOHome(ICFile.class);
-		return sHome;
-	}*/
-	
-	
 	public BuilderService getBuilderService(){
 		try {
 			return (BuilderService) this.getServiceInstance(BuilderService.class);
@@ -135,7 +129,6 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			log.error(e);
 		}
 		return null;
-		
 	}
 	
 	private ICPage getICPage(int id) {

@@ -43,7 +43,7 @@ function closeLoadingMessage() {
 function getThemeStyleVariations(themeID) {
 	setGlobalId(themeID);
 	setThemeForPreview(themeID);
-	ThemesPreviewsProvider.getThemeStyleVariations(themeID, insertStyleVariations);
+	ThemesEngine.getThemeStyleVariations(themeID, insertStyleVariations);
 }
 
 function insertStyleVariations(variations) {
@@ -64,7 +64,7 @@ function changeTheme(themeID, styleGroupName, newStyleMember, type, checked) {
 	}
 	var themeNameObj = document.getElementById("theme_name");
 	if (themeNameObj != null) {
-		ThemesPreviewsProvider.changeTheme(themeID, styleGroupName, newStyleMember, themeNameObj.value, radio, checked, changeThemeCallback);
+		ThemesEngine.changeTheme(themeID, styleGroupName, newStyleMember, themeNameObj.value, radio, checked, changeThemeCallback);
 	}
 }
 
@@ -85,7 +85,7 @@ function saveTheme() {
 		showLoadingMessage('Saving theme...');
 		var themeNameObj = document.getElementById("theme_name");
 		if (themeNameObj != null) {
-			ThemesPreviewsProvider.saveTheme(globalThemeID, themeNameObj.value, saveThemeCallback);
+			ThemesEngine.saveTheme(globalThemeID, themeNameObj.value, saveThemeCallback);
 		}
 	}
 }
@@ -158,7 +158,7 @@ function scroll(id) {
 function getThemes(themeID) {
 	showLoadingMessage("Generating preview");
 	setGlobalId(themeID);
-	ThemesPreviewsProvider.getThemesPreviewsInfo(getThemesCallback);
+	ThemesEngine.getThemesPreviewsInfo(getThemesCallback);
 }
 
 function getThemesCallback(themes) {
@@ -245,10 +245,11 @@ function Theme(themeName, url, urlToBig, id) {
 function setPreview(url) {
 	var preview = document.getElementById("themePreview");
 	if (preview == null) {
-		preview = document.createElement("img");
+		/*preview = document.createElement("img");
 		preview.setAttribute("id", "themePreview");
 		preview.className = "bigThemePreview";
-		document.getElementById("themePreviewContainer").appendChild(preview);
+		document.getElementById("themePreviewContainer").appendChild(preview);*/
+		return;
 	}
 	preview.src = url;
 }
@@ -396,7 +397,7 @@ function insertStyle(themeID, page) {
 		return;
 	}
 	showLoadingMessage("Applying style...");
-	ThemesPreviewsProvider.setSelectedStyle(themeID, page, setSelectedStyleCallback);
+	ThemesEngine.setSelectedStyle(themeID, page, setSelectedStyleCallback);
 }
 
 function setSelectedStyleCallback(result) {
@@ -404,7 +405,7 @@ function setSelectedStyleCallback(result) {
 }
 
 function insertStyleFile() {
-	var style=document.createElement("link");
+	var style = document.createElement("link");
 	style.setAttribute("type","text/css");
 	style.setAttribute("href", "/idegaweb/bundles/com.idega.content.bundle/resources/style/themes_manager.css");
 	style.setAttribute("rel","stylesheet");
