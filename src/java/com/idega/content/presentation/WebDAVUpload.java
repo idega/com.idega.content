@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.5.2.7 2006/11/09 20:19:49 gimmi Exp $
+ * $Id: WebDAVUpload.java,v 1.5.2.8 2006/11/10 00:27:22 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -35,10 +35,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/09 20:19:49 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/11/10 00:27:22 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.5.2.7 $
+ * @version $Revision: 1.5.2.8 $
  */
 public class WebDAVUpload extends ContentBlock {
 
@@ -211,7 +211,7 @@ public class WebDAVUpload extends ContentBlock {
 		}
 		
 		UICommand upload = null;
-		if (!useLinkAsSubmit) {
+		if (useLinkAsSubmit) {
 			upload = new HtmlCommandButton();
 			((HtmlCommandButton) upload).setStyleClass(getStyleClassButton());
 			if (onClickAction != null) {
@@ -224,9 +224,12 @@ public class WebDAVUpload extends ContentBlock {
 			if (onClickAction != null) {
 				((HtmlCommandLink) upload).setOnclick(onClickAction);
 			}
-			HtmlOutputText text = new HtmlOutputText();
-			getBundle().getLocalizedUIComponent("upload", text);
-			upload.getChildren().add(text);
+			WFContainer container = new WFContainer();
+			container.setSpan(true);
+			HtmlOutputText text = getBundle().getLocalizedText("upload");
+			container.getChildren().add(text);
+			upload.getChildren().add(container);
+			
 		}
 		upload.setId(getId()+"_uploadCmd");
 		upload.setActionListener(WFUtil.createMethodBinding("#{"+BEAN_ID+"."+getUploadMethod()+"}", new Class[]{ActionEvent.class}));
