@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVDocumentDeleter.java,v 1.7 2006/10/24 14:47:34 gimmi Exp $
+ * $Id: WebDAVDocumentDeleter.java,v 1.8 2006/11/10 01:28:30 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -11,9 +11,14 @@ package com.idega.content.presentation;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.faces.component.UICommand;
 import javax.faces.component.html.HtmlCommandButton;
+import javax.faces.component.html.HtmlCommandLink;
 import javax.faces.component.html.HtmlForm;
+import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
@@ -22,17 +27,17 @@ import javax.faces.event.ActionListener;
 import org.apache.commons.httpclient.HttpException;
 
 import com.idega.presentation.IWContext;
-import com.idega.presentation.Table;
 import com.idega.slide.util.WebdavExtendedResource;
+import com.idega.webface.WFContainer;
 import com.idega.webface.WFUtil;
 
 
 /**
  * 
- *  Last modified: $Date: 2006/10/24 14:47:34 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/11/10 01:28:30 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class WebDAVDocumentDeleter extends ContentBlock implements ActionListener {
 
@@ -41,11 +46,15 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	public static final String PARAMETER_PATH = "dd_pp";
 	
 	private boolean embedInForm = false;
+	private String redirectOnSuccessURI = null;
+	private boolean useLinkAsSubmit = false;
+	private List WFContainerLines = null;
+	private HtmlForm form = null;
 	
 	protected void initializeComponent(FacesContext context) {
 		String pathToUse = IWContext.getIWContext(context).getParameter(PARAMETER_PATH);
 		Boolean deleted = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getDeleted");
-		Table table = null;
+		WFContainerLines = new ArrayList();
 		if (deleted == null) {
 			String clickedPath = null;
 			if (pathToUse != null) {
@@ -76,9 +85,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 				e.printStackTrace();
 			}
 	
-			table = new Table();
-			int row = 1;
-			table.add(WFUtil.getText(path, "wf_text"), 1, row++);
+			addLineToContainer(new Object[]{WFUtil.getText(path)}, "wf_text", "resource_path");
 			
 //			if (showResourceName) {
 //				HtmlOutputText resName = new HtmlOutputText();
@@ -89,30 +96,37 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 //			}
 			
 			if (resource.isCollection()) {
-				table.add(getText("are_you_sure_you_want_to_delete_folder"), 1, row++);
+				addLineToContainer(new Object[]{getText("are_you_sure_you_want_to_delete_folder")}, "verify", "verify_question");
 			} else {
-				table.add(getText("are_you_sure_you_want_to_delete_file"), 1, row++);
+				addLineToContainer(new Object[]{getText("are_you_sure_you_want_to_delete_file")}, "verify", "verify_question");
 			}
 			
-			HtmlCommandButton button = new HtmlCommandButton();
+			UICommand button = null;
+			if (useLinkAsSubmit) {
+				button = new HtmlCommandLink();
+				HtmlOutputText text = getBundle().getLocalizedText("yes");
+				text.setStyleClass("forcespan");
+				button.getChildren().add(text);
+			} else {
+				button = new HtmlCommandButton();
+				getBundle().getLocalizedUIComponent("yes", button);
+			}
 			button.getAttributes().put(ACTION, ACTION_YES);
 			button.getAttributes().put(PARAMETER_PATH, resource.getPath());
 			button.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
-			getBundle().getLocalizedUIComponent("yes", button);
-			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
-			table.add(button, 1, row);
+
+			addLineToContainer(new Object[]{button}, "submit", "submit");
 			
 		} else {
-			table = new Table();
 			Boolean wasFolder = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getWasFolder");
 			if (deleted.booleanValue()) {
 				if (wasFolder.booleanValue()) {
-					table.add(getText("folder_deleted"));
+					addLineToContainer(new Object[]{getText("folder_deleted")}, "delete_result", "delete_result");
 				} else {
-					table.add(getText("file_deleted"));
+					addLineToContainer(new Object[]{getText("file_deleted")}, "delete_result", "delete_result");
 				}
 			} else {
-				table.add(getText("deletion_failed"));
+				addLineToContainer(new Object[]{getText("deletion_failed")}, "delete_result", "delete_result");
 			}
 			try {
 				ContentViewer viewer = (ContentViewer) getParent().getParent();
@@ -121,21 +135,56 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 				System.out.println("[WebDAVDocumentDeleter] grandpa is not ContentViewer");
 			}
 		}
-		if (table != null) {
-			if (embedInForm) {
-				HtmlForm form = new HtmlForm();
-				form.setId("webdavdeleterform_"+getId());
-				form.setEnctype("multipart/form-data");
-				form.getChildren().add(table);
-				getChildren().add(form);
-			} else {
-				getChildren().add(table);
+
+		if (embedInForm) {
+			HtmlForm form = getForm();
+			add(form);
+		}
+		
+		addLines();
+	}
+
+	private HtmlForm getForm() {
+		if (this.form == null) {
+			form = new HtmlForm();
+			form.setStyleClass("wf_webdav_deleter_form");
+			form.setId("webdavdeleterform_"+getId());
+			form.setEnctype("multipart/form-data");
+		}
+		return form;
+	}
+
+	private void addLineToContainer(Object[] lineElements, String styleClass, String ID) {
+		if (lineElements == null) {
+			return;
+		}
+		WFContainer line = new WFContainer();
+		line.setStyleClass(styleClass);
+		line.setId(ID);
+		for (int i = 0; i < lineElements.length; i++) {
+			line.getChildren().add(lineElements[i]);
+		}
+		WFContainerLines.add(line);
+	}
+	
+	private void addLines() {
+		if (WFContainerLines == null) {
+			return;
+		}
+		
+		if (embedInForm) {
+			for (int i = 0; i < WFContainerLines.size(); i++) {
+				getForm().getChildren().add(WFContainerLines.get(i));
+			}
+		} else {
+			for (int i = 0; i < WFContainerLines.size(); i++) {
+				getChildren().add(WFContainerLines.get(i));
 			}
 		}
 	}
-
+	
 	public void processAction(ActionEvent arg0) throws AbortProcessingException {
-		HtmlCommandButton source = (HtmlCommandButton) arg0.getSource();
+		UICommand source = (UICommand) arg0.getSource();
 		String path = (String) source.getAttributes().get(PARAMETER_PATH);
 		String action = (String) source.getAttributes().get(ACTION);
 		
@@ -168,6 +217,9 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 			}
 			WFUtil.invoke("webdavdocumentdeleterbean", "setDeleted", deleted, Boolean.class);
 			WFUtil.invoke("webdavdocumentdeleterbean", "setWasFolder", wasFolder, Boolean.class);
+			if (deleted != null && deleted.booleanValue() && redirectOnSuccessURI != null) {
+				IWContext.getInstance().sendRedirect(redirectOnSuccessURI);
+			}
 		}
 	}
 
@@ -178,6 +230,38 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	public boolean getEmbeddedInForm() {
 		return embedInForm;
 	}
+
+	public void setRedirectOnSuccessURI(String uri) {
+		this.redirectOnSuccessURI = uri;
+	}
+
+	public String getRedirectOnSuccessURI() {
+		return redirectOnSuccessURI;
+	}
 	
+	public boolean getUseLinkAsSubmit() {
+		return useLinkAsSubmit;
+	}
+
+	public void setUseLinkAsSubmit(boolean useLinkAsSubmit) {
+		this.useLinkAsSubmit = useLinkAsSubmit;
+	}
+	
+	public Object saveState(FacesContext ctx) {
+		Object values[] = new Object[4];
+		values[0] = super.saveState(ctx);
+		values[1] = new Boolean(embedInForm);
+		values[2] = redirectOnSuccessURI;
+		values[3] = new Boolean(useLinkAsSubmit);
+		return values;
+	}
+
+	public void restoreState(FacesContext ctx, Object state) {
+		Object values[] = (Object[]) state;
+		super.restoreState(ctx, values[0]);
+		this.embedInForm = ((Boolean) values[1]).booleanValue();
+		redirectOnSuccessURI = (String) values[2];
+		this.useLinkAsSubmit = ((Boolean) values[3]).booleanValue();
+	}	
 
 }
