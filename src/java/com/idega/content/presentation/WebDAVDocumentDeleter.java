@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVDocumentDeleter.java,v 1.6.2.5 2006/11/10 00:27:41 gimmi Exp $
+ * $Id: WebDAVDocumentDeleter.java,v 1.6.2.6 2006/11/10 01:10:28 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -18,6 +18,7 @@ import javax.faces.component.UICommand;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlCommandLink;
 import javax.faces.component.html.HtmlForm;
+import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
@@ -33,10 +34,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/10 00:27:41 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/11/10 01:10:28 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.6.2.5 $
+ * @version $Revision: 1.6.2.6 $
  */
 public class WebDAVDocumentDeleter extends ContentBlock implements ActionListener {
 
@@ -103,10 +104,9 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 			UICommand button = null;
 			if (useLinkAsSubmit) {
 				button = new HtmlCommandLink();
-				WFContainer container = new WFContainer();
-				container.setSpan(true);
-				container.add(getBundle().getLocalizedText("yes"));
-				button.getChildren().add(container);
+				HtmlOutputText text = getBundle().getLocalizedText("yes");
+				text.setStyleClass("forcespan");
+				button.getChildren().add(text);
 			} else {
 				button = new HtmlCommandButton();
 				getBundle().getLocalizedUIComponent("yes", button);

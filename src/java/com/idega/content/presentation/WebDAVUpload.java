@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.5.2.9 2006/11/10 00:43:51 gimmi Exp $
+ * $Id: WebDAVUpload.java,v 1.5.2.10 2006/11/10 01:10:28 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -35,10 +35,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/10 00:43:51 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/11/10 01:10:28 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.5.2.9 $
+ * @version $Revision: 1.5.2.10 $
  */
 public class WebDAVUpload extends ContentBlock {
 
@@ -224,11 +224,9 @@ public class WebDAVUpload extends ContentBlock {
 			if (onClickAction != null) {
 				((HtmlCommandLink) upload).setOnclick(onClickAction);
 			}
-			WFContainer container = new WFContainer();
-			container.setSpan(true);
 			HtmlOutputText text = getBundle().getLocalizedText("upload");
-			container.getChildren().add(text);
-			upload.getChildren().add(container);
+			text.setStyleClass("forcespan");
+			upload.getChildren().add(text);
 			
 		}
 		upload.setId(getId()+"_uploadCmd");
