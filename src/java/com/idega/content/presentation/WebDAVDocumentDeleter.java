@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVDocumentDeleter.java,v 1.6.2.4 2006/11/09 19:09:50 gimmi Exp $
+ * $Id: WebDAVDocumentDeleter.java,v 1.6.2.5 2006/11/10 00:27:41 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -11,6 +11,8 @@ package com.idega.content.presentation;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.faces.component.UICommand;
 import javax.faces.component.html.HtmlCommandButton;
@@ -24,17 +26,17 @@ import javax.faces.event.ActionListener;
 import org.apache.commons.httpclient.HttpException;
 
 import com.idega.presentation.IWContext;
-import com.idega.presentation.Table;
 import com.idega.slide.util.WebdavExtendedResource;
+import com.idega.webface.WFContainer;
 import com.idega.webface.WFUtil;
 
 
 /**
  * 
- *  Last modified: $Date: 2006/11/09 19:09:50 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/11/10 00:27:41 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.6.2.4 $
+ * @version $Revision: 1.6.2.5 $
  */
 public class WebDAVDocumentDeleter extends ContentBlock implements ActionListener {
 
@@ -45,11 +47,13 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	private boolean embedInForm = false;
 	private String redirectOnSuccessURI = null;
 	private boolean useLinkAsSubmit = false;
-
+	private List WFContainerLines = null;
+	private HtmlForm form = null;
+	
 	protected void initializeComponent(FacesContext context) {
 		String pathToUse = IWContext.getIWContext(context).getParameter(PARAMETER_PATH);
 		Boolean deleted = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getDeleted");
-		Table table = null;
+		WFContainerLines = new ArrayList();
 		if (deleted == null) {
 			String clickedPath = null;
 			if (pathToUse != null) {
@@ -80,9 +84,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 				e.printStackTrace();
 			}
 	
-			table = new Table();
-			int row = 1;
-			table.add(WFUtil.getText(path, "wf_text"), 1, row++);
+			addLineToContainer(new Object[]{WFUtil.getText(path)}, "wf_text", "resource_path");
 			
 //			if (showResourceName) {
 //				HtmlOutputText resName = new HtmlOutputText();
@@ -93,15 +95,18 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 //			}
 			
 			if (resource.isCollection()) {
-				table.add(getText("are_you_sure_you_want_to_delete_folder"), 1, row++);
+				addLineToContainer(new Object[]{getText("are_you_sure_you_want_to_delete_folder")}, "verify", "verify_question");
 			} else {
-				table.add(getText("are_you_sure_you_want_to_delete_file"), 1, row++);
+				addLineToContainer(new Object[]{getText("are_you_sure_you_want_to_delete_file")}, "verify", "verify_question");
 			}
 			
 			UICommand button = null;
 			if (useLinkAsSubmit) {
 				button = new HtmlCommandLink();
-				button.getChildren().add(getBundle().getLocalizedText("yes"));
+				WFContainer container = new WFContainer();
+				container.setSpan(true);
+				container.add(getBundle().getLocalizedText("yes"));
+				button.getChildren().add(container);
 			} else {
 				button = new HtmlCommandButton();
 				getBundle().getLocalizedUIComponent("yes", button);
@@ -110,20 +115,18 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 			button.getAttributes().put(PARAMETER_PATH, resource.getPath());
 			button.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 
-			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
-			table.add(button, 1, row);
+			addLineToContainer(new Object[]{button}, "submit", "submit");
 			
 		} else {
-			table = new Table();
 			Boolean wasFolder = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getWasFolder");
 			if (deleted.booleanValue()) {
 				if (wasFolder.booleanValue()) {
-					table.add(getText("folder_deleted"));
+					addLineToContainer(new Object[]{getText("folder_deleted")}, "delete_result", "delete_result");
 				} else {
-					table.add(getText("file_deleted"));
+					addLineToContainer(new Object[]{getText("file_deleted")}, "delete_result", "delete_result");
 				}
 			} else {
-				table.add(getText("deletion_failed"));
+				addLineToContainer(new Object[]{getText("deletion_failed")}, "delete_result", "delete_result");
 			}
 			try {
 				ContentViewer viewer = (ContentViewer) getParent().getParent();
@@ -132,22 +135,56 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 				System.out.println("[WebDAVDocumentDeleter] grandpa is not ContentViewer");
 			}
 		}
-		if (table != null) {
-			if (embedInForm) {
-				HtmlForm form = new HtmlForm();
-				form.setStyleClass("wf_webdav_deleter_form");
-				form.setId("webdavdeleterform_"+getId());
-				form.setEnctype("multipart/form-data");
-				form.getChildren().add(table);
-				getChildren().add(form);
-			} else {
-				getChildren().add(table);
+
+		if (embedInForm) {
+			HtmlForm form = getForm();
+			add(form);
+		}
+		
+		addLines();
+	}
+
+	private HtmlForm getForm() {
+		if (this.form == null) {
+			form = new HtmlForm();
+			form.setStyleClass("wf_webdav_deleter_form");
+			form.setId("webdavdeleterform_"+getId());
+			form.setEnctype("multipart/form-data");
+		}
+		return form;
+	}
+
+	private void addLineToContainer(Object[] lineElements, String styleClass, String ID) {
+		if (lineElements == null) {
+			return;
+		}
+		WFContainer line = new WFContainer();
+		line.setStyleClass(styleClass);
+		line.setId(ID);
+		for (int i = 0; i < lineElements.length; i++) {
+			line.getChildren().add(lineElements[i]);
+		}
+		WFContainerLines.add(line);
+	}
+	
+	private void addLines() {
+		if (WFContainerLines == null) {
+			return;
+		}
+		
+		if (embedInForm) {
+			for (int i = 0; i < WFContainerLines.size(); i++) {
+				getForm().getChildren().add(WFContainerLines.get(i));
+			}
+		} else {
+			for (int i = 0; i < WFContainerLines.size(); i++) {
+				getChildren().add(WFContainerLines.get(i));
 			}
 		}
 	}
-
+	
 	public void processAction(ActionEvent arg0) throws AbortProcessingException {
-		HtmlCommandButton source = (HtmlCommandButton) arg0.getSource();
+		UICommand source = (UICommand) arg0.getSource();
 		String path = (String) source.getAttributes().get(PARAMETER_PATH);
 		String action = (String) source.getAttributes().get(ACTION);
 		

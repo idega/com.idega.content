@@ -5,7 +5,15 @@
   </properties>
   <body>
   
-      <release version="3.1.14" date="2006-11-09">
+    <release version="3.1.15" date="2006-11-10">
+      <action dev="gimmi" type="update">
+      	Fixes to uploader and deleter link as submitter
+      	Removed Table from deleter and replaced with DIV
+      	Updated webface[3.1.1]
+      </action>
+    </release>
+    
+    <release version="3.1.14" date="2006-11-09">
       <action dev="gimmi" type="update">
 		Redirect on success added to upload and deleter objects
       	Tooltip on delete link
