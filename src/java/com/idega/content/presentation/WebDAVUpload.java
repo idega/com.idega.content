@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.9 2006/10/30 16:53:54 gimmi Exp $
+ * $Id: WebDAVUpload.java,v 1.10 2006/11/10 01:23:41 gimmi Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -13,6 +13,8 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.faces.component.UICommand;
+import javax.faces.component.html.HtmlCommandLink;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlForm;
 import javax.faces.component.html.HtmlGraphicImage;
@@ -33,10 +35,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/10/30 16:53:54 $ by $Author: gimmi $
+ *  Last modified: $Date: 2006/11/10 01:23:41 $ by $Author: gimmi $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class WebDAVUpload extends ContentBlock {
 
@@ -45,6 +47,8 @@ public class WebDAVUpload extends ContentBlock {
 	protected static final String DEFAULT_OUTPUT_TEXT_STYLE = "wf_inputtext";
 	
 	protected static final String DEFAULT_BUTTON_STYLE = "wf_webdav_upload_button";
+	
+	protected static final String DEFAULT_FORM_STYLE = "wf_webdav_upload_form";
 	
 	protected static final String DEFAULT_INPUT_FILE_STYLE = "fileUploadInput";
 	
@@ -105,6 +109,8 @@ public class WebDAVUpload extends ContentBlock {
 	private HtmlForm form;
 		
 	private boolean showStatusAfterUploadAttempt = false;
+	private String redirectOnSuccessURI = null;
+	private boolean useLinkAsSubmit = false;
 	
 	protected void initializeComponent(FacesContext context) {
 		
@@ -117,15 +123,17 @@ public class WebDAVUpload extends ContentBlock {
 			Boolean success = bean.isUploadSuccessful();
 
 			HtmlOutputText status = null;
+			String sStatus = "failed";
 			if (success.booleanValue()) {
 				status = getText("file_uploaded_successfully", getStyleClassGiveName());
+				sStatus = "success";
 			} else {
 				status = getText("file_upload_failed", getStyleClassGiveName());
 			}
 			status.setId(getId()+"_status");
 			status.setTitle(message);
 
-			addLineToContainer(new Object[] {status}, getStyleClassWFContainerLine(), "status");
+			addLineToContainer(new Object[] {status}, getStyleClassWFContainerLine()+ " "+sStatus, "status");
 		}
 				
 		HtmlOutputText selectFile = getText("select_a_file_to_upload", getStyleClassSelectFile());
@@ -183,7 +191,9 @@ public class WebDAVUpload extends ContentBlock {
 		} else if (this.uploadPath != null) {
 			bean.setUploadFilePath(this.uploadPath);
 		}		
-
+		if (redirectOnSuccessURI != null) {
+			bean.setRedirectOnSuccessURI(redirectOnSuccessURI);
+		}
 		HtmlOutputLink fileLink = null;
 		if (useFileLink) {
 			fileLink = new HtmlOutputLink();
@@ -201,39 +211,53 @@ public class WebDAVUpload extends ContentBlock {
 			imagePreview.setValueBinding("value", WFUtil.createValueBinding("#{"+BEAN_ID+".imagePath}"));
 		}
 		
-		HtmlCommandButton upload = new HtmlCommandButton();
-		upload.setId(getId()+"_uploadCmd");
-		upload.setStyleClass(getStyleClassButton());
-		upload.setActionListener(WFUtil.createMethodBinding("#{"+BEAN_ID+"."+getUploadMethod()+"}", new Class[]{ActionEvent.class}));
-		if (onClickAction != null) {
-			upload.setOnclick(onClickAction);
+		UICommand upload = null;
+		if (!useLinkAsSubmit) {
+			upload = new HtmlCommandButton();
+			((HtmlCommandButton) upload).setStyleClass(getStyleClassButton());
+			if (onClickAction != null) {
+				((HtmlCommandButton) upload).setOnclick(onClickAction);
+			}
+			getBundle().getLocalizedUIComponent("upload", upload);
+		} else {
+			upload = new HtmlCommandLink();
+			((HtmlCommandLink) upload).setStyleClass(getStyleClassButton());
+			if (onClickAction != null) {
+				((HtmlCommandLink) upload).setOnclick(onClickAction);
+			}
+			HtmlOutputText text = getBundle().getLocalizedText("upload");
+			text.setStyleClass("forcespan");
+			upload.getChildren().add(text);
+			
 		}
-		getBundle().getLocalizedUIComponent("upload", upload);
+		upload.setId(getId()+"_uploadCmd");
+		upload.setActionListener(WFUtil.createMethodBinding("#{"+BEAN_ID+"."+getUploadMethod()+"}", new Class[]{ActionEvent.class}));
+		
 		
 		
 		addLineToContainer(new Object[] {selectFile, fileUpload}, getStyleClassWFContainerLine(), "upload_file");
 		
 		if (useFileName) {
-			addLineToContainer(new Object[] {giveName, fileName}, getStyleClassWFContainerLine(), "file_name");
+			addLineToContainer(new Object[] {giveName, fileName}, getStyleClassWFContainerLine()+" filename", "file_name");
 		}
 		
 		if (useVersionComment) {
-			addLineToContainer(new Object[] {versionText, comment}, getStyleClassWFContainerLine(), "upload_comment");
+			addLineToContainer(new Object[] {versionText, comment}, getStyleClassWFContainerLine()+" comment", "upload_comment");
 		}
 		
 		if (useUploadPath) {
-			addLineToContainer(new Object[] {folder, uploadPath}, getStyleClassWFContainerLine(), "upload_path");
+			addLineToContainer(new Object[] {folder, uploadPath}, getStyleClassWFContainerLine()+" uploadpath", "upload_path");
 		}
 		
 		if (useFileLink && useImagePreview) {
-			addLineToContainer(new Object[] {fileLink, imagePreview}, getStyleClassWFContainerLine(), "file_link_image_preview");
+			addLineToContainer(new Object[] {fileLink, imagePreview}, getStyleClassWFContainerLine()+ "filelink_imgprev", "file_link_image_preview");
 		}
 		else {
 			if (useFileLink) {
-				addLineToContainer(new Object[] {fileLink}, getStyleClassWFContainerLine(), "file_link");
+				addLineToContainer(new Object[] {fileLink}, getStyleClassWFContainerLine()+" filelink", "file_link");
 			}
 			if (useImagePreview) {
-				addLineToContainer(new Object[] {imagePreview}, getStyleClassWFContainerLine(), "image_preview");
+				addLineToContainer(new Object[] {imagePreview}, getStyleClassWFContainerLine()+" imgprev", "image_preview");
 			}
 		}
 		
@@ -492,13 +516,29 @@ public class WebDAVUpload extends ContentBlock {
 	public void setShowStatusAfterUploadAttempt(boolean showStatusAfterUploadAttempt) {
 		this.showStatusAfterUploadAttempt = showStatusAfterUploadAttempt;
 	}
-	
+	public void setRedirectOnSuccessURI(String uri) {
+		this.redirectOnSuccessURI = uri;
+	}
+
+	public String getRedirectOnSuccessURI() {
+		return redirectOnSuccessURI;
+	}
+
+	public boolean getUseLinkAsSubmit() {
+		return useLinkAsSubmit;
+	}
+
+	public void setUseLinkAsSubmit(boolean useLinkAsSubmit) {
+		this.useLinkAsSubmit = useLinkAsSubmit;
+	}	
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[4];
+		Object values[] = new Object[6];
 		values[0] = super.saveState(ctx);
 		values[1] = new Boolean(useUserHomeFolder);
 		values[2] = new Boolean(embedInForm);
 		values[3] = new Boolean(showStatusAfterUploadAttempt);
+		values[4] = redirectOnSuccessURI;
+		values[5] = new Boolean(useLinkAsSubmit);
 		return values;
 	}
 
@@ -508,6 +548,8 @@ public class WebDAVUpload extends ContentBlock {
 		this.useUserHomeFolder = ((Boolean) values[1]).booleanValue();
 		this.embedInForm = ((Boolean) values[2]).booleanValue();
 		showStatusAfterUploadAttempt = ((Boolean) values[3]).booleanValue();
+		redirectOnSuccessURI = (String) values[4];
+		useLinkAsSubmit = ((Boolean) values[5]).booleanValue();
 	}
 
 }
