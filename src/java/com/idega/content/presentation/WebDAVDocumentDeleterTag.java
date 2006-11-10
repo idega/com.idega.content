@@ -8,6 +8,7 @@ public class WebDAVDocumentDeleterTag extends UIComponentTag {
 	private boolean embedInForm;
 	private String redirectOnSuccessURI;
 	private boolean useLinkAsSubmit;
+	private boolean showFullPath;
 	
 	public String getComponentType() {
 		return "WebDAVDocumentDeleter";
@@ -41,12 +42,21 @@ public class WebDAVDocumentDeleterTag extends UIComponentTag {
 		this.useLinkAsSubmit = useLinkAsSubmit;
 	}
 	
+	public boolean getShowFullPath() {
+		return showFullPath;
+	}
+
+	public void setShowFullPath(boolean showFullPath) {
+		this.showFullPath = showFullPath;
+	}
+	
 	public void release() {   
 		super.release();      
 
 		this.embedInForm = false;
 		this.redirectOnSuccessURI = null;
 		useLinkAsSubmit = false;
+		showFullPath = true;
 	}
 	
 	protected void setProperties(UIComponent component) {      
@@ -57,6 +67,7 @@ public class WebDAVDocumentDeleterTag extends UIComponentTag {
 			deleter.setEmbeddedInForm(embedInForm);
 			deleter.setRedirectOnSuccessURI(redirectOnSuccessURI);
 			deleter.setUseLinkAsSubmit(useLinkAsSubmit);
+			deleter.setShowFullPath(showFullPath);
 		}
 	}
 

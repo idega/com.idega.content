@@ -150,6 +150,11 @@
 			<property-name>useLinkAsSubmit</property-name>
 			<property-class>boolean</property-class>
 		</property>
+		<property>
+			<display-name>Show full resource path</display-name>
+			<property-name>showFullPath</property-name>
+			<property-class>boolean</property-class>
+		</property>		
 		<component-extension>
 			<idegaweb-info>
 				<builder-visible>true</builder-visible>

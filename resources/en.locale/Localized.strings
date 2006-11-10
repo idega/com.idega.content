@@ -65,6 +65,7 @@ current_folder=Current folder
 current_version=Current version
 delete=Delete
 deletion_failed=Deletion failed
+delete_file=Delete file
 description=Description
 details=Details
 document_details=Document details
