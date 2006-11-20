@@ -33,5 +33,5 @@ public interface ThemesService extends IBOService, IWSlideChangeListener {
 	/**
 	 * @see com.idega.content.themes.business.ThemesServiceBean#getBuilderService
 	 */
-	public BuilderService getBuilderService() throws RemoteException;
+	public BuilderService getBuilderService();
 }

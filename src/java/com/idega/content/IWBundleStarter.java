@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.8 2006/11/10 14:43:24 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.9 2006/11/20 17:40:41 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -40,10 +40,10 @@ import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/10 14:43:24 $ by $Author: valdas $
+ *  Last modified: $Date: 2006/11/20 17:40:41 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class IWBundleStarter implements IWBundleStartable {
 	
@@ -117,8 +117,11 @@ public class IWBundleStarter implements IWBundleStartable {
 		IWMainApplicationSettings applicationSettings  = application.getSettings();
 		while (it.hasNext()) {
 			setting = it.next();
-			applicationSettings.setProperty(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() +
-					ThemesConstants.THEMES_PROPERTY_END, setting.getDefaultValue());
+			if (applicationSettings.getProperty(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() +
+					ThemesConstants.THEMES_PROPERTY_END) == null) { // Not overriding existing values
+				applicationSettings.setProperty(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() +
+						ThemesConstants.THEMES_PROPERTY_END, setting.getDefaultValue());
+			}
 		}
 	}
 }

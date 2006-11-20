@@ -6,33 +6,37 @@ import java.util.Random;
 public class ThemesLoader {
 	
 	private Theme theme = null;
-	private Random generator = new Random();
 	private ThemesHelper helper = null;
+	private Random idGenerator = null;
 	
 	public ThemesLoader(ThemesHelper helper) {
 		this.helper = helper;
+		idGenerator = new Random();
 	}
 	
-	public synchronized boolean loadTheme(String originalUri, String encodedUri, boolean newTheme) {
+	public synchronized boolean loadTheme(String originalUri, String encodedUri, boolean newTheme, boolean manuallyCreated) {
 		if (encodedUri == null || originalUri == null) {
 			return false;
 		}
+
 		encodedUri = getUriWithoutContent(encodedUri);
 		originalUri = getUriWithoutContent(originalUri);
 		
-		createNewTheme(originalUri, encodedUri, newTheme);
+		if (createNewTheme(originalUri, encodedUri, newTheme, manuallyCreated) == null) {
+			return false;
+		}
 		
 		return true;
 	}
 	
-	public synchronized boolean loadThemes(List <String> urisToThemes, boolean newThemes) {
+	public synchronized boolean loadThemes(List <String> urisToThemes, boolean newThemes, boolean manuallyCreated) {
 		if (urisToThemes == null) {
 			return false;
 		}
 		
 		boolean result = true;
 		for (int i = 0; (i < urisToThemes.size() && result); i++) {
-			result = loadTheme(helper.decodeUrl(urisToThemes.get(i)), urisToThemes.get(i), newThemes);
+			result = loadTheme(helper.decodeUrl(urisToThemes.get(i)), urisToThemes.get(i), newThemes, manuallyCreated);
 		}
 			
 		return result;
@@ -42,16 +46,7 @@ public class ThemesLoader {
 		if (theme == null) {
 			theme = new Theme(getThemeId());
 			theme.setNewTheme(newTheme);
-			theme.setLoading(true);
 		}
-	}
-	
-	private String getThemeId() {
-		String id = String.valueOf(generator.nextInt(Integer.MAX_VALUE));
-		while (helper.getTheme(id) != null) { // Checking if exists Theme with the same ID
-			id = String.valueOf(generator.nextInt(Integer.MAX_VALUE));
-		}
-		return id;
 	}
 	
 	private void addThemeInfo() {
@@ -60,7 +55,6 @@ public class ThemesLoader {
 		}
 		if (!helper.getThemesCollection().contains(theme)) {
 			helper.addTheme(theme);
-			theme.setLoading(false);
 		}
 		theme = null;
 	}
@@ -74,21 +68,32 @@ public class ThemesLoader {
 		return helper.extractValueFromString(uri, index, uri.length());
 	}
 	
-	public synchronized String createNewTheme(String originalUri, String encodedUri, boolean newTheme) {
-		String themeID = null;
-		
+	public synchronized String createNewTheme(String originalUri, String encodedUri, boolean newTheme, boolean manuallyCreated) {		
 		helper.addUriToTheme(originalUri);
 		
 		initTheme(newTheme);
 		
-		themeID = theme.getThemeId();
+		String themeID = theme.getId();
 		
 		theme.setLinkToSkeleton(encodedUri);
 		theme.setLinkToBase(helper.getLinkToBase(encodedUri));
 		theme.setLinkToBaseAsItIs(helper.getLinkToBase(originalUri));
+		
+		if (manuallyCreated) {
+			theme.setLoading(false);
+		}
+		
 		addThemeInfo();
 		
 		return themeID;
+	}
+	
+	private String getThemeId() {
+		String id = String.valueOf(idGenerator.nextInt(Integer.MAX_VALUE));
+		while (helper.getTheme(id) != null) { // Checking if exists Theme with the same ID
+			id = String.valueOf(idGenerator.nextInt(Integer.MAX_VALUE));
+		}
+		return id;
 	}
 
 }

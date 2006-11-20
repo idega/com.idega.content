@@ -1,5 +1,6 @@
 package com.idega.content.themes.helpers;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,13 +33,9 @@ import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentSearch;
 import com.idega.content.themes.business.ThemesService;
 import com.idega.core.search.business.SearchResult;
-import com.idega.graphics.PreviewGenerator;
-import com.idega.graphics.WebPagePreviewGenerator;
-import com.idega.graphics.image.business.ImageEncoder;
+import com.idega.graphics.Generator;
+import com.idega.graphics.ImageGenerator;
 import com.idega.idegaweb.IWMainApplication;
-import com.idega.io.MemoryFileBuffer;
-import com.idega.io.MemoryInputStream;
-import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
 import com.idega.repository.data.Singleton;
 import com.idega.slide.business.IWSlideService;
@@ -49,7 +46,7 @@ public class ThemesHelper implements Singleton {
 	
 	private volatile static ThemesHelper helper = null;
 	
-	private volatile PreviewGenerator generator = null;
+	private volatile Generator generator = null;
 	private volatile ThemeChanger changer = null;
 	private volatile ThemeStyleVariations variations = null;
 	private volatile ThemesPropertiesExtractor extractor = null;
@@ -58,11 +55,12 @@ public class ThemesHelper implements Singleton {
 	private Map <String, Theme> themes = null;
 	private Map <String, Setting> themeSettings = null;
 	private Map <String, Setting> pageSettings = null;
+	private List <String> themeQueue = null;
 	private List <String> urisToThemes = null;
 	
 	private IWSlideService service = null;
-	private ImageEncoder encoder = null;
 	private ThemesService themesService = null;
+	
 	private boolean checkedFromSlide = false;
 	private boolean loadedThemeSettings = false;
 	private boolean loadedPageSettings = false;
@@ -74,6 +72,7 @@ public class ThemesHelper implements Singleton {
 		themes = new HashMap <String, Theme> ();
 		themeSettings = new HashMap <String, Setting> ();
 		pageSettings = new HashMap <String, Setting> ();
+		themeQueue = new ArrayList <String> ();
 		urisToThemes = new ArrayList <String> ();
 		if (searchForThemes) {
 			searchForThemes();
@@ -102,11 +101,11 @@ public class ThemesHelper implements Singleton {
 		return helper;
 	}
 	
-	public PreviewGenerator getPreviewGenerator() {
+	public Generator getImageGenerator() {
 		if (generator == null) {
 			synchronized (ThemesHelper.class) {
 				if (generator == null) {
-					generator = new WebPagePreviewGenerator();
+					generator = new ImageGenerator();
 				}
 			}
 		}
@@ -172,6 +171,7 @@ public class ThemesHelper implements Singleton {
 	
 	public void searchForThemes() {
 		if (!checkedFromSlide) {
+			checkedFromSlide = true;
 			ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
 			Collection results = search.doSimpleDASLSearch(ThemesConstants.THEME_SEARCH_KEY, ThemesConstants.CONTENT + ThemesConstants.THEMES_PATH);
 			if (results == null) {
@@ -186,7 +186,7 @@ public class ThemesHelper implements Singleton {
 					urisToThemes.add(uri);
 				}
 			}
-			checkedFromSlide = getThemesLoader().loadThemes(urisToThemes, false);
+			checkedFromSlide = getThemesLoader().loadThemes(urisToThemes, false, true);
 		}
 	}
 	
@@ -363,7 +363,7 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public void addTheme(Theme themeInfo) {
-		themes.put(themeInfo.getThemeId(), themeInfo);
+		themes.put(themeInfo.getId(), themeInfo);
 	}
 	
 	public Collection <Theme> getThemesCollection() {
@@ -433,6 +433,9 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public Theme getTheme(String themeID) {
+		if (themeID == null) {
+			return null;
+		}
 		return themes.get(themeID);
 	}
 	
@@ -626,67 +629,28 @@ public class ThemesHelper implements Singleton {
 		return encoded.toString();
 	}
 	
-	protected boolean processThemeImages(Theme theme, boolean useDraftPreview) {
+	protected boolean createSmallImage(Theme theme, boolean useDraftPreview) {
 		String encodedUriToImage = null;
 		String uriToImage = null;
 		if (useDraftPreview) {
 			uriToImage = theme.getLinkToDraftPreview();
-			encodedUriToImage = encode(theme.getLinkToDraftPreview(), true);
 		}
 		else {
 			uriToImage = theme.getLinkToThemePreview();
-			encodedUriToImage = encode(theme.getLinkToThemePreview(), true);
 		}
+		encodedUriToImage = encode(uriToImage, true);
 		String extension = helper.getFileExtension(uriToImage).toLowerCase();
 		String mimeType = ThemesConstants.DEFAULT_MIME_TYPE + extension;
-		
-		// Encoding original image
-		InputStream input = getInputStream(getFullWebRoot() + theme.getLinkToBase() + encodedUriToImage);
-		encodeAndUploadImage(theme.getLinkToBaseAsItIs(), uriToImage, mimeType, input, ThemesConstants.REDUCED_PREVIEW_WIDTH, ThemesConstants.REDUCED_PREVIEW_HEIGHT);
-		closeInputStream(input);
+		InputStream input = null;
 		
 		// Reducing and encoding original image, saving as new image
 		input = getInputStream(getFullWebRoot() + theme.getLinkToBase() + encodedUriToImage);
 		String newName = theme.getName() + ThemesConstants.THEME_SMALL_PREVIEW + ThemesConstants.DOT + extension;
-		encodeAndUploadImage(theme.getLinkToBaseAsItIs(), newName, mimeType, input, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
+		getImageGenerator().encodeAndUploadImage(theme.getLinkToBaseAsItIs(), newName, mimeType, input, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
 		theme.setLinkToSmallPreview(newName);
 		closeInputStream(input);
 		
 		return true;
-	}
-	
-	public boolean encodeAndUploadImage(String imageBase, String imageName, String mimeType, InputStream input, int width, int height) {
-		MemoryFileBuffer buff = new MemoryFileBuffer();
-		OutputStream output = new MemoryOutputStream(buff);
-		InputStream is = null;
-		try {
-			getImageEncoder().encode(mimeType, input, output, width, height);
-			is = new MemoryInputStream(buff);
-			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(imageBase, imageName, is, mimeType, true);
-		} catch (RemoteException e) {
-			log.error(e);
-			return false;
-		} catch (IOException e) {
-			log.error(e);
-			return false;
-		} finally {
-			closeInputStream(is);
-			closeOutputStream(output);
-		}
-		return true;
-	}
-	
-	public ImageEncoder getImageEncoder() {
-		if (encoder == null) {
-			synchronized (ThemesHelper.class) {
-				try {
-					encoder = (ImageEncoder) IBOLookup.getServiceInstance(IWContext.getInstance(), ImageEncoder.class);
-				} catch (IBOLookupException e) {
-					log.error(e);
-				}
-			}
-		}
-		return encoder;
 	}
 	
 	public ThemesService getThemesService() {
@@ -776,6 +740,50 @@ public class ThemesHelper implements Singleton {
 		}
 		parsedValues[parsedValues.length - 1] = value.trim();
 		return parsedValues;
+	}
+	
+	public boolean closeInputStreamReader(InputStreamReader stream) {
+		if (stream == null) {
+			return true;
+		}
+		try {
+			stream.close();
+		} catch (IOException e) {
+			log.error(e);
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean closeBufferedReader(BufferedReader buffer) {
+		if (buffer == null) {
+			return true;
+		}
+		try {
+			buffer.close();
+		} catch (IOException e) {
+			log.error(e);
+			return false;
+		}
+		return true;
+	}
+	
+	public synchronized void addThemeToQueue(String linkToBase) {
+		if (!themeQueue.contains(linkToBase)) {
+			themeQueue.add(linkToBase);
+		}
+	}
+	
+	public synchronized void removeThemeFromQueue(String linkToBase) {
+		List <Theme> themes = new ArrayList<Theme>(getThemesCollection());
+		Theme theme = null;
+		for (int i = 0; i < themes.size(); i++) {
+			theme = themes.get(i);
+			if (theme.getLinkToBaseAsItIs().startsWith(linkToBase)) {
+				theme.setLoading(false);
+			}
+		}
+		themeQueue.remove(linkToBase);
 	}
 
 }

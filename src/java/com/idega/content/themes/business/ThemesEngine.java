@@ -33,10 +33,15 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#savePageInfo
 	 */
-	public boolean savePageInfo(String pageID, String[] keywords, String[] values);
+	public boolean savePageInfo(String pageID, String[] keywords, String[] values) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getPageInfoElements
 	 */
-	public String[] getPageInfoElements();
+	public String[] getPageInfoElements() throws RemoteException;
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#restoreTheme
+	 */
+	public boolean restoreTheme(String themeID) throws RemoteException;
 }

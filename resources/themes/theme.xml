@@ -9,14 +9,14 @@
 		<method>setPageTitle</method>
 	</key>
 	<key>
-		<code>siteTitle</code>
+		<code>site_title</code>
 		<label>Site title</label>
 		<defaultValue>My website</defaultValue>
 		<type>text</type>
 		<method>setSiteTitle</method>
 	</key>
 	<key>
-		<code>siteSlogan</code>
+		<code>site_slogan</code>
 		<label>Site slogan</label>
 		<defaultValue>Changing the world, one site at a time...</defaultValue>
 		<type>text</type>

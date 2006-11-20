@@ -13,18 +13,27 @@ public class ThemesPropertiesExtractor {
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	
 	private static final String LIMITED_SELECTION = "1";
-	
 	private static final String CSS_EXTENSION = ".css";
 	
-	public synchronized boolean proceedFileExtractor(Theme theme) {
-		List files = helper.getFiles(theme.getLinkToBaseAsItIs());
-		if ((theme.isPropertiesExtracted() && !theme.isLoading()) || files == null) {
+	public synchronized boolean proceedFileExtractor(Theme theme) {		
+		// Checking if it is possible to extract properties
+		if (theme.isLoading()) {
 			return true;
 		}
+		if (theme.isPropertiesExtracted()) {
+			return true;
+		}
+		List files = helper.getFiles(theme.getLinkToBaseAsItIs());
+		if (files == null) {
+			return true;
+		}
+		
 		String webRoot = helper.getFullWebRoot();
 		String url = helper.getWebRootWithoutContent(webRoot);
 		String linkToProperties = null;
 		boolean foundedPropertiesFile = false;
+		
+		// Looking for properties file
 		for (int j = 0; (j < files.size() && !foundedPropertiesFile); j++) {
 			linkToProperties = files.get(j).toString();
 			for (int k = 0; (k < ThemesConstants.PROPERTIES_FILES.size() && !foundedPropertiesFile); k++) {
@@ -34,7 +43,8 @@ public class ThemesPropertiesExtractor {
 			}
 		}
 		
-		if (foundedPropertiesFile) { // Extraxting properties and preparing theme, style files for usage
+		// Extraxting properties and preparing theme, style files for usage
+		if (foundedPropertiesFile) {
 			if (linkToProperties.indexOf(ThemesConstants.SPACE) != -1) {
 				linkToProperties = helper.urlEncode(linkToProperties);
 			}
@@ -52,6 +62,12 @@ public class ThemesPropertiesExtractor {
 			}
 		}
 		
+		// Setting default theme if it does not exit
+		if (theme.getName() == null) {
+			theme.setName(helper.getFileName(theme.getLinkToSkeleton()));
+		}
+		
+		// Getting theme name, which will be used to search for configuration file
 		String searchName = theme.getName();
 		String skeletonName = null;
 		if (theme.getLinkToSkeleton().indexOf(ThemesConstants.THEME) != -1) {
@@ -59,12 +75,15 @@ public class ThemesPropertiesExtractor {
 			searchName = helper.extractValueFromString(skeletonName, 0, skeletonName.indexOf(ThemesConstants.THEME));
 		}
 		
+		// Searching for configuration file
 		String linkToConfig = null;
 		for (int i = 0; (i < files.size() && linkToConfig == null); i++) {
 			if (files.get(i).toString().endsWith(searchName + ThemesConstants.IDEGA_THEME_INFO)) {
 				linkToConfig = files.get(i).toString();
 			}
 		}
+		
+		// Extracting configuration
 		if (linkToConfig != null) {
 			if (linkToConfig.indexOf(ThemesConstants.SPACE) != -1) {
 				linkToConfig = helper.urlEncode(linkToConfig);
@@ -72,24 +91,29 @@ public class ThemesPropertiesExtractor {
 			extractConfiguration(theme, url + linkToConfig);
 		}
 		
+		// Searching for previews
 		if (theme.getLinkToThemePreview() == null || theme.getLinkToSmallPreview() == null) {
 			searchForPreviews(theme, files);
 		}
 		
-		if (theme.getLinkToThemePreview() == null) { // Big preview
-			if (helper.getPreviewGenerator().generatePreview(webRoot + theme.getLinkToSkeleton(), theme.getName() + ThemesConstants.THEME_PREVIEW, theme.getLinkToBaseAsItIs(), ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT)) {
-				theme.setLinkToThemePreview(theme.getName() + ThemesConstants.THEME_PREVIEW + ThemesConstants.DOT +	helper.getPreviewGenerator().getFileType());
+		// No previews where found, generating big preview
+		if (theme.getLinkToThemePreview() == null) {
+			if (helper.getImageGenerator().generatePreview(webRoot + theme.getLinkToSkeleton(), theme.getName() + ThemesConstants.THEME_PREVIEW, theme.getLinkToBaseAsItIs(), ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT, true)) {
+				theme.setLinkToThemePreview(theme.getName() + ThemesConstants.THEME_PREVIEW + ThemesConstants.DOT +	helper.getImageGenerator().getFileExtension());
 			}
 		}
 		
+		// If does not exist small preview, we'll get it from big preview, also encoding will be done for both images
 		if (theme.getLinkToSmallPreview() == null) {
-			helper.processThemeImages(theme, false);
+			helper.createSmallImage(theme, false);
 		}
 		
-		if (theme.getName() == null) {
-			theme.setName(helper.getFileName(theme.getLinkToSkeleton()));
+		// Creating configuration file
+		if (linkToConfig == null) {
+			helper.createThemeConfig(theme);
 		}
-		helper.createThemeConfig(theme);
+		
+		// Finishing theme
 		theme.setNewTheme(false);
 		theme.setPropertiesExtracted(true);
 		return true;

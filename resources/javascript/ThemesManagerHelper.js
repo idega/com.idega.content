@@ -1,14 +1,32 @@
 var globalThemeID = null;
 var themesArray = new Array();
 
-var imageWidth = 120;
-var imageHeight = 140;
+var imageWidth = 149;//120;
+var imageHeight = 112;//140;
 var currentIndex = 0;
 var waitForStyle = 2500;
 
 var containerID = "themes";
+var themesContainerID = "themesSliderContainer";
+var showThemesButtonID = "showThemesButton";
 
 var enableStyleFunctions = true;
+var enableThemeContainer = true;
+var enableStyleVariations = true;
+
+var needReflection = false;
+
+function getImageWidth() {
+	return imageWidth;
+}
+
+function getAllImageSpace() {
+	return (getImageWidth() + 8);
+}
+
+function getImageHeight() {
+	return imageHeight;
+}
 
 function isCorrectFileType(id, fileType, noFileMsg, invalidFileTypeMsg) {
 	var input = document.getElementById(id);
@@ -48,6 +66,9 @@ function getThemeStyleVariations(themeID) {
 
 function insertStyleVariations(variations) {
 	var oldVariation = document.getElementById("themeStyleVariations");
+	if (oldVariation == null) {
+		return;
+	}
 	if (oldVariation.childNodes) {
 		while (oldVariation.childNodes.length > 0) {
 			oldVariation.removeChild(oldVariation.childNodes[0]);
@@ -76,7 +97,7 @@ function changeThemeCallback(themeID) {
 	else {
 		setGlobalId(themeID);
 		document.getElementById('themeSaveButton').disabled = false;
-		getThemes(themeID);
+		getThemes(themeID, true);
 	}
 }
 
@@ -95,14 +116,15 @@ function saveThemeCallback(themeID) {
 	if (themeID != null) {
 		setGlobalId(themeID);
 		document.getElementById('themeSaveButton').disabled = false;
-		getThemes(themeID);
+		getThemes(themeID, true);
 	}
 }
 
-function enableButton(inputId) {
-	/*if (document.getElementById(inputId).value != "") {
-		document.getElementById('themeSaveButton').disabled = false;
-	}*/
+function manageButton(id, disable) {
+	var button = document.getElementById(id);
+	if (button != null) {
+		button.disabled = disable;
+	}
 }
 
 function setGlobalId(themeId) {
@@ -135,7 +157,7 @@ function scroll(id) {
 		}
 		
 		if (move){
-			new Effect.MoveBy(document.getElementById(containerID), 0, (imageWidth + 12),  {queue: 'end', mode: 'relative', duration: 0.3 });
+			new Effect.MoveBy(document.getElementById(containerID), 0, getAllImageSpace(),  {queue: 'end', mode: 'relative', duration: 0.3 });
 		}
 		return;
 	}
@@ -150,26 +172,30 @@ function scroll(id) {
 		}
 		
 		if (move){
-			new Effect.MoveBy(document.getElementById(containerID), 0, -(imageWidth + 12),  {queue: 'end', mode: 'relative', duration: 0.3 });
+			new Effect.MoveBy(document.getElementById(containerID), 0, -(getAllImageSpace()),  {queue: 'end', mode: 'relative', duration: 0.3 });
 		}
 	}
 }
 
-function getThemes(themeID) {
-	showLoadingMessage("Generating preview");
+function getThemes(themeID, addReflect) {
+	showLoadingMessage("Generating preview...");
 	setGlobalId(themeID);
+	needReflection = addReflect;
 	ThemesEngine.getThemesPreviewsInfo(getThemesCallback);
 }
 
 function getThemesCallback(themes) {
 	if (themes == null) {
+		hideThemesContainer();
 		closeLoadingMessage();
 		return;
 	}
 	if (themes == "") {
+		hideThemesContainer();
 		closeLoadingMessage();
 		return;
 	}
+	showThemesContainer();
 	var container = document.getElementById(containerID);
 	if (container == null) {
 		closeLoadingMessage();
@@ -178,9 +204,12 @@ function getThemesCallback(themes) {
 	container.innerHTML = "";
 	themesArray = new Array();
 	var info = themes.split(";");
+	var date = new Date();
+	var time = null;
 	for (var i = 0; i < info.length; i++) {
 		var themeFields = info[i].split("@");
-		var theme = new Theme(themeFields[0], themeFields[1] + "?" + new Date().getTime(), themeFields[2] + "?" + new Date().getTime(), themeFields[3]);
+		time = date.getTime()
+		var theme = new Theme(themeFields[0], themeFields[1] + "?" + time, themeFields[2] + "?" + time, themeFields[3]);
 		var div = document.createElement("div");
 		div.className = "imageGallery";
 		
@@ -191,36 +220,41 @@ function getThemesCallback(themes) {
 		textDiv.appendChild(span);
 		div.appendChild(textDiv);
 		
-		var div1 = document.createElement("div");
-		div1.setAttribute("id", theme.id + "_container");
+		var imageDiv = document.createElement("div");
+		imageDiv.setAttribute("id", theme.id + "_container");
 		var image = document.createElement("img"); 
    		image.setAttribute("id", theme.id); 
    		image.setAttribute("src", theme.url);
-   		image.setAttribute("width", imageWidth + "px");
-   		image.setAttribute("height", imageHeight + "px");
+   		image.setAttribute("width", getImageWidth() + "px");
+   		image.setAttribute("height", getImageHeight() + "px");
    		image.setAttribute("title", theme.themeName);
    		if (typeof container.attachEvent != 'undefined') {
-            image.attachEvent('onclick', function(e){getThemeStyleVariations(this.id);});
+   			if (enableStyleVariations) {
+            	image.attachEvent('onclick', function(e){getThemeStyleVariations(this.id);});
+   			}
             if (enableStyleFunctions) {
 	            image.attachEvent('onmouseover', function(e){chooseStyle(this.id);});
 	            image.attachEvent('onmouseout', function(e){recallStyle(this.id);});
             }
         } else {
-        	image.addEventListener('click', function(e){getThemeStyleVariations(this.id);}, true);
+        	if (enableStyleVariations) {
+        		image.addEventListener('click', function(e){getThemeStyleVariations(this.id);}, true);
+        	}
         	if (enableStyleFunctions) {
 	        	image.addEventListener('mouseover', function(e){chooseStyle(this.id);}, true);
 	        	image.addEventListener('mouseout', function(e){recallStyle(this.id);}, true);
         	}
         }
-        image.className = "reflect rheight20 ropacity50";
-        div1.className = "galleryImage firstInRow";
-        div1.appendChild(image);
-        div.appendChild(div1);
+        image.className = "reflect rheight18 ropacity68";
+        imageDiv.className = "galleryImage firstInRow";
+        imageDiv.appendChild(image);
+        div.appendChild(imageDiv);
         
 		container.appendChild(div);
 		themesArray.push(theme);
 	}
-	container.style.width = Math.round(themesArray.length * 140) + "px";
+	container.style.width = Math.round(themesArray.length * getAllImageSpace()) + "px";
+	
 	var theme = null;
 	if (globalThemeID != null) {
 		theme = getTheme(globalThemeID);
@@ -229,9 +263,13 @@ function getThemesCallback(themes) {
 		theme = themesArray[0];
 	}
 	if (theme != null) {
-		getThemeStyleVariations(theme.id);
+		if (enableStyleVariations) {
+			getThemeStyleVariations(theme.id);
+		}
+		setGlobalId(theme.id);
 	}
 	closeLoadingMessage();
+	addReflectionToThemes();
 }
 
 function Theme(themeName, url, urlToBig, id) {
@@ -245,10 +283,6 @@ function Theme(themeName, url, urlToBig, id) {
 function setPreview(url) {
 	var preview = document.getElementById("themePreview");
 	if (preview == null) {
-		/*preview = document.createElement("img");
-		preview.setAttribute("id", "themePreview");
-		preview.className = "bigThemePreview";
-		document.getElementById("themePreviewContainer").appendChild(preview);*/
 		return;
 	}
 	preview.src = url;
@@ -284,124 +318,11 @@ function getThemeIndex(themeID) {
 	return -1;
 }
 
-function chooseStyle(themeID) {
-	if (themeID == null) {
-		return;
-	}
-	var theme = getTheme(themeID);
-	if (theme != null) {
-		theme.applyStyle = true;
-		setTimeout("sleepAndApply('"+themeID+"')", waitForStyle);
-	}
-}
-
-function recallStyle(themeID) {
-	if (themeID == null) {
-		return;
-	}
-	var theme = getTheme(themeID);
-	if (theme != null) {
-		theme.applyStyle = false;
-	}
-}
-
-function sleepAndApply(themeID) {
-	if (themeID == null) {
-		return;
-	}
-	var theme = getTheme(themeID);
-	if (theme != null) {
-		if (theme.applyStyle) {
-			theme.applyStyle = false;
-			chooseOption(themeID);
-		}
-	}
-}
-
-function chooseOption(themeID) {
-	var div = document.getElementById("chooseStyleLayer");
-	if (div == null) {
-		div = document.createElement("div");
-		div.setAttribute("id", "chooseStyleLayer");
-		div.className = "themeChooseStyle";
-		
-		var divp = document.createElement("div");
-		divp.className = "themeChooseStyleText";
-		var pageSpan = document.createElement("span");
-		pageSpan.setAttribute("id", "pageStyle");
-		pageSpan.appendChild(document.createTextNode("Page"));
-		divp.appendChild(pageSpan);
-	
-		var divs = document.createElement("div");
-		divs.className = "themeChooseStyleText";
-		var siteSpan = document.createElement("span");
-		siteSpan.setAttribute("id", "siteStyle");
-		siteSpan.appendChild(document.createTextNode("Site"));
-		divs.appendChild(siteSpan);
-		
-		if (typeof div.attachEvent != 'undefined') {
-			pageSpan.attachEvent('onclick', function(e){insertStyle(themeID, true);});
-	    	siteSpan.attachEvent('onclick', function(e){insertStyle(themeID, false);});
-	    	div.attachEvent('onclick', function(e){removeStyleOptions();});
-	    } else {
-	    	pageSpan.addEventListener('click', function(e){insertStyle(themeID, true);}, true);
-	    	siteSpan.addEventListener('click', function(e){insertStyle(themeID, false);}, true);
-	    	div.addEventListener('click', function(e){removeStyleOptions();}, true);
-	   	}
-		div.appendChild(divp);
-		div.appendChild(divs);
-		document.body.appendChild(div);
-	}
-	new Effect.Move(div, {x: getAbsoluteLeft(themeID + "_container") + 2, y: getAbsoluteTop(themeID + "_container") - Math.round(imageHeight * 0.62), mode: 'absolute'});
-	div.style.visibility = "visible";
-}
-
-function getAbsoluteLeft(objectId) {
-	o = document.getElementById(objectId);
-	if (o == null) {
-		return 0;
-	}
-	oLeft = o.offsetLeft;
-	while(o.offsetParent != null) {
-		oParent = o.offsetParent;
-		oLeft += oParent.offsetLeft;
-		o = oParent;
-	}
-	return oLeft;
-}
-
-function getAbsoluteTop(objectId) {
-	o = document.getElementById(objectId);
-	if (o == null) {
-		return 0;
-	}
-	oTop = o.offsetTop;
-	while(o.offsetParent != null) {
-		oParent = o.offsetParent;
-		oTop += oParent.offsetTop;
-		o = oParent;
-	}
-	return oTop;
-}
-
 function removeStyleOptions() {
 	var div = document.getElementById("chooseStyleLayer");
 	if (div != null) {
-		div.style.visibility="hidden";
+		new Effect.Fade(div);
 	}
-}
-
-function insertStyle(themeID, page) {
-	removeStyleOptions();
-	if (themeID == null) {
-		return;
-	}
-	showLoadingMessage("Applying style...");
-	ThemesEngine.setSelectedStyle(themeID, page, setSelectedStyleCallback);
-}
-
-function setSelectedStyleCallback(result) {
-	closeLoadingMessage();
 }
 
 function insertStyleFile() {
@@ -412,6 +333,48 @@ function insertStyleFile() {
 	document.getElementsByTagName("head")[0].appendChild(style); 
 }
 
-function initScript(useStyling) {
+function initScript(useStyling, enableContainer, enableVariations) {
 	enableStyleFunctions = useStyling;
+	enableThemeContainer = enableContainer;
+	enableStyleVariations = enableVariations;
+}
+
+function hideThemesContainer() {
+	var container = document.getElementById(themesContainerID);
+	if (container != null) {
+		container.style.display = "none";
+	}
+	manageButton(showThemesButtonID, true);
+}
+
+function showThemesContainer() {
+	if (enableThemeContainer) {
+		var container = document.getElementById(themesContainerID);
+		if (container != null) {
+			container.style.display = "block";
+		}
+	}
+	manageButton(showThemesButtonID, false);
+}
+
+function restoreTheme() {
+	showLoadingMessage('Restoring theme...');
+	ThemesEngine.restoreTheme(globalThemeID, restoreThemeCallback);
+}
+
+function restoreThemeCallback(result) {
+	closeLoadingMessage();
+	getThemes(globalThemeID, true);
+}
+
+function addReflectionToThemes() {
+	if (needReflection) {
+		setTimeout("addAfterSleep()", 1000); // Needs to stop script, because reflection is added before images are loaded
+	}
+}
+
+function addAfterSleep() {
+	for (var i = 0; i < themesArray.length; i++) {
+		Reflection.add(document.getElementById(themesArray[i].id), { height: 18/100, opacity: 68/100 });
+	}
 }

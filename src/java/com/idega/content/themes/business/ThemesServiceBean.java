@@ -29,6 +29,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 
 	private static final long serialVersionUID = -1765120426660957585L;
 	private static final Log log = LogFactory.getLog(ThemesServiceBean.class);
+	
+	private BuilderService builder = null;
 
 	public void onSlideChange(IWContentEvent idegaWebContentEvent) {
 		String uri = idegaWebContentEvent.getContentEvent().getUri();
@@ -48,14 +50,14 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 				}
 				if (foundTheme && !theme.isLocked()) {
 					deleteIBPage(theme);
-					String themeID = theme.getThemeId();
+					String themeID = theme.getId();
 					ThemesHelper.getInstance(false).removeTheme(uri, themeID);
 				}
 			}
 		}
 		else {
 			if (ThemesHelper.getInstance().isCorrectFile(uri) && isNewTheme(uri) && !ThemesHelper.getInstance().isCreatedManually(uri)) {
-				ThemesHelper.getInstance().getThemesLoader().loadTheme(uri, ThemesHelper.getInstance().urlEncode(uri), true);
+				ThemesHelper.getInstance().getThemesLoader().loadTheme(uri, ThemesHelper.getInstance().urlEncode(uri), true, false);
 			}
 		}
 	}
@@ -82,15 +84,15 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			return false;
 		}
 		int id = -1;
-		BuilderService builder = getBuilderService();
+		getBuilderService();
 		
 		if (theme.getIBPageID() == -1) { // Creating IBPage for theme
-			Map tree = getBuilderService().getTree(IWContext.getInstance());
+			Map tree = builder.getTree(IWContext.getInstance());
 			String parentId = builder.getTopLevelTemplateId(builder.getTopLevelTemplates(IWContext.getInstance()));
-			if (parentId == ThemesConstants.INCORRECT_PARENT_ID) {
+			if (parentId.equals(ThemesConstants.INCORRECT_PARENT_ID)) {
 				return false;
 			}
-			id = builder.createNewPage(parentId, theme.getName(), builder.getTemplateKey(), null, ThemesConstants.CONTENT + theme.getLinkToSkeleton(), tree,
+			id = builder.createNewPage(parentId, theme.getName(), builder.getTemplateKey(), null, "/themes/"+theme.getName(), tree,
 					IWContext.getInstance(), null, -1, builder.getHTMLTemplateKey(), null);
 //			id = builder.createPageOrTemplateToplevelOrWithParent(theme.getName(), null, builder.getTemplateKey(), null, tree, IWContext.getInstance());
 			if (id == -1) {
@@ -122,13 +124,19 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		return sHome;
 	}
 	
-	public BuilderService getBuilderService(){
-		try {
-			return (BuilderService) this.getServiceInstance(BuilderService.class);
-		} catch (IBOLookupException e) {
-			log.error(e);
+	public BuilderService getBuilderService() {
+		if (builder == null) {
+			synchronized (ThemesServiceBean.class) {
+				if (builder == null) {
+					try {
+						builder = (BuilderService) this.getServiceInstance(BuilderService.class);
+					} catch (IBOLookupException e) {
+						log.error(e);
+					}
+				}
+			}
 		}
-		return null;
+		return builder;
 	}
 	
 	private ICPage getICPage(int id) {

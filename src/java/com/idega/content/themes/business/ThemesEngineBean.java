@@ -1,6 +1,5 @@
 package com.idega.content.themes.business;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +13,6 @@ import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
-import com.idega.core.builder.business.BuilderService;
 import com.idega.presentation.IWContext;
 
 public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
@@ -24,7 +22,6 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	private static final Log log = LogFactory.getLog(ThemesEngineBean.class);
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
-	private BuilderService builder = null;
 	
 	private boolean extractingProperties;
 
@@ -58,10 +55,12 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 					info.append(theme.getName());
 				}
 				info.append(ThemesConstants.AT);
-				info.append(webRoot + theme.getLinkToBase());
+				info.append(webRoot);
+				info.append(theme.getLinkToBase());
 				info.append(helper.encode(theme.getLinkToSmallPreview(), true));
 				info.append(ThemesConstants.AT);
-				info.append(webRoot + theme.getLinkToBase());
+				info.append(webRoot);
+				info.append(theme.getLinkToBase());
 				if (theme.getLinkToDraftPreview() != null) {
 					info.append(helper.encode(theme.getLinkToDraftPreview(), true));
 				}
@@ -69,7 +68,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 					info.append(helper.encode(theme.getLinkToThemePreview(), true));
 				}
 				info.append(ThemesConstants.AT);
-				info.append(theme.getThemeId());
+				info.append(theme.getId());
 				if (i + 1 < themes.size()) {
 					info.append(ThemesConstants.SEMICOLON);
 				}
@@ -78,18 +77,30 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return info.toString();
 	}
 	
+	/**
+	 * 
+	 */
 	public String getThemeStyleVariations(String themeID) {
 		return helper.getThemeStyleVariations().getThemeStyleVariations(themeID);
 	}
 	
-	public String changeTheme(String themeID, String styleGroupName, String styleMember, String themeName, boolean radio, boolean checked) {
-		return helper.getThemeChanger().changeTheme(themeID, styleGroupName, styleMember, themeName, radio, checked);
+	/**
+	 * 
+	 */
+	public String changeTheme(String themeID, String styleGroupName, String styleMember, String themeName, boolean isRadio, boolean isChecked) {
+		return helper.getThemeChanger().changeTheme(themeID, styleGroupName, styleMember, themeName, isRadio, isChecked);
 	}
 	
+	/**
+	 * 
+	 */
 	public boolean saveTheme(String themeID, String themeName) {
 		return helper.getThemeChanger().saveTheme(themeID, themeName);
 	}
 	
+	/**
+	 * 
+	 */
 	public String setSelectedStyle(String themeID, boolean applyToPage) {
 		if (applyToPage) {
 			return "page";
@@ -99,6 +110,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	public boolean savePageInfo(String pageID, String[] keywords, String[] values) {
 		if (pageID == null || keywords == null || values == null) {
 			return false;
@@ -106,30 +120,21 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (keywords.length != values.length) {
 			return false;
 		}
-		if (builder == null) {
-			synchronized (ThemesEngineBean.class) {
-				if (builder == null) {
-					try {
-						builder = helper.getThemesService().getBuilderService();
-					} catch (RemoteException e) {
-						log.error(e);
-						return false;
-					}
-				}
-			}
-		}
 		String instanceID = "-1";
 		Setting s = null;
 		Map <String, Setting> map = helper.getPageSettings();
 		for (int i = 0; i < keywords.length; i++) {
 			s = map.get(keywords[i]);
 			if (s != null) {
-				builder.setProperty(pageID, instanceID, s.getMethod(), helper.getPageValues(s, values[i]), IWContext.getInstance().getIWMainApplication());
+				helper.getThemesService().getBuilderService().setProperty(pageID, instanceID, s.getMethod(), helper.getPageValues(s, values[i]), IWContext.getInstance().getIWMainApplication());
 			}
 		}
 		return true;
 	}
 	
+	/**
+	 * 
+	 */
 	public String[] getPageInfoElements() {
 		String[] elements = null;
 		Collection <Setting> c = helper.getPageSettings().values();
@@ -142,6 +147,13 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			elements[i] = settings.get(i).getCode();
 		}
 		return elements;
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean restoreTheme(String themeID) {
+		return helper.getThemeChanger().restoreTheme(themeID);
 	}
 
 }

@@ -71,7 +71,7 @@ public class ThemeStyleVariations {
 			result.append(INPUT_VALUE);
 			result.append(member.getName());
 			result.append(INPUT_ONCLICK);
-			result.append(theme.getThemeId());
+			result.append(theme.getId());
 			result.append(SEPERATOR);
 			result.append(styleGroupName);
 			result.append(SEPERATOR);

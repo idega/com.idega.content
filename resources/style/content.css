@@ -341,20 +341,28 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 }
 
 .theme_slider {
+	width: 70%;
+	height: 150px;
+	background-color: #000000;
+	border: 1px solid #D7D7D7;
 }
 
 .leftThemeScroller {
 	position: absolute;
 	cursor: pointer;
+	bottom: 75px;
 }
 
 .rightThemeScroller{
 	position: absolute;
 	cursor: pointer;
-	left: 567px;
+	left: 565px;
+	bottom: 75px;
+	z-index: 100;
 }
 
 .themes_gallery {
+	
 }
 
 .theme_image {
@@ -368,55 +376,51 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 
 .themesTicker {
 	position: absolute;
-	left: 35px;
-	width: 528px;
-	height: 190px;
+	left: 29px;
+	width: 535px;
+	height: 150px;
 	overflow: hidden;
 }
 
-.themesTicker .multiImageGallery{
+.themesTicker .multiImageGallery {
 	position: relative;
 }
 
-.themesTicker .multiImageGallery .imageGallery{
-	background-color: #000000;
+.themesTicker .multiImageGallery .imageGallery {
 	cursor: pointer;
 	float: left;
 }
 
-.imageGallery{
+.imageGallery {
 }
 
-.multiImageGallery{
+.multiImageGallery {
 }
 
-.galleryImage{
+.galleryImage {
 	float: left;
-	border-width: 2px;
-	border-style: solid;
-    border-color: white;
 }
 
-.galleryImage .firstInRow{
+.galleryImage .firstInRow {
 	clear: left;
 }
 
-.galleryImage .lastInRow{
+.galleryImage .lastInRow {
 	clear: right;
 }
 
 .bigThemePreview {
 	width: 70%;
+	border: 1px solid #D7D7D7;
 }
 
 .themeChooseStyle {
-    width: 122px;
-    height: 142px;
-    		
-	visibility: hidden;
-	
+	position: absolute;
+    width: 149px;
+    height: 112px;
 	background-color: #D3D3D3;
-	opacity: 0.7;
+	opacity: 0.75;
+	z-index: 4;
 }
 
 .themeChooseStyleText {
@@ -424,4 +428,21 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
     font-size: 9pt;
     font-weight: bold;
     text-align: center;
+    cursor: pointer;
+}
+
+.pageInfoStyle {
+	position: absolute;
+	width: 275px;
+	height: 150px;
+	bottom: 30px;
+	border: 1px solid #D7D7D7;
+	z-index: 1;
+}
+
+.buttonsContainerStyle {
+	position: absolute;
+	right: 0px;
+	bottom: 0px;
+	border: 1px solid #D7D7D7;
 }

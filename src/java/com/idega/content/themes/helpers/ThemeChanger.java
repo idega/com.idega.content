@@ -47,6 +47,8 @@ public class ThemeChanger {
 	private static final String SIDEBAR = "sidebar";
 	private static final String BREADCRUMB = "breadcrumb";
 	private static final String FOOTER = "footer";
+	private static final String SITE_TITLE = "site_title";
+	private static final String SITE_SLOGAN = "site_slogan";
 	
 	// These are defaults in RapidWeaver style files, we need to change directories to images
 	private static final String CSS_IMAGE_URL = "url(";
@@ -210,8 +212,9 @@ public class ThemeChanger {
 			return false;
 		} finally {
 			helper.closeInputStream(is);
+			helper.closeInputStreamReader(isr);
+			helper.closeBufferedReader(buf);
 		}
-		
 		// Changing content
 		String content = sb.toString();
 		boolean needToReplace = false;
@@ -451,14 +454,15 @@ public class ThemeChanger {
 			return ThemesConstants.EMPTY;
 		}
 		String[] elements = defaultValue.split(ThemesConstants.COMMA);
-		if (elements == null) {
-			return ThemesConstants.EMPTY;
-		}
-		String sidebar = SIDEBAR_REPLACE_BEGIN;
+		StringBuffer sidebar = new StringBuffer();
+		sidebar.append(SIDEBAR_REPLACE_BEGIN);
 		for (int i = 0; i < elements.length; i++) {
-			sidebar += SIDEBAR_REPLACE_ELEMENT_BEGIN + elements[i] + SIDEBAR_REPLACE_ELEMENT_END;
+			sidebar.append(SIDEBAR_REPLACE_ELEMENT_BEGIN);
+			sidebar.append(elements[i]);
+			sidebar.append(SIDEBAR_REPLACE_ELEMENT_END);
 		}
-		return sidebar + SIDEBAR_REPLACE_ELEMENT_END;
+		sidebar.append(SIDEBAR_REPLACE_ELEMENT_END);
+		return sidebar.toString();
 	}
 	
 	/**
@@ -486,6 +490,14 @@ public class ThemeChanger {
 			}
 			if (value.equals(FOOTER)) {
 				return region + COPY_AND_SPACE + getBasicReplace(null, propertyValue, null) + ThemesConstants.COMMENT_BEGIN +
+					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
+			}
+			if (value.equals(SITE_TITLE)) {
+				return region + getBasicReplace(null, propertyValue, null) + ThemesConstants.COMMENT_BEGIN +
+					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
+			}
+			if (value.equals(SITE_SLOGAN)) {
+				return region + getBasicReplace(null, propertyValue, null) + ThemesConstants.COMMENT_BEGIN +
 					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
 			region += propertyValue;
@@ -614,13 +626,13 @@ public class ThemeChanger {
 
 		String uploadDir = helper.getFullWebRoot() + theme.getLinkToDraft();
 		String fileName = theme.getName() +	ThemesConstants.DRAFT_PREVIEW;
-		boolean result = helper.getPreviewGenerator().generatePreview(uploadDir, fileName, theme.getLinkToBaseAsItIs(), ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT);
+		boolean result = helper.getImageGenerator().generatePreview(uploadDir, fileName, theme.getLinkToBaseAsItIs(), ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT, true);
 		if (!result) {
 			return null;
 		}
 		addThemeChange(theme, styleChanger, limitedSelection);
-		theme.setLinkToDraftPreview(fileName + ThemesConstants.DOT + helper.getPreviewGenerator().getFileType());
-		helper.processThemeImages(theme, true);
+		theme.setLinkToDraftPreview(fileName + ThemesConstants.DOT + helper.getImageGenerator().getFileExtension());
+		helper.createSmallImage(theme, true);
 		
 		if (result) {
 			return themeID;
@@ -629,6 +641,9 @@ public class ThemeChanger {
 	}
 
 	private void addThemeChange(Theme theme, ThemeStyleGroupMember style, boolean limitedSelection) {
+		if (theme == null || style == null) {
+			return;
+		}
 		ThemeChange change = new ThemeChange();
 		change.setLimitedSelection(limitedSelection);
 		change.setEnabled(style.isEnabled());
@@ -802,13 +817,6 @@ public class ThemeChanger {
 		
 		Theme theme = helper.getTheme(themeID);
 		
-		try {
-			helper.getThemesService().createIBPage(theme);
-		} catch (RemoteException e) {
-			log.error(e);
-			return false;
-		}
-		
 		if (!theme.getName().equals(themeName)) {
 			return createNewTheme(theme, themeName);
 		}
@@ -838,19 +846,28 @@ public class ThemeChanger {
 		}
 		theme.setLocked(false);
 		
-		theme.setChanges(new ArrayList<ThemeChange>());
 		theme.setLinkToDraft(null);
 		theme.setLinkToThemePreview(theme.getLinkToDraftPreview());
 		theme.setLinkToDraftPreview(null);
 		
+		try {
+			helper.getThemesService().createIBPage(theme);
+		} catch (RemoteException e) {
+			log.error(e);
+			return false;
+		}
+		
 		return helper.createThemeConfig(theme);
 	}
 	
-	private void restoreTheme(Theme theme) {
+	private boolean restoreTheme(Theme theme) {
 		if (theme == null) {
-			return;
+			return false;
 		}
 		List <ThemeChange> changes = theme.getChanges();
+		if (changes.size() == 0) {
+			return true;
+		}
 		ThemeChange change = null;
 		ThemeStyleGroupMember member = null;
 		for (int i = 0; i < changes.size(); i++) {
@@ -863,12 +880,24 @@ public class ThemeChanger {
 				member.setEnabled(!change.isEnabled());
 			}
 		}
+		theme.setChangedName(null);
+		theme.setLinkToDraftPreview(null);
+		theme.setLinkToDraft(null);
+		theme.setChanges(new ArrayList<ThemeChange>());
+		
 		InputStream is = helper.getInputStream(helper.getFullWebRoot() + theme.getLinkToBase() + helper.encode(theme.getLinkToThemePreview(), true));
 		String extension = helper.getFileExtension(theme.getLinkToThemePreview());
 		String fileName = theme.getName() + ThemesConstants.THEME_SMALL_PREVIEW + ThemesConstants.DOT + extension;
-		helper.encodeAndUploadImage(theme.getLinkToBaseAsItIs(), fileName, ThemesConstants.DEFAULT_MIME_TYPE + extension, is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
+		helper.getImageGenerator().encodeAndUploadImage(theme.getLinkToBaseAsItIs(), fileName, ThemesConstants.DEFAULT_MIME_TYPE + extension, is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
 		theme.setLinkToSmallPreview(fileName);
 		helper.closeInputStream(is);
+		
+		return true;
+	}
+	
+	public boolean restoreTheme(String themeID) {
+		Theme theme = helper.getTheme(themeID);
+		return restoreTheme(theme);
 	}
 	
 	private void disableStyle(Theme theme, String styleGroupName) {
@@ -885,7 +914,6 @@ public class ThemeChanger {
 	private boolean createNewTheme(Theme parent, String newName) {
 		// Copying Theme skeleton
 		String linkToTheme = parent.getLinkToDraft();
-		parent.setLinkToDraft(null);
 		if (linkToTheme == null) {
 			linkToTheme = parent.getLinkToSkeleton();
 		}
@@ -917,7 +945,7 @@ public class ThemeChanger {
 		}
 		
 		String themeID = helper.getThemesLoader().createNewTheme(decodedLinkToBase + themeName, linkToBase + helper.encode(themeName,
-				true), true);
+				true), true, true);
 		if (themeID == null) {
 			return false;
 		}
@@ -928,7 +956,6 @@ public class ThemeChanger {
 		
 		// Copying Theme preview image
 		String linkToPreview = parent.getLinkToDraftPreview();
-		parent.setLinkToDraftPreview(null);
 		if (linkToPreview == null) {
 			linkToPreview = parent.getLinkToThemePreview();
 		}
@@ -956,12 +983,21 @@ public class ThemeChanger {
 		// Setting Theme small preview
 		is = helper.getInputStream(helper.getFullWebRoot() + linkToBase + endodedLinkToPreview);
 		fileName = child.getName() + ThemesConstants.THEME_SMALL_PREVIEW + ThemesConstants.DOT + extension;
-		helper.encodeAndUploadImage(decodedLinkToBase, fileName, ThemesConstants.DEFAULT_MIME_TYPE + extension, is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
+		helper.getImageGenerator().encodeAndUploadImage(decodedLinkToBase, fileName, ThemesConstants.DEFAULT_MIME_TYPE + extension, is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
 		child.setLinkToSmallPreview(fileName);
 		helper.closeInputStream(is);
 		
 		child.setPropertiesExtracted(true);
 		restoreTheme(parent);
+		
+		// Creating new template
+		try {
+			helper.getThemesService().createIBPage(child);
+		} catch (RemoteException e) {
+			log.error(e);
+			return false;
+		}
+		
 		return helper.createThemeConfig(child);
 	}
 	

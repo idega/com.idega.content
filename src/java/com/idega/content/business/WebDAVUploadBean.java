@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.util.zip.ZipInputStream;
 
 import javax.faces.component.UIComponent;
+import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.event.ActionEvent;
 
 import org.apache.myfaces.custom.fileupload.UploadedFile;
@@ -16,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
@@ -244,10 +246,26 @@ public class WebDAVUploadBean implements Serializable{
 	 */
 	public boolean uploadZipFileContents(ActionEvent event) throws IOException {
 		if (canUploadZipFile()) {
-			return doUploading();
+			return doUploading(isBeingUploadedTheme(event));
 		}		
 		log.info("Unable to upload zip file's contents");
 		return false;
+	}
+	
+	private boolean isBeingUploadedTheme(ActionEvent event) {
+		boolean theme = false;
+		if (event == null) {
+			return theme;
+		}
+		if (event.getSource() instanceof HtmlCommandButton) {
+			HtmlCommandButton button = (HtmlCommandButton) event.getSource();
+			if (button.getId() != null) {
+				if (button.getId().toLowerCase().indexOf("uploadtheme") != -1) {
+					theme = true;
+				}
+			}
+		}
+		return theme;
 	}
 	
 	private boolean canUploadZipFile() {
@@ -266,7 +284,7 @@ public class WebDAVUploadBean implements Serializable{
 		return result;
 	}
 	
-	private boolean doUploading () throws IOException {
+	private boolean doUploading (boolean uploadingTheme) throws IOException {
 		IWSlideService service = null;
 		try {
 			service = (IWSlideService) IBOLookup.getServiceInstance(IWContext.getInstance(), IWSlideService.class);
@@ -275,13 +293,31 @@ public class WebDAVUploadBean implements Serializable{
 			log.error(e);
 			return false;
 		}
+		
+		String resultInfo = null;
+		boolean result;
+		
 		changeFileUploadPath(service);
-		if (service.uploadZipFileContents(new ZipInputStream(new BufferedInputStream(uploadFile.getInputStream())), getUploadFilePath())) {
-			log.info("Success uploading zip file's contents");
-			return true;
+		String path = getUploadFilePath();
+		if (uploadingTheme) {
+			ThemesHelper.getInstance(false).addThemeToQueue(path);
 		}
-		log.info("Unable to upload zip file's contents");
-		return false;
+		
+		if (service.uploadZipFileContents(new ZipInputStream(new BufferedInputStream(uploadFile.getInputStream())), path)) {
+			resultInfo = "Success uploading zip file's contents";
+			result = true;
+		}
+		else {
+			resultInfo = "Unable to upload zip file's contents";
+			result = false;
+		}
+		
+		if (uploadingTheme) {
+			ThemesHelper.getInstance(false).removeThemeFromQueue(path);
+		}
+		
+		log.info(resultInfo);
+		return result;
 	}
 	
 	private void changeFileUploadPath(IWSlideService service) {

@@ -11,9 +11,9 @@ public class Theme {
 	private boolean propertiesExtracted;
 	private boolean locked;
 	private boolean newTheme;
-	private boolean loading;
+	private boolean loading = true;
 	
-	private String themeId;
+	private String id;
 	private String linkToSkeleton;
 	private String linkToDraft;
 	private String linkToProperties;
@@ -36,7 +36,7 @@ public class Theme {
 		styleGroupsNames = new ArrayList<String>();
 		changes = new ArrayList<ThemeChange>();
 		styleGroupsMembers = new HashMap<String, ThemeStyleGroupMember>();
-		this.themeId = themeId;
+		this.id = themeId;
 	}
 	
 	public String getLinkToSkeleton() {
@@ -47,8 +47,8 @@ public class Theme {
 		this.linkToSkeleton = linkToSkeleton;
 	}
 	
-	public String getThemeId() {
-		return themeId;
+	public String getId() {
+		return id;
 	}
 
 	public String getLinkToProperties() {
