@@ -1,5 +1,5 @@
 /*
- * $Id: PageCreationManagedBean.java,v 1.7 2006/11/03 14:35:13 justinas Exp $
+ * $Id: PageCreationManagedBean.java,v 1.8 2006/11/21 11:51:40 justinas Exp $
  * Created on 2.5.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -56,10 +56,10 @@ import com.idega.webface.WFTreeNode;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/03 14:35:13 $ by $Author: justinas $
+ *  Last modified: $Date: 2006/11/21 11:51:40 $ by $Author: justinas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class PageCreationManagedBean implements ActionListener {
 
@@ -114,7 +114,6 @@ public class PageCreationManagedBean implements ActionListener {
 	
 	public TreeNode getPageSelectorTopNode(){
 		try {
-			System.out.println("getPageSelectorTopNode");
 		IWContext iwc = IWContext.getInstance();
 		BuilderService bservice = BuilderServiceFactory.getBuilderService(iwc);
 		ICDomain domain = BuilderServiceFactory.getBuilderService(iwc).getCurrentDomain();
@@ -133,8 +132,7 @@ public class PageCreationManagedBean implements ActionListener {
 		while (it.hasNext()) {
 			ICTreeNode startPage;
 			try {
-				startPage = (ICTreeNode)it.next();
-				System.out.println("id = "+ startPage.getId());			
+				startPage = (ICTreeNode)it.next();			
 //				if(!startPage.getId().equals(Integer.toString(id))){
 //					if(node == null){
 //						node = (WFTreeNode)(bservice.getPageTree(bservice.getRootPageId(), currentUserId));
@@ -152,13 +150,10 @@ public class PageCreationManagedBean implements ActionListener {
 //					node.
 //					System.out.println("before node.getChildCount()"+node.getChildCount());
 //					Collection col = bservice.getPageTree(Integer.parseInt(startPage.getId()), currentUserId);
-System.out.println("childs before = "+node.getChildCount());
 					node.addChild(bservice.getPageTree(Integer.parseInt(startPage.getId()), currentUserId));
-					
-System.out.println("node has children = "+(bservice.getPageTree(Integer.parseInt(startPage.getId()), currentUserId)).getChildCount());					
+										
 			} catch (Exception e) {
 				// TODO: handle exception
-				System.out.println("have exception");
 				e.printStackTrace();
 			}
 		}

@@ -24,8 +24,6 @@
     											 /idegaweb/bundles/com.idega.content.bundle/resources/javascript/scriptaculous.js,
     											 /dwr/interface/BuilderService.js,
     											 /dwr/interface/PagePreview.js,
-    											 /dwr/interface/ThemesPreviewsProvider.js,
-    											 /idegaweb/bundles/com.idega.content.bundle/resources/javascript/rico.js,
     											 /dwr/engine.js">
 			<h:form id="createpageform">
 
@@ -33,26 +31,26 @@
 					<f:verbatim>
 						<h3>Current structure</h3>
 						<a href="#" onclick="treeObj.collapseAll()">Collapse all</a> | 
-						<a href="#" onclick="treeObj.expandAll()">Expand all</a>
-					</f:verbatim>
-					
+						<a href="#" onclick="treeObj.expandAll()">Expand all</a>					</f:verbatim>
+
 					<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}"
 						id="page_chooser" var="node" varNodeToggler="t"
 						clientSideToggle="true"
 						showRootNode="false">
 						<f:facet name="PageTreeNode">
-							<h:panelGroup>
+							
 								<h:outputLink
 									onclick="getPrewUrl(this.parentNode.id);return false;">
 									<h:outputText value="#{node.description}" />
 								</h:outputLink>
-							</h:panelGroup>
+							
 						</f:facet>
 					</wf:iwtree>
-					
+<!-- 
 					<iframe id="treePages" width="100%" height="400px"
 						style="left: 500px; top: 150px; position: absolute;"
 						scrolling="no" />
+ -->					
 				</wf:container>
 
 				<wf:container id="dhtmlgoodies_tree2" styleClass="template_tree">
@@ -62,21 +60,22 @@
  
 					<wf:iwtree value="#{siteTemplateBean.pageTree}" id="page_chooser22"
 						var="node" varNodeToggler="t" clientSideToggle="true"
+						sourceTree="true"
 						showRootNode="false">
 						
-						<!--	  		 			<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">-->
-
-						<f:facet name="PageTreeNode">
+						<!--	  		 			<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true">
+						<f:facet name="PageTreeNode">-->
+						<f:facet name="IWTreeNode">						
 							<h:panelGroup>
 								<h:outputLink
 									onclick="getPrewUrl(this.parentNode.id);return false;">
-									<h:outputText value="#{node.description}" />
+										<h:outputText value="#{node.description}" />									
 								</h:outputLink>
 							</h:panelGroup>
 						</f:facet>
+
 					</wf:iwtree>
 
-  
 <tr:siteTemplatesViewer id="siteTemplates"/>
 
 					<!-- jsp accordion 
@@ -90,34 +89,18 @@
 
 				<f:verbatim>
 					<script type="text/javascript">	
-					
-//					new Rico.Accordion( $('accordionDiv'), {panelHeight:300} );
-					
 						treeObj = new JSDragDropTree();
 						treeObj.setTreeId('page_tree_div');
 						treeObj.setMaximumDepth(7);
 						treeObj.setMessageMaximumDepthReached('Maximum depth reached'); // If you want to show a message when maximum depth is reached, i.e. on drop.
 						treeObj.initTree(); 
 						treeObj.getNodeOrders();
-						treeObj.expandAll();						
+						treeObj.expandAll();								
 
-						treeObj2 = new JSDragDropTree();
-						treeObj2.setTreeId('page_chooser22');
-						treeObj2.initTree(); 
-						treeObj2.expandAll();
-
-						treeObj3 = new JSDragDropTree();
-						treeObj3.setTreeId('page_chooser3');
-						treeObj3.initTree(); 
-						treeObj3.expandAll();
-
-						treeObj4 = new JSDragDropTree();
-						treeObj4.setTreeId('page_chooser4');
-						treeObj4.initTree(); 
-
-//						treeObj3 = new JSDragDropTree();
-//						treeObj3.setTreeId('dhtmlgoodies_tree3');
-//						treeObj3.initTree(); 
+						treeObj22 = new JSDragDropTree();
+						treeObj22.setTreeId('page_chooser22');
+						treeObj22.initTree(); 
+						treeObj22.expandAll();
 
 						
 					</script>

@@ -30,6 +30,8 @@
 		var thisTree = false;
 		var idOfTree;
 		
+		var sourceTree;
+		
 		var imageFolder;
 		var folderImage;
 		var plusImage;
@@ -48,6 +50,8 @@
 		var indicator_offsetX;
 		var indicator_offsetX_sub;
 		var indicator_offsetY;
+		
+		this.sourceTreee = true;
 		
 		this.imageFolder = '/idegaweb/bundles/com.idega.content.bundle/resources/images/';
 //		this.folderImage = 'dhtmlgoodies_folder.gif';
@@ -151,8 +155,9 @@
 			var menuItems = document.getElementById(this.idOfTree).getElementsByTagName('LI');		
 			for(var no=0;no<menuItems.length;no++){
 				var subItems = menuItems[no].getElementsByTagName('UL');
-				if(subItems.length>0 && subItems[0].style.display!='block'){
+				if(subItems.length>0 && subItems[0].style.display!='block'){				
 					JSTreeObj.showHideNode(false,menuItems[no].id);
+
 				}			
 			}
 		}	
@@ -205,8 +210,8 @@
 			else {
 				thisNode = this;
 				if(this.tagName=='A')
-					thisNode = this.parentNode.getElementsByTagName('IMG')[0];					
-			}		
+					thisNode = this.parentNode.getElementsByTagName('IMG')[0];											
+			}					
 			if(thisNode.style.visibility=='hidden')
 				return;		
 			var parentNode = thisNode.parentNode;
@@ -217,7 +222,7 @@
 				ul.style.display='block';
 				if(!initExpandedNodes)initExpandedNodes = ',';
 				if(initExpandedNodes.indexOf(',' + inputId + ',')<0) initExpandedNodes = initExpandedNodes + inputId + ',';
-			}else{
+			}else{					
 				thisNode.src = thisNode.src.replace(JSTreeObj.minusImage,JSTreeObj.plusImage);
 				parentNode.getElementsByTagName('UL')[0].style.display='none';
 				initExpandedNodes = initExpandedNodes.replace(',' + inputId,'');
@@ -227,60 +232,102 @@
 			return false;						
 		}
 		,
-		
-		
-		/* Initialize drag */ 
-		initDrag : function(e)
-		{
+
+		copyDragableNode : function(e)
+		{			
+			var sourceTree = false;			
+			var liTag = document.getElementsByTagName('LI')[0];
 			
-//alert('thisTree = true');			
-			if(document.all)e = event;
 			var subs = JSTreeObj.floatingContainer.getElementsByTagName('LI');
 
 			if(subs.length>0){
 				if(JSTreeObj.dragNode_sourceNextSib){
 					JSTreeObj.dragNode_parent.insertBefore(JSTreeObj.dragNode_source,JSTreeObj.dragNode_sourceNextSib);
-				}else{
+				}
+				else{
+					JSTreeObj.dragNode_parent.appendChild(JSTreeObj.dragNode_source);
+				}
+			}
+			
+			JSTreeObj.dragNode_source = this.parentNode;
+			JSTreeObj.dragNode_parent = this.parentNode.parentNode;
+
+			var parentDiv = JSTreeObj.dragNode_parent;
+			while(true){
+				if (parentDiv.getElementsByTagName('DIV')[0]){
+					globalDivId = parentDiv.getElementsByTagName('DIV')[0].id;
+					break;					
+				}
+				parentDiv = parentDiv.parentNode;
+			}
+			JSTreeObj.dragNode_sourceNextSib = false;
+			
+			if(JSTreeObj.dragNode_source.nextSibling)JSTreeObj.dragNode_sourceNextSib = JSTreeObj.dragNode_source.nextSibling;
+			JSTreeObj.dragNode_destination = false;
+			JSTreeObj.dragDropTimer = 0;
+			JSTreeObj.timerDragCopy();
+			
+			return false;
+		}
+		,
+		timerDragCopy : function()
+		{	
+			if(this.dragDropTimer>=0 && this.dragDropTimer<10) {
+				this.dragDropTimer = this.dragDropTimer + 1;
+				setTimeout('JSTreeObj.timerDragCopy()',20);
+				return;
+			}
+			if(this.dragDropTimer==10)
+			{
+				JSTreeObj.floatingContainer.style.display='block';
+				var tempNode = JSTreeObj.dragNode_source.cloneNode(true);
+				tempNode.id = 'floatingContainer'+ tempNode.id;
+				JSTreeObj.floatingContainer.appendChild(tempNode);									
+			}
+		}
+		,		
+		
+		/* Initialize drag */ 
+		initDrag : function(e)
+		{
+			var sourceTree = false;			
+			var liTag = document.getElementsByTagName('LI')[0];
+			
+			var subs = JSTreeObj.floatingContainer.getElementsByTagName('LI');
+
+			if(subs.length>0){
+				if(JSTreeObj.dragNode_sourceNextSib){
+					JSTreeObj.dragNode_parent.insertBefore(JSTreeObj.dragNode_source,JSTreeObj.dragNode_sourceNextSib);
+				}
+				else{
 					JSTreeObj.dragNode_parent.appendChild(JSTreeObj.dragNode_source);
 				}					
 			}
 			
 			JSTreeObj.dragNode_source = this.parentNode;
 			JSTreeObj.dragNode_parent = this.parentNode.parentNode;
-			
+
 			var parentDiv = JSTreeObj.dragNode_parent;
 			while(true){
 				if (parentDiv.getElementsByTagName('DIV')[0]){
-//alert('parentDiv = '+parentDiv.getElementsByTagName('DIV')[0].id);
 					globalDivId = parentDiv.getElementsByTagName('DIV')[0].id;
 					break;					
 				}
 				parentDiv = parentDiv.parentNode;
 			}
-			
-/*
-var temp = JSTreeObj.dragNode_parent.getElementsByTagName('DIV');
-//alert(temp.length);
-for (var i = 0; i < temp.length; i++) {
-	alert(temp[i]);
-}
-alert('divClass = ' + JSTreeObj.dragNode_parent.getElementsByTagName('DIV'));			
-
-			
-//alert('div = ' + JSTreeObj.dragNode_source.getElementsByTagName('DIV')[0]);			
-*/			
 			JSTreeObj.dragNode_sourceNextSib = false;
 			
 			if(JSTreeObj.dragNode_source.nextSibling)JSTreeObj.dragNode_sourceNextSib = JSTreeObj.dragNode_source.nextSibling;
 			JSTreeObj.dragNode_destination = false;
 			JSTreeObj.dragDropTimer = 0;
 			JSTreeObj.timerDrag();
+			
 			return false;
 		}
 		,
 		timerDrag : function()
 		{	
-			if(this.dragDropTimer>=0 && this.dragDropTimer<10) {
+			if(this.dragDropTimer>=0 && this.dragDropTimer<10){
 				this.dragDropTimer = this.dragDropTimer + 1;
 				setTimeout('JSTreeObj.timerDrag()',20);
 				return;
@@ -293,23 +340,31 @@ alert('divClass = ' + JSTreeObj.dragNode_parent.getElementsByTagName('DIV'));
 		}
 		,
 		moveDragableNodes : function(e)
-		{
+		{			
 			if(JSTreeObj.dragDropTimer<10)return;
 			if(document.all)e = event;
 			dragDrop_x = e.clientX/1 + 5 + document.body.scrollLeft;
 			dragDrop_y = e.clientY/1 + 5 + document.documentElement.scrollTop;	
-					
+
 			JSTreeObj.floatingContainer.style.left = dragDrop_x + 'px';
 			JSTreeObj.floatingContainer.style.top = dragDrop_y + 'px';
-			
-			var thisObj = this;
-			if(thisObj.tagName=='A' || thisObj.tagName=='IMG')thisObj = thisObj.parentNode;
 
+			var thisObj = this;
+
+			if(thisObj.tagName=='A' || thisObj.tagName=='IMG')
+				thisObj = thisObj.parentNode;
 			JSTreeObj.dragNode_noSiblings = false;
 			var tmpVar = thisObj.getAttribute('noSiblings');
 			if(!tmpVar)tmpVar = thisObj.noSiblings;
 			if(tmpVar=='true')JSTreeObj.dragNode_noSiblings=true;
-					
+
+			var tmpVar = thisObj.getAttribute('sourceTree');
+			
+			if(!tmpVar)
+				tmpVar = thisObj.sourceTree;
+			if(tmpVar=='true')
+				JSTreeObj.dragNode_sourceTree=true;
+
 			if(thisObj && thisObj.id)
 			{
 				JSTreeObj.dragNode_destination = thisObj;
@@ -318,7 +373,8 @@ alert('divClass = ' + JSTreeObj.dragNode_parent.getElementsByTagName('DIV'));
 				tmpObj.style.display='block';
 				
 				var eventSourceObj = this;
-				if(JSTreeObj.dragNode_noSiblings && eventSourceObj.tagName=='IMG')eventSourceObj = eventSourceObj.nextSibling;
+				if(JSTreeObj.dragNode_noSiblings && eventSourceObj.tagName=='IMG')
+					eventSourceObj = eventSourceObj.nextSibling;
 				
 				var tmpImg = tmpObj.getElementsByTagName('IMG')[0];
 				if(this.tagName=='A' || JSTreeObj.dragNode_noSiblings) {
@@ -330,54 +386,24 @@ alert('divClass = ' + JSTreeObj.dragNode_parent.getElementsByTagName('DIV'));
 					JSTreeObj.insertAsSub = false;
 					tmpObj.style.left = (JSTreeObj.getLeftPos(eventSourceObj) + JSTreeObj.indicator_offsetX) + 'px';
 				}
-				
-				
+				if(!thisObj || !thisObj.id){
+					tmpImg.style.visibility = 'hidden';
+				}
 				tmpObj.style.top = (JSTreeObj.getTopPos(thisObj) + JSTreeObj.indicator_offsetY + 9) + 'px';
-			}
+			}			
 			
 			return false;
 			
 		}
 		,
 		dropDragableNodes:function()
-		{			
-			
-//alert('id of tree = ' + this.idOfTree);			
-/*			
-			if(thisTree == true)	
-				alert('drag node');
-			else
-				alert('create a new one');
-
-alert('thisTree = false');
-thisTree = false;			
-*/
-/*			
-			if(this.thisTree){
-				alert('moving node');
-				thisTree = false;
-			}
-			else
-				alert('creating new one');
-*/			
-			
+		{	
 			var parent;
 			if(JSTreeObj.dragDropTimer<10){				
 				JSTreeObj.dragDropTimer = -1;
 				return;
 			}
-//mcb			
-
-// 			alert('noRemoving = ' + JSTreeObj.dragNode_source.getAttribute('noRemoving'));
-//alert(tmpObj.dragNode_parent.getAttribute('div'));
-/*
- 			if (JSTreeObj.dragNode_source.getAttribute('noRemoving'))
-				alert('create');			
-			else 
-				alert('move');									
-*/	
-//mce	
-			
+				
 			var showMessage = false;
 			if(JSTreeObj.dragNode_destination){	// Check depth
 				var countUp = JSTreeObj.dragDropCountLevels(JSTreeObj.dragNode_destination,'up');
@@ -390,6 +416,8 @@ thisTree = false;
 				}
 			}
 						
+			var sourceTree = document.getElementById(JSTreeObj.dragNode_source.id).getAttribute("sourceTree");
+						
 			if(JSTreeObj.dragNode_destination){
 				if(JSTreeObj.insertAsSub){
 					var uls = JSTreeObj.dragNode_destination.getElementsByTagName('UL');
@@ -401,14 +429,6 @@ thisTree = false;
 						
 						var li = JSTreeObj.dragNode_source.getElementsByTagName('LI')[0];
 						
-/*						
-alert('li = '+ li);
-if(li.noRemoving)
-	alert('noRemoving');
-	else
-	alert('removing');
-*/	
-
 						if(lis.length>0){	// Sub elements exists - drop dragable node before the first one
 							ul.insertBefore(JSTreeObj.dragNode_source,lis[0]);	
 						}else {	// No sub exists - use the appendChild method - This line should not be executed unless there's something wrong in the HTML, i.e empty <ul>
@@ -420,7 +440,6 @@ if(li.noRemoving)
 						JSTreeObj.dragNode_destination.appendChild(ul);
 						ul.appendChild(JSTreeObj.dragNode_source);
 					}
-//					parent = ul.id;
 					var img = JSTreeObj.dragNode_destination.getElementsByTagName('IMG')[0];	
 
 					img.style.visibility='visible';
@@ -433,7 +452,6 @@ if(li.noRemoving)
 					}else{
 						JSTreeObj.dragNode_destination.parentNode.appendChild(JSTreeObj.dragNode_source);
 					}
-//					parent = JSTreeObj.dragNode_destination.parentNode.id;
 
 				}	
 				/* Clear parent object */
@@ -441,26 +459,24 @@ if(li.noRemoving)
 				var lis = tmpObj.getElementsByTagName('LI');
 
 				if(lis.length==0){
-//					var img = tmpObj.parentNode.getElementsByTagName('IMG')[0];
 					var tmpSpan = tmpObj.parentNode;
-
 					var img = tmpSpan.parentNode.getElementsByTagName('IMG')[0];
 					img.style.visibility='hidden';	// Hide [+],[-] icon
-//					alert('trying to remove. noRemove='+noRemove);	
-//					if(noRemove==false){
-//						tmpObj.parentNode.removeChild(tmpObj);						
-//					}
 				}
 				
 			}else{
 				// Putting the item back to it's original location
 				
+				
 				if(JSTreeObj.dragNode_sourceNextSib){
 					JSTreeObj.dragNode_parent.insertBefore(JSTreeObj.dragNode_source,JSTreeObj.dragNode_sourceNextSib);
+
 				}else{
 					JSTreeObj.dragNode_parent.appendChild(JSTreeObj.dragNode_source);
-				}								
+				}		
+				return;						
 			}
+			
 			JSTreeObj.dropTargetIndicator.style.display='none';		
 			JSTreeObj.dragDropTimer = -1;	
 			if(showMessage && JSTreeObj.messageMaximumDepthReached)alert(JSTreeObj.messageMaximumDepthReached);
@@ -479,9 +495,9 @@ if(li.noRemoving)
 					if (parentDiv.getElementsByTagName('DIV')[0]){
 
 						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id)
-							alert('moving node node ID = '+JSTreeObj.dragNode_source.id+" newParent = "+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
+							console.log('moving node node ID = '+JSTreeObj.dragNode_source.id+" newParent = "+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
 						else
-							alert('creating node newParent = '+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
+							console.log('creating node newParent = '+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
 						break;	
 										
 					}
@@ -489,6 +505,143 @@ if(li.noRemoving)
 				}
 			}			
 //
+		}
+		,
+		dropDragableNodesCopy:function()
+		{	
+			var parent;
+			if(JSTreeObj.dragDropTimer<10){				
+				JSTreeObj.dragDropTimer = -1;
+				return;
+			}
+				
+			var showMessage = false;
+			if(JSTreeObj.dragNode_destination){	// Check depth
+				var countUp = JSTreeObj.dragDropCountLevels(JSTreeObj.dragNode_destination,'up');
+				var countDown = JSTreeObj.dragDropCountLevels(JSTreeObj.dragNode_source,'down');
+				var countLevels = countUp/1 + countDown/1 + (JSTreeObj.insertAsSub?1:0);		
+				
+				if(countLevels>JSTreeObj.maximumDepth){
+					JSTreeObj.dragNode_destination = false;
+					showMessage = true; 	// Used later down in this function
+				}
+			}
+			if(JSTreeObj.dragNode_destination){
+				if(JSTreeObj.insertAsSub){
+					var uls = JSTreeObj.dragNode_destination.getElementsByTagName('UL');
+					if(uls.length>0){
+						ul = uls[0];
+						ul.style.display='block';
+						var lis = ul.getElementsByTagName('LI');						
+						
+						var li = JSTreeObj.dragNode_source.getElementsByTagName('LI')[0];
+						
+						if(lis.length>0){	// Sub elements exists - drop dragable node before the first one
+							ul.insertBefore(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id),lis[0]);	
+						}else {	// No sub exists - use the appendChild method - This line should not be executed unless there's something wrong in the HTML, i.e empty <ul>
+							ul.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
+						}								
+					}else{
+						var ul = document.createElement('UL');
+						ul.style.display='block';
+						JSTreeObj.dragNode_destination.appendChild(ul);
+						ul.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));
+					}
+
+					var img = JSTreeObj.dragNode_destination.getElementsByTagName('IMG')[0];	
+
+					img.style.visibility='visible';
+					img.src = img.src.replace(JSTreeObj.plusImage,JSTreeObj.minusImage);					
+				}else{	
+					if(JSTreeObj.dragNode_destination.nextSibling){
+						var remId;
+
+						if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
+							remId = JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id;
+						}
+
+						if (document.getElementById(remId)){
+							var el = document.getElementById(remId);
+						}						
+						var nextSib = JSTreeObj.dragNode_destination.nextSibling;
+						nextSib.parentNode.insertBefore(el,nextSib);						
+					}else{
+						var remId;
+						if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
+							remId = JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id;
+						}
+						if (document.getElementById(remId)){
+							var el = document.getElementById(remId);
+						}
+							JSTreeObj.dragNode_destination.parentNode.appendChild(el);
+					}
+				}	
+				/* Clear parent object */
+
+				JSTreeObj.getNewNodeId(JSTreeObj.dragNode_source.id);
+				
+//				JSTreeObj.initNode(getElementsByTagName('li').getElementById()
+//				JSTreeObj.dragNode_source.id);
+				
+			}else{
+				// Putting the item back to it's original location
+
+					if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
+						if (document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id)){
+//							var el = document.getElementById('floatingContainer'+JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id);
+							JSTreeObj.floatingContainer.removeChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));
+						}
+					}
+					return;
+/*				
+				if(JSTreeObj.dragNode_sourceNextSib){
+					JSTreeObj.dragNode_parent.insertBefore(JSTreeObj.dragNode_source,JSTreeObj.dragNode_sourceNextSib);
+					var remId;
+					if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
+						remId = JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id;
+					}
+					if (document.getElementById(remId)){
+						var el = document.getElementById(remId);
+						JSTreeObj.floatingContainer.removeChild(el);
+					}
+				}
+				return;						
+*/ 
+			}
+			
+			JSTreeObj.dropTargetIndicator.style.display='none';		
+			JSTreeObj.dragDropTimer = -1;	
+			if(showMessage && JSTreeObj.messageMaximumDepthReached)alert(JSTreeObj.messageMaximumDepthReached);
+//			JSTreeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id,null);			
+			
+//			saveMyTree(JSTreeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id), JSTreeObj.dragNode_source.id);		
+//			saveMyTree(JSTreeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);		
+			saveMyTree(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);		
+			
+//			JSTreeObj.initTree();
+			
+			var parentDiv = JSTreeObj.dragNode_destination;
+//
+			while(true){
+				if (parentDiv.getElementsByTagName('DIV')){
+					if (parentDiv.getElementsByTagName('DIV')[0]){
+
+						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id)
+							console.log('moving node node ID = '+JSTreeObj.dragNode_source.id+" newParent = "+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
+						else
+							console.log('creating node newParent = '+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
+						break;	
+										
+					}
+					parentDiv = parentDiv.parentNode;
+				}
+			}			
+//
+		}
+		,
+
+		getNewNodeId : function(id){
+				
 		}
 		,
 		createDropIndicator : function()
@@ -537,7 +690,7 @@ if(li.noRemoving)
 		}
 		,
 		
-//		getNewParent : function(initObj,saveString,child,numericParentID) {
+//		getNewParent : function(initObj,saveString,child,numericParentID) {	
 		getNewParent : function(initObj,saveString,child,newParent) {
 			if(!saveString)var saveString = '';
 			if(!initObj){
@@ -623,8 +776,80 @@ if(li.noRemoving)
 			return saveString;
 		}
 		,
+		initNode : function(nodeId){
+				// No children var set ?
+
+			document.documentElement.onselectstart = JSTreeObj.cancelSelectionEvent;
+			document.documentElement.ondragstart = JSTreeObj.cancelEvent;
+
+
+				var nodeEl = document.getElementById(nodeId);
+				
+				var noChildren = false;
+				var tmpVar = nodeEl.getAttribute('noChildren');
+				if(!tmpVar)tmpVar = nodeEl.noChildren;
+				if(tmpVar=='true')noChildren=true;
+
+				var sourceTree = false;
+				var tmpVar = nodeEl.getAttribute('sourceTree');
+				if(!tmpVar)
+					tmpVar = nodeEl.sourceTree;
+				if(tmpVar=='true')
+					sourceTree=true;
+				// No drag var set ?
+				var noDrag = false;
+				var tmpVar = nodeEl.getAttribute('noDrag');
+				if(!tmpVar)tmpVar = nodeEl.noDrag;
+				if(tmpVar=='true')noDrag=true;
+						 
+				nodeId++;
+				var subItems = nodeEl.getElementsByTagName('UL');
+				var img = document.createElement('IMG');
+				img.src = this.imageFolder + this.plusImage;
+				img.onclick = JSTreeObj.showHideNode;
+				
+				if(subItems.length==0)
+					img.style.visibility='hidden';
+				else{
+					subItems[0].id = 'tree_ul_' + treeUlCounter;
+					treeUlCounter++;
+				}
+				var aTag = nodeEl.getElementsByTagName('A')[0];
+				if(aTag.id)
+					numericId = aTag.id.replace(/[^0-9]/g,'');
+				else
+					numericId = (no+1);			
+				aTag.id = nodeEl.id + 'a';
+	
+				var input = document.createElement('INPUT');
+				input.style.width = '40%';
+				input.style.display='none';
+				
+				nodeEl.insertBefore(input,aTag);
+				input.id = nodeEl.id + 'input';
+	
+				input.onblur = hideEdit;
+				
+				input.onkeypress = withEnter;
+				aTag.ondblclick = initEditLabel;	
+					if(!noDrag)aTag.onmousedown = JSTreeObj.initDrag;
+					if(!noChildren)aTag.onmousemove = JSTreeObj.moveDragableNodes;
+					if(sourceTree)aTag.onmousedown = JSTreeObj.copyDragableNode;
+					nodeEl.insertBefore(img,input);
+	
+					var folderImg = document.createElement('IMG');
+					if(!noDrag)folderImg.onmousedown = JSTreeObj.initDrag;
+					if(!noChildren)folderImg.onmousemove = JSTreeObj.moveDragableNodes;
+					if(nodeEl.className){
+						folderImg.src = this.imageFolder + menuItems[no].className;
+					}else{
+						folderImg.src = this.imageFolder + this.folderImage;
+					}
+					nodeEl.insertBefore(folderImg,input);			
+		}
+		,
 		initTree : function()
-		{
+		{						
 			JSTreeObj = this;
 			JSTreeObj.createDropIndicator();
 			document.documentElement.onselectstart = JSTreeObj.cancelSelectionEvent;
@@ -632,104 +857,113 @@ if(li.noRemoving)
 			var nodeId = 0;
 			var dhtmlgoodies_tree = document.getElementById(this.idOfTree);
 			var menuItems = dhtmlgoodies_tree.getElementsByTagName('LI');	// Get an array of all menu items
+			var item = menuItems[0];
 			for(var no=0;no<menuItems.length;no++){
 				// No children var set ?
+				
 				var noChildren = false;
 				var tmpVar = menuItems[no].getAttribute('noChildren');
 				if(!tmpVar)tmpVar = menuItems[no].noChildren;
 				if(tmpVar=='true')noChildren=true;
-/*
-				// No remove var set?
-				var noRemove = false;
-				var tmpVar = menuItems[no].getAttribute('noRemoving');
 
-				if(!tmpVar)tmpVar = menuItems[no].noRemoving;
-				if(tmpVar=='true')noRemoving=true;								
-*/
+				var sourceTree = false;
+				var tmpVar = menuItems[no].getAttribute('sourceTree');
+				if(!tmpVar)
+					tmpVar = menuItems[no].sourceTree;
+				if(tmpVar=='true')
+					sourceTree=true;
 				// No drag var set ?
 				var noDrag = false;
 				var tmpVar = menuItems[no].getAttribute('noDrag');
 				if(!tmpVar)tmpVar = menuItems[no].noDrag;
 				if(tmpVar=='true')noDrag=true;
-						 
+				
+				var iconfile = null;		 
+				var tmpVar = menuItems[no].getAttribute('iconfile');
+				if(tmpVar)
+					iconfile = tmpVar;
+									
 				nodeId++;
 				var subItems = menuItems[no].getElementsByTagName('UL');
 				var img = document.createElement('IMG');
 				img.src = this.imageFolder + this.plusImage;
 				img.onclick = JSTreeObj.showHideNode;
 				
-				if(subItems.length==0)img.style.visibility='hidden';else{
+				if(subItems.length==0)
+					img.style.visibility='hidden';
+				else{
 					subItems[0].id = 'tree_ul_' + treeUlCounter;
 					treeUlCounter++;
 				}
+						
 				var aTag = menuItems[no].getElementsByTagName('A')[0];
 
 //risky code
 				
-			if(aTag.id)
-				numericId = aTag.id.replace(/[^0-9]/g,'');
-			else
-				numericId = (no+1);			
-
-//			aTag.id = 'dhtmlgoodies_treeNodeLink' + numericId;
-
-			aTag.id = menuItems[no].id + 'a';
-
-			var input = document.createElement('INPUT');
-			input.style.width = '40%';
-			input.style.display='none';
-			
-			menuItems[no].insertBefore(input,aTag);
-			
-//			input.id = 'dhtmlgoodies_treeNodeInput' + numericId;
-
-			input.id = menuItems[no].id + 'input';
-
-			input.onblur = hideEdit;
-			
-			input.onkeypress = withEnter;
+				if(aTag.id)
+					numericId = aTag.id.replace(/[^0-9]/g,'');
+				else
+					numericId = (no+1);			
+	
+				aTag.id = menuItems[no].id + 'a';
+	
+				var input = document.createElement('INPUT');
+				input.style.width = '40%';
+				input.style.display='none';
+				
+				menuItems[no].insertBefore(input,aTag);
+	
+				input.id = menuItems[no].id + 'input';
+	
+				input.onblur = hideEdit;
+				
+				input.onkeypress = withEnter;
 						
 //			menuItems[no].insertBefore(img,input);
 //			menuItems[no].id = 'dhtmlgoodies_treeNode' + numericId;
 //			aTag.onclick = okToNavigate;				
 
-			aTag.ondblclick = initEditLabel;	
-//				menuItems[no].insertBefore(img, aTag);
-
-//risky code
-
-				//aTag.onclick = JSTreeObj.showHideNode;
+				aTag.ondblclick = initEditLabel;	
 				if(!noDrag)aTag.onmousedown = JSTreeObj.initDrag;
 				if(!noChildren)aTag.onmousemove = JSTreeObj.moveDragableNodes;
-				
-//				menuItems[no].insertBefore(img,aTag);
+				if(sourceTree)aTag.onmousedown = JSTreeObj.copyDragableNode;
+								
 				menuItems[no].insertBefore(img,input);
 
-				//menuItems[no].id = 'dhtmlgoodies_treeNode' + nodeId;
 				var folderImg = document.createElement('IMG');
-				if(!noDrag)folderImg.onmousedown = JSTreeObj.initDrag;
+				
+				if(!noDrag){
+					if(sourceTree)
+						folderImg.onmousedown = JSTreeObj.copyDragableNode;
+					else
+						folderImg.onmousedown = JSTreeObj.initDrag;
+				}
 				if(!noChildren)folderImg.onmousemove = JSTreeObj.moveDragableNodes;
+				
 				if(menuItems[no].className){
 					folderImg.src = this.imageFolder + menuItems[no].className;
 				}else{
 					folderImg.src = this.imageFolder + this.folderImage;
 				}
-//				menuItems[no].insertBefore(folderImg,aTag);
+				if(iconfile)
+					folderImg.src = iconfile;
 				menuItems[no].insertBefore(folderImg,input);				
 			}	
-			
 		
 			initExpandedNodes = this.Get_Cookie('dhtmlgoodies_expandedNodes');
 			if(initExpandedNodes){
 				var nodes = initExpandedNodes.split(',');
-
+/*
 				for(var no=0;no<nodes.length;no++){
 					if(nodes[no])this.showHideNode(false,nodes[no]);	
 				}			
+*/
 			}			
-			
 			document.documentElement.onmousemove = JSTreeObj.moveDragableNodes;	
-			document.documentElement.onmouseup = JSTreeObj.dropDragableNodes;
+			if(sourceTree)
+				document.documentElement.onmouseup = JSTreeObj.dropDragableNodesCopy;
+			else
+				document.documentElement.onmouseup = JSTreeObj.dropDragableNodes;
 		}		
 	}
 	
