@@ -18,7 +18,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#changeTheme
 	 */
-	public String changeTheme(String themeID, String styleGroupName, String styleMember, String themeName, boolean radio, boolean checked) throws RemoteException;
+	public String changeTheme(String themeID, String styleGroupName, String styleMember, String themeName, boolean isRadio, boolean isChecked) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#saveTheme
@@ -33,15 +33,30 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#savePageInfo
 	 */
-	public boolean savePageInfo(String pageID, String[] keywords, String[] values) throws RemoteException;
+	public boolean savePageInfo(String pageID, String[] keywords, String[] values);
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getPageInfoElements
 	 */
-	public String[] getPageInfoElements() throws RemoteException;
+	public String[] getPageInfoElements();
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#restoreTheme
 	 */
 	public boolean restoreTheme(String themeID) throws RemoteException;
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#getSiteInfoElements
+	 */
+	public String[] getSiteInfoElements();
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#getSiteInfoValues
+	 */
+	public String[] getSiteInfoValues(String[] keywords, String language);
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#saveSiteInfo
+	 */
+	public boolean saveSiteInfo(String language, String[] keywords, String[] values);
 }

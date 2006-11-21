@@ -272,7 +272,7 @@
 	
 	<component>
 		<component-type>ThemesManager</component-type>
-		<component-class>com.idega.content.presentation.ThemesManager</component-class>
+		<component-class>com.idega.content.themes.presentation.ThemesManager</component-class>
 	</component>
 	
 	<component> 
@@ -282,7 +282,17 @@
  	
  	<component>
 		<component-type>PageInfo</component-type>
-		<component-class>com.idega.content.presentation.PageInfo</component-class>
+		<component-class>com.idega.content.themes.presentation.PageInfo</component-class>
+		<property>
+			<display-name>Style class</display-name>
+			<property-name>styleClass</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+	</component>
+	
+	<component>
+		<component-type>SiteInfo</component-type>
+		<component-class>com.idega.content.themes.presentation.SiteInfoJsf</component-class>
 		<property>
 			<display-name>Style class</display-name>
 			<property-name>styleClass</property-name>

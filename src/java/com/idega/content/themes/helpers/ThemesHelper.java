@@ -31,6 +31,7 @@ import org.jdom.input.SAXBuilder;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentSearch;
+import com.idega.content.themes.business.ThemesEngine;
 import com.idega.content.themes.business.ThemesService;
 import com.idega.core.search.business.SearchResult;
 import com.idega.graphics.Generator;
@@ -51,15 +52,15 @@ public class ThemesHelper implements Singleton {
 	private volatile ThemeStyleVariations variations = null;
 	private volatile ThemesPropertiesExtractor extractor = null;
 	private volatile ThemesLoader loader = null;
+	private volatile IWSlideService service = null;
+	private volatile ThemesService themesService = null;
+	private volatile ThemesEngine themesEngine = null;
 	
 	private Map <String, Theme> themes = null;
 	private Map <String, Setting> themeSettings = null;
 	private Map <String, Setting> pageSettings = null;
 	private List <String> themeQueue = null;
 	private List <String> urisToThemes = null;
-	
-	private IWSlideService service = null;
-	private ThemesService themesService = null;
 	
 	private boolean checkedFromSlide = false;
 	private boolean loadedThemeSettings = false;
@@ -784,6 +785,19 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		themeQueue.remove(linkToBase);
+	}
+	
+	public ThemesEngine getThemesEngine() {
+		if (themesEngine == null) {
+			synchronized (ThemesHelper.class) {
+				try {
+					themesEngine = (ThemesEngine) IBOLookup.getServiceInstance(IWContext.getInstance(), ThemesEngine.class);
+				} catch (IBOLookupException e) {
+					log.error(e);
+				}
+			}
+		}
+		return themesEngine;
 	}
 
 }

@@ -1,15 +1,15 @@
-package com.idega.content.presentation;
+package com.idega.content.themes.presentation;
 
 import javax.faces.component.UIComponent;
 import javax.faces.webapp.UIComponentTag;
 
-public class PageInfoTag extends UIComponentTag {
+public class SiteInfoTag extends UIComponentTag {
 
 	private String styleClass;
 	
 	@Override
 	public String getComponentType() {
-		return "PageInfo";
+		return "SiteInfo";
 	}
 
 	@Override
@@ -18,13 +18,13 @@ public class PageInfoTag extends UIComponentTag {
 	}
 	
 	protected void setProperties(UIComponent component) {
-		if (component instanceof PageInfo) {
+		if (component instanceof SiteInfoJsf) {
 			super.setProperties(component);
-			PageInfo pageInfo = (PageInfo) component;
-			pageInfo.setStyleClass(getStyleClass());
+			SiteInfoJsf siteInfo = (SiteInfoJsf) component;
+			siteInfo.setStyleClass(getStyleClass());
 		}
 	}
-
+	
 	public String getStyleClass() {
 		return styleClass;
 	}

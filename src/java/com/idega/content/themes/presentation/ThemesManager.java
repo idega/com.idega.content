@@ -1,7 +1,9 @@
-package com.idega.content.presentation;
+package com.idega.content.themes.presentation;
 
 import javax.faces.context.FacesContext;
 
+import com.idega.content.presentation.ContentBlock;
+import com.idega.content.presentation.WebDAVUpload;
 import com.idega.webface.WFBlock;
 import com.idega.webface.WFTitlebar;
 

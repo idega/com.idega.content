@@ -1,4 +1,4 @@
-package com.idega.content.presentation;
+package com.idega.content.themes.presentation;
 
 import java.util.Iterator;
 
@@ -6,6 +6,7 @@ import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 
+import com.idega.content.presentation.ContentBlock;
 import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;

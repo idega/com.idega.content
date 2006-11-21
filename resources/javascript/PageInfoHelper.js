@@ -2,13 +2,20 @@ var globalPageID = 1;
 
 var scrollerImageWidth = 23;
 
+var KEYWORDS = null;
+
 function getScrollerImageWidth() {
 	return scrollerImageWidth;
 }
 
 function savePageInfo() {
 	showLoadingMessage("Saving...");
-	ThemesEngine.getPageInfoElements(getPageInfoElementsCallback);
+	if (KEYWORDS == null) {
+		ThemesEngine.getPageInfoElements(getPageInfoElementsCallback);
+	}
+	else {
+		getPageInfoElementsCallback(KEYWORDS);
+	}
 }
 
 function getPageInfoElementsCallback(allKeywords) {
@@ -49,7 +56,7 @@ function manageSlider(buttonID) {
 		var left = 290;
 		resizeSlider(left);
 		container.style.position = "absolute";
-		container.style.bottom = "30px";
+		container.style.bottom = "28px";
 		container.style.left = left + "px";
 		container.className = "theme_slider";
 		new Effect.Appear(container);

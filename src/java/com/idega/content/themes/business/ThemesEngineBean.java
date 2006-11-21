@@ -9,10 +9,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.idega.business.IBOServiceBean;
+import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
 
 public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
@@ -136,11 +138,46 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	 * 
 	 */
 	public String[] getPageInfoElements() {
-		String[] elements = null;
 		Collection <Setting> c = helper.getPageSettings().values();
 		if (c == null) {
-			return elements;
+			return null;
 		}
+		return getElements(c);
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean restoreTheme(String themeID) {
+		return helper.getThemeChanger().restoreTheme(themeID);
+	}
+	
+	public String[] getSiteInfoElements() {
+		Collection <Setting> c = helper.getThemeSettings().values();
+		if (c == null) {
+			return null;
+		}
+		return getElements(c);
+	}
+	
+	public String[] getSiteInfoValues(String[] keywords, String language) {
+		if (keywords == null || language == null) {
+			return null;
+		}
+		Collection <Setting> c = helper.getThemeSettings().values();
+		if (c == null) {
+			return null;
+		}
+		String[] values = new String[keywords.length];
+		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
+		for (int i = 0; i < keywords.length; i++) {
+			values[i] = settings.getProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + ThemesConstants.UNDER + language);
+		}
+		return values;
+	}
+	
+	private String[] getElements(Collection <Setting> c) {
+		String[] elements = null;
 		List <Setting> settings = new ArrayList<Setting>(c);
 		elements = new String[settings.size()];
 		for (int i = 0; i < settings.size(); i++) {
@@ -149,11 +186,23 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return elements;
 	}
 	
-	/**
-	 * 
-	 */
-	public boolean restoreTheme(String themeID) {
-		return helper.getThemeChanger().restoreTheme(themeID);
+	public boolean saveSiteInfo(String language, String[] keywords, String[] values) {
+		if (language == null || keywords == null || values == null) {
+			return false;
+		}
+		if (keywords.length != values.length) {
+			return false;
+		}
+		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
+		for (int i = 0; i < keywords.length; i++) {
+			if (values[i] == null || values[i].equals(ThemesConstants.EMPTY)) {
+				settings.removeProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + ThemesConstants.UNDER + language);
+			}
+			else {
+				settings.setProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + ThemesConstants.UNDER + language, values[i]);
+			}
+		}
+		return true;
 	}
 
 }

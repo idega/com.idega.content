@@ -25,6 +25,7 @@ public class ThemesConstants {
 	public static final String SPACE_ENCODED = "%20";
 	public static final String ENCODING = "UTF-8";
 	public static final String SEPARATOR = COMMA;
+	public static final String UNDER = "_";
 	
 	protected static final String THEME_PREVIEW = "_theme_preview";
 	protected static final String THEME_SMALL_PREVIEW = "_small" + THEME_PREVIEW;

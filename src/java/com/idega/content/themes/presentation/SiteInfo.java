@@ -134,17 +134,6 @@ public class SiteInfo extends Block {
 			values[i] = iwc.getParameter(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.UNDER + REGION_VALUE);
 		}
 		ThemesHelper.getInstance().getThemesEngine().saveSiteInfo(locale, keywords, values);
-
-		/*while (it.hasNext()) {
-			setting = it.next();
-			value = iwc.getParameter(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.UNDER + REGION_VALUE);
-			if (value == null || ThemesConstants.EMPTY.equals(value)) {
-				
-			}
-			else {
-				applicationSettings.setProperty(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.UNDER + locale, value);
-			}
-		}*/
 	}
 	
 	protected Text getText(String text, boolean bold) {

@@ -1,4 +1,4 @@
-package com.idega.content.presentation;
+package com.idega.content.themes.presentation;
 
 import javax.faces.component.UIComponent;
 import javax.faces.webapp.UIComponentTag;

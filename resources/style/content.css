@@ -435,7 +435,7 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	position: absolute;
 	width: 275px;
 	height: 150px;
-	bottom: 30px;
+	bottom: 28px;
 	border: 1px solid #D7D7D7;
 	z-index: 1;
 }
@@ -445,4 +445,14 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	right: 0px;
 	bottom: 0px;
 	border: 1px solid #D7D7D7;
+}
+
+.siteInfoStyle {
+	position: absolute;
+	width: 275px;
+	height: 325px;
+	right: 0px;
+	bottom: 28px;
+	border: 1px solid #D7D7D7;
+	z-index: 1;
 }
