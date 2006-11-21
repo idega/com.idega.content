@@ -9,9 +9,9 @@ import com.idega.core.data.IWTreeNode;
 import com.idega.core.data.ICTreeNodeAddable;
 import com.idega.presentation.PageTag;
 import com.idega.webface.WFTreeNode;
-
-
+import com.idega.webface.WFUtil;
 import java.util.Iterator;
+import javax.faces.component.html.HtmlOutputText;
 
 public class SiteTemplateBean {
 // TO DO change IWTreeNode to PageTreeNode
@@ -23,20 +23,12 @@ public class SiteTemplateBean {
 	TreeNode pageTree = null;
 	String path = null;
 	Document siteDocument = null;
-//	ICTreeNodeAddable iwnode = null;
 	
-	public TreeNode getSiteTree(){
-//	public IWTreeNode getSiteTree(){
-//		TreeNode result = getSiteStructure();
-//		System.out.println("SITE_LINK = "+ThemesHelper.getInstance().getWebRootWithoutContent());
+	public TreeNode getSiteTree(){		
 		return getSiteStructure();
 	}
 
 	public TreeNode getSiteStructure(){
-//	public IWTreeNode getSiteStructure(){
-		
-//		ICTreeNodeAddable rootNode = null;
-//		IWTreeNode rootNode = null;
 		
 		Document siteDocument = ThemesHelper.getInstance().getXMLDocument(SITE_LINK);
 		Element root = siteDocument.getRootElement();
@@ -44,33 +36,63 @@ public class SiteTemplateBean {
 		
 		Element currentElement = (Element)siteRoot.getChildren().get(0);
 		
-//		rootNode = (ICTreeNodeAddable)(new IWTreeNode(currentElement.getAttributeValue("name")));
-		IWTreeNode rootNode = new IWTreeNode(currentElement.getAttributeValue("name"));
+//		IWTreeNode rootNode = new IWTreeNode(currentElement.getAttributeValue("name"));
+		WFTreeNode rootNode = new WFTreeNode(new IWTreeNode(currentElement.getAttributeValue("name")));
+//		IWTreeNodeWithTypes rootNode = new IWTreeNodeWithTypes(currentElement.getAttributeValue("name"),"","");
 		
-//		rootNode = new IWTreeNode(currentElement.getAttributeValue("name"));
-//		
-//		currentElement = (Element)currentElement.getChildren().get(0);
 		
 		rootNode = getPage(currentElement, rootNode);
-//		ICTreeNode icnode = rootNode.getParentNode();
-		ICTreeNode icnode = rootNode;
-
+//		ICTreeNode icnode = rootNode;
+////////////////////////////
+//	    HtmlOutputText texti = new HtmlOutputText();
+//	    texti.setValueBinding("value",WFUtil.createValueBinding("#{node.description}"));
+//	    tree.getFacets().put("IWTreeNode",texti);
+///////////////////////////
 		
 //		IWTreeNode node = rootNode;
 
-		return new WFTreeNode(icnode);
-//		return rootNode;
+//		return new WFTreeNode(icnode);
+		return rootNode;
 
 //		return rootNode;	
 	}	
 	
-//	public ICTreeNodeAddable getPage(Element currElement, ICTreeNodeAddable currNode){
-	public IWTreeNode getPage(Element currElement, IWTreeNode currNode){
+//	public IWTreeNode getPage(Element currElement, IWTreeNode currNode){
+//		String name;
+//		String type;
+//		String iconfile;
+//		Iterator itr = (currElement.getChildren()).iterator();
+//		while(itr.hasNext()){
+//			Element current = (Element)itr.next();
+//			name = current.getAttributeValue("name");
+//			type = current.getAttributeValue("type");
+//			iconfile = current.getAttributeValue("iconfile"); 
+//			IWTreeNode newNode = new IWTreeNode(name);
+//			newNode.setParent(currNode);
+//			currNode.addChild(newNode);
+//			if(!current.getChildren().isEmpty()){
+//				newNode = getPage(current, newNode);
+//			}
+//		}
+//		return currNode;
+//	}
+	
+	public WFTreeNode getPage(Element currElement, WFTreeNode currNode){
+		String name;
+		String type;
+		String iconfile;
 		Iterator itr = (currElement.getChildren()).iterator();
 		while(itr.hasNext()){
 			Element current = (Element)itr.next();
-			IWTreeNode newNode = new IWTreeNode(current.getAttributeValue("name"));
-			newNode.setParent(currNode);
+			name = current.getAttributeValue("name");
+			type = current.getAttributeValue("type");
+			iconfile = current.getAttributeValue("iconfile"); 
+//			IWTreeNode newNode = new IWTreeNode(name);
+			WFTreeNode newNode = new WFTreeNode(new IWTreeNode(current.getAttributeValue("name")));
+			newNode.setIconURI(current.getAttributeValue("iconfile"));
+			newNode.setPageType(current.getAttributeValue("type"));
+//System.out.println("iconFile = "+iconfile);			
+//			newNode.setParent(currNode);
 			currNode.addChild(newNode);
 			if(!current.getChildren().isEmpty()){
 				newNode = getPage(current, newNode);
@@ -79,7 +101,7 @@ public class SiteTemplateBean {
 		return currNode;
 	}
 	
-	public TreeNode getPageTree(){
+	public TreeNode getPageTree(){		
 		Document siteDocument = ThemesHelper.getInstance().getXMLDocument(PAGE_LINK);
 		Element root = siteDocument.getRootElement();
 //		Element siteRoot = (Element)root.getChild("site");
@@ -87,11 +109,13 @@ public class SiteTemplateBean {
 		
 //		Element currentElement = (Element)siteRoot.getChildren().get(0);
 		Element currentElement = (Element)root;
-		IWTreeNode rootNode = new IWTreeNode("");
-		
+//		IWTreeNodeWithTypes rootNode = new IWTreeNodeWithTypes("","","");
+		WFTreeNode rootNode = new WFTreeNode(new IWTreeNode(currentElement.getAttributeValue("name")));
+//		IWTreeNode rootNode = new IWTreeNode("");
 		rootNode = getPage(currentElement, rootNode);
-		ICTreeNode icnode = rootNode;
-		return new WFTreeNode(icnode);
+//		ICTreeNode icnode = rootNode;
+//		return new WFTreeNode(icnode);
+		return rootNode;
 		}
 
 	public String getPath() {
