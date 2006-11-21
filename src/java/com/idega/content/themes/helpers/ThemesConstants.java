@@ -15,16 +15,16 @@ public class ThemesConstants {
 	public static final String THEMES_PREVIEW_PATH = THEMES_PATH + "preview/";
 	
 	protected static final String DOT = ".";
-	public static final String SLASH = "/";
+	protected static final String SLASH = "/";
 	public static final String AT = "@";
 	public static final String EMPTY = "";
 	protected static final String COMMA = ",";
 	public static final String SEMICOLON = ";";
-	public static final String PLUS = "+";
-	public static final String SPACE = " ";
-	public static final String SPACE_ENCODED = "%20";
-	public static final String ENCODING = "UTF-8";
-	public static final String SEPARATOR = COMMA;
+	protected static final String PLUS = "+";
+	protected static final String SPACE = " ";
+	protected static final String SPACE_ENCODED = "%20";
+	protected static final String ENCODING = "UTF-8";
+	protected static final String SEPARATOR = COMMA;
 	public static final String UNDER = "_";
 	
 	protected static final String THEME_PREVIEW = "_theme_preview";

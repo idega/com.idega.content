@@ -102,7 +102,7 @@ public class ThemesHelper implements Singleton {
 		return helper;
 	}
 	
-	public Generator getImageGenerator() {
+	protected Generator getImageGenerator() {
 		if (generator == null) {
 			synchronized (ThemesHelper.class) {
 				if (generator == null) {
@@ -146,7 +146,7 @@ public class ThemesHelper implements Singleton {
 		return extractor;
 	}
 	
-	public IWSlideService getSlideService() {
+	protected IWSlideService getSlideService() {
 		if (service == null) {
 			synchronized (ThemesHelper.class) {
 				try {
@@ -191,7 +191,7 @@ public class ThemesHelper implements Singleton {
 		}
 	}
 	
-	public String getFileName(String uri) {
+	protected String getFileName(String uri) {
 		String name = null;
 		int begin = uri.lastIndexOf(ThemesConstants.SLASH);
 		int end = uri.lastIndexOf(ThemesConstants.DOT);
@@ -204,7 +204,7 @@ public class ThemesHelper implements Singleton {
 		return name;
 	}
 	
-	public String getFileNameWithExtension(String uri) {
+	protected String getFileNameWithExtension(String uri) {
 		String name = null;
 		int begin = uri.lastIndexOf(ThemesConstants.SLASH);
 		if (begin == -1) {
@@ -216,7 +216,7 @@ public class ThemesHelper implements Singleton {
 		return name;
 	}
 	
-	public String extractValueFromString(String fullString, int beginIndex, int endIndex) {
+	protected String extractValueFromString(String fullString, int beginIndex, int endIndex) {
 		String value = ThemesConstants.EMPTY;
 		if (canExtractValueFromString(fullString, beginIndex, endIndex)) {
 			value = fullString.substring(beginIndex, endIndex);
@@ -236,7 +236,7 @@ public class ThemesHelper implements Singleton {
 		return false;
 	}
 	
-	public String getFileExtension(String uri) {
+	protected String getFileExtension(String uri) {
 		String type = null;
 		int begin = uri.lastIndexOf(ThemesConstants.DOT);
 		if (begin != -1) {
@@ -245,7 +245,7 @@ public class ThemesHelper implements Singleton {
 		return type;
 	}
 	
-	public List getFiles(String folderURI) {
+	protected List getFiles(String folderURI) {
 		List files = null;
 		try {
 			files = getSlideService().getChildPathsExcludingFoldersAndHiddenFiles(folderURI);
@@ -259,7 +259,7 @@ public class ThemesHelper implements Singleton {
 		return getWebRootWithoutContent(getFullWebRoot());
 	}
 	
-	public String getWebRootWithoutContent(String fullWebRoot) {
+	protected String getWebRootWithoutContent(String fullWebRoot) {
 		if (webRoot != null) {
 			return webRoot;
 		}
@@ -294,7 +294,7 @@ public class ThemesHelper implements Singleton {
 		return fullWebRoot;
 	}
 	
-	public boolean isCorrectFile(String fileName, String nameTemplate) {
+	protected boolean isCorrectFile(String fileName, String nameTemplate) {
 		if (fileName == null || nameTemplate == null) {
 			return false;
 		}
@@ -336,7 +336,7 @@ public class ThemesHelper implements Singleton {
 		return false;
 	}
 	
-	public boolean isDraft(String fileName) {
+	protected boolean isDraft(String fileName) {
 		if (fileName == null) {
 			return true;
 		}
@@ -346,7 +346,7 @@ public class ThemesHelper implements Singleton {
 		return false;
 	}
 	
-	public boolean isSystemFile(String fileName) {
+	protected boolean isSystemFile(String fileName) {
 		if (fileName == null) {
 			return true; // Not a system file, but invalid also
 		}
@@ -356,14 +356,14 @@ public class ThemesHelper implements Singleton {
 		return false;
 	}
 	
-	public boolean isPropertiesFile(String uri) {
+	protected boolean isPropertiesFile(String uri) {
 		if (ThemesConstants.PROPERTIES_FILES.contains(uri)) {
 			return true;
 		}
 		return false;
 	}
 	
-	public void addTheme(Theme themeInfo) {
+	protected void addTheme(Theme themeInfo) {
 		themes.put(themeInfo.getId(), themeInfo);
 	}
 	
@@ -371,7 +371,7 @@ public class ThemesHelper implements Singleton {
 		return themes.values();
 	}
 	
-	public void addUriToTheme(String uri) {
+	protected void addUriToTheme(String uri) {
 		urisToThemes.add(uri);
 	}
 	
@@ -390,7 +390,7 @@ public class ThemesHelper implements Singleton {
 		return getXMLDocument(getInputStream(url));
 	}
 	
-	public Document getXMLDocument(InputStream stream) {
+	protected Document getXMLDocument(InputStream stream) {
 		if(stream == null){
 			return null;
 		}
@@ -424,7 +424,7 @@ public class ThemesHelper implements Singleton {
 		return document;
 	}
 	
-	public String getLinkToBase(String uri) {
+	protected String getLinkToBase(String uri) {
 		int index = uri.lastIndexOf(ThemesConstants.SLASH);
 		String link = extractValueFromString(uri, 0, index);
 		if (!link.endsWith(ThemesConstants.SLASH)) {
@@ -433,7 +433,7 @@ public class ThemesHelper implements Singleton {
 		return link;
 	}
 	
-	public Theme getTheme(String themeID) {
+	protected Theme getTheme(String themeID) {
 		if (themeID == null) {
 			return null;
 		}
@@ -505,7 +505,7 @@ public class ThemesHelper implements Singleton {
 		}
 	}
 	
-	public InputStream getInputStream(String link) {
+	protected InputStream getInputStream(String link) {
 		InputStream is = null;
         try {
         	URL url = getUrl(link);
@@ -521,7 +521,7 @@ public class ThemesHelper implements Singleton {
         return is;
 	}
 	
-	public boolean closeInputStream(InputStream is) {
+	protected boolean closeInputStream(InputStream is) {
 		try {
 			is.close();
 		} catch (IOException e) {
@@ -531,7 +531,7 @@ public class ThemesHelper implements Singleton {
 		return true;
 	}
 	
-	public boolean closeOutputStream(OutputStream os) {
+	protected boolean closeOutputStream(OutputStream os) {
 		try {
 			os.close();
 		} catch (IOException e) {
@@ -541,7 +541,7 @@ public class ThemesHelper implements Singleton {
 		return true;
 	}
 	
-	public URL getUrl(String link) {
+	protected URL getUrl(String link) {
 		URL url = null;
 		try {
 			url = new URL(link);
@@ -591,7 +591,7 @@ public class ThemesHelper implements Singleton {
 		return encode(encoded.toString(), false);
 	}
 	
-	public String decode(String value, boolean fullyDecode) {
+	protected String decode(String value, boolean fullyDecode) {
 		if (value == null) {
 			return null;
 		}
@@ -667,7 +667,7 @@ public class ThemesHelper implements Singleton {
 		return themesService;
 	}
 
-	public boolean createThemeConfig(Theme theme) {
+	protected boolean createThemeConfig(Theme theme) {
 		Document doc = new Document();
 		Element root = new Element(ThemesConstants.CON_THEME);
 		Collection <Element> rootElements = new ArrayList<Element>();
@@ -743,7 +743,7 @@ public class ThemesHelper implements Singleton {
 		return parsedValues;
 	}
 	
-	public boolean closeInputStreamReader(InputStreamReader stream) {
+	protected boolean closeInputStreamReader(InputStreamReader stream) {
 		if (stream == null) {
 			return true;
 		}
@@ -756,7 +756,7 @@ public class ThemesHelper implements Singleton {
 		return true;
 	}
 	
-	public boolean closeBufferedReader(BufferedReader buffer) {
+	protected boolean closeBufferedReader(BufferedReader buffer) {
 		if (buffer == null) {
 			return true;
 		}
