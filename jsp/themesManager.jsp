@@ -17,7 +17,7 @@ version="1.2">
 						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/reflection.js">
                 <h:form id="uploadForm" enctype="multipart/form-data" onsubmit="showLoadingMessage('Uploading theme...');">
                 	<jsf:verbatim>
-                		<script type="text/javascript">insertStyleFile();initScript(false, true, true);getThemes(null, false);</script>
+                		<script type="text/javascript">insertStyleFile();initScript(false, true, true);getThemes(null, true);</script>
                 	</jsf:verbatim>
 					<wf:wfblock id="themeManagerBlock" title="#{localizedStrings['com.idega.content']['themes_manager']}" >
 						<x:div id="themePreviewContainer" forceId="true">

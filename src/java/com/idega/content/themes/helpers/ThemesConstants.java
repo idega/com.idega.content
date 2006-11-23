@@ -9,30 +9,22 @@ public class ThemesConstants {
 	protected static final String NAMESPACE = "http://www.w3.org/1999/xhtml";
 	protected static final String NAMESPACE_ID = "xmlns";
 	
-	public static final String CONTENT = "/content";
 	protected static final String THEMES = "/themes/";
-	public static final String THEMES_PATH = "/files/cms" + THEMES;
-	public static final String THEMES_PREVIEW_PATH = THEMES_PATH + "preview/";
 	
 	protected static final String DOT = ".";
 	protected static final String SLASH = "/";
-	public static final String AT = "@";
-	public static final String EMPTY = "";
 	protected static final String COMMA = ",";
-	public static final String SEMICOLON = ";";
 	protected static final String PLUS = "+";
 	protected static final String SPACE = " ";
 	protected static final String SPACE_ENCODED = "%20";
 	protected static final String ENCODING = "UTF-8";
 	protected static final String SEPARATOR = COMMA;
-	public static final String UNDER = "_";
 	
 	protected static final String THEME_PREVIEW = "_theme_preview";
 	protected static final String THEME_SMALL_PREVIEW = "_small" + THEME_PREVIEW;
 	protected static final String DRAFT_PREVIEW = "_draft_preview";
 	
 	protected static final String THEME_SEARCH_KEY = "*.htm*";
-	
 	protected static final String IDEGA_THEME_INFO = "_idega_theme.xml";
 	
 	private static final String[] _FILTER = new String[] {"htm", "html", "xhtml", "ibxml", "jsp"};
@@ -52,6 +44,9 @@ public class ThemesConstants {
 	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "content",
 		"sidebarContainer", "navcontainer", "sidebar", "footer", "breadcrumbcontainer"};
 	protected static final List <String> BASIC_IDS_FOR_REGIONS = Collections.unmodifiableList(Arrays.asList(_BASIC_IDS_FOR_REGIONS));
+
+	private static final String[] _DEFAULT_STYLE_FILES = new String[] {"styles.css", "handheld.css", "print.css"};
+	protected static final List <String> DEFAULT_STYLE_FILES = Collections.unmodifiableList(Arrays.asList(_DEFAULT_STYLE_FILES));
 	
 	protected static final String COMMENT_BEGIN = "<!--";
 	protected static final String COMMENT_END = "-->";
@@ -86,8 +81,6 @@ public class ThemesConstants {
 	protected static final String TAG_ATTRIBUTE_ID = "id";
 	protected static final String TAG_ATTRIBUTE_TYPE = "type";
 	
-	public static final String THEME_SETTINGS = "/resources/themes/theme.xml";
-	public static final String PAGE_SETTINGS = "/idegaweb/bundles/com.idega.content.bundle/resources/themes/page.xml";
 	protected static final String SETTING_CODE = "code";
 	protected static final String SETTING_LABEL = "label";
 	protected static final String SETTING_DEFAULT_VALUE = "defaultValue";
@@ -104,11 +97,6 @@ public class ThemesConstants {
 	protected static final String CON_SMALL_PREVIEW = "small-preview";
 	protected static final String CON_PAGE_ID = "page-id";
 	
-	private static final String[] _DEFAULT_STYLE_FILES = new String[] {"styles.css", "handheld.css", "print.css"};
-	protected static final List <String> DEFAULT_STYLE_FILES = Collections.unmodifiableList(Arrays.asList(_DEFAULT_STYLE_FILES));
-	
-	//protected static final String REGION_SYNTAX = "/idegaweb/bundles/com.idega.content.bundle/resources/themes/region.xml";
-	
 	protected static final int SMALL_PREVIEW_WIDTH = 120;
 	protected static final int SMALL_PREVIEW_HEIGHT = 140;
 	
@@ -120,9 +108,22 @@ public class ThemesConstants {
 	
 	protected static final String DEFAULT_MIME_TYPE = "image/";
 	
+	/*Public fields*/
 	public static final String INCORRECT_PARENT_ID = "-1";
 	
 	public static final String THEMES_PROPERTY_START = "theme.";
 	public static final String THEMES_PROPERTY_END = ".default";
+	
+	public static final String CONTENT = "/content";
+	public static final String THEMES_PATH = "/files/cms" + THEMES;
+	public static final String THEMES_PREVIEW_PATH = THEMES_PATH + "preview/";
+	
+	public static final String AT = "@";
+	public static final String EMPTY = "";
+	public static final String SEMICOLON = ";";
+	public static final String UNDER = "_";
+	
+	public static final String THEME_SETTINGS = "/resources/themes/theme.xml";
+	public static final String PAGE_SETTINGS = "/idegaweb/bundles/com.idega.content.bundle/resources/themes/page.xml";
 	
 }

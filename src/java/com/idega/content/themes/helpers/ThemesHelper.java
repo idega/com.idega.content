@@ -46,7 +46,6 @@ public class ThemesHelper implements Singleton {
 	private static Log log = LogFactory.getLog(ThemesHelper.class);
 	
 	private volatile static ThemesHelper helper = null;
-	
 	private volatile Generator generator = null;
 	private volatile ThemeChanger changer = null;
 	private volatile ThemeStyleVariations variations = null;

@@ -5,6 +5,7 @@ import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table2;
 import com.idega.presentation.ui.DropdownMenu;
+import com.idega.presentation.ui.GenericButton;
 import com.idega.webface.WFBlock;
 import com.idega.webface.WFTitlebar;
 
@@ -36,6 +37,12 @@ public class SiteInfoJsf extends SiteInfo {
 		
 		siteInfo.add(getText("Locale: ", false));
 		siteInfo.add(locales);
+		
+		GenericButton save = new GenericButton("Save");
+		save.setStyleClass("button");
+		save.setId("saveButton");
+		save.setOnClick("saveSiteInfo()");
+		siteInfo.add(save);
 		
 		getChildren().add(siteInfo);
 		
