@@ -1,13 +1,14 @@
 package com.idega.content.themes.business;
 
 import java.rmi.RemoteException;
-import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.ejb.EJBException;
 import javax.ejb.FinderException;
+import javax.ejb.RemoveException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -71,11 +72,15 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			return false;
 		}
 		try {
-			page.delete();
-		} catch (SQLException e) {
+			page.remove();
+		} catch (EJBException e) {
+			log.error(e);
+			return false;
+		} catch (RemoveException e) {
 			log.error(e);
 			return false;
 		}
+
 		return true;
 	}
 	

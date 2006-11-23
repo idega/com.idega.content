@@ -49,6 +49,19 @@
             </value>
             <type>map</type>
           </key>
+          <key>
+            <name>com.idega.content.themes.presentation.ApplicationPropertyViewer</name>
+            <value>
+              <map>
+                <key>
+                  <name>component_property_file</name>
+                  <type>java.lang.String</type>
+                  <value>com.idega.content.themes.presentation.ApplicationPropertyViewer.pxml</value>
+                </key>
+              </map>
+            </value>
+            <type>map</type>
+          </key>
         </map>
       </value>
       <type>map</type>

@@ -252,12 +252,9 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 
 .current_structure {
 	position:absolute;
-	right:0;
-	top:90px;
 	border-left:0px; 
 	border-bottom:0px;
 	float:right;
-	width:20%; 
 	margin:0px 0px 10px 10px;
 }
 
@@ -418,31 +415,33 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	position: absolute;
     width: 149px;
     height: 112px;
-	background-color: #D3D3D3;
-	opacity: 0.75;
 	z-index: 4;
+	clear: both;
+	
 }
 
 .themeChooseStyleText {
+	background-color: #D3D3D3;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 9pt;
+    font-size: 34pt;
     font-weight: bold;
     text-align: center;
     cursor: pointer;
+    height: 50%;
 }
 
 .pageInfoStyle {
 	position: absolute;
 	width: 275px;
 	height: 150px;
-	bottom: 28px;
+	bottom: 24px;
 	border: 1px solid #D7D7D7;
 	z-index: 1;
 }
 
 .buttonsContainerStyle {
 	position: absolute;
-	right: 0px;
+	width: 100%;
 	bottom: 0px;
 	border: 1px solid #D7D7D7;
 }
@@ -452,7 +451,32 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	width: 275px;
 	height: 325px;
 	right: 0px;
-	bottom: 28px;
+	bottom: 0px;
 	border: 1px solid #D7D7D7;
 	z-index: 1;
+}
+
+.currentStructureStyle {
+	position: absolute;
+	width: 275px;
+	height: 260px;
+	right: 0px;
+	border: 1px solid #D7D7D7;
+}
+
+.leftButtonStyle {
+	position: absolute;
+	left: 5px;
+	bottom: 0px;
+}
+
+.rightButtonStyle {
+	position: absolute;
+	right: 0px;
+	bottom: 0px;
+}
+
+.pagePreviewFrame {
+	position: absolute;
+	border: 1px solid #D7D7D7;
 }

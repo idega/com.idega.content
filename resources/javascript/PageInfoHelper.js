@@ -1,6 +1,7 @@
 var globalPageID = 1;
 
 var scrollerImageWidth = 23;
+var SPACE_FROM_LEFT = 290;
 
 var KEYWORDS = null;
 
@@ -43,6 +44,16 @@ function savePageInfoCallback(result) {
 	closeLoadingMessage();
 }
 
+function showSlider(container) {
+	resizeSlider();
+	container.style.position = "absolute";
+	container.style.bottom = "24px";
+	container.style.left = SPACE_FROM_LEFT + "px";
+	container.className = "theme_slider";
+	new Effect.Appear(container);
+	getThemes(null, true);
+}
+
 function manageSlider(buttonID) {
 	var container = document.getElementById("themesSliderContainer");
 	if (container == null) {
@@ -53,15 +64,8 @@ function manageSlider(buttonID) {
 		return;
 	}
 	if (container.style.display == "none") {
-		var left = 290;
-		resizeSlider(left);
-		container.style.position = "absolute";
-		container.style.bottom = "28px";
-		container.style.left = left + "px";
-		container.className = "theme_slider";
-		new Effect.Appear(container);
 		button.value = "Hide Themes";
-		getThemes(null, true);
+		showSlider(container);
 	}
 	else {
 		removeStyleOptions();
@@ -123,6 +127,7 @@ function chooseOption(themeID) {
 		
 		var divp = document.createElement("div");
 		divp.className = "themeChooseStyleText";
+		divp.style.opacity = "0.5";
 		var pageSpan = document.createElement("span");
 		pageSpan.setAttribute("id", "pageStyle");
 		pageSpan.appendChild(document.createTextNode("Page"));
@@ -130,6 +135,7 @@ function chooseOption(themeID) {
 	
 		var divs = document.createElement("div");
 		divs.className = "themeChooseStyleText";
+		divs.style.opacity = "0.3";
 		var siteSpan = document.createElement("span");
 		siteSpan.setAttribute("id", "siteStyle");
 		siteSpan.appendChild(document.createTextNode("Site"));
@@ -195,7 +201,7 @@ function setStyleCallback(result) {
 	closeLoadingMessage();
 }
 
-function resizeSlider(left) {
+function resizeSlider() {
 	var rightScroller = document.getElementById("rightScrollerContainer");
 	var themesTicker = document.getElementById("themesTickerContainer");
 	var container = document.getElementById("themesSliderContainer");
@@ -221,4 +227,35 @@ function getTotalWidth() {
     width = document.body.clientWidth; // IE 4 compatible
   }
   return width;
+}
+
+function getTotalHeight() {
+  var height = 0;
+  if(typeof(window.innerHeight) == "number") {
+    height = window.innerHeight; // Non-IE
+  } else if(document.documentElement && document.documentElement.clientHeight) {
+    height = document.documentElement.clientHeight; // IE 6+ in 'standards compliant mode'
+  } else if(document.body && document.body.clientHeight) {
+    height = document.body.clientHeight; // IE 4 compatible
+  }
+  return height;
+}
+
+function newPage() {
+}
+
+function resizeFrame() {
+	var frame = document.getElementById("treePages");
+	if (frame == null) {
+		return;
+	}
+	frame.style.left = SPACE_FROM_LEFT + "px";
+	var availableWidth = getTotalWidth() - 500;
+	if (availableWidth > 0) {
+		frame.style.width = availableWidth + "px";
+	}
+	var availableHeight = getTotalHeight() - 331;
+	if (availableHeight > 0) {
+		frame.style.height = availableHeight + "px";
+	}
 }

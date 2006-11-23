@@ -180,6 +180,7 @@ incorrect_file_type=Unsupported file type! Only zip files allowed.
 theme_name=Theme name
 theme_variations=Theme variations
 page_info=Page Info
+hide_themes=Hide Themes
 show_themes=Show Themes
 restore_theme=Restore
 scroll_left=Scroll to left
