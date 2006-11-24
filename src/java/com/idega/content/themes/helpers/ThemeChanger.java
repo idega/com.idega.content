@@ -72,10 +72,18 @@ public class ThemeChanger {
 	private static final String TAG_ATTRIBUTE_VALUE_SCREEN = "screen";
 	
 	private static final String COPY_AND_SPACE = "&copy;&nbsp;";
+	private static final String NEW_LINE = "\n";
+	private static final String COMMENT_BEGIN = "/*";
+	private static final String COMMENT_END = "*/";
+	private static final String OPENER = "{";
+	private static final String CLOSER = "}";
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
 	private XMLOutputter out = null;
+	
+	private int openers = 0;
+	private int closers = 0;
 	
 	public ThemeChanger() {
 		out = new XMLOutputter();
@@ -104,7 +112,7 @@ public class ThemeChanger {
 		Element head = root.getChild(HTML_HEAD, namespace);
 		
 		// Removing needles content (like "%pathto")
-		if (!proceedHeadContent(head)) {
+		if (!proceedHeadContent(ThemesConstants.CONTENT + theme.getLinkToBaseAsItIs(), head)) {
 			return false;
 		}
 		
@@ -118,7 +126,7 @@ public class ThemeChanger {
 		// Adding enabled styles
 		List <ThemeStyleGroupMember> members = getEnabledStyles(theme);
 		for (int i = 0; i < members.size(); i++) {
-			head.addContent(index, getNewStyleElement(members.get(i)));
+			head.addContent(index, getNewStyleElement(ThemesConstants.CONTENT + theme.getLinkToBaseAsItIs(), members.get(i)));
 			index++;
 		}
 		
@@ -189,6 +197,36 @@ public class ThemeChanger {
 		return true;
 	}
 	
+	private String scanLine(String line) {
+		if (line == null) {
+			return ThemesConstants.EMPTY;
+		}
+		
+		if (line.indexOf(OPENER) == -1 && line.indexOf(CLOSER) == -1) {
+			return line;
+		}
+		
+		if (line.indexOf(OPENER) != -1 && line.indexOf(CLOSER) != -1 && openers == closers) {
+			return line;
+		}
+		
+		if (line.indexOf(OPENER) != -1 && line.indexOf(CLOSER) == -1) {
+			openers++;
+			return line;
+		}
+		if (line.indexOf(OPENER) == -1 && line.indexOf(CLOSER) != -1) {
+			closers++;
+			if (closers != openers) {
+				line = line.replace(CLOSER, ThemesConstants.EMPTY);
+			}
+			openers = 0;
+			closers = 0;
+			return line;
+		}
+		
+		return line;
+	}
+	
 	private boolean proceedStyleFile(String linkToStyle, String[] replaces, String replacement) {
 		if (linkToStyle == null || replaces == null || replacement == null) {
 			return false;
@@ -205,7 +243,10 @@ public class ThemeChanger {
 		String line;
 		try {
 			while ((line = buf.readLine()) != null) {
-			     sb.append(line);
+				if (line.indexOf(COMMENT_BEGIN) == -1 && line.indexOf(COMMENT_END) == -1) {
+					line = scanLine(line);
+				}
+				sb.append(line).append(NEW_LINE);
 			}
 		} catch (IOException e) {
 			log.error(e);
@@ -259,7 +300,7 @@ public class ThemeChanger {
 			e = (Element) elements.get(i);
 			value = e.getAttributeValue(attributeType);
 			if (attributeValue.equals(value)) {
-					index = i;
+				index = i;
 			}
 		}
 		index++;
@@ -313,8 +354,8 @@ public class ThemeChanger {
 	 * @param head
 	 * @return boolean
 	 */
-	private boolean proceedHeadContent(Element head) {
-		if (head == null) {
+	private boolean proceedHeadContent(String linkToBase, Element head) {
+		if (linkToBase == null || head == null) {
 			return false;
 		}
 		List headElements = head.getContent();
@@ -340,7 +381,7 @@ public class ThemeChanger {
 					a = e.getAttribute(ThemesConstants.TAG_ATTRIBUTE_SRC);
 				}
 				if (a != null) {
-					a.setValue(fixValue(a.getValue())); // Fixing attribute's value
+					a.setValue(linkToBase + fixValue(a.getValue())); // Fixing attribute's value
 				}
 			}
 			else {
@@ -366,16 +407,6 @@ public class ThemeChanger {
 			t.detach();
 		}
 		
-		/*head.addContent(0, getCommentsCollection("header"));
-		head.addContent(getCommentsCollection("user_javascript"));
-		
-		Collection <Element> c = new ArrayList<Element>();
-		Element meta = new Element("script", namespace);
-		meta.setAttribute(new Attribute("type", "text/javascript"));
-		meta.setAttribute(new Attribute("src", "noScriptActually.js"));
-		c.add(meta);
-		head.addContent(c);*/
-		
 		return true;
 	}
 	
@@ -388,6 +419,15 @@ public class ThemeChanger {
 		Collection <Comment> c = new ArrayList <Comment> ();
 		c.add(new Comment(ThemesConstants.TEMPLATE_REGION_BEGIN + commentValue + ThemesConstants.TEMPLATE_REGION_MIDDLE));
 		c.add(new Comment(ThemesConstants.TEMPLATE_REGION_END));
+		return c;
+	}
+	
+	private Collection <Element> getElement(String type, String text, String attribute, String attributeValue) {
+		Collection <Element> c = new ArrayList <Element> ();
+		Element e = new Element(type, namespace);
+		e.setText(text);
+		e.setAttribute(attribute, attributeValue);
+		c.add(e);
 		return c;
 	}
 	
@@ -409,11 +449,11 @@ public class ThemeChanger {
 	
 	/**
 	 * Adding regions to div tags like this: <!-- TemplateBeginEditable name="MyUniqueRegionId1" -->MyUniqueRegionId1<!-- TemplateEndEditable -->
-	 * @param root
+	 * @param body
 	 * @return boolean
 	 */
-	private boolean proceedBodyContent(Element root) {
-		if (root == null) {
+	private boolean proceedBodyContent(Element body) {
+		if (body == null) {
 			return false;
 		}
 		List nodes = null;
@@ -421,7 +461,7 @@ public class ThemeChanger {
 		try {
 			xp = new JDOMXPath(ThemesConstants.DIV_TAG_INSTRUCTION);
 			xp.addNamespace(ThemesConstants.NAMESPACE_ID, ThemesConstants.NAMESPACE);
-			nodes = xp.selectNodes(root);
+			nodes = xp.selectNodes(body);
 		} catch (JaxenException e) {
 			log.error(e);
 		}
@@ -432,6 +472,7 @@ public class ThemeChanger {
 		while (it.hasNext()) {
 			addRegion((Element) it.next());
 		}
+		body.addContent(getElement("div", "&nbsp;", "style", "height:600;visibility:hidden"));
 		return true;
 	}
 	
@@ -608,7 +649,7 @@ public class ThemeChanger {
 		}
 		
 		Element root = doc.getRootElement();
-		if (!changeThemeStyle(root.getChild(HTML_HEAD, namespace), oldStyle, newStyle)) {
+		if (!changeThemeStyle(ThemesConstants.CONTENT + theme.getLinkToBaseAsItIs(), root.getChild(HTML_HEAD, namespace), oldStyle, newStyle)) {
 			return null;
 		}
 		if (oldStyle != null) {
@@ -659,7 +700,7 @@ public class ThemeChanger {
 	 * @param newStyle
 	 * @return boolean
 	 */
-	private boolean changeThemeStyle(Element head, ThemeStyleGroupMember oldStyle, ThemeStyleGroupMember newStyle) {
+	private boolean changeThemeStyle(String linkToBase, Element head, ThemeStyleGroupMember oldStyle, ThemeStyleGroupMember newStyle) {
 		if (head == null) {
 			return false;
 		}
@@ -680,19 +721,28 @@ public class ThemeChanger {
 			
 			Element style = null;
 			String attributeValue = null;
+			List <String> files = null;
+			boolean foundStyle = false;
 			for (int i = 0; i < styles.size(); i++) {
 				style = (Element) styles.get(i);
 				attributeValue = style.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_HREF);
-				if (oldStyle.getStyleFiles().contains(attributeValue)) {
-					uselessStyles.add(style);
-					index = getElementIndex(head.getChildren(), ThemesConstants.TAG_ATTRIBUTE_HREF, attributeValue);
+				files = oldStyle.getStyleFiles();
+				foundStyle = false;
+				if (files != null) {
+					for (int j = 0; (j < files.size() && !foundStyle); j++) {
+						if (attributeValue.indexOf(files.get(j)) != -1) {
+							foundStyle = true;
+							uselessStyles.add(style);
+							index = getElementIndex(head.getChildren(), ThemesConstants.TAG_ATTRIBUTE_HREF, attributeValue);
+						}
+					}
 				}
 			}
 			
 		}
 		
 		if (newStyle != null) {
-			head.addContent(index, getNewStyleElement(newStyle));
+			head.addContent(index, getNewStyleElement(linkToBase, newStyle));
 		}
 		
 		Iterator <Element> it = uselessStyles.iterator();
@@ -708,13 +758,16 @@ public class ThemeChanger {
 	 * @param newStyle
 	 * @return Collection
 	 */
-	private Collection <Element> getNewStyleElement(ThemeStyleGroupMember newStyle) {
+	private Collection <Element> getNewStyleElement(String linkToBase, ThemeStyleGroupMember newStyle) {
 		Collection <Element> newStyleElements = new ArrayList <Element> ();
+		if (linkToBase == null || newStyle == null) {
+			return newStyleElements;
+		}
 		List <Attribute> attributes = null;
 		Element newStyleHref = null;
 		for (int i = 0; i < newStyle.getStyleFiles().size(); i++) {
 			attributes = getBasicAttributesList();			
-			attributes.add(new Attribute(ThemesConstants.TAG_ATTRIBUTE_HREF, newStyle.getStyleFiles().get(i)));
+			attributes.add(new Attribute(ThemesConstants.TAG_ATTRIBUTE_HREF, linkToBase + newStyle.getStyleFiles().get(i)));
 
 			newStyleHref = new Element(ThemesConstants.ELEMENT_LINK, namespace);
 			newStyleHref.setAttributes(attributes);

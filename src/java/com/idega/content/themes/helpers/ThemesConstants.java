@@ -9,10 +9,10 @@ public class ThemesConstants {
 	protected static final String NAMESPACE = "http://www.w3.org/1999/xhtml";
 	protected static final String NAMESPACE_ID = "xmlns";
 	
-	protected static final String THEMES = "/themes/";
+	public static final String THEMES = "/themes/";
 	
 	protected static final String DOT = ".";
-	protected static final String SLASH = "/";
+	public static final String SLASH = "/";
 	protected static final String COMMA = ",";
 	protected static final String PLUS = "+";
 	protected static final String SPACE = " ";
