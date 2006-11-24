@@ -33,12 +33,12 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#savePageInfo
 	 */
-	public boolean savePageInfo(String pageID, String[] keywords, String[] values);
+	public boolean savePageInfo(String pageID, String[] keywords, String[] values) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getPageInfoElements
 	 */
-	public String[] getPageInfoElements();
+	public String[] getPageInfoElements() throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#restoreTheme
@@ -48,15 +48,20 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getSiteInfoElements
 	 */
-	public String[] getSiteInfoElements();
+	public String[] getSiteInfoElements() throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getSiteInfoValues
 	 */
-	public String[] getSiteInfoValues(String[] keywords, String language);
+	public String[] getSiteInfoValues(String[] keywords, String language) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#saveSiteInfo
 	 */
 	public boolean saveSiteInfo(String language, String[] keywords, String[] values);
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#createPage
+	 */
+	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) throws RemoteException;
 }

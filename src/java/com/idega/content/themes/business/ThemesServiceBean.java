@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.ejb.EJBException;
 import javax.ejb.FinderException;
-import javax.ejb.RemoveException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,6 +18,7 @@ import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.builder.business.BuilderService;
+import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.builder.data.ICPageHome;
 import com.idega.presentation.IWContext;
@@ -67,7 +66,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		if (theme.getIBPageID() == -1) {
 			return true; // No IBPage was created
 		}
-		ICPage page = getICPage(theme.getIBPageID());
+		/*ICPage page = getICPage(theme.getIBPageID());
 		if (page == null) {
 			return false;
 		}
@@ -79,9 +78,26 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		} catch (RemoveException e) {
 			log.error(e);
 			return false;
+		}*/
+		IWContext iwc = IWContext.getInstance();
+		if (iwc == null) {
+			return false;
 		}
-
-		return true;
+		getBuilderService();
+		
+		Map tree = builder.getTree(iwc);
+		ICDomain domain = null;
+		try {
+			domain = builder.getCurrentDomain();
+		} catch (RemoteException e) {
+			log.error(e);
+			return false;
+		}
+		String pageId = String.valueOf(theme.getIBPageID());
+		if (builder.checkDeletePage(pageId, domain)) {
+			return builder.deletePage(pageId, false, tree, iwc.getUserId(), domain);
+		}
+		return false;
 	}
 	
 	public boolean createIBPage(Theme theme) {
@@ -89,16 +105,20 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			return false;
 		}
 		int id = -1;
+		IWContext iwc = IWContext.getInstance();
+		if (iwc == null) {
+			return false;
+		}
 		getBuilderService();
 		
 		if (theme.getIBPageID() == -1) { // Creating IBPage for theme
-			Map tree = builder.getTree(IWContext.getInstance());
-			String parentId = builder.getTopLevelTemplateId(builder.getTopLevelTemplates(IWContext.getInstance()));
+			String parentId = builder.getTopLevelTemplateId(builder.getTopLevelTemplates(iwc));
 			if (parentId.equals(ThemesConstants.INCORRECT_PARENT_ID)) {
 				return false;
 			}
-			id = builder.createNewPage(parentId, theme.getName(), builder.getTemplateKey(), null, "/themes/"+theme.getName(), tree,
-					IWContext.getInstance(), null, -1, builder.getHTMLTemplateKey(), null);
+			String name = theme.getName();//ThemesHelper.getInstance(false).encode(theme.getName().toLowerCase(), true);
+			id = createIBPage(parentId, theme.getName(), builder.getTemplateKey(), null, ThemesConstants.THEMES +
+					name + ThemesConstants.SLASH, null, -1, builder.getHTMLTemplateKey(), null);
 //			id = builder.createPageOrTemplateToplevelOrWithParent(theme.getName(), null, builder.getTemplateKey(), null, tree, IWContext.getInstance());
 			if (id == -1) {
 				return false;
@@ -115,6 +135,16 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		page.store();
 		
 		return true;
+	}
+	
+	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) {
+		IWContext iwc = IWContext.getInstance();
+		if (iwc == null) {
+			return -1;
+		}
+		getBuilderService();
+		Map tree = builder.getTree(iwc);
+		return builder.createNewPage(parentId, name, type, templateId, pageUri, tree, iwc, subType, domainId, format, sourceMarkup);
 	}
 	
 	private boolean isNewTheme(String uri) {

@@ -1,5 +1,6 @@
 package com.idega.content.themes.business;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -25,7 +26,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	
-	private boolean extractingProperties;
+	//private boolean extractingProperties;
 
 	/**
 	 * Returns info about themes in slide
@@ -33,13 +34,13 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	public String getThemesPreviewsInfo() {
 		helper.searchForThemes(); // It is done in ThemesHelper's constructor, but it's possible to pass a paremeter to not search
 		
-		if (!extractingProperties) {
-			extractingProperties = true;
+//		if (!extractingProperties) {
+//			extractingProperties = true;
 			if (!helper.getThemesPropertiesExtractor().proceedFileExtractor()) {
 				log.info("Error extracting theme's properties");
 			}
-			extractingProperties = false;
-		}
+//			extractingProperties = false;
+//		}
 		
 		List <Theme> themes = new ArrayList<Theme>(helper.getThemesCollection());
 		StringBuffer info = new StringBuffer();
@@ -203,6 +204,17 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			}
 		}
 		return true;
+	}
+	
+	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) {
+		int id = -1;
+		try {
+			id = helper.getThemesService().createIBPage(parentId, name, type, templateId, pageUri, subType, domainId, format, sourceMarkup);
+		} catch (RemoteException e) {
+			log.error(e);
+			return -1;
+		}
+		return id;
 	}
 
 }
