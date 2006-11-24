@@ -798,5 +798,16 @@ public class ThemesHelper implements Singleton {
 		}
 		return themesEngine;
 	}
+	
+	public String removeSpaces(String value) {
+		if (value == null) {
+			return null;
+		}
+		value = value.trim();
+		while (value.indexOf(ThemesConstants.SPACE) != -1) {
+			value = value.replace(ThemesConstants.SPACE, ThemesConstants.UNDER);
+		}
+		return value;
+	}
 
 }

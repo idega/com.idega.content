@@ -66,19 +66,6 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		if (theme.getIBPageID() == -1) {
 			return true; // No IBPage was created
 		}
-		/*ICPage page = getICPage(theme.getIBPageID());
-		if (page == null) {
-			return false;
-		}
-		try {
-			page.remove();
-		} catch (EJBException e) {
-			log.error(e);
-			return false;
-		} catch (RemoveException e) {
-			log.error(e);
-			return false;
-		}*/
 		IWContext iwc = IWContext.getInstance();
 		if (iwc == null) {
 			return false;
@@ -116,10 +103,9 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			if (parentId.equals(ThemesConstants.INCORRECT_PARENT_ID)) {
 				return false;
 			}
-			String name = theme.getName();//ThemesHelper.getInstance(false).encode(theme.getName().toLowerCase(), true);
-			id = createIBPage(parentId, theme.getName(), builder.getTemplateKey(), null, ThemesConstants.THEMES +
-					name + ThemesConstants.SLASH, null, -1, builder.getHTMLTemplateKey(), null);
-//			id = builder.createPageOrTemplateToplevelOrWithParent(theme.getName(), null, builder.getTemplateKey(), null, tree, IWContext.getInstance());
+			String name = ThemesHelper.getInstance(false).removeSpaces(theme.getName());
+			id = createIBPage(parentId, theme.getName(), builder.getTemplateKey(), null, ThemesConstants.THEMES + name +
+					ThemesConstants.SLASH, null, -1, builder.getHTMLTemplateKey(), null);
 			if (id == -1) {
 				return false;
 			}
@@ -133,7 +119,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		
 		page.setWebDavUri(ThemesConstants.CONTENT + theme.getLinkToSkeleton()); // Updating template
 		page.store();
-		
+		// TODO: should we clear a cache?
 		return true;
 	}
 	

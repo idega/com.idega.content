@@ -78,6 +78,8 @@ public class ThemeChanger {
 	private static final String OPENER = "{";
 	private static final String CLOSER = "}";
 	
+	private static final String REGION_TO_EXPAND = "contentContainer";
+	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
 	private XMLOutputter out = null;
@@ -112,7 +114,7 @@ public class ThemeChanger {
 		Element head = root.getChild(HTML_HEAD, namespace);
 		
 		// Removing needles content (like "%pathto")
-		if (!proceedHeadContent(ThemesConstants.CONTENT + theme.getLinkToBaseAsItIs(), head)) {
+		if (!proceedHeadContent(ThemesConstants.CONTENT + theme.getLinkToBase(), head)) {
 			return false;
 		}
 		
@@ -126,7 +128,7 @@ public class ThemeChanger {
 		// Adding enabled styles
 		List <ThemeStyleGroupMember> members = getEnabledStyles(theme);
 		for (int i = 0; i < members.size(); i++) {
-			head.addContent(index, getNewStyleElement(ThemesConstants.CONTENT + theme.getLinkToBaseAsItIs(), members.get(i)));
+			head.addContent(index, getNewStyleElement(ThemesConstants.CONTENT + theme.getLinkToBase(), members.get(i)));
 			index++;
 		}
 		
@@ -472,7 +474,6 @@ public class ThemeChanger {
 		while (it.hasNext()) {
 			addRegion((Element) it.next());
 		}
-		body.addContent(getElement("div", "&nbsp;", "style", "height:600;visibility:hidden"));
 		return true;
 	}
 	
@@ -594,6 +595,10 @@ public class ThemeChanger {
 		if (needAddRegion(ThemesConstants.BASIC_IDS_FOR_REGIONS, regionID)) {
 			e.addContent(0, getCommentsCollection(regionID));
 		}
+		if (regionID.equals(REGION_TO_EXPAND)) {
+			e.addContent(getElement("div", "&nbsp;", "style", "height:600;visibility:hidden")); // Expanding theme
+		}
+		
 		return true;
 	}
 	
@@ -649,7 +654,7 @@ public class ThemeChanger {
 		}
 		
 		Element root = doc.getRootElement();
-		if (!changeThemeStyle(ThemesConstants.CONTENT + theme.getLinkToBaseAsItIs(), root.getChild(HTML_HEAD, namespace), oldStyle, newStyle)) {
+		if (!changeThemeStyle(ThemesConstants.CONTENT + theme.getLinkToBase(), root.getChild(HTML_HEAD, namespace), oldStyle, newStyle)) {
 			return null;
 		}
 		if (oldStyle != null) {
