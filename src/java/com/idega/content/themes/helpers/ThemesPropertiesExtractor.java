@@ -15,14 +15,35 @@ public class ThemesPropertiesExtractor {
 	private static final String LIMITED_SELECTION = "1";
 	private static final String CSS_EXTENSION = ".css";
 	
-	public synchronized boolean proceedFileExtractor(Theme theme) {		
+	public boolean proceedFileExtractor() {
+		boolean result = true;
+		List <Theme> themes = null;
+		synchronized (ThemesPropertiesExtractor.class) {
+			themes = new ArrayList<Theme>(helper.getThemesCollection());
+		}
+		if (themes == null) {
+			return false;
+		}
+		
+		for (int i = 0; (i < themes.size() && result); i++) {
+			result = proceedFileExtractor(themes.get(i));
+		}
+		return result;
+	}
+	
+	public boolean proceedFileExtractor(Theme theme) {
 		// Checking if it is possible to extract properties
-		if (theme.isLoading()) {
-			return true;
+		synchronized (ThemesPropertiesExtractor.class) {
+			if (theme.isLoading()) {
+				return true;
+			}
+			if (theme.isPropertiesExtracted()) {
+				return true;
+			}
+			
+			theme.setLoading(true);
 		}
-		if (theme.isPropertiesExtracted()) {
-			return true;
-		}
+		
 		List files = helper.getFiles(theme.getLinkToBaseAsItIs());
 		if (files == null) {
 			return true;
@@ -116,6 +137,7 @@ public class ThemesPropertiesExtractor {
 		// Finishing theme
 		theme.setNewTheme(false);
 		theme.setPropertiesExtracted(true);
+		theme.setLoading(false);
 		return true;
 	}
 	
@@ -192,15 +214,6 @@ public class ThemesPropertiesExtractor {
 				}
 			}
 		}
-	}
-	
-	public synchronized boolean proceedFileExtractor() {
-		boolean result = true;
-		List <Theme> themes = new ArrayList<Theme>(helper.getThemesCollection());
-		for (int i = 0; (i < themes.size() && result); i++) {
-			result = proceedFileExtractor(themes.get(i));
-		}
-		return result;
 	}
 	
 	private void extractProperties(Theme theme, String link) {

@@ -1,4 +1,4 @@
-var globalPageID = 1;
+var globalPageID = null;
 
 var SCROLLER_IMAGE_WIDTH = 23;
 var SPACE_FROM_LEFT = 290;

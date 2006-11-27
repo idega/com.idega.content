@@ -22,4 +22,18 @@
 		<type>metatext</type>
 		<method>:method:1:implied:void:setDescriptionMetaTag:java.lang.String:</method>
 	</key>
+	<key>
+		<code>javascript</code>
+		<label>JavaScript Source</label>
+		<defaultValue></defaultValue>
+		<type>text</type>
+		<method>:method:1:implied:void:addScriptSource:java.lang.String:</method>
+	</key>
+	<key>
+		<code>stylesheet</code>
+		<label>Stylesheet URL</label>
+		<defaultValue></defaultValue>
+		<type>text</type>
+		<method>:method:1:implied:void:addStyleSheetURL:java.lang.String:</method>
+	</key>
 </config>

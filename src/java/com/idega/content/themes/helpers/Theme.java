@@ -179,7 +179,7 @@ public class Theme {
 		return loading;
 	}
 
-	protected void setLoading(boolean loading) {
+	protected synchronized void setLoading(boolean loading) {
 		this.loading = loading;
 	}
 	

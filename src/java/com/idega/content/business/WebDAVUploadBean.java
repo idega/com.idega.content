@@ -17,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
-import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.presentation.IWContext;

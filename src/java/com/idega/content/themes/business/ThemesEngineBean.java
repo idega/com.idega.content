@@ -21,12 +21,9 @@ import com.idega.presentation.IWContext;
 public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 
 	private static final long serialVersionUID = 5875353284352953688L;
-	
 	private static final Log log = LogFactory.getLog(ThemesEngineBean.class);
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
-	
-	//private boolean extractingProperties;
 
 	/**
 	 * Returns info about themes in slide
@@ -34,13 +31,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	public String getThemesPreviewsInfo() {
 		helper.searchForThemes(); // It is done in ThemesHelper's constructor, but it's possible to pass a paremeter to not search
 		
-//		if (!extractingProperties) {
-//			extractingProperties = true;
-			if (!helper.getThemesPropertiesExtractor().proceedFileExtractor()) {
-				log.info("Error extracting theme's properties");
-			}
-//			extractingProperties = false;
-//		}
+		if (!helper.getThemesPropertiesExtractor().proceedFileExtractor()) {
+			log.info("Error extracting theme's properties");
+		}
 		
 		List <Theme> themes = new ArrayList<Theme>(helper.getThemesCollection());
 		StringBuffer info = new StringBuffer();

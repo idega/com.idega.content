@@ -33,7 +33,7 @@ public class ThemesConstants {
 	private static final String[] _USELESS_CONTENT = new String[] {"%pathto(", ")%", "%", " xml:space=\"preserve\""};
 	protected static final List <String> USELESS_CONTENT = Collections.unmodifiableList(Arrays.asList(_USELESS_CONTENT));
 	
-	private static final String[] _REGIONS = new String[] {"%title%", "%header%", "%user_styles%", "%user_javascript%",
+	private static final String[] _REGIONS = new String[] {/*"%title%", "%header%", "%user_styles%", "%user_javascript%",*/
 		"%logo%", "%site_title%", "%site_slogan%", "%content%", "%toolbar%", "%sidebar_title%", "%sidebar%", "%plugin_sidebar%",
 		"%breadcrumb%", "%footer%"};
 	protected static final List <String> REGIONS = Collections.unmodifiableList(Arrays.asList(_REGIONS));
