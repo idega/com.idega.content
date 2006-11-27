@@ -12,12 +12,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.slide.event.ContentEvent;
 
-import com.idega.business.IBOLookupException;
 import com.idega.business.IBOServiceBean;
 import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.builder.business.BuilderService;
+import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.builder.data.ICPageHome;
@@ -66,6 +66,18 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		if (theme.getIBPageID() == -1) {
 			return true; // No IBPage was created
 		}
+		return deletePage(String.valueOf(theme.getIBPageID()), false);
+	}
+	
+	public boolean deleteIBPage(String pageID, boolean deleteChildren) {
+		return deletePage(pageID, deleteChildren);
+	}
+	
+	private boolean deletePage(String pageID, boolean deleteChildren) {
+		if (pageID == null) {
+			return false;
+		}
+		
 		IWContext iwc = IWContext.getInstance();
 		if (iwc == null) {
 			return false;
@@ -73,6 +85,10 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		getBuilderService();
 		
 		Map tree = builder.getTree(iwc);
+		if (tree == null) {
+			return false;
+		}
+		
 		ICDomain domain = null;
 		try {
 			domain = builder.getCurrentDomain();
@@ -80,11 +96,11 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			log.error(e);
 			return false;
 		}
-		String pageId = String.valueOf(theme.getIBPageID());
-		if (builder.checkDeletePage(pageId, domain)) {
-			return builder.deletePage(pageId, false, tree, iwc.getUserId(), domain);
+		
+		if (builder.checkDeletePage(pageID, domain)) {
+			return builder.deletePage(pageID, deleteChildren, tree, iwc.getUserId(), domain);
 		}
-		return false;
+		return true;
 	}
 	
 	public boolean createIBPage(Theme theme) {
@@ -150,8 +166,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			synchronized (ThemesServiceBean.class) {
 				if (builder == null) {
 					try {
-						builder = (BuilderService) this.getServiceInstance(BuilderService.class);
-					} catch (IBOLookupException e) {
+						builder = BuilderServiceFactory.getBuilderService(getIWApplicationContext());
+					} catch (RemoteException e) {
 						log.error(e);
 					}
 				}

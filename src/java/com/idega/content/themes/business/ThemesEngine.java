@@ -64,4 +64,9 @@ public interface ThemesEngine extends IBOService {
 	 * @see com.idega.content.themes.business.ThemesEngineBean#createPage
 	 */
 	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) throws RemoteException;
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#deletePage
+	 */
+	public boolean deletePage(String pageId, boolean deleteChildren) throws RemoteException;
 }

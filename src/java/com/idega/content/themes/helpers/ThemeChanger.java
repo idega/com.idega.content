@@ -78,6 +78,8 @@ public class ThemeChanger {
 	private static final String OPENER = "{";
 	private static final String CLOSER = "}";
 	
+	private static final int THEME_HEIGHT = 450;
+	
 	private static final String REGION_TO_EXPAND = "contentContainer";
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
@@ -167,14 +169,10 @@ public class ThemeChanger {
 		}
 		
 		// Constructing correct path to images folder
-		String addToCss = helper.extractValueFromString(theme.getLinkToBase(), index, theme.getLinkToBase().length());
-		String[] dirLevels = addToCss.split(ThemesConstants.SLASH);
 		StringBuffer replacement = new StringBuffer();
 		replacement.append(CSS_IMAGE_URL);
-		for (int i = 0; i < dirLevels.length; i++) {
-			replacement.append(DIRECTORY);
-		}
-		replacement.append(addToCss);
+		replacement.append(ThemesConstants.CONTENT);
+		replacement.append(theme.getLinkToBase());
 		replacement.append(IMAGES);
 		
 		while (it.hasNext()) {
@@ -596,7 +594,7 @@ public class ThemeChanger {
 			e.addContent(0, getCommentsCollection(regionID));
 		}
 		if (regionID.equals(REGION_TO_EXPAND)) {
-			e.addContent(getElement("div", "&nbsp;", "style", "height:600;visibility:hidden")); // Expanding theme
+			e.addContent(getElement("div", "&nbsp;", "style", "height:"+THEME_HEIGHT+";visibility:hidden")); // Expanding theme
 		}
 		
 		return true;

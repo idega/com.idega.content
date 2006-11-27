@@ -1,12 +1,13 @@
 var globalPageID = 1;
 
-var scrollerImageWidth = 23;
+var SCROLLER_IMAGE_WIDTH = 23;
 var SPACE_FROM_LEFT = 290;
+var FRAME_CHANGE = 155;
 
 var KEYWORDS = null;
 
 function getScrollerImageWidth() {
-	return scrollerImageWidth;
+	return SCROLLER_IMAGE_WIDTH;
 }
 
 function savePageInfo() {
@@ -66,11 +67,13 @@ function manageSlider(buttonID) {
 	if (container.style.display == "none") {
 		button.value = "Hide Themes";
 		showSlider(container);
+		changeFrameHeight(-FRAME_CHANGE);
 	}
 	else {
 		removeStyleOptions();
 		new Effect.Fade(container);
 		button.value = "Show Themes";
+		changeFrameHeight(FRAME_CHANGE);
 	}
 }
 
@@ -242,6 +245,26 @@ function getTotalHeight() {
 }
 
 function newPage() {
+}
+
+function changeFrameHeight(change) {
+	var frame = document.getElementById("treePages");
+	if (frame == null) {
+		return;
+	}
+	var current = frame.style.height;
+	if (current == null) {
+		return;
+	}
+	var temp = current.split("px");
+	if (temp == null) {
+		return;
+	}
+	var height = temp[0];
+	height++;
+	height--;
+	height += change;
+	frame.style.height = height + "px";
 }
 
 function resizeFrame() {

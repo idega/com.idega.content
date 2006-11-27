@@ -3,25 +3,26 @@ package com.idega.content.tree;
 import java.rmi.RemoteException;
 
 import com.idega.business.IBOServiceBean;
+import com.idega.content.themes.helpers.ThemesConstants;
+import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.builder.business.BuilderService;
-import com.idega.core.builder.business.BuilderServiceFactory;
 
 public class PagePreviewBean extends IBOServiceBean implements PagePreview{
 	
+	private static final long serialVersionUID = -4609798037266246269L;
+
 	public String getPreviewUrl(String ID){
-//	public String getPreviewUrl(){
-		System.out.println("getURL id = "+ ID);
-		//return "http://localhost:8080/pages";
-		String uri=null;
-		BuilderService builderService;
+		String uri = null;
+		BuilderService builderService = ThemesHelper.getInstance().getThemesService().getBuilderService();
+		if (builderService == null) {
+			return ThemesConstants.EMPTY;
+		}
 		try {
-			builderService = BuilderServiceFactory.getBuilderService(getIWApplicationContext());
 			uri = builderService.getPageURI(ID);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return ThemesConstants.EMPTY;
 		}
-		System.out.println("URI = "+ uri);
 		return uri;
 	}
 }

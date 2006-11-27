@@ -4,21 +4,21 @@
 	<key>
 		<code>title</code>
 		<label>Title</label>
-		<defaultValue>Untitled Page 1</defaultValue>
+		<defaultValue>Start Page</defaultValue>
 		<type>text</type>
 		<method>setPageTitle</method>
 	</key>
 	<key>
 		<code>site_title</code>
 		<label>Site title</label>
-		<defaultValue>My website</defaultValue>
+		<defaultValue>idega</defaultValue>
 		<type>text</type>
 		<method>setSiteTitle</method>
 	</key>
 	<key>
 		<code>site_slogan</code>
 		<label>Site slogan</label>
-		<defaultValue>Changing the world, one site at a time...</defaultValue>
+		<defaultValue>Idega Software CMS and RAD webapplication tools</defaultValue>
 		<type>text</type>
 		<method>setSiteSlogan</method>
 	</key>
@@ -32,7 +32,7 @@
 	<key>
 		<code>toolbar</code>
 		<label>Toolbar</label>
-		<defaultValue>Untitled Page 1</defaultValue>
+		<defaultValue>Start Page</defaultValue>
 		<type>text</type>
 		<method>setToolbar</method>
 	</key>
@@ -46,21 +46,21 @@
 	<key>
 		<code>sidebar</code>
 		<label>Sidebar</label>
-		<defaultValue>Personal,Work,Humor</defaultValue>
+		<defaultValue>The Products,Web Community,Partner Program,Get Support,About idega</defaultValue>
 		<type>text</type>
 		<method>setSidebar</method>
 	</key>
 	<key>
 		<code>breadcrumb</code>
 		<label>Breadcrumb</label>
-		<defaultValue>Untitled Page 1</defaultValue>
+		<defaultValue>Start Page</defaultValue>
 		<type>text</type>
 		<method>setBreadcrumb</method>
 	</key>
 	<key>
 		<code>footer</code>
 		<label>Footer</label>
-		<defaultValue>User</defaultValue>
+		<defaultValue>idega</defaultValue>
 		<type>text</type>
 		<method>setFooter</method>
 	</key>

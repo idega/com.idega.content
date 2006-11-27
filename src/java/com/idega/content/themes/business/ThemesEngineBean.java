@@ -216,5 +216,18 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		return id;
 	}
+	
+	public boolean deletePage(String pageId, boolean deleteChildren) {
+		if (pageId == null) {
+			return false;
+		}
+		try {
+			helper.getThemesService().deleteIBPage(pageId, deleteChildren);
+		} catch (RemoteException e) {
+			log.error(e);
+			return false;
+		}
+		return true;
+	}
 
 }
