@@ -1,17 +1,14 @@
 package com.idega.content.bean;
 
+import java.util.Iterator;
+
+import org.apache.myfaces.custom.tree2.TreeNode;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.apache.myfaces.custom.tree2.TreeNode;
+
 import com.idega.content.themes.helpers.ThemesHelper;
-import com.idega.core.data.ICTreeNode;
 import com.idega.core.data.IWTreeNode;
-import com.idega.core.data.ICTreeNodeAddable;
-import com.idega.presentation.PageTag;
 import com.idega.webface.WFTreeNode;
-import com.idega.webface.WFUtil;
-import java.util.Iterator;
-import javax.faces.component.html.HtmlOutputText;
 
 public class SiteTemplateBean {
 // TO DO change IWTreeNode to PageTreeNode
@@ -32,7 +29,7 @@ public class SiteTemplateBean {
 		
 		Document siteDocument = ThemesHelper.getInstance().getXMLDocument(SITE_LINK);
 		Element root = siteDocument.getRootElement();
-		Element siteRoot = (Element)root.getChild("site");
+		Element siteRoot = root.getChild("site");
 		
 		Element currentElement = (Element)siteRoot.getChildren().get(0);
 		
@@ -78,15 +75,15 @@ public class SiteTemplateBean {
 //	}
 	
 	public WFTreeNode getPage(Element currElement, WFTreeNode currNode){
-		String name;
-		String type;
-		String iconfile;
+		//String name;
+		//String type;
+		//String iconfile;
 		Iterator itr = (currElement.getChildren()).iterator();
 		while(itr.hasNext()){
 			Element current = (Element)itr.next();
-			name = current.getAttributeValue("name");
-			type = current.getAttributeValue("type");
-			iconfile = current.getAttributeValue("iconfile"); 
+			//name = current.getAttributeValue("name");
+			//type = current.getAttributeValue("type");
+			//iconfile = current.getAttributeValue("iconfile"); 
 //			IWTreeNode newNode = new IWTreeNode(name);
 			WFTreeNode newNode = new WFTreeNode(new IWTreeNode(current.getAttributeValue("name")));
 			newNode.setIconURI(current.getAttributeValue("iconfile"));
@@ -108,7 +105,7 @@ public class SiteTemplateBean {
 //		root = (Element)root.getChild("site"); 
 		
 //		Element currentElement = (Element)siteRoot.getChildren().get(0);
-		Element currentElement = (Element)root;
+		Element currentElement = root;
 //		IWTreeNodeWithTypes rootNode = new IWTreeNodeWithTypes("","","");
 		WFTreeNode rootNode = new WFTreeNode(new IWTreeNode(currentElement.getAttributeValue("name")));
 //		IWTreeNode rootNode = new IWTreeNode("");

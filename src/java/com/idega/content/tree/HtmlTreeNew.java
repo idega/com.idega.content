@@ -1,15 +1,6 @@
 package com.idega.content.tree;
 
-import javax.faces.component.UICommand;
-import javax.faces.component.html.HtmlCommandLink;
-import javax.faces.context.FacesContext;
-import javax.faces.el.MethodBinding;
-import javax.faces.el.ValueBinding;
-
 import org.apache.myfaces.custom.tree2.HtmlTree;
-import org.apache.myfaces.custom.tree2.HtmlTreeRenderer;
-
-import java.util.Map;
 
 /**
  * Represents "tree data" in an HTML format.  Also provides a mechanism for maintaining expand/collapse
@@ -22,7 +13,7 @@ public class HtmlTreeNew extends HtmlTree
     public static final String COMPONENT_TYPE = "tree";
     private static final String DEFAULT_RENDERER_TYPE = "tree";
 	
-	private UICommand _expandControl;
+	/*private UICommand _expandControl;
     private String _varNodeToggler;
     private Boolean _showNav;
     private Boolean _showLines;
@@ -30,7 +21,7 @@ public class HtmlTreeNew extends HtmlTree
     private Boolean _showRootNode;
     private Boolean _preserveToggle;
     private String _javascriptLocation;
-    private String _imageLocation;
+    private String _imageLocation;*/
 
     /**
      * Constructor

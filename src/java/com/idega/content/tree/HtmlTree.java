@@ -77,7 +77,7 @@ public class HtmlTree extends UITreeData
         values[7] = _javascriptLocation;
         values[8] = _imageLocation;
 
-        return (Object)values;
+        return values;
     }
 
     // see superclass for documentation

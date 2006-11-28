@@ -1,5 +1,5 @@
 /*
- * $Id: PageCreationManagedBean.java,v 1.8 2006/11/21 11:51:40 justinas Exp $
+ * $Id: PageCreationManagedBean.java,v 1.9 2006/11/28 18:37:21 laddi Exp $
  * Created on 2.5.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -25,30 +25,18 @@ import javax.faces.model.SelectItem;
 import org.apache.myfaces.custom.tree2.TreeNode;
 import org.apache.myfaces.custom.tree2.TreeNodeBase;
 
-////import com.idega.builder.business.BuilderLogic;
-//import com.idega.builder.business.DomainTree;
-//import com.idega.builder.business.PageTreeNode;
-//import com.idega.builder.business.BuilderLogic;
-//import com.idega.builder.business.DomainTree;
 import com.idega.content.business.ContentUtil;
 import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
-import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.builder.data.ICPageHome;
 import com.idega.core.data.ICTreeNode;
-import com.idega.core.data.ICTreeNodeAddable;
-import com.idega.core.data.IWTreeNode;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
-import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWContext;
-import com.idega.presentation.Page;
-import com.idega.presentation.text.Link;
-import com.idega.presentation.ui.TreeViewer;
 import com.idega.webface.WFTreeNode;
 
 //import com.idega.builder.business;
@@ -56,19 +44,19 @@ import com.idega.webface.WFTreeNode;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/21 11:51:40 $ by $Author: justinas $
+ *  Last modified: $Date: 2006/11/28 18:37:21 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class PageCreationManagedBean implements ActionListener {
 
 	private String SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED = "no_template_selected";
-	private final String LINK_STYLE = "font-family:Arial,Helvetica,sans-serif;font-size:8pt;color:#000000;text-decoration:none;";
-	private static String DOMAIN_TREE_KEY="ic_domain_tree_";
+	//private final String LINK_STYLE = "font-family:Arial,Helvetica,sans-serif;font-size:8pt;color:#000000;text-decoration:none;";
+	//private static String DOMAIN_TREE_KEY="ic_domain_tree_";
 	private int pageSelectorTopNode = -1;
 	
-	private int pageSelectorTopNodes = -1;	
+	//private int pageSelectorTopNodes = -1;	
 	
 	private String selectedPageLocationIdentifier = null;
 	private String selectedPageLocationName = "[Select page]";
@@ -116,7 +104,7 @@ public class PageCreationManagedBean implements ActionListener {
 		try {
 		IWContext iwc = IWContext.getInstance();
 		BuilderService bservice = BuilderServiceFactory.getBuilderService(iwc);
-		ICDomain domain = BuilderServiceFactory.getBuilderService(iwc).getCurrentDomain();
+		//ICDomain domain = BuilderServiceFactory.getBuilderService(iwc).getCurrentDomain();
 
 		if (this.pageSelectorTopNode == -1) {
 			this.pageSelectorTopNode = bservice.getRootPageId();
@@ -126,7 +114,7 @@ public class PageCreationManagedBean implements ActionListener {
 		coll = BuilderServiceFactory.getBuilderService(iwc).getTopLevelPages(iwc);
 //		coll = DomainTree.getDomainTree(iwc).getPagesNode().getChildren();//getStartPages(domain);
 		Iterator it = coll.iterator();
-		int id = domain.getStartPageID();
+		//int id = domain.getStartPageID();
 		WFTreeNode node = new WFTreeNode();
 		
 		while (it.hasNext()) {

@@ -17,14 +17,10 @@
 package com.idega.content.tree;
 
 import org.apache.myfaces.custom.tree2.TreeTag;
-import org.apache.myfaces.shared_tomahawk.taglib.UIComponentTagBase;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.el.ValueBinding;
 
 /**
  * @author Sean Schofield
- * @version $Revision: 1.1 $ $Date: 2006/09/22 12:35:00 $
+ * @version $Revision: 1.2 $ $Date: 2006/11/28 18:37:21 $
  */
 
 public class TreeTagNew extends TreeTag //UIComponentBodyTagBase

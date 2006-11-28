@@ -13,7 +13,7 @@ public class NodeIDBean extends IBOServiceBean implements NodeID{
 		NodeIDPair IDPair;
 		String result = "";
 		for(int i = 0; i < IDsArray.size(); i++){
-			IDPair = (NodeIDPair)IDsArray.get(i);
+			IDPair = IDsArray.get(i);
 			if (IDPair.getIDinTree().equals(IDinTree)){
 				result = IDPair.getIDinDB();
 				break;
@@ -25,7 +25,7 @@ public class NodeIDBean extends IBOServiceBean implements NodeID{
 	public void setIDinDB(String IDinTree, String value){
 		NodeIDPair IDPair;
 		for(int i = 0; i < IDsArray.size(); i++){
-			IDPair = (NodeIDPair)IDsArray.get(i);			
+			IDPair = IDsArray.get(i);			
 			if (IDPair.getIDinTree().equals(IDinTree)){
 				IDPair.setIDinDB(value);
 				IDsArray.setElementAt(IDPair, i);
@@ -37,7 +37,7 @@ public class NodeIDBean extends IBOServiceBean implements NodeID{
 		NodeIDPair IDPair;
 		String result = "";
 		for(int i = 0; i < IDsArray.size(); i++){
-			IDPair = (NodeIDPair)IDsArray.get(i);
+			IDPair = IDsArray.get(i);
 			if (IDPair.getIDinDB().equals(IDinDB)){
 				result = IDPair.getIDinTree();
 				break;
@@ -49,7 +49,7 @@ public class NodeIDBean extends IBOServiceBean implements NodeID{
 	public void setIDinTree(String IDinDB, String value){
 		NodeIDPair IDPair;
 		for(int i = 0; i < IDsArray.size(); i++){
-			IDPair = (NodeIDPair)IDsArray.get(i);			
+			IDPair = IDsArray.get(i);			
 			if (IDPair.getIDinDB().equals(IDinDB)){
 				IDPair.setIDinTree(value);
 				IDsArray.setElementAt(IDPair, i);
@@ -67,12 +67,12 @@ public class NodeIDBean extends IBOServiceBean implements NodeID{
 	}
 	
 	public String getIDinTree(int index){
-		NodeIDPair pair = (NodeIDPair)IDsArray.get(index);
+		NodeIDPair pair = IDsArray.get(index);
 		return pair.getIDinTree(); 
 	}
 
 	public String getIDinDB(int index){
-		NodeIDPair pair = (NodeIDPair)IDsArray.get(index);
+		NodeIDPair pair = IDsArray.get(index);
 		return pair.getIDinDB(); 
 	}
 	

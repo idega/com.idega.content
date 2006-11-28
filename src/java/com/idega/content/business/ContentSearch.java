@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.26 2006/10/24 15:00:25 gimmi Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.27 2006/11/28 18:37:21 laddi Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2006/10/24 15:00:25 $ by $Author: gimmi $ This class
+ * Last modified: $Date: 2006/11/28 18:37:21 $ by $Author: laddi $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -83,7 +83,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.26 $
+ * @version $Revision: 1.27 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -550,7 +550,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 
 	protected void executeSearch(List results, String servletMapping, SearchMethod method, HttpClient client)
 	throws IOException, HttpException {
-		int state = client.executeMethod(method);
+		/*int state =*/ client.executeMethod(method);
 //		todo remove
 		//System.out.println("DASL Search result status code: " + state);
 		//System.out.println("DASL Search result status text: " + method.getStatusText());
@@ -667,7 +667,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 	public Collection getExtraRowElements(SearchResult result, IWResourceBundle iwrb) {
 		Collection coll = new Vector();
 		if (isSetToShowDeleteLink()) {
-			Layer deleteL = (Layer) new Layer();
+			Layer deleteL = new Layer();
 			deleteL.setStyleClass(SearchResults.DEFAULT_LINK_STYLE_CLASS+"_delete");
 			Link dLink = new Link(new Span(new Text(iwrb.getLocalizedString("search_results.delete", "Delete"))));
 			if (deletePage != null) {

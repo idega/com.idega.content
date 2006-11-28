@@ -49,7 +49,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Sean Schofield
  * @author Hans Bergsten (Some code taken from an example in his O'Reilly JavaServer Faces book. Copied with permission)
- * @version $Revision: 1.1 $ $Date: 2006/09/22 12:35:00 $
+ * @version $Revision: 1.2 $ $Date: 2006/11/28 18:37:20 $
  */
 public class UITreeData extends UIComponentBase implements NamingContainer
 {
@@ -95,7 +95,7 @@ public class UITreeData extends UIComponentBase implements NamingContainer
         values[0] = super.saveState(context);
         values[1] = _var;
         values[2] = _restoredState;
-        return ((Object) (values));
+        return values;
     }
 
 
@@ -628,9 +628,9 @@ public class UITreeData extends UIComponentBase implements NamingContainer
      *
      * @author Sean Schofield
      * @author Hans Bergsten (Some code taken from an example in his O'Reilly JavaServer Faces book. Copied with permission)
-     * @version $Revision: 1.1 $ $Date: 2006/09/22 12:35:00 $
+     * @version $Revision: 1.2 $ $Date: 2006/11/28 18:37:20 $
      */
-    private static class SavedState implements Serializable
+    protected static class SavedState implements Serializable
     {
         private static final long serialVersionUID = 273343276957070557L;
         private Object submittedValue;

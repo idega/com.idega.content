@@ -1,27 +1,25 @@
 package com.idega.content.tree;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.apache.myfaces.custom.tree2.TreeNode;
-import com.idega.core.data.ICTreeNode;
-import com.idega.core.data.IWTreeNode;
-import com.idega.core.data.ICTreeNodeAddable;
-import com.idega.presentation.PageTag;
-import com.idega.webface.WFTreeNode;
-
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 
+import org.apache.myfaces.custom.tree2.TreeNode;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+
+import com.idega.core.data.ICTreeNode;
+import com.idega.core.data.IWTreeNode;
+import com.idega.webface.WFTreeNode;
+
 public class SiteTemplate {
 // TO DO change IWTreeNode to PageTreeNode
 	
 	private static final String SITE_LINK = "http://localhost:8080" + "/idegaweb/bundles/com.idega.content.bundle/resources/templates/site-templates.xml";
-	private static final String PAGE_LINK = "http://localhost:8080" + "/idegaweb/bundles/com.idega.content.bundle/resources/templates/page-templates.xml";
+	//private static final String PAGE_LINK = "http://localhost:8080" + "/idegaweb/bundles/com.idega.content.bundle/resources/templates/page-templates.xml";
 	
 	TreeNode siteTree = null;
 	TreeNode pageTree = null;
@@ -63,7 +61,7 @@ public class SiteTemplate {
 		
 		Document siteDocument = getXMLDocument(SITE_LINK);
 		Element root = siteDocument.getRootElement();
-		Element siteRoot = (Element)root.getChild("site");
+		Element siteRoot = root.getChild("site");
 		
 		Element currentElement = (Element)siteRoot.getChildren().get(0);
 		
@@ -109,7 +107,7 @@ public class SiteTemplate {
 //		root = (Element)root.getChild("site"); 
 		
 //		Element currentElement = (Element)siteRoot.getChildren().get(0);
-		Element currentElement = (Element)root;
+		Element currentElement = root;
 		IWTreeNode rootNode = new IWTreeNode("");
 		
 		rootNode = getPage(currentElement, rootNode);
