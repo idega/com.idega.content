@@ -10,12 +10,9 @@ public class ThemesConstants {
 	protected static final String NAMESPACE_ID = "xmlns";
 	
 	protected static final String SPACE = " ";
-	protected static final String DOT = ".";
-	protected static final String COMMA = ",";
 	protected static final String PLUS = "+";
 	protected static final String SPACE_ENCODED = "%20";
 	protected static final String ENCODING = "UTF-8";
-	protected static final String SEPARATOR = COMMA;
 	
 	protected static final String THEME_PREVIEW = "_theme_preview";
 	protected static final String THEME_SMALL_PREVIEW = "_small" + THEME_PREVIEW;
@@ -122,8 +119,12 @@ public class ThemesConstants {
 	public static final String SEMICOLON = ";";
 	public static final String UNDER = "_";
 	public static final String SLASH = "/";
+	public static final String DOT = ".";
+	public static final String COMMA = ",";
 	
 	public static final String THEME_SETTINGS = "/resources/themes/theme.xml";
 	public static final String PAGE_SETTINGS = "/idegaweb/bundles/com.idega.content.bundle/resources/themes/page.xml";
+	
+	public static final String LAST_USED_THEME = "theme.last_used.ibpage_id";
 	
 }

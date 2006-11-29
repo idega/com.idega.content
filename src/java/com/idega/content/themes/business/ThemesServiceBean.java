@@ -135,7 +135,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		
 		page.setWebDavUri(ThemesConstants.CONTENT + theme.getLinkToSkeleton()); // Updating template
 		page.store();
-		// TODO: should we clear a cache?
+		builder.clearAllCachedPages();
 		return true;
 	}
 	
@@ -176,9 +176,9 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		return builder;
 	}
 	
-	private ICPage getICPage(int id) {
+	public ICPage getICPage(int id) {
 		ICPage page = null;
-		try { // Getting existing template
+		try {
 			page = getICPageHome().findByPrimaryKey(id);
 		} catch (RemoteException e) {
 			log.error(e);

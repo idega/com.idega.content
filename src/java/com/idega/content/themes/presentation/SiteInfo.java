@@ -76,9 +76,9 @@ public class SiteInfo extends Block {
 			
 			cell = row.createCell();
 			if (TYPE_TEXT.equals(setting.getType())) {
-				regionValue = new TextInput(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.UNDER + REGION_VALUE);
+				regionValue = new TextInput(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.DOT + REGION_VALUE);
 				regionValue.setId(setting.getCode());
-				value = applicationSettings.getProperty(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.UNDER + locale);
+				value = applicationSettings.getProperty(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.DOT + locale);
 				regionValue.setValue(value);
 				cell.add(regionValue);
 			}
@@ -131,7 +131,7 @@ public class SiteInfo extends Block {
 		for (int i = 0; i < l.size(); i++) {
 			setting = l.get(i);
 			keywords[i] = setting.getCode();
-			values[i] = iwc.getParameter(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.UNDER + REGION_VALUE);
+			values[i] = iwc.getParameter(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.DOT + REGION_VALUE);
 		}
 		ThemesHelper.getInstance().getThemesEngine().saveSiteInfo(locale, keywords, values);
 	}

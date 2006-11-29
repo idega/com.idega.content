@@ -2,6 +2,7 @@ package com.idega.content.themes.business;
 
 
 import com.idega.core.builder.business.BuilderService;
+import com.idega.core.builder.data.ICPage;
 import com.idega.business.IBOService;
 import com.idega.content.themes.helpers.Theme;
 import com.idega.slide.business.IWContentEvent;
@@ -44,4 +45,9 @@ public interface ThemesService extends IBOService, IWSlideChangeListener {
 	 * @see com.idega.content.themes.business.ThemesServiceBean#getBuilderService
 	 */
 	public BuilderService getBuilderService();
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesServiceBean#getICPage
+	 */
+	public ICPage getICPage(int id);
 }

@@ -1,10 +1,23 @@
-var globalPageID = null;
+var PAGE_ID = null;
+var THEME_ID = null;
 
 var SCROLLER_IMAGE_WIDTH = 23;
 var SPACE_FROM_LEFT = 290;
 var FRAME_CHANGE = 155;
 
 var KEYWORDS = null;
+
+function setThemeForStyle(ID) {
+	THEME_ID = ID;
+}
+
+function getThemeForStyle() {
+	return THEME_ID;
+}
+
+function getPageID() {
+	return PAGE_ID;
+}
 
 function getScrollerImageWidth() {
 	return SCROLLER_IMAGE_WIDTH;
@@ -21,7 +34,7 @@ function savePageInfo() {
 }
 
 function getPageInfoElementsCallback(allKeywords) {
-	if (globalPageID == null || allKeywords == null) {
+	if (PAGE_ID == null || allKeywords == null) {
 		closeLoadingMessage();
 		return;
 	}
@@ -38,7 +51,7 @@ function getPageInfoElementsCallback(allKeywords) {
 			}
 		}
 	}
-	ThemesEngine.savePageInfo(globalPageID, keywords, values, savePageInfoCallback);
+	ThemesEngine.savePageInfo(PAGE_ID, keywords, values, savePageInfoCallback);
 }
 
 function savePageInfoCallback(result) {
@@ -77,8 +90,21 @@ function manageSlider(buttonID) {
 	}
 }
 
+function getGlobalPageId() {
+	ThemesEngine.getPageId(setGlobalPageId);
+}
+
+function setGlobalPageId(ID) {
+	setPageID(ID);
+	getPrewUrl(ID);
+}
+
+function nothingToDo(parameter) {
+}
+
 function setPageID(ID) {
-	globalPageID = ID;
+	PAGE_ID = ID;
+	ThemesEngine.setPageId(ID, nothingToDo);
 }
 
 function chooseStyle(themeID) {
@@ -121,7 +147,11 @@ function chooseOption(themeID) {
 		return; // There is not enough space
 	}
 	
+	setThemeForStyle(themeID);
+	
 	var div = document.getElementById("chooseStyleLayer");
+	var pageSpan = null;
+	var siteSpan = null;
 	if (div == null) {
 		div = document.createElement("div");
 		div.style.display = "none";
@@ -131,7 +161,7 @@ function chooseOption(themeID) {
 		var divp = document.createElement("div");
 		divp.className = "themeChooseStyleText";
 		divp.style.opacity = "0.5";
-		var pageSpan = document.createElement("span");
+		pageSpan = document.createElement("span");
 		pageSpan.setAttribute("id", "pageStyle");
 		pageSpan.appendChild(document.createTextNode("Page"));
 		divp.appendChild(pageSpan);
@@ -139,27 +169,27 @@ function chooseOption(themeID) {
 		var divs = document.createElement("div");
 		divs.className = "themeChooseStyleText";
 		divs.style.opacity = "0.3";
-		var siteSpan = document.createElement("span");
+		siteSpan = document.createElement("span");
 		siteSpan.setAttribute("id", "siteStyle");
 		siteSpan.appendChild(document.createTextNode("Site"));
 		divs.appendChild(siteSpan);
 		
 		if (typeof div.attachEvent != 'undefined') {
-			pageSpan.attachEvent('onclick', function(e){setStyle(themeID, true);});
-	    	siteSpan.attachEvent('onclick', function(e){setStyle(themeID, false);});
-	    	div.attachEvent('onclick', function(e){removeStyleOptions();});
-	    } else {
-	    	pageSpan.addEventListener('click', function(e){setStyle(themeID, true);}, true);
-	    	siteSpan.addEventListener('click', function(e){setStyle(themeID, false);}, true);
-	    	div.addEventListener('click', function(e){removeStyleOptions();}, true);
-	   	}
+			pageSpan.attachEvent('onclick', function(e){setStyle(true);});
+	   		siteSpan.attachEvent('onclick', function(e){setStyle(false);});
+	   		div.attachEvent('onclick', function(e){removeStyleOptions();});
+		} else {
+			pageSpan.addEventListener('click', function(e){setStyle(true);}, false);
+	    	siteSpan.addEventListener('click', function(e){setStyle(false);}, false);
+	    	div.addEventListener('click', function(e){removeStyleOptions();}, false);
+		}
+		
 		div.appendChild(divp);
 		div.appendChild(divs);
 		document.body.appendChild(div);
 	}
 	div.style.left = leftPosition + "px";
 	div.style.top = (getAbsoluteTop(themeID + "_container") + 3) + "px";
-	//new Effect.Appear(div);
 	div.style.display = "block";
 }
 
@@ -191,16 +221,24 @@ function getAbsoluteTop(objectId) {
 	return oTop;
 }
 
-function setStyle(themeID, page) {
+function setStyle(isPage) {
 	removeStyleOptions();
-	if (themeID == null) {
+	if (getThemeForStyle() == null) {
+		return;
+	}
+	if (isPage && getPageID() == null) {
 		return;
 	}
 	showLoadingMessage("Applying style...");
-	ThemesEngine.setSelectedStyle(themeID, page, setStyleCallback);
+	ThemesEngine.setSelectedStyle(getThemeForStyle(), getPageID(), isPage, setStyleCallback);
 }
 
 function setStyleCallback(result) {
+	if (getPageID() != null) {
+		if (getPageID() != -1) {
+			getPrewUrl(getPageID());
+		}
+	}
 	closeLoadingMessage();
 }
 

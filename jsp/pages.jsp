@@ -88,7 +88,7 @@ version="1.2">
 					</jsf:verbatim>
                 </wf:wfblock>
                 <jsf:verbatim>
-                	<script type="text/javascript">showSlider(document.getElementById("themesSliderContainer"));resizeFrame();</script>
+                	<script type="text/javascript">showSlider(document.getElementById("themesSliderContainer"));resizeFrame();getGlobalPageId();</script>
                 </jsf:verbatim>
 			</h:form>
 		</ws:page>

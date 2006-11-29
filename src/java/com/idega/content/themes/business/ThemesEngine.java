@@ -28,7 +28,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#setSelectedStyle
 	 */
-	public String setSelectedStyle(String themeID, boolean applyToPage) throws RemoteException;
+	public boolean setSelectedStyle(String themeID, String pageID, boolean applyToPage) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#savePageInfo
@@ -69,4 +69,14 @@ public interface ThemesEngine extends IBOService {
 	 * @see com.idega.content.themes.business.ThemesEngineBean#deletePage
 	 */
 	public boolean deletePage(String pageId, boolean deleteChildren) throws RemoteException;
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#getPageId
+	 */
+	public String getPageId();
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#setPageId
+	 */
+	public boolean setPageId(String id);
 }

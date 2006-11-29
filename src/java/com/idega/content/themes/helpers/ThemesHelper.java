@@ -67,6 +67,7 @@ public class ThemesHelper implements Singleton {
 	
 	private String fullWebRoot; // For cache
 	private String webRoot;
+	private String lastVisitedPage;
 	
 	private ThemesHelper(boolean searchForThemes) {
 		themes = new HashMap <String, Theme> ();
@@ -432,7 +433,7 @@ public class ThemesHelper implements Singleton {
 		return link;
 	}
 	
-	protected Theme getTheme(String themeID) {
+	public Theme getTheme(String themeID) {
 		if (themeID == null) {
 			return null;
 		}
@@ -728,7 +729,7 @@ public class ThemesHelper implements Singleton {
 		String[] settingValues = null;
 		if (s.getDefaultValue() != null) {
 			if (!ThemesConstants.EMPTY.equals(s.getDefaultValue())) {
-				settingValues = s.getDefaultValue().split(ThemesConstants.SEPARATOR);
+				settingValues = s.getDefaultValue().split(ThemesConstants.COMMA);
 			}
 		}
 		if (settingValues == null) {
@@ -808,6 +809,14 @@ public class ThemesHelper implements Singleton {
 			value = value.replace(ThemesConstants.SPACE, ThemesConstants.UNDER);
 		}
 		return value;
+	}
+
+	public String getLastVisitedPage() {
+		return lastVisitedPage;
+	}
+
+	public void setLastVisitedPage(String lastVisitedPage) {
+		this.lastVisitedPage = lastVisitedPage;
 	}
 
 }

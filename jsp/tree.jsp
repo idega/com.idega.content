@@ -49,7 +49,7 @@
 						<wf:iwtree value="#{siteTemplateBean.pageTree}" id="page_chooser22"	var="node" varNodeToggler="t" clientSideToggle="true"	sourceTree="true"	showRootNode="false">
 							<f:facet name="IWTreeNode">						
 								<h:panelGroup>
-									<h:outputLink onclick="getPrewUrl(this.parentNode.id);return false;">
+									<h:outputLink>
 										<h:outputText value="#{node.description}" />									
 									</h:outputLink>
 								</h:panelGroup>

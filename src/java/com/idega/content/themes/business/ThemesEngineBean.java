@@ -3,6 +3,7 @@ package com.idega.content.themes.business;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,8 @@ import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.core.builder.data.ICPage;
+import com.idega.core.data.ICTreeNode;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
 
@@ -97,13 +100,63 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	/**
 	 * 
 	 */
-	public String setSelectedStyle(String themeID, boolean applyToPage) {
-		if (applyToPage) {
-			return "page";
+	public boolean setSelectedStyle(String themeID, String pageID, boolean applyToPage) {
+		IWContext iwc = IWContext.getInstance();
+		if (iwc == null) {
+			return false;
 		}
-		else {
-			return "site";
+		
+		if (themeID == null) {
+			return false;
 		}
+		Theme theme = helper.getTheme(themeID);
+		if (theme == null) {
+			return false;
+		}
+		boolean result = true;
+		
+		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
+		settings.setProperty(ThemesConstants.LAST_USED_THEME, String.valueOf(theme.getIBPageID()));
+		
+		if (applyToPage) { // Apply style to selected page
+			result = setPageStyle(pageID, theme.getIBPageID(), iwc);
+		}
+		else { // Apply style to all pages
+			result = setSiteStyle(theme.getIBPageID(), iwc);
+		}
+		helper.getThemesService().getBuilderService().clearAllCachedPages();
+		return result;
+	}
+	
+	private boolean setPageStyle(String pageID, int templateID, IWContext iwc) {
+		ICPage page = null;
+		page = helper.getThemesService().getICPage(Integer.valueOf(pageID).intValue());
+		if (page == null) {
+			return false;
+		}
+		//if (page.isPage()) {
+			helper.getThemesService().getBuilderService().setTemplateId(pageID, String.valueOf(templateID));
+			page.setTemplateId(templateID);
+			page.store();
+		//}
+		return true;
+	}
+	
+	private boolean setSiteStyle(int templateID, IWContext iwc) {
+		Map tree = helper.getThemesService().getBuilderService().getTree(iwc);
+		if (tree == null) {
+			return false;
+		}
+		Iterator it = tree.values().iterator();
+		Object o = null;
+		boolean result = true;
+		while (it.hasNext()) {
+			o = it.next();
+			if (o instanceof ICTreeNode) {
+				result = setPageStyle(((ICTreeNode) o).getId(), templateID, iwc);
+			}
+		}
+		return result;
 	}
 	
 	/**
@@ -165,7 +218,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		String[] values = new String[keywords.length];
 		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
 		for (int i = 0; i < keywords.length; i++) {
-			values[i] = settings.getProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + ThemesConstants.UNDER + language);
+			values[i] = settings.getProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + ThemesConstants.DOT + language);
 		}
 		return values;
 	}
@@ -190,10 +243,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
 		for (int i = 0; i < keywords.length; i++) {
 			if (values[i] == null || values[i].equals(ThemesConstants.EMPTY)) {
-				settings.removeProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + ThemesConstants.UNDER + language);
+				settings.removeProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + ThemesConstants.DOT + language);
 			}
 			else {
-				settings.setProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + ThemesConstants.UNDER + language, values[i]);
+				settings.setProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + ThemesConstants.DOT + language, values[i]);
 			}
 		}
 		return true;
@@ -220,6 +273,31 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			log.error(e);
 			return false;
 		}
+		return true;
+	}
+	
+	public String getPageId() {
+		String id = null;
+		id = helper.getLastVisitedPage();
+		if (id != null) {
+			return id;
+		}
+		
+		try {
+		id = String.valueOf(helper.getThemesService().getBuilderService().getRootPageId());
+		} catch (Exception e) {
+			log.error(e);
+			return null;
+		}
+		helper.setLastVisitedPage(id);
+		return id;
+	}
+	
+	public boolean setPageId(String id) {
+		if (id == null) {
+			return false;
+		}
+		helper.setLastVisitedPage(id);
 		return true;
 	}
 

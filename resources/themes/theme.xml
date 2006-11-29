@@ -37,7 +37,7 @@
 		<method>setToolbar</method>
 	</key>
 	<key>
-		<code>sidebarTitle</code>
+		<code>sidebar_title</code>
 		<label>Sidebar title</label>
 		<defaultValue></defaultValue>
 		<type>text</type>
