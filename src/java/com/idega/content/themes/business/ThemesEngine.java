@@ -3,6 +3,8 @@ package com.idega.content.themes.business;
 
 import com.idega.business.IBOService;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 
 public interface ThemesEngine extends IBOService {
 	/**
@@ -59,6 +61,11 @@ public interface ThemesEngine extends IBOService {
 	 * @see com.idega.content.themes.business.ThemesEngineBean#saveSiteInfo
 	 */
 	public boolean saveSiteInfo(String language, String[] keywords, String[] values);
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#beforeCreatePage
+	 */
+	public ArrayList<String> beforeCreatePage(List struct) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#createPage

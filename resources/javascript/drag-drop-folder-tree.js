@@ -31,6 +31,7 @@
 		var idOfTree;
 		
 		var sourceTree;
+		var actionOnMouseUp;
 		
 		var imageFolder;
 		var folderImage;
@@ -40,7 +41,8 @@
 		var dragNode_source;
 		var dragNode_parent;
 		var dragNode_sourceNextSib;
-		var dragNode_noSiblings;
+		var dragNode_noSiblings; 
+		var deleteNodes;
 		
 		var dragNode_destination;
 		var floatingContainer;
@@ -50,12 +52,19 @@
 		var indicator_offsetX;
 		var indicator_offsetX_sub;
 		var indicator_offsetY;
-		
+		var newPageId;
+		var treeStructure;
+
+		this.newPageId = -1;
+		this.deleteNodes = false;
 		this.sourceTreee = true;
+		this.actionOnMouseUp = 'empty';
 		
 		this.imageFolder = '/idegaweb/bundles/com.idega.content.bundle/resources/images/';
+		this.iconFolder = '/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/';
 //		this.folderImage = 'dhtmlgoodies_folder.gif';
-		this.folderImage = 'treeviewer_node_leaf.gif';
+//		this.folderImage = 'treeviewer_node_leaf.gif';
+		this.folderImage = 'text.png';
 //		this.plusImage = 'dhtmlgoodies_plus.gif';
 //		this.minusImage = 'dhtmlgoodies_minus.gif';
 		this.plusImage = 'nav-plus.gif';
@@ -232,7 +241,6 @@
 			return false;						
 		}
 		,
-
 		copyDragableNode : function(e)
 		{			
 			var sourceTree = false;			
@@ -290,7 +298,9 @@
 		/* Initialize drag */ 
 		initDrag : function(e)
 		{
-			var sourceTree = false;			
+//			document.documentElement.onmouseup = JSTreeObj.actionOnMouseUp;
+			
+//			var sourceTree = false;			
 			var liTag = document.getElementsByTagName('LI')[0];
 			
 			var subs = JSTreeObj.floatingContainer.getElementsByTagName('LI');
@@ -341,16 +351,27 @@
 		,
 		moveDragableNodes : function(e)
 		{			
+			
+			var divTags = document.getElementsByTagName('div');
+			var divTag = null;
+			for(var i = 0; i < divTags.length; i++){
+				if(divTags[i].getAttribute('class') == 'current_structure')
+					divTag = divTags[i];
+			}
+			
 			if(JSTreeObj.dragDropTimer<10)return;
 			if(document.all)e = event;
 			dragDrop_x = e.clientX/1 + 5 + document.body.scrollLeft;
 			dragDrop_y = e.clientY/1 + 5 + document.documentElement.scrollTop;	
 
+//			dragDrop_x = e.clientX/1 -60+ document.body.scrollLeft;
+//			dragDrop_y = e.clientY/1 -20+ document.documentElement.scrollTop;	
+
 			JSTreeObj.floatingContainer.style.left = dragDrop_x + 'px';
 			JSTreeObj.floatingContainer.style.top = dragDrop_y + 'px';
+			JSTreeObj.floatingContainer.style.opacity = 0.5;
 
 			var thisObj = this;
-
 			if(thisObj.tagName=='A' || thisObj.tagName=='IMG')
 				thisObj = thisObj.parentNode;
 			JSTreeObj.dragNode_noSiblings = false;
@@ -364,9 +385,8 @@
 				tmpVar = thisObj.sourceTree;
 			if(tmpVar=='true')
 				JSTreeObj.dragNode_sourceTree=true;
-
-			if(thisObj && thisObj.id)
-			{
+				
+			if(thisObj && thisObj.id) {
 				JSTreeObj.dragNode_destination = thisObj;
 				var img = thisObj.getElementsByTagName('IMG')[1];
 				var tmpObj= JSTreeObj.dropTargetIndicator;
@@ -391,7 +411,21 @@
 				}
 				tmpObj.style.top = (JSTreeObj.getTopPos(thisObj) + JSTreeObj.indicator_offsetY + 9) + 'px';
 			}			
-			
+			else{
+//				console.log('JSTreeObj.dragNode_destination = '+JSTreeObj.dragNode_destination);											
+/*
+//b
+			var parentDiv = thisObj;
+console.log('parentDiv = '+parentDiv);
+			if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id){
+				console.log('globalDivId = '+ globalDivId + ' parentDiv.getElementsByTagName(DIV)[0].id = '+ parentDiv.getElementsByTagName('DIV')[0].id);
+			}
+			else 
+				console.log('globalDivId = '+ globalDivId + ' parentDiv.getElementsByTagName(DIV)[0].id = '+ parentDiv.getElementsByTagName('DIV')[0].id);
+//e
+ * 
+ */
+			}
 			return false;
 			
 		}
@@ -484,7 +518,7 @@
 			
 //			saveMyTree(JSTreeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id), JSTreeObj.dragNode_source.id);		
 //			saveMyTree(JSTreeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);		
-			saveMyTree(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);		
+
 			
 //			JSTreeObj.initTree();
 			
@@ -493,9 +527,11 @@
 			while(true){
 				if (parentDiv.getElementsByTagName('DIV')){
 					if (parentDiv.getElementsByTagName('DIV')[0]){
-
-						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id)
+	
+						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id){
 							console.log('moving node node ID = '+JSTreeObj.dragNode_source.id+" newParent = "+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
+							saveMyTree(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);									
+						}
 						else
 							console.log('creating node newParent = '+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
 						break;	
@@ -507,13 +543,39 @@
 //
 		}
 		,
+		deleteNodeChilds : function(nodeParent){
+			var childs = nodeParent.getElementsByTagName('li');
+			var nodeChilds = nodeParent.childNodes;
+			for(var i = 0; i < childs.length; i++){
+				if (nodeChilds[i].parentNode == nodeParent){
+//					console.log('Child '+ childs[i].id);
+					JSTreeObj.getNodeChilds(nodeChilds[i]);
+					console.log('delete node = '+ childs[i].id);
+					deletePage(childs[i].id);
+				}
+			}
+		}		
+		,
 		dropDragableNodesCopy:function()
-		{	
+		{
 			var parent;
 			if(JSTreeObj.dragDropTimer<10){				
 				JSTreeObj.dragDropTimer = -1;
 				return;
 			}
+
+			if(JSTreeObj.deleteNodes == true){
+				console.log('delete node = '+ JSTreeObj.dragNode_source.id);
+//				JSTreeObj.deleteNodeChilds(JSTreeObj.dragNode_source);				
+				deletePage(JSTreeObj.dragNode_source.id);
+				if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
+					if (document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id)){
+//						var el = document.getElementById('floatingContainer'+JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id);
+						JSTreeObj.floatingContainer.removeChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));
+					}
+				}				
+				return;
+			}				
 				
 			var showMessage = false;
 			if(JSTreeObj.dragNode_destination){	// Check depth
@@ -577,8 +639,34 @@
 					}
 				}	
 				/* Clear parent object */
-
-				JSTreeObj.getNewNodeId(JSTreeObj.dragNode_source.id);
+				
+				var tmpObj = JSTreeObj.dragNode_parent;
+				var lis = tmpObj.getElementsByTagName('LI');
+//console.log('JSTreeObj.dragNode_destination = '+ JSTreeObj.dragNode_destination);		
+				if(lis.length==0){
+					var tmpSpan = tmpObj.parentNode;
+					var img = tmpSpan.parentNode.getElementsByTagName('IMG')[0];
+					img.style.visibility='hidden';	// Hide [+],[-] icon
+					tmpObj.parentNode.removeChild(tmpObj);											
+				}				
+				
+/*				
+console.log('Clear parent object');				
+				var tmpObj = JSTreeObj.dragNode_parent;
+				var lis = tmpObj.getElementsByTagName('LI');
+console.log('tmpObj = '+tmpObj.id);
+				if(lis.length==0){
+console.log('hidden');	
+console.log('tmpObj.parentNode = '+tmpObj.parentNode.parentNode);
+					var img = tmpObj.parentNode.getElementsByTagName('IMG')[0];
+console.log('img = '+ img.src);		
+console.log('img.style.visibility = '+ img.style.visibility);		
+//					var img = tmpObj.getElementsByTagName('IMG')[0];
+					img.style.visibility='hidden';	// Hide [+],[-] icon
+					tmpObj.parentNode.removeChild(tmpObj);						
+				}
+*/
+//				JSTreeObj.getNewNodeId(JSTreeObj.dragNode_source.id);
 				
 //				JSTreeObj.initNode(getElementsByTagName('li').getElementById()
 //				JSTreeObj.dragNode_source.id);
@@ -608,7 +696,6 @@
 				return;						
 */ 
 			}
-			
 			JSTreeObj.dropTargetIndicator.style.display='none';		
 			JSTreeObj.dragDropTimer = -1;	
 			if(showMessage && JSTreeObj.messageMaximumDepthReached)alert(JSTreeObj.messageMaximumDepthReached);
@@ -616,7 +703,7 @@
 			
 //			saveMyTree(JSTreeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id), JSTreeObj.dragNode_source.id);		
 //			saveMyTree(JSTreeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);		
-			saveMyTree(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);		
+			
 			
 //			JSTreeObj.initTree();
 			
@@ -625,11 +712,19 @@
 			while(true){
 				if (parentDiv.getElementsByTagName('DIV')){
 					if (parentDiv.getElementsByTagName('DIV')[0]){
-
-						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id)
+						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id){
 							console.log('moving node node ID = '+JSTreeObj.dragNode_source.id+" newParent = "+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
-						else
-							console.log('creating node newParent = '+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
+							saveMyTree(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);		
+						}
+						else{
+							console.log('creating node newParent = '+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null)+ 
+							' pagetype = '+JSTreeObj.dragNode_source.getAttribute('pagetype') + ' templatefile = '+JSTreeObj.dragNode_source.getAttribute('templatefile'));
+//							saveNewPage(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 'newPage');
+							JSTreeObj.saveNewPage(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
+							(JSTreeObj.dragNode_source.getElementsByTagName('A')[0]).innerHTML);
+						}
+							//need name
+							
 						break;	
 										
 					}
@@ -639,11 +734,12 @@
 //
 		}
 		,
-
+/*
 		getNewNodeId : function(id){
 				
 		}
 		,
+*/ 
 		createDropIndicator : function()
 		{
 			this.dropTargetIndicator = document.createElement('DIV');
@@ -689,7 +785,6 @@
 			return false;	
 		}
 		,
-		
 //		getNewParent : function(initObj,saveString,child,numericParentID) {	
 		getNewParent : function(initObj,saveString,child,newParent) {
 			if(!saveString)var saveString = '';
@@ -776,6 +871,7 @@
 			return saveString;
 		}
 		,
+/*		
 		initNode : function(nodeId){
 				// No children var set ?
 
@@ -832,7 +928,7 @@
 				
 				input.onkeypress = withEnter;
 				aTag.ondblclick = initEditLabel;	
-					if(!noDrag)aTag.onmousedown = JSTreeObj.initDrag;
+					if(!noDrag)aTag.onmousedown = J§.initDrag;
 					if(!noChildren)aTag.onmousemove = JSTreeObj.moveDragableNodes;
 					if(sourceTree)aTag.onmousedown = JSTreeObj.copyDragableNode;
 					nodeEl.insertBefore(img,input);
@@ -846,6 +942,15 @@
 						folderImg.src = this.imageFolder + this.folderImage;
 					}
 					nodeEl.insertBefore(folderImg,input);			
+		}
+		,
+*/		
+		
+		prepareToDelete : function(){
+			if(JSTreeObj.deleteNodes == true)
+				JSTreeObj.deleteNodes = false;
+			else
+				JSTreeObj.deleteNodes = true;
 		}
 		,
 		initTree : function()
@@ -880,8 +985,26 @@
 				
 				var iconfile = null;		 
 				var tmpVar = menuItems[no].getAttribute('iconfile');
+				if(!tmpVar)				
+					tmpVar = menuItems[no].iconfile;
 				if(tmpVar)
 					iconfile = tmpVar;
+				else {
+					var pageType = menuItems[no].getAttribute('pagetype');
+					if (pageType)
+//						iconfile = this.imageFolder + menuItems[no].getAttribute('pagetype') +'.png';
+						iconfile = this.iconFolder + menuItems[no].getAttribute('pagetype') +'.png';
+					else
+						iconfile = this.iconFolder + this.folderImage;
+				}
+
+				var templatefile = null;		 
+				var tmpVar = menuItems[no].getAttribute('templatefile');
+				if(!tmpVar)				
+					tmpVar = menuItems[no].templatefile;
+				if(tmpVar)
+					templatefile = tmpVar;
+
 									
 				nodeId++;
 				var subItems = menuItems[no].getElementsByTagName('UL');
@@ -943,7 +1066,8 @@
 				if(menuItems[no].className){
 					folderImg.src = this.imageFolder + menuItems[no].className;
 				}else{
-					folderImg.src = this.imageFolder + this.folderImage;
+					folderImg.src = this.imageFolder + this.folderImage;					
+//					folderImg.src = this.imageFolder + this.iconFolder;					
 				}
 				if(iconfile)
 					folderImg.src = iconfile;
@@ -960,13 +1084,160 @@
 */
 			}			
 			document.documentElement.onmousemove = JSTreeObj.moveDragableNodes;	
-			if(sourceTree)
-				document.documentElement.onmouseup = JSTreeObj.dropDragableNodesCopy;
-			else
-				document.documentElement.onmouseup = JSTreeObj.dropDragableNodes;
-		}		
-	}
+			
+			document.documentElement.onmouseup = JSTreeObj.dropDragableNodesCopy;
+			
+			if(sourceTree){			
+//				JSTreeObj.actionOnMouseUp = 'copy';
+				this.actionOnMouseUp = 'copy';
+//				console.log('copy');
+//				document.documentElement.onmouseup = JSTreeObj.dropDragableNodesCopy;
+			}
+			else{
+				this.actionOnMouseUp = 'move';
+//				console.log('move');				
+//				JSTreeObj.actionOnMouseUp = 'move';
+//				document.documentElement.onmouseup = JSTreeObj.dropDragableNodes;
+			}
+		}
+		,	
+		saveNewPage : function (newParentNodeId, pagetype, templatefile, pageName){
+			treeStructure = new Array();
+			
+console.log('nodeId = '+JSTreeObj.dragNode_source.id +'parentId = '+newParentNodeId);			
 	
+			JSTreeObj.getStructure(JSTreeObj.dragNode_source, newParentNodeId);
+//			JSTreeObj.dragNode_source.id = 'temporary';
+//			var struct = JSTreeObj.getStructure(JSTreeObj.dragNode_source)
+/*
+			var struct = new Array(3);
+			var test =  new Array ('nodeName', 'pageType', 'templateFile');
+			struct[0] = 'nodeName2';
+			struct[1] = 'nodeName3';
+			struct[2] = 'nodeName4';
+			struct[3] = 'nodeName5';
+			struct[4] = 'nodeName6';
+			struct[5] = 'nodeName7';
+*/
+			ThemesEngine.beforeCreatePage(treeStructure, JSTreeObj.getNewId);
+//			ThemesEngine.beforeCreatePage(newParentNodeId, pagetype, templatefile, pageName, JSTreeObj.getNewId);		
+		}	
+		,
+
+		getStructure : function(source, parentId){
+
+			var nodeChilds = source.getElementsByTagName('li');
+			var count = nodeChilds.length;
+			var childs = new Array();
+
+//			var currentNode = nodeChilds[i];
+
+			var nodeId = source.id;
+			var nodeName = (source.getElementsByTagName('A')[0]).innerHTML;
+			var pageType = source.getAttribute('pagetype');
+//			parentId = source.parentNode.parentNode.parentNode.id;
+			var templateFile = source.getAttribute('templatefile');
+									
+			treeStructure.push(nodeId);		
+			treeStructure.push(parentId);			
+			treeStructure.push(nodeName);
+			treeStructure.push(pageType);
+			treeStructure.push(templateFile);										
+									
+			var nodeData = new Array (nodeName, pageType, templateFile);
+			childs.push(nodeData);
+			for (var i = 0; i < count; i++){
+/*				
+				var nodeId = source.getAttribute('id');
+				var nodeName = (source.getElementsByTagName('A')[0]).innerHTML;
+				var pageType = source.getAttribute('pagetype');
+				var templateFile = source.getAttribute('templatefile');		
+*/				
+
+				var nodeId = nodeChilds[i].id;
+				var nodeName = (nodeChilds[i].getElementsByTagName('A')[0]).innerHTML;
+				var pageType = nodeChilds[i].getAttribute('pagetype');
+				parentId = nodeChilds[i].parentNode.parentNode.parentNode.id;
+				var templateFile = nodeChilds[i].getAttribute('templatefile');		
+
+				treeStructure.push(nodeId);		
+				treeStructure.push(parentId);			
+				treeStructure.push(nodeName);
+				treeStructure.push(pageType);
+				treeStructure.push(templateFile);				
+				
+				parentId = nodeChilds[i].getAttribute('id');
+console.log(' count = '+i +' ParentName = '+(nodeChilds[i].getElementsByTagName('A')[0]).innerHTML +' nodeId = '+nodeChilds[i].id +' parentId = '+nodeChilds[i].parentNode.parentNode.parentNode.id);
+//				childs.push(JSTreeObj.getStructure(nodeChilds[i], parentId));
+			}			
+/*			
+			for (var i = 0; i < count; i++){
+				parentId = nodeChilds[i].getAttribute('id');
+console.log(' count = '+count +' ParentName = '+(source.getElementsByTagName('A')[0]).innerHTML +' nodeId = '+parentId +' parentId = '+nodeId);
+				childs.push(JSTreeObj.getStructure(nodeChilds[i], parentId));
+			}
+*/ 
+//			return childs;
+			return treeStructure;
+		}
+		,
+		getNewId : function(id){}
+		,
+/*		
+		getNewId : function(id){
+//			JSTreeObj.receved = true;
+			JSTreeObj.setReceved(true);
+//			alert('test');			
+console.log('getNewId = '+ id);			
+//console.log('document.getElementById(temporary) '+document.getElementById('temporary'));
+			var newParent = document.getElementById('temporary');			
+			newParent.setAttribute('id',id);
+			var nodeChilds = newParent.getElementsByTagName('li');
+			var currentNode;
+			for (var i = 0; i < nodeChilds.length; i++){
+				currentNode = nodeChilds[i];
+				currentNode.setAttribute('id','temporary');
+				
+				var parentId = newParent.getAttribute('id');
+				var nodeName = (currentNode.getElementsByTagName('A')[0]).innerHTML;
+				var pageType = currentNode.getAttribute('pagetype');
+				var templateFile = currentNode.getAttribute('templatefile');
+				
+console.log('parent = '+parentId+' name = '+nodeName);
+//				JSTreeObj.receved = false;
+				JSTreeObj.setReceved(false);
+				ThemesEngine.beforeCreatePage(parentId, pageType, templateFile, nodeName, JSTreeObj.getNewId);
+			}
+		}
+		,				
+*/
+		getNodeChilds : function(nodeParent, newParentId){
+//console.log('newParentId '+newParentId);			
+			var childs = nodeParent.getElementsByTagName('li');
+			var nodeChilds = nodeParent.childNodes;
+			for(var i = 0; i < childs.length; i++){
+				if (nodeChilds[i].parentNode == nodeParent){
+//					console.log('Child '+ childs[i].id);
+console.log('creating node newParent = '+newParentId+ ' pagetype = '+childs[i].getAttribute('pagetype') +
+					' templatefile = '+childs[i].getAttribute('templatefile'));
+					JSTreeObj.saveNewPage(newParentId, childs[i].getAttribute('pagetype'), childs[i].getAttribute('templatefile'), 
+							(childs[i].getElementsByTagName('A')[0]).innerHTML);
+console.log('just saved parent = '+newParentId+ ' name '+(childs[i].getElementsByTagName('A')[0]).innerHTML );
+					JSTreeObj.getNodeChilds(nodeChilds[i], JSTreeObj.newPageId);
+				}
+			}
+		}
+		,
+		setReceved : function(rec){
+		JSTreeObj.receved = rec;	
+console.log('JSTreeObj.receved = '+JSTreeObj.receved);		
+		}
+		,
+		getReceved : function(){
+console.log('JSTreeObj.receved = '+JSTreeObj.receved);			
+			return JSTreeObj.receved;
+		}
+	}
 	
 	function withEnter(e) {
 		if (window.event) {
@@ -1028,8 +1299,8 @@
 			var changeNameId = editObj.id.replace(/[^0-9]/g,'');
 			var newName = editObj.value;
 				
-			BuilderService.changeNodeName(changeNameId, newName, empty);
-
+//			BuilderService.changeNodeName(changeNameId, newName, empty);
+			BuilderService.changePageName(changeNameId, newName, empty);
 //			ajax.requestFile = fileName + '?updateNode='+editObj.id.replace(/[^0-9]/g,'') + '&newValue='+editObj.value;	// Specifying which file to get
 //			ajax.onCompletion = showUpdate;	// Specify function that will be executed after file has been found
 //			ajax.runAJAX();		// Execute AJAX function

@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,9 @@ import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.core.builder.business.BuilderService;
+import com.idega.core.builder.business.BuilderServiceFactory;
+import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.data.ICTreeNode;
 import com.idega.idegaweb.IWMainApplicationSettings;
@@ -252,8 +256,32 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) {
+//	public synchronized int beforeCreatePage(List struct, String pageType, String templateFile, String name){
+	public synchronized ArrayList beforeCreatePage(List struct){
+		ArrayList<String> newIds = new ArrayList<String>();
 		int id = -1;
+		String prevId = null;
+//		String currId = null;
+		for(int i = 0; i< struct.size(); i=i+5){
+			prevId = (String)struct.get(i);			
+			
+			id = createPage((String)struct.get(i+1), (String)struct.get(i+2), "P", null, null, (String)struct.get(i+3),
+			-1, "IBXML", null);		
+						
+			for(int j = i; j< struct.size(); j=j+5){
+//				currId = (String)struct.get(j+1);
+				if(((String)struct.get(j+1)).equals(prevId)){
+					struct.set(j+1, (""+id));
+				}
+			}
+			newIds.add(""+id);
+		}
+		
+		return newIds;
+	}
+	
+	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) {
+		int id = -1;	
 		try {
 			id = helper.getThemesService().createIBPage(parentId, name, type, templateId, pageUri, subType, domainId, format, sourceMarkup);
 		} catch (RemoteException e) {

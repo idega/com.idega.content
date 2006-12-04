@@ -105,6 +105,7 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 			WFTreeNode newNode = new WFTreeNode(new IWTreeNode(current.getAttributeValue("name")));
 			newNode.setIconURI(current.getAttributeValue("iconfile"));
 			newNode.setPageType(current.getAttributeValue("type"));
+			newNode.setTemplateURI(current.getAttributeValue("templatefile"));
 			if(!current.getChildren().isEmpty()){
 				newNode = getPage(current, newNode);
 			}

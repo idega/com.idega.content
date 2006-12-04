@@ -1,5 +1,5 @@
 /*
- * $Id: PageCreationManagedBean.java,v 1.9 2006/11/28 18:37:21 laddi Exp $
+ * $Id: PageCreationManagedBean.java,v 1.10 2006/12/04 09:38:16 justinas Exp $
  * Created on 2.5.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -37,6 +37,7 @@ import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.Page;
 import com.idega.webface.WFTreeNode;
 
 //import com.idega.builder.business;
@@ -44,10 +45,10 @@ import com.idega.webface.WFTreeNode;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/28 18:37:21 $ by $Author: laddi $
+ *  Last modified: $Date: 2006/12/04 09:38:16 $ by $Author: justinas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class PageCreationManagedBean implements ActionListener {
 
@@ -111,7 +112,7 @@ public class PageCreationManagedBean implements ActionListener {
 		}
 		int currentUserId = -1;
 		Collection coll = null;
-		coll = BuilderServiceFactory.getBuilderService(iwc).getTopLevelPages(iwc);
+		coll = bservice.getTopLevelPages(iwc);
 //		coll = DomainTree.getDomainTree(iwc).getPagesNode().getChildren();//getStartPages(domain);
 		Iterator it = coll.iterator();
 		//int id = domain.getStartPageID();
@@ -120,7 +121,17 @@ public class PageCreationManagedBean implements ActionListener {
 		while (it.hasNext()) {
 			ICTreeNode startPage;
 			try {
-				startPage = (ICTreeNode)it.next();			
+//				bservice.startPage.getId();
+				
+				startPage = (ICTreeNode)it.next();
+				
+				String startPageId = startPage.getId();
+				ICPage page = bservice.getICPage(startPageId);
+				page.getSubType();
+//				page.getSubType();
+				
+//				Page page = bservice.getCurrentPage(arg0).get
+				
 //				if(!startPage.getId().equals(Integer.toString(id))){
 //					if(node == null){
 //						node = (WFTreeNode)(bservice.getPageTree(bservice.getRootPageId(), currentUserId));
@@ -138,6 +149,7 @@ public class PageCreationManagedBean implements ActionListener {
 //					node.
 //					System.out.println("before node.getChildCount()"+node.getChildCount());
 //					Collection col = bservice.getPageTree(Integer.parseInt(startPage.getId()), currentUserId);
+					
 					node.addChild(bservice.getPageTree(Integer.parseInt(startPage.getId()), currentUserId));
 										
 			} catch (Exception e) {

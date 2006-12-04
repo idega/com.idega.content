@@ -47,7 +47,7 @@ import java.util.HashMap;
  * @author Sean Schofield
  * @author Chris Barlow
  * @author Hans Bergsten (Some code taken from an example in his O'Reilly JavaServer Faces book. Copied with permission)
- * @version $Revision: 1.3 $ $Date: 2006/11/28 18:37:21 $
+ * @version $Revision: 1.4 $ $Date: 2006/12/04 09:38:33 $
  */
 public class HtmlTreeRenderer extends Renderer
 {
@@ -76,7 +76,7 @@ public class HtmlTreeRenderer extends Renderer
         return true;
     }
 
-    private void restoreStateFromCookies(FacesContext context, UIComponent component) {
+    private void restoreStateFromCookies(FacesContext context, UIComponent component) { 
         String nodeId = null;
         HtmlTree tree = (HtmlTree)component;
         TreeState state = tree.getDataModel().getTreeState();

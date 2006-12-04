@@ -4,11 +4,22 @@ function saveMyTree(newParentNodeId, sourceNodeId) {
 	saveString = treeObj.getNodeOrders();
 	BuilderService.movePage(newParentNodeId, sourceNodeId, empty);
 }
+
+
+function getNewId(id){
+	return id;
+}
+
+function deletePage(pageId){
+	ThemesEngine.deletePage(pageId, true);
+}
+
 function empty(param) {
 }
 
 function testingIds(url) {
-	document.getElementById('treePages').src=url;
+//	document.getElementById('treePages').src=url;
+	document.getElementById('page_tree_div').src=url;
 }
 						
 function getPrewUrl(nodeID){
@@ -21,5 +32,6 @@ function getId(){
 }
 
 function changeName() {
-	document.getElementById('treePages').id=url;
+//	document.getElementById('treePages').id=url;
+	document.getElementById('page_tree_div').id=url;
 }
