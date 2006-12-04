@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <page-templates>
-	<page name="Page" type="Page" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/text.png"></page>
-	<page name="Blog" type="Blog" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/text.png"></page>
-	<page name="eShop" type="eShop" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/text.png"></page>					
-	<page name="flashIntro" type="flashIntro" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/text.png"></page>
-	<page name="forum" type="forum" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/text.png"></page>
-	<page name="guestbook" type="guestbook" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/text.png"></page>				
-	<page name="imageGallery" type="imageGallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/imagegallery.png"></page>
-	<page name="login" type="login" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/text.png"></page>				
+	<page name="Page" type="page" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>
+	<page name="Blog" type="blog" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>
+	<page name="eShop" type="eshop" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>					
+	<page name="flashIntro" type="flashintro" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>
+	<page name="forum" type="forum" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>
+	<page name="guestbook" type="guestbook" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>				
+	<page name="imageGallery" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>
+	<page name="login" type="login" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>				
 </page-templates>
