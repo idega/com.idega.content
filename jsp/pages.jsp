@@ -34,7 +34,7 @@ version="1.2">
 								<a href="#" onclick="treeObj.expandAll()">Expand all</a>
 							</jsf:verbatim>
 			
-							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
+							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 								<jsf:facet name="PageTreeNode">
 									<h:outputLink onclick="setPageID(this.parentNode.id);getPrewUrl(this.parentNode.id);return false;">
 										<h:outputText value="#{node.description}" />
@@ -67,25 +67,43 @@ version="1.2">
 						<c:PageInfo id="customizePage" styleClass="pageInfoStyle"></c:PageInfo>
 					</x:div>
 					
-						<x:div styleClass="leftButtonStyle">
-							<x:commandButton id="newPageButton" forceId="true" type="button" onclick="newPage()" value="#{localizedStrings['com.idega.content']['create_page']}"></x:commandButton>
-						</x:div>
-						<x:div styleClass="rightButtonStyle">
-							<x:commandButton id="saveButton" forceId="true" type="button" onclick="savePageInfo()" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
-							<x:commandButton id="showThemesButton" forceId="true" type="button" onclick="manageSlider(this.id)" value="#{localizedStrings['com.idega.content']['hide_themes']}"></x:commandButton>
-						</x:div>
+					<x:div styleClass="leftButtonStyle">
+						<x:commandButton id="newPageButton" forceId="true" type="button" onclick="newPage()" value="#{localizedStrings['com.idega.content']['create_page']}"></x:commandButton>
+					</x:div>
+					<x:div styleClass="rightButtonStyle">
+						<x:commandButton id="saveButton" forceId="true" type="button" onclick="savePageInfo()" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
+						<x:commandButton id="showThemesButton" forceId="true" type="button" onclick="manageSlider(this.id)" value="#{localizedStrings['com.idega.content']['hide_themes']}"></x:commandButton>
+					</x:div>
+					
+					<x:div id="newPageContainer" forceId="true" styleClass="newPageContainerStyle" style="display: none; left: 8px;">
+						<wf:iwtree value="#{siteTemplateBean.pageTree}" id="new_page_tree" var="node" varNodeToggler="t" clientSideToggle="true"	sourceTree="true"	showRootNode="false">
+							<jsf:facet name="IWTreeNode">						
+								<h:panelGroup>
+									<h:outputLink>
+										<h:outputText value="#{node.description}" />									
+									</h:outputLink>
+								</h:panelGroup>
+							</jsf:facet>
+						</wf:iwtree>
+					</x:div>
 					
 					<jsf:verbatim>
 						<script type="text/javascript">	
 							treeObj = new JSDragDropTree();
-							treeObj.setTreeId('page_tree_div');
+							treeObj.setTreeId('current_structure_tree');
 							treeObj.setMaximumDepth(7);
 							treeObj.setMessageMaximumDepthReached('Maximum depth reached'); // If you want to show a message when maximum depth is reached, i.e. on drop.
 							treeObj.initTree();
 							treeObj.getNodeOrders();
 							treeObj.expandAll();
+							
+							treeObj22 = new JSDragDropTree();
+							treeObj22.setTreeId('new_page_tree');
+							treeObj22.initTree(); 
+							treeObj22.expandAll();
 						</script>
 					</jsf:verbatim>
+					
                 </wf:wfblock>
                 <jsf:verbatim>
                 	<script type="text/javascript">showSlider(document.getElementById("themesSliderContainer"));resizeFrame();getGlobalPageId();</script>

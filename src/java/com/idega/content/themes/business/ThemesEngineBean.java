@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -17,9 +16,6 @@ import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
-import com.idega.core.builder.business.BuilderService;
-import com.idega.core.builder.business.BuilderServiceFactory;
-import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.data.ICTreeNode;
 import com.idega.idegaweb.IWMainApplicationSettings;
@@ -256,25 +252,23 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-//	public synchronized int beforeCreatePage(List struct, String pageType, String templateFile, String name){
-	public synchronized ArrayList beforeCreatePage(List struct){
-		ArrayList<String> newIds = new ArrayList<String>();
+	public List <String> beforeCreatePage(List <String> struct){
+		List <String> newIds = new ArrayList<String>();
 		int id = -1;
 		String prevId = null;
 //		String currId = null;
-		for(int i = 0; i< struct.size(); i=i+5){
-			prevId = (String)struct.get(i);			
+		for(int i = 0; i < struct.size(); i = i+5){
+			prevId = struct.get(i);			
 			
-			id = createPage((String)struct.get(i+1), (String)struct.get(i+2), "P", null, null, (String)struct.get(i+3),
-			-1, "IBXML", null);		
+			id = createPage(struct.get(i+1), struct.get(i+2), "P", null, null, struct.get(i+3),	-1, "IBXML", null);		
 						
-			for(int j = i; j< struct.size(); j=j+5){
+			for(int j = i; j < struct.size(); j = j+5){
 //				currId = (String)struct.get(j+1);
-				if(((String)struct.get(j+1)).equals(prevId)){
-					struct.set(j+1, (""+id));
+				if((struct.get(j+1)).equals(prevId)){
+					struct.set(j+1, (String.valueOf(id)));
 				}
 			}
-			newIds.add(""+id);
+			newIds.add(String.valueOf(id));
 		}
 		
 		return newIds;

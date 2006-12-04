@@ -89,7 +89,7 @@ public class ThemesPropertiesExtractor {
 		}
 		
 		// Getting theme name, which will be used to search for configuration file
-		String searchName = theme.getName();
+		String searchName = helper.removeSpaces(theme.getName());
 		String skeletonName = null;
 		if (theme.getLinkToSkeleton().indexOf(ThemesConstants.THEME) != -1) {
 			skeletonName = helper.decode(helper.getFileNameWithExtension(theme.getLinkToSkeleton()), true);

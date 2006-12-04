@@ -988,7 +988,7 @@ public class ThemeChanger {
 		if (!decodedLinkToBase.endsWith(ThemesConstants.SLASH)) {
 			decodedLinkToBase += ThemesConstants.SLASH;
 		}
-		String themeName = newName + ThemesConstants.THEME;
+		String themeName = helper.removeSpaces(newName + ThemesConstants.THEME);
 		try {
 			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(decodedLinkToBase,	themeName, is, null, true)) {
 				return false;

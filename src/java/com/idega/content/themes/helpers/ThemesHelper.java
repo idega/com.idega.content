@@ -719,7 +719,7 @@ public class ThemesHelper implements Singleton {
 		
 		root.setContent(rootElements);
 		doc.setRootElement(root);
-		return getThemeChanger().uploadDocument(doc, theme.getLinkToBaseAsItIs(), theme.getName() + ThemesConstants.IDEGA_THEME_INFO, theme, false);
+		return getThemeChanger().uploadDocument(doc, theme.getLinkToBaseAsItIs(), removeSpaces(theme.getName()) + ThemesConstants.IDEGA_THEME_INFO, theme, false);
 	}
 	
 	public String[] getPageValues(Setting s, String value) {

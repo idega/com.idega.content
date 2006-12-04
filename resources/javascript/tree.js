@@ -17,14 +17,15 @@ function deletePage(pageId){
 function empty(param) {
 }
 
-function testingIds(url) {
-//	document.getElementById('treePages').src=url;
-	document.getElementById('page_tree_div').src=url;
+function setFrameUrl(url) {
+	var frame = document.getElementById('treePages');
+	if (frame != null) {
+		frame.src=url;
+	}
 }
 						
 function getPrewUrl(nodeID){
-	var lists = document.getElementsByTagName("LI");
-	PagePreview.getPreviewUrl(nodeID, testingIds);
+	PagePreview.getPreviewUrl(nodeID, setFrameUrl);
 }
 						
 function getId(){

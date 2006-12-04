@@ -5,6 +5,8 @@ var SCROLLER_IMAGE_WIDTH = 23;
 var SPACE_FROM_LEFT = 290;
 var FRAME_CHANGE = 155;
 
+var CLICKED_CREATE = false;
+
 var KEYWORDS = null;
 
 function setThemeForStyle(ID) {
@@ -282,7 +284,26 @@ function getTotalHeight() {
   return height;
 }
 
+function setButtonText(id, text) {
+	var button = document.getElementById(id);
+	if (button != null) {
+		button.value = text;
+	}
+}
+
 function newPage() {
+	var newPage = document.getElementById("newPageContainer");
+	if (CLICKED_CREATE) {
+		CLICKED_CREATE = false;
+		if (newPage != null) {
+			newPage.style.display = "none";
+		}
+		setButtonText("newPageButton", "Create Page");
+		return;
+	}
+	CLICKED_CREATE = true;
+	setButtonText("newPageButton", "Close");
+	new Effect.Appear(newPage);
 }
 
 function changeFrameHeight(change) {

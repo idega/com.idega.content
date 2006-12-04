@@ -2,9 +2,8 @@ package com.idega.content.themes.business;
 
 
 import com.idega.business.IBOService;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
+import java.rmi.RemoteException;
 
 public interface ThemesEngine extends IBOService {
 	/**
@@ -65,7 +64,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#beforeCreatePage
 	 */
-	public ArrayList<String> beforeCreatePage(List struct) throws RemoteException;
+	public List<String> beforeCreatePage(List<String> struct) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#createPage
@@ -80,10 +79,10 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getPageId
 	 */
-	public String getPageId();
+	public String getPageId() throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#setPageId
 	 */
-	public boolean setPageId(String id);
+	public boolean setPageId(String id) throws RemoteException;
 }
