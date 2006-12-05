@@ -1,5 +1,5 @@
 /*
- * $Id: HTMLAreaDocumentLinkCreator.java,v 1.3 2006/05/31 23:31:24 eiki Exp $
+ * $Id: HTMLAreaDocumentLinkCreator.java,v 1.3.2.1 2006/12/05 15:31:11 gimmi Exp $
  * Created on 1.3.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -21,12 +21,16 @@ public class HTMLAreaDocumentLinkCreator implements HTMLAreaLinkType {
 		return bundle.getValueBinding("link_type_document");
 	}
 	
-	public UIComponent getLinkCreation() {
+	public UIComponent getLinkCreation(Object param) {
 		ContentViewer list = new ContentViewer();
 		list.setShowPermissionTab(false);
 		list.setShowUploadComponent(true);
-		list.setRootPath("/files");
-		list.setOnFileClickEvent("SelectDocument()");
+		if (param != null) {
+			list.setRootPath(param.toString());
+		} else {
+			list.setRootPath("/files");
+		}
+		list.setOnFileClickEvent("SelectDocument(this);return false;");
 		list.setColumnsToHide(WebDAVListManagedBean.COLUMN_DELETE+","+WebDAVListManagedBean.COLUMN_CHECKOUT+","+WebDAVListManagedBean.COLUMN_LOCK);
 		return list;
 	}
@@ -45,6 +49,10 @@ public class HTMLAreaDocumentLinkCreator implements HTMLAreaLinkType {
 
 	public String getLinkType() {
 		return "document";
+	}
+
+	public UIComponent getLinkCreation() {
+		return getLinkCreation(null);
 	}
 
 }
