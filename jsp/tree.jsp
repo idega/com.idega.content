@@ -30,6 +30,7 @@
 								<a href="#" onclick="treeObj.collapseAll()">Collapse all </a>
 								<a href="#" onclick="treeObj.expandAll()">Expand all</a>
 							</f:verbatim>
+							<h:graphicImage id="trash" value="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash2.png" onmouseover="treeObj.prepareToDelete();" onmouseout="treeObj.prepareToDelete();"/>
 			
 							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 								<f:facet name="PageTreeNode">
