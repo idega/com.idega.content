@@ -80,10 +80,10 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 	private Collection columnsToHide = null;
 	private boolean useVersionControl = true;
 	private String onFileClickEventName = null;
-	private String onFileClickEventParameter = null;
 	private int startPage = -1;
 	private int rows = -1;
 	private String sorter = SORT_BY_NAME;
+	private boolean useStartPathIfAvailable = true;
 
 	public WebDAVListManagedBean() {
 		List hideColumns = new ArrayList();
@@ -244,6 +244,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 					if (child instanceof UIParameter) {
 						par = (UIParameter) child;
 						if (PARAMETER_WEB_DAV_URL.equals(par.getName()) ) {
+							useStartPathIfAvailable = false;
 							this.webDAVPath = (String) par.getValue();
 						} else if (PARAMETER_IS_FOLDER.equals(par.getName())) {
 							isFolder = ((Boolean) par.getValue()).booleanValue();
@@ -344,8 +345,9 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			
 			if (this.onFileClickEventName != null) {
 				// Temporary hardcoding (this.href) to the onclick
-				String onClick = this.onFileClickEventName+"(this);return false;";
-				nameLink.setOnclick(onClick);
+//				String onClick = this.onFileClickEventName+"(this);return false;";
+//				nameLink.setOnclick(onClick);
+				nameLink.setOnclick(onFileClickEventName);
 			}
 
 			nameLink.setValueBinding("value", WFUtil.createValueBinding("#{"+ var + ".encodedURL}"));
@@ -592,15 +594,32 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			if (this.startPath != null && this.startPath.equals("/")) {
 				this.startPath = "";
 			}
+			if (startPath != null && startPath.endsWith("/")) {
+				startPath = startPath.substring(0, startPath.length()-1);
+			}
+			if (startPath != null && startPath.startsWith(ss.getIWSlideService().getWebdavServerURI())) {
+				startPath = startPath.replaceFirst(ss.getIWSlideService().getWebdavServerURI(), "");
+			}
+
+			
 			if (this.rootPath != null && this.rootPath.equals("/")) {
 				this.rootPath = "";
 			}
-			
-			
-			if (this.startPath != null && this.webDAVPath.indexOf(this.startPath) == -1) {
-				this.webDAVPath = this.startPath;
-				this.startPath = null;
-			} else if(this.webDAVPath == null){
+//			System.out.println("====================================");
+//			System.out.println("UseStart   : "+useStartPathIfAvailable);
+//			System.out.println("startPath  : "+startPath);
+//			System.out.println("webDAVPath : "+webDAVPath);
+			if (startPath != null && useStartPathIfAvailable) {
+				webDAVPath = startPath;
+//				System.out.println("NEW webDAVPath : "+webDAVPath);
+			}
+//			// useStartPathIfAvailable
+//			if (this.startPath != null && this.webDAVPath.indexOf(this.startPath) == -1) {
+//				System.out.println("Setting webDAV to startpage");
+//				this.webDAVPath = this.startPath;
+//				this.startPath = null;
+//			} else 
+			if(this.webDAVPath == null){
 				this.webDAVPath = "";
 			}
 			
@@ -748,17 +767,18 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 	}
 
 	public void setOnFileClickEvent(String event) {
-		if (event != null && !"".equals(event.trim())) {
-			int index1 = event.indexOf("(");
-			int index2 = event.indexOf(")");
-			if (index1 > -1 && index2 > -1) {
-				this.onFileClickEventName = event.substring(0, index1);
-				this.onFileClickEventParameter = event.substring(index1+1, index2);
-				if (this.onFileClickEventParameter.trim().equals("")) {
-					this.onFileClickEventParameter = null;
-				}
-			}
-		}
+		onFileClickEventName = event;
+//		if (event != null && !"".equals(event.trim())) {
+//			int index1 = event.indexOf("(");
+//			int index2 = event.indexOf(")");
+//			if (index1 > -1 && index2 > -1) {
+//				this.onFileClickEventName = event.substring(0, index1);
+//				this.onFileClickEventParameter = event.substring(index1+1, index2);
+//				if (this.onFileClickEventParameter.trim().equals("")) {
+//					this.onFileClickEventParameter = null;
+//				}
+//			}
+//		}
 	}
 	
 	
