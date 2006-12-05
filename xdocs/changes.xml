@@ -5,6 +5,13 @@
   </properties>
   <body>
   
+    <release version="3.1.16" date="2006-12-05">
+      <action dev="gimmi" type="update">
+      	Image and link window in Xinha updated
+      	Updated webface[3.1.2]
+      </action>
+    </release>
+
     <release version="3.1.15" date="2006-11-10">
       <action dev="gimmi" type="update">
       	Fixes to uploader and deleter link as submitter
