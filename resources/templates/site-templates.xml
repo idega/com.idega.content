@@ -2,15 +2,15 @@
 <site-templates>
 	<site name="Current structure" site-category="Business">
 		<structure>
-			<page name="homeFromXML" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/">
-				<page name="test1xml" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/">
-					<page name="test1.1xml" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>
-					<page name="test1.2xml" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>
-					<page name="test1.3xml" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>					
+			<page name="homeFromXML" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="">
+				<page name="test1xml" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="">
+					<page name="test1.1xml" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile=""></page>
+					<page name="test1.2xml" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile=""></page>
+					<page name="test1.3xml" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile=""></page>					
 				</page>
-				<page name="test2xml" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/">
-					<page name="test2.1xml" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>
-					<page name="test2.2xml" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>				
+				<page name="test2xml" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="">
+					<page name="test2.1xml" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile=""></page>
+					<page name="test2.2xml" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile=""></page>				
 				</page>
 			</page>
 		</structure>		
@@ -20,8 +20,8 @@
 	</site>
 	<site name="Software company" site-category="Business">
 		<structure>
-			<page name="Home" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/">
-				<page name="company pr photos" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>
+			<page name="Home" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="">
+				<page name="company pr photos" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile=""></page>
 			</page>
 		</structure>		
 		<variables>
@@ -31,9 +31,9 @@
 	
 	<site name="New Page" site-category="IdegaWebstructure">
 		<structure>
-			<page name="Text" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>
-			<page name="Image Gallery" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>
-			<page name="Blog" type="articlelist" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="/idegaweb/bundles/com.idega.content.bundle/resources/templates/"></page>			
+			<page name="Text" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+			<page name="Image Gallery" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile=""></page>
+			<page name="Blog" type="articlelist" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>			
 		</structure>		
 		<variables>
 			<variable name="site_title" value="my business site"/>

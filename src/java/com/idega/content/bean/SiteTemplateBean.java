@@ -4,14 +4,9 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.apache.myfaces.custom.tree2.TreeNode;
 import com.idega.content.themes.helpers.ThemesHelper;
-import com.idega.core.data.ICTreeNode;
 import com.idega.core.data.IWTreeNode;
-import com.idega.core.data.ICTreeNodeAddable;
-import com.idega.presentation.PageTag;
 import com.idega.webface.WFTreeNode;
-import com.idega.webface.WFUtil;
 import java.util.Iterator;
-import javax.faces.component.html.HtmlOutputText;
 
 public class SiteTemplateBean {
 // TO DO change IWTreeNode to PageTreeNode

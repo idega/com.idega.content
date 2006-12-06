@@ -128,12 +128,16 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			theme.setIBPageID(id);
 		}
 		
-		ICPage page = getICPage(theme.getIBPageID());
+		return updatePageWebDav(theme.getIBPageID(), ThemesConstants.CONTENT + theme.getLinkToSkeleton());
+	}
+	
+	public boolean updatePageWebDav(int id, String uri) {
+		ICPage page = getICPage(id);
 		if (page == null) {
 			return false;
 		}
 		
-		page.setWebDavUri(ThemesConstants.CONTENT + theme.getLinkToSkeleton()); // Updating template
+		page.setWebDavUri(uri);
 		page.store();
 		builder.clearAllCachedPages();
 		return true;
@@ -144,8 +148,19 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		if (iwc == null) {
 			return -1;
 		}
+		
 		getBuilderService();
+		
 		Map tree = builder.getTree(iwc);
+		if (tree == null) {
+			return -1;
+		}
+		
+		if (builder.getPageKey().equals(type)) {
+			if (templateId == null) {
+				templateId = ThemesHelper.getInstance().getLastUsedTheme();
+			}
+		}
 		return builder.createNewPage(parentId, name, type, templateId, pageUri, tree, iwc, subType, domainId, format, sourceMarkup);
 	}
 	

@@ -16,6 +16,7 @@ version="1.2">
 						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
         				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous-js-1.6.2/lib/prototype.js,
         				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous-js-1.6.2/src/scriptaculous.js,
+        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/PageInfoHelper.js,
 						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/reflection.js,

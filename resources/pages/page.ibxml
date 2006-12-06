@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+  <page type="page">
+  	<region id="content" label="content">
+    	<module id="uuid_40580a4a-8377-11db-b05c-f9d22ee6ddc5" class="com.idega.block.article.component.ArticleItemViewer">
+    	</module>
+    </region>
+  </page>
+</xml>

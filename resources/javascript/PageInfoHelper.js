@@ -1,4 +1,3 @@
-var PAGE_ID = null;
 var THEME_ID = null;
 
 var SCROLLER_IMAGE_WIDTH = 23;
@@ -17,10 +16,6 @@ function getThemeForStyle() {
 	return THEME_ID;
 }
 
-function getPageID() {
-	return PAGE_ID;
-}
-
 function getScrollerImageWidth() {
 	return SCROLLER_IMAGE_WIDTH;
 }
@@ -36,7 +31,7 @@ function savePageInfo() {
 }
 
 function getPageInfoElementsCallback(allKeywords) {
-	if (PAGE_ID == null || allKeywords == null) {
+	if (getPageID() == null || allKeywords == null) {
 		closeLoadingMessage();
 		return;
 	}
@@ -53,7 +48,7 @@ function getPageInfoElementsCallback(allKeywords) {
 			}
 		}
 	}
-	ThemesEngine.savePageInfo(PAGE_ID, keywords, values, savePageInfoCallback);
+	ThemesEngine.savePageInfo(getPageID(), keywords, values, savePageInfoCallback);
 }
 
 function savePageInfoCallback(result) {
@@ -99,14 +94,6 @@ function getGlobalPageId() {
 function setGlobalPageId(ID) {
 	setPageID(ID);
 	getPrewUrl(ID);
-}
-
-function nothingToDo(parameter) {
-}
-
-function setPageID(ID) {
-	PAGE_ID = ID;
-	ThemesEngine.setPageId(ID, nothingToDo);
 }
 
 function chooseStyle(themeID) {

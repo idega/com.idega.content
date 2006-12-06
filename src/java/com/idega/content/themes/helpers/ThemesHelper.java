@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpURL;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.logging.Log;
@@ -31,12 +32,14 @@ import org.jdom.input.SAXBuilder;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentSearch;
+import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.business.ThemesEngine;
 import com.idega.content.themes.business.ThemesService;
 import com.idega.core.search.business.SearchResult;
 import com.idega.graphics.Generator;
 import com.idega.graphics.ImageGenerator;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
 import com.idega.repository.data.Singleton;
 import com.idega.slide.business.IWSlideService;
@@ -69,13 +72,13 @@ public class ThemesHelper implements Singleton {
 	private String webRoot;
 	private String lastVisitedPage;
 	
-	private ThemesHelper(boolean searchForThemes) {
+	private ThemesHelper(boolean canUseSlide) {
 		themes = new HashMap <String, Theme> ();
 		themeSettings = new HashMap <String, Setting> ();
 		pageSettings = new HashMap <String, Setting> ();
 		themeQueue = new ArrayList <String> ();
 		urisToThemes = new ArrayList <String> ();
-		if (searchForThemes) {
+		if (canUseSlide) {
 			searchForThemes();
 		}
 	}
@@ -817,6 +820,114 @@ public class ThemesHelper implements Singleton {
 
 	public void setLastVisitedPage(String lastVisitedPage) {
 		this.lastVisitedPage = lastVisitedPage;
+	}
+	
+	public String getLastUsedTheme() {
+		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
+		String lastUsedTheme = settings.getProperty(ThemesConstants.LAST_USED_THEME);
+		if (lastUsedTheme != null) {
+			return lastUsedTheme;
+		}
+		List <Theme> themes = new ArrayList<Theme>(getThemesCollection());
+		if (themes == null) {
+			return null;
+		}
+		Theme theme = null;
+		boolean foundDefaultValue = false;
+		for (int i = 0; (i < themes.size() && !foundDefaultValue); i++) {
+			theme = themes.get(i);
+			if (theme.getIBPageID() != -1) {
+				foundDefaultValue = true;
+				lastUsedTheme = String.valueOf(theme.getIBPageID());
+			}
+		}
+		return lastUsedTheme;
+	}
+	
+	public void setLastUsedTheme(int id) {
+		if (id == -1) {
+			return;
+		}
+		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
+		try {
+			settings.setProperty(ThemesConstants.LAST_USED_THEME, String.valueOf(id));
+		} catch (NumberFormatException e) {
+			log.error(e);
+		}
+	}
+	
+	public String loadPageToSlide(String fileName) {
+		if (fileName == null) {
+			return null;
+		}
+		String fullUrl = changeUploadFileName(ThemesConstants.PAGES_PATH_SLIDE + fileName);
+		String base = extractValueFromString(fullUrl, 0, fullUrl.lastIndexOf(ThemesConstants.SLASH));
+		if (!base.endsWith(ThemesConstants.SLASH)) {
+			base += ThemesConstants.SLASH;
+		}
+		String changedFileName = extractValueFromString(fullUrl, fullUrl.lastIndexOf(ThemesConstants.SLASH) + 1, fullUrl.length());
+		String mimeType = "text/xml";
+		InputStream stream = getInputStream(getWebRootWithoutContent() + ThemesConstants.PAGES_PATH_APPL + fileName);
+		if (stream == null) {
+			return null;
+		}
+		try {
+			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, changedFileName, stream, mimeType, true);
+		} catch (RemoteException e) {
+			log.error(e);
+		} finally {
+			closeInputStream(stream);
+		}
+		
+		return ThemesConstants.CONTENT + base + changedFileName;
+	}
+	
+	private boolean existInSlide(String path) {
+		try {
+			return getSlideService().getExistence(path);
+		} catch (HttpException e) {
+			log.error(e);
+		} catch (RemoteException e) {
+			log.error(e);
+		} catch (IOException e) {
+			log.error(e);
+		}
+		return false;
+	}
+	
+	public String changeUploadFileName(String fileName) {
+		if (fileName == null) {
+			return null;
+		}
+		fileName = removeSpaces(fileName);
+		String fileRoot = fileName;
+		String fileType = ThemesConstants.EMPTY;
+		if (fileName.indexOf(ThemesConstants.DOT) != -1) {
+			fileRoot = extractValueFromString(fileName, 0, fileName.lastIndexOf(ThemesConstants.DOT));
+			fileType = getFileExtension(fileName);
+		}
+		int i = 1;
+		String path = fileRoot + ThemesConstants.DOT + fileType;
+		while (existInSlide(path)) {
+			path = fileRoot + i + ThemesConstants.DOT + fileType;
+			i++;
+		}
+		return path;
+	}
+	
+	public String changeFileUploadPath(String path) {
+		if (path == null) {
+			return null;
+		}
+		path = removeSpaces(path);
+		int i = 1;
+		String tempPath = path;
+		while (existInSlide(tempPath)) {
+			tempPath = path + i;
+			i++;
+		}
+		path = tempPath;
+		return path;
 	}
 
 }

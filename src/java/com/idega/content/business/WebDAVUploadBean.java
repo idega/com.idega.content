@@ -3,7 +3,6 @@ package com.idega.content.business;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.util.zip.ZipInputStream;
 
 import javax.faces.component.UIComponent;
@@ -297,7 +296,7 @@ public class WebDAVUploadBean implements Serializable{
 		String resultInfo = null;
 		boolean result;
 		
-		changeFileUploadPath(service);
+		uploadFilePath = ThemesHelper.getInstance(false).changeFileUploadPath(getUploadFilePath() + uploadFile.getName().substring(0, uploadFile.getName().lastIndexOf(".")));
 		String path = getUploadFilePath();
 		if (uploadingTheme) {
 			ThemesHelper.getInstance(false).addThemeToQueue(path);
@@ -318,28 +317,6 @@ public class WebDAVUploadBean implements Serializable{
 		
 		log.info(resultInfo);
 		return result;
-	}
-	
-	private void changeFileUploadPath(IWSlideService service) {
-		String changedPath = getUploadFilePath() + uploadFile.getName().substring(0, uploadFile.getName().lastIndexOf("."));
-		try {
-			if (service.getExistence(changedPath)) {
-				int i = 1;
-				String tempPath = changedPath + i;
-				while (service.getExistence(tempPath)) {
-					i++;
-					tempPath = changedPath + i;
-				}
-				changedPath = tempPath;
-			}
-		} catch (RemoteException e) {
-			log.error(e);
-		} catch (HttpException e) {
-			log.error(e);
-		} catch (IOException e) {
-			log.error(e);
-		}
-		uploadFilePath = ThemesHelper.getInstance(false).removeSpaces(changedPath);
 	}
 
 }

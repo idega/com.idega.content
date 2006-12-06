@@ -6,6 +6,9 @@ import java.util.List;
 
 public class ThemesConstants {
 	
+	private static final String BASE_ROOT_APPL = "/idegaweb/bundles/com.idega.content.bundle/resources";
+	private static final String BASE_ROOT_SLIDE = "/files/cms";
+	
 	protected static final String NAMESPACE = "http://www.w3.org/1999/xhtml";
 	protected static final String NAMESPACE_ID = "xmlns";
 	
@@ -102,6 +105,8 @@ public class ThemesConstants {
 	
 	protected static final String DEFAULT_MIME_TYPE = "image/";
 	
+	protected static final String PAGES_PATH_APPL = BASE_ROOT_APPL + "/pages/";
+	
 	/*Public fields*/
 	public static final String THEMES = "/themes/";
 	
@@ -111,7 +116,8 @@ public class ThemesConstants {
 	public static final String THEMES_PROPERTY_END = ".default";
 	
 	public static final String CONTENT = "/content";
-	public static final String THEMES_PATH = "/files/cms" + THEMES;
+	public static final String THEMES_PATH = BASE_ROOT_SLIDE + THEMES;
+	public static final String PAGES_PATH_SLIDE = BASE_ROOT_SLIDE + "/pages/";
 	public static final String THEMES_PREVIEW_PATH = THEMES_PATH + "preview/";
 	
 	public static final String AT = "@";
@@ -123,7 +129,7 @@ public class ThemesConstants {
 	public static final String COMMA = ",";
 	
 	public static final String THEME_SETTINGS = "/resources/themes/theme.xml";
-	public static final String PAGE_SETTINGS = "/idegaweb/bundles/com.idega.content.bundle/resources/themes/page.xml";
+	public static final String PAGE_SETTINGS = BASE_ROOT_APPL + "/themes/page.xml";
 	
 	public static final String LAST_USED_THEME = "theme.last_used.ibpage_id";
 	

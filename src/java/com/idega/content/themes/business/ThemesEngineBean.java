@@ -115,8 +115,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		boolean result = true;
 		
-		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
-		settings.setProperty(ThemesConstants.LAST_USED_THEME, String.valueOf(theme.getIBPageID()));
+		helper.setLastUsedTheme(theme.getIBPageID());
 		
 		if (applyToPage) { // Apply style to selected page
 			result = setPageStyle(pageID, theme.getIBPageID(), iwc);
@@ -256,26 +255,55 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		List <String> newIds = new ArrayList<String>();
 		int id = -1;
 		String prevId = null;
-//		String currId = null;
-		for(int i = 0; i < struct.size(); i = i+5){
+		String pageType = helper.getThemesService().getBuilderService().getPageKey();
+		String format = helper.getThemesService().getBuilderService().getIBXMLFormat();
+		boolean canCreate;
+		String realID = null;
+		String webDAVUri = null;
+		for (int i = 0; i < struct.size(); i = i+5) {
+			canCreate = true;
 			prevId = struct.get(i);			
-			
-			id = createPage(struct.get(i+1), struct.get(i+2), "P", null, null, struct.get(i+3),	-1, "IBXML", null);		
-						
-			for(int j = i; j < struct.size(); j = j+5){
-//				currId = (String)struct.get(j+1);
-				if((struct.get(j+1)).equals(prevId)){
-					struct.set(j+1, (String.valueOf(id)));
-				}
+			try {
+				webDAVUri = struct.get(i+4);
+				id = createPage(struct.get(i+1), struct.get(i+2), pageType, null, null, struct.get(i+3), -1, format, null);
+				realID = String.valueOf(id);
+			} catch (IndexOutOfBoundsException e) {
+				log.error(e);
+				canCreate = false;
 			}
-			newIds.add(String.valueOf(id));
+			if (canCreate) {
+				if (webDAVUri != null) {
+					if (!webDAVUri.equals(ThemesConstants.EMPTY)) {
+						String uriToPage = helper.loadPageToSlide(webDAVUri);
+						if (uriToPage != null) {
+							helper.getThemesService().updatePageWebDav(id, uriToPage);
+						}
+						String lastTheme = helper.getLastUsedTheme();
+						if (lastTheme != null) {
+							helper.getThemesService().getBuilderService().setTemplateId(realID, lastTheme);
+						}
+					}
+				}
+				
+				for (int j = i; j < struct.size(); j = j+5) {
+					if((struct.get(j+1)).equals(prevId)) {
+						struct.set(j+1, realID);
+					}
+				}
+				newIds.add(realID);
+			}
 		}
-		
+
 		return newIds;
 	}
 	
 	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) {
-		int id = -1;	
+		int id = -1;
+		if (pageUri != null) {
+			if (pageUri.equals(ThemesConstants.EMPTY)) {
+				pageUri = null;
+			}
+		}
 		try {
 			id = helper.getThemesService().createIBPage(parentId, name, type, templateId, pageUri, subType, domainId, format, sourceMarkup);
 		} catch (RemoteException e) {

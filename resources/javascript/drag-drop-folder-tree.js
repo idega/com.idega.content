@@ -1119,6 +1119,7 @@ console.log('nodeId = '+JSTreeObj.dragNode_source.id +'parentId = '+newParentNod
 			struct[4] = 'nodeName6';
 			struct[5] = 'nodeName7';
 */
+			showLoadingMessage("Creating...");
 			ThemesEngine.beforeCreatePage(treeStructure, JSTreeObj.getNewId);
 //			ThemesEngine.beforeCreatePage(newParentNodeId, pagetype, templatefile, pageName, JSTreeObj.getNewId);		
 		}	
@@ -1137,7 +1138,7 @@ console.log('nodeId = '+JSTreeObj.dragNode_source.id +'parentId = '+newParentNod
 			var pageType = source.getAttribute('pagetype');
 //			parentId = source.parentNode.parentNode.parentNode.id;
 			var templateFile = source.getAttribute('templatefile');
-									
+							console.log(templateFile);		
 			treeStructure.push(nodeId);		
 			treeStructure.push(parentId);			
 			treeStructure.push(nodeName);
@@ -1181,7 +1182,15 @@ console.log(' count = '+count +' ParentName = '+(source.getElementsByTagName('A'
 			return treeStructure;
 		}
 		,
-		getNewId : function(id){}
+		getNewId : function(id){
+			closeLoadingMessage();
+			if (id == null) {
+				return;
+			}
+			var lastID = id[id.length - 1];
+			setPageID(lastID);
+			getPrewUrl(lastID);
+		}
 		,
 /*		
 		getNewId : function(id){
