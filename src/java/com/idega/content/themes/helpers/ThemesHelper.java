@@ -882,8 +882,10 @@ public class ThemesHelper implements Singleton {
 					e = (Element) o;
 					if (e.getName().equals(ATTRIBUTE_NAME)) {
 						a = e.getAttribute(ATTRIBUTE_PROPERTY);
-						a.setValue(RESOURCE_PATH_START + uri + RESOURCE_PATH_END);
-						changedValue = true;
+						if (a != null) {
+							a.setValue(RESOURCE_PATH_START + uri + RESOURCE_PATH_END);
+							changedValue = true;
+						}
 					}
 				}
 			}

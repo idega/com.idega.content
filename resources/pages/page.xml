@@ -2,8 +2,88 @@
 <xml>
   <page type="page">
   	<region id="content" label="content">
+  		<module id="uuid_ae2b67fa-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
+      		<property>
+        		<name>:method:1:implied:void:setApplicationPropertyKey:java.lang.String:</name>
+        		<value>content</value>
+        		<type>java.lang.String</type>
+      		</property>
+    	</module>
     	<module id="uuid_40580a4a-8377-11db-b05c-f9d22ee6ddc5" class="com.idega.block.article.component.ArticleItemViewer">
     		<property name="resourcePath" value="" />
+    	</module>
+    </region>
+    <region id="sidebar" label="sidebar">
+    	<module id="uuid_c3e3dc8b-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
+      		<property>
+        		<name>:method:1:implied:void:setApplicationPropertyKey:java.lang.String:</name>
+        		<value>sidebar</value>
+        		<type>java.lang.String</type>
+      		</property>
+    	</module>
+    	<module id="uuid_3ca228d2-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.block.navigation.presentation.NavigationList" />
+    </region>
+    <region id="breadcrumb" label="breadcrumb">
+    	<module id="uuid_9d2c0ea9-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
+      		<property>
+        		<name>:method:1:implied:void:setApplicationPropertyKey:java.lang.String:</name>
+        		<value>breadcrumb</value>
+        		<type>java.lang.String</type>
+      		</property>
+    	</module>
+    </region>
+    <region id="footer" label="footer">
+    	<module id="uuid_43113173-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
+      		<property>
+        		<name>:method:1:implied:void:setApplicationPropertyKey:java.lang.String:</name>
+        		<value>footer</value>
+        		<type>java.lang.String</type>
+      		</property>
+    	</module>
+    </region>
+    <region id="sidebar_title" label="sidebar_title">
+    	<module id="uuid_d801dafc-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
+      		<property>
+        		<name>:method:1:implied:void:setApplicationPropertyKey:java.lang.String:</name>
+        		<value>sidebar_title</value>
+        		<type>java.lang.String</type>
+      		</property>
+    	</module>
+    </region>
+    <region id="site_slogan" label="site_slogan">
+    	<module id="uuid_f7bbf4cd-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
+      		<property>
+        		<name>:method:1:implied:void:setApplicationPropertyKey:java.lang.String:</name>
+        		<value>site_slogan</value>
+        		<type>java.lang.String</type>
+      		</property>
+    	</module>
+    </region>
+    <region id="site_title" label="site_title">
+    	<module id="uuid_0e3e701e-85fb-11db-bbf1-8f8904f6eb89" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
+      		<property>
+        		<name>:method:1:implied:void:setApplicationPropertyKey:java.lang.String:</name>
+        		<value>site_title</value>
+        		<type>java.lang.String</type>
+      		</property>
+    	</module>
+    </region>
+    <region id="title" label="title">
+    	<module id="uuid_2678114f-85fb-11db-bbf1-8f8904f6eb89" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
+      		<property>
+        		<name>:method:1:implied:void:setApplicationPropertyKey:java.lang.String:</name>
+        		<value>title</value>
+        		<type>java.lang.String</type>
+      		</property>
+    	</module>
+    </region>
+    <region id="toolbar" label="toolbar">
+    	<module id="uuid_3f211620-85fb-11db-bbf1-8f8904f6eb89" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
+      		<property>
+        		<name>:method:1:implied:void:setApplicationPropertyKey:java.lang.String:</name>
+        		<value>toolbar</value>
+        		<type>java.lang.String</type>
+      		</property>
     	</module>
     </region>
   </page>
