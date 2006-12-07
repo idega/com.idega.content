@@ -24,6 +24,7 @@ import org.apache.commons.httpclient.HttpURL;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -35,6 +36,7 @@ import com.idega.content.business.ContentSearch;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.business.ThemesEngine;
 import com.idega.content.themes.business.ThemesService;
+import com.idega.core.builder.data.ICPage;
 import com.idega.core.search.business.SearchResult;
 import com.idega.graphics.Generator;
 import com.idega.graphics.ImageGenerator;
@@ -61,6 +63,7 @@ public class ThemesHelper implements Singleton {
 	private Map <String, Theme> themes = null;
 	private Map <String, Setting> themeSettings = null;
 	private Map <String, Setting> pageSettings = null;
+	private Map <String, Document> pages = null;
 	private List <String> themeQueue = null;
 	private List <String> urisToThemes = null;
 	
@@ -72,10 +75,17 @@ public class ThemesHelper implements Singleton {
 	private String webRoot;
 	private String lastVisitedPage;
 	
+	private static final String RESOURCE_PATH_START = "/files/cms/article";
+	private static final String RESOURCE_PATH_END = ".article";
+	private static final String PAGE_TYPE = "page";
+	private static final String ATTRIBUTE_NAME = "property";
+	private static final String ATTRIBUTE_PROPERTY = "value";
+	
 	private ThemesHelper(boolean canUseSlide) {
 		themes = new HashMap <String, Theme> ();
 		themeSettings = new HashMap <String, Setting> ();
 		pageSettings = new HashMap <String, Setting> ();
+		pages = new HashMap <String, Document> ();
 		themeQueue = new ArrayList <String> ();
 		urisToThemes = new ArrayList <String> ();
 		if (canUseSlide) {
@@ -856,10 +866,61 @@ public class ThemesHelper implements Singleton {
 		}
 	}
 	
-	public String loadPageToSlide(String fileName) {
-		if (fileName == null) {
+	private Document preparePageDocument(Document doc, String type, String uri) {
+		if (PAGE_TYPE.equals(type)) {
+			if (uri.endsWith(ThemesConstants.SLASH)) {
+				uri = extractValueFromString(uri, 0, uri.lastIndexOf(ThemesConstants.SLASH));
+			}
+			Iterator it = doc.getDescendants();
+			Object o = null;
+			Element e = null;
+			Attribute a = null;
+			boolean changedValue = false;
+			while (it.hasNext() && !changedValue) {
+				o = it.next();
+				if (o instanceof Element) {
+					e = (Element) o;
+					if (e.getName().equals(ATTRIBUTE_NAME)) {
+						a = e.getAttribute(ATTRIBUTE_PROPERTY);
+						a.setValue(RESOURCE_PATH_START + uri + RESOURCE_PATH_END);
+						changedValue = true;
+					}
+				}
+			}
+		}
+		return doc;
+	}
+	
+	private String getPageDocument(String type, String uri, String fileName) {
+		Document doc = pages.get(type);
+		if (doc != null) {
+			doc = preparePageDocument(doc, type, uri);
+			return getThemeChanger().getXMLOutputter().outputString(doc);
+		}
+		doc = getXMLDocument(getWebRootWithoutContent() + ThemesConstants.PAGES_PATH_APPL + fileName);
+		if (doc == null) {
 			return null;
 		}
+		pages.put(type, doc);
+		doc = preparePageDocument(doc, type, uri);
+		return getThemeChanger().getXMLOutputter().outputString(doc);
+	}
+	
+	public String loadPageToSlide(String type, int pageID, String fileName) {
+		if (type == null || fileName == null) {
+			return null;
+		}
+		
+		ICPage page = getThemesService().getICPage(pageID);
+		if (page == null) {
+			return null;
+		}
+		
+		String docContent = getPageDocument(type, page.getDefaultPageURI(), fileName);
+		if (docContent == null) {
+			return null;
+		}
+		
 		String fullUrl = changeUploadFileName(ThemesConstants.PAGES_PATH_SLIDE + fileName);
 		String base = extractValueFromString(fullUrl, 0, fullUrl.lastIndexOf(ThemesConstants.SLASH));
 		if (!base.endsWith(ThemesConstants.SLASH)) {
@@ -867,16 +928,11 @@ public class ThemesHelper implements Singleton {
 		}
 		String changedFileName = extractValueFromString(fullUrl, fullUrl.lastIndexOf(ThemesConstants.SLASH) + 1, fullUrl.length());
 		String mimeType = "text/xml";
-		InputStream stream = getInputStream(getWebRootWithoutContent() + ThemesConstants.PAGES_PATH_APPL + fileName);
-		if (stream == null) {
-			return null;
-		}
+
 		try {
-			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, changedFileName, stream, mimeType, true);
+			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, changedFileName, docContent, mimeType, true);
 		} catch (RemoteException e) {
 			log.error(e);
-		} finally {
-			closeInputStream(stream);
 		}
 		
 		return ThemesConstants.CONTENT + base + changedFileName;

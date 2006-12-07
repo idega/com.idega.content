@@ -133,11 +133,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (page == null) {
 			return false;
 		}
-		//if (page.isPage()) {
+		if (page.isPage()) {
 			helper.getThemesService().getBuilderService().setTemplateId(pageID, String.valueOf(templateID));
 			page.setTemplateId(templateID);
 			page.store();
-		//}
+		}
 		return true;
 	}
 	
@@ -260,12 +260,14 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		boolean canCreate;
 		String realID = null;
 		String webDAVUri = null;
+		String subType = null;
 		for (int i = 0; i < struct.size(); i = i+5) {
 			canCreate = true;
 			prevId = struct.get(i);			
 			try {
+				subType = struct.get(i+3);
 				webDAVUri = struct.get(i+4);
-				id = createPage(struct.get(i+1), struct.get(i+2), pageType, null, null, struct.get(i+3), -1, format, null);
+				id = createPage(struct.get(i+1), struct.get(i+2), pageType, null, null, subType, -1, format, null);
 				realID = String.valueOf(id);
 			} catch (IndexOutOfBoundsException e) {
 				log.error(e);
@@ -274,7 +276,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			if (canCreate) {
 				if (webDAVUri != null) {
 					if (!webDAVUri.equals(ThemesConstants.EMPTY)) {
-						String uriToPage = helper.loadPageToSlide(webDAVUri);
+						String uriToPage = helper.loadPageToSlide(subType, id, webDAVUri);
 						if (uriToPage != null) {
 							helper.getThemesService().updatePageWebDav(id, uriToPage);
 						}

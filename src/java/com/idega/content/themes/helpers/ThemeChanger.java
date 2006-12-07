@@ -1081,5 +1081,9 @@ public class ThemeChanger {
 			}
 		}
 	}
+	
+	protected XMLOutputter getXMLOutputter() {
+		return out;
+	}
 
 }
