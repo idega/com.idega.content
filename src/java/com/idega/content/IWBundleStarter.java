@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.9 2006/11/20 17:40:41 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.10 2006/12/07 15:31:33 gediminas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -9,16 +9,13 @@
  */
 package com.idega.content;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.rmi.RemoteException;
-import java.util.Iterator;
 import java.util.Map;
 
-import org.chiba.xml.xslt.impl.ResourceResolver;
-
-import com.idega.block.form.business.BundleResourceResolver;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentIWActionURIHandler;
@@ -29,10 +26,10 @@ import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.content.view.ContentViewManager;
 import com.idega.core.uri.IWActionURIManager;
+import com.idega.idegaweb.DefaultIWBundle;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWBundleStartable;
-import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.include.GlobalIncludeManager;
 import com.idega.slide.business.IWSlideService;
@@ -40,10 +37,10 @@ import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/20 17:40:41 $ by $Author: valdas $
+ *  Last modified: $Date: 2006/12/07 15:31:33 $ by $Author: gediminas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class IWBundleStarter implements IWBundleStartable {
 	
@@ -78,7 +75,7 @@ public class IWBundleStarter implements IWBundleStartable {
 	    	e.printStackTrace();
 	    }
 
-	    loadThemeValues(starterBundle.getApplication());
+	    loadThemeValues(starterBundle);
 	}
 
 	/* (non-Javadoc)
@@ -98,11 +95,17 @@ public class IWBundleStarter implements IWBundleStartable {
 		
 	}
 	
-	private void loadThemeValues(IWMainApplication application) {
-		ResourceResolver resolver = new BundleResourceResolver(application);
+	private void loadThemeValues(IWBundle bundle) {
 		InputStream stream = null;
 		try {
-			stream = resolver.resolve(URI.create("bundle://" + ContentUtil.IW_BUNDLE_IDENTIFIER + ThemesConstants.THEME_SETTINGS)).getInputStream();
+			String sBundlesDirectory = System.getProperty(DefaultIWBundle.SYSTEM_BUNDLES_RESOURCE_DIR);
+			if (sBundlesDirectory != null) {
+				String filePath = sBundlesDirectory + File.separator + ContentUtil.IW_BUNDLE_IDENTIFIER + File.separator + ThemesConstants.THEME_SETTINGS;
+				stream = new FileInputStream(filePath);
+			}
+			else {
+				stream = bundle.getResourceInputStream(ThemesConstants.THEME_SETTINGS);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
@@ -112,15 +115,11 @@ public class IWBundleStarter implements IWBundleStartable {
 		if (settings == null) {
 			return;
 		}
-		Iterator<Setting> it = settings.values().iterator();
-		Setting setting = null;
-		IWMainApplicationSettings applicationSettings  = application.getSettings();
-		while (it.hasNext()) {
-			setting = it.next();
-			if (applicationSettings.getProperty(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() +
-					ThemesConstants.THEMES_PROPERTY_END) == null) { // Not overriding existing values
-				applicationSettings.setProperty(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() +
-						ThemesConstants.THEMES_PROPERTY_END, setting.getDefaultValue());
+		IWMainApplicationSettings applicationSettings = bundle.getApplication().getSettings();
+		for (Setting setting : settings.values()) {
+			String key = ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.THEMES_PROPERTY_END;
+			if (applicationSettings.getProperty(key) == null) { // Not overriding existing values
+				applicationSettings.setProperty(key, setting.getDefaultValue());
 			}
 		}
 	}

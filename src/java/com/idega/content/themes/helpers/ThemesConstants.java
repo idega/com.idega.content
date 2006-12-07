@@ -128,7 +128,7 @@ public class ThemesConstants {
 	public static final String DOT = ".";
 	public static final String COMMA = ",";
 	
-	public static final String THEME_SETTINGS = "/resources/themes/theme.xml";
+	public static final String THEME_SETTINGS = "resources/themes/theme.xml";
 	public static final String PAGE_SETTINGS = BASE_ROOT_APPL + "/themes/page.xml";
 	
 	public static final String LAST_USED_THEME = "theme.last_used.ibpage_id";
