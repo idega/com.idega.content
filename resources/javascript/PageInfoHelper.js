@@ -63,6 +63,12 @@ function getPageInfoElementsCallback(allKeywords) {
 }
 
 function savePageInfoCallback(result) {
+	if (result != null) {
+		var pageUri = document.getElementById("pageUri");
+		if (pageUri != null) {
+			pageUri.value = result;
+		}
+	}
 	closeLoadingMessage();
 	getPrewUrl(getPageID());
 }

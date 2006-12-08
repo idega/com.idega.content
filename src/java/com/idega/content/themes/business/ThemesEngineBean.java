@@ -163,12 +163,12 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return result;
 	}
 	
-	public boolean changePageUri(String pageID, String pageTitle) {
+	public String changePageUri(String pageID, String pageTitle) {
 		if (pageID == null || pageTitle == null) {
-			return false;
+			return null;
 		}
 		if (MINUS_ONE.equals(pageID)) {
-			return false;
+			return null;
 		}
 		
 		ICPage page = helper.getThemesService().getICPage(Integer.valueOf(pageID).intValue());
@@ -178,27 +178,31 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			parentId = parentNode.getId();
 		}
 		
-		return helper.getThemesService().getBuilderService().changePageUriByTitle(parentId, page, pageTitle, -1);
+		if (helper.getThemesService().getBuilderService().changePageUriByTitle(parentId, page, pageTitle, -1)) {
+			return page.getDefaultPageURI();
+		}
+		return null;
 	}
 	
 	/**
 	 * 
 	 */
-	public boolean savePageInfo(String pageID, String[] keywords, String[] values) {
+	public String savePageInfo(String pageID, String[] keywords, String[] values) {
 		if (pageID == null || keywords == null || values == null) {
-			return false;
+			return null;
 		}
 		if (keywords.length != values.length) {
-			return false;
+			return null;
 		}
 		IWContext iwc = IWContext.getInstance();
 		if (iwc == null) {
-			return false;
+			return null;
 		}
 		IWMainApplication appl = iwc.getIWMainApplication();
 		if (appl == null) {
-			return false;
+			return null;
 		}
+		String changedPageUri = null;
 		Setting s = null;
 		Map <String, Setting> map = helper.getPageSettings();
 		String[] currentValues = null;
@@ -213,19 +217,19 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				}
 				else {
 					if (s.getCode().equals(PAGE_URI)) {
-						changePageUri(pageID, values[i]);
+						changedPageUri = changePageUri(pageID, values[i]);
 					}
 					else {
 						helper.getThemesService().getBuilderService().setProperty(pageID, MINUS_ONE, s.getMethod(), helper.getPageValues(s, values[i]), appl);
 						if (s.getCode().equals(PAGE_TITLE)) {
-							changePageUri(pageID, values[i]);
+							changedPageUri = changePageUri(pageID, values[i]);
 							helper.getThemesService().getBuilderService().changePageName(Integer.valueOf(pageID).intValue(), values[i]);
 						}
 					}
 				}
 			}
 		}
-		return true;
+		return changedPageUri;
 	}
 	
 	public String[] getPageInfoValues(String pageID, String[] keywords) {

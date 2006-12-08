@@ -34,12 +34,12 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#changePageUri
 	 */
-	public boolean changePageUri(String pageID, String pageTitle) throws RemoteException;
+	public String changePageUri(String pageID, String pageTitle) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#savePageInfo
 	 */
-	public boolean savePageInfo(String pageID, String[] keywords, String[] values) throws RemoteException;
+	public String savePageInfo(String pageID, String[] keywords, String[] values) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getPageInfoValues

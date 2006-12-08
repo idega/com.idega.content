@@ -464,12 +464,6 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	border: 1px solid #D7D7D7;
 }
 
-.leftButtonStyle {
-	position: absolute;
-	left: 5px;
-	bottom: 0px;
-}
-
 .rightButtonStyle {
 	position: absolute;
 	right: 0px;
@@ -504,5 +498,14 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	width: 200px;
 	z-index: 5;
 	background-color: #f6f6f6;
+	border: 1px solid #D7D7D7;
+}
+
+.pageInfoButtonsContainer {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	width: 100%;
+	background-color: #E1E1E1;
 	border: 1px solid #D7D7D7;
 }
