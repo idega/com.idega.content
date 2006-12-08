@@ -37,7 +37,7 @@ version="1.2">
 			
 							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 								<jsf:facet name="PageTreeNode">
-									<h:outputLink onclick="setPageID(this.parentNode.id);getPrewUrl(this.parentNode.id);return false;">
+									<h:outputLink onclick="setPageID(this.parentNode.id);getPrewUrl(this.parentNode.id);getPageInfoValues();return false;">
 										<h:outputText value="#{node.description}" />
 									</h:outputLink>
 								</jsf:facet>
@@ -108,6 +108,9 @@ version="1.2">
                 </wf:wfblock>
                 <jsf:verbatim>
                 	<script type="text/javascript">showSlider(document.getElementById("themesSliderContainer"));resizeFrame();getGlobalPageId();</script>
+                </jsf:verbatim>
+                <jsf:verbatim>
+                	<script type="text/javascript">getPageInfoValues();</script>
                 </jsf:verbatim>
 			</h:form>
 		</ws:page>

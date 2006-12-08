@@ -32,9 +32,19 @@ public interface ThemesEngine extends IBOService {
 	public boolean setSelectedStyle(String themeID, String pageID, boolean applyToPage) throws RemoteException;
 
 	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#changePageUri
+	 */
+	public boolean changePageUri(String pageID, String pageTitle) throws RemoteException;
+
+	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#savePageInfo
 	 */
 	public boolean savePageInfo(String pageID, String[] keywords, String[] values) throws RemoteException;
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#getPageInfoValues
+	 */
+	public String[] getPageInfoValues(String pageID, String[] keywords) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getPageInfoElements

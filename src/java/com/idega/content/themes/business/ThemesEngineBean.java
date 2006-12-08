@@ -18,6 +18,7 @@ import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.data.ICTreeNode;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
 
@@ -25,6 +26,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 
 	private static final long serialVersionUID = 5875353284352953688L;
 	private static final Log log = LogFactory.getLog(ThemesEngineBean.class);
+	
+	private static final String PAGE_URI = "pageUri";
+	private static final String PAGE_TITLE = "pageTitle";
+	private static final String MINUS_ONE = "-1";
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 
@@ -158,6 +163,24 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return result;
 	}
 	
+	public boolean changePageUri(String pageID, String pageTitle) {
+		if (pageID == null || pageTitle == null) {
+			return false;
+		}
+		if (MINUS_ONE.equals(pageID)) {
+			return false;
+		}
+		
+		ICPage page = helper.getThemesService().getICPage(Integer.valueOf(pageID).intValue());
+		ICTreeNode parentNode = page.getParentNode();
+		String parentId = null;
+		if (parentNode != null) {
+			parentId = parentNode.getId();
+		}
+		
+		return helper.getThemesService().getBuilderService().changePageUriByTitle(parentId, page, pageTitle, -1);
+	}
+	
 	/**
 	 * 
 	 */
@@ -168,16 +191,90 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (keywords.length != values.length) {
 			return false;
 		}
-		String instanceID = "-1";
+		IWContext iwc = IWContext.getInstance();
+		if (iwc == null) {
+			return false;
+		}
+		IWMainApplication appl = iwc.getIWMainApplication();
+		if (appl == null) {
+			return false;
+		}
 		Setting s = null;
 		Map <String, Setting> map = helper.getPageSettings();
+		String[] currentValues = null;
 		for (int i = 0; i < keywords.length; i++) {
 			s = map.get(keywords[i]);
 			if (s != null) {
-				helper.getThemesService().getBuilderService().setProperty(pageID, instanceID, s.getMethod(), helper.getPageValues(s, values[i]), IWContext.getInstance().getIWMainApplication());
+				if (ThemesConstants.EMPTY.equals(values[i]) || values[i] == null) {
+					currentValues = helper.getThemesService().getBuilderService().getPropertyValues(appl, pageID, MINUS_ONE, s.getMethod(), null, true);
+					if (currentValues != null) {
+						helper.getThemesService().getBuilderService().removeProperty(appl, pageID, MINUS_ONE, s.getMethod(), currentValues);
+					}
+				}
+				else {
+					if (s.getCode().equals(PAGE_URI)) {
+						changePageUri(pageID, values[i]);
+					}
+					else {
+						helper.getThemesService().getBuilderService().setProperty(pageID, MINUS_ONE, s.getMethod(), helper.getPageValues(s, values[i]), appl);
+						if (s.getCode().equals(PAGE_TITLE)) {
+							changePageUri(pageID, values[i]);
+							helper.getThemesService().getBuilderService().changePageName(Integer.valueOf(pageID).intValue(), values[i]);
+						}
+					}
+				}
 			}
 		}
 		return true;
+	}
+	
+	public String[] getPageInfoValues(String pageID, String[] keywords) {
+		if (pageID == null || keywords == null) {
+			return null;
+		}
+		if (MINUS_ONE.equals(pageID)) {
+			return null;
+		}
+		IWContext iwc = IWContext.getInstance();
+		if (iwc == null) {
+			return null;
+		}
+		IWMainApplication appl = iwc.getIWMainApplication();
+		if (appl == null) {
+			return null;
+		}
+		Setting s = null;
+		Map <String, Setting> map = helper.getPageSettings();
+		String[] values = new String[keywords.length];
+		String[] propValues = null;
+		StringBuffer value = null;
+		for (int i = 0; i < keywords.length; i++) {
+			s = map.get(keywords[i]);
+			value = new StringBuffer();
+			if (s != null) {
+				propValues = helper.getThemesService().getBuilderService().getPropertyValues(appl, pageID, MINUS_ONE, s.getMethod(), null, true);
+				if (propValues != null) {
+					for (int j = 0; j < propValues.length; j++) {
+						if (!s.getDefaultValue().equals(propValues[j])) {
+							value.append(propValues[j]);
+							if (j + 1 < propValues.length) {
+								value.append(ThemesConstants.COMMA);
+							}
+						}
+					}
+				}
+				else {
+					if (s.getCode().equals(PAGE_URI)) {
+						ICPage page = helper.getThemesService().getICPage(Integer.valueOf(pageID).intValue());
+						if (page != null) {
+							value.append(page.getDefaultPageURI());
+						}
+					}
+				}
+			}
+			values[i] = value.toString();
+		}
+		return values;
 	}
 	
 	/**

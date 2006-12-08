@@ -35,16 +35,27 @@ function getPageInfoElementsCallback(allKeywords) {
 		closeLoadingMessage();
 		return;
 	}
+	KEYWORDS = allKeywords;
 	var keywords = new Array();
 	var values = new Array();
 	var element = null;
+	var treeNode = null;
 	for (var i = 0; i < allKeywords.length; i++) {
 		element = document.getElementById(allKeywords[i]);
 		if (element != null) {
-			if (element.value != "") {
-				keywords.push(allKeywords[i]);
-				values.push(element.value);
-				element.value = "";
+			keywords.push(allKeywords[i]);
+			values.push(element.value);
+			if (allKeywords[i] == "pageTitle" && element.value != "") {
+				treeNode = document.getElementById(getPageID()+ "a");
+				if (treeNode != null) {
+					var children = treeNode.childNodes;
+					if (children != null) {
+						for (var j = 0; j < children.length; j++) {
+							treeNode.removeChild(children[j]);
+						}
+					}
+					treeNode.appendChild(document.createTextNode(element.value));
+				}
 			}
 		}
 	}
@@ -53,6 +64,7 @@ function getPageInfoElementsCallback(allKeywords) {
 
 function savePageInfoCallback(result) {
 	closeLoadingMessage();
+	getPrewUrl(getPageID());
 }
 
 function showSlider(container) {
@@ -326,5 +338,39 @@ function resizeFrame() {
 	var availableHeight = getTotalHeight() - 331;
 	if (availableHeight > 0) {
 		frame.style.height = availableHeight + "px";
+	}
+}
+
+function getPageInfoValues() {
+	if (KEYWORDS == null) {
+		ThemesEngine.getPageInfoElements(getAvailableElements);
+	}
+	else {
+		getAvailableElements(KEYWORDS);
+	}
+}
+
+
+function getAvailableElements(allKeywords) {
+	if (allKeywords == null) {
+		return;
+	}
+	KEYWORDS = allKeywords;
+	ThemesEngine.getPageInfoValues(getPageID(), allKeywords, showPageInfoValues);
+}
+
+function showPageInfoValues(values) {
+	if (values == null || KEYWORDS == null) {
+		return;
+	}
+	if (KEYWORDS.length != values.length) {
+		return;
+	}
+	var element = null;
+	for (var i = 0; i < KEYWORDS.length; i++) {
+		element = document.getElementById(KEYWORDS[i]);
+		if (element != null) {
+			element.value = values[i];
+		}
 	}
 }

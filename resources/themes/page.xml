@@ -26,14 +26,21 @@
 		<code>javascript</code>
 		<label>JavaScript Source</label>
 		<defaultValue></defaultValue>
-		<type>text</type>
+		<type>multipleText</type>
 		<method>:method:1:implied:void:addScriptSource:java.lang.String:</method>
 	</key>
 	<key>
 		<code>stylesheet</code>
 		<label>Stylesheet URL</label>
 		<defaultValue></defaultValue>
-		<type>text</type>
+		<type>multipleText</type>
 		<method>:method:1:implied:void:addStyleSheetURL:java.lang.String:</method>
+	</key>
+	<key>
+		<code>pageUri</code>
+		<label>Page URI</label>
+		<defaultValue></defaultValue>
+		<type></type>
+		<method></method>
 	</key>
 </config>
