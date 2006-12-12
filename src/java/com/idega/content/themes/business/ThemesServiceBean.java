@@ -49,6 +49,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 					}
 				}
 				if (foundTheme && !theme.isLocked()) {
+					ThemesHelper.getInstance(false).removeLastUsedTheme(String.valueOf(theme.getIBPageID()));
 					deleteIBPage(theme);
 					String themeID = theme.getId();
 					ThemesHelper.getInstance(false).removeTheme(uri, themeID);

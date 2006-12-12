@@ -188,24 +188,34 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public void searchForThemes() {
-		if (!checkedFromSlide) {
-			checkedFromSlide = true;
-			ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
-			Collection results = search.doSimpleDASLSearch(ThemesConstants.THEME_SEARCH_KEY, ThemesConstants.CONTENT + ThemesConstants.THEMES_PATH);
-			if (results == null) {
-				return;
-			}
-			Iterator it = results.iterator();
-			List <String> urisToThemes = new ArrayList<String>();
-			String uri = null;
-			while (it.hasNext()) {
-				uri = ((SearchResult) it.next()).getSearchResultURI();
+		if (checkedFromSlide) {
+			log.info("Search allready proceeded earlier");
+			return;
+		}
+		checkedFromSlide = true;
+		log.info("Starting search for themes ("+ThemesConstants.THEME_SEARCH_KEY+") in: " + ThemesConstants.CONTENT + ThemesConstants.THEMES_PATH);
+		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
+		Collection results = search.doSimpleDASLSearch(ThemesConstants.THEME_SEARCH_KEY, ThemesConstants.CONTENT + ThemesConstants.THEMES_PATH);
+		if (results == null) {
+			log.info("ContentSearch.doSimpleDASLSearch returned results Collection, which is null: " + results);
+			return;
+		}
+		Iterator it = results.iterator();
+		List <String> urisToThemes = new ArrayList<String>();
+		String uri = null;
+		Object o = null;
+		while (it.hasNext()) {
+			o = it.next();
+			if (o instanceof SearchResult) {
+				uri = ((SearchResult) o).getSearchResultURI();
 				if (isCorrectFile(uri)) {
+					log.info("ContentSearch.doSimpleDASLSearch result: " + uri);
 					urisToThemes.add(uri);
 				}
 			}
-			checkedFromSlide = getThemesLoader().loadThemes(urisToThemes, false, true);
 		}
+		checkedFromSlide = getThemesLoader().loadThemes(urisToThemes, false, true);
+		log.info("Themes search success: " + checkedFromSlide);
 	}
 	
 	protected String getFileName(String uri) {
@@ -1001,6 +1011,20 @@ public class ThemesHelper implements Singleton {
 			return 0;
 		}
 		return number;
+	}
+	
+	public void removeLastUsedTheme(String templateID) {
+		if (templateID == null) {
+			return;
+		}
+		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
+		String lastUsedTheme = settings.getProperty(ThemesConstants.LAST_USED_THEME);
+		if (lastUsedTheme == null) {
+			return;
+		}
+		if (templateID.equals(lastUsedTheme)) {
+			settings.removeProperty(ThemesConstants.LAST_USED_THEME);
+		}
 	}
 
 }
