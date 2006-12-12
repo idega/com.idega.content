@@ -6,8 +6,10 @@ import java.util.List;
 
 public class ThemesConstants {
 	
-	private static final String BASE_ROOT_APPL = "/idegaweb/bundles/com.idega.content.bundle/resources";
-	private static final String BASE_ROOT_SLIDE = "/files/cms";
+	private static final String BASE_ROOT_APPL = ContentUtil.getBundle().getResourcesPath();
+	private static final String BASE_ROOT_SLIDE = ContentUtil.getContentBaseFolderPath();
+	
+	protected static final String BASE_THEME_IMAGES = BASE_ROOT_APPL + "/images/themes/";
 	
 	protected static final String NAMESPACE = "http://www.w3.org/1999/xhtml";
 	protected static final String NAMESPACE_ID = "xmlns";
@@ -16,6 +18,7 @@ public class ThemesConstants {
 	protected static final String PLUS = "+";
 	protected static final String SPACE_ENCODED = "%20";
 	protected static final String ENCODING = "UTF-8";
+	protected static final String SINGLE_QUOTE = "\"";
 	
 	protected static final String THEME_PREVIEW = "_theme_preview";
 	protected static final String THEME_SMALL_PREVIEW = "_small" + THEME_PREVIEW;
@@ -23,6 +26,12 @@ public class ThemesConstants {
 	
 	protected static final String THEME_SEARCH_KEY = "*.htm*";
 	protected static final String IDEGA_THEME_INFO = "_idega_theme.xml";
+	
+	private static final String[] _THEME_IMAGES = new String[] {"eagle.jpg", "grapes.jpg", "rocks.jpg", "ship.jpg", "sky.jpg"};
+	protected static final List <String> THEME_IMAGES = Collections.unmodifiableList(Arrays.asList(_THEME_IMAGES));
+	
+	private static final String[] _IMAGE_POSITIONS = new String[] {"left", "right"};
+	protected static final List <String> IMAGE_POSITIONS = Collections.unmodifiableList(Arrays.asList(_IMAGE_POSITIONS));
 	
 	private static final String[] _FILTER = new String[] {"htm", "html", "xhtml", "ibxml", "jsp"};
 	protected static final List <String> FILTER = Collections.unmodifiableList(Arrays.asList(_FILTER));
@@ -33,9 +42,8 @@ public class ThemesConstants {
 	private static final String[] _USELESS_CONTENT = new String[] {"%pathto(", ")%", "%", " xml:space=\"preserve\""};
 	protected static final List <String> USELESS_CONTENT = Collections.unmodifiableList(Arrays.asList(_USELESS_CONTENT));
 	
-	private static final String[] _REGIONS = new String[] {/*"%title%", "%header%", "%user_styles%", "%user_javascript%",*/
-		"%logo%", "%site_title%", "%site_slogan%", "%content%", "%toolbar%", "%sidebar_title%", "%sidebar%", "%plugin_sidebar%",
-		"%breadcrumb%", "%footer%"};
+	private static final String[] _REGIONS = new String[] {"%logo%", "%site_title%", "%site_slogan%", "%content%", "%toolbar%",
+		"%sidebar_title%", "%sidebar%", "%plugin_sidebar%", "%breadcrumb%", "%footer%"};
 	protected static final List <String> REGIONS = Collections.unmodifiableList(Arrays.asList(_REGIONS));
 	
 	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "sidebarContainer",
