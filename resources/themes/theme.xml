@@ -32,7 +32,7 @@
 	<key>
 		<code>toolbar</code>
 		<label>Toolbar</label>
-		<defaultValue>Start Page</defaultValue>
+		<defaultValue>Current Page</defaultValue>
 		<type>text</type>
 		<method>setToolbar</method>
 	</key>

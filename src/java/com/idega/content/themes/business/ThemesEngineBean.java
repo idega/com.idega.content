@@ -36,7 +36,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	/**
 	 * Returns info about themes in slide
 	 */
-	public String getThemesPreviewsInfo() {
+	public String getThemesPreviewsInfo() {		
 		helper.searchForThemes(); // It is done in ThemesHelper's constructor, but it's possible to pass a paremeter to not search
 		
 		if (!helper.getThemesPropertiesExtractor().proceedFileExtractor()) {

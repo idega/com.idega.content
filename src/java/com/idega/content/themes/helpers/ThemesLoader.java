@@ -1,17 +1,14 @@
 package com.idega.content.themes.helpers;
 
 import java.util.List;
-import java.util.Random;
 
 public class ThemesLoader {
 	
 	private Theme theme = null;
 	private ThemesHelper helper = null;
-	private Random idGenerator = null;
 	
 	public ThemesLoader(ThemesHelper helper) {
 		this.helper = helper;
-		idGenerator = new Random();
 	}
 	
 	public synchronized boolean loadTheme(String originalUri, String encodedUri, boolean newTheme, boolean manuallyCreated) {
@@ -89,9 +86,9 @@ public class ThemesLoader {
 	}
 	
 	private String getThemeId() {
-		String id = String.valueOf(idGenerator.nextInt(Integer.MAX_VALUE));
+		String id = String.valueOf(helper.getRandomNumber(Integer.MAX_VALUE));
 		while (helper.getTheme(id) != null) { // Checking if exists Theme with the same ID
-			id = String.valueOf(idGenerator.nextInt(Integer.MAX_VALUE));
+			id = String.valueOf(helper.getRandomNumber(Integer.MAX_VALUE));
 		}
 		return id;
 	}

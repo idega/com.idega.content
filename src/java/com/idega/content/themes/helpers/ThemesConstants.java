@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.idega.content.business.ContentUtil;
+
 public class ThemesConstants {
 	
 	private static final String BASE_ROOT_APPL = ContentUtil.getBundle().getResourcesPath();

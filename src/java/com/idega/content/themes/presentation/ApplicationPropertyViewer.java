@@ -5,8 +5,11 @@ import java.util.Locale;
 import javax.faces.context.FacesContext;
 
 import com.idega.content.themes.helpers.ThemesConstants;
+import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.core.builder.data.ICPage;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.text.Link;
 import com.idega.presentation.text.ListItem;
 import com.idega.presentation.text.Lists;
 import com.idega.presentation.text.Text;
@@ -22,6 +25,8 @@ import com.idega.presentation.text.Text;
 public class ApplicationPropertyViewer extends Block {
 	
 	private static final String SIDEBAR = "sidebar";
+	private static final String TOOLBAR = "toolbar";
+	private static final String BREADCRUMB = "breadcrumb";
 	private static final String LIST_STYLE = "list-style-type: none; width: 100%";
 
 	private String applicationPropertyKey = null;
@@ -49,7 +54,14 @@ public class ApplicationPropertyViewer extends Block {
 			if (value == null) {
 				return;
 			}
+			
 			if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + SIDEBAR + ThemesConstants.DOT) != -1) { // Sidebar
+				ICPage page = ThemesHelper.getInstance().getThemesService().getICPage(iwc.getCurrentIBPageID());
+				if (page != null) {
+					if (page.getWebDavUri() != null) {
+						return;
+					}
+				}
 				String[] values = value.split(ThemesConstants.COMMA);
 				Lists list = new Lists();
 				list.setStyleAttribute(LIST_STYLE);
@@ -60,11 +72,26 @@ public class ApplicationPropertyViewer extends Block {
 					list.add(item);
 				}
 				this.add(list);
+				return;
 			}
-			else { // Simple text
-				Text text = new Text(value);
-				this.add(text);
+			
+			if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + TOOLBAR + ThemesConstants.DOT) != -1) { // Toolbar
+				Link l = new Link();
+				l.setId("current");
+				l.setText(value);
+				this.add(l);
+				return;
 			}
+			
+			if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + BREADCRUMB + ThemesConstants.DOT) != -1) { // Breadcrumb
+				Link l = new Link();
+				l.setText(value);
+				this.add(l);
+				return;
+			}
+
+			Text text = new Text(value); // Simple text
+			this.add(text);
 		}	
 	}
 	

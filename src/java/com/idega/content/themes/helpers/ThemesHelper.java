@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpURL;
@@ -81,6 +82,8 @@ public class ThemesHelper implements Singleton {
 	private static final String ATTRIBUTE_NAME = "property";
 	private static final String ATTRIBUTE_PROPERTY = "value";
 	
+	private Random numberGenerator = null;
+	
 	private ThemesHelper(boolean canUseSlide) {
 		themes = new HashMap <String, Theme> ();
 		themeSettings = new HashMap <String, Setting> ();
@@ -88,6 +91,7 @@ public class ThemesHelper implements Singleton {
 		pages = new HashMap <String, Document> ();
 		themeQueue = new ArrayList <String> ();
 		urisToThemes = new ArrayList <String> ();
+		numberGenerator = new Random();
 		if (canUseSlide) {
 			searchForThemes();
 		}
@@ -953,7 +957,7 @@ public class ThemesHelper implements Singleton {
 		return false;
 	}
 	
-	public String changeUploadFileName(String fileName) {
+	protected String changeUploadFileName(String fileName) {
 		if (fileName == null) {
 			return null;
 		}
@@ -986,6 +990,17 @@ public class ThemesHelper implements Singleton {
 		}
 		path = tempPath;
 		return path;
+	}
+	
+	protected int getRandomNumber(int maxValue) {
+		int number;
+		try {
+			number = numberGenerator.nextInt(maxValue);
+		} catch (IllegalArgumentException e) {
+			log.error(e);
+			return 0;
+		}
+		return number;
 	}
 
 }

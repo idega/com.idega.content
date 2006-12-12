@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,19 @@ public class ThemeChanger {
 	private static final String BREADCRUMB_REPLACE_BEGIN = "<ul><li><a href=\"index.html\">";
 	private static final String BREADCRUMB_REPLACE_END = "</a></li></ul>";
 	
+	private static final String IMAGE_START = "<img src=";
+	private static final String IMAGE_POSITION = "style=\"margin: 2px; float: ";
+	private static final String IMAGE_END = " />";
+	private static final String CONTENT_PARAGRAPH_TITLE = "<div class=\"blog-entry\"><div class=\"blog-entry-title\">";
+	private static final String CONTENT_PARAGRAPH_DATE = "</div><div class=\"blog-entry-date\">";
+	private static final String CONTENT_PARAGRAPH_LINK = "<span class=\"blog-entry-permalink\"> | <a>Permalink</a></span></div><div class=\"blog-entry-body\">";
+	private static final String CONTENT_PARAGRAPH_START = "<p style=\"font-family: Verdana,Arial,Helvetica,sans-serif\">";
+	private static final String CONTENT_PARAGRAPH_END = "</p></div></div>";
+	private static final String CONTENT_PARAGRAPH = "Article";
+	private static final String[] PARAGRAPHS = new String[] {"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum bibendum, ligula ut feugiat rutrum, mauris libero ultricies nulla, at hendrerit lectus dui bibendum metus. Phasellus quis nulla nec mauris sollicitudin ornare. Vivamus faucibus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Cras vulputate condimentum ipsum. Duis urna eros, commodo id, sagittis sed, sodales eu, ante. Etiam ante. Cras risus dolor, porta nec, adipiscing eu, scelerisque at, metus. Mauris nunc eros, porttitor nec, tincidunt ut, rutrum eget, massa. In facilisis nisi. Sed non lorem malesuada quam egestas bibendum. Quisque bibendum ullamcorper purus. Integer id diam vel elit adipiscing consectetuer. Phasellus vitae eros. Vivamus laoreet consectetuer tortor. In congue dignissim quam. Suspendisse nec purus vel velit ultricies bibendum."};
+	private static final String CONTENT_BEGIN = "<div class=\"contentSpacer\"></div>";
+	private static final String CONTENT_END = "<div class=\"clear\"></div>\n<div class=\"clearer\"></div>";
+	
 	// Default keywords
 	private static final String TOOLBAR = "toolbar";
 	private static final String SIDEBAR = "sidebar";
@@ -49,6 +63,7 @@ public class ThemeChanger {
 	private static final String FOOTER = "footer";
 	private static final String SITE_TITLE = "site_title";
 	private static final String SITE_SLOGAN = "site_slogan";
+	private static final String CONTENT = "content";
 	
 	// These are defaults in RapidWeaver style files, we need to change directories to images
 	private static final String CSS_IMAGE_URL = "url(";
@@ -58,8 +73,9 @@ public class ThemeChanger {
 	private static final String[] CUSTOM_REPLACE = new String[] {CUSTOM_CSS_REPLACE};
 
 	// Incorrect CSS syntax needs to be replaced
-	private static final String[] DEFAULT_REPLACE = new String[] {"href^=", "href$="};
-	private static final String DEFAULT_CSS_REPLACEMENT = "href~=";
+	private static final String[] HREF_REPLACE = new String[] {"href^=", "href$="};
+	private static final String HREF_REPLACEMENT = "href~=";
+	private static final String[] IMAGE_URL_REPLACE = new String[] {"url(images"};
 	
 	private static final String HTML_HEAD = "head";
 	private static final String HTML_BODY = "body";
@@ -78,7 +94,7 @@ public class ThemeChanger {
 	private static final String OPENER = "{";
 	private static final String CLOSER = "}";
 	
-	private static final int THEME_HEIGHT = 450;
+	private static final int THEME_HEIGHT = 200;
 	
 	private static final String REGION_TO_EXPAND = "contentContainer";
 	
@@ -175,11 +191,13 @@ public class ThemeChanger {
 		replacement.append(theme.getLinkToBase());
 		replacement.append(IMAGES);
 		
+		Replaces[] r = new Replaces[]{getReplace(CUSTOM_REPLACE, replacement.toString())};
+		
 		while (it.hasNext()) {
 			member = (ThemeStyleGroupMember) it.next();
 			files = member.getStyleFiles();
 			for (index = 0; index < files.size(); index++) {
-				if (!proceedStyleFile(theme.getLinkToBase() + files.get(index), CUSTOM_REPLACE, replacement.toString())) {
+				if (!proceedStyleFile(theme.getLinkToBase() + files.get(index), r)) {
 					return false;
 				}
 			}
@@ -187,10 +205,23 @@ public class ThemeChanger {
 		return true;
 	}
 	
+	private Replaces getReplace(String[] whatToReplace, String replacement) {
+		if (whatToReplace == null || replacement == null) {
+			return null;
+		}
+		Replaces replace = new Replaces();
+		replace.setReplaces(whatToReplace);
+		replace.setReplacement(replacement);
+		return replace;
+	}
+	
 	private boolean prepareThemeDefaultStyleFiles(Theme theme) {
 		List <String> defaultStyles = ThemesConstants.DEFAULT_STYLE_FILES;
+		StringBuffer replacement = new StringBuffer();
+		replacement.append(CSS_IMAGE_URL).append(ThemesConstants.CONTENT).append(theme.getLinkToBase()).append(IMAGES);
+		Replaces[] r = new Replaces[]{getReplace(HREF_REPLACE, HREF_REPLACEMENT), getReplace(IMAGE_URL_REPLACE, replacement.toString())};	
 		for (int i = 0; i < defaultStyles.size(); i++) {
-			if (!proceedStyleFile(theme.getLinkToBase() + defaultStyles.get(i), DEFAULT_REPLACE, DEFAULT_CSS_REPLACEMENT)) {
+			if (!proceedStyleFile(theme.getLinkToBase() + defaultStyles.get(i), r)) {
 				return false;
 			}
 		}
@@ -227,8 +258,8 @@ public class ThemeChanger {
 		return line;
 	}
 	
-	private boolean proceedStyleFile(String linkToStyle, String[] replaces, String replacement) {
-		if (linkToStyle == null || replaces == null || replacement == null) {
+	private boolean proceedStyleFile(String linkToStyle, Replaces[] replaces) {
+		if (linkToStyle == null || replaces == null) {
 			return false;
 		}
 		
@@ -259,10 +290,18 @@ public class ThemeChanger {
 		// Changing content
 		String content = sb.toString();
 		boolean needToReplace = false;
+		String[] whatToReplace = null;
+		String replacement = null;
 		for (int i = 0; i < replaces.length; i++) {
-			while (content.indexOf(replaces[i]) != -1) {
-				content = content.replace(replaces[i], replacement);
-				needToReplace = true;
+			whatToReplace = replaces[i].getReplaces();
+			replacement = replaces[i].getReplacement();
+			if (whatToReplace != null && replacement != null) {
+				for (int j = 0; j < whatToReplace.length; j++) {
+					while (content.indexOf(whatToReplace[j]) != -1) {
+						content = content.replace(whatToReplace[j], replacement);
+						needToReplace = true;
+					}
+				}
 			}
 		}
 
@@ -505,6 +544,33 @@ public class ThemeChanger {
 		return sidebar.toString();
 	}
 	
+	private String getContentReplace(String defaultValue) {
+		StringBuffer content = new StringBuffer();
+		if (defaultValue != null && !ThemesConstants.EMPTY.equals(defaultValue)) {
+			content.append(defaultValue).append(NEW_LINE);
+		}
+		Date d = new Date();
+		content.append(CONTENT_BEGIN).append(NEW_LINE);
+		for (int i = 0; i < PARAGRAPHS.length; i++) {
+			content.append(CONTENT_PARAGRAPH_TITLE).append(CONTENT_PARAGRAPH);
+			if (PARAGRAPHS.length > 1) {
+				content.append(ThemesConstants.SPACE).append(i + 1);
+			}
+			content.append(CONTENT_PARAGRAPH_DATE);
+			content.append(d);
+			content.append(CONTENT_PARAGRAPH_LINK).append(CONTENT_PARAGRAPH_START);
+			content.append(IMAGE_START).append(ThemesConstants.SINGLE_QUOTE);
+			content.append(ThemesConstants.BASE_THEME_IMAGES);
+			content.append(ThemesConstants.THEME_IMAGES.get(helper.getRandomNumber(ThemesConstants.THEME_IMAGES.size())));
+			content.append(ThemesConstants.SINGLE_QUOTE).append(ThemesConstants.SPACE).append(IMAGE_POSITION);
+			content.append(ThemesConstants.IMAGE_POSITIONS.get(helper.getRandomNumber(ThemesConstants.IMAGE_POSITIONS.size())));
+			content.append(ThemesConstants.SINGLE_QUOTE).append(IMAGE_END);
+			content.append(PARAGRAPHS[i]).append(CONTENT_PARAGRAPH_END);
+		}
+		content.append(CONTENT_END).append(NEW_LINE);
+		return content.toString();
+	}
+	
 	/**
 	 * Creates String, thats represens Builder's region
 	 * @param value
@@ -539,6 +605,9 @@ public class ThemeChanger {
 			if (value.equals(SITE_SLOGAN)) {
 				return region + getBasicReplace(null, propertyValue, null) + ThemesConstants.COMMENT_BEGIN +
 					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
+			}
+			if (value.equals(CONTENT)) {
+				return region + getContentReplace(propertyValue) + ThemesConstants.COMMENT_BEGIN + ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
 			region += propertyValue;
 		}
