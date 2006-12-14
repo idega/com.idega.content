@@ -26,13 +26,14 @@
 					
 					<x:div styleClass="currentStructureStyle">
 						<wf:container id="page_tree_div" styleClass="current_structure">
-							<f:verbatim>
-								<h3>Current Structure</h3>
-								<a href="#" onclick="treeObj.collapseAll()">Collapse all </a>
-								<a href="#" onclick="treeObj.expandAll()">Expand all</a>
-							</f:verbatim>
-							<h:graphicImage id="trash" value="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash2.png" onmouseover="treeObj.prepareToDelete();" onmouseout="treeObj.prepareToDelete();"/>
-			
+							<x:div styleClass="siteMap">
+								<h:outputText value="Current Structure"/>
+							</x:div>	
+							<h:outputLink value="#" onclick="treeObj.collapseAll()"><h:outputText value="Collapse all"/></h:outputLink>
+							<h:outputLink value="#" onclick="treeObj.expandAll()"><h:outputText value="Expand all"/></h:outputLink>								
+ 							<x:div>
+ 								<x:graphicImage id="trash" forceId="true" value="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash2.png" styleClass="recycleBin" onmouseover="treeObj.prepareToDelete();" onmouseout="treeObj.prepareToDelete();"/> 
+							</x:div>	
 							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 								<f:facet name="PageTreeNode">
 									<h:outputLink onclick="getPrewUrl(this.parentNode.id);return false;">
@@ -49,7 +50,7 @@
 						</f:verbatim>
 	 
 						<wf:iwtree value="#{siteTemplateBean.pageTree}" id="page_chooser22"	var="node" varNodeToggler="t" clientSideToggle="true"	sourceTree="true"	showRootNode="false">
-							<f:facet name="IWTreeNode">						
+							<f:facet name="IWTreeNode">
 								<h:panelGroup>
 									<h:outputLink>
 										<h:outputText value="#{node.description}" />									
@@ -77,10 +78,12 @@
 							treeObj22.expandAll();
 						</script>
 					</f:verbatim>
-
+ 				
 					<x:div id="siteInfoContainer" forceId="true">
 						<c:SiteInfo id="siteInfo" styleClass="siteInfoStyle"></c:SiteInfo>
 					</x:div>
+
+					
 				</wf:wfblock>
 				<f:verbatim><script type="text/javascript">setActiveLanguage();</script></f:verbatim>
 			</h:form>

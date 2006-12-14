@@ -34,9 +34,6 @@ version="1.2">
 								<a href="#" onclick="treeObj.collapseAll()">Collapse all </a>
 								<a href="#" onclick="treeObj.expandAll()">Expand all</a>
 							</jsf:verbatim>
-							<x:div>
- 								<x:graphicImage id="trash" forceId="true" value="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash2.png" style="margin: 5px; border: 2px outset #D7D7D7;  opacity: 0.5;" onmouseover="treeObj.prepareToDelete();" onmouseout="treeObj.prepareToDelete();"/> 
-							</x:div>	
 							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 								<jsf:facet name="PageTreeNode">
 									<h:outputLink onclick="setPageID(this.parentNode.id);getPrewUrl(this.parentNode.id);getPageInfoValues();return false;">
@@ -44,6 +41,10 @@ version="1.2">
 									</h:outputLink>
 								</jsf:facet>
 							</wf:iwtree>				
+							<x:div>
+ 								<x:graphicImage id="trash" forceId="true" value="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash2.png" style="margin: 5px; border: 2px outset #D7D7D7;  opacity: 0.5;" onmouseover="treeObj.prepareToDelete();" onmouseout="treeObj.prepareToDelete();"/> 
+							</x:div>	
+
 						</wf:container>
 					
 					<x:div>
