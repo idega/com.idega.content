@@ -610,13 +610,19 @@ console.log('parentDiv = '+parentDiv);
 						if(lis.length>0){	// Sub elements exists - drop dragable node before the first one
 							ul.insertBefore(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id),lis[0]);	
 						}else {	// No sub exists - use the appendChild method - This line should not be executed unless there's something wrong in the HTML, i.e empty <ul>
+console.log(ul);						
 							ul.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
 						}								
 					}else{
 						var ul = document.createElement('UL');
 						ul.style.display='block';
 						JSTreeObj.dragNode_destination.appendChild(ul);
-						ul.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));
+console.log(ul);			
+console.log(ul.parentNode);
+var childElement = document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id);
+console.log(childElement);
+						ul.appendChild(childElement);											
+//						ul.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));											
 					}
 					var img = JSTreeObj.dragNode_destination.getElementsByTagName('IMG')[0];	
 
@@ -1227,7 +1233,9 @@ console.log('parentDiv = '+parentDiv);
 
 			for(var i = 0; i < newChilds.length; i++){
 				(document.getElementById(newChilds[i].id)).setAttribute("id", id[i]);	
-				JSTreeObj.initNode(document.getElementById(id[i]));				
+				JSTreeObj.initNode(document.getElementById(id[i]));		
+				var newName = (document.getElementById(id[i]).getElementsByTagName('A')[0]).innerHTML;
+				ThemesEngine.changePageUri(id[i], newName, empty);			
 			}
 			var lastID = id[id.length - 1];
 			setPageID(lastID);
@@ -1324,6 +1332,9 @@ console.log('editObj.id ' + editObj.id + ' editObj.id.replace '+editObj.id.repla
 				
 //			BuilderService.changeNodeName(changeNameId, newName, empty);
 			BuilderService.changePageName(changeNameId, newName, empty);
+			
+			ThemesEngine.changePageUri(changeNameId, newName, empty);
+			
 //			ajax.requestFile = fileName + '?updateNode='+editObj.id.replace(/[^0-9]/g,'') + '&newValue='+editObj.value;	// Specifying which file to get
 //			ajax.onCompletion = showUpdate;	// Specify function that will be executed after file has been found
 //			ajax.runAJAX();		// Execute AJAX function
