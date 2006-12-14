@@ -945,10 +945,15 @@ console.log(childElement);
 */		
 		
 		prepareToDelete : function(){
-			if(JSTreeObj.deleteNodes == true)
+			var trashCan = document.getElementById('trash');
+			if(JSTreeObj.deleteNodes == true){
 				JSTreeObj.deleteNodes = false;
-			else
+				trashCan.style.opacity = 0.5;
+				}
+			else {
 				JSTreeObj.deleteNodes = true;
+				trashCan.style.opacity = 1;
+			}
 		}
 		,
 		initTree : function()
