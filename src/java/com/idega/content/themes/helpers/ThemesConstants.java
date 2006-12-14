@@ -116,6 +116,7 @@ public class ThemesConstants {
 	protected static final String DEFAULT_MIME_TYPE = "image/";
 	
 	protected static final String PAGES_PATH_APPL = BASE_ROOT_APPL + "/pages/";
+	protected static final String ARTICLE_PATH_APPL = BASE_ROOT_APPL + "/themes/article.xml";
 	
 	/*Public fields*/
 	public static final String THEMES = "/themes/";

@@ -9,7 +9,9 @@
         		<type>java.lang.String</type>
       		</property>
     	</module>
-    	<module id="uuid_149462b7-8376-11db-b05c-f9d22ee6ddc5" class="com.idega.block.article.component.ArticleListViewer" />
+    	<module id="uuid_149462b7-8376-11db-b05c-f9d22ee6ddc5" class="com.idega.block.article.component.ArticleListViewer">
+    		<property name="styleClass" value="blog-entry-date" />
+    	</module>
     </region>
     <region id="sidebar" label="sidebar">
     	<module id="uuid_c3e3dc8b-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">

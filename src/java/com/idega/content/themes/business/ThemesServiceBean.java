@@ -65,7 +65,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	
 	public boolean deleteIBPage(Theme theme) {
 		if (theme.getIBPageID() == -1) {
-			return true; // No IBPage was created
+			return true;
 		}
 		return deletePage(String.valueOf(theme.getIBPageID()), false);
 	}
@@ -96,6 +96,10 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		} catch (RemoteException e) {
 			log.error(e);
 			return false;
+		}
+		
+		if (pageID.equals(ThemesHelper.getInstance(false).getLastVisitedPage())) {
+			ThemesHelper.getInstance(false).setLastVisitedPage(null);
 		}
 		
 		if (builder.checkDeletePage(pageID, domain)) {

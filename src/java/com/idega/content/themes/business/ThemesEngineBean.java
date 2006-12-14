@@ -380,6 +380,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 						String uriToPage = helper.loadPageToSlide(subType, id, webDAVUri);
 						if (uriToPage != null) {
 							helper.getThemesService().updatePageWebDav(id, uriToPage);
+							helper.createArticle(subType, uriToPage);
 						}
 						String lastTheme = helper.getLastUsedTheme();
 						if (lastTheme != null) {

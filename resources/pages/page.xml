@@ -11,6 +11,7 @@
     	</module>
     	<module id="uuid_40580a4a-8377-11db-b05c-f9d22ee6ddc5" class="com.idega.block.article.component.ArticleItemViewer">
     		<property name="resourcePath" value="" />
+    		<property name="styleClass" value="blog-entry-date" />
     	</module>
     </region>
     <region id="sidebar" label="sidebar">

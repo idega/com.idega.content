@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://xmlns.idega.com/block/article/xml">
+	<content_language>en</content_language>
+	<headline>Article</headline>
+	<teaser />
+	<body>
+		<html xmlns="http://www.w3.org/1999/xhtml">
+			<head>
+				<meta name="generator" content="HTML Tidy, see www.w3.org" />
+				<title />
+			</head>
+			<body>
+				<img vspace="0" hspace="0" border="0" align="" src="" />Lorem
+ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum
+bibendum, ligula ut feugiat rutrum, mauris libero ultricies nulla,
+at hendrerit lectus dui bibendum metus. Phasellus quis nulla nec
+mauris sollicitudin ornare. Vivamus faucibus. Class aptent taciti
+sociosqu ad litora torquent per conubia nostra, per inceptos
+hymenaeos. Cras vulputate condimentum ipsum. Duis urna eros,
+commodo id, sagittis sed, sodales eu, ante. Etiam ante. Cras risus
+dolor, porta nec, adipiscing eu, scelerisque at, metus. Mauris nunc
+eros, porttitor nec, tincidunt ut, rutrum eget, massa. In facilisis
+nisi. Sed non lorem malesuada quam egestas bibendum. Quisque
+bibendum ullamcorper purus. Integer id diam vel elit adipiscing
+consectetuer. Phasellus vitae eros. Vivamus laoreet consectetuer
+tortor. In congue dignissim quam. Suspendisse nec purus vel velit
+ultricies bibendum.
+			</body>
+		</html>
+	</body>
+	<author>Administrator</author>
+	<source></source>
+	<article_comment></article_comment>
+</article>

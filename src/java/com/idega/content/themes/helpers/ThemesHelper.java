@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -65,6 +66,7 @@ public class ThemesHelper implements Singleton {
 	private Map <String, Setting> themeSettings = null;
 	private Map <String, Setting> pageSettings = null;
 	private Map <String, Document> pages = null;
+	private Map <String, Document> articles = null;
 	private List <String> themeQueue = null;
 	private List <String> urisToThemes = null;
 	
@@ -81,6 +83,9 @@ public class ThemesHelper implements Singleton {
 	private static final String PAGE_TYPE = "page";
 	private static final String ATTRIBUTE_NAME = "property";
 	private static final String ATTRIBUTE_PROPERTY = "value";
+	private static final String DEFAULT_ARTICLE = "default_theme_article";
+	private static final String XML_EXTENSION = "xml";
+	private static final String XML_MIME_TYPE = "text/" + XML_EXTENSION;
 	
 	private Random numberGenerator = null;
 	
@@ -89,6 +94,7 @@ public class ThemesHelper implements Singleton {
 		themeSettings = new HashMap <String, Setting> ();
 		pageSettings = new HashMap <String, Setting> ();
 		pages = new HashMap <String, Document> ();
+		articles = new HashMap <String, Document> ();
 		themeQueue = new ArrayList <String> ();
 		urisToThemes = new ArrayList <String> ();
 		numberGenerator = new Random();
@@ -943,10 +949,9 @@ public class ThemesHelper implements Singleton {
 			base += ThemesConstants.SLASH;
 		}
 		String changedFileName = extractValueFromString(fullUrl, fullUrl.lastIndexOf(ThemesConstants.SLASH) + 1, fullUrl.length());
-		String mimeType = "text/xml";
 
 		try {
-			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, changedFileName, docContent, mimeType, true);
+			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, changedFileName, docContent, XML_MIME_TYPE, true);
 		} catch (RemoteException e) {
 			log.error(e);
 		}
@@ -1025,6 +1030,121 @@ public class ThemesHelper implements Singleton {
 		if (templateID.equals(lastUsedTheme)) {
 			settings.removeProperty(ThemesConstants.LAST_USED_THEME);
 		}
+	}
+	
+	public void createArticle(String type, String name) {
+		if (type == null || name == null) {
+			return;
+		}
+		if (!PAGE_TYPE.equals(type)) {
+			return;
+		}
+		
+		IWContext iwc = IWContext.getInstance();
+		if (iwc == null) {
+			return;
+		}
+		String language = "en";
+		Locale l = iwc.getCurrentLocale();
+		if (l != null) {
+			if (l.getLanguage() != null) {
+				language = l.getLanguage();
+			}
+		}
+		
+		String needlessStart = ThemesConstants.CONTENT + ThemesConstants.PAGES_PATH_SLIDE;
+		String needlessEnd = ThemesConstants.DOT + XML_EXTENSION;
+		if (name.indexOf(needlessStart) != -1) {
+			if (name.indexOf(needlessEnd) != -1) {
+				name = extractValueFromString(name, name.indexOf(needlessStart) + needlessStart.length(), name.indexOf(needlessEnd));
+			} else {
+				name = extractValueFromString(name, name.indexOf(needlessStart) + needlessStart.length(), name.length());
+			}
+		}
+		if (!name.startsWith(ThemesConstants.SLASH)) {
+			name = ThemesConstants.SLASH + name;
+		}
+		
+		String docContent = getArticleDocument(language);
+		if (docContent == null) {
+			return;
+		}
+
+		String fileName = language + ThemesConstants.DOT + XML_EXTENSION;
+		String base = RESOURCE_PATH_START + name + RESOURCE_PATH_END + ThemesConstants.SLASH;
+		try {
+			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, fileName, docContent, XML_MIME_TYPE, true);
+		} catch (RemoteException e) {
+			log.error(e);
+		}
+	}
+	
+	private String getArticleDocument(String language) {
+		Document doc = articles.get(DEFAULT_ARTICLE);
+		if (doc != null) {
+			doc = prepareArticleDocument(doc, language);
+			return getThemeChanger().getXMLOutputter().outputString(doc);
+		}
+		doc = getXMLDocument(getWebRootWithoutContent() + ThemesConstants.ARTICLE_PATH_APPL);
+		if (doc == null) {
+			return null;
+		}
+		pages.put(DEFAULT_ARTICLE, doc);
+		doc = prepareArticleDocument(doc, language);
+		return getThemeChanger().getXMLOutputter().outputString(doc);
+	}
+	
+	private Document prepareArticleDocument(Document doc, String language) {
+		String languageTag = "content_language";
+		
+		Element root = doc.getRootElement();
+		if (root == null) {
+			return doc;
+		}
+		
+		Element lang = root.getChild(languageTag);
+		if (lang != null) {
+			lang.setText(language);
+		}
+		
+		setArticleImage(root);
+
+		return doc;
+	}
+	
+	private void setArticleImage(Element root) {
+		if (root == null) {
+			return;
+		}
+		
+		String imageTag = "img";
+		String align = "align";
+		String src = "src";
+		
+		Iterator it = root.getDescendants();
+		Object o = null;
+		Element e = null;
+		Attribute position = null;
+		Attribute source = null;
+		boolean prepared = false;
+		while (it.hasNext() && !prepared) {
+			o = it.next();
+			if (o instanceof Element) {
+				e = (Element) o;
+				if (e.getName().equals(imageTag)) {
+					position = e.getAttribute(align);
+					if (position != null) {
+						position.setValue(ThemesConstants.IMAGE_POSITIONS.get(helper.getRandomNumber(ThemesConstants.IMAGE_POSITIONS.size())));
+					}
+					source = e.getAttribute(src);
+					if (source != null) {
+						source.setValue(ThemesConstants.BASE_THEME_IMAGES + ThemesConstants.THEME_IMAGES.get(helper.getRandomNumber(ThemesConstants.THEME_IMAGES.size())));
+					}
+					prepared = true;
+				}
+			}
+		}
+		
 	}
 
 }
