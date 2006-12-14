@@ -458,6 +458,9 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 
 .currentStructureStyle {
 	position: absolute;
+/*	width: 35%;
+	width: 275px;
+*/
 	width: 275px;
 	height: 260px;
 	right: 0px;
@@ -508,4 +511,17 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	width: 100%;
 	background-color: #E1E1E1;
 	border: 1px solid #D7D7D7;
+}
+
+.siteMap {
+	font-size: 1.5em;
+	margin: 5px;
+}
+
+.recycleBin {
+	margin-left: 10px;
+	border: 2px outset #D7D7D7;
+	opacity: 0.5; 
+	
+/*	border: 1px outset #D7D7D7;	*/
 }
