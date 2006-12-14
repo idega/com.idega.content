@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <page-templates>
-	<page name="Page" type="page" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="page.xml"></page>
-	<page name="Blog" type="blog" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="blog.xml"></page>		
+	<page name="Page" type="page" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="idega_theme_page.xml"></page>
+	<page name="Blog" type="blog" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="idega_theme_blog.xml"></page>		
 </page-templates>

@@ -144,7 +144,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		
 		page.setWebDavUri(uri);
 		page.store();
-		builder.clearAllCachedPages();
+		getBuilderService().clearAllCachedPages();
 		return true;
 	}
 	

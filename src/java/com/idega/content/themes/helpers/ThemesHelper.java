@@ -195,15 +195,13 @@ public class ThemesHelper implements Singleton {
 	
 	public void searchForThemes() {
 		if (checkedFromSlide) {
-			log.info("Search allready proceeded earlier");
 			return;
 		}
 		checkedFromSlide = true;
-		log.info("Starting search for themes ("+ThemesConstants.THEME_SEARCH_KEY+") in: " + ThemesConstants.CONTENT + ThemesConstants.THEMES_PATH);
 		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
 		Collection results = search.doSimpleDASLSearch(ThemesConstants.THEME_SEARCH_KEY, ThemesConstants.CONTENT + ThemesConstants.THEMES_PATH);
 		if (results == null) {
-			log.info("ContentSearch.doSimpleDASLSearch returned results Collection, which is null: " + results);
+			log.error("ContentSearch.doSimpleDASLSearch returned results Collection, which is null: " + results);
 			return;
 		}
 		Iterator it = results.iterator();
@@ -215,13 +213,11 @@ public class ThemesHelper implements Singleton {
 			if (o instanceof SearchResult) {
 				uri = ((SearchResult) o).getSearchResultURI();
 				if (isCorrectFile(uri)) {
-					log.info("ContentSearch.doSimpleDASLSearch result: " + uri);
 					urisToThemes.add(uri);
 				}
 			}
 		}
 		checkedFromSlide = getThemesLoader().loadThemes(urisToThemes, false, true);
-		log.info("Themes search success: " + checkedFromSlide);
 	}
 	
 	protected String getFileName(String uri) {
@@ -1032,11 +1028,23 @@ public class ThemesHelper implements Singleton {
 		}
 	}
 	
-	public void createArticle(String type, String name) {
-		if (type == null || name == null) {
+	public void createArticle(String type, int id) {
+		if (type == null) {
+			return;
+		}
+		if (id == -1) {
 			return;
 		}
 		if (!PAGE_TYPE.equals(type)) {
+			return;
+		}
+		
+		ICPage page = getThemesService().getICPage(id);
+		if (page == null) {
+			return;
+		}
+		String name = page.getDefaultPageURI();
+		if (name == null) {
 			return;
 		}
 		
@@ -1052,17 +1060,11 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		
-		String needlessStart = ThemesConstants.CONTENT + ThemesConstants.PAGES_PATH_SLIDE;
-		String needlessEnd = ThemesConstants.DOT + XML_EXTENSION;
-		if (name.indexOf(needlessStart) != -1) {
-			if (name.indexOf(needlessEnd) != -1) {
-				name = extractValueFromString(name, name.indexOf(needlessStart) + needlessStart.length(), name.indexOf(needlessEnd));
-			} else {
-				name = extractValueFromString(name, name.indexOf(needlessStart) + needlessStart.length(), name.length());
-			}
-		}
 		if (!name.startsWith(ThemesConstants.SLASH)) {
 			name = ThemesConstants.SLASH + name;
+		}
+		if (name.endsWith(ThemesConstants.SLASH)) {
+			name = extractValueFromString(name, 0, name.lastIndexOf(ThemesConstants.SLASH));
 		}
 		
 		String docContent = getArticleDocument(language);
@@ -1134,11 +1136,11 @@ public class ThemesHelper implements Singleton {
 				if (e.getName().equals(imageTag)) {
 					position = e.getAttribute(align);
 					if (position != null) {
-						position.setValue(ThemesConstants.IMAGE_POSITIONS.get(helper.getRandomNumber(ThemesConstants.IMAGE_POSITIONS.size())));
+						position.setValue(ThemesConstants.IMAGE_POSITIONS.get(getRandomNumber(ThemesConstants.IMAGE_POSITIONS.size())));
 					}
 					source = e.getAttribute(src);
 					if (source != null) {
-						source.setValue(ThemesConstants.BASE_THEME_IMAGES + ThemesConstants.THEME_IMAGES.get(helper.getRandomNumber(ThemesConstants.THEME_IMAGES.size())));
+						source.setValue(ThemesConstants.BASE_THEME_IMAGES + ThemesConstants.THEME_IMAGES.get(getRandomNumber(ThemesConstants.THEME_IMAGES.size())));
 					}
 					prepared = true;
 				}

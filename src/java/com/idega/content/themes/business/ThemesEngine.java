@@ -34,7 +34,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#changePageUri
 	 */
-	public String changePageUri(String pageID, String pageTitle) throws RemoteException;
+	public String changePageUri(String pageID, String pageTitle, boolean needSetPageTitle) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#savePageInfo

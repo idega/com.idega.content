@@ -2,6 +2,7 @@ package com.idega.content.themes.business;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -163,7 +164,29 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return result;
 	}
 	
-	public String changePageUri(String pageID, String pageTitle) {
+	private boolean setPageTitle(String pageID, String title) {
+		if (pageID == null || title == null) {
+			return false;
+		}
+		if (MINUS_ONE.equals(pageID)) {
+			return false;
+		}
+		
+		IWContext iwc = IWContext.getInstance();
+		if (iwc == null) {
+			return false;
+		}
+		
+		IWMainApplication appl = iwc.getIWMainApplication();
+		if (appl == null) {
+			return false;
+		}
+		
+		String method = ":method:1:implied:void:setTitle:java.lang.String:";
+		return helper.getThemesService().getBuilderService().setProperty(pageID, MINUS_ONE, method, new String[]{title}, appl);
+	}
+	
+	public String changePageUri(String pageID, String pageTitle, boolean needSetPageTitle) {
 		if (pageID == null || pageTitle == null) {
 			return null;
 		}
@@ -172,10 +195,18 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		ICPage page = helper.getThemesService().getICPage(Integer.valueOf(pageID).intValue());
+		if (pageTitle.equals(page.getDefaultPageURI())) {
+			return null;
+		}
+		
 		ICTreeNode parentNode = page.getParentNode();
 		String parentId = null;
 		if (parentNode != null) {
 			parentId = parentNode.getId();
+		}
+		
+		if (needSetPageTitle) {
+			setPageTitle(pageID, pageTitle);
 		}
 		
 		if (helper.getThemesService().getBuilderService().changePageUriByTitle(parentId, page, pageTitle, -1)) {
@@ -206,24 +237,39 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		Setting s = null;
 		Map <String, Setting> map = helper.getPageSettings();
 		String[] currentValues = null;
+		String[] newValues = null;
+		boolean changedPageTitle = false;
+		boolean needSetValue = true;
 		for (int i = 0; i < keywords.length; i++) {
 			s = map.get(keywords[i]);
 			if (s != null) {
+				currentValues = helper.getThemesService().getBuilderService().getPropertyValues(appl, pageID, MINUS_ONE, s.getMethod(), null, true);
 				if (ThemesConstants.EMPTY.equals(values[i]) || values[i] == null) {
-					currentValues = helper.getThemesService().getBuilderService().getPropertyValues(appl, pageID, MINUS_ONE, s.getMethod(), null, true);
 					if (currentValues != null) {
 						helper.getThemesService().getBuilderService().removeProperty(appl, pageID, MINUS_ONE, s.getMethod(), currentValues);
 					}
 				}
 				else {
 					if (s.getCode().equals(PAGE_URI)) {
-						changedPageUri = changePageUri(pageID, values[i]);
+						if (!changedPageTitle) {
+							changedPageUri = changePageUri(pageID, values[i], false);
+						}
 					}
 					else {
-						helper.getThemesService().getBuilderService().setProperty(pageID, MINUS_ONE, s.getMethod(), helper.getPageValues(s, values[i]), appl);
-						if (s.getCode().equals(PAGE_TITLE)) {
-							changedPageUri = changePageUri(pageID, values[i]);
-							helper.getThemesService().getBuilderService().changePageName(Integer.valueOf(pageID).intValue(), values[i]);
+						newValues = helper.getPageValues(s, values[i]);
+						if (newValues == null) {
+							needSetValue = false;
+						}
+						if (Arrays.deepEquals(newValues, currentValues)) {
+							needSetValue = false;
+						}
+						if (needSetValue) {
+							helper.getThemesService().getBuilderService().setProperty(pageID, MINUS_ONE, s.getMethod(), newValues, appl);
+							if (s.getCode().equals(PAGE_TITLE)) {
+								changedPageUri = changePageUri(pageID, values[i], false);
+								helper.getThemesService().getBuilderService().changePageName(Integer.valueOf(pageID).intValue(), values[i]);
+								changedPageTitle = true;
+							}
 						}
 					}
 				}
@@ -378,9 +424,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				if (webDAVUri != null) {
 					if (!webDAVUri.equals(ThemesConstants.EMPTY)) {
 						String uriToPage = helper.loadPageToSlide(subType, id, webDAVUri);
+						helper.createArticle(subType, id);
 						if (uriToPage != null) {
 							helper.getThemesService().updatePageWebDav(id, uriToPage);
-							helper.createArticle(subType, uriToPage);
 						}
 						String lastTheme = helper.getLastUsedTheme();
 						if (lastTheme != null) {

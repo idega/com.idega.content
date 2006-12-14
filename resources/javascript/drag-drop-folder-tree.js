@@ -1240,7 +1240,7 @@ console.log(childElement);
 				(document.getElementById(newChilds[i].id)).setAttribute("id", id[i]);	
 				JSTreeObj.initNode(document.getElementById(id[i]));		
 				var newName = (document.getElementById(id[i]).getElementsByTagName('A')[0]).innerHTML;
-				ThemesEngine.changePageUri(id[i], newName, empty);			
+				ThemesEngine.changePageUri(id[i], newName, false, changePageTitleCallback);			
 			}
 			var lastID = id[id.length - 1];
 			setPageID(lastID);
@@ -1338,7 +1338,8 @@ console.log('editObj.id ' + editObj.id + ' editObj.id.replace '+editObj.id.repla
 //			BuilderService.changeNodeName(changeNameId, newName, empty);
 			BuilderService.changePageName(changeNameId, newName, empty);
 			
-			ThemesEngine.changePageUri(changeNameId, newName, empty);
+			changePageTitleInPageInfo(newName);
+			ThemesEngine.changePageUri(changeNameId, newName, true, changePageTitleCallback);
 			
 //			ajax.requestFile = fileName + '?updateNode='+editObj.id.replace(/[^0-9]/g,'') + '&newValue='+editObj.value;	// Specifying which file to get
 //			ajax.onCompletion = showUpdate;	// Specify function that will be executed after file has been found
