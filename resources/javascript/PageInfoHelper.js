@@ -345,6 +345,28 @@ function resizeFrame() {
 	if (availableHeight > 0) {
 		frame.style.height = availableHeight + "px";
 	}
+	
+	var siteContainer = document.getElementById("site_tree_container");
+	if (siteContainer == null) {
+		return;
+	}
+	var children = siteContainer.childNodes;
+	if (children == null) {
+		return;
+	}
+	var realContainer = null;
+	var found = false;
+	for (var i = 0; (i < children.length && !found); i++) {
+		realContainer = children[i];
+		if (realContainer != null) {
+			if (realContainer.className == "site_tree_container") {
+				found = true;
+			}
+		}
+	}
+	if (realContainer != null) {
+		realContainer.style.height = availableHeight + "px";
+	}
 }
 
 function getPageInfoValues() {
