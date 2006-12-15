@@ -26,28 +26,30 @@
 					
 					<x:div styleClass="currentStructureStyle">
 						<wf:container id="page_tree_div" styleClass="current_structure">
-							<x:div styleClass="siteMap">
+							<x:div styleClass="siteTreeTopic">
 								<h:outputText value="Current Structure"/>
 							</x:div>	
-							<h:outputLink value="#" onclick="treeObj.collapseAll()"><h:outputText value="Collapse all"/></h:outputLink>
+							<h:outputLink value="#" onclick="treeObj.collapseAll()"><h:outputText value="Collapse all "/></h:outputLink>
 							<h:outputLink value="#" onclick="treeObj.expandAll()"><h:outputText value="Expand all"/></h:outputLink>								
+							<x:div styleClass="siteTree">
+								<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
+									<f:facet name="PageTreeNode">
+										<h:outputLink onclick="getPrewUrl(this.parentNode.id);return false;">
+											<h:outputText value="#{node.description}" />
+										</h:outputLink>
+									</f:facet>
+								</wf:iwtree>				
+							</x:div>
  							<x:div>
- 								<x:graphicImage id="trash" forceId="true" value="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash2.png" styleClass="recycleBin" onmouseover="treeObj.prepareToDelete();" onmouseout="treeObj.prepareToDelete();"/> 
-							</x:div>	
-							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="page_chooser" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
-								<f:facet name="PageTreeNode">
-									<h:outputLink onclick="getPrewUrl(this.parentNode.id);return false;">
-										<h:outputText value="#{node.description}" />
-									</h:outputLink>
-								</f:facet>
-							</wf:iwtree>				
+ 								<x:graphicImage id="trash" forceId="true" styleClass="recycleBin2" value="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash2.png" onmouseover="treeObj.prepareToDelete();" onmouseout="treeObj.prepareToDelete();"/> 
+							</x:div>
 						</wf:container>
 					</x:div>
 
 					<wf:container id="dhtmlgoodies_tree2" styleClass="template_tree">
-						<f:verbatim>
-							<h3>Page types</h3>
-						</f:verbatim>
+							<x:div styleClass="siteTreeTopic">
+								<h:outputText value="Page types"/>
+							</x:div>
 	 
 						<wf:iwtree value="#{siteTemplateBean.pageTree}" id="page_chooser22"	var="node" varNodeToggler="t" clientSideToggle="true"	sourceTree="true"	showRootNode="false">
 							<f:facet name="IWTreeNode">

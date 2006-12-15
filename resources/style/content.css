@@ -462,7 +462,7 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	width: 275px;
 */
 	width: 275px;
-	height: 260px;
+	height: 275px;
 	right: 0px;
 	border: 1px solid #D7D7D7;
 }
@@ -513,15 +513,23 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	border: 1px solid #D7D7D7;
 }
 
-.siteMap {
-	font-size: 1.5em;
+.siteTreeTopic {
+	font-size: 1.2em;
+	font-weight: bold;
 	margin: 5px;
 }
 
-.recycleBin {
-	margin-left: 10px;
-	border: 2px outset #D7D7D7;
+.recycleBin2 {
+	margin-left: 15px;
+/*	border: 2px outset #D7D7D7; */
+	border: 2px solid black; 
 	opacity: 0.5; 
-	
-/*	border: 1px outset #D7D7D7;	*/
+}
+
+.siteTree {
+	margin: 5px;
+	border: 1px solid #D7D7D7;
+	overflow:auto;
+	height: 200px;
+	width: 250px;
 }

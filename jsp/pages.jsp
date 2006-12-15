@@ -29,18 +29,20 @@ version="1.2">
                 <wf:wfblock maximizedVertically="true" id="pagesBlock" title="#{localizedStrings['com.idega.content']['pages']}">
                 
                 	<wf:container id="page_tree_div" styleClass="current_structure">
-							<jsf:verbatim>
-								<h3>Current Structure</h3>
-								<a href="#" onclick="treeObj.collapseAll()">Collapse all </a>
-								<a href="#" onclick="treeObj.expandAll()">Expand all</a>
-							</jsf:verbatim>
-							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
-								<jsf:facet name="PageTreeNode">
-									<h:outputLink onclick="setPageID(this.parentNode.id);getPrewUrl(this.parentNode.id);getPageInfoValues();return false;">
-										<h:outputText value="#{node.description}" />
-									</h:outputLink>
-								</jsf:facet>
-							</wf:iwtree>				
+							<x:div styleClass="siteTreeTopic">
+								<h:outputText value="Current Structure"/>
+							</x:div>	
+							<h:outputLink value="#" onclick="treeObj.collapseAll()"><h:outputText value="Collapse all "/></h:outputLink>
+							<h:outputLink value="#" onclick="treeObj.expandAll()"><h:outputText value="Expand all"/></h:outputLink>				
+							<x:div styleClass="siteTree">
+								<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
+									<jsf:facet name="PageTreeNode">
+										<h:outputLink onclick="setPageID(this.parentNode.id);getPrewUrl(this.parentNode.id);getPageInfoValues();return false;">
+											<h:outputText value="#{node.description}" />
+										</h:outputLink>
+									</jsf:facet>
+								</wf:iwtree>				
+							</x:div>
 							<x:div>
  								<x:graphicImage id="trash" forceId="true" value="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash2.png" style="margin: 5px; border: 2px outset #D7D7D7;  opacity: 0.5;" onmouseover="treeObj.prepareToDelete();" onmouseout="treeObj.prepareToDelete();"/> 
 							</x:div>	
