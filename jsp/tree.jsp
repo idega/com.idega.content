@@ -22,7 +22,7 @@
         			/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
         			/idegaweb/bundles/com.idega.content.bundle/resources/javascript/SiteInfoHelper.js">
 			<h:form id="createpageform">			
-				<wf:wfblock maximizedVertically="true" id="siteMapBlock" title="#{localizedStrings['com.idega.content']['site_map']}">
+				<wf:wfblock maximizedVertically="true" id="siteMapBlock">
 					
 					<x:div styleClass="currentStructureStyle">
 						<wf:container id="page_tree_div" styleClass="current_structure">

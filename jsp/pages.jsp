@@ -26,7 +26,7 @@ version="1.2">
                 	<script type="text/javascript">initScript(true, false, false);</script>
                 </jsf:verbatim>
                 
-                <wf:wfblock maximizedVertically="true" id="pagesBlock" title="#{localizedStrings['com.idega.content']['pages']}">
+                <wf:wfblock maximizedVertically="true" id="pagesBlock">
                 
                 	<wf:container id="page_tree_div" styleClass="current_structure">
 							<x:div styleClass="siteTreeTopic">
