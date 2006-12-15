@@ -188,3 +188,6 @@ scroll_right=Scroll to right
 site_map=Sitemap
 site_info=Site Info
 new_page=New Page
+current_site_structure=Current Site Structure
+collapse_all=Collapse All
+expand_all=Expand All

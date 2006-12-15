@@ -513,6 +513,18 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	border: 1px solid #D7D7D7;
 }
 
+.tree_container_pages {
+	position: absolute;
+	width: 275px;
+	height: 439px;
+	border: 1px solid #D7D7D7;
+}
+
+.tree_container_pages ul {
+	list-style-type: none;
+	padding-left: 15px;
+}
+
 .siteTreeTopic {
 	font-size: 1.2em;
 	font-weight: bold;

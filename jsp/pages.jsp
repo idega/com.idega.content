@@ -26,28 +26,24 @@ version="1.2">
                 	<script type="text/javascript">initScript(true, false, false);</script>
                 </jsf:verbatim>
                 
-                <wf:wfblock maximizedVertically="true" id="pagesBlock">
+                <wf:wfblock maximizedVertically="true" id="pagesBlock" title="#{localizedStrings['com.idega.content']['pages']}">
                 
-                	<wf:container id="page_tree_div" styleClass="current_structure">
-							<x:div styleClass="siteTreeTopic">
-								<h:outputText value="Current Structure"/>
-							</x:div>	
-							<h:outputLink value="#" onclick="treeObj.collapseAll()"><h:outputText value="Collapse all "/></h:outputLink>
-							<h:outputLink value="#" onclick="treeObj.expandAll()"><h:outputText value="Expand all"/></h:outputLink>				
-							<x:div styleClass="siteTree">
-								<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
-									<jsf:facet name="PageTreeNode">
-										<h:outputLink onclick="setPageID(this.parentNode.id);getPrewUrl(this.parentNode.id);getPageInfoValues();return false;">
-											<h:outputText value="#{node.description}" />
-										</h:outputLink>
-									</jsf:facet>
-								</wf:iwtree>				
-							</x:div>
-							<x:div>
- 								<x:graphicImage id="trash" forceId="true" value="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash2.png" style="margin: 5px; border: 2px outset #D7D7D7;  opacity: 0.5;" onmouseover="treeObj.prepareToDelete();" onmouseout="treeObj.prepareToDelete();"/> 
-							</x:div>	
-
-						</wf:container>
+                	
+                	<wf:wfblock id="page_tree_div" styleClass="tree_container_pages" title="#{localizedStrings['com.idega.content']['current_site_structure']}">
+						<h:outputLink value="#" onclick="if (treeObj != null) {treeObj.collapseAll()}"><h:outputText value="#{localizedStrings['com.idega.content']['collapse_all']}"/><h:outputText value=" "/></h:outputLink>
+						<h:outputLink value="#" onclick="if (treeObj != null) {treeObj.expandAll()}"><h:outputText value="#{localizedStrings['com.idega.content']['expand_all']}"/></h:outputLink>								
+ 						<x:div>
+ 							<x:graphicImage id="trash" forceId="true" value="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash2.png" styleClass="recycleBin" onmouseover="treeObj.prepareToDelete();" onmouseout="treeObj.prepareToDelete();"/> 
+						</x:div>
+						<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
+							<jsf:facet name="PageTreeNode">
+								<h:outputLink onclick="setPageID(this.parentNode.id);getPrewUrl(this.parentNode.id);getPageInfoValues();return false;">
+									<h:outputText value="#{node.description}" />
+								</h:outputLink>
+							</jsf:facet>
+						</wf:iwtree>				
+					</wf:wfblock>
+					
 					
 					<x:div>
 						<jsf:verbatim>
@@ -92,7 +88,7 @@ version="1.2">
 						treeObj = new JSDragDropTree();
 						treeObj.setTreeId('current_structure_tree');
 						treeObj.setMaximumDepth(7);
-						treeObj.setMessageMaximumDepthReached('Maximum depth reached'); // If you want to show a message when maximum depth is reached, i.e. on drop.
+						treeObj.setMessageMaximumDepthReached('Maximum depth reached');
 						treeObj.initTree();
 						treeObj.getNodeOrders();
 						treeObj.expandAll();

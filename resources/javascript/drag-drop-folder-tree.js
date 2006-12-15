@@ -1240,9 +1240,7 @@ console.log(childElement);
 				(document.getElementById(newChilds[i].id)).setAttribute("id", id[i]);	
 				JSTreeObj.initNode(document.getElementById(id[i]));		
 				var newName = (document.getElementById(id[i]).getElementsByTagName('A')[0]).innerHTML;
-console.log('changePageUri');				
 				ThemesEngine.changePageUri(id[i], newName, false, changePageTitleCallback);			
-console.log('after changePageUri');								
 			}
 			var lastID = id[id.length - 1];
 			setPageID(lastID);
