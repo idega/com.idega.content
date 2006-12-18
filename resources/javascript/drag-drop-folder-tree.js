@@ -558,7 +558,7 @@ console.log('parentDiv = '+parentDiv);
 		}		
 		,
 		dropDragableNodesCopy:function()
-		{		
+		{
 			var parent;
 			if(JSTreeObj.dragDropTimer<10){				
 				JSTreeObj.dragDropTimer = -1;
@@ -1284,24 +1284,55 @@ console.log('new root id = '+id[0]);
 		
 		saveNewPage : function (newParentNodeId, pagetype, templatefile, pageName){
 			treeStructure = new Array();
+			JSTreeObj.getStructure('floatingContainer'+JSTreeObj.dragNode_source.id, newParentNodeId);
 			
-//			JSTreeObj.dragNode_source.id = 'temporary';	
-	
-			JSTreeObj.getStructure(JSTreeObj.dragNode_source, newParentNodeId);			
+			document.getElementById('floatingContainer'+JSTreeObj.dragNode_source.id).id = 'rootTemporary';	
+			
 			showLoadingMessage("Creating...");			
-			ThemesEngine.beforeCreatePage(treeStructure, JSTreeObj.getNewId);
+			ThemesEngine.beforeCreatePage(treeStructure, JSTreeObj.getNewRootId);
 		}	
 		,
+		getStructure : function(rootId, parentId){
+			var root = document.getElementById(rootId);
+			var newChilds = root.getElementsByTagName('li');
+
+			var nodeId = root.id;
+			var nodeName = (root.getElementsByTagName('A')[0]).innerHTML;
+			var pageType = root.getAttribute('pagetype');
+			var parentId = parentId;
+			var templateFile = root.getAttribute('templatefile');		
+
+			treeStructure.push(nodeId);		
+			treeStructure.push(parentId);			
+			treeStructure.push(nodeName);
+			treeStructure.push(pageType);
+			treeStructure.push(templateFile);				
+			parentId = nodeId;
+			
+			for (var i = 0; i < newChilds.length; i++){			
+				nodeId = newChilds[i].id;
+				nodeName = (newChilds[i].getElementsByTagName('A')[0]).innerHTML;
+				pageType = newChilds[i].getAttribute('pagetype');
+				if(i != 0)
+					parentId = newChilds[i].parentNode.parentNode.parentNode.id;
+				templateFile = newChilds[i].getAttribute('templatefile');		
+
+				treeStructure.push(nodeId);		
+				treeStructure.push(parentId);			
+				treeStructure.push(nodeName);
+				treeStructure.push(pageType);
+				treeStructure.push(templateFile);				
+				
+				parentId = newChilds[i].getAttribute('id');
+			}
+			return treeStructure;			
+		}	
+		,	
+/*
 		getStructure : function(source, parentId){					
 			JSTreeObj.parentId = parentId;		
 			var newParent = document.getElementById(parentId);
 			var newChilds = newParent.getElementsByTagName('li');
-/*
-			var nodeId = source.id;
-			var nodeName = (source.getElementsByTagName('A')[0]).innerHTML;
-			var pageType = source.getAttribute('pagetype');
-			var templateFile = source.getAttribute('templatefile');
-*/			
 			for (var i = 0; i < newChilds.length; i++){			
 
 				var nodeId = newChilds[i].id;
@@ -1314,6 +1345,7 @@ console.log('new root id = '+id[0]);
 				treeStructure.push(nodeId);		
 				treeStructure.push(parentId);			
 				treeStructure.push(nodeName);
+//console.log('name = '+nodeName);				
 				treeStructure.push(pageType);
 				treeStructure.push(templateFile);				
 				
@@ -1322,6 +1354,7 @@ console.log('new root id = '+id[0]);
 			return treeStructure;					
 		}
 		,
+*/
 		getNewId : function(id){
 			closeLoadingMessage();
 			if (id == null) {
