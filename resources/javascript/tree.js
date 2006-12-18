@@ -11,10 +11,12 @@ function getNewId(id){
 }
 
 function deletePage(pageId){
-	ThemesEngine.deletePage(pageId, true);
+	showLoadingMessage("Deleting...");
+	ThemesEngine.deletePage(pageId, true, empty);
 }
 
 function empty(param) {
+	closeLoadingMessage();
 }
 
 function setFrameUrl(url) {

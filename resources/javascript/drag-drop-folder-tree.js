@@ -763,13 +763,23 @@ console.log(childElement);
 			var newName = (document.getElementById(id[0]).getElementsByTagName('A')[0]).innerHTML;
 			ThemesEngine.changePageUri(id[0], newName, false, changePageTitleCallback);			
 console.log('new root id = '+id[0]);
-			var newChilds = root.getElementsByTagName('li');		
-
+			var newChilds = root.getElementsByTagName('li');
+			var newChildsElement = null;
+			var newNode = null;
+			var newName = null;
 			for(var i = 0; i < newChilds.length; i++){
-				(document.getElementById(newChilds[i+1].id)).setAttribute("id", id[i+1]);	
-				JSTreeObj.initNode(document.getElementById(id[i+1]));		
-				var newName = (document.getElementById(id[i+1]).getElementsByTagName('A')[0]).innerHTML;
-				ThemesEngine.changePageUri(id[i+1], newName, false, changePageTitleCallback);			
+				newChildsElement = newChilds[i+1];
+				if (newChildsElement != null) {
+					(document.getElementById(newChildsElement.id)).setAttribute("id", id[i+1]);
+				}
+				newNode = document.getElementById(id[i+1]);
+				if (newNode != null) {
+					JSTreeObj.initNode(newNode);
+					newName = (newNode.getElementsByTagName('A')[0]).innerHTML;
+				}
+				if (id[i + 1] != null && newName != null) {
+					ThemesEngine.changePageUri(id[i+1], newName, false, changePageTitleCallback);
+				}
 			}
 			var lastID = id[id.length - 1];
 			setPageID(lastID);
