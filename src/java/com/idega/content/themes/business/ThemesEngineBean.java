@@ -436,9 +436,13 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				}
 				
 				for (int j = i; j < struct.size(); j = j+5) {
-					if((struct.get(j+1)).equals(prevId)) {
-						struct.set(j+1, realID);
-					}
+					if(struct == null)
+						System.out.println("struct.get(j + 1)");
+					if (struct.get(j + 1) != null) {
+						if ((struct.get(j + 1)).equals(prevId)) {
+							struct.set(j + 1, realID);
+						}
+					}					
 				}
 				newIds.add(realID);
 			}

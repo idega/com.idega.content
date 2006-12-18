@@ -718,8 +718,15 @@ console.log(childElement);
 							console.log('creating node newParent = '+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null)+ 
 							' pagetype = '+JSTreeObj.dragNode_source.getAttribute('pagetype') + ' templatefile = '+JSTreeObj.dragNode_source.getAttribute('templatefile'));
 //							saveNewPage(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 'newPage');
-							JSTreeObj.saveNewPage(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
-							(JSTreeObj.dragNode_source.getElementsByTagName('A')[0]).innerHTML);
+							var newParentId = treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null);
+							if(!newParentId) {
+								console.log('newParentId = null');
+								JSTreeObj.saveRoot(JSTreeObj.dragNode_source.id, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
+								(JSTreeObj.dragNode_source.getElementsByTagName('A')[0]).innerHTML);
+							}
+							else
+								JSTreeObj.saveNewPage(newParentId, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
+								(JSTreeObj.dragNode_source.getElementsByTagName('A')[0]).innerHTML);
 						}
 							//need name
 							
@@ -732,6 +739,85 @@ console.log(childElement);
 //
 		}
 		,
+		saveRoot : function (nodeId, pagetype, templatefile, pageName){
+			treeStructure = new Array();
+			
+//			JSTreeObj.dragNode_source.id = 'temporary';	
+	
+	console.log('nodeId = '+nodeId);
+	console.log(document.getElementById('floatingContainer'+nodeId));
+			JSTreeObj.getRootStructure('floatingContainer'+nodeId);			
+			document.getElementById('floatingContainer'+nodeId).id = 'rootTemporary';
+			showLoadingMessage("Creating...");			
+			ThemesEngine.beforeCreatePage(treeStructure, JSTreeObj.getNewRootId);
+		}	
+		,
+		getNewRootId : function(id){
+			closeLoadingMessage();
+			if (id == null) {
+				return;
+			}
+			var root = document.getElementById('rootTemporary');
+			(document.getElementById('rootTemporary')).setAttribute("id", id[0]);	
+			JSTreeObj.initNode(document.getElementById(id[0]));		
+			var newName = (document.getElementById(id[0]).getElementsByTagName('A')[0]).innerHTML;
+			ThemesEngine.changePageUri(id[0], newName, false, changePageTitleCallback);			
+console.log('new root id = '+id[0]);
+			var newChilds = root.getElementsByTagName('li');		
+
+			for(var i = 0; i < newChilds.length; i++){
+				(document.getElementById(newChilds[i+1].id)).setAttribute("id", id[i+1]);	
+				JSTreeObj.initNode(document.getElementById(id[i+1]));		
+				var newName = (document.getElementById(id[i+1]).getElementsByTagName('A')[0]).innerHTML;
+				ThemesEngine.changePageUri(id[i+1], newName, false, changePageTitleCallback);			
+			}
+			var lastID = id[id.length - 1];
+			setPageID(lastID);
+			getPrewUrl(lastID);
+
+		}
+		,		
+		getRootStructure : function(rootId){					
+			
+//			JSTreeObj.parentId = parentId;
+//			var newParent = document.getElementById(parentId);
+
+			var root = document.getElementById(rootId);
+			var newChilds = root.getElementsByTagName('li');
+
+			var nodeId = root.id;
+			var nodeName = (root.getElementsByTagName('A')[0]).innerHTML;
+			var pageType = root.getAttribute('pagetype');
+			var parentId = null;
+			var templateFile = root.getAttribute('templatefile');		
+
+			treeStructure.push(nodeId);		
+			treeStructure.push(parentId);			
+			treeStructure.push(nodeName);
+			treeStructure.push(pageType);
+			treeStructure.push(templateFile);				
+			parentId = nodeId;
+			
+			for (var i = 0; i < newChilds.length; i++){			
+				nodeId = newChilds[i].id;
+				nodeName = (newChilds[i].getElementsByTagName('A')[0]).innerHTML;
+				pageType = newChilds[i].getAttribute('pagetype');
+				if(i != 0)
+					parentId = newChilds[i].parentNode.parentNode.parentNode.id;
+				templateFile = newChilds[i].getAttribute('templatefile');		
+
+				treeStructure.push(nodeId);		
+				treeStructure.push(parentId);			
+				treeStructure.push(nodeName);
+				treeStructure.push(pageType);
+				treeStructure.push(templateFile);				
+				
+				parentId = newChilds[i].getAttribute('id');
+			}
+			return treeStructure;					
+		}		
+		,
+		
 /*
 		getNewNodeId : function(id){
 				
@@ -1130,7 +1216,6 @@ console.log(childElement);
 				tmpVar = node.templatefile;
 			if(tmpVar)
 				templatefile = tmpVar;
-
 			nodeId++;
 			var subItems = node.getElementsByTagName('UL');
 
@@ -1197,8 +1282,7 @@ console.log(childElement);
 			ThemesEngine.beforeCreatePage(treeStructure, JSTreeObj.getNewId);
 		}	
 		,
-		getStructure : function(source, parentId){
-					
+		getStructure : function(source, parentId){					
 			JSTreeObj.parentId = parentId;		
 			var newParent = document.getElementById(parentId);
 			var newChilds = newParent.getElementsByTagName('li');
