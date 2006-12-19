@@ -95,6 +95,14 @@ public interface ThemesEngine extends IBOService {
 	 * @see com.idega.content.themes.business.ThemesEngineBean#setPageId
 	 */
 	public boolean setPageId(String id) throws RemoteException;
-	
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#movePage
+	 */
+	public boolean movePage(int newParentId, int nodeId) throws RemoteException;
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#getPathToImageFolder
+	 */
 	public String getPathToImageFolder() throws RemoteException;
 }

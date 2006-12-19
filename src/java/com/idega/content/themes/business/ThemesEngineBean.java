@@ -436,14 +436,17 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				}
 				
 				for (int j = i; j < struct.size(); j = j+5) {
-					if(struct == null)
-						System.out.println("struct.get(j + 1)");
-					if (struct.get(j + 1) != null) {
-						if ((struct.get(j + 1)).equals(prevId)) {
-							struct.set(j + 1, realID);
+					try {
+						if (struct.get(j + 1) != null) {
+							if ((struct.get(j + 1)).equals(prevId)) {
+								struct.set(j + 1, realID);
+							}
 						}
-					}					
+					} catch (IndexOutOfBoundsException e) {
+						log.error(e);
+					}
 				}
+				
 				newIds.add(realID);
 			}
 		}
@@ -503,6 +506,17 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		helper.setLastVisitedPage(id);
 		return true;
+	}
+	
+	public boolean movePage(int newParentId, int nodeId) {
+		if (newParentId == 0 || newParentId == -1) {
+			IWContext iwc = IWContext.getInstance();
+			if (iwc == null) {
+				return false;
+			}
+			return helper.getThemesService().getBuilderService().movePageToTopLevel(nodeId, iwc);
+		}
+		return helper.getThemesService().getBuilderService().movePage(newParentId, nodeId);
 	}
 	
 	public String getPathToImageFolder(){
