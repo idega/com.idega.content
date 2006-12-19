@@ -490,12 +490,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return id;
 		}
 		
-		try {
-		id = String.valueOf(helper.getThemesService().getBuilderService().getRootPageId());
-		} catch (Exception e) {
-			log.error(e);
-			return null;
-		}
+		id = String.valueOf(getRootPageId());
 		helper.setLastVisitedPage(id);
 		return id;
 	}
@@ -521,6 +516,59 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	public String getPathToImageFolder(){
 		return PATH_TO_IMAGE_FOLDER;
+	}
+	
+	public boolean isStartPage(String pageID) {
+		if (pageID == null) {
+			return true; // Returning true to disable a button
+		}
+		int id = -1;
+		try {
+			id = Integer.valueOf(pageID).intValue();
+		} catch (NumberFormatException e) {
+			log.error(e);
+			return true; // Returning true to disable a button
+		}
+		if (id <= 0) {
+			return true; // Returning true to disable a button
+		}
+		if (id == getRootPageId()) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean setAsStartPage(String pageID) {
+		if (pageID == null) {
+			return false;
+		}
+		int newRoot = -1;
+		try {
+			newRoot = Integer.valueOf(pageID).intValue();
+		} catch (NumberFormatException e) {
+			log.error(e);
+			return false;
+		}
+		if (newRoot <= 0) {
+			return false;
+		}
+		
+		int currentRoot = getRootPageId();
+		if (currentRoot == newRoot) {
+			return true;
+		}
+		return true;
+	}
+	
+	private int getRootPageId() {
+		int id = 1;
+		try {
+			id = helper.getThemesService().getBuilderService().getRootPageId();
+		} catch (Exception e) {
+			log.error(e);
+			return -1;
+		}
+		return id;
 	}
 
 }

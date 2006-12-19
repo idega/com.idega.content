@@ -97,15 +97,22 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			log.error(e);
 			return false;
 		}
+		int domainId = domain.getID();
 		
-		if (pageID.equals(ThemesHelper.getInstance(false).getLastVisitedPage())) {
-			ThemesHelper.getInstance(false).setLastVisitedPage(null);
+		if (pageID.equals(ThemesHelper.getInstance().getLastVisitedPage())) {
+			ThemesHelper.getInstance().setLastVisitedPage(null);
 		}
 		
+		boolean result = true;
 		if (builder.checkDeletePage(pageID, domain)) {
-			return builder.deletePage(pageID, deleteChildren, tree, iwc.getUserId(), domain);
+			result =  builder.deletePage(pageID, deleteChildren, tree, iwc.getUserId(), domain);
 		}
-		return true;
+		
+		if (domainId != -1) { // Deleted top level page
+			builder.clearAllCachedPages();
+		}
+		
+		return result;
 	}
 	
 	public boolean createIBPage(Theme theme) {
@@ -124,7 +131,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			if (parentId.equals(ThemesConstants.INCORRECT_PARENT_ID)) {
 				return false;
 			}
-			String name = ThemesHelper.getInstance(false).removeSpaces(theme.getName());
+			String name = ThemesHelper.getInstance().removeSpaces(theme.getName());
 			id = createIBPage(parentId, theme.getName(), builder.getTemplateKey(), null, ThemesConstants.THEMES + name +
 					ThemesConstants.SLASH, null, -1, builder.getHTMLTemplateKey(), null);
 			if (id == -1) {
@@ -166,6 +173,19 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 				templateId = ThemesHelper.getInstance().getLastUsedTheme();
 			}
 		}
+		
+		if (parentId == null) { // Creating top level page
+			ICDomain domain = null;
+			try {
+				domain = builder.getCurrentDomain();
+			} catch (RemoteException e) {
+				log.error(e);
+			}
+			if (domain != null) {
+				domainId = domain.getID();
+			}
+		}
+		
 		return builder.createNewPage(parentId, name, type, templateId, pageUri, tree, iwc, subType, domainId, format, sourceMarkup);
 	}
 	

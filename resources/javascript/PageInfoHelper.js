@@ -265,30 +265,6 @@ function resizeSlider() {
 	}
 }
 
-function getTotalWidth() {
-  var width = 0;
-  if(typeof(window.innerWidth) == "number") {
-    width = window.innerWidth; // Non-IE
-  } else if(document.documentElement && document.documentElement.clientWidth) {
-    width = document.documentElement.clientWidth; // IE 6+ in 'standards compliant mode'
-  } else if(document.body && document.body.clientWidth) {
-    width = document.body.clientWidth; // IE 4 compatible
-  }
-  return width;
-}
-
-function getTotalHeight() {
-  var height = 0;
-  if(typeof(window.innerHeight) == "number") {
-    height = window.innerHeight; // Non-IE
-  } else if(document.documentElement && document.documentElement.clientHeight) {
-    height = document.documentElement.clientHeight; // IE 6+ in 'standards compliant mode'
-  } else if(document.body && document.body.clientHeight) {
-    height = document.body.clientHeight; // IE 4 compatible
-  }
-  return height;
-}
-
 function setButtonText(id, text) {
 	var button = document.getElementById(id);
 	if (button != null) {
@@ -346,27 +322,7 @@ function resizeFrame() {
 		frame.style.height = availableHeight + "px";
 	}
 	
-	var siteContainer = document.getElementById("site_tree_container");
-	if (siteContainer == null) {
-		return;
-	}
-	var children = siteContainer.childNodes;
-	if (children == null) {
-		return;
-	}
-	var realContainer = null;
-	var found = false;
-	for (var i = 0; (i < children.length && !found); i++) {
-		realContainer = children[i];
-		if (realContainer != null) {
-			if (realContainer.className == "site_tree_container") {
-				found = true;
-			}
-		}
-	}
-	if (realContainer != null) {
-		realContainer.style.height = availableHeight + "px";
-	}
+	resizeContainer("site_tree_container", "site_tree_container_pages", 331, true);
 }
 
 function getPageInfoValues() {
@@ -401,4 +357,30 @@ function showPageInfoValues(values) {
 			element.value = values[i];
 		}
 	}
+}
+
+function isStartPage(pageID) {
+	ThemesEngine.isStartPage(pageID, isStartPageCallback);
+}
+
+function isStartPageCallback(isStart) {
+	var button = document.getElementById("makeStartPage");
+	if (button == null) {
+		return;
+	}
+	if (isStart) {
+		button.disabled = true;
+	}
+	else {
+		button.disabled = false;
+	}
+}
+
+function makePageAsStartPage() {
+	showLoadingMessage("Changing structure...");
+	ThemesEngine.setAsStartPage(getPageID(), setAsStartPageCallback);
+}
+
+function setAsStartPageCallback(result) {
+	closeLoadingMessage();
 }

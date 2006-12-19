@@ -513,13 +513,37 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	border: 1px solid #D7D7D7;
 }
 
-.site_tree_container {
+.pagesTypesContainer {
+	position: absolute;
+	border: 1px solid #D7D7D7;
+	height: 130px;
+}
+
+.siteTemplatesContainer {
+	position: absolute;
+	bottom: 0px;
+	border: 1px solid #D7D7D7;
+}
+
+.site_tree_container_site {
+	position: absolute;
+	right: 0px;
+	width: 275px;
+	border: 1px solid #D7D7D7;
+}
+
+.site_tree_container_pages {
 	position: absolute;
 	width: 275px;
 	border: 1px solid #D7D7D7;
 }
 
-.site_tree_container ul {
+.site_tree_container_pages ul {
+	list-style-type: none;
+	padding-left: 15px;
+}
+
+.site_tree_container_site ul {
 	list-style-type: none;
 	padding-left: 15px;
 }

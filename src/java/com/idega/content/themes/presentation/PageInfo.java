@@ -14,7 +14,9 @@ import com.idega.presentation.Table2;
 import com.idega.presentation.TableCell2;
 import com.idega.presentation.TableRow;
 import com.idega.presentation.TableRowGroup;
+import com.idega.presentation.ui.GenericButton;
 import com.idega.webface.WFBlock;
+import com.idega.webface.WFMenu;
 import com.idega.webface.WFTitlebar;
 
 public class PageInfo extends ContentBlock {
@@ -27,6 +29,8 @@ public class PageInfo extends ContentBlock {
 		if (styleClass != null) {
 			pageInfo.setStyleClass(getStyleClass());
 		}
+		
+		pageInfo.setToolbar(getToolbar());
 		
 		WFTitlebar bar = new WFTitlebar();
 		bar.addTitleText(getBundle().getLocalizedText("page_info"));
@@ -67,6 +71,16 @@ public class PageInfo extends ContentBlock {
 
 	public void setStyleClass(String styleClass) {
 		this.styleClass = styleClass;
+	}
+	
+	private WFMenu getToolbar() {
+		WFMenu toolbar = new WFMenu();
+		GenericButton button = new GenericButton("makeStartPage", "Make This Page As Start Page");
+		button.setOnClick("makePageAsStartPage();");
+		button.setInputType("button");
+		button.setId("makeStartPage");
+		toolbar.setMenuHeader(button);
+		return toolbar;
 	}
 
 }

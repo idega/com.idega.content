@@ -47,9 +47,9 @@
 					</x:div>
 
 					<wf:container id="dhtmlgoodies_tree2" styleClass="template_tree">
-							<x:div styleClass="siteTreeTopic">
-								<h:outputText value="Page types"/>
-							</x:div>
+						<x:div styleClass="siteTreeTopic">
+							<h:outputText value="Page types"/>
+						</x:div>
 	 
 						<wf:iwtree value="#{siteTemplateBean.pageTree}" id="page_chooser22"	var="node" varNodeToggler="t" clientSideToggle="true"	sourceTree="true"	showRootNode="false">
 							<f:facet name="IWTreeNode">
@@ -88,6 +88,9 @@
 					
 				</wf:wfblock>
 				<f:verbatim><script type="text/javascript">setActiveLanguage();</script></f:verbatim>
+				<f:verbatim>
+					<script type="text/javascript">resizeSiteTree("site_tree_container", "site_tree_container_site", 482)</script>
+				</f:verbatim>
 			</h:form>
 		</ws:page>
 	</f:view>

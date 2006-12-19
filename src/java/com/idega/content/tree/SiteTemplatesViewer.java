@@ -39,7 +39,7 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		Iterator itr = siteRoot.iterator();
 		Accordion acc = new Accordion("site_templates");
 		getChildren().add(acc);
-		acc.setHeight("200");
+		acc.setHeight("240");
 		int panelID = 0;
 		while(itr.hasNext()){
 			panelID++;
