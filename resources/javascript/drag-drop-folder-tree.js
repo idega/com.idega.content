@@ -709,6 +709,7 @@ console.log('parentDiv = '+parentDiv);
 						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id){
 							console.log('moving node node ID = '+JSTreeObj.dragNode_source.id+" newParent = "+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
 							saveMyTree(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);		
+							ThemesEngine.changePageUri(JSTreeObj.dragNode_source.id, (JSTreeObj.dragNode_source.getElementsByTagName('A')[0]).innerHTML, false, changePageTitleCallback);
 						}
 						else{
 							console.log('creating node newParent = '+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null)+ 
@@ -758,7 +759,6 @@ console.log('parentDiv = '+parentDiv);
 			JSTreeObj.initNode(document.getElementById(id[0]));		
 			var newName = (document.getElementById(id[0]).getElementsByTagName('A')[0]).innerHTML;
 			ThemesEngine.changePageUri(id[0], newName, false, changePageTitleCallback);			
-console.log('new root id = '+id[0]);
 			var newChilds = root.getElementsByTagName('li');
 			var newChildsElement = null;
 			var newNode = null;
@@ -1212,7 +1212,6 @@ console.log('new root id = '+id[0]);
 					iconfile = this.iconFolder + node.getAttribute('pagetype') +'.png';
 				else
 					iconfile = this.iconFolder + this.folderImage;
-				alert(iconfile);
 			}
 
 			var templatefile = null;		 
@@ -1362,7 +1361,7 @@ console.log('new root id = '+id[0]);
 				(document.getElementById(newChilds[i].id)).setAttribute("id", id[i]);	
 				JSTreeObj.initNode(document.getElementById(id[i]));		
 				var newName = (document.getElementById(id[i]).getElementsByTagName('A')[0]).innerHTML;
-				ThemesEngine.changePageUri(id[i], newName, false, changePageTitleCallback);			
+				ThemesEngine.changePageUri(id[i], newName, false, changePageTitleCallback);
 			}
 			var lastID = id[id.length - 1];
 			setPageID(lastID);
@@ -1414,7 +1413,6 @@ console.log('new root id = '+id[0]);
 	
 	function initEditLabel()
 	{	
-//		alert('initEditLabel');
 		if(editEl)hideEdit();
 		editCounter = 0;
 		editEl = this;	// Referenc to a Tag
