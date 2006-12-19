@@ -362,11 +362,9 @@
 			
 			if(JSTreeObj.dragDropTimer<10)return;
 			if(document.all)e = event;
-			dragDrop_x = e.clientX/1 + 5 + document.body.scrollLeft;
-			dragDrop_y = e.clientY/1 + 5 + document.documentElement.scrollTop;	
 
-//			dragDrop_x = e.clientX/1 -60+ document.body.scrollLeft;
-//			dragDrop_y = e.clientY/1 -20+ document.documentElement.scrollTop;	
+			dragDrop_x = e.clientX/1 - 55 + document.body.scrollLeft;
+			dragDrop_y = e.clientY/1 + 0 + document.documentElement.scrollTop;	
 
 			JSTreeObj.floatingContainer.style.left = dragDrop_x + 'px';
 			JSTreeObj.floatingContainer.style.top = dragDrop_y + 'px';
@@ -410,7 +408,7 @@
 				if(!thisObj || !thisObj.id){
 					tmpImg.style.visibility = 'hidden';
 				}
-				tmpObj.style.top = (JSTreeObj.getTopPos(thisObj) + JSTreeObj.indicator_offsetY + 9) + 'px';
+				tmpObj.style.top = (JSTreeObj.getTopPos(thisObj) + JSTreeObj.indicator_offsetY + 15) + 'px';
 			}			
 			else{
 //				console.log('JSTreeObj.dragNode_destination = '+JSTreeObj.dragNode_destination);											
