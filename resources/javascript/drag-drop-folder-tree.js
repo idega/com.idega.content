@@ -610,17 +610,13 @@ console.log('parentDiv = '+parentDiv);
 						if(lis.length>0){	// Sub elements exists - drop dragable node before the first one
 							ul.insertBefore(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id),lis[0]);	
 						}else {	// No sub exists - use the appendChild method - This line should not be executed unless there's something wrong in the HTML, i.e empty <ul>
-console.log(ul);						
 							ul.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
 						}								
 					}else{
 						var ul = document.createElement('UL');
 						ul.style.display='block';
 						JSTreeObj.dragNode_destination.appendChild(ul);
-console.log(ul);			
-console.log(ul.parentNode);
-var childElement = document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id);
-console.log(childElement);
+						var childElement = document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id);
 						ul.appendChild(childElement);											
 //						ul.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));											
 					}
@@ -827,13 +823,6 @@ console.log('new root id = '+id[0]);
 			return treeStructure;					
 		}		
 		,
-		
-/*
-		getNewNodeId : function(id){
-				
-		}
-		,
-*/ 
 		createDropIndicator : function()
 		{
 			this.dropTargetIndicator = document.createElement('DIV');
@@ -1052,9 +1041,17 @@ console.log('new root id = '+id[0]);
 			}
 		}
 		,
+		folderPath : function (path){
+			alert('test');
+			JSTreeObj.iconFolder = path;	
+			alert(path);
+		}
+		,
 		initTree : function()
-		{						
+		{					
 			JSTreeObj = this;
+			ThemesEngine.getPathToImageFolder(JSTreeObj.folderPath());
+			JSTreeObj.iconFolder;			
 			JSTreeObj.createDropIndicator();
 			document.documentElement.onselectstart = JSTreeObj.cancelSelectionEvent;
 			document.documentElement.ondragstart = JSTreeObj.cancelEvent;
@@ -1092,9 +1089,9 @@ console.log('new root id = '+id[0]);
 					var pageType = menuItems[no].getAttribute('pagetype');
 					if (pageType)
 //						iconfile = this.imageFolder + menuItems[no].getAttribute('pagetype') +'.png';
-						iconfile = this.iconFolder + menuItems[no].getAttribute('pagetype') +'.png';
+						iconfile = JSTreeObj.iconFolder + menuItems[no].getAttribute('pagetype') +'.png';
 					else
-						iconfile = this.iconFolder + this.folderImage;
+						iconfile = JSTreeObj.iconFolder + this.folderImage;
 				}
 
 				var templatefile = null;		 
@@ -1218,6 +1215,7 @@ console.log('new root id = '+id[0]);
 					iconfile = this.iconFolder + node.getAttribute('pagetype') +'.png';
 				else
 					iconfile = this.iconFolder + this.folderImage;
+				alert(iconfile);
 			}
 
 			var templatefile = null;		 
@@ -1372,7 +1370,6 @@ console.log('new root id = '+id[0]);
 			var lastID = id[id.length - 1];
 			setPageID(lastID);
 			getPrewUrl(lastID);
-
 		}
 		,
 		getNodeChilds : function(nodeParent, newParentId){

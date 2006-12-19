@@ -31,6 +31,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	private static final String PAGE_URI = "pageUri";
 	private static final String PAGE_TITLE = "pageTitle";
 	private static final String MINUS_ONE = "-1";
+	private static final String PATH_TO_IMAGE_FOLDER = "/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/";
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 
@@ -50,8 +51,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		Theme theme = null;
 		String webRoot = helper.getFullWebRoot();
 		for (int i = 0; i < themes.size(); i++) {
-			theme = themes.get(i);
-			
+			theme = themes.get(i);			
 			if (theme.isPropertiesExtracted()) {
 				if (theme.getChangedName() != null) {
 					info.append(theme.getChangedName());
@@ -503,6 +503,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		helper.setLastVisitedPage(id);
 		return true;
+	}
+	
+	public String getPathToImageFolder(){
+		return PATH_TO_IMAGE_FOLDER;
 	}
 
 }
