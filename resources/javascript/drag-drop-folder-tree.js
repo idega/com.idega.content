@@ -1042,16 +1042,13 @@ console.log('new root id = '+id[0]);
 		}
 		,
 		folderPath : function (path){
-			console.log('test');
-			JSTreeObj.iconFolder = path;	
-			console.log(path);
+			JSTreeObj.iconFolder = path;
 		}
 		,
 		initTree : function()
 		{					
 			JSTreeObj = this;
 			ThemesEngine.getPathToImageFolder(JSTreeObj.folderPath);
-			JSTreeObj.iconFolder;			
 			JSTreeObj.createDropIndicator();
 			document.documentElement.onselectstart = JSTreeObj.cancelSelectionEvent;
 			document.documentElement.ondragstart = JSTreeObj.cancelEvent;
