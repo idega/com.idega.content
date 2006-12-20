@@ -248,7 +248,8 @@ function setStyle(isPage) {
 function setStyleCallback(result) {
 	if (getPageID() != null) {
 		if (getPageID() != -1) {
-			getPrewUrl(getPageID());
+			setTimeout("getPrewUrl('"+getPageID()+"')", 1000); // Temporarily solution to avoid NullPointerException
+			//getPrewUrl(getPageID());
 		}
 	}
 	closeLoadingMessage();
@@ -369,11 +370,6 @@ function isStartPage(pageID) {
 }
 
 function isStartPageCallback(isStart) {
-	if (console) {
-		if (console.log) {
-			console.log("Page " + getPageID() + " is start page: " + isStart);
-		}
-	}
 	var button = document.getElementById("makeStartPage");
 	if (button == null) {
 		return;

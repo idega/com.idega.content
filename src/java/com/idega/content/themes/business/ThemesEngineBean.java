@@ -531,7 +531,6 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	public boolean isStartPage(String pageID) {
-		log.info("ID from DWR: " + pageID);
 		if (pageID == null) {
 			pageID = helper.getLastVisitedPage();
 			//return true; // Returning true to disable a button

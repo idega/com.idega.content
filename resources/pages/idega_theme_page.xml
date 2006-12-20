@@ -11,8 +11,11 @@
     	</module>
     	<module id="uuid_40580a4a-8377-11db-b05c-f9d22ee6ddc5" class="com.idega.block.article.component.ArticleItemViewer">
     		<property name="resourcePath" value="" />
-    		<property name="styleClass" value="blog-entry-date" />
+    		<property name="styleClass" value="blog-entry" />
     	</module>
+    </region>
+    <region id="navcontainer" label="navcontainer">
+    	<module id="uuid_3ca228d2-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.block.navigation.presentation.NavigationList" />
     </region>
     <region id="sidebar" label="sidebar">
     	<module id="uuid_c3e3dc8b-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
@@ -22,7 +25,6 @@
         		<type>java.lang.String</type>
       		</property>
     	</module>
-    	<module id="uuid_3ca228d2-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.block.navigation.presentation.NavigationList" />
     </region>
     <region id="breadcrumb" label="breadcrumb">
     	<module id="uuid_9d2c0ea9-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">

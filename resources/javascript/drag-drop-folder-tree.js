@@ -360,7 +360,7 @@
 					divTag = divTags[i];
 			}
 			
-			if (JSTreeObj != null) {
+			if (JSTreeObj) {
 				if (JSTreeObj.dragDropTimer < 10) {
 					return;
 				}

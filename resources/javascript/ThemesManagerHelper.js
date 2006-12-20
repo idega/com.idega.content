@@ -4,7 +4,7 @@ var themesArray = new Array();
 var imageWidth = 149;//120;
 var imageHeight = 112;//140;
 var currentIndex = 0;
-var waitForStyle = 500;
+var waitForStyle = 100;
 
 var containerID = "themes";
 var themesContainerID = "themesSliderContainer";
