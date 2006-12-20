@@ -24,7 +24,7 @@ public class SiteInfoJsf extends SiteInfo {
 		}
 		
 		WFTitlebar bar = new WFTitlebar();
-		bar.addTitleText( ContentUtil.getBundle().getLocalizedText("site_info"));
+		bar.addTitleText(ContentUtil.getBundle().getLocalizedText("site_info"));
 		siteInfo.setTitlebar(bar);
 		
 		DropdownMenu locales = getLocales(iwc, false, "getValues(this)");
