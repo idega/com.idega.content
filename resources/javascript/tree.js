@@ -2,8 +2,7 @@ var ajaxObjects = new Array();
 	
 function saveMyTree(newParentNodeId, sourceNodeId) {
 	saveString = treeObj.getNodeOrders();
-	console.log("newParentNodeId: " + newParentNodeId + ", sourceNodeId: " + sourceNodeId);
-	//BuilderService.movePage(newParentNodeId, sourceNodeId, empty);
+	//console.log("newParentNodeId: " + newParentNodeId + ", sourceNodeId: " + sourceNodeId);
 	ThemesEngine.movePage(newParentNodeId, sourceNodeId, empty);
 }
 

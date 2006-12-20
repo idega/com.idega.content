@@ -112,7 +112,7 @@ version="1.2">
 		<jsf:verbatim>
 			<script type="text/javascript">showSlider(document.getElementById("themesSliderContainer"));resizeFrame();getGlobalPageId();</script>
 			<script type="text/javascript">getPageInfoValues();</script>
-			<script type="text/javascript">isStartPage(getPageID());</script>
+			<script type="text/javascript">isStartPage(getGlobalPageId());</script>
 		</jsf:verbatim>
 	</jsf:view>
 </jsp:root>

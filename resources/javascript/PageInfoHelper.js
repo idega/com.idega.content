@@ -106,7 +106,12 @@ function manageSlider(buttonID) {
 }
 
 function getGlobalPageId() {
-	ThemesEngine.getPageId(setGlobalPageId);
+	if (getPageID() == null) {
+		ThemesEngine.getPageId(setGlobalPageId);
+	}
+	else {
+		return getPageID();
+	}
 }
 
 function setGlobalPageId(ID) {
@@ -364,16 +369,19 @@ function isStartPage(pageID) {
 }
 
 function isStartPageCallback(isStart) {
+	//console.log("Page " + getPageID() + " is start page: " + isStart);
 	var button = document.getElementById("makeStartPage");
 	if (button == null) {
 		return;
 	}
-	if (isStart) {
+	/*button.disabled = isStart;
+	if (isStart) {*/
 		button.disabled = true;
-	}
+		button.value = "This Page is A Start Page (not works yet)";
+	/*}
 	else {
-		button.disabled = false;
-	}
+		button.value = "Make This Page As Start Page";
+	}*/
 }
 
 function makePageAsStartPage() {
@@ -383,4 +391,7 @@ function makePageAsStartPage() {
 
 function setAsStartPageCallback(result) {
 	closeLoadingMessage();
+	if (result != null) {
+		changePageTitleCallback(result);
+	}
 }

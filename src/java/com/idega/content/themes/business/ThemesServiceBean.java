@@ -124,6 +124,11 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		if (iwc == null) {
 			return false;
 		}
+		int domainID = -1;
+		ICDomain domain = iwc.getDomain();
+		if (domain != null) {
+			domainID = domain.getID();
+		}
 		getBuilderService();
 		
 		if (theme.getIBPageID() == -1) { // Creating IBPage for theme
@@ -133,7 +138,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			}
 			String name = ThemesHelper.getInstance().removeSpaces(theme.getName());
 			id = createIBPage(parentId, theme.getName(), builder.getTemplateKey(), null, ThemesConstants.THEMES + name +
-					ThemesConstants.SLASH, null, -1, builder.getHTMLTemplateKey(), null);
+					ThemesConstants.SLASH, null, domainID, builder.getHTMLTemplateKey(), null);
 			if (id == -1) {
 				return false;
 			}

@@ -114,5 +114,5 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#setAsStartPage
 	 */
-	public boolean setAsStartPage(String pageID) throws RemoteException;
+	public String setAsStartPage(String pageID) throws RemoteException;
 }

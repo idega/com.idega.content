@@ -528,11 +528,11 @@ console.log('parentDiv = '+parentDiv);
 					if (parentDiv.getElementsByTagName('DIV')[0]){
 	
 						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id){
-							console.log('moving node node ID = '+JSTreeObj.dragNode_source.id+" newParent = "+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
+							//console.log('moving node node ID = '+JSTreeObj.dragNode_source.id+" newParent = "+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
 							saveMyTree(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);									
 						}
 						else
-							console.log('creating node newParent = '+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
+							//console.log('creating node newParent = '+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
 						break;	
 										
 					}
@@ -549,7 +549,7 @@ console.log('parentDiv = '+parentDiv);
 				if (nodeChilds[i].parentNode == nodeParent){
 //					console.log('Child '+ childs[i].id);
 					JSTreeObj.getNodeChilds(nodeChilds[i]);
-					console.log('delete node = '+ childs[i].id);
+					//console.log('delete node = '+ childs[i].id);
 					deletePage(childs[i].id);
 				}
 			}
@@ -705,17 +705,17 @@ console.log('parentDiv = '+parentDiv);
 				if (parentDiv.getElementsByTagName('DIV')){
 					if (parentDiv.getElementsByTagName('DIV')[0]){
 						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id){
-							console.log('moving node node ID = '+JSTreeObj.dragNode_source.id+" newParent = "+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
+							//console.log('moving node node ID = '+JSTreeObj.dragNode_source.id+" newParent = "+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null));
 							saveMyTree(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);		
 							ThemesEngine.changePageUri(JSTreeObj.dragNode_source.id, (JSTreeObj.dragNode_source.getElementsByTagName('A')[0]).innerHTML, false, changePageTitleCallback);
 						}
 						else{
-							console.log('creating node newParent = '+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null)+ 
-							' pagetype = '+JSTreeObj.dragNode_source.getAttribute('pagetype') + ' templatefile = '+JSTreeObj.dragNode_source.getAttribute('templatefile'));
+							/*console.log('creating node newParent = '+treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null)+ 
+							' pagetype = '+JSTreeObj.dragNode_source.getAttribute('pagetype') + ' templatefile = '+JSTreeObj.dragNode_source.getAttribute('templatefile'));*/
 //							saveNewPage(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 'newPage');
 							var newParentId = treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null);
 							if(!newParentId) {
-								console.log('newParentId = null');
+								//console.log('newParentId = null');
 								JSTreeObj.saveRoot(JSTreeObj.dragNode_source.id, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
 								(JSTreeObj.dragNode_source.getElementsByTagName('A')[0]).innerHTML);
 							}
@@ -739,8 +739,8 @@ console.log('parentDiv = '+parentDiv);
 			
 //			JSTreeObj.dragNode_source.id = 'temporary';	
 	
-	console.log('nodeId = '+nodeId);
-	console.log(document.getElementById('floatingContainer'+nodeId));
+	//console.log('nodeId = '+nodeId);
+	//console.log(document.getElementById('floatingContainer'+nodeId));
 			JSTreeObj.getRootStructure('floatingContainer'+nodeId);			
 			document.getElementById('floatingContainer'+nodeId).id = 'rootTemporary';
 			showLoadingMessage("Creating...");			
@@ -1447,7 +1447,7 @@ console.log('parentDiv = '+parentDiv);
 			editEl.innerHTML = editObj.value;
 //			var changeNameId = editObj.id.replace(/[^0-9]/g,'');
 
-console.log('editObj.id ' + editObj.id + ' editObj.id.replace '+editObj.id.replace(/[^0-9]/g,'')+' editObj.value '+editObj.value);
+//console.log('editObj.id ' + editObj.id + ' editObj.id.replace '+editObj.id.replace(/[^0-9]/g,'')+' editObj.value '+editObj.value);
 //console.log('editObj.id '+editObj.id+' editObj.id.replace(/[^0-9]/g,'') '+editObj.id.replace(/[^0-9]/g,''));
 			var changeNameId = editObj.id.replace(/[^0-9]/g,'');
 			var newName = editObj.value;

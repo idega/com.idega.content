@@ -32,6 +32,7 @@
         		<type>java.lang.String</type>
       		</property>
     	</module>
+    	<module id="uuid_116e3748-900a-11db-be89-7f0c8cf10368" class="com.idega.block.navigation.presentation.NavigationBreadCrumbsList" />
     </region>
     <region id="footer" label="footer">
     	<module id="uuid_43113173-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">

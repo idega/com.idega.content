@@ -1,6 +1,7 @@
 package com.idega.content.themes.business;
 
 import java.rmi.RemoteException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,8 +18,11 @@ import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.core.builder.business.BuilderService;
+import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.data.ICTreeNode;
+import com.idega.data.TreeableEntity;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
@@ -209,7 +213,15 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			setPageTitle(pageID, pageTitle);
 		}
 		
-		if (helper.getThemesService().getBuilderService().changePageUriByTitle(parentId, page, pageTitle, -1)) {
+		ICDomain domain = null;
+		try {
+			domain = helper.getThemesService().getBuilderService().getCurrentDomain();
+		} catch (RemoteException e) {
+			log.error(e);
+			return null;
+		}
+		
+		if (helper.getThemesService().getBuilderService().changePageUriByTitle(parentId, page, pageTitle, domain.getID())) {
 			return page.getDefaultPageURI();
 		}
 		return null;
@@ -504,14 +516,14 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	public boolean movePage(int newParentId, int nodeId) {
-		if (newParentId == 0 || newParentId == -1) {
-			IWContext iwc = IWContext.getInstance();
-			if (iwc == null) {
-				return false;
-			}
+		IWContext iwc = IWContext.getInstance();
+		if (iwc == null) {
+			return false;
+		}
+		if (newParentId <= 0) {
 			return helper.getThemesService().getBuilderService().movePageToTopLevel(nodeId, iwc);
 		}
-		return helper.getThemesService().getBuilderService().movePage(newParentId, nodeId);
+		return helper.getThemesService().getBuilderService().movePage(newParentId, nodeId, iwc.getDomain());
 	}
 	
 	public String getPathToImageFolder(){
@@ -538,26 +550,79 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return false;
 	}
 	
-	public boolean setAsStartPage(String pageID) {
+	public String setAsStartPage(String pageID) {
 		if (pageID == null) {
-			return false;
+			return null;
 		}
 		int newRoot = -1;
 		try {
 			newRoot = Integer.valueOf(pageID).intValue();
 		} catch (NumberFormatException e) {
 			log.error(e);
-			return false;
+			return null;
 		}
 		if (newRoot <= 0) {
-			return false;
+			return null;
 		}
 		
 		int currentRoot = getRootPageId();
 		if (currentRoot == newRoot) {
-			return true;
+			return null;
 		}
-		return true;
+		
+		BuilderService builder = helper.getThemesService().getBuilderService();
+		
+		ICDomain domain = null;
+		try {
+			domain = builder.getCurrentDomain();
+		} catch (RemoteException e) {
+			log.error(e);
+			return null;
+		}
+		
+		IWContext iwc = IWContext.getInstance();
+		if (iwc == null) {
+			return null;
+		}
+		
+		ICPage rootPage = helper.getThemesService().getICPage(currentRoot);
+		if (rootPage == null) {
+			return null;
+		}
+		rootPage.setDefaultPageURI(ThemesConstants.SLASH + rootPage.getName().toLowerCase() + ThemesConstants.SLASH);
+		rootPage.store();
+		builder.createTopLevelPageFromExistingPage(currentRoot, domain.getID(), iwc);
+		
+		ICPage newRootPage = helper.getThemesService().getICPage(newRoot);
+		if (newRootPage == null) {
+			return null;
+		}
+		newRootPage.setDefaultPageURI(ThemesConstants.SLASH);
+		newRootPage.store();
+		domain.setIBPage(newRootPage);
+		domain.store();
+		
+		TreeableEntity parent = newRootPage.getParentEntity();
+		if (parent instanceof ICPage) {
+			ICPage parentPage = (ICPage) parent;
+			if (parentPage.getPageKey().equals(rootPage.getPageKey())) {
+				try {
+					rootPage.removeChild(newRootPage); // Old root now is top level page, without children
+				} catch (SQLException e) {
+					log.error(e);
+				}
+			}
+		}
+		
+		Map tree = builder.getTree(iwc);
+		Iterator it = tree.values().iterator();
+		while (it.hasNext()) {
+			log.info(it.next());
+		}
+		
+		builder.clearAllCachedPages();
+		
+		return newRootPage.getDefaultPageURI();
 	}
 	
 	private int getRootPageId() {
