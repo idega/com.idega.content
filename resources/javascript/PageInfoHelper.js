@@ -369,19 +369,22 @@ function isStartPage(pageID) {
 }
 
 function isStartPageCallback(isStart) {
-	//console.log("Page " + getPageID() + " is start page: " + isStart);
+	if (console) {
+		if (console.log) {
+			console.log("Page " + getPageID() + " is start page: " + isStart);
+		}
+	}
 	var button = document.getElementById("makeStartPage");
 	if (button == null) {
 		return;
 	}
-	/*button.disabled = isStart;
-	if (isStart) {*/
-		button.disabled = true;
-		button.value = "This Page is A Start Page (not works yet)";
-	/*}
+	button.disabled = isStart;
+	if (isStart) {
+		button.value = "This Page is A Start Page";
+	}
 	else {
 		button.value = "Make This Page As Start Page";
-	}*/
+	}
 }
 
 function makePageAsStartPage() {
@@ -390,8 +393,8 @@ function makePageAsStartPage() {
 }
 
 function setAsStartPageCallback(result) {
-	closeLoadingMessage();
 	if (result != null) {
 		changePageTitleCallback(result);
 	}
+	window.location.href=window.location.href;
 }

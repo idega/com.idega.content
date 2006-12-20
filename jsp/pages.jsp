@@ -24,6 +24,7 @@ version="1.2">
 			<h:form id="pagesForm">
 				<jsf:verbatim>
                 	<script type="text/javascript">initScript(true, false, false);</script>
+                	<script type="text/javascript">getGlobalPageId();</script>
                 </jsf:verbatim>
                 
                 <wf:wfblock maximizedVertically="true" id="pagesBlock" title="#{localizedStrings['com.idega.content']['pages']}">
@@ -110,9 +111,9 @@ version="1.2">
 			</h:form>
 		</ws:page>
 		<jsf:verbatim>
-			<script type="text/javascript">showSlider(document.getElementById("themesSliderContainer"));resizeFrame();getGlobalPageId();</script>
+			<script type="text/javascript">showSlider(document.getElementById("themesSliderContainer"));resizeFrame();</script>
 			<script type="text/javascript">getPageInfoValues();</script>
-			<script type="text/javascript">isStartPage(getGlobalPageId());</script>
+			<script type="text/javascript">isStartPage(getPageID());</script>
 		</jsf:verbatim>
 	</jsf:view>
 </jsp:root>

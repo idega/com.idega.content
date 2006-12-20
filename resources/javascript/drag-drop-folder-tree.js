@@ -360,7 +360,11 @@
 					divTag = divTags[i];
 			}
 			
-			if(JSTreeObj.dragDropTimer<10)return;
+			if (JSTreeObj != null) {
+				if (JSTreeObj.dragDropTimer < 10) {
+					return;
+				}
+			}
 			if(document.all)e = event;
 
 			dragDrop_x = e.clientX/1 - 55 + document.body.scrollLeft;

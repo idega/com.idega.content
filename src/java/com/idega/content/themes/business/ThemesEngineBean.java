@@ -531,8 +531,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	public boolean isStartPage(String pageID) {
+		log.info("ID from DWR: " + pageID);
 		if (pageID == null) {
-			return true; // Returning true to disable a button
+			pageID = helper.getLastVisitedPage();
+			//return true; // Returning true to disable a button
 		}
 		int id = -1;
 		try {
@@ -585,39 +587,30 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return null;
 		}
 		
-		ICPage rootPage = helper.getThemesService().getICPage(currentRoot);
-		if (rootPage == null) {
-			return null;
-		}
-		rootPage.setDefaultPageURI(ThemesConstants.SLASH + rootPage.getName().toLowerCase() + ThemesConstants.SLASH);
-		rootPage.store();
-		builder.createTopLevelPageFromExistingPage(currentRoot, domain.getID(), iwc);
-		
 		ICPage newRootPage = helper.getThemesService().getICPage(newRoot);
 		if (newRootPage == null) {
 			return null;
 		}
-		newRootPage.setDefaultPageURI(ThemesConstants.SLASH);
-		newRootPage.store();
-		domain.setIBPage(newRootPage);
+		domain.setIBPage(newRootPage); // Setting new start page in ICDomain
 		domain.store();
+		newRootPage.setDefaultPageURI(ThemesConstants.SLASH); // Changing uri to new start page
+		newRootPage.store();
+		
+		ICPage rootPage = helper.getThemesService().getICPage(currentRoot);
+		if (rootPage == null) {
+			return null;
+		}
+		changePageUri(rootPage.getPageKey(), rootPage.getName().toLowerCase(), false);
+		builder.createTopLevelPageFromExistingPage(currentRoot, domain, iwc);
 		
 		TreeableEntity parent = newRootPage.getParentEntity();
 		if (parent instanceof ICPage) {
 			ICPage parentPage = (ICPage) parent;
-			if (parentPage.getPageKey().equals(rootPage.getPageKey())) {
-				try {
-					rootPage.removeChild(newRootPage); // Old root now is top level page, without children
-				} catch (SQLException e) {
-					log.error(e);
-				}
+			try {
+				parentPage.removeChild(newRootPage); // Removing new root as child from his old parent node
+			} catch (SQLException e) {
+				log.error(e);
 			}
-		}
-		
-		Map tree = builder.getTree(iwc);
-		Iterator it = tree.values().iterator();
-		while (it.hasNext()) {
-			log.info(it.next());
 		}
 		
 		builder.clearAllCachedPages();
