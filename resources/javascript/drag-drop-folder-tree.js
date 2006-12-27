@@ -575,6 +575,8 @@ console.log('parentDiv = '+parentDiv);
 					rootUl.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
 					var temporaryTable = document.getElementById('templateTable');
 					rootUl.removeChild(temporaryTable);
+					JSTreeObj.saveRoot(JSTreeObj.dragNode_source.id, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
+								(JSTreeObj.dragNode_source.getElementsByTagName('A')[0]).innerHTML);
 				}				
 				return;
 			}
