@@ -39,7 +39,7 @@ version="1.2">
 							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 								<jsf:facet name="PageTreeNode">
 									<h:outputLink onclick="setPageID(this.parentNode.id);getPrewUrl(this.parentNode.id);getPageInfoValues();isStartPage(this.parentNode.id);return false;">
-										<h:outputText value="#{node.description}" />
+										<h:outputText value="#{node.description}" title="#{node.description}" />
 									</h:outputLink>
 								</jsf:facet>
 							</wf:iwtree>				

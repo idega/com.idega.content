@@ -97,3 +97,18 @@ function resizeContainer(containerID, styleClass, usedSpace, changeHeight) {
 		} 
 	}
 }
+
+function checkIfNotEmptySiteTree(id) {
+	if (id == null) {
+		return;
+	}
+	var treeContainer = document.getElementById(id);
+	if (treeContainer == null) {
+		return;
+	}
+	if (treeContainer.childNodes != null) {
+		if (treeContainer.childNodes.length != 0) {
+			return;
+		}
+	}
+}

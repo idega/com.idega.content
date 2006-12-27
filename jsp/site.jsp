@@ -34,7 +34,7 @@
 							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 								<f:facet name="PageTreeNode">
 									<h:outputLink onclick="setPageID(this.parentNode.id);getPrewUrl(this.parentNode.id);getPageInfoValues();return false;">
-										<h:outputText value="#{node.description}" />
+										<h:outputText value="#{node.description}" title="#{node.description}" />
 									</h:outputLink>
 								</f:facet>
 							</wf:iwtree>				
@@ -47,7 +47,7 @@
 								<f:facet name="IWTreeNode">
 									<h:panelGroup>
 										<h:outputLink>
-											<h:outputText value="#{node.description}" />									
+											<h:outputText value="#{node.description}" title="#{node.description}" />									
 										</h:outputLink>
 									</h:panelGroup>
 								</f:facet>
@@ -67,7 +67,7 @@
 							treeObj.setTreeId('page_tree_div');
 							treeObj.setMaximumDepth(7);
 							treeObj.setMessageMaximumDepthReached('Maximum depth reached'); // If you want to show a message when maximum depth is reached, i.e. on drop.
-							treeObj.initTree(); 
+							treeObj.initTree();
 							treeObj.getNodeOrders();
 							treeObj.expandAll();								
 	
@@ -91,6 +91,7 @@
 						resizeContainer("pagesTypesContainer", "pagesTypesContainer", 502, false);
 						resizeContainer("siteTemplatesContainer", "siteTemplatesContainer", 502, false);
 						resizeContainer("siteTemplatesContainer", "siteTemplatesContainer", 287, true);
+						checkIfNotEmptySiteTree("div_id_current_structure_tree");
 					</script>
 				</f:verbatim>
 			</h:form>

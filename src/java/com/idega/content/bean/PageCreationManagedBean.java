@@ -1,5 +1,5 @@
 /*
- * $Id: PageCreationManagedBean.java,v 1.10 2006/12/04 09:38:16 justinas Exp $
+ * $Id: PageCreationManagedBean.java,v 1.11 2006/12/27 08:53:37 valdas Exp $
  * Created on 2.5.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -26,18 +26,17 @@ import org.apache.myfaces.custom.tree2.TreeNode;
 import org.apache.myfaces.custom.tree2.TreeNodeBase;
 
 import com.idega.content.business.ContentUtil;
+import com.idega.content.themes.helpers.ThemesConstants;
+import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.builder.business.BuilderService;
-import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.builder.data.ICPageHome;
 import com.idega.core.data.ICTreeNode;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWBundle;
-import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWContext;
-import com.idega.presentation.Page;
 import com.idega.webface.WFTreeNode;
 
 //import com.idega.builder.business;
@@ -45,10 +44,10 @@ import com.idega.webface.WFTreeNode;
 
 /**
  * 
- *  Last modified: $Date: 2006/12/04 09:38:16 $ by $Author: justinas $
+ *  Last modified: $Date: 2006/12/27 08:53:37 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class PageCreationManagedBean implements ActionListener {
 
@@ -101,75 +100,48 @@ public class PageCreationManagedBean implements ActionListener {
 //	}
 
 	
-	public TreeNode getPageSelectorTopNode(){
-		try {
+	public TreeNode getPageSelectorTopNode() {
 		IWContext iwc = IWContext.getInstance();
-		BuilderService bservice = BuilderServiceFactory.getBuilderService(iwc);
-		//ICDomain domain = BuilderServiceFactory.getBuilderService(iwc).getCurrentDomain();
-
-		if (this.pageSelectorTopNode == -1) {
-			this.pageSelectorTopNode = bservice.getRootPageId();
+		if (iwc == null) {
+			return new TreeNodeBase("type", "description", true);
 		}
-		int currentUserId = -1;
-		Collection coll = null;
-		coll = bservice.getTopLevelPages(iwc);
-//		coll = DomainTree.getDomainTree(iwc).getPagesNode().getChildren();//getStartPages(domain);
-		Iterator it = coll.iterator();
-		//int id = domain.getStartPageID();
-		WFTreeNode node = new WFTreeNode();
-		
-		while (it.hasNext()) {
-			ICTreeNode startPage;
+		BuilderService bservice = ThemesHelper.getInstance().getThemesService().getBuilderService();
+		if (this.pageSelectorTopNode == -1) {
 			try {
-//				bservice.startPage.getId();
-				
-				startPage = (ICTreeNode)it.next();
-				
-				String startPageId = startPage.getId();
-				ICPage page = bservice.getICPage(startPageId);
-				page.getSubType();
-//				page.getSubType();
-				
-//				Page page = bservice.getCurrentPage(arg0).get
-				
-//				if(!startPage.getId().equals(Integer.toString(id))){
-//					if(node == null){
-//						node = (WFTreeNode)(bservice.getPageTree(bservice.getRootPageId(), currentUserId));
-//						int childCount = node.getChildCount();
-//						for (int i = 0; i < childCount; i++) {
-//							System.out.println("removing "+i);
-//							System.out.println("removing "+node.getChildren());
-//							node.getChildren().remove(0);
-//							
-//							
-//						}
-//				 		System.out.println("after clear children = " + node.getChildCount());
-//				 		System.out.println("after clear children2222 = " + node.getChildren().size());
-//					}
-//					node.
-//					System.out.println("before node.getChildCount()"+node.getChildCount());
-//					Collection col = bservice.getPageTree(Integer.parseInt(startPage.getId()), currentUserId);
-					
-					node.addChild(bservice.getPageTree(Integer.parseInt(startPage.getId()), currentUserId));
-										
-			} catch (Exception e) {
-				// TODO: handle exception
+				this.pageSelectorTopNode = bservice.getRootPageId();
+			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
 		}
+		int currentUserId = -1;
 		try {
 			currentUserId = iwc.getCurrentUserId();
-		} catch (NotLoggedOnException nle) {}
+		} catch (NotLoggedOnException nle) {
+			nle.printStackTrace();
+		}
+		List <ICTreeNode> topLevelPages = new ArrayList <ICTreeNode> (bservice.getTopLevelPages(iwc));
+		WFTreeNode node = new WFTreeNode();
+		ICTreeNode startPage = null;
+		ICTreeNode page = null;
+		for (int i = 0; i < topLevelPages.size(); i++) {
+			startPage = topLevelPages.get(i);
+			if (ThemesConstants.MINUS_ONE.equals(startPage.getId()) || startPage.getId() == null) {
+				// Do nothing, tree is empty
+			}
+			else {
+				try {
+					page = bservice.getPageTree(Integer.parseInt(startPage.getId()), currentUserId);
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+				if (page != null) {
+					node.addChild(page);
+				}
+			}
+		}
 		return node;
-	}
-	catch (UnavailableIWContext e) {
-		e.printStackTrace();
-	}
-	catch (RemoteException e) {
-		e.printStackTrace();
-	}
-			
-	return new TreeNodeBase("type","description",true);
 	}	
 	
 	public String getResourceRealPath(){
