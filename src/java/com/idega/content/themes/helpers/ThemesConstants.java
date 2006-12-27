@@ -49,7 +49,7 @@ public class ThemesConstants {
 	protected static final List <String> REGIONS = Collections.unmodifiableList(Arrays.asList(_REGIONS));
 	
 	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "sidebarContainer",
-		"navcontainer", "breadcrumbcontainer"};
+		"breadcrumbcontainer", "navcontainer"};
 	protected static final List <String> BASIC_IDS_FOR_REGIONS = Collections.unmodifiableList(Arrays.asList(_BASIC_IDS_FOR_REGIONS));
 
 	private static final String[] _DEFAULT_STYLE_FILES = new String[] {"styles.css", "handheld.css", "print.css"};
@@ -144,4 +144,9 @@ public class ThemesConstants {
 	
 	public static final String LAST_USED_THEME = "theme.last_used.ibpage_id";
 	
+	public static final String SYSTEM_SETTINGS = "_systemSettings";
+	public static final String DOMAIN_NAME = "mainDomainName";
+	public static final String DOMAIN_SERVER_NAME = "mainDomainServerName";
+	
+	public static final String MINUS_ONE = "-1";
 }
