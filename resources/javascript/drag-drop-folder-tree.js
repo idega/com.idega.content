@@ -55,7 +55,9 @@
 		var newPageId;
 		var treeStructure;
 		var parentId;
+		var firstTopPage;
 
+		this.firstTopPage = false;
 		this.parentid = -1;
 		this.newPageId = -1;
 		this.deleteNodes = false;
@@ -564,6 +566,16 @@ console.log('parentDiv = '+parentDiv);
 			var parent;
 			if(JSTreeObj.dragDropTimer<10){				
 				JSTreeObj.dragDropTimer = -1;
+				return;
+			}
+
+			if(JSTreeObj.firstTopPage == true){
+				var rootUl = document.getElementById('rootUl');
+				if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
+					rootUl.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
+					var temporaryTable = document.getElementById('templateTable');
+					rootUl.removeChild(temporaryTable);
+				}				
 				return;
 			}
 
@@ -1388,6 +1400,18 @@ console.log('parentDiv = '+parentDiv);
 		,
 		getReceved : function(){
 			return JSTreeObj.receved;
+		}
+		,
+		prepareToSetTopPage : function(){
+			var tempTable = document.getElementById('templateTable');
+			tempTable.style.border='3px  solid';
+			JSTreeObj.firstTopPage = true;
+		}
+		,
+		topPageNotSet : function(){
+			var tempTable = document.getElementById('templateTable');
+			tempTable.style.border='1px  solid';
+			JSTreeObj.firstTopPage = false;			
 		}
 	}
 	

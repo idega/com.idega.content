@@ -111,4 +111,21 @@ function checkIfNotEmptySiteTree(id) {
 			return;
 		}
 	}
+	var rootUl = document.createElement('ul');
+	rootUl.setAttribute('id','rootUl');
+	var tempTable = document.createElement('table');
+	tempTable.setAttribute('id','templateTable');
+	tempTable.setAttribute('onmouseover','treeObj.prepareToSetTopPage();');	
+	tempTable.setAttribute('onmouseout','treeObj.topPageNotSet();');	
+	tempTable.style.border='1px  solid';
+	tempTable.style.margin='5px';
+	var tr=document.createElement('tr');
+  	var td=document.createElement('td');
+  	var tdText=document.createTextNode('Drop templates here'); 
+  	td.appendChild(tdText);  					// - put the text node in the table cell
+  	tr.appendChild(td); 						// - put the cell into the row
+  	tempTable.appendChild(tr); 	
+  	rootUl.appendChild(tempTable);
+	treeContainer.appendChild(rootUl);
+	
 }
