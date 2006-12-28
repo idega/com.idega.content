@@ -7,7 +7,6 @@ function saveMyTree(newParentNodeId, sourceNodeId) {
 	//console.log("newParentNodeId: " + newParentNodeId + ", sourceNodeId: " + sourceNodeId);
 	showLoadingMessage("Moving...");
 	setPageID(sourceNodeId);
-	RELOAD_PAGE = true;
 	ThemesEngine.movePage(newParentNodeId, sourceNodeId, empty);
 }
 
@@ -18,11 +17,17 @@ function getNewId(id){
 
 function deletePage(pageId){
 	showLoadingMessage("Deleting...");
+	setPageID(null);
+	RELOAD_PAGE = true;
 	ThemesEngine.deletePage(pageId, true, empty);
 }
 
 function empty(param) {
 	closeLoadingMessage();
+	if (RELOAD_PAGE) {
+		RELOAD_PAGE = false;
+		getGlobalPageId();
+	}
 }
 
 function setFrameUrl(url) {

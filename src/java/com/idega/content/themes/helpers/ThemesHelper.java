@@ -80,7 +80,7 @@ public class ThemesHelper implements Singleton {
 	private String webRoot;
 	private String lastVisitedPage;
 	
-	private static final String RESOURCE_PATH_START = "/files/cms/article/idega_theme_";
+	private static final String RESOURCE_PATH_START = "/files/cms/article/idega_theme_article";
 	private static final String RESOURCE_PATH_END = ThemesConstants.DOT + "article";
 	private static final String PAGE_TYPE = "page";
 	private static final String ATTRIBUTE_NAME = "property";
@@ -1059,9 +1059,9 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		
-		if (!name.startsWith(ThemesConstants.SLASH)) {
+		/*if (!name.startsWith(ThemesConstants.SLASH)) {
 			name = ThemesConstants.SLASH + name;
-		}
+		}*/
 		name += id;
 		
 		String docContent = getArticleDocument(language);

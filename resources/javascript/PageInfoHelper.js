@@ -105,20 +105,6 @@ function manageSlider(buttonID) {
 	}
 }
 
-function getGlobalPageId() {
-	if (getPageID() == null) {
-		ThemesEngine.getPageId(setGlobalPageId);
-	}
-	else {
-		return getPageID();
-	}
-}
-
-function setGlobalPageId(ID) {
-	setPageID(ID);
-	getPrewUrl(ID);
-}
-
 function chooseStyle(themeID) {
 	if (themeID == null) {
 		return;

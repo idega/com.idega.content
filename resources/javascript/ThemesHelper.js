@@ -15,6 +15,20 @@ function setPageID(ID) {
 function nothingToDo(parameter) {
 }
 
+function getGlobalPageId() {
+	if (getPageID() == null) {
+		ThemesEngine.getPageId(setGlobalPageId);
+	}
+	else {
+		return getPageID();
+	}
+}
+
+function setGlobalPageId(ID) {
+	setPageID(ID);
+	getPrewUrl(ID);
+}
+
 function changePageTitleCallback(result) {
 	if (result == null) {
 		return;
