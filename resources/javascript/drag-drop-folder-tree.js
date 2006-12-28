@@ -555,7 +555,7 @@
 					var temporaryTable = document.getElementById('templateTable');
 					rootUl.removeChild(temporaryTable);
 					JSTreeObj.saveRoot(JSTreeObj.dragNode_source.id, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
-								(JSTreeObj.dragNode_source.getElementsByTagName('A')[0]).innerHTML);
+								(JSTreeObj.dragNode_source.getElementsByTagName('span')[0]).innerHTML);
 				}				
 				return;
 			}
@@ -700,17 +700,18 @@
 					if (parentDiv.getElementsByTagName('DIV')[0]){
 						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id){
 							saveMyTree(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);		
-							ThemesEngine.changePageUri(JSTreeObj.dragNode_source.id, (JSTreeObj.dragNode_source.getElementsByTagName('A')[0]).innerHTML, false, changePageTitleCallback);
+							ThemesEngine.changePageUri(JSTreeObj.dragNode_source.id, (JSTreeObj.dragNode_source.getElementsByTagName('span')[0]).innerHTML, false, changePageTitleCallback);
 						}
 						else{
 							var newParentId = treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null);
 							if(!newParentId) {
 								JSTreeObj.saveRoot(JSTreeObj.dragNode_source.id, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
-								(JSTreeObj.dragNode_source.getElementsByTagName('A')[0]).innerHTML);
+								(JSTreeObj.dragNode_source.getElementsByTagName('span')[0]).innerHTML);
 							}
 							else
 								JSTreeObj.saveNewPage(newParentId, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
-								(JSTreeObj.dragNode_source.getElementsByTagName('A')[0]).innerHTML);
+								(JSTreeObj.dragNode_source.getElementsByTagName('span')[0]).innerHTML);
+//								console.log((JSTreeObj.dragNode_source.getElementsByTagName('span')[0]).innerHTML);
 						}
 							//need name
 							
@@ -738,7 +739,7 @@
 			var root = document.getElementById('rootTemporary');
 			(document.getElementById('rootTemporary')).setAttribute("id", id[0]);	
 			JSTreeObj.initNode(document.getElementById(id[0]));		
-			var newName = (document.getElementById(id[0]).getElementsByTagName('A')[0]).innerHTML;
+			var newName = (document.getElementById(id[0]).getElementsByTagName('span')[0]).innerHTML;
 //			ThemesEngine.changePageUri(id[0], newName, false, changePageTitleCallback);			
 			var newChilds = root.getElementsByTagName('li');
 			var newChildsElement = null;
@@ -752,7 +753,7 @@
 				newNode = document.getElementById(id[i+1]);
 				if (newNode != null) {
 					JSTreeObj.initNode(newNode);
-					newName = (newNode.getElementsByTagName('A')[0]).innerHTML;
+					newName = (newNode.getElementsByTagName('span')[0]).innerHTML;
 				}
 				if (id[i + 1] != null && newName != null) {
 //					ThemesEngine.changePageUri(id[i+1], newName, false, changePageTitleCallback);
@@ -770,7 +771,7 @@
 			var newChilds = root.getElementsByTagName('li');
 
 			var nodeId = root.id;
-			var nodeName = (root.getElementsByTagName('A')[0]).innerHTML;
+			var nodeName = (root.getElementsByTagName('span')[0]).innerHTML;
 			var pageType = root.getAttribute('pagetype');
 			var parentId = null;
 			var templateFile = root.getAttribute('templatefile');		
@@ -784,7 +785,7 @@
 			
 			for (var i = 0; i < newChilds.length; i++){			
 				nodeId = newChilds[i].id;
-				nodeName = (newChilds[i].getElementsByTagName('A')[0]).innerHTML;
+				nodeName = (newChilds[i].getElementsByTagName('span')[0]).innerHTML;
 				pageType = newChilds[i].getAttribute('pagetype');
 				if(i != 0)
 					parentId = newChilds[i].parentNode.parentNode.parentNode.id;
@@ -1258,7 +1259,7 @@
 			var newChilds = root.getElementsByTagName('li');
 
 			var nodeId = root.id;
-			var nodeName = (root.getElementsByTagName('A')[0]).innerHTML;
+			var nodeName = (root.getElementsByTagName('span')[0]).innerHTML;
 			var pageType = root.getAttribute('pagetype');
 			var parentId = parentId;
 			var templateFile = root.getAttribute('templatefile');		
@@ -1272,7 +1273,7 @@
 			
 			for (var i = 0; i < newChilds.length; i++){			
 				nodeId = newChilds[i].id;
-				nodeName = (newChilds[i].getElementsByTagName('A')[0]).innerHTML;
+				nodeName = (newChilds[i].getElementsByTagName('span')[0]).innerHTML;
 				pageType = newChilds[i].getAttribute('pagetype');
 				if(i != 0)
 					parentId = newChilds[i].parentNode.parentNode.parentNode.id;
@@ -1326,7 +1327,7 @@
 			for(var i = 0; i < newChilds.length; i++){
 				(document.getElementById(newChilds[i].id)).setAttribute("id", id[i]);	
 				JSTreeObj.initNode(document.getElementById(id[i]));		
-				var newName = (document.getElementById(id[i]).getElementsByTagName('A')[0]).innerHTML;
+				var newName = (document.getElementById(id[i]).getElementsByTagName('span')[0]).innerHTML;
 				if(movingNode){
 					ThemesEngine.changePageUri(id[i], newName, false, changePageTitleCallback);
 				}
@@ -1342,7 +1343,7 @@
 			for(var i = 0; i < childs.length; i++){
 				if (nodeChilds[i].parentNode == nodeParent){
 					JSTreeObj.saveNewPage(newParentId, childs[i].getAttribute('pagetype'), childs[i].getAttribute('templatefile'), 
-						(childs[i].getElementsByTagName('A')[0]).innerHTML);
+						(childs[i].getElementsByTagName('span')[0]).innerHTML);
 					JSTreeObj.getNodeChilds(nodeChilds[i], JSTreeObj.newPageId);
 				}
 			}
