@@ -1,5 +1,5 @@
 /*
- * $Id: ContentUtil.java,v 1.10 2006/02/28 14:49:28 tryggvil Exp $
+ * $Id: ContentUtil.java,v 1.11 2006/12/28 11:50:11 gediminas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -13,16 +13,15 @@ import javax.faces.context.FacesContext;
 import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.idegaweb.IWBundle;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWUserContext;
-import com.idega.presentation.IWContext;
-
 
 /**
  * 
- * Last modified: $Date: 2006/02/28 14:49:28 $ by $Author: tryggvil $
+ * Last modified: $Date: 2006/12/28 11:50:11 $ by $Author: gediminas $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class ContentUtil {
 	public static final String CONTENT_PATH = "/files/cms";
@@ -45,9 +44,15 @@ public class ContentUtil {
 	}
 
 	private static void setupBundle() {
+		IWMainApplication app = null;
 		FacesContext context = FacesContext.getCurrentInstance();
-		IWContext iwContext = IWContext.getIWContext(context);
-		bundle = iwContext.getIWMainApplication().getBundle(IW_BUNDLE_IDENTIFIER);
+		if (context != null) {
+			app = IWMainApplication.getIWMainApplication(context);
+		}
+		else {
+			app = IWMainApplication.getDefaultIWMainApplication();
+		}
+		bundle = app.getBundle(IW_BUNDLE_IDENTIFIER);
 	}
 	
 	/**
