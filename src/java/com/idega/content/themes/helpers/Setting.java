@@ -38,5 +38,4 @@ public class Setting {
 	public void setType(String type) {
 		this.type = type;
 	}
-	
 }

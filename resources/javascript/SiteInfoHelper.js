@@ -106,7 +106,7 @@ function proceedSaving(keywords) {
 		element = document.getElementById(KEYWORDS[i]);
 		if (element != null) {
 			values.push(element.value);
-			if (KEYWORDS[i] == "mainDomainName_systemSettings") {
+			if (KEYWORDS[i] == "mainDomainName") {
 				var siteName = getElementByClassName("div", "ws_appinfo");
 				if (siteName != null) {
 					var newName = document.createTextNode(element.value);

@@ -23,6 +23,11 @@ function changePageTitleCallback(result) {
 	if (pageUri != null) {
 		pageUri.value = result;
 	}
+	if (getPageID() != null) {
+		if (getPageID() != -1) {
+			getPrewUrl(getPageID());
+		}
+	}
 }
 
 function changePageTitleInPageInfo(title) {

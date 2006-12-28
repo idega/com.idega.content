@@ -1,8 +1,13 @@
 var ajaxObjects = new Array();
+
+var RELOAD_PAGE = false;
 	
 function saveMyTree(newParentNodeId, sourceNodeId) {
 	saveString = treeObj.getNodeOrders();
 	//console.log("newParentNodeId: " + newParentNodeId + ", sourceNodeId: " + sourceNodeId);
+	showLoadingMessage("Moving...");
+	setPageID(sourceNodeId);
+	RELOAD_PAGE = true;
 	ThemesEngine.movePage(newParentNodeId, sourceNodeId, empty);
 }
 

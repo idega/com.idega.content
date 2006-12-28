@@ -157,7 +157,7 @@ function scroll(id) {
 		}
 		
 		if (move){
-			new Effect.MoveBy(document.getElementById(containerID), 0, getAllImageSpace(),  {queue: 'end', mode: 'relative', duration: 0.3 });
+			new Effect.MoveBy(document.getElementById(containerID), 0, getAllImageSpace(), {queue: 'end', mode: 'relative', duration: 0.09 });
 		}
 		return;
 	}
@@ -172,7 +172,7 @@ function scroll(id) {
 		}
 		
 		if (move){
-			new Effect.MoveBy(document.getElementById(containerID), 0, -(getAllImageSpace()),  {queue: 'end', mode: 'relative', duration: 0.3 });
+			new Effect.MoveBy(document.getElementById(containerID), 0, -(getAllImageSpace()), {queue: 'end', mode: 'relative', duration: 0.09 });
 		}
 	}
 }

@@ -116,15 +116,15 @@ public class ThemesConstants {
 	protected static final String DEFAULT_MIME_TYPE = "image/";
 	
 	protected static final String PAGES_PATH_APPL = BASE_ROOT_APPL + "/pages/";
-	protected static final String ARTICLE_PATH_APPL = BASE_ROOT_APPL + "/themes/article.xml";
+	public static final String IDEGA_THEME_ARTICLE = "idegathemearticle";
+	protected static final String ARTICLE_PATH_APPL = BASE_ROOT_APPL + "/themes/" + /*IDEGA_THEME_ARTICLE*/ "idega_theme_article" + ".xml";
 	
-	/*Public fields*/
 	public static final String THEMES = "/themes/";
 	
 	public static final String INCORRECT_PARENT_ID = "-1";
 	
 	public static final String THEMES_PROPERTY_START = "theme.";
-	public static final String THEMES_PROPERTY_END = ".default";
+	public static final String THEMES_PROPERTY_END = ".def";
 	
 	public static final String CONTENT = "/content";
 	public static final String THEMES_PATH = BASE_ROOT_SLIDE + THEMES;
@@ -144,9 +144,9 @@ public class ThemesConstants {
 	
 	public static final String LAST_USED_THEME = "theme.last_used.ibpage_id";
 	
-	public static final String SYSTEM_SETTINGS = "_systemSettings";
-	public static final String DOMAIN_NAME = "mainDomainName";
-	public static final String DOMAIN_SERVER_NAME = "mainDomainServerName";
+	public static final String SYSTEM_SETTINGS = "mainDomain";
+	public static final String DOMAIN_NAME = SYSTEM_SETTINGS + "Name";
+	public static final String DOMAIN_SERVER_NAME = SYSTEM_SETTINGS + "ServerName";
 	
 	public static final String MINUS_ONE = "-1";
 }

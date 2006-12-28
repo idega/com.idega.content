@@ -32,7 +32,7 @@ public class SiteInfoJsf extends SiteInfo {
 		
 		Table2 table = new Table2();
 		table.setCellpadding(0);
-		createTableBody(table.createBodyRowGroup(), iwc.getApplicationSettings(), false);
+		createTableBody(table.createBodyRowGroup(), iwc, false);
 		siteInfo.add(table);
 		
 		siteInfo.add(getText("Locale: ", false));

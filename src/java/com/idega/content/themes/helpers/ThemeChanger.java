@@ -36,12 +36,8 @@ public class ThemeChanger {
 	private static final String TOOLBAR_REPLACE_BEGIN = "<ul><li><a href=\"index.html\" rel=\"self\" id=\"current\">";
 	private static final String TOOLBAR_REPLACE_END = "</a></li></ul>";
 	
-	private static final String SIDEBAR_REPLACE_BEGIN = "<div id=\"blog-categories\">";
-	private static final String SIDEBAR_REPLACE_ELEMENT_BEGIN = "<div class=\"blog-category-link-disabled\">";
-	private static final String SIDEBAR_REPLACE_ELEMENT_END = "</div>";
-	
-	private static final String BREADCRUMB_REPLACE_BEGIN = "<ul><li><a href=\"index.html\">";
-	private static final String BREADCRUMB_REPLACE_END = "</a></li></ul>";
+//	private static final String BREADCRUMB_REPLACE_BEGIN = "<ul><li><a href=\"index.html\">";
+//	private static final String BREADCRUMB_REPLACE_END = "</a></li></ul>";
 	
 	private static final String IMAGE_START = "<img src=";
 	private static final String IMAGE_POSITION = "style=\"margin: 2px; float: ";
@@ -58,8 +54,8 @@ public class ThemeChanger {
 	
 	// Default keywords
 	private static final String TOOLBAR = "toolbar";
-	private static final String SIDEBAR = "sidebar";
-	private static final String BREADCRUMB = "breadcrumb";
+	private static final String NAVIGATION = "navcontainer";
+	private static final String BREADCRUMB = "breadcrumbcontainer";
 	private static final String FOOTER = "footer";
 	private static final String SITE_TITLE = "site_title";
 	private static final String SITE_SLOGAN = "site_slogan";
@@ -97,6 +93,7 @@ public class ThemeChanger {
 	private static final int THEME_HEIGHT = 200;
 	
 	private static final String REGION_TO_EXPAND = "contentContainer";
+	//private static final String MORE = ">";
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
@@ -515,6 +512,13 @@ public class ThemeChanger {
 	}
 	
 	private String getBasicReplace(String begin, String defaultValue, String end) {
+		if (defaultValue == null) {
+			return ThemesConstants.EMPTY;
+		}
+		if (ThemesConstants.EMPTY.equals(defaultValue)) {
+			return ThemesConstants.EMPTY;
+		}
+		
 		String value = ThemesConstants.EMPTY;
 		if (begin != null) {
 			value += begin;
@@ -528,20 +532,54 @@ public class ThemeChanger {
 		return value;
 	}
 	
-	private String getSidebarReplace(String defaultValue) {
-		if (defaultValue == null) {
-			return ThemesConstants.EMPTY;
+	private Collection <Element> getNavigatorContent(String propertyKey, boolean addID) {
+		if (propertyKey == null) {
+			return new ArrayList<Element>();
 		}
-		String[] elements = defaultValue.split(ThemesConstants.COMMA);
-		StringBuffer sidebar = new StringBuffer();
-		sidebar.append(SIDEBAR_REPLACE_BEGIN);
+		IWMainApplicationSettings settings  = IWMainApplication.getDefaultIWMainApplication().getSettings();
+		if (settings == null) {
+			return new ArrayList<Element>();
+		}
+		String propertyValue = settings.getProperty(ThemesConstants.THEMES_PROPERTY_START + propertyKey + ThemesConstants.THEMES_PROPERTY_END);
+		if (propertyValue == null) {
+			return new ArrayList<Element>();
+		}
+		if (ThemesConstants.EMPTY.equals(propertyValue)) {
+			return new ArrayList<Element>();
+		}
+		
+		Collection <Element> container = new ArrayList<Element>();
+		Collection <Element> pages = new ArrayList<Element>();
+		Collection <Element> linkToPage = null;
+		
+		String[] elements = propertyValue.split(ThemesConstants.COMMA);
+		
+		Element listContainer = new Element("ul");
+		Element listElement = null;
+		Element link = null;
+		
+		String LI = "li";
+		String A = "a";
+		String ID = "id";
+		String CURRENT = "current";
+		
 		for (int i = 0; i < elements.length; i++) {
-			sidebar.append(SIDEBAR_REPLACE_ELEMENT_BEGIN);
-			sidebar.append(elements[i]);
-			sidebar.append(SIDEBAR_REPLACE_ELEMENT_END);
+			listElement = new Element(LI);
+			link = new Element(A);
+			if (addID) {
+				if (i == 0) {
+					link.setAttribute(ID, CURRENT);
+				}
+			}
+			link.setText(elements[i]);
+			linkToPage = new ArrayList<Element>();
+			linkToPage.add(link);
+			listElement.setContent(linkToPage);
+			pages.add(listElement);
 		}
-		sidebar.append(SIDEBAR_REPLACE_ELEMENT_END);
-		return sidebar.toString();
+		listContainer.setContent(pages);
+		container.add(listContainer);
+		return container;
 	}
 	
 	private String getContentReplace(String defaultValue) {
@@ -586,14 +624,6 @@ public class ThemeChanger {
 				return region + getBasicReplace(TOOLBAR_REPLACE_BEGIN, propertyValue, TOOLBAR_REPLACE_END) +
 					ThemesConstants.COMMENT_BEGIN +	ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
-			if (value.equals(SIDEBAR)) {
-				return region + getSidebarReplace(propertyValue) + ThemesConstants.COMMENT_BEGIN +
-					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
-			}
-			if (value.equals(BREADCRUMB)) {
-				return region + getBasicReplace(BREADCRUMB_REPLACE_BEGIN, propertyValue, BREADCRUMB_REPLACE_END) +
-					ThemesConstants.COMMENT_BEGIN +	ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
-			}
 			if (value.equals(FOOTER)) {
 				return region + COPY_AND_SPACE + getBasicReplace(null, propertyValue, null) + ThemesConstants.COMMENT_BEGIN +
 					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
@@ -624,7 +654,7 @@ public class ThemeChanger {
 		String fixedValue = null;
 		for (int i = 0; i < ThemesConstants.REGIONS.size(); i++) {
 			fixedValue = fixValue(ThemesConstants.REGIONS.get(i));
-			while (docContent.indexOf(ThemesConstants.REGIONS.get(i)) != -1) {
+			if (docContent.indexOf(ThemesConstants.REGIONS.get(i)) != -1) {
 				docContent = docContent.replace(ThemesConstants.REGIONS.get(i), getRegion(fixedValue));
 			}
 		}
@@ -661,6 +691,12 @@ public class ThemeChanger {
 		
 		if (needAddRegion(ThemesConstants.BASIC_IDS_FOR_REGIONS, regionID)) {
 			e.addContent(0, getCommentsCollection(regionID));
+			if (NAVIGATION.equals(regionID)) {
+				e.addContent(1, getNavigatorContent(regionID, true));
+			}
+			if (BREADCRUMB.equals(regionID)) {
+				e.addContent(1, getNavigatorContent(regionID, false));
+			}
 		}
 		if (regionID.equals(REGION_TO_EXPAND)) {
 			e.addContent(getElement("div", "&nbsp;", "style", "height:"+THEME_HEIGHT+";visibility:hidden")); // Expanding theme

@@ -6,6 +6,7 @@ import com.idega.business.IBOServiceBean;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.builder.business.BuilderService;
+import com.idega.presentation.IWContext;
 
 public class PagePreviewBean extends IBOServiceBean implements PagePreview{
 	
@@ -35,6 +36,10 @@ public class PagePreviewBean extends IBOServiceBean implements PagePreview{
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			return ThemesConstants.EMPTY;
+		}
+		IWContext iwc = IWContext.getInstance();
+		if (iwc != null) {
+			builderService.setCurrentPageId(iwc, ID);
 		}
 		return uri;
 	}

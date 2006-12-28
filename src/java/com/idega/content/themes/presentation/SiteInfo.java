@@ -2,14 +2,14 @@ package com.idega.content.themes.presentation;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
+import com.idega.content.themes.business.ThemesEngine;
 import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.core.builder.data.ICDomain;
 import com.idega.core.localisation.presentation.LocalePresentationUtil;
-import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table2;
@@ -57,19 +57,24 @@ public class SiteInfo extends Block {
 		return locales;
 	}
 	
-	protected void createTableBody(TableRowGroup group, IWMainApplicationSettings applicationSettings, boolean boldText) {
+	protected void createTableBody(TableRowGroup group, IWContext iwc, boolean boldText) {
 		TableRow row = null;
 		TableCell2 cell = null;
 		
 		Setting setting = null;
 		String value = null;
 		TextInput regionValue = null;
-		Iterator <Setting> it = ThemesHelper.getInstance().getThemeSettings().values().iterator();
+		List <Setting> settings = new ArrayList <Setting> (ThemesHelper.getInstance().getThemeSettings().values());
+		if (settings == null) {
+			return;
+		}
 		if (locale == null) {
 			return;
 		}
-		while(it.hasNext()) {
-			setting = it.next();
+		ThemesEngine engine = ThemesHelper.getInstance().getThemesEngine();
+		ICDomain domain = iwc.getIWMainApplication().getIWApplicationContext().getDomain();
+		for (int i = 0; i < settings.size(); i++) {
+			setting = settings.get(i);
 			row = group.createRow();
 			cell = row.createCell();
 			cell.add(getText(setting.getLabel(), boldText));
@@ -78,7 +83,7 @@ public class SiteInfo extends Block {
 			if (TYPE_TEXT.equals(setting.getType())) {
 				regionValue = new TextInput(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.DOT + REGION_VALUE);
 				regionValue.setId(setting.getCode());
-				value = applicationSettings.getProperty(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.DOT + locale);
+				value = engine.getSiteInfoValue(setting.getCode(), locale, iwc.getApplicationSettings(), domain);
 				regionValue.setValue(value);
 				cell.add(regionValue);
 			}
@@ -107,7 +112,7 @@ public class SiteInfo extends Block {
 		cell.add(new Text("Value"));
 		
 		doBusiness(iwc, ThemesHelper.getInstance().getThemeSettings().values());
-		createTableBody(table.createBodyRowGroup(), iwc.getApplicationSettings(), true);
+		createTableBody(table.createBodyRowGroup(), iwc, true);
 		
 		SubmitButton save = new SubmitButton("Save", SAVE_PARAMETER, SAVE_ACTION);
 		save.setStyleClass("button");

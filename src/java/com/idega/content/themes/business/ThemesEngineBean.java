@@ -19,6 +19,7 @@ import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.builder.business.BuilderService;
+import com.idega.core.builder.data.CachedDomain;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.data.ICTreeNode;
@@ -26,6 +27,7 @@ import com.idega.data.TreeableEntity;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
+import com.idega.servlet.filter.IWWelcomeFilter;
 
 public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 
@@ -34,8 +36,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	private static final String PAGE_URI = "pageUri";
 	private static final String PAGE_TITLE = "pageTitle";
-	private static final String MINUS_ONE = "-1";
-	private static final String PATH_TO_IMAGE_FOLDER = "/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/";
+	private static final String PATH_TO_IMAGE_FOLDER = ContentUtil.getBundle().getResourcesPath() + "/images/pageIcons/"; //"/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/";
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 
@@ -172,7 +173,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (pageID == null || title == null) {
 			return false;
 		}
-		if (MINUS_ONE.equals(pageID)) {
+		if (ThemesConstants.MINUS_ONE.equals(pageID)) {
 			return false;
 		}
 		
@@ -187,14 +188,14 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		String method = ":method:1:implied:void:setTitle:java.lang.String:";
-		return helper.getThemesService().getBuilderService().setProperty(pageID, MINUS_ONE, method, new String[]{title}, appl);
+		return helper.getThemesService().getBuilderService().setProperty(pageID, ThemesConstants.MINUS_ONE, method, new String[]{title}, appl);
 	}
 	
 	public String changePageUri(String pageID, String pageTitle, boolean needSetPageTitle) {
 		if (pageID == null || pageTitle == null) {
 			return null;
 		}
-		if (MINUS_ONE.equals(pageID)) {
+		if (ThemesConstants.MINUS_ONE.equals(pageID)) {
 			return null;
 		}
 		
@@ -255,10 +256,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		for (int i = 0; i < keywords.length; i++) {
 			s = map.get(keywords[i]);
 			if (s != null) {
-				currentValues = helper.getThemesService().getBuilderService().getPropertyValues(appl, pageID, MINUS_ONE, s.getMethod(), null, true);
+				currentValues = helper.getThemesService().getBuilderService().getPropertyValues(appl, pageID, ThemesConstants.MINUS_ONE, s.getMethod(), null, true);
 				if (ThemesConstants.EMPTY.equals(values[i]) || values[i] == null) {
 					if (currentValues != null) {
-						helper.getThemesService().getBuilderService().removeProperty(appl, pageID, MINUS_ONE, s.getMethod(), currentValues);
+						helper.getThemesService().getBuilderService().removeProperty(appl, pageID, ThemesConstants.MINUS_ONE, s.getMethod(), currentValues);
 					}
 				}
 				else {
@@ -276,7 +277,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 							needSetValue = false;
 						}
 						if (needSetValue) {
-							helper.getThemesService().getBuilderService().setProperty(pageID, MINUS_ONE, s.getMethod(), newValues, appl);
+							helper.getThemesService().getBuilderService().setProperty(pageID, ThemesConstants.MINUS_ONE, s.getMethod(), newValues, appl);
 							if (s.getCode().equals(PAGE_TITLE)) {
 								changedPageUri = changePageUri(pageID, values[i], false);
 								helper.getThemesService().getBuilderService().changePageName(Integer.valueOf(pageID).intValue(), values[i]);
@@ -294,7 +295,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (pageID == null || keywords == null) {
 			return null;
 		}
-		if (MINUS_ONE.equals(pageID)) {
+		if (ThemesConstants.MINUS_ONE.equals(pageID)) {
 			return null;
 		}
 		IWContext iwc = IWContext.getInstance();
@@ -314,7 +315,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			s = map.get(keywords[i]);
 			value = new StringBuffer();
 			if (s != null) {
-				propValues = helper.getThemesService().getBuilderService().getPropertyValues(appl, pageID, MINUS_ONE, s.getMethod(), null, true);
+				propValues = helper.getThemesService().getBuilderService().getPropertyValues(appl, pageID, ThemesConstants.MINUS_ONE, s.getMethod(), null, true);
 				if (propValues != null) {
 					for (int j = 0; j < propValues.length; j++) {
 						if (!s.getDefaultValue().equals(propValues[j])) {
@@ -374,11 +375,45 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return null;
 		}
 		String[] values = new String[keywords.length];
-		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
+		IWMainApplication application = ContentUtil.getBundle().getApplication();
+		IWMainApplicationSettings settings  = application.getSettings();
+		ICDomain domain = application.getIWApplicationContext().getDomain(); // Cached domain
 		for (int i = 0; i < keywords.length; i++) {
-			values[i] = settings.getProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + ThemesConstants.DOT + language);
+			values[i] = getSiteInfoValue(keywords[i], language, settings, domain);
 		}
 		return values;
+	}
+	
+	public String getSiteInfoValue(String keyword, String language, IWMainApplicationSettings settings, ICDomain domain) {
+		if (keyword == null || language == null || settings == null) {
+			return ThemesConstants.EMPTY;
+		}
+		keyword = ThemesConstants.THEMES_PROPERTY_START + keyword + ThemesConstants.DOT + language;
+		if (keyword.indexOf(ThemesConstants.SYSTEM_SETTINGS) == -1) {
+			return settings.getProperty(keyword);
+		}
+		else { // System Settings
+			if (domain == null) {
+				try {
+					domain = helper.getThemesService().getBuilderService().getCurrentDomain();
+				} catch (RemoteException e) {
+					log.error(e);
+					return ThemesConstants.EMPTY;
+				}
+			}
+			if (domain == null) {
+				return ThemesConstants.EMPTY;
+			}
+			else {
+				if (keyword.indexOf(ThemesConstants.DOMAIN_NAME) != -1) {
+					return domain.getDomainName();
+				}
+				if (keyword.indexOf(ThemesConstants.DOMAIN_SERVER_NAME) != -1) {
+					return domain.getServerName();
+				}
+			}
+		}
+		return ThemesConstants.EMPTY;
 	}
 	
 	private String[] getElements(Collection <Setting> c) {
@@ -398,13 +433,37 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (keywords.length != values.length) {
 			return false;
 		}
-		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
+		IWMainApplication application = ContentUtil.getBundle().getApplication();
+		IWMainApplicationSettings settings  = application.getSettings();
+		language = ThemesConstants.DOT + language;
+		ICDomain domain = null;
+		ICDomain cachedDomain = application.getIWApplicationContext().getDomain();
 		for (int i = 0; i < keywords.length; i++) {
-			if (values[i] == null || values[i].equals(ThemesConstants.EMPTY)) {
-				settings.removeProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + ThemesConstants.DOT + language);
+			if (keywords[i].indexOf(ThemesConstants.SYSTEM_SETTINGS) == -1) {
+				if (values[i] == null || values[i].equals(ThemesConstants.EMPTY)) {
+					settings.removeProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + language);
+				}
+				else {
+					settings.setProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + language, values[i]);
+				}
 			}
-			else {
-				settings.setProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + ThemesConstants.DOT + language, values[i]);
+			else { // Saving System Settings
+				if (values[i] != null && !ThemesConstants.EMPTY.equals(values[i])) {
+					if (domain == null) {
+						domain = helper.getThemesService().getDomain();
+					}
+					if (domain != null) {
+						if (keywords[i].indexOf(ThemesConstants.DOMAIN_NAME) != -1) {
+							domain.setDomainName(values[i]);
+							cachedDomain.setDomainName(values[i]);
+						}
+						if (keywords[i].indexOf(ThemesConstants.DOMAIN_SERVER_NAME) != -1) {
+							domain.setServerName(values[i]);
+							cachedDomain.setServerName(values[i]);
+						}
+						domain.store();
+					}
+				}
 			}
 		}
 		return true;
@@ -414,53 +473,110 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		List <String> newIds = new ArrayList<String>();
 		int id = -1;
 		String prevId = null;
-		String pageType = helper.getThemesService().getBuilderService().getPageKey();
-		String format = helper.getThemesService().getBuilderService().getIBXMLFormat();
+		BuilderService builder = helper.getThemesService().getBuilderService();
+		String pageType = builder.getPageKey();
+		String format = builder.getIBXMLFormat();
 		boolean canCreate;
 		String realID = null;
 		String webDAVUri = null;
 		String subType = null;
-		for (int i = 0; i < struct.size(); i = i+5) {
+		String parentId = null;
+		String name = null;
+		ICDomain domain = helper.getThemesService().getDomain();
+		int domainId = -1;
+		if (domain != null) {
+			domainId = domain.getID();
+		}
+		String uri = null;
+		boolean isRootPage = false;
+		for (int i = 0; i < struct.size(); i = i + 5) {
 			canCreate = true;
-			prevId = struct.get(i);			
 			try {
-				subType = struct.get(i+3);
-				webDAVUri = struct.get(i+4);
-				id = createPage(struct.get(i+1), struct.get(i+2), pageType, null, null, subType, -1, format, null);
-				realID = String.valueOf(id);
+				prevId = struct.get(i);
+				parentId = struct.get(i + 1);
+				name = struct.get(i + 2);
+				subType = struct.get(i + 3);
+				webDAVUri = struct.get(i + 4);
 			} catch (IndexOutOfBoundsException e) {
 				log.error(e);
 				canCreate = false;
 			}
-			if (canCreate) {
-				if (webDAVUri != null) {
-					if (!webDAVUri.equals(ThemesConstants.EMPTY)) {
-						String uriToPage = helper.loadPageToSlide(subType, id, webDAVUri);
-						helper.createArticle(subType, id);
-						if (uriToPage != null) {
-							helper.getThemesService().updatePageWebDav(id, uriToPage);
-						}
-						String lastTheme = helper.getLastUsedTheme();
-						if (lastTheme != null) {
-							helper.getThemesService().getBuilderService().setTemplateId(realID, lastTheme);
-						}
-					}
-				}
-				
-				for (int j = i; j < struct.size(); j = j+5) {
-					try {
-						if (struct.get(j + 1) != null) {
-							if ((struct.get(j + 1)).equals(prevId)) {
-								struct.set(j + 1, realID);
-							}
-						}
-					} catch (IndexOutOfBoundsException e) {
-						log.error(e);
-					}
-				}
-				
-				newIds.add(realID);
+			if (!canCreate) {
+				return newIds;
 			}
+			if (domain != null && parentId == null) {
+				if (domain.getStartPage() == null) {
+					uri = ThemesConstants.SLASH;
+					isRootPage = true;
+				}
+			}
+			
+			id = createPage(parentId, name, pageType, null, uri, subType, domainId, format, null);
+			realID = String.valueOf(id);
+			
+			if (isRootPage) { // Creating root page and root template
+				ICDomain cachedDomain = IWMainApplication.getDefaultIWMainApplication().getIWApplicationContext().getDomain();
+				if (cachedDomain.getDomainName() == null) {
+					cachedDomain.setDomainName("Default Site");
+				}
+				
+				if (domain.getDomainName() == null) {
+					domain.setDomainName(cachedDomain.getDomainName());
+					domain.store();
+				}
+				
+				builder.unlockRegion(realID, ThemesConstants.MINUS_ONE, null);
+				
+				domain.setIBPage(helper.getThemesService().getICPage(id));
+				int templateId = createPage(null, "Template", builder.getTemplateKey(), null, null, null, domainId, format, null);
+				
+				builder.unlockRegion(String.valueOf(templateId), ThemesConstants.MINUS_ONE, null);
+				
+				domain.setStartTemplate(helper.getThemesService().getICPage(templateId));
+				domain.store();
+				
+				cachedDomain.setIBPage(domain.getStartPage());
+				cachedDomain.setStartTemplate(domain.getStartTemplate());
+				if(cachedDomain instanceof CachedDomain){
+					CachedDomain ccachedDomain = (CachedDomain)cachedDomain;
+					ccachedDomain.setStartTemplateID(domain.getStartTemplateID());
+					ccachedDomain.setStartPage(domain.getStartPage());
+					ccachedDomain.setStartPageID(domain.getStartPageID());
+				}
+				
+				IWWelcomeFilter.unload();
+			}
+
+			uri = null;
+			isRootPage = false;
+			
+			if (webDAVUri != null) {
+				if (!webDAVUri.equals(ThemesConstants.EMPTY)) {
+					String uriToPage = helper.loadPageToSlide(subType, id, webDAVUri);
+					if (uriToPage != null) {
+						helper.getThemesService().updatePageWebDav(id, uriToPage);
+					}
+					helper.createArticle(subType, id);
+					String lastTheme = helper.getLastUsedTheme();
+					if (lastTheme != null) {
+						helper.getThemesService().getBuilderService().setTemplateId(realID, lastTheme);
+					}
+				}
+			}
+
+			for (int j = i; j < struct.size(); j = j + 5) {
+				try {
+					if (struct.get(j + 1) != null) {
+						if ((struct.get(j + 1)).equals(prevId)) {
+							struct.set(j + 1, realID);
+						}
+					}
+				} catch (IndexOutOfBoundsException e) {
+					log.error(e);
+				}
+			}
+
+			newIds.add(realID);
 		}
 
 		return newIds;

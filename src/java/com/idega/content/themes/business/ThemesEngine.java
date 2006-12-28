@@ -1,6 +1,8 @@
 package com.idega.content.themes.business;
 
 
+import com.idega.core.builder.data.ICDomain;
+import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.business.IBOService;
 import java.util.List;
 import java.rmi.RemoteException;
@@ -65,6 +67,11 @@ public interface ThemesEngine extends IBOService {
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getSiteInfoValues
 	 */
 	public String[] getSiteInfoValues(String[] keywords, String language) throws RemoteException;
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#getSiteInfoValue
+	 */
+	public String getSiteInfoValue(String keyword, String language, IWMainApplicationSettings settings, ICDomain domain);
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#saveSiteInfo

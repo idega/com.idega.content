@@ -10,7 +10,7 @@
 				<title />
 			</head>
 			<body>
-				<img vspace="0" hspace="0" border="0" align="" src="" />Lorem
+				<img vspace="0" hspace="5px" border="0" align="" src="" />Lorem
 ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum
 bibendum, ligula ut feugiat rutrum, mauris libero ultricies nulla,
 at hendrerit lectus dui bibendum metus. Phasellus quis nulla nec

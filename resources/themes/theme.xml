@@ -4,7 +4,7 @@
 	<key>
 		<code>title</code>
 		<label>Title</label>
-		<defaultValue>Start Page</defaultValue>
+		<defaultValue>My Page</defaultValue>
 		<type>text</type>
 		<method>setPageTitle</method>
 	</key>
@@ -32,7 +32,7 @@
 	<key>
 		<code>toolbar</code>
 		<label>Toolbar</label>
-		<defaultValue>Current Page</defaultValue>
+		<defaultValue></defaultValue>
 		<type>text</type>
 		<method>setToolbar</method>
 	</key>
@@ -44,16 +44,16 @@
 		<method>setSidebarTitle</method>
 	</key>
 	<key>
-		<code>sidebar</code>
-		<label>Sidebar</label>
+		<code>navcontainer</code>
+		<label>Navigation</label>
 		<defaultValue>The Products,Web Community,Partner Program,Get Support,About idega</defaultValue>
 		<type>text</type>
 		<method>setSidebar</method>
 	</key>
 	<key>
-		<code>breadcrumb</code>
+		<code>breadcrumbcontainer</code>
 		<label>Breadcrumb</label>
-		<defaultValue>Start Page</defaultValue>
+		<defaultValue></defaultValue>
 		<type>text</type>
 		<method>setBreadcrumb</method>
 	</key>
@@ -63,5 +63,19 @@
 		<defaultValue>idega</defaultValue>
 		<type>text</type>
 		<method>setFooter</method>
+	</key>
+	<key>
+		<code>mainDomainName</code>
+		<label>System Name</label>
+		<defaultValue></defaultValue>
+		<type>text</type>
+		<method></method>
+	</key>
+	<key>
+		<code>mainDomainServerName</code>
+		<label>Domain Name</label>
+		<defaultValue></defaultValue>
+		<type>text</type>
+		<method></method>
 	</key>
 </config>

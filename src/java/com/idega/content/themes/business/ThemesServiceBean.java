@@ -19,8 +19,11 @@ import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.core.builder.data.ICDomain;
+import com.idega.core.builder.data.ICDomainHome;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.builder.data.ICPageHome;
+import com.idega.data.IDOLookup;
+import com.idega.data.IDOLookupException;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWContentEvent;
 import com.idega.slide.business.IWSlideChangeListener;
@@ -179,7 +182,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			}
 		}
 		
-		if (parentId == null) { // Creating top level page
+		if (parentId == null && domainId == -1) { // Creating top level page
 			ICDomain domain = null;
 			try {
 				domain = builder.getCurrentDomain();
@@ -233,5 +236,21 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			return null;
 		}
 		return page;
+	}
+	
+	public ICDomain getDomain() {
+		ICDomainHome domainHome = null;
+		try {
+			domainHome = (ICDomainHome) IDOLookup.getHome(ICDomain.class);
+		} catch (IDOLookupException e) {
+			log.error(e);
+			return null;
+		}
+		try {
+			return domainHome.findFirstDomain();
+		} catch (FinderException e) {
+			log.error(e);
+			return null;
+		}
 	}
 }

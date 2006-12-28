@@ -14,12 +14,14 @@ import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpURL;
@@ -78,8 +80,8 @@ public class ThemesHelper implements Singleton {
 	private String webRoot;
 	private String lastVisitedPage;
 	
-	private static final String RESOURCE_PATH_START = "/files/cms/article";
-	private static final String RESOURCE_PATH_END = ".article";
+	private static final String RESOURCE_PATH_START = "/files/cms/article/idega_theme_";
+	private static final String RESOURCE_PATH_END = ThemesConstants.DOT + "article";
 	private static final String PAGE_TYPE = "page";
 	private static final String ATTRIBUTE_NAME = "property";
 	private static final String ATTRIBUTE_PROPERTY = "value";
@@ -91,7 +93,7 @@ public class ThemesHelper implements Singleton {
 	
 	private ThemesHelper(boolean canUseSlide) {
 		themes = new HashMap <String, Theme> ();
-		themeSettings = new HashMap <String, Setting> ();
+		themeSettings = Collections.synchronizedMap(new TreeMap<String, Setting>());//new HashMap <String, Setting> ();
 		pageSettings = new HashMap <String, Setting> ();
 		pages = new HashMap <String, Document> ();
 		articles = new HashMap <String, Document> ();
@@ -882,11 +884,8 @@ public class ThemesHelper implements Singleton {
 		}
 	}
 	
-	private Document preparePageDocument(Document doc, String type, String uri) {
+	private Document preparePageDocument(Document doc, String type, String uri, int pageID) {
 		if (PAGE_TYPE.equals(type)) {
-			if (uri.endsWith(ThemesConstants.SLASH)) {
-				uri = extractValueFromString(uri, 0, uri.lastIndexOf(ThemesConstants.SLASH));
-			}
 			Iterator it = doc.getDescendants();
 			Object o = null;
 			Element e = null;
@@ -899,7 +898,7 @@ public class ThemesHelper implements Singleton {
 					if (e.getName().equals(ATTRIBUTE_NAME)) {
 						a = e.getAttribute(ATTRIBUTE_PROPERTY);
 						if (a != null) {
-							a.setValue(RESOURCE_PATH_START + uri + RESOURCE_PATH_END);
+							a.setValue(RESOURCE_PATH_START + uri + pageID + RESOURCE_PATH_END);
 							changedValue = true;
 						}
 					}
@@ -909,10 +908,10 @@ public class ThemesHelper implements Singleton {
 		return doc;
 	}
 	
-	private String getPageDocument(String type, String uri, String fileName) {
+	private String getPageDocument(String type, String uri, String fileName, int pageID) {
 		Document doc = pages.get(type);
 		if (doc != null) {
-			doc = preparePageDocument(doc, type, uri);
+			doc = preparePageDocument(doc, type, uri, pageID);
 			return getThemeChanger().getXMLOutputter().outputString(doc);
 		}
 		doc = getXMLDocument(getWebRootWithoutContent() + ThemesConstants.PAGES_PATH_APPL + fileName);
@@ -920,7 +919,7 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		pages.put(type, doc);
-		doc = preparePageDocument(doc, type, uri);
+		doc = preparePageDocument(doc, type, uri, pageID);
 		return getThemeChanger().getXMLOutputter().outputString(doc);
 	}
 	
@@ -934,7 +933,7 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		
-		String docContent = getPageDocument(type, page.getDefaultPageURI(), fileName);
+		String docContent = getPageDocument(type, page.getDefaultPageURI(), fileName, pageID);
 		if (docContent == null) {
 			return null;
 		}
@@ -1063,9 +1062,7 @@ public class ThemesHelper implements Singleton {
 		if (!name.startsWith(ThemesConstants.SLASH)) {
 			name = ThemesConstants.SLASH + name;
 		}
-		if (name.endsWith(ThemesConstants.SLASH)) {
-			name = extractValueFromString(name, 0, name.lastIndexOf(ThemesConstants.SLASH));
-		}
+		name += id;
 		
 		String docContent = getArticleDocument(language);
 		if (docContent == null) {

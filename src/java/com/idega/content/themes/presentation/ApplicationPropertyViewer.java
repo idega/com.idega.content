@@ -24,9 +24,9 @@ import com.idega.presentation.text.Text;
  */
 public class ApplicationPropertyViewer extends Block {
 	
-	private static final String SIDEBAR = "sidebar";
+	private static final String NAVIGATION = "navcontainer";
 	private static final String TOOLBAR = "toolbar";
-	private static final String BREADCRUMB = "breadcrumb";
+	private static final String BREADCRUMB = "breadcrumbcontainer";
 	private static final String LIST_STYLE = "list-style-type: none; width: 100%";
 
 	private String applicationPropertyKey = null;
@@ -55,7 +55,7 @@ public class ApplicationPropertyViewer extends Block {
 				return;
 			}
 			
-			if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + SIDEBAR + ThemesConstants.DOT) != -1) { // Sidebar
+			if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + NAVIGATION + ThemesConstants.DOT) != -1) {
 				ICPage page = ThemesHelper.getInstance().getThemesService().getICPage(iwc.getCurrentIBPageID());
 				if (page != null) {
 					if (page.getWebDavUri() != null) {
@@ -76,17 +76,21 @@ public class ApplicationPropertyViewer extends Block {
 			}
 			
 			if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + TOOLBAR + ThemesConstants.DOT) != -1) { // Toolbar
-				Link l = new Link();
-				l.setId("current");
-				l.setText(value);
-				this.add(l);
+				if (!ThemesConstants.EMPTY.equals(value)) {
+					Link l = new Link();
+					l.setId("current");
+					l.setText(value);
+					this.add(l);
+				}
 				return;
 			}
 			
-			if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + BREADCRUMB + ThemesConstants.DOT) != -1) { // Breadcrumb
-				Link l = new Link();
-				l.setText(value);
-				this.add(l);
+			if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + BREADCRUMB + ThemesConstants.DOT) != -1) {
+				if (!ThemesConstants.EMPTY.equals(value)) {
+					Link l = new Link();
+					l.setText(value);
+					this.add(l);
+				}
 				return;
 			}
 

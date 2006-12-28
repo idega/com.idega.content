@@ -248,8 +248,7 @@ function setStyle(isPage) {
 function setStyleCallback(result) {
 	if (getPageID() != null) {
 		if (getPageID() != -1) {
-			setTimeout("getPrewUrl('"+getPageID()+"')", 1000); // Temporarily solution to avoid NullPointerException
-			//getPrewUrl(getPageID());
+			setTimeout("getPrewUrl('"+getPageID()+"')", 1000);
 		}
 	}
 	closeLoadingMessage();

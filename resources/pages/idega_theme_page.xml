@@ -26,7 +26,7 @@
       		</property>
     	</module>
     </region>
-    <region id="breadcrumb" label="breadcrumb">
+    <region id="breadcrumbcontainer" label="breadcrumbcontainer">
     	<module id="uuid_9d2c0ea9-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
       		<property>
         		<name>:method:1:implied:void:setApplicationPropertyKey:java.lang.String:</name>
