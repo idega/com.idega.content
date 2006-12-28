@@ -1447,10 +1447,11 @@ console.log(JSTreeObj.dragNode_destination);
 
 			var changeNameId = editObj.id.replace(/[^0-9]/g,'');
 			var newName = editObj.value;
-				
+			
+			showLoadingMessage("Changing...");
 //			BuilderService.changeNodeName(changeNameId, newName, empty);
 			BuilderService.changePageName(changeNameId, newName, empty);
-			
+
 			changePageTitleInPageInfo(newName);
 			ThemesEngine.changePageUri(changeNameId, newName, true, changePageTitleCallback);
 			
