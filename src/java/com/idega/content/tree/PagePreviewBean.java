@@ -12,9 +12,12 @@ public class PagePreviewBean extends IBOServiceBean implements PagePreview{
 	private static final long serialVersionUID = -4609798037266246269L;
 
 	public String getPreviewUrl(String ID){
+		if (ID == null) {
+			return ThemesConstants.EMPTY;
+		}
 		int id = -1;
 		try {
-			id = Integer.valueOf(ID);
+			id = Integer.valueOf(ID).intValue();
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			return ThemesConstants.EMPTY;

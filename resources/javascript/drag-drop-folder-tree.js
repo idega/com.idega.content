@@ -577,7 +577,6 @@
 						JSTreeObj.floatingContainer.removeChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));
 					}
 					
-console.log('NOT SAVE ON DROP');
 					JSTreeObj.dropTargetIndicator.style.display='none';		
 					JSTreeObj.dragDropTimer = -1;	
 
@@ -740,7 +739,7 @@ console.log(JSTreeObj.dragNode_destination);
 			(document.getElementById('rootTemporary')).setAttribute("id", id[0]);	
 			JSTreeObj.initNode(document.getElementById(id[0]));		
 			var newName = (document.getElementById(id[0]).getElementsByTagName('A')[0]).innerHTML;
-			ThemesEngine.changePageUri(id[0], newName, false, changePageTitleCallback);			
+//			ThemesEngine.changePageUri(id[0], newName, false, changePageTitleCallback);			
 			var newChilds = root.getElementsByTagName('li');
 			var newChildsElement = null;
 			var newNode = null;
@@ -756,7 +755,7 @@ console.log(JSTreeObj.dragNode_destination);
 					newName = (newNode.getElementsByTagName('A')[0]).innerHTML;
 				}
 				if (id[i + 1] != null && newName != null) {
-					ThemesEngine.changePageUri(id[i+1], newName, false, changePageTitleCallback);
+//					ThemesEngine.changePageUri(id[i+1], newName, false, changePageTitleCallback);
 				}
 			}
 			var lastID = id[id.length - 1];
@@ -1328,8 +1327,9 @@ console.log(JSTreeObj.dragNode_destination);
 				(document.getElementById(newChilds[i].id)).setAttribute("id", id[i]);	
 				JSTreeObj.initNode(document.getElementById(id[i]));		
 				var newName = (document.getElementById(id[i]).getElementsByTagName('A')[0]).innerHTML;
-				if(movingNode)
+				if(movingNode){
 					ThemesEngine.changePageUri(id[i], newName, false, changePageTitleCallback);
+				}
 			}
 			var lastID = id[id.length - 1];
 			setPageID(lastID);
