@@ -91,6 +91,7 @@ version="1.2">
 						treeObj.setMaximumDepth(7);
 						treeObj.setMessageMaximumDepthReached('Maximum depth reached');
 						treeObj.initTree();
+						treeObj.checkIfOverTree('page_tree_div');
 						treeObj.getNodeOrders();
 						treeObj.expandAll();
 							
