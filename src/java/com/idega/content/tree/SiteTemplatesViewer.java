@@ -69,7 +69,7 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		        
 		    HtmlOutputText texti = new HtmlOutputText();		    
 		    texti.setValueBinding("value",WFUtil.createValueBinding("#{node.description}"));
-		    texti.setValueBinding("title",WFUtil.createValueBinding("#{node.description}"));
+//		    texti.setValueBinding("title",WFUtil.createValueBinding("#{node.description}"));
 //		    linki.setValueBinding("iconURI",WFUtil.createValueBinding("#{node.iconURI}"));
 		    
 		    linki.getChildren().add(texti);		    

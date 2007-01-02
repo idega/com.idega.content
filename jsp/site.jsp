@@ -34,7 +34,7 @@
 							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 								<f:facet name="PageTreeNode">
 									<h:outputLink onclick="setPageID(this.parentNode.id);getPrewUrl(this.parentNode.id);getPageInfoValues();return false;">
-										<h:outputText value="#{node.description}" title="#{node.description}" />
+										<h:outputText value="#{node.description}"/>
 									</h:outputLink>
 								</f:facet>
 							</wf:iwtree>				
@@ -47,7 +47,7 @@
 								<f:facet name="IWTreeNode">
 									<h:panelGroup>
 										<h:outputLink>
-											<h:outputText value="#{node.description}" title="#{node.description}" />									
+											<h:outputText value="#{node.description}"/>									
 										</h:outputLink>
 									</h:panelGroup>
 								</f:facet>
@@ -70,7 +70,7 @@
 							treeObj.initTree();
 							treeObj.checkIfOverTree('page_tree_div');							
 							treeObj.getNodeOrders();
-							treeObj.expandAll();								
+							treeObj.expandAll();							
 	
 							treeObj22 = new JSDragDropTree();
 							treeObj22.setTreeId('page_chooser22');

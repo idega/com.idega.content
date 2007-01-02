@@ -133,7 +133,7 @@ function checkIfNotEmptySiteTree(id) {
 	var rootUl = document.createElement('ul');
 	rootUl.setAttribute('id','rootUl');
 	var tempTable = document.createElement('table');
-	tempTable.setAttribute('id','templateTable');
+	tempTable.setAttribute('id','temporaryTable');
 	tempTable.setAttribute('onmouseover','treeObj.prepareToSetTopPage();');	
 	tempTable.setAttribute('onmouseout','treeObj.topPageNotSet();');	
 	tempTable.style.border='1px  solid';
