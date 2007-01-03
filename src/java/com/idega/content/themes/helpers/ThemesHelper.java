@@ -80,14 +80,13 @@ public class ThemesHelper implements Singleton {
 	private String webRoot;
 	private String lastVisitedPage;
 	
-	private static final String RESOURCE_PATH_START = "/files/cms/article/idega_theme_article";
+	private static final String RESOURCE_PATH_START = ThemesConstants.BASE_ROOT_SLIDE + "/article/" + ThemesConstants.IDEGA_THEME + ThemesConstants.DOT;//"/files/cms/article/idega_theme_article";
 	private static final String RESOURCE_PATH_END = ThemesConstants.DOT + "article";
 	private static final String PAGE_TYPE = "page";
 	private static final String ATTRIBUTE_NAME = "property";
 	private static final String ATTRIBUTE_PROPERTY = "value";
 	private static final String DEFAULT_ARTICLE = "default_theme_article";
-	private static final String XML_EXTENSION = "xml";
-	private static final String XML_MIME_TYPE = "text/" + XML_EXTENSION;
+	private static final String XML_MIME_TYPE = "text/" + ThemesConstants.XML_EXTENSION;
 	
 	private Random numberGenerator = null;
 	
@@ -545,8 +544,10 @@ public class ThemesHelper implements Singleton {
         	}
             is = url.openStream();
         } catch (java.net.MalformedURLException e) {
+        	log.info("Error getting: " + link);
             log.error(e);
         } catch (java.io.IOException e) {
+        	log.info("Error getting: " + link);
             log.error(e);
         }
         return is;
@@ -886,6 +887,12 @@ public class ThemesHelper implements Singleton {
 	
 	private Document preparePageDocument(Document doc, String type, String uri, int pageID) {
 		if (PAGE_TYPE.equals(type)) {
+			if (uri.startsWith(ThemesConstants.SLASH)) {
+				uri = extractValueFromString(uri, uri.indexOf(ThemesConstants.SLASH), uri.length());
+			}
+			if (uri.endsWith(ThemesConstants.SLASH)) {
+				uri = extractValueFromString(uri, 0, uri.lastIndexOf(ThemesConstants.SLASH) - 1);
+			}
 			Iterator it = doc.getDescendants();
 			Object o = null;
 			Element e = null;
@@ -1059,9 +1066,12 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		
-		/*if (!name.startsWith(ThemesConstants.SLASH)) {
-			name = ThemesConstants.SLASH + name;
-		}*/
+		if (name.startsWith(ThemesConstants.SLASH)) {
+			name = extractValueFromString(name, name.indexOf(ThemesConstants.SLASH), name.length());
+		}
+		if (name.endsWith(ThemesConstants.SLASH)) {
+			name = extractValueFromString(name, 0, name.lastIndexOf(ThemesConstants.SLASH) - 1);
+		}
 		name += id;
 		
 		String docContent = getArticleDocument(language);
@@ -1069,7 +1079,7 @@ public class ThemesHelper implements Singleton {
 			return;
 		}
 
-		String fileName = language + ThemesConstants.DOT + XML_EXTENSION;
+		String fileName = language + ThemesConstants.DOT + ThemesConstants.XML_EXTENSION;
 		String base = RESOURCE_PATH_START + name + RESOURCE_PATH_END + ThemesConstants.SLASH;
 		try {
 			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, fileName, docContent, XML_MIME_TYPE, true);

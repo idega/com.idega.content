@@ -129,15 +129,19 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		int domainID = -1;
 		ICDomain domain = iwc.getDomain();
-		if (domain != null) {
-			domainID = domain.getID();
+		if (domain == null) {
+			return false;
 		}
+		domainID = domain.getID();
+		
 		getBuilderService();
 		
 		if (theme.getIBPageID() == -1) { // Creating IBPage for theme
 			String parentId = builder.getTopLevelTemplateId(builder.getTopLevelTemplates(iwc));
-			if (parentId.equals(ThemesConstants.INCORRECT_PARENT_ID)) {
-				return false;
+			if (parentId == null || ThemesConstants.INCORRECT_PARENT_ID.equals(parentId)) { // No Top Level Template
+				int topTemplate = ThemesHelper.getInstance().getThemesEngine().createRootTemplate(domain, builder, domainID, builder.getIBXMLFormat());
+				ThemesHelper.getInstance().getThemesEngine().initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
+				parentId = String.valueOf(topTemplate);
 			}
 			String name = ThemesHelper.getInstance().removeSpaces(theme.getName());
 			id = createIBPage(parentId, theme.getName(), builder.getTemplateKey(), null, ThemesConstants.THEMES + name +

@@ -8,35 +8,35 @@ public class ThemeChange {
 	private boolean enabled;
 	private boolean limitedSelection;
 
-	public boolean isEnabled() {
+	protected boolean isEnabled() {
 		return enabled;
 	}
 
-	public void setEnabled(boolean enabled) {
+	protected void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
-	public String getStyleGroupMember() {
+	protected String getStyleGroupMember() {
 		return styleGroupMember;
 	}
 
-	public void setStyleGroupMember(String styleGroupMember) {
+	protected void setStyleGroupMember(String styleGroupMember) {
 		this.styleGroupMember = styleGroupMember;
 	}
 
-	public String getStyleGroupName() {
+	protected String getStyleGroupName() {
 		return styleGroupName;
 	}
 
-	public void setStyleGroupName(String styleGroupName) {
+	protected void setStyleGroupName(String styleGroupName) {
 		this.styleGroupName = styleGroupName;
 	}
 
-	public boolean isLimitedSelection() {
+	protected boolean isLimitedSelection() {
 		return limitedSelection;
 	}
 
-	public void setLimitedSelection(boolean limitedSelection) {
+	protected void setLimitedSelection(boolean limitedSelection) {
 		this.limitedSelection = limitedSelection;
 	}
 	

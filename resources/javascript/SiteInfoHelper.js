@@ -95,8 +95,11 @@ function proceedSaving(keywords) {
 		return;
 	}
 	if (LANGUAGE == null) {
-		closeLoadingMessage();
-		return;
+		setActiveLanguage();
+		if (LANGUAGE == null) {
+			closeLoadingMessage();
+			return;
+		}
 	}
 	
 	KEYWORDS = keywords;

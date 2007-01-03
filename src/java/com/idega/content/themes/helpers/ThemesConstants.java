@@ -8,8 +8,15 @@ import com.idega.content.business.ContentUtil;
 
 public class ThemesConstants {
 	
+	public static final String IDEGA_THEME = "idega_theme";
+
+	public static final String DOT = ".";
+	public static final String UNDER = "_";
+	
+	protected static final String XML_EXTENSION = "xml";
+	
 	private static final String BASE_ROOT_APPL = ContentUtil.getBundle().getResourcesPath();
-	private static final String BASE_ROOT_SLIDE = ContentUtil.getContentBaseFolderPath();
+	protected static final String BASE_ROOT_SLIDE = ContentUtil.getContentBaseFolderPath();
 	
 	protected static final String BASE_THEME_IMAGES = BASE_ROOT_APPL + "/images/themes/";
 	
@@ -27,7 +34,10 @@ public class ThemesConstants {
 	protected static final String DRAFT_PREVIEW = "_draft_preview";
 	
 	protected static final String THEME_SEARCH_KEY = "*.htm*";
-	protected static final String IDEGA_THEME_INFO = "_idega_theme.xml";
+	protected static final String IDEGA_THEME_INFO = UNDER + IDEGA_THEME + DOT + XML_EXTENSION;//"_idega_theme.xml";
+	
+	private static final String[] _DUMMY_ARTICLES = new String[] {"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum bibendum, ligula ut feugiat rutrum, mauris libero ultricies nulla, at hendrerit lectus dui bibendum metus. Phasellus quis nulla nec mauris sollicitudin ornare. Vivamus faucibus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Cras vulputate condimentum ipsum. Duis urna eros, commodo id, sagittis sed, sodales eu, ante. Etiam ante. Cras risus dolor, porta nec, adipiscing eu, scelerisque at, metus. Mauris nunc eros, porttitor nec, tincidunt ut, rutrum eget, massa. In facilisis nisi. Sed non lorem malesuada quam egestas bibendum. Quisque bibendum ullamcorper purus. Integer id diam vel elit adipiscing consectetuer. Phasellus vitae eros. Vivamus laoreet consectetuer tortor. In congue dignissim quam. Suspendisse nec purus vel velit ultricies bibendum."};
+	public static final List <String> DUMMY_ARTICLES = Collections.unmodifiableList(Arrays.asList(_DUMMY_ARTICLES));
 	
 	private static final String[] _THEME_IMAGES = new String[] {"eagle.jpg", "grapes.jpg", "rocks.jpg", "ship.jpg", "sky.jpg"};
 	protected static final List <String> THEME_IMAGES = Collections.unmodifiableList(Arrays.asList(_THEME_IMAGES));
@@ -80,7 +90,7 @@ public class ThemesConstants {
 	protected static final String RW_GROUP_MEMBERS = "GroupMembers";
 	
 	protected static final String DRAFT = "_idega_draft.html";
-	protected static final String THEME = "_idega_theme.html";
+	protected static final String THEME = "_" + IDEGA_THEME + ".html";
 	
 	protected static final String ELEMENT_LINK = "link";
 	protected static final String TAG_ATTRIBUTE_HREF = "href";
@@ -116,8 +126,7 @@ public class ThemesConstants {
 	protected static final String DEFAULT_MIME_TYPE = "image/";
 	
 	protected static final String PAGES_PATH_APPL = BASE_ROOT_APPL + "/pages/";
-	public static final String IDEGA_THEME_ARTICLE = "idegathemearticle";
-	protected static final String ARTICLE_PATH_APPL = BASE_ROOT_APPL + "/themes/" + /*IDEGA_THEME_ARTICLE*/ "idega_theme_article" + ".xml";
+	protected static final String ARTICLE_PATH_APPL = BASE_ROOT_APPL + "/themes/" + IDEGA_THEME + "_article." + XML_EXTENSION;
 	
 	public static final String THEMES = "/themes/";
 	
@@ -134,9 +143,7 @@ public class ThemesConstants {
 	public static final String AT = "@";
 	public static final String EMPTY = "";
 	public static final String SEMICOLON = ";";
-	public static final String UNDER = "_";
 	public static final String SLASH = "/";
-	public static final String DOT = ".";
 	public static final String COMMA = ",";
 	
 	public static final String THEME_SETTINGS = "resources/themes/theme.xml";
@@ -149,4 +156,6 @@ public class ThemesConstants {
 	public static final String DOMAIN_SERVER_NAME = SYSTEM_SETTINGS + "ServerName";
 	
 	public static final String MINUS_ONE = "-1";
+	
+	public static final String DEFAULT_DOMAIN_NAME = "Default Site";
 }

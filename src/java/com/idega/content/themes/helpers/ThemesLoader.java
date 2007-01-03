@@ -65,7 +65,7 @@ public class ThemesLoader {
 		return helper.extractValueFromString(uri, index, uri.length());
 	}
 	
-	public synchronized String createNewTheme(String originalUri, String encodedUri, boolean newTheme, boolean manuallyCreated) {		
+	protected synchronized String createNewTheme(String originalUri, String encodedUri, boolean newTheme, boolean manuallyCreated) {		
 		helper.addUriToTheme(originalUri);
 		
 		initTheme(newTheme);

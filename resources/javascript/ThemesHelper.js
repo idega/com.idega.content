@@ -130,6 +130,13 @@ function checkIfNotEmptySiteTree(id) {
 			return;
 		}
 	}
+	// No pages created
+	var button = document.getElementById("makeStartPage");
+	if (button != null) {
+		button.disabled = true;
+		button.value = "No page exist";
+	}
+	
 	var rootUl = document.createElement('ul');
 	rootUl.setAttribute('id','rootUl');
 	var tempTable = document.createElement('table');

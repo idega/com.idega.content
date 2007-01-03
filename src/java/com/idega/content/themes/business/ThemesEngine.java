@@ -3,6 +3,7 @@ package com.idega.content.themes.business;
 
 import com.idega.core.builder.data.ICDomain;
 import com.idega.idegaweb.IWMainApplicationSettings;
+import com.idega.core.builder.business.BuilderService;
 import com.idega.business.IBOService;
 import java.util.List;
 import java.rmi.RemoteException;
@@ -122,4 +123,14 @@ public interface ThemesEngine extends IBOService {
 	 * @see com.idega.content.themes.business.ThemesEngineBean#setAsStartPage
 	 */
 	public String setAsStartPage(String pageID) throws RemoteException;
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#createRootTemplate
+	 */
+	public int createRootTemplate(ICDomain domain, BuilderService builder, int domainID, String format);
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#initializeCachedDomain
+	 */
+	public boolean initializeCachedDomain(String domainName, ICDomain domain);
 }

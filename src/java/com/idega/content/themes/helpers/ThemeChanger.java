@@ -48,7 +48,6 @@ public class ThemeChanger {
 	private static final String CONTENT_PARAGRAPH_START = "<p style=\"font-family: Verdana,Arial,Helvetica,sans-serif\">";
 	private static final String CONTENT_PARAGRAPH_END = "</p></div></div>";
 	private static final String CONTENT_PARAGRAPH = "Article";
-	private static final String[] PARAGRAPHS = new String[] {"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum bibendum, ligula ut feugiat rutrum, mauris libero ultricies nulla, at hendrerit lectus dui bibendum metus. Phasellus quis nulla nec mauris sollicitudin ornare. Vivamus faucibus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Cras vulputate condimentum ipsum. Duis urna eros, commodo id, sagittis sed, sodales eu, ante. Etiam ante. Cras risus dolor, porta nec, adipiscing eu, scelerisque at, metus. Mauris nunc eros, porttitor nec, tincidunt ut, rutrum eget, massa. In facilisis nisi. Sed non lorem malesuada quam egestas bibendum. Quisque bibendum ullamcorper purus. Integer id diam vel elit adipiscing consectetuer. Phasellus vitae eros. Vivamus laoreet consectetuer tortor. In congue dignissim quam. Suspendisse nec purus vel velit ultricies bibendum."};
 	private static final String CONTENT_BEGIN = "<div class=\"contentSpacer\"></div>";
 	private static final String CONTENT_END = "<div class=\"clear\"></div>\n<div class=\"clearer\"></div>";
 	
@@ -112,7 +111,11 @@ public class ThemeChanger {
 	 * @param theme
 	 * @return boolean
 	 */
-	public boolean prepareThemeForUsage(Theme theme) {
+	protected boolean prepareThemeForUsage(Theme theme) {
+		if (theme == null) {
+			return false;
+		}
+		
 		if (!theme.isNewTheme()) {
 			return true; // Theme allready prepared
 		}
@@ -159,7 +162,11 @@ public class ThemeChanger {
 	 * @param theme
 	 * @return
 	 */
-	public boolean prepareThemeStyleFiles(Theme theme) {
+	protected boolean prepareThemeStyleFiles(Theme theme) {
+		if (theme == null) {
+			return false;
+		}
+		
 		if (!theme.isNewTheme()) {
 			return true; // Theme allready prepared
 		}
@@ -350,7 +357,7 @@ public class ThemeChanger {
 	 * @param fileName
 	 * @return boolean
 	 */
-	public boolean uploadDocument(Document doc, String linkToBase, String fileName, Theme theme, boolean isTheme) {
+	protected boolean uploadDocument(Document doc, String linkToBase, String fileName, Theme theme, boolean isTheme) {
 		String docContent = out.outputString(doc);
 		
 		if (isTheme) {
@@ -589,9 +596,9 @@ public class ThemeChanger {
 		}
 		Date d = new Date();
 		content.append(CONTENT_BEGIN).append(NEW_LINE);
-		for (int i = 0; i < PARAGRAPHS.length; i++) {
+		for (int i = 0; i < ThemesConstants.DUMMY_ARTICLES.size(); i++) {
 			content.append(CONTENT_PARAGRAPH_TITLE).append(CONTENT_PARAGRAPH);
-			if (PARAGRAPHS.length > 1) {
+			if (ThemesConstants.DUMMY_ARTICLES.size() > 1) {
 				content.append(ThemesConstants.SPACE).append(i + 1);
 			}
 			content.append(CONTENT_PARAGRAPH_DATE);
@@ -603,7 +610,7 @@ public class ThemeChanger {
 			content.append(ThemesConstants.SINGLE_QUOTE).append(ThemesConstants.SPACE).append(IMAGE_POSITION);
 			content.append(ThemesConstants.IMAGE_POSITIONS.get(helper.getRandomNumber(ThemesConstants.IMAGE_POSITIONS.size())));
 			content.append(ThemesConstants.SINGLE_QUOTE).append(IMAGE_END);
-			content.append(PARAGRAPHS[i]).append(CONTENT_PARAGRAPH_END);
+			content.append(ThemesConstants.DUMMY_ARTICLES.get(i)).append(CONTENT_PARAGRAPH_END);
 		}
 		content.append(CONTENT_END).append(NEW_LINE);
 		return content.toString();
@@ -922,7 +929,7 @@ public class ThemeChanger {
 	 * @param theme
 	 * @return List
 	 */
-	public List <ThemeStyleGroupMember> getEnabledStyles(Theme theme) {
+	protected List <ThemeStyleGroupMember> getEnabledStyles(Theme theme) {
 		List <ThemeStyleGroupMember> members = new ArrayList<ThemeStyleGroupMember>();
 		List <String> groupNames = theme.getStyleGroupsNames();
 		ThemeStyleGroupMember member = null;
@@ -950,7 +957,7 @@ public class ThemeChanger {
 	 * @param styleVariation
 	 * @return ThemeStyleGroupMember
 	 */
-	public ThemeStyleGroupMember getStyleMember(Theme theme, String styleGroupName, String styleVariation) {
+	protected ThemeStyleGroupMember getStyleMember(Theme theme, String styleGroupName, String styleVariation) {
 		Map <String, ThemeStyleGroupMember> styleMembers = theme.getStyleGroupsMembers();
 		int i = 0;
 		ThemeStyleGroupMember member = styleMembers.get(styleGroupName + ThemesConstants.AT + i);
@@ -1057,6 +1064,9 @@ public class ThemeChanger {
 	}
 	
 	public boolean restoreTheme(String themeID) {
+		if (themeID == null) {
+			return false;
+		}
 		Theme theme = helper.getTheme(themeID);
 		return restoreTheme(theme);
 	}

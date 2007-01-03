@@ -36,7 +36,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	private static final String PAGE_URI = "pageUri";
 	private static final String PAGE_TITLE = "pageTitle";
-	private static final String PATH_TO_IMAGE_FOLDER = ContentUtil.getBundle().getResourcesPath() + "/images/pageIcons/"; //"/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/";
+	private static final String PATH_TO_IMAGE_FOLDER = ContentUtil.getBundle().getResourcesPath() + "/images/pageIcons/";
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 
@@ -46,7 +46,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	public String getThemesPreviewsInfo() {		
 		helper.searchForThemes(); // It is done in ThemesHelper's constructor, but it's possible to pass a paremeter to not search
 		
-		if (!helper.getThemesPropertiesExtractor().proceedFileExtractor()) {
+		if (!helper.getThemesPropertiesExtractor().prepareThemes()) {
 			log.info("Error extracting theme's properties");
 		}
 		
@@ -471,29 +471,36 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	public List <String> beforeCreatePage(List <String> struct){
 		List <String> newIds = new ArrayList<String>();
-		int id = -1;
-		String prevId = null;
+		
 		BuilderService builder = helper.getThemesService().getBuilderService();
+		ICDomain domain = helper.getThemesService().getDomain();
+		
+		int pageID = -1;
+		int domainID = -1;
+		
+		boolean isRootPage = false;
+		boolean canCreate;
+		
+		if (domain != null) {
+			domainID = domain.getID();
+		}
+		
+		String uri = null;
+		String lastTheme = null;
+		String prevID = null;
 		String pageType = builder.getPageKey();
 		String format = builder.getIBXMLFormat();
-		boolean canCreate;
 		String realID = null;
 		String webDAVUri = null;
 		String subType = null;
-		String parentId = null;
+		String parentID = null;
 		String name = null;
-		ICDomain domain = helper.getThemesService().getDomain();
-		int domainId = -1;
-		if (domain != null) {
-			domainId = domain.getID();
-		}
-		String uri = null;
-		boolean isRootPage = false;
+		
 		for (int i = 0; i < struct.size(); i = i + 5) {
 			canCreate = true;
 			try {
-				prevId = struct.get(i);
-				parentId = struct.get(i + 1);
+				prevID = struct.get(i);
+				parentID = struct.get(i + 1);
 				name = struct.get(i + 2);
 				subType = struct.get(i + 3);
 				webDAVUri = struct.get(i + 4);
@@ -504,46 +511,20 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			if (!canCreate) {
 				return newIds;
 			}
-			if (domain != null && parentId == null) {
+			if (domain != null && parentID == null) {
 				if (domain.getStartPage() == null) {
 					uri = ThemesConstants.SLASH;
 					isRootPage = true;
 				}
 			}
 			
-			id = createPage(parentId, name, pageType, null, uri, subType, domainId, format, null);
-			realID = String.valueOf(id);
+			pageID = createPage(parentID, name, pageType, null, uri, subType, domainID, format, null);
+			realID = String.valueOf(pageID);
 			
 			if (isRootPage) { // Creating root page and root template
-				ICDomain cachedDomain = IWMainApplication.getDefaultIWMainApplication().getIWApplicationContext().getDomain();
-				if (cachedDomain.getDomainName() == null) {
-					cachedDomain.setDomainName("Default Site");
-				}
-				
-				if (domain.getDomainName() == null) {
-					domain.setDomainName(cachedDomain.getDomainName());
-					domain.store();
-				}
-				
-				builder.unlockRegion(realID, ThemesConstants.MINUS_ONE, null);
-				
-				domain.setIBPage(helper.getThemesService().getICPage(id));
-				int templateId = createPage(null, "Template", builder.getTemplateKey(), null, null, null, domainId, format, null);
-				
-				builder.unlockRegion(String.valueOf(templateId), ThemesConstants.MINUS_ONE, null);
-				
-				domain.setStartTemplate(helper.getThemesService().getICPage(templateId));
-				domain.store();
-				
-				cachedDomain.setIBPage(domain.getStartPage());
-				cachedDomain.setStartTemplate(domain.getStartTemplate());
-				if(cachedDomain instanceof CachedDomain){
-					CachedDomain ccachedDomain = (CachedDomain)cachedDomain;
-					ccachedDomain.setStartTemplateID(domain.getStartTemplateID());
-					ccachedDomain.setStartPage(domain.getStartPage());
-					ccachedDomain.setStartPageID(domain.getStartPageID());
-				}
-				
+				createRootPage(pageID, domain, builder, domainID, format);
+				createRootTemplate(domain, builder, domainID, format);
+				initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
 				IWWelcomeFilter.unload();
 			}
 
@@ -552,12 +533,12 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			
 			if (webDAVUri != null) {
 				if (!webDAVUri.equals(ThemesConstants.EMPTY)) {
-					String uriToPage = helper.loadPageToSlide(subType, id, webDAVUri);
+					String uriToPage = helper.loadPageToSlide(subType, pageID, webDAVUri);
 					if (uriToPage != null) {
-						helper.getThemesService().updatePageWebDav(id, uriToPage);
+						helper.getThemesService().updatePageWebDav(pageID, uriToPage);
 					}
-					helper.createArticle(subType, id);
-					String lastTheme = helper.getLastUsedTheme();
+					helper.createArticle(subType, pageID);
+					lastTheme = helper.getLastUsedTheme();
 					if (lastTheme != null) {
 						helper.getThemesService().getBuilderService().setTemplateId(realID, lastTheme);
 					}
@@ -567,7 +548,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			for (int j = i; j < struct.size(); j = j + 5) {
 				try {
 					if (struct.get(j + 1) != null) {
-						if ((struct.get(j + 1)).equals(prevId)) {
+						if ((struct.get(j + 1)).equals(prevID)) {
 							struct.set(j + 1, realID);
 						}
 					}
@@ -649,7 +630,6 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	public boolean isStartPage(String pageID) {
 		if (pageID == null) {
 			pageID = helper.getLastVisitedPage();
-			//return true; // Returning true to disable a button
 		}
 		int id = -1;
 		try {
@@ -742,6 +722,52 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return -1;
 		}
 		return id;
+	}
+	
+	private boolean createRootPage(int pageID, ICDomain domain, BuilderService builder, int domainID, String format) {	
+		if (domain.getStartPage() != null) {
+			return true;
+		}
+		
+		if (domain.getDomainName() == null) {
+			domain.setDomainName(ThemesConstants.DEFAULT_DOMAIN_NAME);
+			domain.store();
+		}
+		
+		builder.unlockRegion(String.valueOf(pageID), ThemesConstants.MINUS_ONE, null);
+
+		domain.setIBPage(helper.getThemesService().getICPage(pageID));
+		return true;
+	}
+	
+	public int createRootTemplate(ICDomain domain, BuilderService builder, int domainID, String format) {
+		if (domain.getStartTemplate() != null) {
+			return domain.getStartTemplateID();
+		}
+		
+		int templateId = createPage(null, "Template", builder.getTemplateKey(), null, null, null, domainID, format, null);
+		
+		builder.unlockRegion(String.valueOf(templateId), ThemesConstants.MINUS_ONE, null);
+		
+		domain.setStartTemplate(helper.getThemesService().getICPage(templateId));
+		domain.store();
+		return templateId;
+	}
+	
+	public boolean initializeCachedDomain(String domainName, ICDomain domain) {
+		ICDomain cachedDomain = IWMainApplication.getDefaultIWMainApplication().getIWApplicationContext().getDomain();
+		if (cachedDomain.getDomainName() == null) {
+			cachedDomain.setDomainName(domainName);
+		}
+		cachedDomain.setIBPage(domain.getStartPage());
+		cachedDomain.setStartTemplate(domain.getStartTemplate());
+		if(cachedDomain instanceof CachedDomain){
+			CachedDomain ccachedDomain = (CachedDomain)cachedDomain;
+			ccachedDomain.setStartTemplateID(domain.getStartTemplateID());
+			ccachedDomain.setStartPage(domain.getStartPage());
+			ccachedDomain.setStartPageID(domain.getStartPageID());
+		}
+		return true;
 	}
 
 }

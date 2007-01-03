@@ -15,7 +15,7 @@ public class ThemesPropertiesExtractor {
 	private static final String LIMITED_SELECTION = "1";
 	private static final String CSS_EXTENSION = ".css";
 	
-	public boolean proceedFileExtractor() {
+	public boolean prepareThemes() {
 		boolean result = true;
 		List <Theme> themes = null;
 		synchronized (ThemesPropertiesExtractor.class) {
@@ -26,12 +26,12 @@ public class ThemesPropertiesExtractor {
 		}
 		
 		for (int i = 0; (i < themes.size() && result); i++) {
-			result = proceedFileExtractor(themes.get(i));
+			result = prepareTheme(themes.get(i));
 		}
 		return result;
 	}
 	
-	public boolean proceedFileExtractor(Theme theme) {
+	private boolean prepareTheme(Theme theme) {
 		// Checking if it is possible to extract properties
 		synchronized (ThemesPropertiesExtractor.class) {
 			if (theme.isLoading()) {

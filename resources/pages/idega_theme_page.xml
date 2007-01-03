@@ -15,7 +15,13 @@
     	</module>
     </region>
     <region id="navcontainer" label="navcontainer">
-    	<module id="uuid_3ca228d2-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.block.navigation.presentation.NavigationList" />
+    	<module id="uuid_3ca228d2-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.block.navigation.presentation.NavigationList">
+    		<property>
+    			<name>:method:1:implied:void:setAddStyleClassOnSelectedItem:boolean:</name>
+    			<value>N</value>
+    			<type>java.lang.String</type>
+    		</property>
+    	</module>
     </region>
     <region id="sidebar" label="sidebar">
     	<module id="uuid_c3e3dc8b-85fa-11db-bbf1-8f8904f6eb89" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">

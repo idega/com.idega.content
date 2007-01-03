@@ -47,17 +47,6 @@ function isCorrectFileType(id, fileType, noFileMsg, invalidFileTypeMsg) {
 	return true;
 }
 
-function closeLoadingMessage() {
-	var elem = document.getElementById('busybuddy');
-	if (elem) {
-		if(elem.style) { 
-	      elem.style.display = 'none';
-	    } else {
-	      elem.display = 'none' ;
-	    }
-	}
-}
-
 function getThemeStyleVariations(themeID) {
 	setGlobalId(themeID);
 	setThemeForPreview(themeID);

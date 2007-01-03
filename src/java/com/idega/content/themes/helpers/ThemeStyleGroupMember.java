@@ -29,51 +29,51 @@ public class ThemeStyleGroupMember {
 		this.styleFiles = new ArrayList <String> (parent.getStyleFiles());
 	}
 
-	public boolean isEnabled() {
+	protected boolean isEnabled() {
 		return enabled;
 	}
 
-	public void setEnabled(boolean enabled) {
+	protected void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
-	public String getName() {
+	protected String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	protected void setName(String name) {
 		this.name = name;
 	}
 
-	public List<String> getStyleFiles() {
+	protected List<String> getStyleFiles() {
 		return styleFiles;
 	}
 
-	public void addStyleFile(String styleFile) {
+	protected void addStyleFile(String styleFile) {
 		styleFiles.add(styleFile);
 	}
 
-	public String getType() {
+	protected String getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	protected void setType(String type) {
 		this.type = type;
 	}
 
-	public boolean isLimitedSelection() {
+	protected boolean isLimitedSelection() {
 		return limitedSelection;
 	}
 
-	public void setLimitedSelection(boolean limitedSelection) {
+	protected void setLimitedSelection(boolean limitedSelection) {
 		this.limitedSelection = limitedSelection;
 	}
 
-	public String getGroupName() {
+	protected String getGroupName() {
 		return groupName;
 	}
 
-	public void setGroupName(String groupName) {
+	protected void setGroupName(String groupName) {
 		this.groupName = groupName;
 	}
 
