@@ -140,6 +140,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	private boolean setPageStyle(String pageID, int templateID, IWContext iwc) {
 		ICPage page = null;
+		if (templateID <= 0) {
+			return false;
+		}
 		page = helper.getThemesService().getICPage(Integer.valueOf(pageID).intValue());
 		if (page == null) {
 			return false;

@@ -12,6 +12,7 @@ public class ThemesConstants {
 
 	public static final String DOT = ".";
 	public static final String UNDER = "_";
+	public static final String SPACE = " ";
 	
 	protected static final String XML_EXTENSION = "xml";
 	
@@ -23,7 +24,6 @@ public class ThemesConstants {
 	protected static final String NAMESPACE = "http://www.w3.org/1999/xhtml";
 	protected static final String NAMESPACE_ID = "xmlns";
 	
-	protected static final String SPACE = " ";
 	protected static final String PLUS = "+";
 	protected static final String SPACE_ENCODED = "%20";
 	protected static final String ENCODING = "UTF-8";

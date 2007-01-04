@@ -33,6 +33,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.xml.sax.EntityResolver;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -422,9 +423,10 @@ public class ThemesHelper implements Singleton {
 	
 	protected Document getXMLDocument(InputStream stream) {
 		if(stream == null){
+			log.info("Stream is null");
 			return null;
 		}
-		
+
 		Reader r = null;
 		try {
 			r = new InputStreamReader(stream, ThemesConstants.ENCODING);
@@ -433,14 +435,22 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		
-		SAXBuilder builder = new SAXBuilder();
 		Document document = null;
+		
+		SAXBuilder builder = new SAXBuilder(false);
+		EntityResolver resolver = null;
+		//Creating our EntityResolver to avoid IOException trying to load DTD file, defined in every Theme.plist file:
+		//<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+		resolver = new ThemesEntityResolver();
+		builder.setEntityResolver(resolver);
 		try {
 			document = builder.build(r);
 		} catch (JDOMException e) {
+			log.info("JDOM exception");
 			log.error(e);
 			return null;
 		} catch (IOException e) {
+			log.info("IOException trying to build a JDOM Document");
 			log.error(e);
 			return null;
 		} finally {
