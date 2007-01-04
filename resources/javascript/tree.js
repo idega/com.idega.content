@@ -16,10 +16,18 @@ function getNewId(id){
 }
 
 function deletePage(pageId){
-	showLoadingMessage("Deleting...");
-	setPageID(null);
-	RELOAD_PAGE = true;
-	ThemesEngine.deletePage(pageId, true, empty);
+	var wantToDelete = confirm("Are you sure?");
+	if (wantToDelete){
+		showLoadingMessage("Deleting...");
+		setPageID(null);
+		RELOAD_PAGE = true;
+		ThemesEngine.deletePage(pageId, true, empty);
+	}
+	else {
+		if (treeObj) {
+			treeObj.restoreTreeStructure();
+		}
+	}
 }
 
 function empty(param) {

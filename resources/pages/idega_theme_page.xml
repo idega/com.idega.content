@@ -21,6 +21,11 @@
     			<value>N</value>
     			<type>java.lang.String</type>
     		</property>
+    		<property>
+				<name>:method:1:implied:void:setShowRoot:boolean:</name>
+				<value>Y</value>
+				<type>java.lang.String</type>
+			</property>
     	</module>
     </region>
     <region id="sidebar" label="sidebar">
