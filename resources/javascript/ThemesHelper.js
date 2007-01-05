@@ -3,6 +3,25 @@ var PAGE_ID = null;
 var TOTAL_WIDTH = 0;
 var TOTAL_HEIGHT = 0;
 
+var IS_SITE_MAP = false;
+
+function isSiteMap() {
+	return IS_SITE_MAP;
+}
+
+function setIsSiteMap(isSiteMap) {
+	IS_SITE_MAP = isSiteMap;
+}
+
+function isChangingSiteMap() {
+	if (isSiteMap()) {
+		return false;
+	}
+	else {
+		getPageInfoValues();
+	}
+}
+
 function getPageID() {
 	return PAGE_ID;
 }
@@ -37,9 +56,11 @@ function changePageTitleCallback(result) {
 	if (pageUri != null) {
 		pageUri.value = result;
 	}
-	if (getPageID() != null) {
-		if (getPageID() != -1) {
-			getPrewUrl(getPageID());
+	if (!isSiteMap()) {
+		if (getPageID() != null) {
+			if (getPageID() != -1) {
+				setTimeout("getPrewUrl('"+getPageID()+"')", 1000);
+			}
 		}
 	}
 }

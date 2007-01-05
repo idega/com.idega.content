@@ -1,22 +1,3 @@
-	/************************************************************************************************************
-	(C) www.dhtmlgoodies.com, July 2006
-	
-	Update log:
-		August, 8th, 2006: Replaced getLeftPos and getTopPos methods. 
-	
-	This is a script from www.dhtmlgoodies.com. You will find this and a lot of other scripts at our website.	
-	
-	Terms of use:
-	You are free to use this script as long as the copyright message is kept intact. However, you may not
-	redistribute, sell or repost it without our permission.
-	
-	Thank you!
-	
-	www.dhtmlgoodies.com
-	Alf Magne Kalleland
-	
-	************************************************************************************************************/
-		
 	var JSTreeObj;
 	var treeUlCounter = 0;
 	var nodeId = 1;
@@ -693,8 +674,16 @@
 				if (parentDiv.getElementsByTagName('DIV')){
 					if (parentDiv.getElementsByTagName('DIV')[0]){
 						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id){
-							saveMyTree(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);		
-							ThemesEngine.changePageUri(JSTreeObj.dragNode_source.id, (JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, false, changePageTitleCallback);
+							saveMyTree(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);
+							var newPageUri = "undefined";
+							var linkFirstChild = JSTreeObj.dragNode_source.getElementsByTagName('a')[0];
+							if (linkFirstChild != null) {
+								var span = linkFirstChild.firstChild;
+								if (span != null) {
+									newPageUri = span.firstChild.nodeValue;
+								}
+							}
+							ThemesEngine.changePageUri(JSTreeObj.dragNode_source.id, newPageUri, false, changePageTitleCallback);
 						}
 						else{
 							var newParentId = treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null);
@@ -705,7 +694,6 @@
 							else
 								JSTreeObj.saveNewPage(newParentId, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
 								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML);
-//								console.log((JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML);
 						}
 							//need name
 							
@@ -743,7 +731,6 @@
 			(document.getElementById('rootTemporary')).setAttribute("id", id[0]);	
 			JSTreeObj.initNode(document.getElementById(id[0]));		
 			var newName = (document.getElementById(id[0]).getElementsByTagName('a')[0]).innerHTML;
-//			ThemesEngine.changePageUri(id[0], newName, false, changePageTitleCallback);			
 			var newChilds = root.getElementsByTagName('li');
 			var newChildsElement = null;
 			var newNode = null;
@@ -758,14 +745,11 @@
 					JSTreeObj.initNode(newNode);
 					newName = (newNode.getElementsByTagName('a')[0]).innerHTML;
 				}
-				if (id[i + 1] != null && newName != null) {
-//					ThemesEngine.changePageUri(id[i+1], newName, false, changePageTitleCallback);
-				}
 			}
 			var lastID = id[id.length - 1];
 			setPageID(lastID);
 			getPrewUrl(lastID);
-
+			isChangingSiteMap();
 		}
 		,		
 		getRootStructure : function(rootId){					
@@ -1338,6 +1322,7 @@
 			var lastID = id[id.length - 1];
 			setPageID(lastID);
 			getPrewUrl(lastID);
+			isChangingSiteMap();
 		}
 		,
 		getNodeChilds : function(nodeParent, newParentId){

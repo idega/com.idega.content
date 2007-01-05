@@ -33,7 +33,7 @@
 							</x:div>
 							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 								<f:facet name="PageTreeNode">
-									<h:outputLink onclick="setPageID(this.parentNode.id);getPrewUrl(this.parentNode.id);getPageInfoValues();return false;">
+									<h:outputLink onclick="setPageID(this.parentNode.id);return false;">
 										<h:outputText value="#{node.description}"/>
 									</h:outputLink>
 								</f:facet>
@@ -61,6 +61,7 @@
 						</wf:wfblock>
 					</x:div>
 
+					<f:verbatim><script type="text/javascript">setIsSiteMap(true);</script></f:verbatim>
 					<f:verbatim>
 						<script type="text/javascript">	
 							treeObj = new JSDragDropTree();

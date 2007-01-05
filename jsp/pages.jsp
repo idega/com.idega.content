@@ -84,6 +84,7 @@ version="1.2">
 					</wf:iwtree>
 				</x:div>
 				
+				<jsf:verbatim><script type="text/javascript">setIsSiteMap(false);</script></jsf:verbatim>
 				<jsf:verbatim>
 					<script type="text/javascript">	
 						treeObj = new JSDragDropTree();

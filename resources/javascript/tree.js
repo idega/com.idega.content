@@ -1,12 +1,12 @@
 var ajaxObjects = new Array();
 
 var RELOAD_PAGE = false;
+var REFRESH_PAGE_INFO = false;
 	
 function saveMyTree(newParentNodeId, sourceNodeId) {
-	saveString = treeObj.getNodeOrders();
-	//console.log("newParentNodeId: " + newParentNodeId + ", sourceNodeId: " + sourceNodeId);
 	showLoadingMessage("Moving...");
 	setPageID(sourceNodeId);
+	REFRESH_PAGE_INFO = !isSiteMap();
 	ThemesEngine.movePage(newParentNodeId, sourceNodeId, empty);
 }
 
@@ -35,6 +35,10 @@ function empty(param) {
 	if (RELOAD_PAGE) {
 		RELOAD_PAGE = false;
 		getGlobalPageId();
+	}
+	if (REFRESH_PAGE_INFO) {
+		REFRESH_PAGE_INFO = false;
+		getPageInfoValues();
 	}
 }
 
