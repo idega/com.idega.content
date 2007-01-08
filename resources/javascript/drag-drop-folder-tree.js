@@ -533,7 +533,10 @@
 				if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
 					rootUl.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
 					var temporaryTable = document.getElementById('temporaryTable');
-					rootUl.removeChild(temporaryTable);
+					if (temporaryTable != null) {
+						setNeedRelaodBuilderPage(true);
+						rootUl.removeChild(temporaryTable);
+					}
 					JSTreeObj.saveRoot(JSTreeObj.dragNode_source.id, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
 								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML);
 				}				
@@ -718,12 +721,11 @@
 			treeStructure = new Array();
 			JSTreeObj.getRootStructure('floatingContainer'+nodeId);			
 			document.getElementById('floatingContainer'+nodeId).id = 'rootTemporary';
-			showLoadingMessage("Creating...");			
+			showLoadingMessage("Creating...");
 			ThemesEngine.beforeCreatePage(treeStructure, JSTreeObj.getNewRootId);
 		}	
 		,
-		getNewRootId : function(id){
-			closeLoadingMessage();
+		getNewRootId : function(id) {
 			if (id == null) {
 				return;
 			}
@@ -750,6 +752,12 @@
 			setPageID(lastID);
 			getPrewUrl(lastID);
 			isChangingSiteMap();
+			closeLoadingMessage();
+			if (isNeedRelaodBuilderPage() && isSiteMap()) {
+				showLoadingMessage("Redirecting...");
+				setNeedRelaodBuilderPage(false);
+				redirectAction("/workspace/builder/application", 0);
+			}
 		}
 		,		
 		getRootStructure : function(rootId){					

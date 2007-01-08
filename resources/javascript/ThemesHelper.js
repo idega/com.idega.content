@@ -4,6 +4,7 @@ var TOTAL_WIDTH = 0;
 var TOTAL_HEIGHT = 0;
 
 var IS_SITE_MAP = false;
+var NEED_RELOAD_BUILDER_PAGE = false;
 
 function isSiteMap() {
 	return IS_SITE_MAP;
@@ -174,5 +175,50 @@ function checkIfNotEmptySiteTree(id) {
   	tempTable.appendChild(tr); 	
   	rootUl.appendChild(tempTable);
 	treeContainer.appendChild(rootUl);
+}
+
+function setNeedRelaodBuilderPage(needReload) {
+	NEED_RELOAD_BUILDER_PAGE = needReload;
+}
+
+function isNeedRelaodBuilderPage() {
+	return NEED_RELOAD_BUILDER_PAGE;
+}
+
+function redirectAction(uri, timeOut) {
+	if (uri != null) {
+		setTimeout("redirectFromSiteMap('"+uri+"')", timeOut);
+	}
+}
+
+function redirectFromSiteMap(uri) {
+	if (uri == null) {
+		return;
+	}
+	var frame = null;
 	
+	var allFrames = null;
+	var parentWindow = window.parent;
+	if (parentWindow != null) {
+		allFrames = parentWindow.document.getElementsByTagName("iframe");
+	}
+	else {
+		allFrames = document.getElementsByTagName("iframe");
+	}
+	
+	if (allFrames != null) {
+		frame = allFrames[0];
+	}
+	
+	if (frame == null) {
+		if (parentWindow != null) {
+			parentWindow.location.href = uri;
+		}
+		else {
+			closeLoadingMessage();
+			return;
+		}
+	}
+	
+	frame.src = uri;
 }

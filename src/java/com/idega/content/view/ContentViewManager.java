@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.26 2007/01/03 14:47:17 valdas Exp $
+ * $Id: ContentViewManager.java,v 1.27 2007/01/08 14:30:37 valdas Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -15,6 +15,7 @@ import javax.faces.context.FacesContext;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.view.ApplicationViewNode;
 import com.idega.core.view.DefaultViewNode;
+import com.idega.core.view.FramedApplicationViewNode;
 import com.idega.core.view.KeyboardShortcut;
 import com.idega.core.view.ViewManager;
 import com.idega.core.view.ViewNode;
@@ -26,10 +27,10 @@ import com.idega.repository.data.Singleton;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2007/01/03 14:47:17 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/01/08 14:30:37 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.26 $
+ * @version $Revision: 1.27 $
  */
 public class ContentViewManager implements Singleton  {
 
@@ -92,14 +93,19 @@ public class ContentViewManager implements Singleton  {
 		ViewNode contentNode = initalizeContentNode(bundle);
 		
 		/* Page nodes begin */
-		DefaultViewNode pagesNode = new DefaultViewNode("pages",contentNode);
+		DefaultViewNode pagesNode = new DefaultViewNode("pages", contentNode);
 		pagesNode.setJspUri(bundle.getJSPURI("pages.jsp"));
 		pagesNode.setKeyboardShortcut(new KeyboardShortcut("p"));
 		pagesNode.setName("#{localizedStrings['com.idega.content']['pages']}");
 		
-		DefaultViewNode siteNode = new DefaultViewNode("site_map", pagesNode);
-		siteNode.setJspUri(bundle.getJSPURI("tree.jsp"));
+		DefaultViewNode siteNode = new DefaultViewNode("site", pagesNode);
+		siteNode.setJspUri(bundle.getJSPURI("site.jsp"));
 		siteNode.setName("#{localizedStrings['com.idega.content']['site_map']}");
+		
+		DefaultViewNode treeNode = new DefaultViewNode("tree", pagesNode);
+		treeNode.setJspUri(bundle.getJSPURI("tree.jsp"));
+		treeNode.setName("#{localizedStrings['com.idega.content']['site_map']}");
+		treeNode.setVisibleInMenus(false);
 		
 		DefaultViewNode themes = new DefaultViewNode("themes", pagesNode);
 		themes.setJspUri(bundle.getJSPURI("themes.jsp"));
