@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ejb.FinderException;
+import javax.faces.context.FacesContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,10 +68,38 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	}
 	
 	public boolean deleteIBPage(Theme theme) {
+		if (theme == null) {
+			return false;
+		}
 		if (theme.getIBPageID() == -1) {
 			return true;
 		}
-		return deletePage(String.valueOf(theme.getIBPageID()), false);
+		FacesContext context = FacesContext.getCurrentInstance();
+		IWContext iwc = null;
+		if (context != null) {
+			iwc = IWContext.getIWContext(context);
+		}
+		else {
+			iwc = IWContext.getInstance();
+		}
+		int userID = -1;
+		if (iwc != null) {
+			userID = iwc.getCurrentUserId();
+		}
+		getBuilderService();
+		ICDomain domain = null;
+		try {
+			domain = builder.getCurrentDomain();
+		} catch (RemoteException e) {
+			log.error(e);
+			return false;
+		}
+		boolean result = false;
+		result = builder.deletePage(String.valueOf(theme.getIBPageID()), false, null, userID, domain);
+		if (result) {
+			builder.clearAllCachedPages();
+		}
+		return result;
 	}
 	
 	public boolean deleteIBPage(String pageID, boolean deleteChildren) {
@@ -82,17 +111,25 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			return false;
 		}
 		
-		IWContext iwc = IWContext.getInstance();
+		FacesContext context = FacesContext.getCurrentInstance();
+		IWContext iwc = null;
+		if (context != null) {
+			iwc = IWContext.getIWContext(context);
+		}
+		else {
+			iwc = IWContext.getInstance();
+		}
+		
 		if (iwc == null) {
 			return false;
 		}
+
 		getBuilderService();
-		
+
 		Map tree = builder.getTree(iwc);
-		if (tree == null) {
-			return false;
-		}
 		
+		int userID = iwc.getUserId();
+
 		ICDomain domain = null;
 		try {
 			domain = builder.getCurrentDomain();
@@ -108,10 +145,10 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		
 		boolean result = true;
 		if (builder.checkDeletePage(pageID, domain)) {
-			result =  builder.deletePage(pageID, deleteChildren, tree, iwc.getUserId(), domain);
+			result = builder.deletePage(pageID, deleteChildren, tree, userID, domain);
 		}
 		
-		if (domainId != -1) { // Deleted top level page
+		if (domainId != -1) {
 			builder.clearAllCachedPages();
 		}
 		
