@@ -19,7 +19,7 @@ version="1.2">
                 	
 				<wf:wfblock id="themeManagerBlock" title="#{localizedStrings['com.idega.content']['themes_manager']}" >
 					<x:div id="themePreviewContainer" forceId="true">
-						<x:graphicImage id="themePreview" forceId="true" styleClass="bigThemePreview" url="/idegaweb/bundles/com.idega.core.bundle/resources/style/images/transparent.png"></x:graphicImage>
+						<x:graphicImage id="themePreview" forceId="true" styleClass="bigThemePreview" url="noImage.png"></x:graphicImage>
 					</x:div>
 					
 					<x:div id="themesSliderContainer" forceId="true" styleClass="theme_slider">
