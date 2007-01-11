@@ -257,6 +257,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		boolean changedPageTitle = false;
 		boolean needSetValue = true;
 		for (int i = 0; i < keywords.length; i++) {
+			needSetValue = true;
 			s = map.get(keywords[i]);
 			if (s != null) {
 				currentValues = helper.getThemesService().getBuilderService().getPropertyValues(appl, pageID, ThemesConstants.MINUS_ONE, s.getMethod(), null, true);

@@ -117,6 +117,7 @@ version="1.2">
 			<script type="text/javascript">getPageInfoValues();</script>
 			<script type="text/javascript">isStartPage(getPageID());</script>
 			<script type="text/javascript">checkIfNotEmptySiteTree("div_id_current_structure_tree");</script>
+			<script type="text/javascript">document.onclick = removeStyleOptions;</script>
 		</jsf:verbatim>
 	</jsf:view>
 </jsp:root>

@@ -6,6 +6,7 @@ import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 
+import com.idega.content.business.ContentUtil;
 import com.idega.content.presentation.ContentBlock;
 import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.ThemesConstants;
@@ -36,7 +37,8 @@ public class PageInfo extends ContentBlock {
 		bar.addTitleText(getBundle().getLocalizedText("page_info"));
 		pageInfo.setTitlebar(bar);
 		
-		ThemesHelper.getInstance().loadPageSettings(ThemesHelper.getInstance().getWebRootWithoutContent() + ThemesConstants.PAGE_SETTINGS);
+		ThemesHelper.getInstance().loadPageSettings(ThemesHelper.getInstance().getWebRootWithoutContent() +
+				ThemesConstants.PAGE_SETTINGS);
 		Iterator <Setting> it = ThemesHelper.getInstance().getPageSettings().values().iterator();
 		Setting s = null;
 		HtmlOutputText label = null;
@@ -46,12 +48,14 @@ public class PageInfo extends ContentBlock {
 		TableRowGroup group = table.createBodyRowGroup();
 		TableRow row = null;
 		TableCell2 cell = null;
+		String keyPressAction = "return savePageInfoWithEnter(event)";
 		while(it.hasNext()) {
 			s = it.next();
 			label = new HtmlOutputText();
 			label.setValue(s.getLabel());
 			
 			input = new HtmlInputText();
+			input.setOnkeypress(keyPressAction);
 			input.setId(s.getCode());
 			
 			row = group.createRow();
@@ -75,7 +79,7 @@ public class PageInfo extends ContentBlock {
 	
 	private WFMenu getToolbar() {
 		WFMenu toolbar = new WFMenu();
-		GenericButton button = new GenericButton("makeStartPage", "Make This Page As Start Page");
+		GenericButton button = new GenericButton("makeStartPage", ContentUtil.getBundle().getLocalizedString("make_start_page"));
 		button.setOnClick("makePageAsStartPage();");
 		button.setInputType("button");
 		button.setId("makeStartPage");

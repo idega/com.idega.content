@@ -310,7 +310,7 @@ function getThemeIndex(themeID) {
 function removeStyleOptions() {
 	var div = document.getElementById("chooseStyleLayer");
 	if (div != null) {
-		new Effect.Fade(div);
+		div.style.display = "none";
 	}
 }
 

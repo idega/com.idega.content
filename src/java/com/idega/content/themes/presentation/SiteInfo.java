@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.business.ThemesEngine;
 import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.ThemesConstants;
@@ -57,7 +58,7 @@ public class SiteInfo extends Block {
 		return locales;
 	}
 	
-	protected void createTableBody(TableRowGroup group, IWContext iwc, boolean boldText) {
+	protected void createTableBody(TableRowGroup group, IWContext iwc, boolean boldText, boolean addKeyPressAction) {
 		TableRow row = null;
 		TableCell2 cell = null;
 		
@@ -73,6 +74,7 @@ public class SiteInfo extends Block {
 		}
 		ThemesEngine engine = ThemesHelper.getInstance().getThemesEngine();
 		ICDomain domain = iwc.getIWMainApplication().getIWApplicationContext().getDomain();
+		String keyPressAction = "return saveSiteInfoWithEnter(event)";
 		for (int i = 0; i < settings.size(); i++) {
 			setting = settings.get(i);
 			row = group.createRow();
@@ -81,7 +83,11 @@ public class SiteInfo extends Block {
 			
 			cell = row.createCell();
 			if (TYPE_TEXT.equals(setting.getType())) {
-				regionValue = new TextInput(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.DOT + REGION_VALUE);
+				regionValue = new TextInput(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.DOT +
+						REGION_VALUE);
+				if (addKeyPressAction) {
+					regionValue.setOnKeyPress(keyPressAction);
+				}
 				regionValue.setId(setting.getCode());
 				value = engine.getSiteInfoValue(setting.getCode(), locale, iwc.getApplicationSettings(), domain);
 				regionValue.setValue(value);
@@ -101,20 +107,19 @@ public class SiteInfo extends Block {
 		
 		TableRowGroup group = table.createHeaderRowGroup();
 		TableRow row = group.createRow();
-		
-		form.add(getText("Locale: ", true));
+		form.add(getText(ContentUtil.getBundle().getLocalizedString("locale") + ": ", true));
 		form.add(getLocales(iwc, true, null));
 
 		TableCell2 cell = row.createHeaderCell();
-		cell.add(new Text("Region"));
+		cell.add(new Text(ContentUtil.getBundle().getLocalizedString("region")));
 
 		cell = row.createHeaderCell();
-		cell.add(new Text("Value"));
+		cell.add(new Text(ContentUtil.getBundle().getLocalizedString("value")));
 		
 		doBusiness(iwc, ThemesHelper.getInstance().getThemeSettings().values());
-		createTableBody(table.createBodyRowGroup(), iwc, true);
+		createTableBody(table.createBodyRowGroup(), iwc, true, false);
 		
-		SubmitButton save = new SubmitButton("Save", SAVE_PARAMETER, SAVE_ACTION);
+		SubmitButton save = new SubmitButton(ContentUtil.getBundle().getLocalizedString("save"), SAVE_PARAMETER, SAVE_ACTION);
 		save.setStyleClass("button");
 		save.setID(SAVE_ACTION);
 		form.add(save);		
@@ -136,7 +141,8 @@ public class SiteInfo extends Block {
 		for (int i = 0; i < l.size(); i++) {
 			setting = l.get(i);
 			keywords[i] = setting.getCode();
-			values[i] = iwc.getParameter(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.DOT + REGION_VALUE);
+			values[i] = iwc.getParameter(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.DOT +
+					REGION_VALUE);
 		}
 		ThemesHelper.getInstance().getThemesEngine().saveSiteInfo(locale, keywords, values);
 	}

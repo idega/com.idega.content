@@ -49,7 +49,7 @@ function setFrameUrl(url) {
 	}
 }
 						
-function getPrewUrl(nodeID){
+function getPrewUrl(nodeID) {
 	PagePreview.getPreviewUrl(nodeID, setFrameUrl);
 }
 						

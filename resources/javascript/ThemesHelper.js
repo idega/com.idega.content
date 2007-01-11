@@ -222,3 +222,26 @@ function redirectFromSiteMap(uri) {
 	
 	frame.src = uri;
 }
+
+function isEnterEvent(event) {
+	if (event == null) {
+		return false;
+	}
+	var keyCode = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
+	if (keyCode == 13) {
+		return true;
+	}
+	return false;
+}
+
+function savePageInfoWithEnter(event) {
+	if (isEnterEvent(event)) {
+		savePageInfo();
+	}
+}
+
+function saveSiteInfoWithEnter(event) {
+	if (isEnterEvent(event)) { 
+		saveSiteInfo();
+	}
+}

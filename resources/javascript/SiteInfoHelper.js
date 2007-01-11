@@ -59,7 +59,7 @@ function getSiteInfoValuesCallback(values) {
 }
 
 function saveSiteInfo() {
-	showLoadingMessage("Saving..");
+	showLoadingMessage("Saving...");
 	if (KEYWORDS == null) {
 		ThemesEngine.getSiteInfoElements(proceedSaving);
 	}

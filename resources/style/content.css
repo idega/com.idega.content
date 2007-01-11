@@ -415,13 +415,13 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	position: absolute;
     width: 149px;
     height: 112px;
-	z-index: 4;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/idegaweb/bundles/com.idega.core.bundle/resources/style/images/transparent.png',sizingMethod='scale');
+	z-index: 9999;
 	clear: both;
 	
 }
 
 .themeChooseStyleText {
-	background-color: #D3D3D3;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
     font-size: 34pt;
     font-weight: bold;

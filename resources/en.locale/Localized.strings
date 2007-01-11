@@ -195,3 +195,7 @@ site_map=Site Map
 page_types=Page Types
 site_templates=Site Templates
 site_logo=Site Logo
+locale=Locale
+region=Region
+value=Value
+make_start_page=Make This Page As Start Page

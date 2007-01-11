@@ -32,13 +32,13 @@ public class SiteInfoJsf extends SiteInfo {
 		
 		Table2 table = new Table2();
 		table.setCellpadding(0);
-		createTableBody(table.createBodyRowGroup(), iwc, false);
+		createTableBody(table.createBodyRowGroup(), iwc, false, true);
 		siteInfo.add(table);
 		
-		siteInfo.add(getText("Locale: ", false));
+		siteInfo.add(getText(ContentUtil.getBundle().getLocalizedString("locale") + ": ", false));
 		siteInfo.add(locales);
 		
-		GenericButton save = new GenericButton("Save");
+		GenericButton save = new GenericButton(ContentUtil.getBundle().getLocalizedString("save"));
 		save.setStyleClass("button");
 		save.setId("saveButton");
 		save.setOnClick("saveSiteInfo()");

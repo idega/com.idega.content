@@ -158,7 +158,8 @@ function chooseOption(themeID) {
 		
 		var divp = document.createElement("div");
 		divp.className = "themeChooseStyleText";
-		divp.style.opacity = "0.5";
+		divp.setAttribute("title", "Select style for current page");
+		divp.setAttribute("alt", "Select style for current page");
 		pageSpan = document.createElement("span");
 		pageSpan.setAttribute("id", "pageStyle");
 		pageSpan.appendChild(document.createTextNode("Page"));
@@ -166,7 +167,8 @@ function chooseOption(themeID) {
 	
 		var divs = document.createElement("div");
 		divs.className = "themeChooseStyleText";
-		divs.style.opacity = "0.3";
+		divs.setAttribute("title", "Select style for all pages");
+		divs.setAttribute("alt", "Select style for all pages");
 		siteSpan = document.createElement("span");
 		siteSpan.setAttribute("id", "siteStyle");
 		siteSpan.appendChild(document.createTextNode("Site"));
