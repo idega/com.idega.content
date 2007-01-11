@@ -20,11 +20,6 @@ public interface ThemesService extends IBOService, IWSlideChangeListener {
 	/**
 	 * @see com.idega.content.themes.business.ThemesServiceBean#deleteIBPage
 	 */
-	public boolean deleteIBPage(Theme theme) throws RemoteException;
-
-	/**
-	 * @see com.idega.content.themes.business.ThemesServiceBean#deleteIBPage
-	 */
 	public boolean deleteIBPage(String pageID, boolean deleteChildren) throws RemoteException;
 
 	/**

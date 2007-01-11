@@ -36,9 +36,6 @@ public class ThemeChanger {
 	private static final String TOOLBAR_REPLACE_BEGIN = "<ul><li><a href=\"index.html\" rel=\"self\" id=\"current\">";
 	private static final String TOOLBAR_REPLACE_END = "</a></li></ul>";
 	
-//	private static final String BREADCRUMB_REPLACE_BEGIN = "<ul><li><a href=\"index.html\">";
-//	private static final String BREADCRUMB_REPLACE_END = "</a></li></ul>";
-	
 	private static final String IMAGE_START = "<img src=";
 	private static final String IMAGE_POSITION = "style=\"margin: 2px; float: ";
 	private static final String IMAGE_END = " />";
@@ -56,9 +53,8 @@ public class ThemeChanger {
 	private static final String NAVIGATION = "navcontainer";
 	private static final String BREADCRUMB = "breadcrumbcontainer";
 	private static final String FOOTER = "footer";
-	private static final String SITE_TITLE = "site_title";
-	private static final String SITE_SLOGAN = "site_slogan";
 	private static final String CONTENT = "content";
+	private static final String PAGE_HEADER = "pageHeader";
 	
 	// These are defaults in RapidWeaver style files, we need to change directories to images
 	private static final String CSS_IMAGE_URL = "url(";
@@ -92,7 +88,6 @@ public class ThemeChanger {
 	private static final int THEME_HEIGHT = 200;
 	
 	private static final String REGION_TO_EXPAND = "contentContainer";
-	//private static final String MORE = ">";
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
@@ -150,7 +145,8 @@ public class ThemeChanger {
 			index++;
 		}
 		
-		if (!uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.getFileNameWithExtension(theme.getLinkToSkeleton()), theme, true)) {
+		if (!uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.getFileNameWithExtension(theme.getLinkToSkeleton()), theme,
+				true)) {
 			return false;
 		}
 		
@@ -223,7 +219,8 @@ public class ThemeChanger {
 		List <String> defaultStyles = ThemesConstants.DEFAULT_STYLE_FILES;
 		StringBuffer replacement = new StringBuffer();
 		replacement.append(CSS_IMAGE_URL).append(ThemesConstants.CONTENT).append(theme.getLinkToBase()).append(IMAGES);
-		Replaces[] r = new Replaces[]{getReplace(HREF_REPLACE, HREF_REPLACEMENT), getReplace(IMAGE_URL_REPLACE, replacement.toString())};	
+		Replaces[] r = new Replaces[]{getReplace(HREF_REPLACE, HREF_REPLACEMENT), getReplace(IMAGE_URL_REPLACE,
+				replacement.toString())};	
 		for (int i = 0; i < defaultStyles.size(); i++) {
 			if (!proceedStyleFile(theme.getLinkToBase() + defaultStyles.get(i), r)) {
 				return false;
@@ -469,7 +466,9 @@ public class ThemeChanger {
 		Collection <Element> c = new ArrayList <Element> ();
 		Element e = new Element(type, namespace);
 		e.setText(text);
-		e.setAttribute(attribute, attributeValue);
+		if (attribute != null) {
+			e.setAttribute(attribute, attributeValue);
+		}
 		c.add(e);
 		return c;
 	}
@@ -547,7 +546,8 @@ public class ThemeChanger {
 		if (settings == null) {
 			return new ArrayList<Element>();
 		}
-		String propertyValue = settings.getProperty(ThemesConstants.THEMES_PROPERTY_START + propertyKey + ThemesConstants.THEMES_PROPERTY_END);
+		String propertyValue = settings.getProperty(ThemesConstants.THEMES_PROPERTY_START + propertyKey +
+				ThemesConstants.THEMES_PROPERTY_END);
 		if (propertyValue == null) {
 			return new ArrayList<Element>();
 		}
@@ -617,7 +617,7 @@ public class ThemeChanger {
 	}
 	
 	/**
-	 * Creates String, thats represens Builder's region
+	 * Creates String, thats represents Builder's region
 	 * @param value
 	 * @return String
 	 */
@@ -625,7 +625,8 @@ public class ThemeChanger {
 		String region = ThemesConstants.COMMENT_BEGIN + ThemesConstants.TEMPLATE_REGION_BEGIN + value +
 			ThemesConstants.TEMPLATE_REGION_MIDDLE + ThemesConstants.COMMENT_END;
 		IWMainApplicationSettings settings  = IWMainApplication.getDefaultIWMainApplication().getSettings();
-		String propertyValue = settings.getProperty(ThemesConstants.THEMES_PROPERTY_START + value + ThemesConstants.THEMES_PROPERTY_END);
+		String propertyValue = settings.getProperty(ThemesConstants.THEMES_PROPERTY_START + value +
+				ThemesConstants.THEMES_PROPERTY_END);
 		if (propertyValue != null) {
 			if (value.equals(TOOLBAR)) {
 				return region + getBasicReplace(TOOLBAR_REPLACE_BEGIN, propertyValue, TOOLBAR_REPLACE_END) +
@@ -635,16 +636,9 @@ public class ThemeChanger {
 				return region + COPY_AND_SPACE + getBasicReplace(null, propertyValue, null) + ThemesConstants.COMMENT_BEGIN +
 					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
-			if (value.equals(SITE_TITLE)) {
-				return region + getBasicReplace(null, propertyValue, null) + ThemesConstants.COMMENT_BEGIN +
-					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
-			}
-			if (value.equals(SITE_SLOGAN)) {
-				return region + getBasicReplace(null, propertyValue, null) + ThemesConstants.COMMENT_BEGIN +
-					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
-			}
 			if (value.equals(CONTENT)) {
-				return region + getContentReplace(propertyValue) + ThemesConstants.COMMENT_BEGIN + ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
+				return region + getContentReplace(propertyValue) + ThemesConstants.COMMENT_BEGIN +
+				ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
 			region += propertyValue;
 		}
@@ -683,7 +677,7 @@ public class ThemeChanger {
 	}
 	
 	/**
-	 * Adds region to div tag if div tag has id attribute
+	 * Adds region to div tag if div tag has proper id attribute
 	 * @param e
 	 * @return boolean
 	 */
@@ -704,12 +698,73 @@ public class ThemeChanger {
 			if (BREADCRUMB.equals(regionID)) {
 				e.addContent(1, getNavigatorContent(regionID, false));
 			}
+			if (PAGE_HEADER.equals(regionID)) {
+				detachElement(e, "h1");
+				detachElement(e, "h2");
+				e.addContent(getCommentsCollection(ThemesConstants.SITE_TITLE));
+				addElementToRegion(e, e.getContentSize() - 1, "h1", ThemesConstants.SITE_TITLE);
+				
+				e.addContent(getCommentsCollection(ThemesConstants.SITE_SLOGAN));
+				addElementToRegion(e, e.getContentSize() - 1, "h2", ThemesConstants.SITE_SLOGAN);
+			}
 		}
 		if (regionID.equals(REGION_TO_EXPAND)) {
 			e.addContent(getElement("div", "&nbsp;", "style", "height:"+THEME_HEIGHT+";visibility:hidden")); // Expanding theme
 		}
 		
 		return true;
+	}
+	
+	private boolean addElementToRegion(Element e, int index, String elementName, String applicationPropertyKey) {
+		if (e == null || elementName == null || applicationPropertyKey == null) {
+			return false;
+		}
+		if (index < 0) {
+			index = 0;
+		}
+		e.addContent(index, getSimpleTextElement(elementName, applicationPropertyKey));
+		return true;
+	}
+	
+	private boolean detachElement(Element parent, String elementName) {
+		if (parent == null || elementName == null) {
+			return false;
+		}
+		Element useless = parent.getChild(elementName, namespace);
+		if (useless != null) {
+			useless.detach();
+			return true;
+		}
+		return false;
+	}
+	
+	private Collection <Element> getSimpleTextElement(String containerName, String propertyKey) {
+		if (propertyKey == null) {
+			return new ArrayList<Element>();
+		}
+		IWMainApplicationSettings settings  = IWMainApplication.getDefaultIWMainApplication().getSettings();
+		if (settings == null) {
+			return new ArrayList<Element>();
+		}
+		String propertyValue = settings.getProperty(ThemesConstants.THEMES_PROPERTY_START + propertyKey +
+				ThemesConstants.THEMES_PROPERTY_END);
+		if (propertyValue == null) {
+			return new ArrayList<Element>();
+		}
+		if (ThemesConstants.EMPTY.equals(propertyValue)) {
+			return new ArrayList<Element>();
+		}
+		Collection <Element> mainContainer = new ArrayList<Element>();
+		Element parent = new Element(containerName, namespace);
+		
+		Collection <Text> textContainer = new ArrayList<Text>();
+		Text text = new Text(propertyValue);
+		
+		textContainer.add(text);
+		parent.addContent(textContainer);
+		mainContainer.add(parent);
+		
+		return mainContainer;
 	}
 	
 	/**
@@ -719,7 +774,8 @@ public class ThemeChanger {
 	 * @param styleMember
 	 * @return String
 	 */
-	public String changeTheme(String themeID, String styleGroupName, String styleMember, String themeName, boolean radio, boolean checked) {
+	public String changeTheme(String themeID, String styleGroupName, String styleMember, String themeName, boolean radio,
+			boolean checked) {
 		if (themeID == null || styleGroupName == null || styleMember == null) {
 			return null;
 		}
@@ -764,7 +820,8 @@ public class ThemeChanger {
 		}
 		
 		Element root = doc.getRootElement();
-		if (!changeThemeStyle(ThemesConstants.CONTENT + theme.getLinkToBase(), root.getChild(HTML_HEAD, namespace), oldStyle, newStyle)) {
+		if (!changeThemeStyle(ThemesConstants.CONTENT + theme.getLinkToBase(), root.getChild(HTML_HEAD, namespace), oldStyle,
+				newStyle)) {
 			return null;
 		}
 		if (oldStyle != null) {
@@ -782,7 +839,8 @@ public class ThemeChanger {
 
 		String uploadDir = helper.getFullWebRoot() + theme.getLinkToDraft();
 		String fileName = theme.getName() +	ThemesConstants.DRAFT_PREVIEW;
-		boolean result = helper.getImageGenerator().generatePreview(uploadDir, fileName, theme.getLinkToBaseAsItIs(), ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT, true);
+		boolean result = helper.getImageGenerator().generatePreview(uploadDir, fileName, theme.getLinkToBaseAsItIs(),
+				ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT, true);
 		if (!result) {
 			return null;
 		}
@@ -815,7 +873,8 @@ public class ThemeChanger {
 	 * @param newStyle
 	 * @return boolean
 	 */
-	private boolean changeThemeStyle(String linkToBase, Element head, ThemeStyleGroupMember oldStyle, ThemeStyleGroupMember newStyle) {
+	private boolean changeThemeStyle(String linkToBase, Element head, ThemeStyleGroupMember oldStyle,
+			ThemeStyleGroupMember newStyle) {
 		if (head == null) {
 			return false;
 		}
@@ -1003,7 +1062,8 @@ public class ThemeChanger {
 		String fileName = helper.decode(helper.getFileNameWithExtension(theme.getLinkToSkeleton()), true);
 		theme.setLocked(true);
 		try {
-			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), fileName, is, null, true)) {
+			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), fileName, is,
+					null, true)) {
 				return false;
 			}
 		} catch (RemoteException e) {
@@ -1053,10 +1113,12 @@ public class ThemeChanger {
 		theme.setLinkToDraft(null);
 		theme.setChanges(new ArrayList<ThemeChange>());
 		
-		InputStream is = helper.getInputStream(helper.getFullWebRoot() + theme.getLinkToBase() + helper.encode(theme.getLinkToThemePreview(), true));
+		InputStream is = helper.getInputStream(helper.getFullWebRoot() + theme.getLinkToBase() +
+				helper.encode(theme.getLinkToThemePreview(), true));
 		String extension = helper.getFileExtension(theme.getLinkToThemePreview());
 		String fileName = theme.getName() + ThemesConstants.THEME_SMALL_PREVIEW + ThemesConstants.DOT + extension;
-		helper.getImageGenerator().encodeAndUploadImage(theme.getLinkToBaseAsItIs(), fileName, ThemesConstants.DEFAULT_MIME_TYPE + extension, is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
+		helper.getImageGenerator().encodeAndUploadImage(theme.getLinkToBaseAsItIs(), fileName, ThemesConstants.DEFAULT_MIME_TYPE +
+				extension, is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
 		theme.setLinkToSmallPreview(fileName);
 		helper.closeInputStream(is);
 		
@@ -1115,8 +1177,8 @@ public class ThemeChanger {
 			helper.closeInputStream(is);
 		}
 		
-		String themeID = helper.getThemesLoader().createNewTheme(decodedLinkToBase + themeName, linkToBase + helper.encode(themeName,
-				true), true, true);
+		String themeID = helper.getThemesLoader().createNewTheme(decodedLinkToBase + themeName, linkToBase +
+				helper.encode(themeName, true), true, true);
 		if (themeID == null) {
 			return false;
 		}
@@ -1154,7 +1216,8 @@ public class ThemeChanger {
 		// Setting Theme small preview
 		is = helper.getInputStream(helper.getFullWebRoot() + linkToBase + endodedLinkToPreview);
 		fileName = child.getName() + ThemesConstants.THEME_SMALL_PREVIEW + ThemesConstants.DOT + extension;
-		helper.getImageGenerator().encodeAndUploadImage(decodedLinkToBase, fileName, ThemesConstants.DEFAULT_MIME_TYPE + extension, is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
+		helper.getImageGenerator().encodeAndUploadImage(decodedLinkToBase, fileName, ThemesConstants.DEFAULT_MIME_TYPE + extension,
+				is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
 		child.setLinkToSmallPreview(fileName);
 		helper.closeInputStream(is);
 		

@@ -272,10 +272,8 @@ function Theme(themeName, url, urlToBig, id) {
 function setPreview(url) {
 	var preview = document.getElementById("themePreview");
 	if (preview == null) {
-		alert("No image tag");
 		return;
 	}
-	console.log(url);
 	preview.src = url;
 }
 

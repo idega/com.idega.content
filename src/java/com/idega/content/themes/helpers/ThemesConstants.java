@@ -34,7 +34,7 @@ public class ThemesConstants {
 	protected static final String DRAFT_PREVIEW = "_draft_preview";
 	
 	protected static final String THEME_SEARCH_KEY = "*.htm*";
-	protected static final String IDEGA_THEME_INFO = UNDER + IDEGA_THEME + DOT + XML_EXTENSION;//"_idega_theme.xml";
+	protected static final String IDEGA_THEME_INFO = UNDER + IDEGA_THEME + DOT + XML_EXTENSION;
 	
 	private static final String[] _DUMMY_ARTICLES = new String[] {"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum bibendum, ligula ut feugiat rutrum, mauris libero ultricies nulla, at hendrerit lectus dui bibendum metus. Phasellus quis nulla nec mauris sollicitudin ornare. Vivamus faucibus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Cras vulputate condimentum ipsum. Duis urna eros, commodo id, sagittis sed, sodales eu, ante. Etiam ante. Cras risus dolor, porta nec, adipiscing eu, scelerisque at, metus. Mauris nunc eros, porttitor nec, tincidunt ut, rutrum eget, massa. In facilisis nisi. Sed non lorem malesuada quam egestas bibendum. Quisque bibendum ullamcorper purus. Integer id diam vel elit adipiscing consectetuer. Phasellus vitae eros. Vivamus laoreet consectetuer tortor. In congue dignissim quam. Suspendisse nec purus vel velit ultricies bibendum."};
 	public static final List <String> DUMMY_ARTICLES = Collections.unmodifiableList(Arrays.asList(_DUMMY_ARTICLES));
@@ -54,8 +54,8 @@ public class ThemesConstants {
 	private static final String[] _USELESS_CONTENT = new String[] {"%pathto(", ")%", "%", " xml:space=\"preserve\""};
 	protected static final List <String> USELESS_CONTENT = Collections.unmodifiableList(Arrays.asList(_USELESS_CONTENT));
 	
-	private static final String[] _REGIONS = new String[] {"%logo%", "%site_title%", "%site_slogan%", "%content%", "%toolbar%",
-		"%sidebar_title%", "%sidebar%", "%plugin_sidebar%", "%breadcrumb%", "%footer%"};
+	private static final String[] _REGIONS = new String[] {"%logo%", "%content%", "%toolbar%", "%sidebar_title%", "%sidebar%",
+		"%plugin_sidebar%", "%breadcrumb%", "%footer%"};
 	protected static final List <String> REGIONS = Collections.unmodifiableList(Arrays.asList(_REGIONS));
 	
 	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "sidebarContainer",
@@ -70,6 +70,9 @@ public class ThemesConstants {
 	protected static final String TEMPLATE_REGION_BEGIN = " TemplateBeginEditable name=\"";
 	protected static final String TEMPLATE_REGION_MIDDLE = "\" ";
 	protected static final String TEMPLATE_REGION_END = " TemplateEndEditable ";
+	
+	public static final String SITE_TITLE = "site_title";
+	public static final String SITE_SLOGAN = "site_slogan";
 	
 	protected static final String DIV_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":div";
 	

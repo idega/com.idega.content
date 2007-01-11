@@ -78,4 +78,11 @@
 		<type>text</type>
 		<method></method>
 	</key>
+	<key>
+		<code>logo</code>
+		<label>Site Logo</label>
+		<defaultValue></defaultValue>
+		<type>text</type>
+		<method>setSiteLogo</method>
+	</key>
 </config>

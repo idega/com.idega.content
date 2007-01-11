@@ -67,7 +67,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 	}
 	
-	public boolean deleteIBPage(Theme theme) {
+	private boolean deleteIBPage(Theme theme) {
 		if (theme == null) {
 			return false;
 		}
