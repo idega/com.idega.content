@@ -199,3 +199,6 @@ locale=Locale
 region=Region
 value=Value
 make_start_page=Make This Page As Start Page
+apply_theme=Apply
+apply_theme_for_all=Apply current theme for all pages
+for=for

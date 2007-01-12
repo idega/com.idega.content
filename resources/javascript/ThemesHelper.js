@@ -245,3 +245,8 @@ function saveSiteInfoWithEnter(event) {
 		saveSiteInfo();
 	}
 }
+
+function applyThemeForSite(themeId) {
+	setThemeForStyle(themeId);
+	setStyle(false);
+}

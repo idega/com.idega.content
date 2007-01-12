@@ -781,6 +781,9 @@ public class ThemeChanger {
 		}
 		
 		Theme theme = helper.getTheme(themeID);
+		if (theme == null) {
+			return null;
+		}
 		
 		theme.setChangedName(themeName);
 		
@@ -1043,13 +1046,15 @@ public class ThemeChanger {
 		}
 		
 		Theme theme = helper.getTheme(themeID);
+		if (theme == null) {
+			return false;
+		}
 		
 		if (!theme.getName().equals(themeName)) {
 			return createNewTheme(theme, themeName);
 		}
 		
 		if (theme.getLinkToDraft() == null) {
-			log.info("No draft for theme: " + themeID);
 			return false;
 		}
 
@@ -1130,6 +1135,9 @@ public class ThemeChanger {
 			return false;
 		}
 		Theme theme = helper.getTheme(themeID);
+		if (theme == null) {
+			return false;
+		}
 		return restoreTheme(theme);
 	}
 	
@@ -1183,6 +1191,9 @@ public class ThemeChanger {
 			return false;
 		}
 		Theme child = helper.getTheme(themeID);
+		if (child == null) {
+			return false;
+		}
 		child.setName(newName);
 
 		copyTheme(parent, child);

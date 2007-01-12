@@ -14,6 +14,8 @@ version="1.2">
         				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous-js-1.6.2/lib/prototype.js,
         				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous-js-1.6.2/src/scriptaculous.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
+        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/PageInfoHelper.js,
+        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
 						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/reflection.js">
 			<h:form id="uploadForm" enctype="multipart/form-data" onsubmit="showLoadingMessage('Uploading theme...');">
 				<jsf:verbatim>
@@ -48,8 +50,9 @@ version="1.2">
 								<x:div id="themeSaveArea" forceId="true" styleClass="wf_webdav_upload">
 									<h:outputText value="#{localizedStrings['com.idega.content']['theme_name']}"></h:outputText>
 									<x:inputText id="theme_name" forceId="true"></x:inputText>
-									<x:commandButton id="themeSaveButton" type="button" forceId="true" onclick="saveTheme()" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
-									<x:commandButton id="themeRestoreButton" type="button" forceId="true" onclick="restoreTheme()" value="#{localizedStrings['com.idega.content']['restore_theme']}"></x:commandButton>
+									<x:commandButton id="themeSaveButton" type="button" forceId="true" onclick="saveTheme()" title="#{localizedStrings['com.idega.content']['save']}" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
+									<x:commandButton id="themeRestoreButton" type="button" forceId="true" onclick="restoreTheme()" title="#{localizedStrings['com.idega.content']['restore_theme']}" value="#{localizedStrings['com.idega.content']['restore_theme']}"></x:commandButton>
+									<x:commandButton id="saveAndApplyButton" type="button" forceId="true" onclick="saveAndApplyTheme()" title="#{localizedStrings['com.idega.content']['apply_theme_for_all']}" value="#{localizedStrings['com.idega.content']['apply_theme']}"></x:commandButton>
 								</x:div>
 							</x:div>
 						</wf:wfblock>

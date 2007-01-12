@@ -28,7 +28,11 @@ public class ThemeStyleVariations {
 			return buffer.toString();
 		}
 		Theme theme = ThemesHelper.getInstance().getTheme(themeID);
-		buffer.append("<p>Theme variations for ");
+		if (theme == null) {
+			return buffer.toString();
+		}
+		buffer.append("<p>").append(/*ContentUtil.getBundle().getLocalizedString("theme_variations")*/"Theme variations ");
+		buffer.append(/*ContentUtil.getBundle().getLocalizedString("for")*/"for").append(ThemesConstants.SPACE);
 		buffer.append(theme.getName());
 		buffer.append(":</p>");
 		buffer.append("<ul style='list-style-type: none;'>");
