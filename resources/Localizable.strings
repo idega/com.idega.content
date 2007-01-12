@@ -55,6 +55,7 @@ creation_date=Creation date
 current_folder=Current folder
 current_version=Current version
 delete=Delete
+delete_file=Delete file
 deletion_failed=Deletion failed
 description=Description
 details=Details
