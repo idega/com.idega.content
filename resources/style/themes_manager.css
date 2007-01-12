@@ -9,9 +9,107 @@
 .ws_main{
 	position: absolute;
 	left: -55px !important;
-	width: 850px;
+	right: 0;
+	width: auto;
+	bottom: 0;
+	top: 60px;
 }
 
+.ws_main .wf_block {
+	position: absolute;
+	width: auto;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	top: 0;
+	height: auto;
+}
+
+.multiImageGallery{}
+
+.theme_container .wf_block{
+	position: relative;
+	top: auto !important;
+	float: left;
+	display: block;
+}
+
+body#themeManager .ws_main .wf_block .wf_blockmainarea {
+	bottom: 0;
+	top: 0;
+	height: auto !important;
+	position: absolute;
+	width: auto;
+	left: 0;
+	right: 0;
+}
+
+body#themeManager .ws_main .theme_container .wf_titlebar{
+	display: none;
+}
+
+
+
+body#themeManager .ws_main .theme_container .wf_block{
+	width: 100% !important;
+	border: 0 !important;
+}
+
+
+body#themeManager .ws_main .theme_container .wf_block .wf_blockmainarea {
+	position: relative !important;
+	left: auto !important;
+	right: auto !important;
+	top: auto !important;
+	bottom: auto !important;
+}
+
+
+
+img#themePreview {
+	display: block;
+	position: absolute;
+	bottom: 155px;
+	top: 8px;
+	left: 8px;
+	right: 220px;
+	width: auto;
+}
+
+iframe#themePreview{
+	display: block;
+	position: absolute;
+	bottom: 155px;
+	top: 8px;
+	left: 8px;
+	right: 220px;
+	width: auto;
+}
+
+#themesSliderContainer {
+	position: absolute;
+	bottom: 0;
+	left: 8px;
+	right: 220px;
+	width: auto;
+}
+
+.theme_container {
+	position: absolute;
+	top: 8px;
+	bottom: -1px;
+	right: 0px;
+	width: 205px;
+	z-index: 1;
+	border: 1px solid #d7d7d7;
+	border-width: 1px 0 0 1px
+}
+
+.theme_container ul{
+	margin: 0;
+	padding: 5px;
+
+}
 
 .theme_container .variationsAndSaveBox .wf_blockmainarea{
 	height: 316px;
@@ -20,6 +118,7 @@
 
 .wf_webdav_upload{
 	width: 192px !important;
+	margin-left: 0;
 }
 
 .wf_webdav_upload .wf_inputtext{
@@ -27,6 +126,33 @@
 	display: block;
 }
 
+.fileUploadInput{
+}
+
 .wf_webdav_upload .wf_webdav_upload_button{
 	margin-top: 4px !important;
+}
+
+.multiImageGallery{
+	position: relative !important;
+}
+
+.themesTicker{
+	position: absolute !important;
+	width: 92%;
+}
+
+.theme_slider #rightScrollerContainer{
+	position: absolute !important;
+	right: 0 !important;
+	left: auto !important;
+	width: 34px;
+	height: 150px !important;
+	bottom: 0 !important;
+	background: #000;
+}
+
+.theme_slider #rightScrollerContainer #rightScroller{
+	float: right;
+	margin-top: 52px;
 }

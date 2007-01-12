@@ -326,14 +326,6 @@ function removeStyleOptions() {
 	}
 }
 
-function insertStyleFile() {
-	var style = document.createElement("link");
-	style.setAttribute("type","text/css");
-	style.setAttribute("href", "/idegaweb/bundles/com.idega.content.bundle/resources/style/themes_manager.css");
-	style.setAttribute("rel","stylesheet");
-	document.getElementsByTagName("head")[0].appendChild(style); 
-}
-
 function initScript(useStyling, enableContainer, enableVariations) {
 	enableStyleFunctions = useStyling;
 	enableThemeContainer = enableContainer;
