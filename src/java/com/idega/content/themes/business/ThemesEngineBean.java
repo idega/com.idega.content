@@ -16,6 +16,7 @@ import com.idega.business.IBOServiceBean;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.Theme;
+import com.idega.content.themes.helpers.ThemeChange;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.builder.business.BuilderService;
@@ -772,6 +773,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			ccachedDomain.setStartPageID(domain.getStartPageID());
 		}
 		return true;
+	}
+	
+	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes) {
+		return helper.getThemeChanger().applyMultipleChangesToTheme(themeID, changes);
 	}
 
 }

@@ -202,3 +202,5 @@ make_start_page=Make This Page As Start Page
 apply_theme=Apply
 apply_theme_for_all=Apply current theme for all pages
 for=for
+change=Change
+change_variations=Change current theme with selected variations

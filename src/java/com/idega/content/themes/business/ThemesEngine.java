@@ -1,6 +1,7 @@
 package com.idega.content.themes.business;
 
 
+import com.idega.content.themes.helpers.ThemeChange;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.core.builder.business.BuilderService;
@@ -133,4 +134,9 @@ public interface ThemesEngine extends IBOService {
 	 * @see com.idega.content.themes.business.ThemesEngineBean#initializeCachedDomain
 	 */
 	public boolean initializeCachedDomain(String domainName, ICDomain domain);
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#applyMultipleChangesToTheme
+	 */
+	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes) throws RemoteException;
 }

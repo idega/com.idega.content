@@ -1,5 +1,6 @@
 var THEME_ID = null;
 var themesArray = new Array();
+var themeChanges = new Array();
 
 var imageWidth = 149;
 var imageHeight = 112;
@@ -64,11 +65,12 @@ function insertStyleVariations(variations) {
 			oldVariation.removeChild(oldVariation.childNodes[0]);
 		}
 	}
+	console.log(variations);
 	oldVariation.innerHTML = variations;
 }
 
 function changeTheme(themeID, styleGroupName, newStyleMember, type, checked) {
-	showLoadingMessage('Changing...');
+	showLoadingMessage("Changing...");
 	var radio = true;
 	if (type == "checkbox") {
 		radio = false;
@@ -93,7 +95,7 @@ function changeThemeCallback(themeID) {
 
 function saveTheme() {
 	if (THEME_ID != null) {
-		showLoadingMessage('Saving...');
+		showLoadingMessage("Saving...");
 		var themeNameObj = document.getElementById("theme_name");
 		if (themeNameObj != null) {
 			ThemesEngine.saveTheme(THEME_ID, themeNameObj.value, saveThemeCallback);
@@ -357,7 +359,7 @@ function showThemesContainer() {
 }
 
 function restoreTheme() {
-	showLoadingMessage('Restoring theme...');
+	showLoadingMessage("Restoring...");
 	ThemesEngine.restoreTheme(THEME_ID, restoreThemeCallback);
 }
 
@@ -384,4 +386,97 @@ function saveAndApplyTheme() {
 	}
 	needApplyThemeForSite = true;
 	saveTheme();
+}
+
+function changeVariations() {
+	alert("Sorry, this button is not working yet...");
+	return;
+	if (THEME_ID == null) {
+		return false;
+	}
+	if (themeChanges == null) {
+		return false;
+	}
+	showLoadingMessage("Changing...");
+	ThemesEngine.applyMultipleChangesToTheme(THEME_ID, themeChanges, changeVariationsCallback);
+}
+
+function changeVariationsCallback(result) {
+	themeChanges = new Array();
+	closeLoadingMessage();
+}
+
+function ThemeChange(themeID, styleGroupName, variation, variationType, enabled) {
+	this.themeID = themeID;
+	this.styleGroupName = styleGroupName;
+	this.variation = variation;
+	this.variationType = variationType;
+	this.enabled = enabled;
+}
+
+function removeThemeChange(index, elementsToRemove) {
+	if (themeChanges == null) {
+		return false;
+	}
+	if (index >= 0 && index < themeChanges.length) {
+		themeChanges.splice(index, elementsToRemove);
+		return true;
+	}
+	return false;
+}
+
+function addThemeChange(themeID, styleGroupName, variation, variationType, enabled) {
+	if (THEME_ID != themeID) {
+		themeChanges = new Array();	// Reseting array of changes
+	}
+	if (variationType == "checkbox") {
+		removeThemeChange(existThemeChange(themeID, styleGroupName, variation, variationType, enabled), 1);
+	}
+	if (variationType == "radio") {
+		removeSameGroupChanges(themeID, styleGroupName);
+	}
+	
+	var index = existThemeChange(themeID, styleGroupName, variation, variationType, enabled);
+	if (index < 0) {
+		themeChanges.push(new ThemeChange(themeID, styleGroupName, variation, variationType, enabled));
+	}
+}
+
+function removeSameGroupChanges(themeID, styleGroupName) {
+	if (themeChanges == null) {
+		return false;
+	}
+	var themeChange = null;
+	var elementsToRemove = new Array();
+	for (var i = 0; i < themeChanges.length; i++) {
+		themeChange = themeChanges[i];
+		if (themeChange.themeID == themeID && themeChange.styleGroupName == styleGroupName) {
+			elementsToRemove.push(i);
+		}
+	}
+	for (var i = 0; i < elementsToRemove.length; i++) {
+		removeThemeChange(elementsToRemove[i], 1);
+	}
+}
+
+function existThemeChange(themeID, styleGroupName, variation, variationType, enabled) {
+	if (themeChanges == null) {
+		return -1;
+	}
+	var existChange = false;
+	var themeChange = null;
+	var i = 0;
+	for (i = 0; (i < themeChanges.length && !existChange); i++) {
+		themeChange = themeChanges[i];
+		if (themeChange.themeID == themeID && themeChange.styleGroupName == styleGroupName && themeChange.variation == variation) {
+			existChange = true;
+		}
+	}
+	if (existChange) {
+		if (i == 0) {
+			return 0;
+		}
+		return i - 1;
+	}
+	return -1;
 }

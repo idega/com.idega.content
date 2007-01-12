@@ -1,42 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site-templates>
-	<site name="Current structure" site-category="Business">
-		<structure>
-			<page name="homeFromXML" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="">
-				<page name="test1xml" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="">
-					<page name="test1.1xml" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile=""></page>
-					<page name="test1.2xml" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile=""></page>
-					<page name="test1.3xml" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile=""></page>					
-				</page>
-				<page name="test2xml" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="">
-					<page name="test2.1xml" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile=""></page>
-					<page name="test2.2xml" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile=""></page>				
-				</page>
-			</page>
-		</structure>		
-		<variables>
-			<variable name="site_title" value="my business site"/>
-		</variables>
-	</site>
-	<site name="Software company" site-category="Business">
+
+	<site name="Business" site-category="Business">
 		<structure>
 			<page name="Home" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="">
-				<page name="company pr photos" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile=""></page>
+				<page name="News and Events" type="blog" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/blog.png" templatefile=""></page>
+				<page name="About" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="">
+					<page name="Overview" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+					<page name="Our Clients" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+					<page name="The Team" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+					<page name="Job Opportunities" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+					<page name="Contact Us" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+				</page>
+				<page name="Products" type="blog" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/blog.png" templatefile=""></page>
+				<page name="Services" type="blog" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/blog.png" templatefile=""></page>
+				<page name="Support" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
 			</page>
 		</structure>		
 		<variables>
-			<variable name="site_title" value="my business site"/>
+			<variable name="site_title" value="My business site"/>
 		</variables>
 	</site>
 	
-	<site name="New Page" site-category="IdegaWebstructure">
+	<site name="Service Company" site-category="Business">
 		<structure>
-			<page name="Text" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
-			<page name="Image Gallery" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile=""></page>
-			<page name="Blog" type="articlelist" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>			
+			<page name="Home" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="">
+				<page name="News and Events" type="blog" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/blog.png" templatefile=""></page>
+				<page name="Services" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="">
+					<page name="Service 1" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+					<page name="Service 2" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+					<page name="Service 3" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+					<page name="Service 4" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+					<page name="Service 5" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+				</page>
+				<page name="About Us" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+				<page name="Feedback" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+				<page name="Contacts" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+			</page>
 		</structure>		
 		<variables>
-			<variable name="site_title" value="my business site"/>
+			<variable name="site_title" value="My Service Company"/>
 		</variables>
 	</site>
+
+	<site name="Blog" site-category="Personal">
+		<structure>
+			<page name="My Blog" type="blog" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile="">
+				<page name="About me" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+				<page name="Photos" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile=""></page>
+				<page name="My family" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+				<page name="Resume" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+				<page name="Contact me" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+			</page>
+		</structure>		
+		<variables>
+			<variable name="site_title" value="My blog"/>
+		</variables>
+	</site>
+	
+		<site name="Photo gallery" site-category="Personal">
+		<structure>
+			<page name="Photos" type="imagegallery" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/imagegallery.png" templatefile="">
+				<page name="About me" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+				<page name="Contact me" type="text" iconfile="/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/text.png" templatefile=""></page>
+			</page>
+		</structure>		
+		<variables>
+			<variable name="site_title" value="My photo gallery"/>
+		</variables>
+	</site>
+	
 </site-templates>

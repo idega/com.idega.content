@@ -2,11 +2,39 @@ package com.idega.content.themes.helpers;
 
 public class ThemeChange {
 	
+	private String themeID;
 	private String styleGroupName;
-	private String styleGroupMember;
-	
+	private String variation;
+	private String variationType;
 	private boolean enabled;
+	
 	private boolean limitedSelection;
+	
+	public ThemeChange() {}
+	
+	public ThemeChange(String themeID, String styleGroupName, String variation, String variationType, boolean enabled) {
+		this.themeID = themeID;
+		this.styleGroupName = styleGroupName;
+		this.variation = variation;
+		this.variationType = variationType;
+		this.enabled = enabled;
+	}
+
+	protected String getThemeId() {
+		return themeID;
+	}
+
+	protected void setThemeId(String themeID) {
+		this.themeID = themeID;
+	}
+
+	protected String getVariationType() {
+		return variationType;
+	}
+
+	protected void setVariationType(String variationType) {
+		this.variationType = variationType;
+	}
 
 	protected boolean isEnabled() {
 		return enabled;
@@ -16,12 +44,12 @@ public class ThemeChange {
 		this.enabled = enabled;
 	}
 
-	protected String getStyleGroupMember() {
-		return styleGroupMember;
+	protected String getVariation() {
+		return variation;
 	}
 
-	protected void setStyleGroupMember(String styleGroupMember) {
-		this.styleGroupMember = styleGroupMember;
+	protected void setVariation(String variation) {
+		this.variation = variation;
 	}
 
 	protected String getStyleGroupName() {

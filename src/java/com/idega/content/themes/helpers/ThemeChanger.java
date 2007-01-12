@@ -865,7 +865,7 @@ public class ThemeChanger {
 		change.setLimitedSelection(limitedSelection);
 		change.setEnabled(style.isEnabled());
 		change.setStyleGroupName(style.getGroupName());
-		change.setStyleGroupMember(style.getName());
+		change.setVariation(style.getName());
 		theme.addThemeChange(change);
 	}
 	
@@ -1105,7 +1105,7 @@ public class ThemeChanger {
 		ThemeStyleGroupMember member = null;
 		for (int i = 0; i < changes.size(); i++) {
 			change = changes.get(i);
-			member = getStyleMember(theme, change.getStyleGroupName(), change.getStyleGroupMember());
+			member = getStyleMember(theme, change.getStyleGroupName(), change.getVariation());
 			if (member != null) {
 				if (change.isLimitedSelection()) {
 					disableStyle(theme, member.getGroupName());
@@ -1273,6 +1273,16 @@ public class ThemeChanger {
 	
 	protected XMLOutputter getXMLOutputter() {
 		return out;
+	}
+	
+	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes) {
+		if (themeID == null || changes == null) {
+			return null;
+		}
+		for (int i = 0; i < changes.size(); i++) {
+			log.info(changes.get(i).getClass());
+		}
+		return themeID;
 	}
 
 }

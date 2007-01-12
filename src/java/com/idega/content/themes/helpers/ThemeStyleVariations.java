@@ -10,7 +10,7 @@ public class ThemeStyleVariations {
 	private static final String INPUT_TYPE = "<input type='";
 	private static final String INPUT_NAME = "' name='";
 	private static final String INPUT_VALUE = "' value='";
-	private static final String INPUT_ONCLICK = "' onclick=\"changeTheme('";
+	private static final String INPUT_ONCLICK = /*"' onclick=\"addThemeChange('";*/"' onclick=\"changeTheme('";
 	private static final String INPUT_CHECKED = "checked='true'";
 	
 	private static final String PARAM_CHECKED = "', this.checked";
