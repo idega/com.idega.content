@@ -15,6 +15,31 @@
 				<value>/files/public/gallery/</value>
 				<type>java.lang.String</type>
 			</property>
+			<property>
+				<name>:method:1:implied:void:setColumns:int:</name>
+				<value>3</value>
+				<type>java.lang.String</type>
+			</property>
+			<property>
+				<name>:method:1:implied:void:setRows:int:</name>
+				<value>9</value>
+				<type>java.lang.String</type>
+			</property>
+			<property>
+				<name>:method:1:implied:void:setWidthOfImages:int:</name>
+				<value>150</value>
+				<type>java.lang.String</type>
+			</property>
+			<property>
+				<name>:method:1:implied:void:setHeightOfImages:int:</name>
+				<value>150</value>
+				<type>java.lang.String</type>
+			</property>
+			<property>
+				<name>:method:1:implied:void:setPopUpOriginalImageOnClick:boolean:</name>
+				<value>Y</value>
+				<type>java.lang.String</type>
+			</property>
     	</module>
     </region>
     <region id="navcontainer" label="navcontainer">
