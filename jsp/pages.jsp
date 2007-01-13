@@ -113,7 +113,8 @@ version="1.2">
 			</h:form>
 		</ws:page>
 		<jsf:verbatim>
-			<script type="text/javascript">showSlider(document.getElementById("themesSliderContainer"));resizeFrame();</script>
+			<script type="text/javascript">showSlider(document.getElementById("themesSliderContainer"));</script>
+			<script type="text/javascript">resizeFrame();</script>
 			<script type="text/javascript">getPageInfoValues();</script>
 			<script type="text/javascript">isStartPage(getPageID());</script>
 			<script type="text/javascript">checkIfNotEmptySiteTree("div_id_current_structure_tree");</script>

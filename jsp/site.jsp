@@ -89,7 +89,7 @@
 				<f:verbatim><script type="text/javascript">setActiveLanguage();</script></f:verbatim>
 				<f:verbatim>
 					<script type="text/javascript">
-						resizeContainer("site_tree_container", "site_tree_container_site", 482, true);
+						resizeContainer("site_tree_container", "site_tree_container_site", 412, true);
 						resizeContainer("pagesTypesContainer", "pagesTypesContainer", 502, false);
 						resizeContainer("siteTemplatesContainer", "siteTemplatesContainer", 502, false);
 						resizeContainer("siteTemplatesContainer", "siteTemplatesContainer", 287, true);

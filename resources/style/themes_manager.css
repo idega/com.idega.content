@@ -77,13 +77,13 @@ img#themePreview {
 }
 
 iframe#themePreview{
-	display: block;
+	/*display: block;
 	position: absolute;
 	bottom: 155px;
 	top: 8px;
 	left: 8px;
 	right: 220px;
-	width: auto;
+	width: auto;*/
 }
 
 #themesSliderContainer {

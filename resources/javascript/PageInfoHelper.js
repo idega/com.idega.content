@@ -4,6 +4,9 @@ var SCROLLER_IMAGE_WIDTH = 23;
 var SPACE_FROM_LEFT = 290;
 var FRAME_CHANGE = 155;
 
+var RESERVED_HEIGHT = 255;
+var RESERVED_WIDTH = 500;
+
 var CLICKED_CREATE = false;
 
 var KEYWORDS = null;
@@ -306,16 +309,16 @@ function resizeFrame() {
 		return;
 	}
 	frame.style.left = SPACE_FROM_LEFT + "px";
-	var availableWidth = getTotalWidth() - 500;
+	var availableWidth = getTotalWidth() - RESERVED_WIDTH;
 	if (availableWidth > 0) {
 		frame.style.width = availableWidth + "px";
 	}
-	var availableHeight = getTotalHeight() - 331;
+	var availableHeight = getTotalHeight() - RESERVED_HEIGHT;
 	if (availableHeight > 0) {
 		frame.style.height = availableHeight + "px";
 	}
 	
-	resizeContainer("site_tree_container", "site_tree_container_pages", 331, true);
+	resizeContainer("site_tree_container", "site_tree_container_pages", RESERVED_HEIGHT, true);
 }
 
 function getPageInfoValues() {

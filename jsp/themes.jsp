@@ -22,9 +22,9 @@ version="1.2">
 					<script type="text/javascript">insertStyleFile();initScript(false, true, true);getThemes(null, true);</script>
 				</jsf:verbatim>
 				<wf:wfblock id="themeManagerBlock" title="#{localizedStrings['com.idega.content']['themes']}" >
-					<x:div id="themePreviewContainer" forceId="true" style="width: 600px; height: 480px">
+					<x:div id="themePreviewContainer" forceId="true" style="width: auto">
 						<jsf:verbatim>
-							<iframe id="themePreview" style="z-index: 999" />
+							<iframe id="themePreview" />
 						</jsf:verbatim>
 					</x:div>
 					
