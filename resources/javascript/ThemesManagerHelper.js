@@ -65,7 +65,6 @@ function insertStyleVariations(variations) {
 			oldVariation.removeChild(oldVariation.childNodes[0]);
 		}
 	}
-	console.log(variations);
 	oldVariation.innerHTML = variations;
 }
 

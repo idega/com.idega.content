@@ -61,6 +61,12 @@ public class ThemesConstants {
 	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "sidebarContainer",
 		"breadcrumbcontainer", "navcontainer"};
 	protected static final List <String> BASIC_IDS_FOR_REGIONS = Collections.unmodifiableList(Arrays.asList(_BASIC_IDS_FOR_REGIONS));
+	
+	private static final String[] _DOCUMENT_PUBLIC_IDS = new String[] {"Apple Computer", "DTD XHTML 1.0 Strict"};
+	protected static final List <String> DOCUMENT_PUBLIC_IDS = Collections.unmodifiableList(Arrays.asList(_DOCUMENT_PUBLIC_IDS));
+	
+	private static final String[] _DOCUMENT_SYSTEM_IDS = new String[] {"PropertyList", "xhtml1-strict.dtd"};
+	protected static final List <String> DOCUMENT_SYSTEM_IDS = Collections.unmodifiableList(Arrays.asList(_DOCUMENT_SYSTEM_IDS));
 
 	private static final String[] _DEFAULT_STYLE_FILES = new String[] {"styles.css", "handheld.css", "print.css"};
 	protected static final List <String> DEFAULT_STYLE_FILES = Collections.unmodifiableList(Arrays.asList(_DEFAULT_STYLE_FILES));
@@ -161,4 +167,6 @@ public class ThemesConstants {
 	public static final String MINUS_ONE = "-1";
 	
 	public static final String DEFAULT_DOMAIN_NAME = "Default Site";
+	
+	protected static final String DOCUMENT_HEADER = "<?xml version='1.0' encoding='UTF-8'?>"; 
 }

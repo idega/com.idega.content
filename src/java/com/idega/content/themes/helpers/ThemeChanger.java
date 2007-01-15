@@ -54,7 +54,6 @@ public class ThemeChanger {
 	private static final String BREADCRUMB = "breadcrumbcontainer";
 	private static final String FOOTER = "footer";
 	private static final String CONTENT = "content";
-	private static final String PAGE_HEADER = "pageHeader";
 	
 	// These are defaults in RapidWeaver style files, we need to change directories to images
 	private static final String CSS_IMAGE_URL = "url(";
@@ -85,7 +84,7 @@ public class ThemeChanger {
 	private static final String OPENER = "{";
 	private static final String CLOSER = "}";
 	
-	private static final int THEME_HEIGHT = 200;
+	private static final int THEME_HEIGHT = 300;
 	
 	private static final String REGION_TO_EXPAND = "contentContainer";
 	
@@ -480,7 +479,7 @@ public class ThemeChanger {
 	 * @return boolean
 	 */
 	private boolean needAddRegion(List <String> regions, String value) {
-		if (regions == null) {
+		if (regions == null || value == null) {
 			return false;
 		}
 		if (regions.contains(value)) {
@@ -490,7 +489,7 @@ public class ThemeChanger {
 	}
 	
 	/**
-	 * Adding regions to div tags like this: <!-- TemplateBeginEditable name="MyUniqueRegionId1" -->MyUniqueRegionId1<!-- TemplateEndEditable -->
+	 * Adding regions to div tags like this: <!-- TemplateBeginEditable name="MyUniqueRegionId1" --><!-- TemplateEndEditable -->
 	 * @param body
 	 * @return boolean
 	 */
@@ -686,9 +685,9 @@ public class ThemeChanger {
 			return false;
 		}
 		String regionID = e.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_ID);
-		if (regionID == null) {
+		/*if (regionID == null) {
 			return false;
-		}
+		}*/
 		
 		if (needAddRegion(ThemesConstants.BASIC_IDS_FOR_REGIONS, regionID)) {
 			e.addContent(0, getCommentsCollection(regionID));
@@ -698,21 +697,30 @@ public class ThemeChanger {
 			if (BREADCRUMB.equals(regionID)) {
 				e.addContent(1, getNavigatorContent(regionID, false));
 			}
-			if (PAGE_HEADER.equals(regionID)) {
-				detachElement(e, "h1");
-				detachElement(e, "h2");
-				e.addContent(getCommentsCollection(ThemesConstants.SITE_TITLE));
-				addElementToRegion(e, e.getContentSize() - 1, "h1", ThemesConstants.SITE_TITLE);
-				
-				e.addContent(getCommentsCollection(ThemesConstants.SITE_SLOGAN));
-				addElementToRegion(e, e.getContentSize() - 1, "h2", ThemesConstants.SITE_SLOGAN);
-			}
 		}
-		if (regionID.equals(REGION_TO_EXPAND)) {
-			e.addContent(getElement("div", "&nbsp;", "style", "height:"+THEME_HEIGHT+";visibility:hidden")); // Expanding theme
+		
+		fixSiteRegion(e, "h1", ThemesConstants.SITE_TITLE);
+		fixSiteRegion(e, "h2", ThemesConstants.SITE_SLOGAN);
+		
+		if (regionID != null) {
+			if (regionID.equals(REGION_TO_EXPAND)) {
+				e.addContent(getElement("div", "&nbsp;", "style", "height:"+THEME_HEIGHT+";visibility:hidden")); // Expanding theme
+			}
 		}
 		
 		return true;
+	}
+	
+	private boolean fixSiteRegion(Element e, String heading, String headingKeyword) {
+		if (e == null || heading == null) {
+			return false;
+		}
+		if (detachElement(e, heading)) {
+			e.addContent(getCommentsCollection(headingKeyword));
+			addElementToRegion(e, e.getContentSize() - 1, heading, headingKeyword);	
+			return true;
+		}
+		return false;
 	}
 	
 	private boolean addElementToRegion(Element e, int index, String elementName, String applicationPropertyKey) {
