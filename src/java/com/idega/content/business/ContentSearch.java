@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.20.2.11 2007/01/15 14:53:18 gediminas Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.20.2.12 2007/01/15 17:07:50 gediminas Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2007/01/15 14:53:18 $ by $Author: gediminas $ 
+ * Last modified: $Date: 2007/01/15 17:07:50 $ by $Author: gediminas $ 
  * This class implements the Searchplugin interface and can therefore be used in a Search block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
  * system. To use it simply register this class as a iw.searchable component in
@@ -82,7 +82,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.20.2.11 $
+ * @version $Revision: 1.20.2.12 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -274,6 +274,22 @@ public class ContentSearch extends Object implements SearchPlugin{
 				}
 				else {
 					SearchRequest query = (SearchRequest) request;
+					
+					// executeSearch uses comparator which needs a property set in propertyToOrderBy
+					// in search results. add it if it's not there
+					boolean selectionCorrect = false;
+					for (Iterator selection = query.getSelection(); selection.hasNext(); ) {
+						PropertyName prop = (PropertyName) selection.next();
+						if (prop.getLocalName().contains(getPropertyToOrderBy())) {
+							selectionCorrect = true;
+							break;
+						}
+					}
+					if (!selectionCorrect) {
+						query.addSelection(new PropertyName("DAV:", getPropertyToOrderBy()));
+						System.err.println("WARNING: content search set to be ordered by " + getPropertyToOrderBy() + ", but this property is not in selection. Adding it.");
+					}
+					
 					queryXML = query.asString();
 				}
 				SearchMethod contentSearch = new SearchMethod(servletMapping, queryXML);
@@ -581,14 +597,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 		}
 		
 		//ONLY NEEDED UNTIL ORDERING / SORTING WORKS IN SLIDE!!
-		SearchResultComparator comparator = null;
-		if (getPropertyToOrderBy() == "displayname") {
-			comparator = new SearchResultComparator(locale,SearchResultComparator.SORT_BY_RESULT_NAME,isSetToUseDescendingOrder());
-		}
-		else {
-			comparator = new SearchResultComparator(locale,getPropertyToOrderBy(),isSetToUseDescendingOrder());
-		}
-		//
+		SearchResultComparator comparator = new SearchResultComparator(locale,getPropertyToOrderBy(),isSetToUseDescendingOrder());
 
 		while (enumerator.hasMoreElements()) {
 			ResponseEntity entity = (ResponseEntity) enumerator.nextElement();
@@ -597,11 +606,13 @@ public class ContentSearch extends Object implements SearchPlugin{
 			if (!fileURI.equalsIgnoreCase(servletMapping)) {
 				Enumeration props = entity.getProperties();
 				Map properties = new HashMap();
+//				System.out.println(fileURI + " properties:");
 				while (props.hasMoreElements()) {
 					prop = (Property) props.nextElement();
 					String name = prop.getLocalName();
 					String value = prop.getPropertyAsString();
 					properties.put(name,value);
+//					System.out.println("| " + name + " = " + value);
 				}
 				
 				// PARSE PROPERTIES AND CONVERT SOME
@@ -648,9 +659,15 @@ public class ContentSearch extends Object implements SearchPlugin{
 			}
 		}
 		
-		
-		
 		Collections.sort(results,comparator);
+		
+		/*
+		System.out.println("Results sorted by " + getPropertyToOrderBy());
+		for (Iterator iter = results.iterator(); iter.hasNext();) {
+			BasicSearchResult result = (BasicSearchResult) iter.next();
+			System.out.println("| " + result.getSearchResultAttributes().get(this.propertyToOrderBy).toString() + " | " + result.getSearchResultName());
+		}
+		*/
 	}
 
 	public void setToShowDeleteLink(boolean show) {
