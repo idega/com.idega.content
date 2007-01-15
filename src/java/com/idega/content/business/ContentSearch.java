@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.27 2006/11/28 18:37:21 laddi Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.28 2007/01/15 17:51:24 gediminas Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2006/11/28 18:37:21 $ by $Author: laddi $ This class
+ * Last modified: $Date: 2007/01/15 17:51:24 $ by $Author: gediminas $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -83,7 +83,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.28 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -274,6 +274,22 @@ public class ContentSearch extends Object implements SearchPlugin{
 				}
 				else {
 					SearchRequest query = (SearchRequest) request;
+					
+					// executeSearch uses comparator which needs a property set in propertyToOrderBy
+					// in search results. add it if it's not there
+					boolean selectionCorrect = false;
+					for (Iterator selection = query.getSelection(); selection.hasNext(); ) {
+						PropertyName prop = (PropertyName) selection.next();
+						if (prop.getLocalName().contains(getPropertyToOrderBy())) {
+							selectionCorrect = true;
+							break;
+						}
+					}
+					if (!selectionCorrect) {
+						query.addSelection(new PropertyName("DAV:", getPropertyToOrderBy()));
+						System.err.println("WARNING: content search set to be ordered by " + getPropertyToOrderBy() + ", but this property is not in selection. Adding it.");
+					}
+					
 					queryXML = query.asString();
 				}
 				SearchMethod contentSearch = new SearchMethod(servletMapping, queryXML);
@@ -582,7 +598,6 @@ public class ContentSearch extends Object implements SearchPlugin{
 		
 		//ONLY NEEDED UNTIL ORDERING / SORTING WORKS IN SLIDE!!
 		SearchResultComparator comparator = new SearchResultComparator(locale,getPropertyToOrderBy(),isSetToUseDescendingOrder());
-		//
 
 		while (enumerator.hasMoreElements()) {
 			ResponseEntity entity = (ResponseEntity) enumerator.nextElement();
@@ -592,11 +607,13 @@ public class ContentSearch extends Object implements SearchPlugin{
 				// TODO remove temp stuff when accesscontrol is fixed
 				Enumeration props = entity.getProperties();
 				Map properties = new HashMap();
+//				System.out.println(fileURI + " properties:");
 				while (props.hasMoreElements()) {
 					prop = (Property) props.nextElement();
 					String name = prop.getLocalName();
 					String value = prop.getPropertyAsString();
 					properties.put(name,value);
+//					System.out.println("| " + name + " = " + value);
 				}
 				
 				// PARSE PROPERTIES AND CONVERT SOME
@@ -643,8 +660,15 @@ public class ContentSearch extends Object implements SearchPlugin{
 			}
 		}
 		
-		
 		Collections.sort(results,comparator);
+		
+		/*
+		System.out.println("Results sorted by " + getPropertyToOrderBy());
+		for (Iterator iter = results.iterator(); iter.hasNext();) {
+			BasicSearchResult result = (BasicSearchResult) iter.next();
+			System.out.println("| " + result.getSearchResultAttributes().get(this.propertyToOrderBy).toString() + " | " + result.getSearchResultName());
+		}
+		*/
 	}
 
 	public void setToShowDeleteLink(boolean show) {
