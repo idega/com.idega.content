@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.20.2.10 2006/11/09 17:09:09 gimmi Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.20.2.11 2007/01/15 14:53:18 gediminas Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2006/11/09 17:09:09 $ by $Author: gimmi $ 
+ * Last modified: $Date: 2007/01/15 14:53:18 $ by $Author: gediminas $ 
  * This class implements the Searchplugin interface and can therefore be used in a Search block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
  * system. To use it simply register this class as a iw.searchable component in
@@ -82,7 +82,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.20.2.10 $
+ * @version $Revision: 1.20.2.11 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -581,7 +581,13 @@ public class ContentSearch extends Object implements SearchPlugin{
 		}
 		
 		//ONLY NEEDED UNTIL ORDERING / SORTING WORKS IN SLIDE!!
-		SearchResultComparator comparator = new SearchResultComparator(locale,getPropertyToOrderBy(),isSetToUseDescendingOrder());
+		SearchResultComparator comparator = null;
+		if (getPropertyToOrderBy() == "displayname") {
+			comparator = new SearchResultComparator(locale,SearchResultComparator.SORT_BY_RESULT_NAME,isSetToUseDescendingOrder());
+		}
+		else {
+			comparator = new SearchResultComparator(locale,getPropertyToOrderBy(),isSetToUseDescendingOrder());
+		}
 		//
 
 		while (enumerator.hasMoreElements()) {
