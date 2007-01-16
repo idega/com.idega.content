@@ -144,8 +144,15 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		
 		boolean result = true;
-		if (builder.checkDeletePage(pageID, domain)) {
-			result = builder.deletePage(pageID, deleteChildren, tree, userID, domain);
+		result =  builder.deletePage(pageID, deleteChildren, tree, iwc.getUserId(), domain);
+		
+		try {
+			if (Integer.valueOf(pageID).intValue() == domain.getStartPageID()) {
+				domain.setIBPage(null);
+				domain.store();
+			}
+		} catch (NumberFormatException e) {
+			log.error(e);
 		}
 		
 		if (domainId != -1) {
