@@ -572,17 +572,17 @@
 				}
 				var tmpObj = JSTreeObj.dragNode_parent;
 				var lis = tmpObj.getElementsByTagName('LI');
-temp = document.getElementById('page_tree_div');
-if (temp.childNodes.length == 0)
-	JSTreeObj.drawTable();
-//if (temp.childNodes.length)
-	else
-				if(lis.length==0){
-					var tmpSpan = tmpObj.parentNode;
-					var img = tmpSpan.parentNode.getElementsByTagName('IMG')[0];
-					img.style.visibility='hidden';	// Hide [+],[-] icon
-					tmpObj.parentNode.removeChild(tmpObj);											
-				}				
+				
+				temp = document.getElementById('page_tree_div');
+				if (temp.childNodes.length == 0)
+					JSTreeObj.drawTable();
+				else
+					if(lis.length==0){
+						var tmpSpan = tmpObj.parentNode;
+						var img = tmpSpan.parentNode.getElementsByTagName('IMG')[0];
+						img.style.visibility='hidden';	// Hide [+],[-] icon
+						tmpObj.parentNode.removeChild(tmpObj);											
+					}				
 								
 				JSTreeObj.dropTargetIndicator.style.display='none';				
 				JSTreeObj.dragDropTimer = -1;
@@ -779,7 +779,7 @@ if (temp.childNodes.length == 0)
 			getPrewUrl(lastID);
 			isChangingSiteMap();
 			closeLoadingMessage();
-			if (isNeedRelaodBuilderPage() && isSiteMap()) {
+			if (isNeedRelaodBuilderPage() && isSiteMap() && isNeedRedirect()) {
 				showLoadingMessage("Redirecting...");
 				setNeedRelaodBuilderPage(false);
 				redirectAction("/workspace/builder/application", 0);
@@ -1034,7 +1034,7 @@ if (temp.childNodes.length == 0)
 			if(JSTreeObj.deleteNodes == true){
 				JSTreeObj.deleteNodes = false;
 				trashCan.style.opacity = 0.5;
-				trashCan.style.border = 'outset';
+//				trashCan.style.border = 'outset';
 				}
 			else {
 				JSTreeObj.deleteNodes = true;

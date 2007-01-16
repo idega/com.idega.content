@@ -5,11 +5,20 @@ var TOTAL_HEIGHT = 0;
 
 var IS_SITE_MAP = false;
 var NEED_RELOAD_BUILDER_PAGE = false;
+var NEED_REDIRECT = false;
 
 var SITE_INFO_KEYWORD_FROM_BOX = null;
 var APPLICATION_PROPERTY = "application_property";
 var OLD_APPLICATION_PROPERTY = null;
 var EDIT_BOX_ID = "changeSiteInfoBox";
+
+function setNeedRedirect(redirect) {
+	NEED_REDIRECT = redirect;
+}
+
+function isNeedRedirect() {
+	return NEED_REDIRECT;
+}
 
 function isSiteMap() {
 	return IS_SITE_MAP;
@@ -154,6 +163,16 @@ function checkIfNotEmptySiteTree(id) {
 	}
 	if (treeContainer.childNodes != null) {
 		if (treeContainer.childNodes.length != 0) {
+/*			
+							treeObj = new JSDragDropTree();
+							treeObj.setTreeId('page_tree_div');
+							treeObj.setMaximumDepth(7);
+							treeObj.setMessageMaximumDepthReached('Maximum depth reached'); // If you want to show a message when maximum depth is reached, i.e. on drop.
+							treeObj.initTree();
+							treeObj.checkIfOverTree('page_tree_div');							
+							treeObj.getNodeOrders();
+							treeObj.expandAll();							
+*/							
 			return;
 		}
 	}

@@ -63,7 +63,7 @@
 					</wf:wfblock>
 				</x:div>
 
-				<f:verbatim><script type="text/javascript">setIsSiteMap(true);</script></f:verbatim>
+				<f:verbatim><script type="text/javascript">setIsSiteMap(true);setNeedRedirect(true);</script></f:verbatim>
 				<f:verbatim>
 					<script type="text/javascript">	
 						treeObj = new JSDragDropTree();
