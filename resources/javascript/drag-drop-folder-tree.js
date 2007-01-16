@@ -519,7 +519,27 @@
 					deletePage(childs[i].id);
 				}
 			}
-		}		
+		}
+		,
+		drawTable : function(){
+			var treeContainer = document.getElementById('page_tree_div');
+			var rootUl = document.createElement('ul');
+			rootUl.setAttribute('id','rootUl');
+			var tempTable = document.createElement('table');
+			tempTable.setAttribute('id','temporaryTable');
+			tempTable.setAttribute('onmouseover','treeObj.prepareToSetTopPage();');	
+			tempTable.setAttribute('onmouseout','treeObj.topPageNotSet();');	
+			tempTable.style.border='1px  solid';
+			tempTable.style.margin='5px';
+			var tr=document.createElement('tr');
+		  	var td=document.createElement('td');
+		  	var tdText=document.createTextNode('Drop templates here'); 
+		  	td.appendChild(tdText);  					// - put the text node in the table cell
+		  	tr.appendChild(td); 						// - put the cell into the row
+		  	tempTable.appendChild(tr); 	
+		  	rootUl.appendChild(tempTable);
+			treeContainer.appendChild(rootUl);
+		}
 		,
 		dropDragableNodesCopy:function()
 		{
@@ -552,6 +572,11 @@
 				}
 				var tmpObj = JSTreeObj.dragNode_parent;
 				var lis = tmpObj.getElementsByTagName('LI');
+temp = document.getElementById('page_tree_div');
+if (temp.childNodes.length == 0)
+	JSTreeObj.drawTable();
+//if (temp.childNodes.length)
+	else
 				if(lis.length==0){
 					var tmpSpan = tmpObj.parentNode;
 					var img = tmpSpan.parentNode.getElementsByTagName('IMG')[0];
@@ -561,6 +586,7 @@
 								
 				JSTreeObj.dropTargetIndicator.style.display='none';				
 				JSTreeObj.dragDropTimer = -1;
+
 				return;
 			}				
 
@@ -1008,10 +1034,12 @@
 			if(JSTreeObj.deleteNodes == true){
 				JSTreeObj.deleteNodes = false;
 				trashCan.style.opacity = 0.5;
+				trashCan.style.border = 'outset';
 				}
 			else {
 				JSTreeObj.deleteNodes = true;
 				trashCan.style.opacity = 1;
+//				trashCan.style.border = 'inset';
 			}
 		}
 		,

@@ -10,7 +10,6 @@ function saveMyTree(newParentNodeId, sourceNodeId) {
 	ThemesEngine.movePage(newParentNodeId, sourceNodeId, empty);
 }
 
-
 function getNewId(id){
 	return id;
 }
