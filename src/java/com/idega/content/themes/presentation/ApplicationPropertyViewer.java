@@ -1,5 +1,6 @@
 package com.idega.content.themes.presentation;
 
+import java.util.HashMap;
 import java.util.Locale;
 
 import javax.faces.context.FacesContext;
@@ -11,6 +12,7 @@ import com.idega.core.builder.data.ICPage;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
+import com.idega.presentation.PresentationObject;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Heading2;
 import com.idega.presentation.text.Link;
@@ -33,6 +35,8 @@ public class ApplicationPropertyViewer extends Block {
 	private static final String BREADCRUMB = "breadcrumbcontainer";
 	private static final String LOGO = "logo";
 	private static final String LIST_STYLE = "list-style-type: none; width: 100%";
+	
+	private static final String USELESS_STYLE_CLASS = "empty_useless_style_class";
 
 	private String applicationPropertyKey = null;
 	
@@ -78,15 +82,16 @@ public class ApplicationPropertyViewer extends Block {
 				item.addText(values[i].trim());
 				list.add(item);
 			}
+			addPropertyEditAction(iwc, list, key);
 			this.add(list);
 			return;
 		}
 		
-		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + TOOLBAR + ThemesConstants.DOT) != -1) { // Toolbar
+		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + TOOLBAR + ThemesConstants.DOT) != -1) {
 			if (!ThemesConstants.EMPTY.equals(value)) {
 				Link l = new Link();
-				l.setId("current");
 				l.setText(value);
+				addPropertyEditAction(iwc, l, key);
 				this.add(l);
 			}
 			return;
@@ -96,6 +101,7 @@ public class ApplicationPropertyViewer extends Block {
 			if (!ThemesConstants.EMPTY.equals(value)) {
 				Link l = new Link();
 				l.setText(value);
+				addPropertyEditAction(iwc, l, key);
 				this.add(l);
 			}
 			return;
@@ -106,6 +112,7 @@ public class ApplicationPropertyViewer extends Block {
 			if (!ThemesConstants.EMPTY.equals(value)) {
 				Image image = new Image(value, ContentUtil.getBundle().getLocalizedString(siteLogo));
 				image.setID(siteLogo);
+				addPropertyEditAction(iwc, image, key);
 				this.add(image);
 			}
 			return;
@@ -114,6 +121,7 @@ public class ApplicationPropertyViewer extends Block {
 		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + ThemesConstants.SITE_TITLE + ThemesConstants.DOT) != -1) {
 			if (!ThemesConstants.EMPTY.equals(value)) {
 				Heading1 h1 = new Heading1(value);
+				addPropertyEditAction(iwc, h1, key);
 				this.add(h1);
 			}
 			return;
@@ -122,12 +130,15 @@ public class ApplicationPropertyViewer extends Block {
 		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + ThemesConstants.SITE_SLOGAN + ThemesConstants.DOT) != -1) {
 			if (!ThemesConstants.EMPTY.equals(value)) {
 				Heading2 h2 = new Heading2(value);
+				addPropertyEditAction(iwc, h2, key);
 				this.add(h2);
 			}
 			return;
 		}
-
+		
 		Text text = new Text(value); // Simple text
+		addPropertyEditAction(iwc, text, key);
+		text.setStyleClass(USELESS_STYLE_CLASS);
 		this.add(text);
 	}
 	
@@ -146,5 +157,28 @@ public class ApplicationPropertyViewer extends Block {
 		values[0] = super.saveState(context);
 		values[1] = this.applicationPropertyKey;
 		return values;
+	}
+	
+	private void addPropertyEditAction(IWContext iwc, PresentationObject component, String key) {
+		if (iwc == null || component == null || key == null) {
+			return;
+		}
+		if (ContentUtil.hasContentEditorRoles(iwc)) {
+			String property = ThemesHelper.getInstance().extractValueFromString(key, key.indexOf(ThemesConstants.DOT) + 1,
+					key.lastIndexOf(ThemesConstants.DOT));
+			component.setID(property + ThemesConstants.ADD_FOR_PROPERTY_CHANGE);
+			if (component.attributes == null) {
+				component.attributes = new HashMap();
+			}
+			StringBuffer javaScript = new StringBuffer();
+			javaScript.append("insertJavaScriptFileToHeader('").append(ContentUtil.getBundle().getResourcesPath());
+			javaScript.append(ThemesConstants.SLASH).append("javascript").append(ThemesConstants.SLASH);
+			javaScript.append("ThemesHelper.js").append("'); ");
+			javaScript.append("insertJavaScriptFileToHeader('/dwr/engine.js'); ");
+			javaScript.append("insertJavaScriptFileToHeader('/dwr/interface/ThemesEngine.js'); ");
+			javaScript.append("changeSiteInfo(this.id);");
+			component.attributes.put("ondblclick", javaScript.toString());
+			component.setToolTip(ContentUtil.getBundle().getLocalizedString("double_click_to_edit"));
+		}
 	}
 }

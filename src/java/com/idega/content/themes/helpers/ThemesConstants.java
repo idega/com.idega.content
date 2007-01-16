@@ -168,5 +168,7 @@ public class ThemesConstants {
 	
 	public static final String DEFAULT_DOMAIN_NAME = "Default Site";
 	
-	protected static final String DOCUMENT_HEADER = "<?xml version='1.0' encoding='UTF-8'?>"; 
+	protected static final String DOCUMENT_HEADER = "<?xml version='1.0' encoding='UTF-8'?>";
+	
+	public static final String ADD_FOR_PROPERTY_CHANGE = "_changeProperty";
 }

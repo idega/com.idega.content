@@ -48,7 +48,7 @@
 		<label>Navigation</label>
 		<defaultValue>The Products,Web Community,Partner Program,Get Support,About idega</defaultValue>
 		<type>text</type>
-		<method>setSidebar</method>
+		<method>setNavContainer</method>
 	</key>
 	<key>
 		<code>breadcrumbcontainer</code>

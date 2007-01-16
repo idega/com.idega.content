@@ -76,6 +76,11 @@ public interface ThemesEngine extends IBOService {
 	public String getSiteInfoValue(String keyword, String language, IWMainApplicationSettings settings, ICDomain domain);
 
 	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#saveSiteInfoValue
+	 */
+	public boolean saveSiteInfoValue(String keyword, String value) throws RemoteException;
+
+	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#saveSiteInfo
 	 */
 	public boolean saveSiteInfo(String language, String[] keywords, String[] values);
@@ -138,5 +143,5 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#applyMultipleChangesToTheme
 	 */
-	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes) throws RemoteException;
+	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes);
 }

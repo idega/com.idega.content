@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -431,6 +432,77 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return elements;
 	}
 	
+	private boolean saveSiteInfoValue(String language, String keyword, String value, IWMainApplicationSettings settings,
+			ICDomain domain, ICDomain cachedDomain) {
+		if (language == null || keyword == null || value == null) {
+			return false;
+		}
+		
+		if (keyword.indexOf(ThemesConstants.SYSTEM_SETTINGS) == -1) {
+			if (settings == null) {
+				return false;
+			}
+			if (value == null || value.equals(ThemesConstants.EMPTY)) {
+				settings.removeProperty(ThemesConstants.THEMES_PROPERTY_START + keyword + language);
+			}
+			else {
+				settings.setProperty(ThemesConstants.THEMES_PROPERTY_START + keyword + language, value);
+			}
+		}
+		else { // Saving System Settings
+			if (cachedDomain == null) {
+				return false;
+			}
+			if (domain == null) {
+				domain = helper.getThemesService().getDomain();
+			}
+			if (value != null && !ThemesConstants.EMPTY.equals(value)) {
+				if (domain != null) {
+					if (keyword.indexOf(ThemesConstants.DOMAIN_NAME) != -1) {
+						domain.setDomainName(value);
+						cachedDomain.setDomainName(value);
+					}
+					if (keyword.indexOf(ThemesConstants.DOMAIN_SERVER_NAME) != -1) {
+						domain.setServerName(value);
+						cachedDomain.setServerName(value);
+					}
+					domain.store();
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	public boolean saveSiteInfoValue(String keyword, String value) {
+		if (keyword == null || value == null) {
+			return false;
+		}
+		
+		IWContext iwc = IWContext.getInstance();
+		if (iwc == null) {
+			return false;
+		}
+		Locale l = iwc.getCurrentLocale();
+		if (l == null) {
+			return false;
+		}
+		String language = l.getLanguage();
+		if (language == null) {
+			return false;
+		}
+		language = ThemesConstants.DOT + language;
+		keyword = helper.extractValueFromString(keyword, 0, keyword.lastIndexOf(ThemesConstants.UNDER));
+		
+		IWMainApplication appl = ContentUtil.getBundle().getApplication();
+		ICDomain cachedDomain = null;
+		if (appl != null) {
+			cachedDomain = appl.getIWApplicationContext().getDomain();
+		}
+		
+		return saveSiteInfoValue(language, keyword, value, appl.getSettings(), null, cachedDomain);
+	}
+	
 	public boolean saveSiteInfo(String language, String[] keywords, String[] values) {
 		if (language == null || keywords == null || values == null) {
 			return false;
@@ -444,32 +516,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		ICDomain domain = null;
 		ICDomain cachedDomain = application.getIWApplicationContext().getDomain();
 		for (int i = 0; i < keywords.length; i++) {
-			if (keywords[i].indexOf(ThemesConstants.SYSTEM_SETTINGS) == -1) {
-				if (values[i] == null || values[i].equals(ThemesConstants.EMPTY)) {
-					settings.removeProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + language);
-				}
-				else {
-					settings.setProperty(ThemesConstants.THEMES_PROPERTY_START + keywords[i] + language, values[i]);
-				}
-			}
-			else { // Saving System Settings
-				if (values[i] != null && !ThemesConstants.EMPTY.equals(values[i])) {
-					if (domain == null) {
-						domain = helper.getThemesService().getDomain();
-					}
-					if (domain != null) {
-						if (keywords[i].indexOf(ThemesConstants.DOMAIN_NAME) != -1) {
-							domain.setDomainName(values[i]);
-							cachedDomain.setDomainName(values[i]);
-						}
-						if (keywords[i].indexOf(ThemesConstants.DOMAIN_SERVER_NAME) != -1) {
-							domain.setServerName(values[i]);
-							cachedDomain.setServerName(values[i]);
-						}
-						domain.store();
-					}
-				}
-			}
+			saveSiteInfoValue(language, keywords[i], values[i], settings, domain, cachedDomain);
 		}
 		return true;
 	}
@@ -601,7 +648,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		String id = null;
 		id = helper.getLastVisitedPage();
 		if (id != null) {
-			return id;
+			if (!ThemesConstants.MINUS_ONE.equals(id)) {
+				return id;
+			}
 		}
 		
 		id = String.valueOf(getRootPageId());

@@ -262,7 +262,7 @@ public class ThemesHelper implements Singleton {
 		return name;
 	}
 	
-	protected String extractValueFromString(String fullString, int beginIndex, int endIndex) {
+	public String extractValueFromString(String fullString, int beginIndex, int endIndex) {
 		String value = ThemesConstants.EMPTY;
 		if (canExtractValueFromString(fullString, beginIndex, endIndex)) {
 			value = fullString.substring(beginIndex, endIndex);
