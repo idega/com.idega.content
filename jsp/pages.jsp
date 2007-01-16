@@ -30,12 +30,14 @@ version="1.2">
                 <wf:wfblock maximizedVertically="true" id="pagesBlock" title="#{localizedStrings['com.idega.content']['pages']}">
                 
                 	<x:div id="site_tree_container" forceId="true">
-	                	<wf:wfblock id="page_tree_div" styleClass="site_tree_container_pages" title="#{localizedStrings['com.idega.content']['current_site_structure']}">
+	                	<c:block_with_toolbar id="page_tree_div" styleClass="site_tree_container_pages" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png">
+<!-- 
 							<h:outputLink value="#" onclick="if (treeObj != null) {treeObj.collapseAll()}"><h:outputText value="#{localizedStrings['com.idega.content']['collapse_all']}"/><h:outputText value=" "/></h:outputLink>
 							<h:outputLink value="#" onclick="if (treeObj != null) {treeObj.expandAll()}"><h:outputText value="#{localizedStrings['com.idega.content']['expand_all']}"/></h:outputLink>								
 	 						<x:div>
 	 							<x:graphicImage id="trash" title="#{localizedStrings['com.idega.content']['drag_to_delete']}" forceId="true" value="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash2.png" styleClass="recycleBin" onmouseover="treeObj.prepareToDelete();" onmouseout="treeObj.prepareToDelete();"/> 
 							</x:div>
+ -->	
 							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 								<jsf:facet name="PageTreeNode">
 									<h:outputLink onclick="setPageID(this.parentNode.id);getPrewUrl(this.parentNode.id);getPageInfoValues();isStartPage(this.parentNode.id);return false;">
@@ -43,7 +45,7 @@ version="1.2">
 									</h:outputLink>
 								</jsf:facet>
 							</wf:iwtree>				
-						</wf:wfblock>
+						</c:block_with_toolbar>
 					</x:div>
 					
 					<x:div>
