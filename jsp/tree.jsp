@@ -67,11 +67,11 @@
 				<f:verbatim>
 					<script type="text/javascript">	
 						treeObj = new JSDragDropTree();
-							treeObj.setTreeId('page_tree_div');
+							treeObj.setTreeId('current_structure_tree');
 							treeObj.setMaximumDepth(7);
 							treeObj.setMessageMaximumDepthReached('Maximum depth reached'); // If you want to show a message when maximum depth is reached, i.e. on drop.
 							treeObj.initTree();
-							treeObj.checkIfOverTree('page_tree_div');							
+							treeObj.checkIfOverTree('current_structure_tree');							
 							treeObj.getNodeOrders();
 							treeObj.expandAll();							
 	

@@ -33,12 +33,15 @@ public class WFBlockWithToolbar extends WFBlock{
 	}
 
 	public void setToolbarForSiteMap() {
+		String title = null;
+		ValueBinding vb = null;
+		
 		if (getToolbar() == null) {
 			WFMenu toolbar = new WFMenu();
 			this.setToolbar(toolbar);
 
 			if(WFUtil.isValueBinding(expandAllValue)){
-				ValueBinding vb = WFUtil.createValueBinding(expandAllValue);
+				vb = WFUtil.createValueBinding(expandAllValue);
 				expandAllValue = (String)(vb.getValue(FacesContext.getCurrentInstance()));
 			}
 			Link expand = new Link(expandAllValue);
@@ -46,9 +49,16 @@ public class WFBlockWithToolbar extends WFBlock{
 			expand.setOnClick("if (treeObj != null) {treeObj.expandAll()}");
 			
 			if(WFUtil.isValueBinding(collapseAllValue)){
-				ValueBinding vb = WFUtil.createValueBinding(collapseAllValue);
+				vb = WFUtil.createValueBinding(collapseAllValue);
 				collapseAllValue = (String)(vb.getValue(FacesContext.getCurrentInstance()));
 			}
+
+			if(WFUtil.isValueBinding("#{localizedStrings['com.idega.content']['drag_to_delete']}")){
+				vb = WFUtil.createValueBinding("#{localizedStrings['com.idega.content']['drag_to_delete']}");
+				title = (String)(vb.getValue(FacesContext.getCurrentInstance()));
+			}
+			
+			
 			Link collapse = new Link(collapseAllValue);
 			
 			collapse.setNoURL();
@@ -57,6 +67,7 @@ public class WFBlockWithToolbar extends WFBlock{
 			Image recycleBinImage = new Image();
 			Table head = new Table(3, 1);
 			recycleBinImage.attributes.put("id", "trash");
+			recycleBinImage.attributes.put("title", title);
 			recycleBinImage.attributes.put("src", trashCanImage);			
 			recycleBinImage.attributes.put("class", "recycleBin");		
 			recycleBinImage.attributes.put("onmouseover", "treeObj.prepareToDelete();");

@@ -521,7 +521,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	public List <String> beforeCreatePage(List <String> struct){
+	public List <String> beforeCreatePage(List <String> struct, boolean isFirst){
 		List <String> newIds = new ArrayList<String>();
 		
 		BuilderService builder = helper.getThemesService().getBuilderService();
@@ -572,6 +572,13 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			
 			pageID = createPage(parentID, name, pageType, null, uri, subType, domainID, format, null);
 			realID = String.valueOf(pageID);
+			
+			if (domain != null){
+				if(domain.getStartPage() == null){
+					domain.setIBPage(helper.getThemesService().getICPage(pageID));
+					domain.store();
+				}					
+			}
 			
 			if (isRootPage) { // Creating root page and root template
 				createRootPage(pageID, domain, builder, domainID, format);

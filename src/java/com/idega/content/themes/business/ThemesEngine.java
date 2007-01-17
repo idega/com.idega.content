@@ -88,7 +88,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#beforeCreatePage
 	 */
-	public List<String> beforeCreatePage(List<String> struct) throws RemoteException;
+	public List<String> beforeCreatePage(List<String> struct, boolean isFirst) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#createPage
