@@ -6,6 +6,9 @@
     <create creator="ibo" javascript="ThemesEngine" scope="application">
       <param name="class" value="com.idega.content.themes.business.ThemesEngine"/>
     </create>
+    <convert converter="bean" match="com.idega.content.themes.helpers.ThemeChange">
+    	<param name="exclude" value="limitedSelection"/>
+    </convert>
     <create creator="ibo" javascript="NodeID" scope="application">
       <param name="class" value="com.idega.content.tree.NodeID"/>
     </create>
@@ -13,6 +16,13 @@
       <param name="class" value="com.idega.content.tree.PagePreview"/>
     </create>
   </allow>
-  <signatures>
-  </signatures>
+  
+	<signatures>
+		<![CDATA[
+  			import java.util.List;
+  			import com.idega.content.themes.business.ThemesEngine;
+  			import com.idega.content.themes.helpers.ThemeChange;
+  			ThemesEngine.applyMultipleChangesToTheme(String, List<ThemeChange>, String);
+  		]]>
+	</signatures>
 </dwr>

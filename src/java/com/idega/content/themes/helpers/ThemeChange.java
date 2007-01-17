@@ -2,69 +2,59 @@ package com.idega.content.themes.helpers;
 
 public class ThemeChange {
 	
-	private String themeID;
-	private String styleGroupName;
-	private String variation;
-	private String variationType;
-	private boolean enabled;
+	private String themeId = null;
+	private String styleGroupName = null;
+	private String variation = null;
+	private boolean radio = false;
+	private boolean enabled = false;
 	
 	private boolean limitedSelection;
-	
-	public ThemeChange() {}
-	
-	public ThemeChange(String themeID, String styleGroupName, String variation, String variationType, boolean enabled) {
-		this.themeID = themeID;
-		this.styleGroupName = styleGroupName;
-		this.variation = variation;
-		this.variationType = variationType;
-		this.enabled = enabled;
+
+	public String getThemeId() {
+		return themeId;
 	}
 
-	protected String getThemeId() {
-		return themeID;
+	public void setThemeId(String themeID) {
+		this.themeId = themeID;
 	}
 
-	protected void setThemeId(String themeID) {
-		this.themeID = themeID;
+	public boolean isRadio() {
+		return radio;
 	}
 
-	protected String getVariationType() {
-		return variationType;
+	public void setRadio(boolean radio) {
+		this.radio = radio;
 	}
 
-	protected void setVariationType(String variationType) {
-		this.variationType = variationType;
-	}
-
-	protected boolean isEnabled() {
+	public boolean isEnabled() {
 		return enabled;
 	}
 
-	protected void setEnabled(boolean enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
-	protected String getVariation() {
+	public String getVariation() {
 		return variation;
 	}
 
-	protected void setVariation(String variation) {
+	public void setVariation(String variation) {
 		this.variation = variation;
 	}
 
-	protected String getStyleGroupName() {
+	public String getStyleGroupName() {
 		return styleGroupName;
 	}
 
-	protected void setStyleGroupName(String styleGroupName) {
+	public void setStyleGroupName(String styleGroupName) {
 		this.styleGroupName = styleGroupName;
 	}
 
-	protected boolean isLimitedSelection() {
+	public boolean isLimitedSelection() {
 		return limitedSelection;
 	}
 
-	protected void setLimitedSelection(boolean limitedSelection) {
+	public void setLimitedSelection(boolean limitedSelection) {
 		this.limitedSelection = limitedSelection;
 	}
 	

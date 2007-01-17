@@ -69,18 +69,19 @@ function insertStyleVariations(variations) {
 }
 
 function changeTheme(themeID, styleGroupName, newStyleMember, type, checked) {
-	showLoadingMessage("Changing...");
 	var radio = true;
 	if (type == "checkbox") {
 		radio = false;
 	}
 	var themeNameObj = document.getElementById("theme_name");
 	if (themeNameObj != null) {
+		showLoadingMessage("Changing...");
 		ThemesEngine.changeTheme(themeID, styleGroupName, newStyleMember, themeNameObj.value, radio, checked, changeThemeCallback);
 	}
 }
 
 function changeThemeCallback(themeID) {
+	themeChanges = new Array();
 	closeLoadingMessage();
 	if (themeID == null) {
 		document.getElementById('themeSaveButton').disabled = true;
@@ -380,28 +381,24 @@ function saveAndApplyTheme() {
 }
 
 function changeVariations() {
-	/*alert("Sorry, this button is not working yet...");
-	return;*/
 	if (THEME_ID == null) {
 		return false;
 	}
 	if (themeChanges == null) {
 		return false;
 	}
-	showLoadingMessage("Changing...");
-	ThemesEngine.applyMultipleChangesToTheme(THEME_ID, themeChanges, changeVariationsCallback);
+	var themeNameObj = document.getElementById("theme_name");
+	if (themeNameObj != null) {
+		showLoadingMessage("Changing...");
+		ThemesEngine.applyMultipleChangesToTheme(THEME_ID, themeChanges, themeNameObj.value, changeThemeCallback);
+	}
 }
 
-function changeVariationsCallback(result) {
-	themeChanges = new Array();
-	closeLoadingMessage();
-}
-
-function ThemeChange(themeId, styleGroupName, variation, variationType, enabled) {
+function ThemeChange(themeId, styleGroupName, variation, radio, enabled) {
 	this.themeId = themeId;
 	this.styleGroupName = styleGroupName;
 	this.variation = variation;
-	this.variationType = variationType;
+	this.radio = radio;
 	this.enabled = enabled;
 }
 
@@ -420,16 +417,18 @@ function addThemeChange(themeId, styleGroupName, variation, variationType, enabl
 	if (THEME_ID != themeId) {
 		themeChanges = new Array();	// Reseting array of changes
 	}
+	var radio = true;
 	if (variationType == "checkbox") {
-		removeThemeChange(existThemeChange(themeId, styleGroupName, variation, variationType, enabled), 1);
+		radio = false;
+		removeThemeChange(existThemeChange(themeId, styleGroupName, variation, radio, enabled), 1);
 	}
-	if (variationType == "radio") {
+	if (radio) {
 		removeSameGroupChanges(themeId, styleGroupName);
 	}
 	
-	var index = existThemeChange(themeId, styleGroupName, variation, variationType, enabled);
+	var index = existThemeChange(themeId, styleGroupName, variation, radio, enabled);
 	if (index < 0) {
-		themeChanges.push(new ThemeChange(themeId, styleGroupName, variation, variationType, enabled));
+		themeChanges.push(new ThemeChange(themeId, styleGroupName, variation, radio, enabled));
 	}
 }
 
@@ -450,7 +449,7 @@ function removeSameGroupChanges(themeId, styleGroupName) {
 	}
 }
 
-function existThemeChange(themeId, styleGroupName, variation, variationType, enabled) {
+function existThemeChange(themeId, styleGroupName, variation, radio, enabled) {
 	if (themeChanges == null) {
 		return -1;
 	}

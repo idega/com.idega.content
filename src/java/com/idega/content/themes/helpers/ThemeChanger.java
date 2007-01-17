@@ -685,9 +685,6 @@ public class ThemeChanger {
 			return false;
 		}
 		String regionID = e.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_ID);
-		/*if (regionID == null) {
-			return false;
-		}*/
 		
 		if (needAddRegion(ThemesConstants.BASIC_IDS_FOR_REGIONS, regionID)) {
 			e.addContent(0, getCommentsCollection(regionID));
@@ -779,12 +776,11 @@ public class ThemeChanger {
 	 * Changes theme with new style variation, creates draft and creates new preview image
 	 * @param themeID
 	 * @param styleGroupName
-	 * @param styleMember
+	 * @param variation
 	 * @return String
 	 */
-	public String changeTheme(String themeID, String styleGroupName, String styleMember, String themeName, boolean radio,
-			boolean checked) {
-		if (themeID == null || styleGroupName == null || styleMember == null) {
+	public String changeTheme(String themeID, String styleGroupName, String variation, String themeName, boolean radio, boolean checked) {
+		/*if (themeID == null || styleGroupName == null || variation == null) {
 			return null;
 		}
 		
@@ -815,17 +811,17 @@ public class ThemeChanger {
 		ThemeStyleGroupMember styleChanger = null;
 		if (radio) { // Simply changing CSS files
 			oldStyle = getEnabledStyleMember(theme, styleGroupName);
-			newStyle = getStyleMember(theme, styleGroupName, styleMember);
+			newStyle = getStyleMember(theme, styleGroupName, variation);
 			styleChanger = oldStyle;
 		}
 		else { //Need to know either add CSS or remove
 			limitedSelection = false;
 			if (checked) { // Need to add
-				newStyle = getStyleMember(theme, styleGroupName, styleMember);
+				newStyle = getStyleMember(theme, styleGroupName, variation);
 				styleChanger = newStyle;
 			}
 			else { //Need to remove
-				oldStyle = getStyleMember(theme, styleGroupName, styleMember);
+				oldStyle = getStyleMember(theme, styleGroupName, variation);
 				styleChanger = oldStyle;
 			}
 		}
@@ -840,29 +836,98 @@ public class ThemeChanger {
 		}
 		if (newStyle != null) {
 			newStyle.setEnabled(true);
+		}*/
+		
+		if (themeID == null) {
+			return null;
+		}
+		Theme theme = helper.getTheme(themeID);
+		if (theme == null) {
+			return null;
+		}
+		Document doc = getThemeDocument(theme.getId());
+		
+		String changed = changeTheme(doc, theme, styleGroupName, variation, themeName, radio, checked);
+		if (changed == null) {
+			return null;
 		}
 		
+		if (finishThemeChange(theme, doc)) {
+			return themeID;
+		}
+		return null;
+	}
+	
+	private boolean finishThemeChange(Theme theme, Document doc) {
 		String draft = helper.getFileName(theme.getLinkToSkeleton()) + ThemesConstants.DRAFT;
 		theme.setLinkToDraft(theme.getLinkToBase() + draft);
 		if (!uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.decode(draft, true), theme, true)) {
-			return null;
+			return false;
 		}
 
 		String uploadDir = helper.getFullWebRoot() + theme.getLinkToDraft();
 		String fileName = theme.getName() +	ThemesConstants.DRAFT_PREVIEW;
-		boolean result = helper.getImageGenerator().generatePreview(uploadDir, fileName, theme.getLinkToBaseAsItIs(),
-				ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT, true);
+		boolean result = helper.getImageGenerator().generatePreview(uploadDir, fileName, theme.getLinkToBaseAsItIs(), ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT, true);
 		if (!result) {
-			return null;
+			return false;
 		}
-		addThemeChange(theme, styleChanger, limitedSelection);
+
 		theme.setLinkToDraftPreview(fileName + ThemesConstants.DOT + helper.getImageGenerator().getFileExtension());
 		helper.createSmallImage(theme, true);
 		
-		if (result) {
-			return themeID;
+		return true;
+	}
+	
+	private String changeTheme(Document doc, Theme theme, String styleGroupName, String variation, String themeName, boolean radio, boolean checked) {
+		if (doc == null) {
+			return null;
 		}
-		return null;
+		if (theme == null || styleGroupName == null || variation == null) {
+			return null;
+		}
+		
+		theme.setChangedName(themeName);
+		
+		boolean limitedSelection = true;
+		
+		ThemeStyleGroupMember oldStyle = null;
+		ThemeStyleGroupMember newStyle = null;
+		ThemeStyleGroupMember styleChanger = null;
+		if (radio) { // Simply changing CSS files
+			oldStyle = getEnabledStyleMember(theme, styleGroupName);
+			newStyle = getStyleMember(theme, styleGroupName, variation);
+			styleChanger = oldStyle;
+		}
+		else { //Need to know either add CSS or remove
+			limitedSelection = false;
+			if (checked) { // Need to add
+				newStyle = getStyleMember(theme, styleGroupName, variation);
+				styleChanger = newStyle;
+			}
+			else { //Need to remove
+				oldStyle = getStyleMember(theme, styleGroupName, variation);
+				styleChanger = oldStyle;
+			}
+		}
+		
+		Element root = doc.getRootElement();
+		if (root == null) {
+			return null;
+		}
+		if (!changeThemeStyle(ThemesConstants.CONTENT + theme.getLinkToBase(), root.getChild(HTML_HEAD, namespace), oldStyle,
+				newStyle)) {
+			return null;
+		}
+		if (oldStyle != null) {
+			oldStyle.setEnabled(false);
+		}
+		if (newStyle != null) {
+			newStyle.setEnabled(true);
+		}
+		
+		addThemeChange(theme, styleChanger, limitedSelection);
+		
+		return theme.getId();
 	}
 
 	private void addThemeChange(Theme theme, ThemeStyleGroupMember style, boolean limitedSelection) {
@@ -1283,14 +1348,56 @@ public class ThemeChanger {
 		return out;
 	}
 	
-	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes) {
+	private Document getThemeDocument(String themeID) {
+		if (themeID == null) {
+			return null;
+		}
+		
+		Theme theme = helper.getTheme(themeID);
+		if (theme == null) {
+			return null;
+		}
+		
+		String linkToDoc = theme.getLinkToDraft();
+		if (linkToDoc == null) {
+			linkToDoc = theme.getLinkToSkeleton();
+		}
+		
+		if (linkToDoc.indexOf(ThemesConstants.SPACE) != -1) {
+			linkToDoc = helper.urlEncode(linkToDoc);
+		}
+		return  helper.getXMLDocument(helper.getFullWebRoot() + linkToDoc);
+	}
+	
+	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes, String themeName) {
 		if (themeID == null || changes == null) {
 			return null;
 		}
-		for (int i = 0; i < changes.size(); i++) {
-			log.info(changes.get(i).getClass());
+		
+		Theme theme = helper.getTheme(themeID);
+		if (theme == null) {
+			return null;
 		}
-		return themeID;
+		Document doc = getThemeDocument(themeID);
+		if (doc == null) {
+			return null;
+		}
+		
+		String changed = themeID;
+		ThemeChange change = null;
+		for (int i = 0; (i < changes.size() && changed != null); i++) {
+			change = changes.get(i);
+			changed = changeTheme(doc, theme, change.getStyleGroupName(), change.getVariation(), themeName, change.isRadio(), change.isEnabled());
+		}
+		
+		if (changed == null) {
+			return null;
+		}
+		
+		if (finishThemeChange(theme, doc)) {
+			return themeID;
+		}
+		return null;
 	}
 
 }
