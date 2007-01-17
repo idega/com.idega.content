@@ -7,11 +7,6 @@ var IS_SITE_MAP = false;
 var NEED_RELOAD_BUILDER_PAGE = false;
 var NEED_REDIRECT = false;
 
-var SITE_INFO_KEYWORD_FROM_BOX = null;
-var APPLICATION_PROPERTY = "application_property";
-var OLD_APPLICATION_PROPERTY = null;
-var EDIT_BOX_ID = "changeSiteInfoBox";
-
 function setNeedRedirect(redirect) {
 	NEED_REDIRECT = redirect;
 }
@@ -163,16 +158,6 @@ function checkIfNotEmptySiteTree(id) {
 	}
 	if (treeContainer.childNodes != null) {
 		if (treeContainer.childNodes.length != 0) {
-/*			
-							treeObj = new JSDragDropTree();
-							treeObj.setTreeId('page_tree_div');
-							treeObj.setMaximumDepth(7);
-							treeObj.setMessageMaximumDepthReached('Maximum depth reached'); // If you want to show a message when maximum depth is reached, i.e. on drop.
-							treeObj.initTree();
-							treeObj.checkIfOverTree('page_tree_div');							
-							treeObj.getNodeOrders();
-							treeObj.expandAll();							
-*/							
 			return;
 		}
 	}
@@ -247,17 +232,6 @@ function redirectFromSiteMap(uri) {
 	frame.src = uri;
 }
 
-function isEnterEvent(event) {
-	if (event == null) {
-		return false;
-	}
-	var keyCode = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
-	if (keyCode == 13) {
-		return true;
-	}
-	return false;
-}
-
 function savePageInfoWithEnter(event) {
 	if (isEnterEvent(event)) {
 		savePageInfo();
@@ -281,134 +255,5 @@ function insertStyleFile() {
 	style.setAttribute("href", "/idegaweb/bundles/com.idega.content.bundle/resources/style/themes_manager.css");
 	style.setAttribute("rel","stylesheet");
 	document.getElementsByTagName("head")[0].appendChild(style); 
-}
-
-function changeSiteInfoValue(id) {
-	if (id == null) {
-		return;
-	}
-	document.onclick = showSiteInfoValue;
-	showSiteInfoValue();
-	SITE_INFO_KEYWORD_FROM_BOX = id;
-	
-	var element = document.getElementById(id);
-	if (element == null) {
-		return;
-	}
-	
-	var editBox = document.getElementById(EDIT_BOX_ID);
-	if (editBox == null) {
-		editBox = document.createElement("input");
-		editBox.setAttribute("type", "input");
-		editBox.setAttribute("id", EDIT_BOX_ID);
-		if (typeof element.attachEvent != "undefined") {
-        	editBox.attachEvent("onkeypress", function(e){saveSiteInfoValue(e, this.value);});
-		} else {
-        	editBox.addEventListener("keypress", function(e){saveSiteInfoValue(e, this.value);}, true);
-		}
-	}
-	else {
-		editBox.value = "";
-		editBox.style.display = "inline";
-		var parentNode = editBox.parentNode;
-		if (parentNode != null) {
-			parentNode.removeChild(editBox);
-		}
-	}
-	
-	if (element.getAttribute(APPLICATION_PROPERTY) == null) {
-		element.setAttribute(APPLICATION_PROPERTY, true);
-	}
-	element.style.visibility = "hidden";
-	appendEditBoxToExactPlace(element, editBox);
-	
-	editBox.focus();
-}
-
-function appendEditBoxToExactPlace(element, edit) {
-	if (element == null || edit == null) {
-		return;
-	}
-	var parentNode = element.parentNode;
-	if (parentNode != null) {
-		parentNode.insertBefore(edit, element);
-	}
-	else {
-		element.appendChild(edit);
-	}
-}
-
-function saveSiteInfoValue(event, value) {
-	if (event == null) {
-		return;
-	}
-	if (!isEnterEvent(event)) {
-		return;
-	}
-	if (SITE_INFO_KEYWORD_FROM_BOX == null || value == null) {
-		return;
-	}
-	
-	var element = document.getElementById(SITE_INFO_KEYWORD_FROM_BOX);
-	if (element != null) {
-		if (element.value != null) {
-			element.value = value;
-		}
-		else {
-			var children = element.childNodes;
-			if (children != null) {
-				for (var j = 0; j < children.length; j++) {
-					element.removeChild(children[j]);
-				}				
-			}
-			element.appendChild(document.createTextNode(value));
-		}
-	}
-	
-	showLoadingMessage("Saving...");
-	ThemesEngine.saveSiteInfoValue(SITE_INFO_KEYWORD_FROM_BOX, value, saveSiteInfoValueCallback);
-}
-
-function saveSiteInfoValueCallback(result) {
-	showSiteInfoValue();
-	closeLoadingMessage();
-}
-
-function showSiteInfoValue() {
-	var editBox = document.getElementById(EDIT_BOX_ID);
-	if (editBox != null) {
-		var container = editBox.parentNode;
-		if (container != null) {
-			container.removeChild(editBox);
-			var children = container.childNodes;
-			if (children != null) {
-				var notVisible = null;
-				for (var i = 0; i < children.length; i++) { // Looking for element that is hidden, need to be visible
-					notVisible = children[i];
-					if (notVisible != null) {
-						if (notVisible.style != null) {
-							if (notVisible.style.visibility != null) {
-								if (notVisible.style.visibility == "hidden") {
-									if (notVisible.getAttribute(APPLICATION_PROPERTY) != null) {
-										notVisible.style.visibility = "visible";
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		else {
-			editBox.style.display = "none";
-		}
-	}
-	if (SITE_INFO_KEYWORD_FROM_BOX == null) {
-		return;
-	}
-	var element = document.getElementById(SITE_INFO_KEYWORD_FROM_BOX);
-	if (element != null) {
-		element.style.visibility = "visible";
-	}
 }
 	

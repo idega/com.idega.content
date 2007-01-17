@@ -171,13 +171,10 @@ public class ApplicationPropertyViewer extends Block {
 				component.attributes = new HashMap();
 			}
 			StringBuffer javaScript = new StringBuffer();
-			javaScript.append("insertJavaScriptFileToHeader('").append(ContentUtil.getBundle().getResourcesPath());
-			javaScript.append(ThemesConstants.SLASH).append("javascript").append(ThemesConstants.SLASH);
-			javaScript.append("ThemesHelper.js").append("'); ");
-			javaScript.append("insertJavaScriptFileToHeader('/dwr/engine.js'); ");
-			javaScript.append("insertJavaScriptFileToHeader('/dwr/interface/ThemesEngine.js'); ");
 			javaScript.append("changeSiteInfo(this.id);");
 			component.attributes.put("ondblclick", javaScript.toString());
+			component.attributes.put("onmouseover", "addStyleProperty(this.id, 'background-color: #ffff99; cursor: pointer;');");
+			component.attributes.put("onmouseout", "removeStyleProperty(this.id);");
 			component.setToolTip(ContentUtil.getBundle().getLocalizedString("double_click_to_edit"));
 		}
 	}
