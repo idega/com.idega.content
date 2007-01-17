@@ -831,8 +831,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes) {
-		return helper.getThemeChanger().applyMultipleChangesToTheme(themeID, changes);
+	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes, String themeName) {
+		return helper.getThemeChanger().applyMultipleChangesToTheme(themeID, changes, themeName);
 	}
 
 }
