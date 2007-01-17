@@ -558,8 +558,12 @@
 						rootUl.removeChild(temporaryTable);
 					}
 					JSTreeObj.saveRoot(JSTreeObj.dragNode_source.id, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
-								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML);
-				}				
+								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, true);
+								
+				JSTreeObj.dropTargetIndicator.style.display='none';				
+				JSTreeObj.dragDropTimer = -1;								
+				}
+				JSTreeObj.firstTopPage = false;
 				return;
 			}
 			
@@ -575,15 +579,15 @@
 				
 				temp = document.getElementById('page_tree_div');
 				if (temp.childNodes.length == 0)
-					JSTreeObj.drawTable();
-				else
+					JSTreeObj.drawTable();					
+				else{
 					if(lis.length==0){
 						var tmpSpan = tmpObj.parentNode;
 						var img = tmpSpan.parentNode.getElementsByTagName('IMG')[0];
 						img.style.visibility='hidden';	// Hide [+],[-] icon
 						tmpObj.parentNode.removeChild(tmpObj);											
 					}				
-								
+				}				
 				JSTreeObj.dropTargetIndicator.style.display='none';				
 				JSTreeObj.dragDropTimer = -1;
 
@@ -718,7 +722,7 @@
 							var newParentId = treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null);
 							if(!newParentId) {
 								JSTreeObj.saveRoot(JSTreeObj.dragNode_source.id, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
-								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML);
+								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, false);
 							}
 							else
 								JSTreeObj.saveNewPage(newParentId, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
@@ -743,12 +747,12 @@
 			return;
 		}
 		,
-		saveRoot : function (nodeId, pagetype, templatefile, pageName){
+		saveRoot : function (nodeId, pagetype, templatefile, pageName, isFirst){
 			treeStructure = new Array();
 			JSTreeObj.getRootStructure('floatingContainer'+nodeId);			
 			document.getElementById('floatingContainer'+nodeId).id = 'rootTemporary';
 			showLoadingMessage("Creating...");
-			ThemesEngine.beforeCreatePage(treeStructure, JSTreeObj.getNewRootId);
+			ThemesEngine.beforeCreatePage(treeStructure, isFirst, JSTreeObj.getNewRootId);
 		}	
 		,
 		getNewRootId : function(id) {
@@ -764,7 +768,8 @@
 			var newNode = null;
 			var newName = null;
 			for(var i = 0; i < newChilds.length; i++){
-				newChildsElement = newChilds[i+1];
+//				newChildsElement = newChilds[i+1];
+				newChildsElement = newChilds[i];
 				if (newChildsElement != null) {
 					(document.getElementById(newChildsElement.id)).setAttribute("id", id[i+1]);
 				}
@@ -1186,7 +1191,7 @@
 		,	
 		
 		initNode : function(node)
-		{						
+		{		
 			var noChildren = false;
 			var sourceTree = false;
 			var noDrag = false;
