@@ -574,7 +574,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			realID = String.valueOf(pageID);
 			
 			if (domain != null){
-				if(domain.getStartPage() == null){
+				if((domain.getStartPage() == null) && (isFirst)){
 					domain.setIBPage(helper.getThemesService().getICPage(pageID));
 					domain.store();
 				}					
