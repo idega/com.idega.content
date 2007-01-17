@@ -1279,7 +1279,7 @@
 			document.getElementById('floatingContainer'+JSTreeObj.dragNode_source.id).id = 'rootTemporary';	
 			
 			showLoadingMessage("Creating...");			
-			ThemesEngine.beforeCreatePage(treeStructure, JSTreeObj.getNewRootId);
+			ThemesEngine.beforeCreatePage(treeStructure, false, JSTreeObj.getNewRootId);
 		}	
 		,
 		getStructure : function(rootId, parentId){
