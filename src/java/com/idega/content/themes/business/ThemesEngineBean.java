@@ -20,6 +20,7 @@ import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemeChange;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.content.themes.helpers.TreeNodeStructure;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.data.CachedDomain;
 import com.idega.core.builder.data.ICDomain;
@@ -521,9 +522,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	public List <String> beforeCreatePage(List <String> struct, boolean isFirst){
+//	public List <String> beforeCreatePage(List <String> struct, boolean isFirst){
+	public List <String> beforeCreatePage(List <TreeNodeStructure> struct, Boolean isFirst){
 		List <String> newIds = new ArrayList<String>();
-		
 		BuilderService builder = helper.getThemesService().getBuilderService();
 		ICDomain domain = helper.getThemesService().getDomain();
 		
@@ -546,16 +547,15 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		String webDAVUri = null;
 		String subType = null;
 		String parentID = null;
-		String name = null;
-		
-		for (int i = 0; i < struct.size(); i = i + 5) {
+		String name = null;				
+		for (int i = 0; i < struct.size(); i++) {			
 			canCreate = true;
 			try {
-				prevID = struct.get(i);
-				parentID = struct.get(i + 1);
-				name = struct.get(i + 2);
-				subType = struct.get(i + 3);
-				webDAVUri = struct.get(i + 4);
+				prevID = struct.get(i).getNodeId();
+				parentID = struct.get(i).getParentId();
+				name = struct.get(i).getNodeName();
+				subType = struct.get(i).getPageType();
+				webDAVUri = struct.get(i).getTemplateFile();
 			} catch (IndexOutOfBoundsException e) {
 				log.error(e);
 				canCreate = false;
@@ -604,11 +604,13 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				}
 			}
 
-			for (int j = i; j < struct.size(); j = j + 5) {
+			for (int j = i; j < struct.size(); j++) {
 				try {
-					if (struct.get(j + 1) != null) {
-						if ((struct.get(j + 1)).equals(prevID)) {
-							struct.set(j + 1, realID);
+					if (struct.get(j).getParentId() != null) {
+						if ((struct.get(j).getParentId()).equals(prevID)) {
+System.out.println("before "+struct.get(j).getParentId());							
+							struct.get(j).setParentId(realID);
+System.out.println("after "+struct.get(j).getParentId());							
 						}
 					}
 				} catch (IndexOutOfBoundsException e) {
