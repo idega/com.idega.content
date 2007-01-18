@@ -387,6 +387,9 @@ function changeVariations() {
 	if (themeChanges == null) {
 		return false;
 	}
+	if (themeChanges.length == 0) {
+		return false;
+	}
 	var themeNameObj = document.getElementById("theme_name");
 	if (themeNameObj != null) {
 		showLoadingMessage("Changing...");
