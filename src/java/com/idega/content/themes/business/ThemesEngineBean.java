@@ -605,17 +605,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			}
 
 			for (int j = i; j < struct.size(); j++) {
-				try {
 					if (struct.get(j).getParentId() != null) {
-						if ((struct.get(j).getParentId()).equals(prevID)) {
-System.out.println("before "+struct.get(j).getParentId());							
-							struct.get(j).setParentId(realID);
-System.out.println("after "+struct.get(j).getParentId());							
+						if ((struct.get(j).getParentId()).equals(prevID)) {		
+							struct.get(j).setParentId(realID);							
 						}
 					}
-				} catch (IndexOutOfBoundsException e) {
-					log.error(e);
-				}
 			}
 
 			newIds.add(realID);

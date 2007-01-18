@@ -803,16 +803,15 @@
 			var parentId = null;
 			var templateFile = root.getAttribute('templatefile');		
 			var newTreeNodes = new Array();
-alert(nodeId);
 			treeStructure.push(nodeId);		
 			treeStructure.push(parentId);			
 			treeStructure.push(nodeName);
 			treeStructure.push(pageType);
 			treeStructure.push(templateFile);				
-			parentId = nodeId;
 			
 			newTreeNodes.push(new newTreeNode (nodeId, parentId, nodeName, pageType, templateFile));						
 			
+			parentId = nodeId;
 			for (var i = 0; i < newChilds.length; i++){			
 				nodeId = newChilds[i].id;
 				nodeName = (newChilds[i].getElementsByTagName('a')[0]).innerHTML;
