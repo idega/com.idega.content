@@ -522,9 +522,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-//	public List <String> beforeCreatePage(List <String> struct, boolean isFirst){
 	public List <String> beforeCreatePage(List <TreeNodeStructure> struct, Boolean isFirst){
 		List <String> newIds = new ArrayList<String>();
+		
 		BuilderService builder = helper.getThemesService().getBuilderService();
 		ICDomain domain = helper.getThemesService().getDomain();
 		
@@ -532,7 +532,6 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		int domainID = -1;
 		
 		boolean isRootPage = false;
-		boolean canCreate;
 		
 		if (domain != null) {
 			domainID = domain.getID();
@@ -540,37 +539,23 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		String uri = null;
 		String lastTheme = null;
-		String prevID = null;
 		String pageType = builder.getPageKey();
 		String format = builder.getIBXMLFormat();
 		String realID = null;
-		String webDAVUri = null;
-		String subType = null;
-		String parentID = null;
-		String name = null;				
-		for (int i = 0; i < struct.size(); i++) {			
-			canCreate = true;
-			try {
-				prevID = struct.get(i).getNodeId();
-				parentID = struct.get(i).getParentId();
-				name = struct.get(i).getNodeName();
-				subType = struct.get(i).getPageType();
-				webDAVUri = struct.get(i).getTemplateFile();
-			} catch (IndexOutOfBoundsException e) {
-				log.error(e);
-				canCreate = false;
-			}
-			if (!canCreate) {
-				return newIds;
-			}
-			if (domain != null && parentID == null) {
+		String uriToPage = null;
+		
+		TreeNodeStructure node = null;
+		for (int i = 0; i < struct.size(); i++) {
+			uriToPage = null;
+			node = struct.get(i);
+			if (domain != null && node.getParentId() == null) {
 				if (domain.getStartPage() == null) {
 					uri = ThemesConstants.SLASH;
 					isRootPage = true;
 				}
 			}
 			
-			pageID = createPage(parentID, name, pageType, null, uri, subType, domainID, format, null);
+			pageID = createPage(node.getParentId(), node.getNodeName(), pageType, null, uri, node.getPageType(), domainID, format, null);
 			realID = String.valueOf(pageID);
 			
 			if (domain != null){
@@ -589,27 +574,25 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 
 			uri = null;
 			isRootPage = false;
-			
-			if (webDAVUri != null) {
-				if (!webDAVUri.equals(ThemesConstants.EMPTY)) {
-					String uriToPage = helper.loadPageToSlide(subType, pageID, webDAVUri);
-					if (uriToPage != null) {
-						helper.getThemesService().updatePageWebDav(pageID, uriToPage);
-					}
-					helper.createArticle(subType, pageID);
-					lastTheme = helper.getLastUsedTheme();
-					if (lastTheme != null) {
-						helper.getThemesService().getBuilderService().setTemplateId(realID, lastTheme);
-					}
+
+			if (!ThemesConstants.EMPTY.equals(node.getTemplateFile())) {
+				uriToPage = helper.loadPageToSlide(node.getPageType(), pageID, node.getTemplateFile());
+				if (uriToPage != null) {
+					helper.getThemesService().updatePageWebDav(pageID, uriToPage);
+				}
+				helper.createArticle(node.getPageType(), pageID);
+				lastTheme = helper.getLastUsedTheme();
+				if (lastTheme != null) {
+					helper.getThemesService().getBuilderService().setTemplateId(realID, lastTheme);
 				}
 			}
 
 			for (int j = i; j < struct.size(); j++) {
-					if (struct.get(j).getParentId() != null) {
-						if ((struct.get(j).getParentId()).equals(prevID)) {		
-							struct.get(j).setParentId(realID);							
-						}
+				if (struct.get(j).getParentId() != null) {
+					if ((struct.get(j).getParentId()).equals(node.getNodeId())) {						
+						struct.get(j).setParentId(realID);		
 					}
+				}
 			}
 
 			newIds.add(realID);
@@ -794,6 +777,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		builder.unlockRegion(String.valueOf(pageID), ThemesConstants.MINUS_ONE, null);
 
 		domain.setIBPage(helper.getThemesService().getICPage(pageID));
+		domain.store();
 		return true;
 	}
 	

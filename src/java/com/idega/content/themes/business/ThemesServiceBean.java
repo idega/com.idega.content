@@ -127,8 +127,6 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		getBuilderService();
 
 		Map tree = builder.getTree(iwc);
-		
-		int userID = iwc.getUserId();
 
 		ICDomain domain = null;
 		try {

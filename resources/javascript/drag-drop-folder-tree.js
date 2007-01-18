@@ -711,10 +711,12 @@
 							var newPageUri = "undefined";
 							var linkFirstChild = JSTreeObj.dragNode_source.getElementsByTagName('a')[0];
 							if (linkFirstChild != null) {
-								var span = linkFirstChild.firstChild;
+								newPageUri = linkFirstChild.innerHTML;
+								/*var span = linkFirstChild.firstChild;
+								alert(span.innerHTML);
 								if (span != null) {
 									newPageUri = span.firstChild.nodeValue;
-								}
+								}*/
 							}
 							ThemesEngine.changePageUri(JSTreeObj.dragNode_source.id, newPageUri, false, changePageTitleCallback);
 						}
