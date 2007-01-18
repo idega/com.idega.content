@@ -749,10 +749,12 @@
 		,
 		saveRoot : function (nodeId, pagetype, templatefile, pageName, isFirst){
 			treeStructure = new Array();
-			JSTreeObj.getRootStructure('floatingContainer'+nodeId);			
+			var nodes = JSTreeObj.getRootStructure('floatingContainer'+nodeId);			
+//			JSTreeObj.getRootStructure('floatingContainer'+nodeId);			
 			document.getElementById('floatingContainer'+nodeId).id = 'rootTemporary';
-			showLoadingMessage("Creating...");
-			ThemesEngine.beforeCreatePage(treeStructure, isFirst, JSTreeObj.getNewRootId);
+			showLoadingMessage("Creating...");			
+//			ThemesEngine.beforeCreatePage(treeStructure, isFirst, JSTreeObj.getNewRootId);
+			ThemesEngine.beforeCreatePage(nodes, isFirst, JSTreeObj.getNewRootId);
 		}	
 		,
 		getNewRootId : function(id) {
@@ -795,19 +797,21 @@
 			
 			var root = document.getElementById(rootId);
 			var newChilds = root.getElementsByTagName('li');
-
 			var nodeId = root.id;
 			var nodeName = (root.getElementsByTagName('a')[0]).innerHTML;
 			var pageType = root.getAttribute('pagetype');
 			var parentId = null;
 			var templateFile = root.getAttribute('templatefile');		
-
+			var newTreeNodes = new Array();
+alert(nodeId);
 			treeStructure.push(nodeId);		
 			treeStructure.push(parentId);			
 			treeStructure.push(nodeName);
 			treeStructure.push(pageType);
 			treeStructure.push(templateFile);				
 			parentId = nodeId;
+			
+			newTreeNodes.push(new newTreeNode (nodeId, parentId, nodeName, pageType, templateFile));						
 			
 			for (var i = 0; i < newChilds.length; i++){			
 				nodeId = newChilds[i].id;
@@ -822,10 +826,13 @@
 				treeStructure.push(nodeName);
 				treeStructure.push(pageType);
 				treeStructure.push(templateFile);				
+
+				newTreeNodes.push(new newTreeNode (nodeId, parentId, nodeName, pageType, templateFile));			
 				
 				parentId = newChilds[i].getAttribute('id');
 			}
-			return treeStructure;					
+//			return treeStructure;					
+			return newTreeNodes;					
 		}		
 		,
 		createDropIndicator : function()
@@ -1274,15 +1281,22 @@
 		
 		saveNewPage : function (newParentNodeId, pagetype, templatefile, pageName){
 			treeStructure = new Array();
-			JSTreeObj.getStructure('floatingContainer'+JSTreeObj.dragNode_source.id, newParentNodeId);
+//			JSTreeObj.getStructure('floatingContainer'+JSTreeObj.dragNode_source.id, newParentNodeId);
+			var nodes = JSTreeObj.getStructure('floatingContainer'+JSTreeObj.dragNode_source.id, newParentNodeId);
 			
 			document.getElementById('floatingContainer'+JSTreeObj.dragNode_source.id).id = 'rootTemporary';	
 			
 			showLoadingMessage("Creating...");			
-			ThemesEngine.beforeCreatePage(treeStructure, false, JSTreeObj.getNewRootId);
+//			ThemesEngine.beforeCreatePage(treeStructure, false, JSTreeObj.getNewRootId); 
+			ThemesEngine.beforeCreatePage(nodes, false, JSTreeObj.getNewRootId);
 		}	
 		,
+
 		getStructure : function(rootId, parentId){
+	
+			var newTreeNodes = new Array();
+//			newTreeNodes.push(new newTreeNode (nodeId, parentId, nodeName, pageType, templateFile));			
+
 			var root = document.getElementById(rootId);
 			var newChilds = root.getElementsByTagName('li');
 
@@ -1297,6 +1311,9 @@
 			treeStructure.push(nodeName);
 			treeStructure.push(pageType);
 			treeStructure.push(templateFile);				
+			
+			newTreeNodes.push(new newTreeNode (nodeId, parentId, nodeName, pageType, templateFile));			
+			
 			parentId = nodeId;
 			
 			for (var i = 0; i < newChilds.length; i++){			
@@ -1307,15 +1324,18 @@
 					parentId = newChilds[i].parentNode.parentNode.parentNode.id;
 				templateFile = newChilds[i].getAttribute('templatefile');		
 
-				treeStructure.push(nodeId);		
+				treeStructure.push(nodeId);
 				treeStructure.push(parentId);			
 				treeStructure.push(nodeName);
 				treeStructure.push(pageType);
 				treeStructure.push(templateFile);				
 				
+				newTreeNodes.push(new newTreeNode (nodeId, parentId, nodeName, pageType, templateFile));			
+				
 				parentId = newChilds[i].getAttribute('id');
 			}
-			return treeStructure;			
+//			return treeStructure;			
+			return newTreeNodes;			
 		}	
 		,	
 /*
@@ -1501,4 +1521,12 @@
 	function mouseUpEvent()
 	{
 		editCounter=-1;		
-	}		
+	}
+			
+	function newTreeNode (nodeId, parentId, nodeName, pageType, templateFile) {
+		this.nodeId = nodeId;
+		this.parentId = parentId;
+		this.nodeName = nodeName;
+		this.pageType = pageType;
+		this.templateFile = templateFile;
+	}	

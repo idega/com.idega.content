@@ -9,6 +9,7 @@
     <convert converter="bean" match="com.idega.content.themes.helpers.ThemeChange">
     	<param name="exclude" value="limitedSelection"/>
     </convert>
+    <convert converter="bean" match="com.idega.content.themes.helpers.TreeNodeStructure" />
     <create creator="ibo" javascript="NodeID" scope="application">
       <param name="class" value="com.idega.content.tree.NodeID"/>
     </create>
@@ -22,7 +23,9 @@
   			import java.util.List;
   			import com.idega.content.themes.business.ThemesEngine;
   			import com.idega.content.themes.helpers.ThemeChange;
+			import com.idega.content.themes.helpers.TreeNodeStructure;
   			ThemesEngine.applyMultipleChangesToTheme(String, List<ThemeChange>, String);
+  			ThemesEngine.beforeCreatePage(List<TreeNodeStructure>, Boolean);
   		]]>
 	</signatures>
 </dwr>

@@ -2,6 +2,7 @@ package com.idega.content.themes.business;
 
 
 import com.idega.content.themes.helpers.ThemeChange;
+import com.idega.content.themes.helpers.TreeNodeStructure;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.core.builder.business.BuilderService;
@@ -88,8 +89,8 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#beforeCreatePage
 	 */
-	public List<String> beforeCreatePage(List<String> struct, boolean isFirst) throws RemoteException;
-
+//	public List<String> beforeCreatePage(List<String> struct, boolean isFirst) throws RemoteException;
+	public List<String> beforeCreatePage(List<TreeNodeStructure> struct, Boolean isFirst) throws RemoteException;
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#createPage
 	 */
