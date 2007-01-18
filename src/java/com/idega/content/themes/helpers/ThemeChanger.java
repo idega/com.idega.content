@@ -136,7 +136,7 @@ public class ThemeChanger {
 		}
 		
 		// Finding where to insert element
-		int index = getElementIndex(head.getChildren(), ThemesConstants.TAG_ATTRIBUTE_TYPE, TAG_ATTRIBUTE_VALUE_CSS);
+		int index = getElementIndex(head.getContent(), ThemesConstants.TAG_ATTRIBUTE_TYPE, TAG_ATTRIBUTE_VALUE_CSS);
 		// Adding enabled styles
 		List <ThemeStyleGroupMember> members = getEnabledStyles(theme);
 		for (int i = 0; i < members.size(); i++) {
@@ -335,11 +335,15 @@ public class ThemeChanger {
 		}
 		Element e = null;
 		String value = null;
+		Object o = null;
 		for (int i = 0; i < elements.size(); i++) {
-			e = (Element) elements.get(i);
-			value = e.getAttributeValue(attributeType);
-			if (attributeValue.equals(value)) {
-				index = i;
+			o = elements.get(i);
+			if (o instanceof Element) {
+				e = (Element) o;
+				value = e.getAttributeValue(attributeType);
+				if (attributeValue.equals(value)) {
+					index = i;
+				}
 			}
 		}
 		index++;
@@ -983,7 +987,7 @@ public class ThemeChanger {
 						if (attributeValue.indexOf(files.get(j)) != -1) {
 							foundStyle = true;
 							uselessStyles.add(style);
-							index = getElementIndex(head.getChildren(), ThemesConstants.TAG_ATTRIBUTE_HREF, attributeValue);
+							index = getElementIndex(head.getContent(), ThemesConstants.TAG_ATTRIBUTE_HREF, attributeValue);
 						}
 					}
 				}
