@@ -96,9 +96,9 @@ public class ThemesHelper implements Singleton {
 	private String webRoot;
 	private String lastVisitedPage;
 	
-	private static final String RESOURCE_PATH_START = ThemesConstants.BASE_ROOT_SLIDE + "/article/" + ThemesConstants.IDEGA_THEME + ThemesConstants.DOT;//"/files/cms/article/idega_theme_article";
+	private static final String RESOURCE_PATH_START = ThemesConstants.BASE_ROOT_SLIDE + "/article/" + ThemesConstants.IDEGA_THEME + ThemesConstants.DOT;
 	private static final String RESOURCE_PATH_END = ThemesConstants.DOT + "article";
-	private static final String PAGE_TYPE = "page";
+	private static final String ARTICLE_PAGE_TYPE = "text";
 	private static final String ATTRIBUTE_NAME = "property";
 	private static final String ATTRIBUTE_PROPERTY = "value";
 	private static final String DEFAULT_ARTICLE = "default_theme_article";
@@ -911,7 +911,7 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	private Document preparePageDocument(Document doc, String type, String uri, int pageID) {
-		if (PAGE_TYPE.equals(type)) {
+		if (ARTICLE_PAGE_TYPE.equals(type)) {
 			if (uri.startsWith(ThemesConstants.SLASH)) {
 				uri = extractValueFromString(uri, uri.indexOf(ThemesConstants.SLASH), uri.length());
 			}
@@ -1067,7 +1067,7 @@ public class ThemesHelper implements Singleton {
 		if (id == -1) {
 			return;
 		}
-		if (!PAGE_TYPE.equals(type)) {
+		if (!ARTICLE_PAGE_TYPE.equals(type)) {
 			return;
 		}
 		

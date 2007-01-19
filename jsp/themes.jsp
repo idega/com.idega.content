@@ -53,7 +53,6 @@ version="1.2">
 									<x:commandButton id="changeVariationsButton" type="button" forceId="true" onclick="changeVariations()" title="#{localizedStrings['com.idega.content']['change_variations']}" value="#{localizedStrings['com.idega.content']['change']}"></x:commandButton>
 									<x:commandButton id="themeSaveButton" type="button" forceId="true" onclick="saveTheme()" title="#{localizedStrings['com.idega.content']['save']}" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
 									<x:commandButton id="themeRestoreButton" type="button" forceId="true" onclick="restoreTheme()" title="#{localizedStrings['com.idega.content']['restore_theme']}" value="#{localizedStrings['com.idega.content']['restore_theme']}"></x:commandButton>
-									<x:commandButton id="saveAndApplyButton" type="button" forceId="true" onclick="saveAndApplyTheme()" title="#{localizedStrings['com.idega.content']['apply_theme_for_all']}" value="#{localizedStrings['com.idega.content']['apply_theme']}"></x:commandButton>
 								</x:div>
 							</x:div>
 						</wf:wfblock>

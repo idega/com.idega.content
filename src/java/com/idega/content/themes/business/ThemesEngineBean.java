@@ -630,16 +630,39 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
+	private boolean isPageDeleted(String pageID) {
+		if (pageID == null) {
+			return true;
+		}
+		int pageKey = -1;
+		try {
+			pageKey = Integer.valueOf(pageID).intValue();
+		} catch (NumberFormatException e) {
+			return true;
+		}
+		ICPage page = helper.getThemesService().getICPage(pageKey);
+		if (page == null) {
+			return true;
+		}
+		return page.getDeleted();
+	}
+	
 	public String getPageId() {
 		String id = null;
 		id = helper.getLastVisitedPage();
 		if (id != null) {
 			if (!ThemesConstants.MINUS_ONE.equals(id)) {
+				if (isPageDeleted(id)) {
+					return ThemesConstants.MINUS_ONE;
+				}
 				return id;
 			}
 		}
 		
 		id = String.valueOf(getRootPageId());
+		if (isPageDeleted(id)) {
+			return ThemesConstants.MINUS_ONE;
+		}
 		helper.setLastVisitedPage(id);
 		return id;
 	}
