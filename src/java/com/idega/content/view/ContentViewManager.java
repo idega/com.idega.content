@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.27 2007/01/08 14:30:37 valdas Exp $
+ * $Id: ContentViewManager.java,v 1.28 2007/01/19 08:15:10 laddi Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -11,11 +11,12 @@ package com.idega.content.view;
 
 import java.util.ArrayList;
 import java.util.Collection;
+
 import javax.faces.context.FacesContext;
+
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.view.ApplicationViewNode;
 import com.idega.core.view.DefaultViewNode;
-import com.idega.core.view.FramedApplicationViewNode;
 import com.idega.core.view.KeyboardShortcut;
 import com.idega.core.view.ViewManager;
 import com.idega.core.view.ViewNode;
@@ -27,10 +28,10 @@ import com.idega.repository.data.Singleton;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2007/01/08 14:30:37 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/01/19 08:15:10 $ by $Author: laddi $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.28 $
  */
 public class ContentViewManager implements Singleton  {
 

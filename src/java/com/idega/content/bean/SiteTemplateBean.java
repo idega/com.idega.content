@@ -27,7 +27,7 @@ public class SiteTemplateBean {
 		
 		Document siteDocument = ThemesHelper.getInstance().getXMLDocument(SITE_LINK);
 		Element root = siteDocument.getRootElement();
-		Element siteRoot = (Element)root.getChild("site");
+		Element siteRoot = root.getChild("site");
 		
 		Element currentElement = (Element)siteRoot.getChildren().get(0);
 		
@@ -98,7 +98,7 @@ public class SiteTemplateBean {
 //		root = (Element)root.getChild("site"); 
 		
 //		Element currentElement = (Element)siteRoot.getChildren().get(0);
-		Element currentElement = (Element)root;
+		Element currentElement = root;
 //		IWTreeNodeWithTypes rootNode = new IWTreeNodeWithTypes("","","");
 		WFTreeNode rootNode = new WFTreeNode(new IWTreeNode(currentElement.getAttributeValue("name")));
 //		IWTreeNode rootNode = new IWTreeNode("");

@@ -6,7 +6,6 @@ import javax.faces.el.ValueBinding;
 import com.idega.presentation.Image;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Link;
-import com.idega.presentation.ui.GenericButton;
 import com.idega.webface.WFBlock;
 import com.idega.webface.WFMenu;
 import com.idega.webface.WFUtil;
