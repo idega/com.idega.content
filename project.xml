@@ -192,6 +192,9 @@
       <version>3.1.2</version>
       <type>jar</type>
       <url>http://www.idega.com/</url>
+      <properties>
+        <eclipse.dependency>${idegaweb.project.source.dependent}</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <groupId>bundles</groupId>
