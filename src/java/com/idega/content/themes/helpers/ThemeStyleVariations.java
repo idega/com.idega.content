@@ -22,6 +22,11 @@ public class ThemeStyleVariations {
 	private static final String RADIO_INPUT = "radio";
 	private static final String CHECKBOX_INPUT = "checkbox";
 	
+	private static final String DIV_OPENER = "<div styleClass=\"";
+	private static final String DIV_CLOSER = "</div>";
+	private static final String VARIATION_GROUP_STYLE = "themeVariationGroup\">";
+	private static final String VARIATION_GROUP_NAME_STYLE = "themeVariationGroupName\">";
+	
 	public String getThemeStyleVariations(String themeID) {
 		StringBuffer buffer = new StringBuffer();
 		if (themeID == null) {
@@ -31,28 +36,34 @@ public class ThemeStyleVariations {
 		if (theme == null) {
 			return buffer.toString();
 		}
-		buffer.append("<p>").append(/*ContentUtil.getBundle().getLocalizedString("theme_variations")*/"Theme variations ");
-		buffer.append(/*ContentUtil.getBundle().getLocalizedString("for")*/"for").append(ThemesConstants.SPACE);
+		/*buffer.append("<p>").append("Theme variations ");
+		buffer.append("for").append(ThemesConstants.SPACE);
 		buffer.append(theme.getName());
-		buffer.append(":</p>");
-		buffer.append("<ul style='list-style-type: none;'>");
+		buffer.append(":</p>");*/
+		buffer.append(DIV_OPENER).append("allThemeVariations\">");
+		buffer.append("<ul>");
 		
 		String styleGroupName = null;
 		List <String> styleGroups = theme.getStyleGroupsNames();
 		for (int i = 0; i < styleGroups.size(); i++) {
 			styleGroupName = styleGroups.get(i);
+			buffer.append(DIV_OPENER).append(VARIATION_GROUP_STYLE);
 			buffer.append(TAG_LI_OPEN);
+			buffer.append(DIV_OPENER).append(VARIATION_GROUP_NAME_STYLE);
 			buffer.append(styleGroupName);
+			buffer.append(DIV_CLOSER);
 			buffer.append(getStyleGroupMembers(theme, styleGroupName));
+			buffer.append(DIV_CLOSER);
 		}
 		
 		buffer.append("</ul>");
+		buffer.append(DIV_CLOSER);
 		return buffer.toString();
 	}
 	
 	private String getStyleGroupMembers(Theme theme, String styleGroupName) {
 		StringBuffer result = new StringBuffer();
-		result.append("<ul style='list-style-type: none;'>");
+		result.append("<ul>");
 		
 		Map <String, ThemeStyleGroupMember> themeVariations = theme.getStyleGroupsMembers();
 		ThemeStyleGroupMember member = null;

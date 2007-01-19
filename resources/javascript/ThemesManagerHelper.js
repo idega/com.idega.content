@@ -56,6 +56,13 @@ function getThemeStyleVariations(themeID) {
 }
 
 function insertStyleVariations(variations) {
+	var theme = getTheme(THEME_ID);
+	if (theme != null) {
+		setIfUsedTheme(theme.used);
+	}
+	else {
+		setIfUsedTheme("");
+	}
 	var oldVariation = document.getElementById("themeStyleVariations");
 	if (oldVariation == null) {
 		return;
@@ -206,7 +213,7 @@ function getThemesCallback(themes) {
 	for (var i = 0; i < info.length; i++) {
 		var themeFields = info[i].split("@");
 		time = date.getTime()
-		var theme = new Theme(themeFields[0], themeFields[1] + "?" + time, themeFields[2] + "?" + time, themeFields[3]);
+		var theme = new Theme(themeFields[0], themeFields[1] + "?" + time, themeFields[2] + "?" + time, themeFields[3], themeFields[4]);
 		var div = document.createElement("div");
 		div.className = "imageGallery";
 		
@@ -260,6 +267,7 @@ function getThemesCallback(themes) {
 		theme = themesArray[0];
 	}
 	if (theme != null) {
+		setIfUsedTheme(theme.used);
 		if (enableStyleVariations) {
 			getThemeStyleVariations(theme.id);
 		}
@@ -273,12 +281,29 @@ function getThemesCallback(themes) {
 	}
 }
 
-function Theme(themeName, url, urlToBig, id) {
+function setIfUsedTheme(used) {
+	if (used == null) {
+		return;
+	}
+	var element = document.getElementById("themeUsability");
+	if (element == null) {
+		return;
+	}
+	if (element.childNodes != null) {
+		for (var i = 0; element.childNodes.length; i++) {
+			element.removeChild(element.childNodes[i]);
+		}
+	}
+	element.appendChild(document.createTextNode(used));
+}
+
+function Theme(themeName, url, urlToBig, id, used) {
 	this.themeName = themeName;
 	this.url = url;
 	this.urlToBig = urlToBig;
 	this.id = id;
 	this.applyStyle = false;
+	this.used = used;
 }
 
 function setPreview(url) {

@@ -43,8 +43,9 @@ version="1.2">
 					</x:div>
 					
 					<x:div styleClass="theme_container">
-						<wf:wfblock title="#{localizedStrings['com.idega.content']['theme_variations']}">
+						<wf:wfblock id="themeStyleVariationsBlock" title="#{localizedStrings['com.idega.content']['theme_variations']}">
 							<x:div id="themeStyleVariations" forceId="true"></x:div>
+							<x:div id="themeUsability" forceId="true" styleClass="themeUsabilityStyle"></x:div>
 							
 							<x:div>
 								<x:div id="themeSaveArea" forceId="true" styleClass="wf_webdav_upload">

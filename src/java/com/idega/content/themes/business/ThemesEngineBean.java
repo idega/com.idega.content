@@ -82,12 +82,34 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				}
 				info.append(ThemesConstants.AT);
 				info.append(theme.getId());
+				info.append(ThemesConstants.AT);
+				if (isUsedTheme(theme.getIBPageID())) {
+					info.append("This theme is set as default");
+				}
+				else {
+					info.append("This theme is not default");
+				}
+				
 				if (i + 1 < themes.size()) {
 					info.append(ThemesConstants.SEMICOLON);
 				}
 			}
 		}
 		return info.toString();
+	}
+	
+	private boolean isUsedTheme(int templateID) {
+		if (templateID == -1) {
+			return false;
+		}
+		String id = helper.getLastUsedTheme();
+		if (id == null) {
+			return false;
+		}
+		if (id.equals(String.valueOf(templateID))) {
+			return true;
+		}
+		return false;
 	}
 	
 	/**
