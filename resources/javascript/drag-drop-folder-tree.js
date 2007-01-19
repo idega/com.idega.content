@@ -584,7 +584,8 @@
 					if(lis.length==0){
 						var tmpSpan = tmpObj.parentNode;
 						var img = tmpSpan.parentNode.getElementsByTagName('IMG')[0];
-						img.style.visibility='hidden';	// Hide [+],[-] icon
+						if (img)
+							img.style.visibility='hidden';	// Hide [+],[-] icon
 						tmpObj.parentNode.removeChild(tmpObj);											
 					}				
 				}				
@@ -694,20 +695,16 @@
 			JSTreeObj.dropTargetIndicator.style.display='none';		
 			JSTreeObj.dragDropTimer = -1;	
 			if(showMessage && JSTreeObj.messageMaximumDepthReached)alert(JSTreeObj.messageMaximumDepthReached);
-//			JSTreeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id,null);			
-			
-//			saveMyTree(JSTreeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id), JSTreeObj.dragNode_source.id);		
-//			saveMyTree(JSTreeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);		
-			
-			
-//			JSTreeObj.initTree();
 			
 			var parentDiv = JSTreeObj.dragNode_destination;
 			while(true){
 				if (parentDiv.getElementsByTagName('DIV')){
 					if (parentDiv.getElementsByTagName('DIV')[0]){
 						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id){
-							saveMyTree(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);
+							var newParentId = treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null);
+							if (!newParentId)
+								newParentId = -1;
+							saveMyTree(newParentId, JSTreeObj.dragNode_source.id);
 							var newPageUri = "undefined";
 							var linkFirstChild = JSTreeObj.dragNode_source.getElementsByTagName('a')[0];
 							if (linkFirstChild != null) {
@@ -721,14 +718,18 @@
 							ThemesEngine.changePageUri(JSTreeObj.dragNode_source.id, newPageUri, false, changePageTitleCallback);
 						}
 						else{
-							var newParentId = treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null);
+//							var newParentId = treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null);							
+							var newParentId = treeObj.getNewParent(null,null,'floatingContainer'+JSTreeObj.dragNode_source.id, null);							
 							if(!newParentId) {
 								JSTreeObj.saveRoot(JSTreeObj.dragNode_source.id, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
 								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, false);
 							}
-							else
+							else {
+//newParentId = JSTreeObj.getParentId('floatingContainer'+JSTreeObj.dragNode_source.id);
+
 								JSTreeObj.saveNewPage(newParentId, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
 								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML);
+}								
 						}
 							//need name
 							
@@ -762,7 +763,8 @@
 		getNewRootId : function(id) {
 			if (id == null) {
 				return;
-			}
+			}			
+			
 			var root = document.getElementById('rootTemporary');
 			(document.getElementById('rootTemporary')).setAttribute("id", id[0]);	
 			JSTreeObj.initNode(document.getElementById(id[0]));		
@@ -823,7 +825,7 @@
 				templateFile = newChilds[i].getAttribute('templatefile');		
 
 				treeStructure.push(nodeId);		
-				treeStructure.push(parentId);			
+				treeStructure.push(parentId);
 				treeStructure.push(nodeName);
 				treeStructure.push(pageType);
 				treeStructure.push(templateFile);				
@@ -882,10 +884,36 @@
 		}
 		,
 //		getNewParent : function(initObj,saveString,child,numericParentID) {	
-		getNewParent : function(initObj,saveString,child,newParent) {
+
+		getParentId : function(childNodeId) {
+			var childNode = document.getElementById(childNodeId);
+			var possibleParent = childNode.parentNode;
+			if(possibleParent.tagName != 'SPAN'){
+
+				possibleParent.id = JSTreeObj.getParentId(possibleParent.id);
+			}
+			return possibleParent.id;
+		}
+		,
+		getParentLiTag : function(child, treeId){
+				var possibleParent = child.parentNode;
+				if(possibleParent.id)
+					if(possibleParent.id.toString() == treeId.toString()){
+						return null;
+					}
+//					else
+						if (possibleParent.tagName.toString() != 'LI'){
+							possibleParent = JSTreeObj.getParentLiTag(possibleParent, treeId);
+						}	
+			return possibleParent;
+		}
+		,
+		getNewParent : function(initObj,saveString,child,newParent, treeId) {
+			var possibleParent = null;
 			if(!saveString)var saveString = '';
 			if(!initObj){
 				initObj = document.getElementById(this.idOfTree);
+				treeId = initObj.id;
 			}
 			var lis = initObj.getElementsByTagName('LI');
 			if(lis.length>0){
@@ -893,28 +921,40 @@
 				while(li){
 					if(li.id){
 						if(saveString.length>0)saveString = saveString + ',';
-						var numericID = li.id.replace(/[^0-9]/gi,'');
+						var numericID = li.id;
 						if(numericID.length==0)numericID='A';
-	
-						if(numericParentID)
-							numericParentID = li.parentNode.parentNode.id.replace(/[^0-9]/gi,'');
+						if(numericParentID){
+							possibleParent = JSTreeObj.getParentLiTag(li, treeId);
+							if (possibleParent)
+								numericParentID = possibleParent.id;							
+							else
+								return null;
+						}
 						else
-							var numericParentID = li.parentNode.parentNode.id.replace(/[^0-9]/gi,'');
+							if(li.id.toString() == child.toString()){
+								possibleParent = JSTreeObj.getParentLiTag(li, treeId);
+								if (possibleParent)
+									var numericParentID = possibleParent.id;							
+								else
+									return null;
+							}		
 						if(numericID!='0'){
 							saveString = saveString + numericID;
-							saveString = saveString + '-';														
+							saveString = saveString + '-';
 							if(li.parentNode.id!=this.idOfTree)
 								saveString = saveString + numericParentID;
 							else saveString = saveString + '0';
 							if (numericID.toString() == child.toString()) {
 								newParent = numericParentID;
+console.log(document.getElementById(newParent));
 								return newParent;
-							}							
+							}
 						}
 						var ul = li.getElementsByTagName('UL');
 						if(ul.length>0){
-							newParent = this.getNewParent(ul[0],saveString,child,newParent);	
+							newParent = this.getNewParent(ul[0],saveString,child,newParent, treeId);	
 						}	
+						possibleParentId = li.id;
 					}			
 					li = li.nextSibling;
 				}
@@ -924,7 +964,6 @@
 				return newParent;							
 			}
 			return newParent;		
-
 		}
 		,
 		getNodeOrders : function(initObj,saveString)
