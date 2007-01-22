@@ -877,8 +877,7 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public String getLastUsedTheme() {
-		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
-		String lastUsedTheme = settings.getProperty(ThemesConstants.LAST_USED_THEME);
+		String lastUsedTheme = getDefaultTheme();
 		if (lastUsedTheme != null) {
 			return lastUsedTheme;
 		}
@@ -908,6 +907,14 @@ public class ThemesHelper implements Singleton {
 		} catch (NumberFormatException e) {
 			log.error(e);
 		}
+	}
+	
+	public String getDefaultTheme() {
+		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
+		if (settings == null) {
+			return null;
+		}
+		return settings.getProperty(ThemesConstants.LAST_USED_THEME);
 	}
 	
 	private Document preparePageDocument(Document doc, String type, String uri, int pageID) {

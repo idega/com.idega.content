@@ -58,8 +58,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		Theme theme = null;
 		String webRoot = helper.getFullWebRoot();
+		
+		String used = "This theme is set as default";
+		String free = "This theme is not default";
 		for (int i = 0; i < themes.size(); i++) {
-			theme = themes.get(i);			
+			theme = themes.get(i);
 			if (theme.isPropertiesExtracted()) {
 				if (theme.getChangedName() != null) {
 					info.append(theme.getChangedName());
@@ -84,10 +87,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				info.append(theme.getId());
 				info.append(ThemesConstants.AT);
 				if (isUsedTheme(theme.getIBPageID())) {
-					info.append("This theme is set as default");
+					info.append(used);
 				}
 				else {
-					info.append("This theme is not default");
+					info.append(free);
 				}
 				
 				if (i + 1 < themes.size()) {
@@ -102,7 +105,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (templateID == -1) {
 			return false;
 		}
-		String id = helper.getLastUsedTheme();
+		String id = helper.getDefaultTheme();
 		if (id == null) {
 			return false;
 		}
@@ -682,6 +685,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		id = String.valueOf(getRootPageId());
+		if (ThemesConstants.MINUS_ONE.equals(id)) {
+			return ThemesConstants.MINUS_ONE;
+		}
 		if (isPageDeleted(id)) {
 			return ThemesConstants.MINUS_ONE;
 		}

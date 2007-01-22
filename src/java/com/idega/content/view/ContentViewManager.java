@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.28 2007/01/19 08:15:10 laddi Exp $
+ * $Id: ContentViewManager.java,v 1.29 2007/01/22 11:53:04 valdas Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -28,10 +28,10 @@ import com.idega.repository.data.Singleton;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2007/01/19 08:15:10 $ by $Author: laddi $
+ *  Last modified: $Date: 2007/01/22 11:53:04 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.29 $
  */
 public class ContentViewManager implements Singleton  {
 
@@ -76,7 +76,7 @@ public class ContentViewManager implements Singleton  {
 	public ViewNode initalizeContentNode(IWBundle contentBundle){
 		ViewNode root = getViewManager().getWorkspaceRoot();
 		DefaultViewNode contentNode = new ApplicationViewNode(CONTENT_ID,root);
-		Collection roles = new ArrayList();
+		Collection<String> roles = new ArrayList<String>();
 		roles.add(StandardRoles.ROLE_KEY_EDITOR);
 		roles.add(StandardRoles.ROLE_KEY_AUTHOR);
 		contentNode.setAuthorizedRoles(roles);

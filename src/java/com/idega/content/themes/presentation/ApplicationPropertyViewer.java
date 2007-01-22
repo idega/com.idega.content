@@ -30,12 +30,9 @@ import com.idega.presentation.text.Text;
  */
 public class ApplicationPropertyViewer extends Block {
 	
-	private static final String NAVIGATION = "navcontainer";
-	private static final String TOOLBAR = "toolbar";
-	private static final String BREADCRUMB = "breadcrumbcontainer";
 	private static final String LOGO = "logo";
-	private static final String LIST_STYLE = "list-style-type: none; width: 100%";
 	
+	private static final String LIST_STYLE = "list-style-type: none; width: 100%";
 	private static final String USELESS_STYLE_CLASS = "empty_useless_style_class";
 
 	private String applicationPropertyKey = null;
@@ -66,7 +63,7 @@ public class ApplicationPropertyViewer extends Block {
 			return;
 		}
 		
-		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + NAVIGATION + ThemesConstants.DOT) != -1) {
+		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + ThemesConstants.NAVIGATION + ThemesConstants.DOT) != -1) {
 			ICPage page = ThemesHelper.getInstance().getThemesService().getICPage(iwc.getCurrentIBPageID());
 			if (page != null) {
 				if (page.getWebDavUri() != null) {
@@ -87,7 +84,7 @@ public class ApplicationPropertyViewer extends Block {
 			return;
 		}
 		
-		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + TOOLBAR + ThemesConstants.DOT) != -1) {
+		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + ThemesConstants.TOOLBAR + ThemesConstants.DOT) != -1) {
 			if (!ThemesConstants.EMPTY.equals(value)) {
 				Link l = new Link();
 				l.setText(value);
@@ -97,7 +94,7 @@ public class ApplicationPropertyViewer extends Block {
 			return;
 		}
 		
-		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + BREADCRUMB + ThemesConstants.DOT) != -1) {
+		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + ThemesConstants.BREADCRUMB + ThemesConstants.DOT) != -1) {
 			if (!ThemesConstants.EMPTY.equals(value)) {
 				Link l = new Link();
 				l.setText(value);

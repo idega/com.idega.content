@@ -14,6 +14,10 @@ public class ThemesConstants {
 	public static final String UNDER = "_";
 	public static final String SPACE = " ";
 	
+	public static final String NAVIGATION = "navcontainer";
+	public static final String TOOLBAR = "toolbar";
+	public static final String BREADCRUMB = "breadcrumbcontainer";
+	
 	protected static final String XML_EXTENSION = "xml";
 	
 	private static final String BASE_ROOT_APPL = ContentUtil.getBundle().getResourcesPath();
@@ -59,7 +63,7 @@ public class ThemesConstants {
 	protected static final List <String> REGIONS = Collections.unmodifiableList(Arrays.asList(_REGIONS));
 	
 	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "sidebarContainer",
-		"breadcrumbcontainer", "navcontainer"};
+		BREADCRUMB, NAVIGATION};
 	protected static final List <String> BASIC_IDS_FOR_REGIONS = Collections.unmodifiableList(Arrays.asList(_BASIC_IDS_FOR_REGIONS));
 	
 	private static final String[] _DOCUMENT_PUBLIC_IDS = new String[] {"Apple Computer", "DTD XHTML 1.0 Strict"};
@@ -171,4 +175,7 @@ public class ThemesConstants {
 	protected static final String DOCUMENT_HEADER = "<?xml version='1.0' encoding='UTF-8'?>";
 	
 	public static final String ADD_FOR_PROPERTY_CHANGE = "_changeProperty";
+	
+	//public static final String DEFAULT_THEME = ContentUtil.getBundle().getLocalizedString("theme_is_used");
+	//public static final String NOT_DEFAULT_THEME = ContentUtil.getBundle().getLocalizedString("theme_is_not_used");
 }

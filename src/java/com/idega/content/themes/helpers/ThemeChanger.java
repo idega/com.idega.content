@@ -49,9 +49,6 @@ public class ThemeChanger {
 	private static final String CONTENT_END = "<div class=\"clear\"></div>\n<div class=\"clearer\"></div>";
 	
 	// Default keywords
-	private static final String TOOLBAR = "toolbar";
-	private static final String NAVIGATION = "navcontainer";
-	private static final String BREADCRUMB = "breadcrumbcontainer";
 	private static final String FOOTER = "footer";
 	private static final String CONTENT = "content";
 	
@@ -631,7 +628,7 @@ public class ThemeChanger {
 		String propertyValue = settings.getProperty(ThemesConstants.THEMES_PROPERTY_START + value +
 				ThemesConstants.THEMES_PROPERTY_END);
 		if (propertyValue != null) {
-			if (value.equals(TOOLBAR)) {
+			if (value.equals(ThemesConstants.TOOLBAR)) {
 				return region + getBasicReplace(TOOLBAR_REPLACE_BEGIN, propertyValue, TOOLBAR_REPLACE_END) +
 					ThemesConstants.COMMENT_BEGIN +	ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
 			}
@@ -692,10 +689,10 @@ public class ThemeChanger {
 		
 		if (needAddRegion(ThemesConstants.BASIC_IDS_FOR_REGIONS, regionID)) {
 			e.addContent(0, getCommentsCollection(regionID));
-			if (NAVIGATION.equals(regionID)) {
+			if (ThemesConstants.NAVIGATION.equals(regionID)) {
 				e.addContent(1, getNavigatorContent(regionID, true));
 			}
-			if (BREADCRUMB.equals(regionID)) {
+			if (ThemesConstants.BREADCRUMB.equals(regionID)) {
 				e.addContent(1, getNavigatorContent(regionID, false));
 			}
 		}
