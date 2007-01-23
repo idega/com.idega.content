@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.3 2006/04/09 12:01:55 laddi Exp $
+ * $Id: CategoryBean.java,v 1.4 2007/01/23 10:25:53 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -32,10 +32,10 @@ import com.idega.slide.util.WebdavRootResource;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
+ *  Last modified: $Date: 2007/01/23 10:25:53 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class CategoryBean {
 	
@@ -46,6 +46,8 @@ public class CategoryBean {
 	private static final String CATEORY_CONFIG_FILE = CATEORY_CONFIG_PATH+"categories.prop";
 //	private static final String CATEORY_CONFIG_FILE = CATEORY_CONFIG_PATH+"cat.prp";
 	private IWMainApplication iwma;
+	
+	public static final String CATEGORY_DELIMETER = ",";
 
 	protected CategoryBean(IWMainApplication iwma){
 		this.iwma=iwma;
@@ -80,8 +82,8 @@ public class CategoryBean {
 	 * <p> Get a collection of categories </p>
 	 * @return collection of strings
 	 */
-	public Collection getCategories() {
-		Collection ret = getCategoriesFromString(getCategoriesAsString());
+	public Collection<String> getCategories() {
+		Collection<String> ret = getCategoriesFromString(getCategoriesAsString());
 		return ret;
 	}
 	
@@ -126,11 +128,11 @@ public class CategoryBean {
 	 * </p>
 	 * @param categoryCommaSeparatedList
 	 */
-	public static Collection getCategoriesFromString(String categoryCommaSeparatedList){
-		Collection ret = new ArrayList();
+	public static Collection<String> getCategoriesFromString(String categoryCommaSeparatedList){
+		Collection<String> ret = new ArrayList<String>();
 		
 		if( categoryCommaSeparatedList != null){
-			StringTokenizer st = new StringTokenizer(categoryCommaSeparatedList,",");
+			StringTokenizer st = new StringTokenizer(categoryCommaSeparatedList,CATEGORY_DELIMETER);
 			while(st.hasMoreTokens()) {
 				ret.add(st.nextToken().trim());
 			}
@@ -149,7 +151,7 @@ public class CategoryBean {
 		Iterator iter = categories.iterator();
 		while(iter.hasNext()) {
 			if(!first) {
-				sb.append(",");
+				sb.append(CATEGORY_DELIMETER);
 			}
 			first=false;
 			sb.append(iter.next().toString());
@@ -211,8 +213,8 @@ public class CategoryBean {
 		StringBuffer sb = new StringBuffer(
 				getCategoriesAsString()
 				);
-		if(sb.length()>0 && !sb.toString().endsWith(",")) {
-			sb.append(",");
+		if(sb.length()>0 && !sb.toString().endsWith(CATEGORY_DELIMETER)) {
+			sb.append(CATEGORY_DELIMETER);
 		}
 		sb.append(category);
 		System.out.println("New category string to store:"+sb.toString()+"  New category:"+category);

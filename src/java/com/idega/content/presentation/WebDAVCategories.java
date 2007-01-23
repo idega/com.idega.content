@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.15 2006/04/09 12:01:54 laddi Exp $
+ * $Id: WebDAVCategories.java,v 1.16 2007/01/23 10:24:08 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -47,10 +47,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2006/04/09 12:01:54 $ by $Author: laddi $
+ *  Last modified: $Date: 2007/01/23 10:24:08 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -426,7 +426,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		}
 		//save the selection of categories to the article
 		//Build together the categories string
-		StringBuffer categories = new StringBuffer(",");
+		StringBuffer categories = new StringBuffer(CategoryBean.CATEGORY_DELIMETER);
 		CategoryBean categoryBean = CategoryBean.getInstance();
 		//Iterator iter = categoryBean.getCategories().iterator();
 		int categoriesCount = categoryBean.getCategories().size();
@@ -443,7 +443,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 			boolean bool = ((Boolean)smc.getValue()).booleanValue();
 //			System.out.println("Category "+text+" was set to "+bool);
 			if(bool) {
-				categories.append(categoryKey).append(",");
+				categories.append(categoryKey).append(CategoryBean.CATEGORY_DELIMETER);
 			}
 		}
 		if(smc!=null) {
