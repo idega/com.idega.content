@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.16 2007/01/23 10:24:08 valdas Exp $
+ * $Id: WebDAVCategories.java,v 1.17 2007/01/23 15:32:59 gediminas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -47,10 +47,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2007/01/23 10:24:08 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/01/23 15:32:59 $ by $Author: gediminas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.17 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -170,7 +170,8 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 					categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					//Text
 					HtmlOutputText catText = new HtmlOutputText();
-					catText.setValue(categoryKey);
+					String catLabel = CategoryBean.getInstance().getCategoryName(categoryKey);
+					catText.setValue(catLabel);
 					categoriesTable.add(catText,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					count++;
 				}
@@ -195,7 +196,8 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 					categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					//Text
 					HtmlOutputText catText = new HtmlOutputText();
-					catText.setValue(categoryKey);
+					String catLabel = CategoryBean.getInstance().getCategoryName(categoryKey);
+					catText.setValue(catLabel);
 					categoriesTable.add(catText,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					count++;
 				}
