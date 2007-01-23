@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.21 2006/10/03 15:58:45 gediminas Exp $
+ * $Id: ContentItemBean.java,v 1.22 2007/01/23 10:27:26 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -29,6 +30,7 @@ import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
+import com.idega.slide.util.IWSlideConstants;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.IWTimestamp;
 
@@ -37,10 +39,10 @@ import com.idega.util.IWTimestamp;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2006/10/03 15:58:45 $ by $Author: gediminas $
+ *  Last modified: $Date: 2007/01/23 10:27:26 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.21 $
+ * @version $Revision: 1.22 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -58,7 +60,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	private ContentItemCase _caseBean = null;
 	
 	private Map _itemFields = null;
-	private Map _locales = null;
+	private Map<String, Locale> _locales = null;
 	
 	public final static String FIELDNAME_ATTACHMENT = "attachment";
 	public final static String FIELDNAME_CREATION_DATE = "creation_date";
@@ -74,6 +76,8 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	private final static String[] ACTION_NOT_EXISTS_ARRAY = new String[] {"create"};
 	
 	private List versions;
+	
+	private Enumeration webDavResourceCategories = null;
 	
 	/**
 	 * Default constructor.
@@ -103,7 +107,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	public void setLocale(Locale locale) {
 		this._locale = locale;
 		if (this._locales == null) {
-			this._locales = new HashMap();
+			this._locales = new HashMap<String, Locale>();
 		}
 		this._locales.put(locale.getLanguage(), locale);
 	}
@@ -205,7 +209,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 */
 	public void setItemFields(String key, List fields) {
 		if (this._itemFields == null) {
-			this._itemFields = new HashMap();
+			this._itemFields = new HashMap<String, List>();
 		}
 		this._itemFields.put(key + getLanguage(), fields);
 	}
@@ -337,7 +341,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 			IWTimestamp lastModified = new IWTimestamp(lLastmodified);
 			setLastModifiedDate(lastModified.getTimestamp());
 			
-			
+			setWebDavResourceCategories(webdavResource.propfindMethod(IWSlideConstants.PROPERTYNAME_CATEGORY));
 			returner = load(webdavResource);
 			setExists(true);
 //			System.out.print("["+this.toString()+"]:");
@@ -377,7 +381,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 			session = (IWSlideSession)IBOLookup.getSessionInstance(iwuc,IWSlideSession.class);
 		}
 		catch (IBOLookupException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return session;
@@ -558,6 +561,14 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 */
 	public void setLoaded(boolean loaded) {
 		this.loaded = loaded;
+	}
+	
+	public void setWebDavResourceCategories(Enumeration webDavResourceCategories) {
+		this.webDavResourceCategories = webDavResourceCategories;
+	}
+
+	public Enumeration getWebDavResourceCategories() {
+		return webDavResourceCategories;
 	}
 
 }
