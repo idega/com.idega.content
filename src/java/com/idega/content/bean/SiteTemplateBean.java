@@ -31,9 +31,7 @@ public class SiteTemplateBean {
 		
 		Element currentElement = (Element)siteRoot.getChildren().get(0);
 		
-//		IWTreeNode rootNode = new IWTreeNode(currentElement.getAttributeValue("name"));
 		WFTreeNode rootNode = new WFTreeNode(new IWTreeNode(currentElement.getAttributeValue("name")));
-//		IWTreeNodeWithTypes rootNode = new IWTreeNodeWithTypes(currentElement.getAttributeValue("name"),"","");
 		
 		
 		rootNode = getPage(currentElement, rootNode);
@@ -106,7 +104,7 @@ public class SiteTemplateBean {
 //		ICTreeNode icnode = rootNode;
 //		return new WFTreeNode(icnode);
 		return rootNode;
-		}
+	}
 
 	public String getPath() {
 		return ThemesHelper.getInstance().getWebRootWithoutContent() + "/idegaweb/bundles/com.idega.content.bundle/resources/templates/site-templates.xml";

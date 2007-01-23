@@ -32,7 +32,7 @@
 										<h:outputText value="#{node.description}"/>
 									</h:outputLink>
 								</f:facet>
-							</wf:iwtree>				
+							</wf:iwtree>
 						</c:block_with_toolbar>
 					</x:div>
 					

@@ -513,7 +513,7 @@
 	</tag>
 	<tag>
 		<name>block_with_toolbar</name>
-		<tag-class>com.idega.content.WFBlockWithToolbarTag</tag-class>
+		<tag-class>com.idega.content.presentation.WFBlockWithToolbarTag</tag-class>
 		<attribute>
 			<name>id</name>
 			<required>false</required>

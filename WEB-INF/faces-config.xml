@@ -301,7 +301,7 @@
 	</component>
 	<component>
 		<component-type>WFBlockWithToolbar</component-type>
-		<component-class>com.idega.content.WFBlockWithToolbar</component-class>
+		<component-class>com.idega.content.presentation.WFBlockWithToolbar</component-class>
 	</component>
     <managed-bean>
         <managed-bean-name>SessionBean1</managed-bean-name>
