@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.18 2006/06/08 15:38:10 tryggvil Exp $
+ * $Id: ContentItemListViewer.java,v 1.19 2007/01/23 10:25:18 valdas Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -19,8 +19,11 @@ import javax.faces.component.UIColumn;
 import javax.faces.component.UIData;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
+import javax.servlet.http.HttpServletRequest;
+
 import com.idega.content.bean.ContentItem;
 import com.idega.content.bean.ContentListViewerManagedBean;
+import com.idega.content.business.CategoryBean;
 import com.idega.content.business.ContentUtil;
 import com.idega.core.cache.CacheableUIComponent;
 import com.idega.core.cache.UIComponentCacher;
@@ -31,10 +34,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- * Last modified: $Date: 2006/06/08 15:38:10 $ by $Author: tryggvil $
+ * Last modified: $Date: 2007/01/23 10:25:18 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.19 $
  */
 public class ContentItemListViewer extends UIData implements CacheableUIComponent{
 
@@ -53,8 +56,9 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	private boolean initialized = false;
 	
 	private static final String DEFAULT_RENDERER_TYPE = "content_list_viewer";
-	private static final String listDelim = ",";
 	private int maxNumberOfDisplayed=-1;
+	
+	public static final String ITEMS_CATEGORY_VIEW = "items_list_category_view";
 	
 	/**
 	 * 
@@ -197,6 +201,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	
 	public void encodeBegin(FacesContext context) throws IOException{
 		UIComponentCacher cacher = getCacher(context);
+		setItemCategoryFromRequest(context);
 		if(cacher.existsInCache(this,context)){
 			// do nothing:
 		}
@@ -435,7 +440,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	public void setCategories(String categories){
 		if(categories!=null){
 			ArrayList cats = new ArrayList();
-			StringTokenizer tokenizer = new StringTokenizer(categories,listDelim);
+			StringTokenizer tokenizer = new StringTokenizer(categories, CategoryBean.CATEGORY_DELIMETER);
 			while(tokenizer.hasMoreTokens()){
 				cats.add(tokenizer.nextToken());
 			}
@@ -453,7 +458,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 				StringBuffer catString = new StringBuffer();
 				catString.append((String)iter.next());
 				while(iter.hasNext()){
-					catString.append(listDelim);
+					catString.append(CategoryBean.CATEGORY_DELIMETER);
 					catString.append((String)iter.next());
 				}
 				return catString.toString();
@@ -549,5 +554,14 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 			buf.append(this.resourcePath);
 		}
 		return buf.toString();
+	}
+	
+	private void setItemCategoryFromRequest(FacesContext context) {
+		if (context == null) {
+			return;
+		}
+		HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+		String category = request.getParameter(ITEMS_CATEGORY_VIEW);
+		setCategories(category);
 	}
 }
