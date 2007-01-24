@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.22 2007/01/23 10:27:26 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.23 2007/01/24 05:16:28 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -39,10 +39,10 @@ import com.idega.util.IWTimestamp;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2007/01/23 10:27:26 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/01/24 05:16:28 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.22 $
+ * @version $Revision: 1.23 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -77,7 +77,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	
 	private List versions;
 	
-	private Enumeration webDavResourceCategories = null;
+	private String webDavResourceCategories = null;
 	
 	/**
 	 * Default constructor.
@@ -564,10 +564,17 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	}
 	
 	public void setWebDavResourceCategories(Enumeration webDavResourceCategories) {
-		this.webDavResourceCategories = webDavResourceCategories;
+		if (webDavResourceCategories == null) {
+			this.webDavResourceCategories = null;
+		}
+		StringBuffer categories = new StringBuffer();
+		while (webDavResourceCategories.hasMoreElements()) {
+			categories.append(webDavResourceCategories.nextElement());
+		}
+		this.webDavResourceCategories = categories.toString();
 	}
 
-	public Enumeration getWebDavResourceCategories() {
+	public String getWebDavResourceCategories() {
 		return webDavResourceCategories;
 	}
 
