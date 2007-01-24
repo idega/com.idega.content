@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.19 2007/01/23 10:25:18 valdas Exp $
+ * $Id: ContentItemListViewer.java,v 1.20 2007/01/24 05:16:58 valdas Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -34,10 +34,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- * Last modified: $Date: 2007/01/23 10:25:18 $ by $Author: valdas $
+ * Last modified: $Date: 2007/01/24 05:16:58 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.20 $
  */
 public class ContentItemListViewer extends UIData implements CacheableUIComponent{
 
@@ -50,7 +50,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	private String _columnClasses;
 	private String _rowClasses;
 	
-	private List categoriesList = null;
+	private List<String> categoriesList = null;
 	private WFDataModel model=null;
 	private String firstArticleItemStyleClass = null;
 	private boolean initialized = false;
@@ -344,7 +344,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		this._rowClasses = (String) values[6];
 		this.detailsViewerPath = (String)values[7];
 		this.initialized = ((Boolean)values[8]).booleanValue();
-		this.categoriesList = (List) values[9];
+		this.categoriesList = (List<String>) values[9];
 		this.maxNumberOfDisplayed=((Integer)values[10]).intValue();
 		notifyManagedBeanOfVariableValues();
 		
@@ -439,12 +439,12 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	 */
 	public void setCategories(String categories){
 		if(categories!=null){
-			ArrayList cats = new ArrayList();
+			List<String> cats = new ArrayList<String>();
 			StringTokenizer tokenizer = new StringTokenizer(categories, CategoryBean.CATEGORY_DELIMETER);
 			while(tokenizer.hasMoreTokens()){
 				cats.add(tokenizer.nextToken());
 			}
-			List cats2 = (cats.isEmpty())?null:cats;
+			List<String> cats2 = (cats.isEmpty())?null:cats;
 			setCategoriesList(cats2);
 		} else {	
 			//null
@@ -456,10 +456,10 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 			Iterator iter = this.categoriesList.iterator();
 			if(iter.hasNext()){
 				StringBuffer catString = new StringBuffer();
-				catString.append((String)iter.next());
+				catString.append(iter.next());
 				while(iter.hasNext()){
 					catString.append(CategoryBean.CATEGORY_DELIMETER);
-					catString.append((String)iter.next());
+					catString.append(iter.next());
 				}
 				return catString.toString();
 			}
@@ -471,7 +471,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	/**
 	 * @param categoriesList The categoriesList to set.
 	 */
-	public void setCategoriesList(List categories) {
+	public void setCategoriesList(List<String> categories) {
 		this.categoriesList = categories;
 		notifyManagedBeanOfCategories(categories);
 	}
