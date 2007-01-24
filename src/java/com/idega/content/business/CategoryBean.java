@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.3.2.1 2007/01/23 12:02:37 gediminas Exp $
+ * $Id: CategoryBean.java,v 1.3.2.2 2007/01/24 08:31:47 gediminas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -36,10 +36,10 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2007/01/23 12:02:37 $ by $Author: gediminas $
+ *  Last modified: $Date: 2007/01/24 08:31:47 $ by $Author: gediminas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.3.2.1 $
+ * @version $Revision: 1.3.2.2 $
  */
 public class CategoryBean {
 	
@@ -66,7 +66,11 @@ public class CategoryBean {
 			TreeMap map = new TreeMap();
 			for (Iterator iter = cats.iterator(); iter.hasNext();) {
 				String cat = (String) iter.next();
-				String key = getCategoryKey(cat);
+				// TODO: should generate keys for each old category, but in that case
+				// need to change categories on all existing articles.
+				// Leave it as is for now to not break them
+				//String key = getCategoryKey(cat);
+				String key = cat;
 				map.put(key, cat);
 			}
 			resourceBundle.putAll(map);
