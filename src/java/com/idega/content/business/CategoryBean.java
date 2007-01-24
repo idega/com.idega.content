@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.3.2.2 2007/01/24 08:31:47 gediminas Exp $
+ * $Id: CategoryBean.java,v 1.3.2.3 2007/01/24 10:25:31 gediminas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -19,7 +19,6 @@ import java.util.TreeMap;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.util.WebdavStatus;
-
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.idegaweb.IWMainApplication;
@@ -36,10 +35,10 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2007/01/24 08:31:47 $ by $Author: gediminas $
+ *  Last modified: $Date: 2007/01/24 10:25:31 $ by $Author: gediminas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.3.2.2 $
+ * @version $Revision: 1.3.2.3 $
  */
 public class CategoryBean {
 	
@@ -53,6 +52,8 @@ public class CategoryBean {
 	private static final String CATEGORY_PROPERTIES_FILE = CATEGORY_CONFIG_PATH+"categories.strings";
 	private IWMainApplication iwma;
 	private WebDAVResourceBundle resourceBundle;
+	
+	public static final String CATEGORY_DELIMETER = ",";
 
 	protected CategoryBean(IWMainApplication iwma){
 		this.iwma=iwma;
@@ -170,7 +171,7 @@ public class CategoryBean {
 		Collection ret = new ArrayList();
 		
 		if( categoryCommaSeparatedList != null){
-			StringTokenizer st = new StringTokenizer(categoryCommaSeparatedList,",");
+			StringTokenizer st = new StringTokenizer(categoryCommaSeparatedList,CATEGORY_DELIMETER);
 			while(st.hasMoreTokens()) {
 				ret.add(st.nextToken().trim());
 			}
