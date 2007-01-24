@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadataResource.java,v 1.2.2.1 2007/01/24 13:35:58 gediminas Exp $
+ * $Id: WebDAVMetadataResource.java,v 1.2.2.2 2007/01/24 13:46:13 gediminas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -17,10 +17,10 @@ import com.idega.content.data.MetadataValueBean;
 
 /**
  * 
- * Last modified: $Date: 2007/01/24 13:35:58 $ by $Author: gediminas $
+ * Last modified: $Date: 2007/01/24 13:46:13 $ by $Author: gediminas $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.2.2.1 $
+ * @version $Revision: 1.2.2.2 $
  */
 public interface WebDAVMetadataResource extends IBOSession {
 	/**
@@ -31,25 +31,25 @@ public interface WebDAVMetadataResource extends IBOSession {
 	/**
 	 * @see com.idega.content.business.WebDAVMetadataResourceBean#getMetadataBeans
 	 */
-	public Collection getMetadataBeans(String resourcePath) throws RemoteException, IOException, RemoteException;
+	public Collection getMetadataBeans(String resourcePath) throws RemoteException, IOException;
 
 	/**
 	 * @see com.idega.content.business.WebDAVMetadataResourceBean#getCategories
 	 */
-	public Collection getCategories(String resourcePath) throws RemoteException, IOException, RemoteException;
+	public Collection getCategories(String resourcePath) throws RemoteException, IOException;
 
 	/**
 	 * @see com.idega.content.business.WebDAVMetadataResourceBean#getMetadata
 	 */
-	public MetadataValueBean[] getMetadata(String resourcePath) throws RemoteException, IOException, RemoteException;
+	public MetadataValueBean[] getMetadata(String resourcePath) throws RemoteException, IOException;
 
 	/**
 	 * @see com.idega.content.business.WebDAVMetadataResourceBean#storeCategories
 	 */
-	public void setCategories(String resourcePath, String categories, boolean setOnParent) throws RemoteException;
+	public void setCategories(String resourcePath, String categories, boolean setOnParent) throws RemoteException, IOException;
 
 	/**
 	 * @see com.idega.content.business.WebDAVMetadataResourceBean#storeMetadata
 	 */
-	public void setMetadata(String resourcePath, String type, String val) throws RemoteException;
+	public void setMetadata(String resourcePath, String type, String val) throws RemoteException, IOException;
 }
