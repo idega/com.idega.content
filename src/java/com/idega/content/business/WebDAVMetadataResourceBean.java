@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadataResourceBean.java,v 1.11 2006/04/09 12:01:55 laddi Exp $
+ * $Id: WebDAVMetadataResourceBean.java,v 1.11.2.1 2007/01/24 13:35:58 gediminas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -29,10 +29,10 @@ import com.idega.slide.util.WebdavRootResource;
 /**
  * A resource bean that holds metadata info for the selected resouce
  * 
- * Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
+ * Last modified: $Date: 2007/01/24 13:35:58 $ by $Author: gediminas $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.11.2.1 $
  */
 public class WebDAVMetadataResourceBean extends IBOSessionBean 
 implements WebDAVMetadataResource
@@ -63,8 +63,7 @@ implements WebDAVMetadataResource
 		this.currentPath = resourcePath;
 	}
 	
-	private void setMetadataBeans(String resourcePath, Collection meta, Collection categories) {
-		this.metadataBeans = meta;
+	private void setSelectedCategories(String resourcePath, Collection categories) {
 		this.selectedCategories = categories;
 		this.currentPath = resourcePath;
 	}
@@ -86,13 +85,9 @@ implements WebDAVMetadataResource
 	 * @return a collection of Strings
 	 */
 	public Collection getCategories(String resourcePath) throws RemoteException, IOException {
-		//Cashing removed so that categories is loaded propperly... TODO look into how to use cashing again
-//		if(selectedCategories == null || !checkPath(resourcePath)) {
-		//eiki added if here. no idea what cashing is ;)
-		if(!"".equals(resourcePath)){
-			setMetadataBeans(resourcePath,getMetadataFromRepository(resourcePath),getCategoriesFromRepository(resourcePath));
+		if(selectedCategories == null || !checkPath(resourcePath)) {
+			setSelectedCategories(resourcePath,getCategoriesFromRepository(resourcePath));
 		}
-//		}
 		return this.selectedCategories;
 	}
 	
@@ -212,5 +207,87 @@ implements WebDAVMetadataResource
 //		}
 		return true;
 	}
+
+	public void setCategories(String resourcePath, String categories, boolean setOnParent) {
+		IWContext iwc = IWContext.getInstance();
+		try {
+			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+
+			String filePath = resourcePath;
+			String serverURI = service.getWebdavServerURI();
+			if(!resourcePath.startsWith(serverURI)) {
+				filePath = service.getURI(resourcePath);
+			}
+			WebdavRootResource rootResource = session.getWebdavRootResource();
+
+			if(categories.length()>0) {
+				rootResource.proppatchMethod(filePath,new PropertyName("DAV:","categories"),categories,true);
+				if(setOnParent){
+					rootResource.proppatchMethod(getParentResource(filePath),new PropertyName("DAV:","categories"),categories,true);
+				}
+			}   
+		}
+		catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		catch (HttpException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		// clear cached values so that they are reloaded
+		clear();
+	}
+
+	public void setMetadata(String resourcePath, String type, String val) {
+		try {
+			IWContext iwc = IWContext.getInstance();
+			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 	
+			WebdavRootResource rootResource = session.getWebdavRootResource();
+
+			String filePath = resourcePath;
+			String serverURI = service.getWebdavServerURI();
+			if(!resourcePath.startsWith(serverURI)) {
+				filePath = service.getURI(resourcePath);
+			}
+
+			//Store new settings
+			if(type.length()>0) {
+//				System.out.println("Proppatch: filepath="+filePath+" type="+type+" value="+val);
+				rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),val,true);
+				//Also set the metadata on the parent folder
+				rootResource.proppatchMethod(getParentResource(filePath),new PropertyName("DAV:",type),val,true);
+			}
+			
+		} catch (HttpException ex) {
+			ex.printStackTrace();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} catch (NullPointerException ex) {
+			ex.printStackTrace();
+		}
+
+		// clear cached values so that they are reloaded
+		clear();
+	}
+
+	/**
+	 * <p>
+	 * Gets the URI to the parent resource of resource with URI resourceUri
+	 * </p>
+	 * @param resourceUri
+	 * @return
+	 */
+	private static String getParentResource(String resourceUri) {
+		int begin = 0;
+		int end = Math.max(resourceUri.lastIndexOf("/"),resourceUri.lastIndexOf("\\"));
+		resourceUri = resourceUri.substring(begin,end);
+		return resourceUri;
+	}
+
 }

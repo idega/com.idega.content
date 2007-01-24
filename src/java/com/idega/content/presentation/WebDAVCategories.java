@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.15.2.1 2007/01/23 12:03:25 gediminas Exp $
+ * $Id: WebDAVCategories.java,v 1.15.2.2 2007/01/24 13:35:58 gediminas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -22,20 +22,14 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.bean.ManagedContentBeans;
 import com.idega.content.business.CategoryBean;
 import com.idega.content.business.WebDAVMetadataResource;
-import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
-import com.idega.slide.business.IWSlideService;
-import com.idega.slide.business.IWSlideSession;
-import com.idega.slide.util.WebdavRootResource;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFResourceUtil;
 
@@ -47,10 +41,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2007/01/23 12:03:25 $ by $Author: gediminas $
+ *  Last modified: $Date: 2007/01/24 13:35:58 $ by $Author: gediminas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.15.2.1 $
+ * @version $Revision: 1.15.2.2 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -95,8 +89,15 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		//initializeContent();
 		//add(new Text("Crap"));
 		setInitialized(false);
-		IWContext iwc = IWContext.getInstance();
-		getWebDAVMetadataResource(iwc).clear();
+		IWContext iwuc = IWContext.getInstance();
+		try {
+			WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(iwuc, WebDAVMetadataResource.class);
+			resource.clear();
+		} catch (IBOLookupException e) {
+			throw new RuntimeException(e);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	
@@ -131,19 +132,6 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		this.displayHeader=display;
 	}
 
-	protected WebDAVMetadataResource getWebDAVMetadataResource(IWUserContext iwuc){
-		WebDAVMetadataResource resource=null;
-		//Get all the selected categories for this article and display them as selected
-		try {
-			resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
-					iwuc, WebDAVMetadataResource.class);
-		}
-		catch (IBOLookupException e) {
-			throw new RuntimeException(e);
-		}
-		return resource;
-	}
-	
 	/**
 	 * <p> Creates a table with checkboxes for all the available categories </p>
 	 * @param resourcePath
@@ -262,18 +250,15 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	 */
 	private Collection getSetCategoriesList() {
 		if(this.resourcePath!=null){
-			IWContext iwc = IWContext.getInstance();
-			//if resourcepath is iset
-			//Get all the selected categories for this article and display them as selected
-			WebDAVMetadataResource resource = getWebDAVMetadataResource(iwc);
-			Collection selectedResourceCategories;
+			IWContext iwuc = IWContext.getInstance();
 			try {
-				selectedResourceCategories = resource.getCategories(this.resourcePath);
-			}
-			catch (Exception e) {
+				WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(iwuc, WebDAVMetadataResource.class);
+				return resource.getCategories(this.resourcePath);
+			} catch (IBOLookupException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-			return selectedResourceCategories;
 		}
 		else if(this.setCategories!=null){
 			Collection selectedCategories=null;
@@ -453,57 +438,17 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 			if(resourcePath == null) {
 				resourcePath = (String)smc.getAttributes().get(RESOURCE_PATH);
 			}
-			IWContext iwc = IWContext.getInstance();
+			
+			IWContext iwuc = IWContext.getInstance();
 			try {
-				IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-				IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
-				String filePath = resourcePath;
-				String serverURI = service.getWebdavServerURI();
-				if(!resourcePath.startsWith(serverURI)) {
-					filePath = service.getURI(resourcePath);
-				}
-				WebdavRootResource rootResource = session.getWebdavRootResource();
-
-				//Store new settings
-				if(categories.length()>0) {
-//					System.out.println("Proppatch: filepath="+filePath+" categories value="+categories);
-					rootResource.proppatchMethod(filePath,new PropertyName("DAV:","categories"),categories.toString(),true);
-					//Also set the metadata on the parent folder
-					if(categoriesUi.getSetCategoriesOnParent()){
-						String parent = categoriesUi.getParentResource(filePath);
-//						System.out.println("Proppatch: filepath="+parent+" categories value="+categories);
-						rootResource.proppatchMethod(parent,new PropertyName("DAV:","categories"),categories.toString(),true);
-					}
-				}   
-				//Clear the cashed data so that it will be reloaded.
-				WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
-						iwc, WebDAVMetadataResource.class);
-				resource.clear();
-			}
-			catch (RemoteException e) {
-				e.printStackTrace();
-			}
-			catch (HttpException e) {
-				e.printStackTrace();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
+				WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(iwuc, WebDAVMetadataResource.class);
+				resource.setCategories(resourcePath, categories.toString(), categoriesUi.getSetCategoriesOnParent());
+			} catch (IBOLookupException e) {
+				throw new RuntimeException(e);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
 			}
 		}
-	}
-	
-	/**
-	 * <p>
-	 * Gets the URI to the parent resource of resource with URI resourceUri
-	 * </p>
-	 * @param s
-	 * @return
-	 */
-	private String getParentResource(String resourceUri) {
-		int begin = 0;
-		int end = Math.max(resourceUri.lastIndexOf("/"),resourceUri.lastIndexOf("\\"));
-		resourceUri = resourceUri.substring(begin,end);
-		return resourceUri;
 	}
 
 	/**
