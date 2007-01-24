@@ -17,6 +17,7 @@ import com.idega.io.MemoryFileBuffer;
 import com.idega.io.MemoryInputStream;
 import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
+import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavRootResource;
 import com.idega.util.SortedProperties;
@@ -48,12 +49,13 @@ public class WebDAVResourceBundle extends ResourceBundle {
 
 	protected void load() {
 		try {
+			String resourcePath = getSlideService().getURI(this.path);
 			WebdavRootResource rootResource = getSlideSession().getWebdavRootResource();
-			InputStream in = rootResource.getMethodData(this.path);
+			InputStream in = rootResource.getMethodData(resourcePath);
 
 			if (rootResource.getStatusCode() != WebdavStatus.SC_OK) {
-				throw new FileNotFoundException("Resource bundle not found: "
-						+ this.path);
+				System.err.println("Could not load from webdav: " + rootResource.getStatusMessage());
+				throw new FileNotFoundException("Resource bundle not found " + resourcePath);
 			}
 
 			props.load(in);
@@ -71,13 +73,14 @@ public class WebDAVResourceBundle extends ResourceBundle {
 			props.store(out, null);
 			out.close();
 			
+			String resourcePath = getSlideService().getURI(this.path);
 			MemoryInputStream in = new MemoryInputStream(buf);
-			System.out.println("Writing file to " + path);
+			System.out.println("Writing file to " + resourcePath);
 
 			WebdavRootResource rootResource = getSlideSession().getWebdavRootResource();
-			boolean putOK = rootResource.putMethod(this.path, in);
+			boolean putOK = rootResource.putMethod(resourcePath, in);
 			if (!putOK) {
-				System.err.println("Could not save to webdav: " + rootResource.getStatusMessage());
+				System.err.println("Could not store to webdav: " + rootResource.getStatusMessage());
 			}
 			in.close();
 		} catch (IOException e) {
@@ -100,6 +103,16 @@ public class WebDAVResourceBundle extends ResourceBundle {
 			IWContext iwc = IWContext.getInstance();
 			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
 			return session;
+		} catch (IBOLookupException e) {
+			throw new RuntimeException("Error getting IWSlideSession");
+		}
+	}
+
+	private static IWSlideService getSlideService() {
+		try {
+			IWContext iwc = IWContext.getInstance();
+			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+			return service;
 		} catch (IBOLookupException e) {
 			throw new RuntimeException("Error getting IWSlideService");
 		}
