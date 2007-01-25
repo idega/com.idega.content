@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadata.java,v 1.17 2006/04/09 12:01:54 laddi Exp $
+ * $Id: WebDAVMetadata.java,v 1.18 2007/01/25 13:52:40 gediminas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -26,8 +26,6 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import javax.faces.model.SelectItem;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.bean.ManagedContentBeans;
@@ -37,9 +35,6 @@ import com.idega.content.data.MetadataValueBean;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
-import com.idega.slide.business.IWSlideService;
-import com.idega.slide.business.IWSlideSession;
-import com.idega.slide.util.WebdavRootResource;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFList;
 import com.idega.webface.WFResourceUtil;
@@ -47,12 +42,12 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2006/04/09 12:01:54 $ by $Author: laddi $
+ * Last modified: $Date: 2007/01/25 13:52:40 $ by $Author: gediminas $
  * 
  * Display the UI for adding metadata type - values to a file.
  *
  * @author Joakim Johnson
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	
@@ -242,66 +237,18 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 			val = newValueInput.getValue().toString();
 			type = dropdown.getValue().toString();
 		}
-		MetadataValueBean[] ret = new MetadataValueBean[0];
-
+		
+		IWContext iwuc = IWContext.getInstance();
 		try {
-			IWContext iwc = IWContext.getInstance();
-			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
-	
-			WebdavRootResource rootResource = session.getWebdavRootResource();
-
-			String filePath = this.resourcePath;
-			String serverURI = service.getWebdavServerURI();
-			if(!this.resourcePath.startsWith(serverURI)) {
-				filePath = service.getURI(this.resourcePath);
-			}
-
-			//Store new settings
-			if(type.length()>0) {
-//				System.out.println("Proppatch: filepath="+filePath+" type="+type+" value="+val);
-				rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),val,true);
-				//Also set the metadata on the parent folder
-				rootResource.proppatchMethod(getParentWOContext(filePath),new PropertyName("DAV:",type),val,true);
-			}
-			
-			//Store changes to previously created metadata
-			WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
-					iwc, WebDAVMetadataResource.class);
-			ret = resource.getMetadata(this.resourcePath);
-
-			for(int i=0; i<ret.length;i++) {
-				type=ret[i].getType();
-				val=ret[i].getMetadatavalues();
-//				System.out.println("type="+type+"  val="+val);
-				rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),val,true);
-				//Also set the metadata on the parent folder
-				rootResource.proppatchMethod(getParentWOContext(filePath),new PropertyName("DAV:",type),val,true);
-			}
-			resource.clear();
-		} catch (HttpException ex) {
-			ex.printStackTrace();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} catch (NullPointerException ex) {
-			ex.printStackTrace();
+			WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(iwuc, WebDAVMetadataResource.class);
+			resource.setMetadata(this.resourcePath, type, val);
+		} catch (IBOLookupException e) {
+			throw new RuntimeException(e);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
-		UIComponent tmp = comp.getParent();
-		while ( tmp != null) {
-			tmp = tmp.getParent();
-		}
-	}
-	
-	/**
-	 * TODO move to business logic and use same as for WebDavCategories
-	 */
-	private String getParentWOContext(String s) {
-		int begin = Math.max(s.indexOf("/",1),s.indexOf("\\",1));
-		int end = Math.max(s.lastIndexOf("/"),s.lastIndexOf("\\"));
-		if(begin>0) {
-			return s.substring(begin,end);
-		}
-		return s;
 	}
 
 	/**
@@ -332,4 +279,5 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 		}
 		
 	}
+
 }
