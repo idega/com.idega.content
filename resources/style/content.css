@@ -1,4 +1,3 @@
-
 /*** idegaWeb Content CSS classes ***/
 
 .content_viewer_new_folder {
@@ -580,3 +579,19 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	height: 200px;
 	width: 250px;
 }
+
+/*IE7 workspace quickfix*/
+
+html* .scrollTable tr.oddrow{
+height: 1.5em !important;
+}
+
+html* .scrollTable tr.evenrow{
+height: 1.5em !important;
+}
+
+html* .scrollTable{
+overflow: auto !important;
+}
+
+/*IE7 workspace quickfix ends*/
