@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.5 2007/01/23 15:30:54 gediminas Exp $
+ * $Id: CategoryBean.java,v 1.6 2007/01/25 13:53:18 gediminas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -13,12 +13,16 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
 
 import org.apache.commons.httpclient.HttpException;
+import org.apache.webdav.lib.PropertyName;
+import org.apache.webdav.lib.WebdavResource;
 import org.apache.webdav.lib.util.WebdavStatus;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.idegaweb.IWMainApplication;
@@ -35,10 +39,10 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2007/01/23 15:30:54 $ by $Author: gediminas $
+ *  Last modified: $Date: 2007/01/25 13:53:18 $ by $Author: gediminas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class CategoryBean {
 	
@@ -58,32 +62,105 @@ public class CategoryBean {
 	protected CategoryBean(IWMainApplication iwma){
 		this.iwma=iwma;
 		this.resourceBundle = new WebDAVResourceBundle(CATEGORY_PROPERTIES_FILE);
-		migrateOldFile();
-	}
-	
-	private void migrateOldFile() {
 		if (getCategories().isEmpty()) {
-			Collection cats = getCategoriesFromString(getCategoriesAsString());
-			TreeMap map = new TreeMap();
+			CategoriesMigrator migrator = new CategoriesMigrator();
+			Collection oldCategories = getCategoriesFromString(getCategoriesAsString());
+			migrator.migrate(oldCategories);
+		}
+	}
+
+	private class CategoriesMigrator {
+		private final String PROPERTY_NAME_CATEGORIES = new PropertyName("DAV","categories").toString();
+
+		private HashMap valuesToKeys;
+		private IWSlideSession session;
+		private IWSlideService service;
+		
+		private void migrate(Collection cats) {
+			System.out.println("Migrating " + CATEGORY_CONFIG_FILE + " to new format at " + CATEGORY_PROPERTIES_FILE);
+			HashMap map = new HashMap();
+			valuesToKeys = new HashMap();
 			for (Iterator iter = cats.iterator(); iter.hasNext();) {
 				String cat = (String) iter.next();
-				// TODO: should generate keys for each old category, but in that case
-				// need to change categories on all existing articles.
-				// Leave it as is for now to not break them
-				//String key = getCategoryKey(cat);
-				String key = cat;
+				String key = CategoryBean.getCategoryKey(cat);
 				map.put(key, cat);
+				valuesToKeys.put(cat, key);
 			}
 			resourceBundle.putAll(map);
-
-			/*
+			
 			try {
-				WebdavResource resource = getSlideService().getWebdavResourceAuthenticatedAsRoot(CATEGORY_CONFIG_FILE);
+				IWContext iwc = IWContext.getInstance();
+				session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+				service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+	
+				updateCategoriesOnFiles(CATEGORY_CONFIG_PATH);
+	
+				/*
+				System.out.println("Deleting old file " + CATEGORY_CONFIG_FILE);
+				WebdavResource resource = session.getWebdavResource(service.getURI(CATEGORY_CONFIG_FILE));
 				resource.deleteMethod();
+				*/
+			} catch (IBOLookupException e) {
+				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			*/
+		}
+		
+		private void updateCategoriesOnFiles(String resourcePath) {
+			try {
+				String filePath = resourcePath;
+				String serverURI = service.getWebdavServerURI();
+				if(!resourcePath.startsWith(serverURI)) {
+					filePath = service.getURI(resourcePath);
+				}
+	
+				WebdavResource resource = session.getWebdavResource(filePath);
+				
+				String oldCats = CATEGORY_DELIMETER;
+				Enumeration enumerator = resource.propfindMethod(PROPERTY_NAME_CATEGORIES);
+				if (enumerator.hasMoreElements()) {
+					StringBuffer cats = new StringBuffer();
+					while(enumerator.hasMoreElements()) {
+						cats.append(enumerator.nextElement());
+					}
+					oldCats = cats.toString();
+				}
+				
+				if (!oldCats.equals(CATEGORY_DELIMETER) && !oldCats.equals("")) {
+					System.out.println("Updating categories on resource " + resourcePath);
+					System.out.println("- " + oldCats);
+					
+					StringTokenizer tokenizer = new StringTokenizer(oldCats, CATEGORY_DELIMETER);
+					StringBuffer newCats = new StringBuffer(CATEGORY_DELIMETER);
+					while (tokenizer.hasMoreTokens()) {
+						String cat = tokenizer.nextToken();
+						String key = (String) valuesToKeys.get(cat);
+						// if we renamed the category key, replace category with it, otherwise leave as is
+						if (key != null) {
+							newCats.append(key);
+						} else {
+							newCats.append(cat);
+						}
+						newCats.append(CATEGORY_DELIMETER);
+					}
+	
+					System.out.println("+ " + newCats.toString());
+					resource.proppatchMethod(PROPERTY_NAME_CATEGORIES, newCats.toString(), true);
+				}
+				
+				// update categories on all child resources
+				Enumeration children = resource.getChildResources().getResourceNames();
+				if (children.hasMoreElements()) {
+					while(children.hasMoreElements()) {
+						String child = (String) children.nextElement();
+						updateCategoriesOnFiles(child);
+					}
+				}
+			
+			} catch (Exception e) {
+				System.err.println("Exception updating categories on resource " + resourcePath);
+			}
 		}
 	}
 
@@ -188,8 +265,9 @@ public class CategoryBean {
 		resourceBundle.put(key, category);
 	}
 
-	private String getCategoryKey(String category) {
-		return StringHandler.stripNonRomanCharacters(category).toLowerCase();
+	private static final char[] LEAVE_AS_IS = {'1','2','3','4','5','6','7','8','9','0','-'};
+	private static String getCategoryKey(String category) {
+		return StringHandler.stripNonRomanCharacters(category, LEAVE_AS_IS).toLowerCase();
 	}
 
 }
