@@ -705,6 +705,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	public boolean movePage(int newParentId, int nodeId) {
 		IWContext iwc = IWContext.getInstance();
+		
+		log.info("movePage called: "+newParentId+" nodeId: "+nodeId);
 		if (iwc == null) {
 			return false;
 		}
