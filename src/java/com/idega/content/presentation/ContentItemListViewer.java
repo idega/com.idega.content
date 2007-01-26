@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.20 2007/01/24 05:16:58 valdas Exp $
+ * $Id: ContentItemListViewer.java,v 1.21 2007/01/26 05:46:53 valdas Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -34,10 +34,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- * Last modified: $Date: 2007/01/24 05:16:58 $ by $Author: valdas $
+ * Last modified: $Date: 2007/01/26 05:46:53 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.20 $
+ * @version $Revision: 1.21 $
  */
 public class ContentItemListViewer extends UIData implements CacheableUIComponent{
 
@@ -442,7 +442,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 			List<String> cats = new ArrayList<String>();
 			StringTokenizer tokenizer = new StringTokenizer(categories, CategoryBean.CATEGORY_DELIMETER);
 			while(tokenizer.hasMoreTokens()){
-				cats.add(tokenizer.nextToken());
+				cats.add(tokenizer.nextToken().trim());
 			}
 			List<String> cats2 = (cats.isEmpty())?null:cats;
 			setCategoriesList(cats2);
