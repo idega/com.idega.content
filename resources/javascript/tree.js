@@ -7,7 +7,7 @@ function saveMyTree(newParentNodeId, sourceNodeId) {
 	showLoadingMessage("Moving...");
 	setPageID(sourceNodeId);
 	RFRESH_PAGE_INFO = !isSiteMap();
-console.log('calling movePage');		
+//console.log('calling movePage');		
 	ThemesEngine.movePage(newParentNodeId, sourceNodeId, empty);
 }
 

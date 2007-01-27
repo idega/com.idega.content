@@ -557,6 +557,7 @@
 						setNeedRelaodBuilderPage(true);
 						rootUl.removeChild(temporaryTable);
 					}
+//console.log('calling saveRoot');					
 					JSTreeObj.saveRoot(JSTreeObj.dragNode_source.id, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
 								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, true);
 								
@@ -946,7 +947,7 @@
 							else saveString = saveString + '0';
 							if (numericID.toString() == child.toString()) {
 								newParent = numericParentID;
-console.log(document.getElementById(newParent));
+//console.log(document.getElementById(newParent));
 								return newParent;
 							}
 						}
