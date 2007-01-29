@@ -26,7 +26,7 @@ public class ThemesManager extends ContentBlock {
 		upload.setUploadMethod("uploadZipFileContents");
 		uploadBlock.add(upload);
 		
-		getChildren().add(uploadBlock);
+		add(uploadBlock);
 	}
 	
 	private String getOnClickAction(String idExtension) {

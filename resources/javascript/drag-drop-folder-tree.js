@@ -698,6 +698,9 @@
 			if(showMessage && JSTreeObj.messageMaximumDepthReached)alert(JSTreeObj.messageMaximumDepthReached);
 			
 			var parentDiv = JSTreeObj.dragNode_destination;
+			if (parentDiv == null) {
+				return;
+			}
 			while(true){
 				if (parentDiv.getElementsByTagName('DIV')){
 					if (parentDiv.getElementsByTagName('DIV')[0]){

@@ -44,7 +44,7 @@ public class SiteInfoJsf extends SiteInfo {
 		save.setOnClick("saveSiteInfo()");
 		siteInfo.add(save);
 		
-		getChildren().add(siteInfo);
+		add(siteInfo);
 		
 		doBusiness(iwc, ThemesHelper.getInstance().getThemeSettings().values());
 	}

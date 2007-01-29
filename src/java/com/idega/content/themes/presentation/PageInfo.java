@@ -31,6 +31,8 @@ public class PageInfo extends ContentBlock {
 			pageInfo.setStyleClass(getStyleClass());
 		}
 		
+		pageInfo.setTitle(getBundle().getLocalizedString("page_info"));
+		
 		pageInfo.setToolbar(getToolbar());
 		
 		WFTitlebar bar = new WFTitlebar();
@@ -65,8 +67,8 @@ public class PageInfo extends ContentBlock {
 			cell.add(input);
 		}
 
-		pageInfo.getChildren().add(table);
-		getChildren().add(pageInfo);
+		pageInfo.add(table);
+		add(pageInfo);
 	}
 
 	public String getStyleClass() {

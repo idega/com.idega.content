@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.21 2007/01/26 05:46:53 valdas Exp $
+ * $Id: ContentItemListViewer.java,v 1.22 2007/01/29 00:33:25 valdas Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -34,10 +34,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- * Last modified: $Date: 2007/01/26 05:46:53 $ by $Author: valdas $
+ * Last modified: $Date: 2007/01/29 00:33:25 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.21 $
+ * @version $Revision: 1.22 $
  */
 public class ContentItemListViewer extends UIData implements CacheableUIComponent{
 
@@ -562,6 +562,8 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		}
 		HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
 		String category = request.getParameter(ITEMS_CATEGORY_VIEW);
-		setCategories(category);
+		if (category != null) { // Just to be sure not overriding (maybe) existing category
+			setCategories(category);
+		}
 	}
 }
