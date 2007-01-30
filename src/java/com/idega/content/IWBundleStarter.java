@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.12 2007/01/30 03:34:45 justinas Exp $
+ * $Id: IWBundleStarter.java,v 1.13 2007/01/30 06:59:59 justinas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -60,10 +60,10 @@ import org.jdom.Element;
 
 /**
  * 
- *  Last modified: $Date: 2007/01/30 03:34:45 $ by $Author: justinas $
+ *  Last modified: $Date: 2007/01/30 06:59:59 $ by $Author: justinas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class IWBundleStarter implements IWBundleStartable, JarLoader {
 	
@@ -213,18 +213,19 @@ public class IWBundleStarter implements IWBundleStartable, JarLoader {
 					siteMap = (Map <String, SiteTemplateStructure>)siteTemplatesFromCache.get("siteMap");
 				}
 				else {			
-					siteMap = getSiteInfo(root);
-					siteTemplatesFromCache.put("siteMap", siteMap);
+					siteMap = new HashMap<String, SiteTemplateStructure>();
 				}						
+				siteMap = getSiteInfo(root, siteMap);
+				siteTemplatesFromCache.put("siteMap", siteMap);
+				
 			}
 			catch (Exception e) {
 				e.printStackTrace();
 			}
 		}		
 	}	
-	public Map <String, SiteTemplateStructure> getSiteInfo(Element root) {
+	public Map <String, SiteTemplateStructure> getSiteInfo(Element root, Map siteMap) {
 		
-		Map siteMap = new HashMap <String, PageTemplate> ();
 		Collection siteRoot = root.getChildren();			
 		Iterator itr = siteRoot.iterator();
 		
