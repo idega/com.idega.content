@@ -21,7 +21,7 @@
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
         			/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
         			/idegaweb/bundles/com.idega.content.bundle/resources/javascript/SiteInfoHelper.js">
-			<h:form id="createpageform">			
+			<h:form id="createpageform">
 				<wf:wfblock maximizedVertically="true" id="siteMapBlock" title="#{localizedStrings['com.idega.content']['site_map']}">
 					
 					<x:div id="site_tree_container" forceId="true">

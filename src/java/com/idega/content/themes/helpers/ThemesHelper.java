@@ -436,7 +436,7 @@ public class ThemesHelper implements Singleton {
 		return getXMLDocument(getInputStream(url));
 	}
 	
-	protected Document getXMLDocument(InputStream stream) {
+	public Document getXMLDocument(InputStream stream) {
 		if(stream == null){
 			log.info("Stream is null");
 			return null;
