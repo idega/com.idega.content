@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.11 2007/01/30 03:20:40 justinas Exp $
+ * $Id: IWBundleStarter.java,v 1.12 2007/01/30 03:34:45 justinas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -60,10 +60,10 @@ import org.jdom.Element;
 
 /**
  * 
- *  Last modified: $Date: 2007/01/30 03:20:40 $ by $Author: justinas $
+ *  Last modified: $Date: 2007/01/30 03:34:45 $ by $Author: justinas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class IWBundleStarter implements IWBundleStartable, JarLoader {
 	
@@ -194,7 +194,6 @@ public class IWBundleStarter implements IWBundleStartable, JarLoader {
 					page.setType(pageType);
 					page.setIconFile(current.getAttributeValue("iconfile"));
 					page.setTemplateFile(current.getAttributeValue("templatefile"));
-//					if (!pageMap.containsKey(pageType))
 					pageMap.put(pageType, page);
 				}
 				pageTemplatesFromCache.put("pageMap", pageMap);				
@@ -235,7 +234,6 @@ public class IWBundleStarter implements IWBundleStartable, JarLoader {
 			String panelName = currentSite.getAttributeValue("name");			
 			Element structure = (Element)currentSite.getChildren().get(0);			
 			siteStruct = getNode(structure);
-//			if (!siteMap.containsKey(panelName))
 			siteMap.put(panelName, siteStruct);		
 		}		
 		return siteMap;

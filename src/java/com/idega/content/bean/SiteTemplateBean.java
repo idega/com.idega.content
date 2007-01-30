@@ -25,9 +25,6 @@ import javax.faces.context.FacesContext;
 public class SiteTemplateBean {
 // TO DO change IWTreeNode to PageTreeNode
 	
-//	private static final String SITE_LINK = ThemesHelper.getInstance().getWebRootWithoutContent() + "/idegaweb/bundles/com.idega.content.bundle/resources/templates/site-templates.xml";
-//	private static final String PAGE_LINK = ThemesHelper.getInstance().getWebRootWithoutContent() + "/idegaweb/bundles/com.idega.content.bundle/resources/templates/page-templates.xml";
-	
 	TreeNode siteTree = null;
 	TreeNode pageTree = null;
 	String path = null;
@@ -43,22 +40,6 @@ public class SiteTemplateBean {
 
 		pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get("pageMap");
 	}
-
-//	public TreeNode getSiteTree(){		
-//		return getSiteStructure();
-//	}
-
-//	public TreeNode getSiteStructure(){
-//		
-//		Document siteDocument = ThemesHelper.getInstance().getXMLDocument(SITE_LINK);
-//		Element root = siteDocument.getRootElement();
-//		Element siteRoot = root.getChild("site");	
-//		Element currentElement = (Element)siteRoot.getChildren().get(0);
-//		WFTreeNode rootNode = new WFTreeNode(new IWTreeNode(currentElement.getAttributeValue("name")));
-//		rootNode = getPage(rootNode);
-//
-//		return rootNode;	
-//	}	
 		
 	public WFTreeNode getPage(WFTreeNode currNode){
 
@@ -76,9 +57,6 @@ public class SiteTemplateBean {
 	}
 	
 	public TreeNode getPageTree(){		
-//		Document siteDocument = ThemesHelper.getInstance().getXMLDocument(PAGE_LINK);
-//		Element root = siteDocument.getRootElement();
-//		Element currentElement = root;
 		WFTreeNode rootNode = new WFTreeNode(new IWTreeNode("pageTemplatesRoot"));
 		rootNode = getPage(rootNode);
 		return rootNode;
@@ -92,34 +70,9 @@ public class SiteTemplateBean {
 		this.path = path;
 	}
 
-//	public Document getSiteDocument() {
-//		return ThemesHelper.getInstance().getXMLDocument(SITE_LINK);
-//	}
-
 	public void setSiteDocument(Document siteDocument) {
 		this.siteDocument = siteDocument;
 	}
-//	public Map <String, PageTemplate> getPageInfo(Map <String, PageTemplate> pageMap) {		
-//
-//		String pageName = null;
-//		String pageType = null;
-//		String iconFile = null;
-//		String templateFile = null;
-//		
-//		Document siteDocument = getXMLDocument(PAGE_LINK);		
-//		Element root = siteDocument.getRootElement();		
-//		Collection siteRoot = root.getChildren();			
-//		Iterator itr = siteRoot.iterator();
-//		while(itr.hasNext()){
-//			Element current = (Element)itr.next();
-//			pageName = current.getAttributeValue("name");
-//			pageType = current.getAttributeValue("type");
-//			iconFile = current.getAttributeValue("iconfile");
-//			templateFile = current.getAttributeValue("templatefile");
-//			pageMap.put(pageType, new PageTemplate(pageName, pageType, iconFile, templateFile));			
-//		}		
-//		return pageMap;
-//	}
 	
 	public Document getXMLDocument(String link) {
 		URL url = null;
