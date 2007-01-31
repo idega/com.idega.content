@@ -21,6 +21,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 import com.idega.block.web2.presentation.Accordion;
+import com.idega.content.TemplatesLoader;
 import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.cache.IWCacheManager2;
@@ -48,6 +49,10 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		
 		pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache("pageMap");
 		siteTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache("siteMap");
+		
+		if (!pageTemplatesFromCache.containsKey("pageMap") || !pageTemplatesFromCache.containsKey("siteMap")){
+			new TemplatesLoader(iwma, true);
+		}		
 		
 		pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get("pageMap");		
 		siteMap = (Map <String, SiteTemplateStructure>)siteTemplatesFromCache.get("siteMap");		

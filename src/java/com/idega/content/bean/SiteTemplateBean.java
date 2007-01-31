@@ -5,6 +5,8 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.apache.myfaces.custom.tree2.TreeNode;
+
+import com.idega.content.TemplatesLoader;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.content.tree.PageTemplate;
 import com.idega.core.cache.IWCacheManager2;
@@ -38,6 +40,10 @@ public class SiteTemplateBean {
 		IWMainApplication iwma = IWMainApplication.getIWMainApplication(ctx);		
 		pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache("pageMap");
 
+		if (!pageTemplatesFromCache.containsKey("pageMap")){
+			new TemplatesLoader(iwma, true);
+		}
+		
 		pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get("pageMap");
 	}
 		
