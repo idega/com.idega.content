@@ -44,7 +44,6 @@ public class ThemeChanger {
 	private static final String CONTENT_PARAGRAPH_LINK = "<span class=\"blog-entry-permalink\"> | <a>Permalink</a></span></div><div class=\"blog-entry-body\">";
 	private static final String CONTENT_PARAGRAPH_START = "<p style=\"font-family: Verdana,Arial,Helvetica,sans-serif\">";
 	private static final String CONTENT_PARAGRAPH_END = "</p></div></div>";
-	private static final String CONTENT_PARAGRAPH = "Article";
 	private static final String CONTENT_BEGIN = "<div class=\"contentSpacer\"></div>";
 	private static final String CONTENT_END = "<div class=\"clear\"></div>\n<div class=\"clearer\"></div>";
 	
@@ -597,7 +596,7 @@ public class ThemeChanger {
 		Date d = new Date();
 		content.append(CONTENT_BEGIN).append(NEW_LINE);
 		for (int i = 0; i < ThemesConstants.DUMMY_ARTICLES.size(); i++) {
-			content.append(CONTENT_PARAGRAPH_TITLE).append(CONTENT_PARAGRAPH);
+			content.append(CONTENT_PARAGRAPH_TITLE).append(ThemesConstants.ARTICLE_TITLE);
 			if (ThemesConstants.DUMMY_ARTICLES.size() > 1) {
 				content.append(ThemesConstants.SPACE).append(i + 1);
 			}
@@ -780,65 +779,7 @@ public class ThemeChanger {
 	 * @param variation
 	 * @return String
 	 */
-	public String changeTheme(String themeID, String styleGroupName, String variation, String themeName, boolean radio, boolean checked) {
-		/*if (themeID == null || styleGroupName == null || variation == null) {
-			return null;
-		}
-		
-		Theme theme = helper.getTheme(themeID);
-		if (theme == null) {
-			return null;
-		}
-		
-		theme.setChangedName(themeName);
-		
-		String linkToDoc = theme.getLinkToDraft();
-		if (linkToDoc == null) {
-			linkToDoc = theme.getLinkToSkeleton();
-		}
-		
-		if (linkToDoc.indexOf(ThemesConstants.SPACE) != -1) {
-			linkToDoc = helper.urlEncode(linkToDoc);
-		}
-		Document doc = helper.getXMLDocument(helper.getFullWebRoot() + linkToDoc);
-		if (doc == null) {
-			return null;
-		}
-		
-		boolean limitedSelection = true;
-		
-		ThemeStyleGroupMember oldStyle = null;
-		ThemeStyleGroupMember newStyle = null;
-		ThemeStyleGroupMember styleChanger = null;
-		if (radio) { // Simply changing CSS files
-			oldStyle = getEnabledStyleMember(theme, styleGroupName);
-			newStyle = getStyleMember(theme, styleGroupName, variation);
-			styleChanger = oldStyle;
-		}
-		else { //Need to know either add CSS or remove
-			limitedSelection = false;
-			if (checked) { // Need to add
-				newStyle = getStyleMember(theme, styleGroupName, variation);
-				styleChanger = newStyle;
-			}
-			else { //Need to remove
-				oldStyle = getStyleMember(theme, styleGroupName, variation);
-				styleChanger = oldStyle;
-			}
-		}
-		
-		Element root = doc.getRootElement();
-		if (!changeThemeStyle(ThemesConstants.CONTENT + theme.getLinkToBase(), root.getChild(HTML_HEAD, namespace), oldStyle,
-				newStyle)) {
-			return null;
-		}
-		if (oldStyle != null) {
-			oldStyle.setEnabled(false);
-		}
-		if (newStyle != null) {
-			newStyle.setEnabled(true);
-		}*/
-		
+	public String changeTheme(String themeID, String styleGroupName, String variation, String themeName, boolean radio, boolean checked) {		
 		if (themeID == null) {
 			return null;
 		}

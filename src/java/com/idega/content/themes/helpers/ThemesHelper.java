@@ -40,6 +40,7 @@ import org.xml.sax.EntityResolver;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.content.bean.ContentItemFeedBean;
 import com.idega.content.business.ContentSearch;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.business.ThemesEngine;
@@ -75,12 +76,12 @@ public class ThemesHelper implements Singleton {
 	private volatile IWSlideService service = null;
 	private volatile ThemesService themesService = null;
 	private volatile ThemesEngine themesEngine = null;
+	private volatile ContentItemFeedBean feedBean = null;
 	
 	private Map <String, Theme> themes = null;
 	private Map <String, Setting> themeSettings = null;
 	private Map <String, Setting> pageSettings = null;
 	private Map <String, Document> pages = null;
-	private Map <String, Document> articles = null;
 	private List <String> themeQueue = null;
 	private List <String> urisToThemes = null;
 	
@@ -101,17 +102,15 @@ public class ThemesHelper implements Singleton {
 	private static final String ARTICLE_PAGE_TYPE = "text";
 	private static final String ATTRIBUTE_NAME = "property";
 	private static final String ATTRIBUTE_PROPERTY = "value";
-	private static final String DEFAULT_ARTICLE = "default_theme_article";
 	private static final String XML_MIME_TYPE = "text/" + ThemesConstants.XML_EXTENSION;
 	
 	private Random numberGenerator = null;
 	
 	private ThemesHelper(boolean canUseSlide) {
 		themes = new HashMap <String, Theme> ();
-		themeSettings = Collections.synchronizedMap(new TreeMap<String, Setting>());//new HashMap <String, Setting> ();
+		themeSettings = Collections.synchronizedMap(new TreeMap<String, Setting>());
 		pageSettings = new HashMap <String, Setting> ();
 		pages = new HashMap <String, Document> ();
-		articles = new HashMap <String, Document> ();
 		themeQueue = new ArrayList <String> ();
 		urisToThemes = new ArrayList <String> ();
 		numberGenerator = new Random();
@@ -189,10 +188,12 @@ public class ThemesHelper implements Singleton {
 	protected IWSlideService getSlideService() {
 		if (service == null) {
 			synchronized (ThemesHelper.class) {
-				try {
-					service = (IWSlideService) IBOLookup.getServiceInstance(IWContext.getInstance(), IWSlideService.class);
-				} catch (IBOLookupException e) {
-					log.error(e);
+				if (service == null) {
+					try {
+						service = (IWSlideService) IBOLookup.getServiceInstance(IWContext.getInstance(), IWSlideService.class);
+					} catch (IBOLookupException e) {
+						log.error(e);
+					}
 				}
 			}
 		}
@@ -208,6 +209,17 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		return loader;
+	}
+	
+	private ContentItemFeedBean getFeedBean() {
+		if (feedBean == null) {
+			synchronized (ThemesHelper.class) {
+				if (feedBean == null) {
+					feedBean = new ContentItemFeedBean(null, ContentItemFeedBean.FEED_TYPE_ATOM_1);
+				}
+			}
+		}
+		return feedBean;
 	}
 	
 	public void searchForThemes() {
@@ -1091,6 +1103,7 @@ public class ThemesHelper implements Singleton {
 		if (iwc == null) {
 			return;
 		}
+		
 		String language = "en";
 		Locale l = iwc.getCurrentLocale();
 		if (l != null) {
@@ -1107,7 +1120,7 @@ public class ThemesHelper implements Singleton {
 		}
 		name += id;
 		
-		String docContent = getArticleDocument(language);
+		String docContent = getArticleDocument(language, name);
 		if (docContent == null) {
 			return;
 		}
@@ -1121,72 +1134,10 @@ public class ThemesHelper implements Singleton {
 		}
 	}
 	
-	private String getArticleDocument(String language) {
-		Document doc = articles.get(DEFAULT_ARTICLE);
-		if (doc != null) {
-			doc = prepareArticleDocument(doc, language);
-			return getThemeChanger().getXMLOutputter().outputString(doc);
-		}
-		doc = getXMLDocument(getWebRootWithoutContent() + ThemesConstants.ARTICLE_PATH_APPL);
-		if (doc == null) {
-			return null;
-		}
-		pages.put(DEFAULT_ARTICLE, doc);
-		doc = prepareArticleDocument(doc, language);
-		return getThemeChanger().getXMLOutputter().outputString(doc);
-	}
-	
-	private Document prepareArticleDocument(Document doc, String language) {
-		String languageTag = "content_language";
-		
-		Element root = doc.getRootElement();
-		if (root == null) {
-			return doc;
-		}
-		
-		Element lang = root.getChild(languageTag);
-		if (lang != null) {
-			lang.setText(language);
-		}
-		
-		setArticleImage(root);
-
-		return doc;
-	}
-	
-	private void setArticleImage(Element root) {
-		if (root == null) {
-			return;
-		}
-		
-		String imageTag = "img";
-		String align = "align";
-		String src = "src";
-		
-		Iterator it = root.getDescendants();
-		Object o = null;
-		Element e = null;
-		Attribute position = null;
-		Attribute source = null;
-		boolean prepared = false;
-		while (it.hasNext() && !prepared) {
-			o = it.next();
-			if (o instanceof Element) {
-				e = (Element) o;
-				if (e.getName().equals(imageTag)) {
-					position = e.getAttribute(align);
-					if (position != null) {
-						position.setValue(ThemesConstants.IMAGE_POSITIONS.get(getRandomNumber(ThemesConstants.IMAGE_POSITIONS.size())));
-					}
-					source = e.getAttribute(src);
-					if (source != null) {
-						source.setValue(ThemesConstants.BASE_THEME_IMAGES + ThemesConstants.THEME_IMAGES.get(getRandomNumber(ThemesConstants.THEME_IMAGES.size())));
-					}
-					prepared = true;
-				}
-			}
-		}
-		
+	private String getArticleDocument(String language, String uri) {
+		return getFeedBean().getFeedEntryAsXML(ThemesConstants.ARTICLE_TITLE,
+				getWebRootWithoutContent() + "/pages" + uri, null, ThemesConstants.ARTICLE_TITLE,
+				null, getArticle(), "Administrator", language, null);
 	}
 	
 	private void addIDsToModules(Element root, int pageID) {
@@ -1329,6 +1280,24 @@ public class ThemesHelper implements Singleton {
 			return Integer.valueOf(newICObjectTypeID).intValue();
 		}
 		return -1;
+	}
+	
+	private String getArticle() {
+		StringBuffer article = new StringBuffer();
+		article.append(getArticleImageTag());
+		article.append(ThemesConstants.DUMMY_ARTICLES.get(getRandomNumber(ThemesConstants.DUMMY_ARTICLES.size())));
+		return article.toString();
+	}
+	
+	private String getArticleImageTag() {
+		StringBuffer img = new StringBuffer();
+		img.append("<img vspace=\"0\" hspace=\"5px\" border=\"0\" align=\"");
+		img.append(ThemesConstants.IMAGE_POSITIONS.get(getRandomNumber(ThemesConstants.IMAGE_POSITIONS.size())));
+		img.append("\" src=\"");
+		img.append(ThemesConstants.BASE_THEME_IMAGES);
+		img.append(ThemesConstants.THEME_IMAGES.get(getRandomNumber(ThemesConstants.THEME_IMAGES.size())));
+		img.append("\" />");
+		return img.toString();
 	}
 
 }

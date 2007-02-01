@@ -40,6 +40,8 @@ public class ThemesConstants {
 	protected static final String THEME_SEARCH_KEY = "*.htm*";
 	protected static final String IDEGA_THEME_INFO = UNDER + IDEGA_THEME + DOT + XML_EXTENSION;
 	
+	public static final String ARTICLE_TITLE = "Article";
+	
 	private static final String[] _DUMMY_ARTICLES = new String[] {"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum bibendum, ligula ut feugiat rutrum, mauris libero ultricies nulla, at hendrerit lectus dui bibendum metus. Phasellus quis nulla nec mauris sollicitudin ornare. Vivamus faucibus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Cras vulputate condimentum ipsum. Duis urna eros, commodo id, sagittis sed, sodales eu, ante. Etiam ante. Cras risus dolor, porta nec, adipiscing eu, scelerisque at, metus. Mauris nunc eros, porttitor nec, tincidunt ut, rutrum eget, massa. In facilisis nisi. Sed non lorem malesuada quam egestas bibendum. Quisque bibendum ullamcorper purus. Integer id diam vel elit adipiscing consectetuer. Phasellus vitae eros. Vivamus laoreet consectetuer tortor. In congue dignissim quam. Suspendisse nec purus vel velit ultricies bibendum."};
 	public static final List <String> DUMMY_ARTICLES = Collections.unmodifiableList(Arrays.asList(_DUMMY_ARTICLES));
 	
