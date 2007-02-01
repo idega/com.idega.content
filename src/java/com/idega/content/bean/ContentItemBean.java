@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.23 2007/01/24 05:16:28 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.24 2007/02/01 01:23:02 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -39,10 +39,10 @@ import com.idega.util.IWTimestamp;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2007/01/24 05:16:28 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/02/01 01:23:02 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.23 $
+ * @version $Revision: 1.24 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -68,6 +68,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	public final static String FIELDNAME_VERSION_NAME = "version_name";
 	public final static String FIELDNAME_STATUS = "status";
 	public final static String FIELDNAME_LAST_MODIFIED_DATE = "lastmodified";
+	public static final String FIELDNAME_PUBLISHED_DATE = "published_date";
 	
 	private Boolean doRender = Boolean.TRUE;
 	private boolean exists=false;
@@ -386,6 +387,14 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		return session;
 	}
 	
+	public Timestamp getPublishedDate() {
+		return (Timestamp) getValue(FIELDNAME_PUBLISHED_DATE);
+	}
+	
+	public void setPublishedDate(Timestamp date) {
+		setValue(FIELDNAME_PUBLISHED_DATE, date);
+	}
+	
 	public Timestamp getCreationDate() {
 		return (Timestamp)getValue(FIELDNAME_CREATION_DATE);
 	}
@@ -480,6 +489,9 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 
 	
 	public void setLanguage(String lang){
+		if (lang == null) {
+			return;
+		}
 		Locale locale = new Locale(lang);
 		setLocale(locale);
 	}
@@ -576,6 +588,25 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 
 	public String getWebDavResourceCategories() {
 		return webDavResourceCategories;
+	}
+	
+	/**
+	 * Adds new entry to feed or modifies existing entry in feed
+	 * @param iwc
+	 * @param feedTitle
+	 * @param feedName
+	 * @param feedType
+	 * @param feedDescription
+	 * @param title
+	 * @param description
+	 * @param author
+	 * @return String of SyndFeed xml if entry was successsfully added to feed, otherwise - null
+	 */
+	public String getFeedEntryAsXML(IWContext iwc, String feedTitle, String feedDescription,
+			String title, String description, String author, List<String> categories) {
+		ContentItemFeedBean feedBean = new ContentItemFeedBean(iwc, ContentItemFeedBean.FEED_TYPE_ATOM_1);
+		return feedBean.getFeedEntryAsXML(feedTitle, getResourcePath(), feedDescription, title, getPublishedDate(), description,
+				author, getLanguage(), categories);
 	}
 
 }
