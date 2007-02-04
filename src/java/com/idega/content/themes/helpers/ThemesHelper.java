@@ -12,6 +12,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -45,6 +46,7 @@ import com.idega.content.business.ContentSearch;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.business.ThemesEngine;
 import com.idega.content.themes.business.ThemesService;
+import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.component.business.ICObjectBusiness;
 import com.idega.core.component.data.ICObject;
@@ -1094,8 +1096,8 @@ public class ThemesHelper implements Singleton {
 		if (page == null) {
 			return;
 		}
-		String name = page.getDefaultPageURI();
-		if (name == null) {
+		String uri = page.getDefaultPageURI();
+		if (uri == null) {
 			return;
 		}
 		
@@ -1112,21 +1114,21 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		
-		if (name.startsWith(ThemesConstants.SLASH)) {
-			name = extractValueFromString(name, name.indexOf(ThemesConstants.SLASH), name.length());
-		}
-		if (name.endsWith(ThemesConstants.SLASH)) {
-			name = extractValueFromString(name, 0, name.lastIndexOf(ThemesConstants.SLASH) - 1);
-		}
-		name += id;
-		
-		String docContent = getArticleDocument(language, name);
+		String docContent = getArticleDocument(language, uri, iwc.getCurrentUser().getName(), iwc.getApplicationContext().getDomain());
 		if (docContent == null) {
 			return;
 		}
-
+		
+		if (uri.startsWith(ThemesConstants.SLASH)) {
+			uri = extractValueFromString(uri, uri.indexOf(ThemesConstants.SLASH), uri.length());
+		}
+		if (uri.endsWith(ThemesConstants.SLASH)) {
+			uri = extractValueFromString(uri, 0, uri.lastIndexOf(ThemesConstants.SLASH) - 1);
+		}
+		uri += id;
+		
 		String fileName = language + ThemesConstants.DOT + ThemesConstants.XML_EXTENSION;
-		String base = RESOURCE_PATH_START + name + RESOURCE_PATH_END + ThemesConstants.SLASH;
+		String base = RESOURCE_PATH_START + uri + RESOURCE_PATH_END + ThemesConstants.SLASH;
 		try {
 			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, fileName, docContent, XML_MIME_TYPE, true);
 		} catch (RemoteException e) {
@@ -1134,10 +1136,27 @@ public class ThemesHelper implements Singleton {
 		}
 	}
 	
-	private String getArticleDocument(String language, String uri) {
-		return getFeedBean().getFeedEntryAsXML(ThemesConstants.ARTICLE_TITLE,
-				getWebRootWithoutContent() + "/pages" + uri, null, ThemesConstants.ARTICLE_TITLE,
-				null, getArticle(), "Administrator", language, null);
+	private String getArticleDocument(String language, String uri, String user, ICDomain cachedDomain) {
+		String article = getArticle();
+		StringBuffer summary = new StringBuffer();
+		if (article.length() >= 200) {
+			summary.append(article.substring(0, 200)).append(ThemesConstants.DOT).append(ThemesConstants.DOT);
+			summary.append(ThemesConstants.DOT);
+		}
+		else {
+			summary = new StringBuffer(article);
+		}
+		StringBuffer server = new StringBuffer(getWebRootWithoutContent());
+		if (cachedDomain != null) {
+			if (cachedDomain.getServerName() != null) {
+				server = new StringBuffer(cachedDomain.getServerName());
+			}
+		}
+		server.append("/pages");
+		StringBuffer link = new StringBuffer(server.toString());
+		link.append(uri);
+		return getFeedBean().getFeedEntryAsXML(ThemesConstants.ARTICLE_TITLE, server.toString(), null, ThemesConstants.ARTICLE_TITLE,
+				new Timestamp(System.currentTimeMillis()), null, summary.toString(), article, user, language, null, link.toString());
 	}
 	
 	private void addIDsToModules(Element root, int pageID) {
@@ -1233,7 +1252,7 @@ public class ThemesHelper implements Singleton {
 			try {
 				blocks = ListUtil.convertCollectionToList(icoHome.findAllByObjectTypeOrdered(ICObjectBMPBean.COMPONENT_TYPE_BLOCK));
 			} catch (FinderException e) {
-				log.error(e);
+				e.printStackTrace();
 			}
 		}
 		newICObjectTypeID = getNewICObjectTypeID(moduleClassName, blocks);

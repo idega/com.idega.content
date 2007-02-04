@@ -271,16 +271,13 @@ function setButtonText(id, text) {
 function newPage() {
 	var newPage = document.getElementById("newPageContainer");
 	if (CLICKED_CREATE) {
-		CLICKED_CREATE = false;
-		if (newPage != null) {
-			newPage.style.display = "none";
-		}
-		setButtonText("newPageButton", "Create Page");
-		return;
+		closeNewPage(newPage);
 	}
-	CLICKED_CREATE = true;
-	setButtonText("newPageButton", "Close");
-	new Effect.Appear(newPage);
+	else {
+		CLICKED_CREATE = true;
+		setButtonText("newPageButton", "Close");
+		new Effect.Appear(newPage);
+	}
 }
 
 function changeFrameHeight(change) {
@@ -383,4 +380,16 @@ function setAsStartPageCallback(result) {
 		changePageTitleCallback(result);
 	}
 	window.location.href=window.location.href;
+}
+
+function closeNewPage(newPage) {
+	CLICKED_CREATE = false;
+	if (newPage != null) {
+		newPage.style.display = "none";
+	}
+	setButtonText("newPageButton", "New Page");
+}
+
+function managePageInfoComponents() {
+	removeStyleOptions();
 }

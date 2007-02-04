@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.18 2007/01/25 13:52:40 gediminas Exp $
+ * $Id: WebDAVCategories.java,v 1.19 2007/02/04 20:45:14 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -41,10 +41,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2007/01/25 13:52:40 $ by $Author: gediminas $
+ *  Last modified: $Date: 2007/02/04 20:45:14 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.19 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -80,8 +80,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	}
 	
 	protected void initializeComponent(FacesContext context) {
-		
-		getChildren().add(getEditContainer());
+		add(getEditContainer());
 	}
 
 	public void reset(){
@@ -148,12 +147,12 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 					//Checkbox
 					HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
 					setCategory(smc,categoryKey);
-					smc.setValue(new Boolean(true));
+					smc.setValue(Boolean.TRUE);
 					String id = getCategoryId()+count;
 	//				System.out.println("CATEGORY-COMPONENT-ID:"+id);
 					smc.setId(id);
 					if(this.resourcePath!=null){
-						smc.getAttributes().put(RESOURCE_PATH,this.resourcePath);
+						smc.getAttributes().put(RESOURCE_PATH, this.resourcePath);
 					}
 					categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					//Text
@@ -407,32 +406,49 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		saveCategoriesSettings(this.resourcePath,this);
 	}
 	
+	public static String getEnabledCategories(WebDAVCategories categoriesUi) {
+		StringBuffer categories = new StringBuffer(CategoryBean.CATEGORY_DELIMETER);
+		if (categoriesUi == null) {
+			return categories.toString();
+		}
+		CategoryBean categoryBean = CategoryBean.getInstance();
+		int categoriesCount = categoryBean.getCategories().size();
+		HtmlSelectBooleanCheckbox smc = null;
+		//int count = 0;
+		String categoryKey = "";
+		String checkId = null;
+		UIComponent parent = null;
+		for (int i = 0; i < categoriesCount; i++) {
+			categoryKey = "";
+			checkId = categoriesUi.getCategoryId(i);
+			parent = categoriesUi.getParent();
+			smc = (HtmlSelectBooleanCheckbox)parent.findComponent(checkId);
+			categoryKey = categoriesUi.getCategory(smc);
+			boolean bool = ((Boolean)smc.getValue()).booleanValue();
+			if(bool) {
+				categories.append(categoryKey).append(CategoryBean.CATEGORY_DELIMETER);
+			}
+		}
+		return categories.toString();
+	}
+	
 	public static void saveCategoriesSettings(String resourcePath, WebDAVCategories categoriesUi) {
 		if(resourcePath==null){
 			throw new RuntimeException("resourcePath is null");
 		}
 		//save the selection of categories to the article
-		//Build together the categories string
-		StringBuffer categories = new StringBuffer(CategoryBean.CATEGORY_DELIMETER);
 		CategoryBean categoryBean = CategoryBean.getInstance();
-		//Iterator iter = categoryBean.getCategories().iterator();
 		int categoriesCount = categoryBean.getCategories().size();
 		HtmlSelectBooleanCheckbox smc = null;
+		String checkId = null;
+		UIComponent parent = null;
 		int count = 0;
-		while(count<categoriesCount){
-		//while(iter.hasNext()) {
-			//String categoryKey = iter.next().toString();
-			String categoryKey = "";
-			String checkId=categoriesUi.getCategoryId(count++);
-			UIComponent parent = categoriesUi.getParent();
-			smc = (HtmlSelectBooleanCheckbox)parent.findComponent(checkId);//comp.getParent().findComponent(checkId);
-			categoryKey = categoriesUi.getCategory(smc);
-			boolean bool = ((Boolean)smc.getValue()).booleanValue();
-//			System.out.println("Category "+text+" was set to "+bool);
-			if(bool) {
-				categories.append(categoryKey).append(CategoryBean.CATEGORY_DELIMETER);
-			}
+		while(count < categoriesCount) {
+			checkId = categoriesUi.getCategoryId(count++);
+			parent = categoriesUi.getParent();
+			smc = (HtmlSelectBooleanCheckbox)parent.findComponent(checkId);
 		}
+		String categories = getEnabledCategories(categoriesUi);
 		if(smc!=null) {
 			//Store categories to file and folder
 			if(resourcePath == null) {

@@ -21,7 +21,8 @@ public class ContentItemFeedBean implements Serializable {
 	
 	public static final String FEED_TYPE_ATOM_1 = "atom_1.0";
 	public static final String FEED_TYPE_RSS_2 = "rss_2.0";
-	private static final String FEED_ENTRY_DESCRIPTION_TYPE = "text/html";
+	private static final String FEED_ENTRY_DESCRIPTION_TYPE = "html";
+	private static final String FEED_ENTRY_BODY_TYPE = "html";
 	
 	private volatile RSSBusiness rss = null;
 	
@@ -56,11 +57,11 @@ public class ContentItemFeedBean implements Serializable {
 	 * @param description
 	 * @return
 	 */
-	protected SyndFeed createFeed(String title, String uri, String description) {
+	private SyndFeed createFeed(String title, String uri, String description, String language, Timestamp date) {
 		if (rss == null) {
 			return null;
 		}
-		return rss.createNewFeed(title, uri, description, getFeedType());
+		return rss.createNewFeed(title, uri, description, getFeedType(), language, date);
 	}
 	
 	/**
@@ -76,19 +77,21 @@ public class ContentItemFeedBean implements Serializable {
 	 * @param categories
 	 * @return
 	 */
-	public SyndFeed createFeedWithEntry(String feedTitle, String url, String feedDescription, String title, Timestamp date,
-			String description, String author, String language, List<String> categories) {
+	private SyndFeed createFeedWithEntry(String feedTitle, String serverName, String feedDescription, String title, Timestamp created,
+			Timestamp published, String description, String body, String author, String language, List<String> categories,
+			String url) {
 		if (rss == null) {
 			return null;
 		}
 		
-		SyndFeed feed = createFeed(feedTitle, url, feedDescription);
+		SyndFeed feed = createFeed(feedTitle, serverName, feedDescription, language, created);
 		if (feed == null) {
 			return null;
 		}
 		
 		List<SyndEntry> entries = new ArrayList<SyndEntry>();
-		entries.add(rss.createNewEntry(title, url, date, FEED_ENTRY_DESCRIPTION_TYPE, description, author, language, categories));
+		entries.add(rss.createNewEntry(title, url, created, published, FEED_ENTRY_DESCRIPTION_TYPE, description, FEED_ENTRY_BODY_TYPE,
+				body, author, language, categories));
 		feed.setEntries(entries);
 		
 		return feed;
@@ -97,22 +100,26 @@ public class ContentItemFeedBean implements Serializable {
 	/**
 	 * 
 	 * @param feedTitle
-	 * @param uri
 	 * @param feedDescription
 	 * @param title
-	 * @param date
 	 * @param description
 	 * @param author
 	 * @param language
 	 * @param categories
+	 * @param url
+	 * @param created
+	 * @param published
+	 * @param body
 	 * @return
 	 */
-	public String getFeedEntryAsXML(String feedTitle, String url, String feedDescription, String title, Timestamp date,
-			String description, String author, String language, List<String> categories) {
+	public String getFeedEntryAsXML(String feedTitle, String serverName, String feedDescription, String title, Timestamp created,
+			Timestamp published, String description, String body, String author, String language, List<String> categories,
+			String url) {
 		if (rss == null) {
 			return null;
 		}
-		SyndFeed feed = createFeedWithEntry(feedTitle, url, feedDescription, title, date, description, author, language, categories);
+		SyndFeed feed = createFeedWithEntry(feedTitle, serverName, feedDescription, title, created, published, description, body,
+				author, language, categories, url);
 		if (feed == null) {
 			return null;
 		}
@@ -125,13 +132,18 @@ public class ContentItemFeedBean implements Serializable {
 			}
 		}
 		if (FEED_TYPE_RSS_2.equals(feed.getFeedType())) {
-			return rss.convertFeedToRSS2XMLString(feed);
+			try {
+				return rss.convertFeedToRSS2XMLString(feed);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+				return null;
+			}
 		}
 		
 		return null;
 	}
 	
-	public Document getFeedAsJDomDocument(SyndFeed feed) {
+	protected Document getFeedAsJDomDocument(SyndFeed feed) {
 		if (rss == null) {
 			return null;
 		}
