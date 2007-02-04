@@ -1,8 +1,6 @@
 package com.idega.content;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,17 +12,11 @@ import java.util.jar.JarFile;
 import org.jdom.Document;
 import org.jdom.Element;
 
-import com.idega.content.business.ContentUtil;
-import com.idega.content.themes.helpers.Setting;
-import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.content.tree.PageTemplate;
 import com.idega.content.tree.SiteTemplateStructure;
 import com.idega.core.cache.IWCacheManager2;
-import com.idega.idegaweb.DefaultIWBundle;
-import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
-import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWModuleLoader;
 import com.idega.idegaweb.JarLoader;
 

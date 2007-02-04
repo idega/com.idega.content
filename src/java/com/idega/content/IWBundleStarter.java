@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.14 2007/01/31 00:11:38 justinas Exp $
+ * $Id: IWBundleStarter.java,v 1.15 2007/02/04 23:58:29 laddi Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -14,17 +14,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.logging.Level;
-
-import javax.faces.context.FacesContext;
-
-//import org.directwebremoting.impl.DwrXmlConfigurator;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -34,36 +24,22 @@ import com.idega.content.themes.business.ThemesService;
 import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
-import com.idega.content.tree.PageTemplate;
-import com.idega.content.tree.SiteTemplateStructure;
 import com.idega.content.view.ContentViewManager;
-import com.idega.core.accesscontrol.data.LoginInfo;
-import com.idega.core.cache.IWCacheManager2;
 import com.idega.core.uri.IWActionURIManager;
 import com.idega.idegaweb.DefaultIWBundle;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWBundleStartable;
-import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
-import com.idega.idegaweb.IWModuleLoader;
-import com.idega.idegaweb.JarLoader;
 import com.idega.idegaweb.include.GlobalIncludeManager;
-import com.idega.presentation.PageTag;
 import com.idega.slide.business.IWSlideService;
-
-import javax.servlet.GenericServlet;
-import javax.servlet.ServletContext;
-
-import org.jdom.Document;
-import org.jdom.Element;
 
 /**
  * 
- *  Last modified: $Date: 2007/01/31 00:11:38 $ by $Author: justinas $
+ *  Last modified: $Date: 2007/02/04 23:58:29 $ by $Author: laddi $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 //public class IWBundleStarter implements IWBundleStartable, JarLoader {
 public class IWBundleStarter implements IWBundleStartable{
@@ -71,8 +47,6 @@ public class IWBundleStarter implements IWBundleStartable{
 	/**
 	 * 
 	 */
-	
-	private IWMainApplication iwma = null;
 	
 	public IWBundleStarter() {
 		super();

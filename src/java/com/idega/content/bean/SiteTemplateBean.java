@@ -1,10 +1,17 @@
 package com.idega.content.bean;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.faces.context.FacesContext;
+
+import org.apache.myfaces.custom.tree2.TreeNode;
 import org.jdom.Document;
-import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.apache.myfaces.custom.tree2.TreeNode;
 
 import com.idega.content.TemplatesLoader;
 import com.idega.content.themes.helpers.ThemesHelper;
@@ -13,16 +20,6 @@ import com.idega.core.cache.IWCacheManager2;
 import com.idega.core.data.IWTreeNode;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.webface.WFTreeNode;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.faces.context.FacesContext;
 
 public class SiteTemplateBean {
 // TO DO change IWTreeNode to PageTreeNode

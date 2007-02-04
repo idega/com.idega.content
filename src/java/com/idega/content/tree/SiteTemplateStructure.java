@@ -1,7 +1,6 @@
 package com.idega.content.tree;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class SiteTemplateStructure {
 
