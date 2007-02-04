@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.3.2.4 2007/01/25 11:53:32 gediminas Exp $
+ * $Id: CategoryBean.java,v 1.3.2.5 2007/02/04 20:13:27 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -39,10 +39,10 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2007/01/25 11:53:32 $ by $Author: gediminas $
+ *  Last modified: $Date: 2007/02/04 20:13:27 $ by $Author: laddi $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.3.2.4 $
+ * @version $Revision: 1.3.2.5 $
  */
 public class CategoryBean {
 	
@@ -55,7 +55,7 @@ public class CategoryBean {
 	private static final String CATEGORY_CONFIG_FILE = CATEGORY_CONFIG_PATH+"categories.prop";
 	private static final String CATEGORY_PROPERTIES_FILE = CATEGORY_CONFIG_PATH+"categories.strings";
 	private IWMainApplication iwma;
-	private WebDAVResourceBundle resourceBundle;
+	protected WebDAVResourceBundle resourceBundle;
 	
 	public static final String CATEGORY_DELIMETER = ",";
 
@@ -69,14 +69,14 @@ public class CategoryBean {
 		}
 	}
 
-	private class CategoriesMigrator {
+	protected class CategoriesMigrator {
 		private final String PROPERTY_NAME_CATEGORIES = new PropertyName("DAV","categories").toString();
 
 		private HashMap valuesToKeys;
 		private IWSlideSession session;
 		private IWSlideService service;
 		
-		private void migrate(Collection cats) {
+		protected void migrate(Collection cats) {
 			System.out.println("Migrating " + CATEGORY_CONFIG_FILE + " to new format at " + CATEGORY_PROPERTIES_FILE);
 			HashMap map = new HashMap();
 			valuesToKeys = new HashMap();
@@ -101,8 +101,6 @@ public class CategoryBean {
 				resource.deleteMethod();
 				*/
 			} catch (IBOLookupException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -266,7 +264,8 @@ public class CategoryBean {
 	}
 
 	private static final char[] LEAVE_AS_IS = {'1','2','3','4','5','6','7','8','9','0','-'};
-	private static String getCategoryKey(String category) {
+	
+	protected static String getCategoryKey(String category) {
 		return StringHandler.stripNonRomanCharacters(category, LEAVE_AS_IS).toLowerCase();
 	}
 
