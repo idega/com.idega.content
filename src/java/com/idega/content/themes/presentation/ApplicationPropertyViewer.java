@@ -9,6 +9,7 @@ import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.builder.data.ICPage;
+import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
@@ -174,5 +175,13 @@ public class ApplicationPropertyViewer extends Block {
 			component.attributes.put("onmouseout", "removeStyleProperty(this.id);");
 			component.setToolTip(ContentUtil.getBundle().getLocalizedString("double_click_to_edit"));
 		}
+	}
+	
+	public String getBuilderName(IWUserContext iwuc) {
+		String name = ContentUtil.getBundle().getComponentName(ApplicationPropertyViewer.class);
+		if (name == null || ThemesConstants.EMPTY.equals(name)) {
+			return "ApplicationPropertyViewer";
+		}
+		return name;
 	}
 }

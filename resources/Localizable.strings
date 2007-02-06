@@ -91,6 +91,7 @@ initial_version=INITIAL VERSION.
 is=Icelandic
 iw.component.com.idega.content.presentation.ContentViewer.name=ContentViewer
 iw.component.com.idega.content.presentation.WhatIsNew.name=WhatIsNew
+iw.component.com.idega.content.themes.presentation.ApplicationPropertyViewer.name=ApplicationPropertyViewer
 keywords=Keywords
 language=Language
 last_modified=Last modified
