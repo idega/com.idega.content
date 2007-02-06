@@ -1114,7 +1114,7 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		
-		String docContent = getArticleDocument(language, uri, iwc.getCurrentUser().getName(), iwc.getApplicationContext().getDomain());
+		String docContent = getArticleDocument(language, uri, iwc);
 		if (docContent == null) {
 			return;
 		}
@@ -1136,7 +1136,7 @@ public class ThemesHelper implements Singleton {
 		}
 	}
 	
-	private String getArticleDocument(String language, String uri, String user, ICDomain cachedDomain) {
+	private String getArticleDocument(String language, String uri, IWContext iwc) {
 		String article = getArticle();
 		StringBuffer summary = new StringBuffer();
 		if (article.length() >= 200) {
@@ -1146,17 +1146,14 @@ public class ThemesHelper implements Singleton {
 		else {
 			summary = new StringBuffer(article);
 		}
-		StringBuffer server = new StringBuffer(getWebRootWithoutContent());
-		if (cachedDomain != null) {
-			if (cachedDomain.getServerName() != null) {
-				server = new StringBuffer(cachedDomain.getServerName());
-			}
-		}
-		server.append("/pages");
-		StringBuffer link = new StringBuffer(server.toString());
+		String server = getFullServerName(iwc);
+		StringBuffer link = new StringBuffer(server);
+		link.append("/pages");
 		link.append(uri);
-		return getFeedBean().getFeedEntryAsXML(ThemesConstants.ARTICLE_TITLE, server.toString(), null, ThemesConstants.ARTICLE_TITLE,
-				new Timestamp(System.currentTimeMillis()), null, summary.toString(), article, user, language, null, link.toString());
+		String user = iwc.getCurrentUser().getName();
+		return getFeedBean().getFeedEntryAsXML(ThemesConstants.ARTICLE_TITLE, server, null, ThemesConstants.ARTICLE_TITLE,
+				new Timestamp(System.currentTimeMillis()), null, summary.toString(), article, user, language, null, link.toString(),
+				null, null);
 	}
 	
 	private void addIDsToModules(Element root, int pageID) {
@@ -1317,6 +1314,28 @@ public class ThemesHelper implements Singleton {
 		img.append(ThemesConstants.THEME_IMAGES.get(getRandomNumber(ThemesConstants.THEME_IMAGES.size())));
 		img.append("\" />");
 		return img.toString();
+	}
+	
+	public String getFullServerName(IWContext iwc) {
+		StringBuffer server = new StringBuffer();
+		if (iwc == null) {
+			return getWebRootWithoutContent();
+		}
+		else {
+			try {
+				ICDomain cachedDomain = iwc.getApplicationContext().getDomain();
+				if (cachedDomain == null) {
+					return getWebRootWithoutContent();
+				}
+				else {
+					server.append(cachedDomain.getServerProtocol()).append("://").append(cachedDomain.getServerName());
+				}
+			} catch (Exception e) {
+				log.error(e);
+				return getWebRootWithoutContent();
+			}
+		}
+		return server.toString();
 	}
 
 }

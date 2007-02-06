@@ -77,21 +77,21 @@ public class ContentItemFeedBean implements Serializable {
 	 * @param categories
 	 * @return
 	 */
-	private SyndFeed createFeedWithEntry(String feedTitle, String serverName, String feedDescription, String title, Timestamp created,
+	private SyndFeed createFeedWithEntry(String feedTitle, String serverName, String feedDescription, String title, Timestamp updated,
 			Timestamp published, String description, String body, String author, String language, List<String> categories,
-			String url) {
+			String url, String source, String comment) {
 		if (rss == null) {
 			return null;
 		}
 		
-		SyndFeed feed = createFeed(feedTitle, serverName, feedDescription, language, created);
+		SyndFeed feed = createFeed(feedTitle, serverName, feedDescription, language, updated);
 		if (feed == null) {
 			return null;
 		}
 		
 		List<SyndEntry> entries = new ArrayList<SyndEntry>();
-		entries.add(rss.createNewEntry(title, url, created, published, FEED_ENTRY_DESCRIPTION_TYPE, description, FEED_ENTRY_BODY_TYPE,
-				body, author, language, categories));
+		entries.add(rss.createNewEntry(title, url, updated, published, FEED_ENTRY_DESCRIPTION_TYPE, description, FEED_ENTRY_BODY_TYPE,
+				body, author, language, categories, source, comment));
 		feed.setEntries(entries);
 		
 		return feed;
@@ -107,19 +107,23 @@ public class ContentItemFeedBean implements Serializable {
 	 * @param language
 	 * @param categories
 	 * @param url
-	 * @param created
+	 * @param updated
 	 * @param published
 	 * @param body
 	 * @return
 	 */
-	public String getFeedEntryAsXML(String feedTitle, String serverName, String feedDescription, String title, Timestamp created,
+	public String getFeedEntryAsXML(String feedTitle, String serverName, String feedDescription, String title, Timestamp updated,
 			Timestamp published, String description, String body, String author, String language, List<String> categories,
-			String url) {
+			String url, String source, String comment) {
 		if (rss == null) {
 			return null;
 		}
-		SyndFeed feed = createFeedWithEntry(feedTitle, serverName, feedDescription, title, created, published, description, body,
-				author, language, categories, url);
+		if (updated == null) {
+			updated = new Timestamp(System.currentTimeMillis());
+		}
+
+		SyndFeed feed = createFeedWithEntry(feedTitle, serverName, feedDescription, title, updated, published, description, body,
+				author, language, categories, url, source, comment);
 		if (feed == null) {
 			return null;
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.25 2007/02/04 20:45:14 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.26 2007/02/06 01:32:37 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -34,16 +34,17 @@ import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.IWSlideConstants;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.IWTimestamp;
+import com.sun.syndication.io.impl.DateParser;
 
 /**
  * <p>
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2007/02/04 20:45:14 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/02/06 01:32:37 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.25 $
+ * @version $Revision: 1.26 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -606,20 +607,25 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 * @return String of SyndFeed xml if entry was successsfully added to feed, otherwise - null
 	 */
 	public String getFeedEntryAsXML(IWContext iwc, String feedTitle, String feedDescription,
-			String title, String description, String body, String author, List<String> categories) {
+			String title, String description, String body, String author, List<String> categories, String source, String comment) {
 		Timestamp published = getPublishedDate();
-		Timestamp created = getCreationDate();
-		StringBuffer serverName = null;
-		if (iwc == null) {
-			serverName = new StringBuffer(ThemesHelper.getInstance(false).getWebRootWithoutContent());
-		}
-		else {
-			serverName = new StringBuffer(iwc.getApplicationContext().getDomain().getServerName());
-		}
-		serverName.append("/pages");
+		Timestamp updated = getLastModifiedDate();
+		String server = ThemesHelper.getInstance(false).getFullServerName(iwc);
 		ContentItemFeedBean feedBean = new ContentItemFeedBean(iwc, ContentItemFeedBean.FEED_TYPE_ATOM_1);
-		return feedBean.getFeedEntryAsXML(feedTitle, serverName.toString(), feedDescription, title, created, published, description,
-				body, author, getLanguage(), categories, getResourcePath());
+		return feedBean.getFeedEntryAsXML(feedTitle, server, feedDescription, title, updated, published, description,
+				body, author, getLanguage(), categories, getResourcePath(), source, comment);
+	}
+	
+	@SuppressWarnings("finally")
+	public Timestamp getParsedDateFromFeed(String dateValue) {
+		Timestamp t = null;
+		try {
+			t = new Timestamp(DateParser.parseW3CDateTime(dateValue).getTime());
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			return t;
+		}
 	}
 	
 }
