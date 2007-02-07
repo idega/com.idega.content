@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.26 2007/02/06 01:32:37 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.27 2007/02/07 20:44:36 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -26,7 +27,11 @@ import org.apache.webdav.lib.util.WebdavStatus;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.core.builder.business.BuilderService;
+import com.idega.core.builder.data.ICPage;
+import com.idega.core.data.ICTreeNode;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
@@ -41,10 +46,10 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2007/02/06 01:32:37 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/02/07 20:44:36 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.26 $
+ * @version $Revision: 1.27 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -604,16 +609,22 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 * @param body
 	 * @param author
 	 * @param categories
+	 * @param source
+	 * @param comment
+	 * @param moduleClass
 	 * @return String of SyndFeed xml if entry was successsfully added to feed, otherwise - null
 	 */
-	public String getFeedEntryAsXML(IWContext iwc, String feedTitle, String feedDescription,
-			String title, String description, String body, String author, List<String> categories, String source, String comment) {
+	public String getFeedEntryAsXML(IWContext iwc, String feedTitle, String feedDescription, String title, String description,
+			String body, String author, List<String> categories, String source, String comment, String moduleClass) {
 		Timestamp published = getPublishedDate();
 		Timestamp updated = getLastModifiedDate();
 		String server = ThemesHelper.getInstance(false).getFullServerName(iwc);
+		StringBuffer articleURL = new StringBuffer(server);
+		articleURL.append(getPageUrlByArticleResourcePath(iwc, moduleClass));
+		
 		ContentItemFeedBean feedBean = new ContentItemFeedBean(iwc, ContentItemFeedBean.FEED_TYPE_ATOM_1);
 		return feedBean.getFeedEntryAsXML(feedTitle, server, feedDescription, title, updated, published, description,
-				body, author, getLanguage(), categories, getResourcePath(), source, comment);
+				body, author, getLanguage(), categories, articleURL.toString(), source, comment);
 	}
 	
 	@SuppressWarnings("finally")
@@ -626,6 +637,82 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		} finally {
 			return t;
 		}
+	}
+	
+	private String getPageUrlByArticleResourcePath(IWContext iwc, String moduleClass) {
+		if (iwc == null) {
+			return getDefaultPageUrlByArticleResourcePath();
+		}
+		BuilderService builder = ThemesHelper.getInstance().getThemesService().getBuilderService();
+		if (builder == null) {
+			return getDefaultPageUrlByArticleResourcePath();
+		}
+		Map tree = builder.getTree(iwc);
+		if (tree == null) {
+			return getDefaultPageUrlByArticleResourcePath();
+		}
+		Object o = null;
+		String pageID = null;
+		List<String> moduleIds = null;
+		String propertyName = "resourcePath";
+		String propertyValue = getPathAppliedForSearch();
+		if (propertyValue == null) {
+			return getDefaultPageUrlByArticleResourcePath();
+		}
+		for (Iterator it = tree.values().iterator(); it.hasNext();) {
+			o = it.next();
+			if (o instanceof ICTreeNode) {
+				pageID = ((ICTreeNode) o).getId();
+				ICPage page = ThemesHelper.getInstance().getThemesService().getICPage(Integer.valueOf(pageID));
+				if (page != null) {
+					if (page.isPage() && !page.getDeleted()) {
+						if (ThemesConstants.ARTICLE_PAGE_TYPE.equals(page.getSubType())) {
+							moduleIds = builder.getModuleId(pageID, moduleClass);
+							if (moduleIds != null) {
+								for (int i = 0; i < moduleIds.size(); i++) {
+									if (builder.isPropertyValueSet(pageID, moduleIds.get(i), propertyName, propertyValue)) {
+										return "/pages" + page.getDefaultPageURI();
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return getDefaultPageUrlByArticleResourcePath();
+	}
+	
+	private String getDefaultPageUrlByArticleResourcePath () {
+		String realPath = getResourcePath();
+		if (realPath == null) {
+			return "/pages";
+		}
+		realPath = realPath.substring(0, realPath.lastIndexOf(ThemesConstants.SLASH));
+		StringBuffer defaultPath = new StringBuffer("/idegaweb/action/preview/article");
+		defaultPath.append(realPath);
+		return defaultPath.toString();
+	}
+	
+	private String getPathAppliedForSearch() {
+		String realPath = getResourcePath();
+		if (realPath == null) {
+			return null;
+		}
+		String[] pathParts = realPath.split(ThemesConstants.SLASH);
+		if (pathParts == null) {
+			return getResourcePath();
+		}
+		if (pathParts.length == 0) {
+			return getResourcePath();
+		}
+		StringBuffer appliedPath = new StringBuffer();
+		for (int i = 0; i + 1 < pathParts.length; i++) {
+			if (ThemesConstants.CONTENT.indexOf(pathParts[i]) == -1) {
+				appliedPath.append(ThemesConstants.SLASH).append(pathParts[i]);
+			}
+		}
+		return appliedPath.toString();
 	}
 	
 }

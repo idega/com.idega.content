@@ -18,7 +18,7 @@ public class ThemesConstants {
 	public static final String TOOLBAR = "toolbar";
 	public static final String BREADCRUMB = "breadcrumbcontainer";
 	
-	protected static final String XML_EXTENSION = "xml";
+	public static final String XML_EXTENSION = "xml";
 	
 	private static final String BASE_ROOT_APPL = ContentUtil.getBundle().getResourcesPath();
 	protected static final String BASE_ROOT_SLIDE = ContentUtil.getContentBaseFolderPath();
@@ -180,4 +180,8 @@ public class ThemesConstants {
 	
 	//public static final String DEFAULT_THEME = ContentUtil.getBundle().getLocalizedString("theme_is_used");
 	//public static final String NOT_DEFAULT_THEME = ContentUtil.getBundle().getLocalizedString("theme_is_not_used");
+	
+	public static final String ARTICLE_PAGE_TYPE = "text";
+	
+	protected static final String XML_MIME_TYPE = "text/" + ThemesConstants.XML_EXTENSION;
 }

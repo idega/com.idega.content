@@ -26,6 +26,7 @@ import java.util.TreeMap;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
+import javax.faces.context.FacesContext;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpURL;
@@ -36,6 +37,7 @@ import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.xml.sax.EntityResolver;
 
@@ -99,12 +101,10 @@ public class ThemesHelper implements Singleton {
 	private String webRoot;
 	private String lastVisitedPage;
 	
-	private static final String RESOURCE_PATH_START = ThemesConstants.BASE_ROOT_SLIDE + "/article/" + ThemesConstants.IDEGA_THEME + ThemesConstants.DOT;
+	private static final String RESOURCE_PATH_START = ThemesConstants.BASE_ROOT_SLIDE + "/article";
 	private static final String RESOURCE_PATH_END = ThemesConstants.DOT + "article";
-	private static final String ARTICLE_PAGE_TYPE = "text";
 	private static final String ATTRIBUTE_NAME = "property";
 	private static final String ATTRIBUTE_PROPERTY = "value";
-	private static final String XML_MIME_TYPE = "text/" + ThemesConstants.XML_EXTENSION;
 	
 	private Random numberGenerator = null;
 	
@@ -188,11 +188,18 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	protected IWSlideService getSlideService() {
+		return getSlideService(null);
+	}
+	
+	protected IWSlideService getSlideService(IWContext iwc) {
 		if (service == null) {
 			synchronized (ThemesHelper.class) {
+				if (iwc == null) {
+					iwc = getIWContext();
+				}
 				if (service == null) {
 					try {
-						service = (IWSlideService) IBOLookup.getServiceInstance(IWContext.getInstance(), IWSlideService.class);
+						service = (IWSlideService) IBOLookup.getServiceInstance(iwc, IWSlideService.class);
 					} catch (IBOLookupException e) {
 						log.error(e);
 					}
@@ -729,7 +736,7 @@ public class ThemesHelper implements Singleton {
 		if (themesService == null) {
 			synchronized (ThemesHelper.class) {
 				try {
-					themesService = (ThemesService) IBOLookup.getServiceInstance(IWContext.getInstance(), ThemesService.class);
+					themesService = (ThemesService) IBOLookup.getServiceInstance(getIWContext(), ThemesService.class);
 				} catch (IBOLookupException e) {
 					log.error(e);
 				}
@@ -862,7 +869,7 @@ public class ThemesHelper implements Singleton {
 		if (themesEngine == null) {
 			synchronized (ThemesHelper.class) {
 				try {
-					themesEngine = (ThemesEngine) IBOLookup.getServiceInstance(IWContext.getInstance(), ThemesEngine.class);
+					themesEngine = (ThemesEngine) IBOLookup.getServiceInstance(getIWContext(), ThemesEngine.class);
 				} catch (IBOLookupException e) {
 					log.error(e);
 				}
@@ -931,27 +938,20 @@ public class ThemesHelper implements Singleton {
 		return settings.getProperty(ThemesConstants.LAST_USED_THEME);
 	}
 	
-	private Document preparePageDocument(Document doc, String type, String uri, int pageID) {
-		if (ARTICLE_PAGE_TYPE.equals(type)) {
-			if (uri.startsWith(ThemesConstants.SLASH)) {
-				uri = extractValueFromString(uri, uri.indexOf(ThemesConstants.SLASH), uri.length());
-			}
-			if (uri.endsWith(ThemesConstants.SLASH)) {
-				uri = extractValueFromString(uri, 0, uri.lastIndexOf(ThemesConstants.SLASH) - 1);
-			}
-			Iterator it = doc.getDescendants();
+	private Document preparePageDocument(Document doc, String type, String articlePath, int pageID) {
+		if (ThemesConstants.ARTICLE_PAGE_TYPE.equals(type) && articlePath != null && !ThemesConstants.MINUS_ONE.equals(articlePath)) {
 			Object o = null;
 			Element e = null;
 			Attribute a = null;
 			boolean changedValue = false;
-			while (it.hasNext() && !changedValue) {
+			for (Iterator it = doc.getDescendants(); (it.hasNext() && !changedValue);) {
 				o = it.next();
 				if (o instanceof Element) {
 					e = (Element) o;
-					if (e.getName().equals(ATTRIBUTE_NAME)) {
+					if (ATTRIBUTE_NAME.equals(e.getName())) {
 						a = e.getAttribute(ATTRIBUTE_PROPERTY);
 						if (a != null) {
-							a.setValue(RESOURCE_PATH_START + uri + pageID + RESOURCE_PATH_END);
+							a.setValue(articlePath);
 							changedValue = true;
 						}
 					}
@@ -962,10 +962,10 @@ public class ThemesHelper implements Singleton {
 		return doc;
 	}
 	
-	private String getPageDocument(String type, String uri, String fileName, int pageID) {
+	private String getPageDocument(String type, String articlePath, String fileName, int pageID) {
 		Document doc = pages.get(type);
 		if (doc != null) {
-			doc = preparePageDocument(doc, type, uri, pageID);
+			doc = preparePageDocument(doc, type, articlePath, pageID);
 			return getThemeChanger().getXMLOutputter().outputString(doc);
 		}
 		doc = getXMLDocument(getWebRootWithoutContent() + ThemesConstants.PAGES_PATH_APPL + fileName);
@@ -973,11 +973,11 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		pages.put(type, doc);
-		doc = preparePageDocument(doc, type, uri, pageID);
+		doc = preparePageDocument(doc, type, articlePath, pageID);
 		return getThemeChanger().getXMLOutputter().outputString(doc);
 	}
 	
-	public String loadPageToSlide(String type, int pageID, String fileName) {
+	public String loadPageToSlide(String type, String fileName, String articlePath, int pageID) {
 		if (type == null || fileName == null) {
 			return null;
 		}
@@ -987,7 +987,7 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		
-		String docContent = getPageDocument(type, page.getDefaultPageURI(), fileName, pageID);
+		String docContent = getPageDocument(type, articlePath, fileName, pageID);
 		if (docContent == null) {
 			return null;
 		}
@@ -1000,7 +1000,7 @@ public class ThemesHelper implements Singleton {
 		String changedFileName = extractValueFromString(fullUrl, fullUrl.lastIndexOf(ThemesConstants.SLASH) + 1, fullUrl.length());
 
 		try {
-			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, changedFileName, docContent, XML_MIME_TYPE, true);
+			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, changedFileName, docContent, ThemesConstants.XML_MIME_TYPE, true);
 		} catch (RemoteException e) {
 			log.error(e);
 		}
@@ -1081,29 +1081,29 @@ public class ThemesHelper implements Singleton {
 		}
 	}
 	
-	public void createArticle(String type, int id) {
+	public String createArticle(String type, int id) {
 		if (type == null) {
-			return;
+			return null;
 		}
 		if (id == -1) {
-			return;
+			return null;
 		}
-		if (!ARTICLE_PAGE_TYPE.equals(type)) {
-			return;
+		if (!ThemesConstants.ARTICLE_PAGE_TYPE.equals(type)) {
+			return ThemesConstants.MINUS_ONE;
 		}
 		
 		ICPage page = getThemesService().getICPage(id);
 		if (page == null) {
-			return;
+			return null;
 		}
 		String uri = page.getDefaultPageURI();
 		if (uri == null) {
-			return;
+			return null;
 		}
 		
-		IWContext iwc = IWContext.getInstance();
+		IWContext iwc = getIWContext();
 		if (iwc == null) {
-			return;
+			return null;
 		}
 		
 		String language = "en";
@@ -1114,25 +1114,25 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		
-		String docContent = getArticleDocument(language, uri, iwc);
-		if (docContent == null) {
-			return;
+		String article = getArticleDocument(language, uri, iwc);
+		if (article == null) {
+			return null;
 		}
-		
-		if (uri.startsWith(ThemesConstants.SLASH)) {
-			uri = extractValueFromString(uri, uri.indexOf(ThemesConstants.SLASH), uri.length());
-		}
+
 		if (uri.endsWith(ThemesConstants.SLASH)) {
-			uri = extractValueFromString(uri, 0, uri.lastIndexOf(ThemesConstants.SLASH) - 1);
+			uri = extractValueFromString(uri, 0, uri.lastIndexOf(ThemesConstants.SLASH));
 		}
-		uri += id;
-		
-		String fileName = language + ThemesConstants.DOT + ThemesConstants.XML_EXTENSION;
-		String base = RESOURCE_PATH_START + uri + RESOURCE_PATH_END + ThemesConstants.SLASH;
+
+		StringBuffer file = new StringBuffer(language);
+		file.append(ThemesConstants.DOT).append(ThemesConstants.XML_EXTENSION);
+		StringBuffer base = new StringBuffer(RESOURCE_PATH_START);
+		base.append(uri).append(RESOURCE_PATH_END).append(ThemesConstants.SLASH);
 		try {
-			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, fileName, docContent, XML_MIME_TYPE, true);
+			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base.toString(), file.toString(), article, ThemesConstants.XML_MIME_TYPE, true);
+			return base.toString();
 		} catch (RemoteException e) {
 			log.error(e);
+			return null;
 		}
 	}
 	
@@ -1336,6 +1336,58 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		return server.toString();
+	}
+	
+	public boolean setNewLinkInArticleFile(IWContext iwc, String link, String language, String baseDirectory, String pageUri) {
+		if (iwc == null || link == null || language == null || baseDirectory == null || pageUri == null) {
+			return false;
+		}
+		
+		StringBuffer fileName = new StringBuffer(language).append(ThemesConstants.DOT).append(ThemesConstants.XML_EXTENSION);
+		StringBuffer articleLink = new StringBuffer(link).append(fileName.toString());
+		Document d = getXMLDocument(articleLink.toString());
+		if (d == null) {
+			return false;
+		}
+		Element root = d.getRootElement();
+		Namespace atom = Namespace.getNamespace("http://www.w3.org/2005/Atom");
+		Element entry = root.getChild("entry", atom);
+		if (entry == null) {
+			return false;
+		}
+		Element linkToPage = entry.getChild("link", atom);
+		if (linkToPage == null) {
+			return false;
+		}
+		Attribute href = linkToPage.getAttribute("href");
+		if (href == null) {
+			return false;
+		}
+		StringBuffer newLink = new StringBuffer(getFullServerName(iwc)).append("/pages").append(pageUri);
+		href.setValue(newLink.toString());
+		Element id = entry.getChild("id", atom);
+		if (id != null) {
+			id.setText(newLink.toString());
+		}
+		try {
+			getSlideService(iwc).uploadFileAndCreateFoldersFromStringAsRoot(baseDirectory, fileName.toString(), getThemeChanger().getXMLOutputter().outputString(d), ThemesConstants.XML_MIME_TYPE, true);
+		} catch (RemoteException e) {
+			log.error(e);
+			return false;
+		}
+		return true;
+	}
+	
+	public IWContext getIWContext() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		if (context == null) {
+			return null;
+		}
+		IWContext iwc = IWContext.getIWContext(context);
+		if (iwc == null) {
+			return null;
+		}
+		return iwc;
 	}
 
 }

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ejb.FinderException;
-import javax.faces.context.FacesContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -74,14 +73,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		if (theme.getIBPageID() == -1) {
 			return true;
 		}
-		FacesContext context = FacesContext.getCurrentInstance();
-		IWContext iwc = null;
-		if (context != null) {
-			iwc = IWContext.getIWContext(context);
-		}
-		else {
-			iwc = IWContext.getInstance();
-		}
+		IWContext iwc = ThemesHelper.getInstance(false).getIWContext();
 		int userID = -1;
 		if (iwc != null) {
 			userID = iwc.getCurrentUserId();
@@ -110,15 +102,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		if (pageID == null) {
 			return false;
 		}
-		
-		FacesContext context = FacesContext.getCurrentInstance();
-		IWContext iwc = null;
-		if (context != null) {
-			iwc = IWContext.getIWContext(context);
-		}
-		else {
-			iwc = IWContext.getInstance();
-		}
+
+		IWContext iwc = ThemesHelper.getInstance(false).getIWContext();
 		
 		if (iwc == null) {
 			return false;
@@ -165,7 +150,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			return false;
 		}
 		int id = -1;
-		IWContext iwc = IWContext.getInstance();
+		IWContext iwc = ThemesHelper.getInstance(false).getIWContext();
 		if (iwc == null) {
 			return false;
 		}
@@ -210,7 +195,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	}
 	
 	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) {
-		IWContext iwc = IWContext.getInstance();
+		IWContext iwc = ThemesHelper.getInstance(false).getIWContext();
 		if (iwc == null) {
 			return -1;
 		}

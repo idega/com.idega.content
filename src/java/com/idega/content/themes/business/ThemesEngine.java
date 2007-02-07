@@ -145,4 +145,10 @@ public interface ThemesEngine extends IBOService {
 	 * @see com.idega.content.themes.business.ThemesEngineBean#applyMultipleChangesToTheme
 	 */
 	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes, String themeName);
+	
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#setNewLinkInArticleFile
+	 */
+	public boolean setNewLinkInArticleFile(String pageKey, String moduleClass, String pageUri);
+	
 }

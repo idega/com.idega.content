@@ -26,6 +26,7 @@ import com.idega.core.builder.data.CachedDomain;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.data.ICTreeNode;
+import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.data.TreeableEntity;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
@@ -140,7 +141,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	 * 
 	 */
 	public boolean setSelectedStyle(String themeID, String pageID, boolean applyToPage) {
-		IWContext iwc = IWContext.getInstance();
+		IWContext iwc = helper.getIWContext();
 		if (iwc == null) {
 			return false;
 		}
@@ -188,10 +189,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (tree == null) {
 			return false;
 		}
-		Iterator it = tree.values().iterator();
 		Object o = null;
 		boolean result = true;
-		while (it.hasNext()) {
+		for (Iterator it = tree.values().iterator(); it.hasNext();) {
 			o = it.next();
 			if (o instanceof ICTreeNode) {
 				result = setPageStyle(((ICTreeNode) o).getId(), templateID, iwc);
@@ -208,7 +208,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		}
 		
-		IWContext iwc = IWContext.getInstance();
+		IWContext iwc = helper.getIWContext();
 		if (iwc == null) {
 			return false;
 		}
@@ -231,6 +231,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		ICPage page = helper.getThemesService().getICPage(Integer.valueOf(pageID).intValue());
+		if (page == null) {
+			return null;
+		}
 		if (pageTitle.equals(page.getDefaultPageURI())) {
 			return null;
 		}
@@ -254,9 +257,65 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		if (helper.getThemesService().getBuilderService().changePageUriByTitle(parentId, page, pageTitle, domain.getID())) {
+			if (ThemesConstants.ARTICLE_PAGE_TYPE.equals(page.getSubType())) {
+				setNewLinkInArticleFile(page.getId(),"com.idega.block.article.component.ArticleItemViewer", page.getDefaultPageURI());
+			}
 			return page.getDefaultPageURI();
 		}
 		return null;
+	}
+	
+	public boolean setNewLinkInArticleFile(String pageKey, String moduleClass, String pageUri) {
+		if (pageKey == null || moduleClass == null || pageUri == null) {
+			return false;
+		}
+		
+		BuilderService builder = helper.getThemesService().getBuilderService();
+		if (builder == null) {
+			return false;
+		}
+		IWContext iwc = helper.getIWContext();
+		if (iwc == null) {
+			return false;
+		}
+		List<String> moduleIds = builder.getModuleId(pageKey, moduleClass);
+		if (moduleIds == null) {
+			return false;
+		}
+		String propertyName = "resourcePath";
+		String[] linkToArticle = null;
+		for (int i = 0; i < moduleIds.size(); i++) {
+			linkToArticle = builder.getPropertyValues(iwc.getIWMainApplication(), pageKey, moduleIds.get(i), propertyName, null, false);
+		}
+		if (linkToArticle == null) {
+			return false;
+		}
+		if (linkToArticle.length == 0) {
+			return false;
+		}
+		
+		List locales = ICLocaleBusiness.getListOfLocalesJAVA();
+		if (locales == null) {
+			return false;
+		}
+		StringBuffer link = new StringBuffer(helper.getFullWebRoot()).append(linkToArticle[0]);
+		if (!link.toString().endsWith(ThemesConstants.SLASH)) {
+			link.append(ThemesConstants.SLASH);
+		}
+		Locale l = null;
+		Object o = null;
+		boolean result = true;
+		for (int i = 0; i < locales.size(); i++) {
+			o = locales.get(i);
+			if (o instanceof Locale) {
+				l = (Locale) o;
+				if (l.getLanguage() != null) {
+					result = helper.setNewLinkInArticleFile(iwc, link.toString(), l.getLanguage(), linkToArticle[0], pageUri);
+				}
+			}
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -269,7 +328,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (keywords.length != values.length) {
 			return null;
 		}
-		IWContext iwc = IWContext.getInstance();
+		IWContext iwc = helper.getIWContext();
 		if (iwc == null) {
 			return null;
 		}
@@ -330,7 +389,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (ThemesConstants.MINUS_ONE.equals(pageID)) {
 			return null;
 		}
-		IWContext iwc = IWContext.getInstance();
+		IWContext iwc = helper.getIWContext();
 		if (iwc == null) {
 			return null;
 		}
@@ -505,7 +564,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		}
 		
-		IWContext iwc = IWContext.getInstance();
+		IWContext iwc = helper.getIWContext();
 		if (iwc == null) {
 			return false;
 		}
@@ -547,7 +606,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	public List <String> beforeCreatePage(List <TreeNodeStructure> struct, Boolean isFirst){
+	public List <String> beforeCreatePage(List <TreeNodeStructure> struct, Boolean isTopLevelPage){
 		List <String> newIds = new ArrayList<String>();
 		
 		BuilderService builder = helper.getThemesService().getBuilderService();
@@ -581,10 +640,13 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			}
 			
 			pageID = createPage(node.getParentId(), node.getNodeName(), pageType, null, uri, node.getPageType(), domainID, format, null);
+			if (pageID < 0) { // Error
+				break;
+			}
 			realID = String.valueOf(pageID);
 			
-			if (domain != null){
-				if((domain.getStartPage() == null) && (isFirst)){
+			if (domain != null) {
+				if ((domain.getStartPage() == null) && (isTopLevelPage)) { // Marking page as top level page
 					domain.setIBPage(helper.getThemesService().getICPage(pageID));
 					domain.store();
 				}					
@@ -601,11 +663,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			isRootPage = false;
 
 			if (!ThemesConstants.EMPTY.equals(node.getTemplateFile())) {
-				uriToPage = helper.loadPageToSlide(node.getPageType(), pageID, node.getTemplateFile());
+				String articlePath = helper.createArticle(node.getPageType(), pageID);
+				uriToPage = helper.loadPageToSlide(node.getPageType(), node.getTemplateFile(), articlePath, pageID);
 				if (uriToPage != null) {
 					helper.getThemesService().updatePageWebDav(pageID, uriToPage);
 				}
-				helper.createArticle(node.getPageType(), pageID);
 				lastTheme = helper.getLastUsedTheme();
 				if (lastTheme != null) {
 					helper.getThemesService().getBuilderService().setTemplateId(realID, lastTheme);
@@ -704,9 +766,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	public boolean movePage(int newParentId, int nodeId) {
-		IWContext iwc = IWContext.getInstance();
-		
-		log.info("movePage called: "+newParentId+" nodeId: "+nodeId);
+		IWContext iwc = helper.getIWContext();
 		if (iwc == null) {
 			return false;
 		}
@@ -770,7 +830,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return null;
 		}
 		
-		IWContext iwc = IWContext.getInstance();
+		IWContext iwc = helper.getIWContext();
 		if (iwc == null) {
 			return null;
 		}
