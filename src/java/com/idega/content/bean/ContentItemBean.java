@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.27 2007/02/07 20:44:36 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.28 2007/02/08 19:38:28 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -27,6 +27,7 @@ import org.apache.webdav.lib.util.WebdavStatus;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.builder.business.BuilderService;
@@ -46,10 +47,10 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2007/02/07 20:44:36 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/02/08 19:38:28 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.28 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -671,7 +672,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 							if (moduleIds != null) {
 								for (int i = 0; i < moduleIds.size(); i++) {
 									if (builder.isPropertyValueSet(pageID, moduleIds.get(i), propertyName, propertyValue)) {
-										return "/pages" + page.getDefaultPageURI();
+										return ContentConstants.PAGES_START_URI + page.getDefaultPageURI();
 									}
 								}
 							}
@@ -686,9 +687,9 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	private String getDefaultPageUrlByArticleResourcePath () {
 		String realPath = getResourcePath();
 		if (realPath == null) {
-			return "/pages";
+			return ContentConstants.PAGES_START_URI;
 		}
-		realPath = realPath.substring(0, realPath.lastIndexOf(ThemesConstants.SLASH));
+		realPath = realPath.substring(0, realPath.lastIndexOf(ContentConstants.SLASH));
 		StringBuffer defaultPath = new StringBuffer("/idegaweb/action/preview/article");
 		defaultPath.append(realPath);
 		return defaultPath.toString();
@@ -699,7 +700,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		if (realPath == null) {
 			return null;
 		}
-		String[] pathParts = realPath.split(ThemesConstants.SLASH);
+		String[] pathParts = realPath.split(ContentConstants.SLASH);
 		if (pathParts == null) {
 			return getResourcePath();
 		}
@@ -708,8 +709,8 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		}
 		StringBuffer appliedPath = new StringBuffer();
 		for (int i = 0; i + 1 < pathParts.length; i++) {
-			if (ThemesConstants.CONTENT.indexOf(pathParts[i]) == -1) {
-				appliedPath.append(ThemesConstants.SLASH).append(pathParts[i]);
+			if (ContentConstants.CONTENT.indexOf(pathParts[i]) == -1) {
+				appliedPath.append(ContentConstants.SLASH).append(pathParts[i]);
 			}
 		}
 		return appliedPath.toString();

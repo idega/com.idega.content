@@ -25,6 +25,7 @@ import org.jdom.Text;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+import com.idega.content.business.ContentConstants;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 
@@ -122,7 +123,7 @@ public class ThemeChanger {
 		Element head = root.getChild(HTML_HEAD, namespace);
 		
 		// Removing needles content (like "%pathto")
-		if (!proceedHeadContent(ThemesConstants.CONTENT + theme.getLinkToBase(), head)) {
+		if (!proceedHeadContent(ContentConstants.CONTENT + theme.getLinkToBase(), head)) {
 			return false;
 		}
 		
@@ -136,7 +137,7 @@ public class ThemeChanger {
 		// Adding enabled styles
 		List <ThemeStyleGroupMember> members = getEnabledStyles(theme);
 		for (int i = 0; i < members.size(); i++) {
-			head.addContent(index, getNewStyleElement(ThemesConstants.CONTENT + theme.getLinkToBase(), members.get(i)));
+			head.addContent(index, getNewStyleElement(ContentConstants.CONTENT + theme.getLinkToBase(), members.get(i)));
 			index++;
 		}
 		
@@ -182,7 +183,7 @@ public class ThemeChanger {
 		// Constructing correct path to images folder
 		StringBuffer replacement = new StringBuffer();
 		replacement.append(CSS_IMAGE_URL);
-		replacement.append(ThemesConstants.CONTENT);
+		replacement.append(ContentConstants.CONTENT);
 		replacement.append(theme.getLinkToBase());
 		replacement.append(IMAGES);
 		
@@ -213,7 +214,7 @@ public class ThemeChanger {
 	private boolean prepareThemeDefaultStyleFiles(Theme theme) {
 		List <String> defaultStyles = ThemesConstants.DEFAULT_STYLE_FILES;
 		StringBuffer replacement = new StringBuffer();
-		replacement.append(CSS_IMAGE_URL).append(ThemesConstants.CONTENT).append(theme.getLinkToBase()).append(IMAGES);
+		replacement.append(CSS_IMAGE_URL).append(ContentConstants.CONTENT).append(theme.getLinkToBase()).append(IMAGES);
 		Replaces[] r = new Replaces[]{getReplace(HREF_REPLACE, HREF_REPLACEMENT), getReplace(IMAGE_URL_REPLACE,
 				replacement.toString())};	
 		for (int i = 0; i < defaultStyles.size(); i++) {
@@ -856,7 +857,7 @@ public class ThemeChanger {
 		if (root == null) {
 			return null;
 		}
-		if (!changeThemeStyle(ThemesConstants.CONTENT + theme.getLinkToBase(), root.getChild(HTML_HEAD, namespace), oldStyle,
+		if (!changeThemeStyle(ContentConstants.CONTENT + theme.getLinkToBase(), root.getChild(HTML_HEAD, namespace), oldStyle,
 				newStyle)) {
 			return null;
 		}
@@ -1181,12 +1182,12 @@ public class ThemeChanger {
 			return false;
 		}
 		String linkToBase = helper.getLinkToBase(linkToTheme);
-		if (!linkToBase.endsWith(ThemesConstants.SLASH)) {
-			linkToBase += ThemesConstants.SLASH;
+		if (!linkToBase.endsWith(ContentConstants.SLASH)) {
+			linkToBase += ContentConstants.SLASH;
 		}
 		String decodedLinkToBase = helper.decodeUrl(linkToBase);
-		if (!decodedLinkToBase.endsWith(ThemesConstants.SLASH)) {
-			decodedLinkToBase += ThemesConstants.SLASH;
+		if (!decodedLinkToBase.endsWith(ContentConstants.SLASH)) {
+			decodedLinkToBase += ContentConstants.SLASH;
 		}
 		String themeName = helper.removeSpaces(newName + ThemesConstants.THEME);
 		try {
@@ -1220,8 +1221,8 @@ public class ThemeChanger {
 		}
 		String endodedLinkToPreview = helper.encode(linkToPreview, true);
 		linkToBase = child.getLinkToBase();
-		if (!linkToBase.endsWith(ThemesConstants.SLASH)) {
-			linkToBase += ThemesConstants.SLASH;
+		if (!linkToBase.endsWith(ContentConstants.SLASH)) {
+			linkToBase += ContentConstants.SLASH;
 		}
 		is = helper.getInputStream(helper.getFullWebRoot() + linkToBase + endodedLinkToPreview);
 		if (is == null) {

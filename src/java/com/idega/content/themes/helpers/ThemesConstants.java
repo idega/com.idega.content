@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 
 public class ThemesConstants {
@@ -150,15 +151,13 @@ public class ThemesConstants {
 	public static final String THEMES_PROPERTY_START = "theme.";
 	public static final String THEMES_PROPERTY_END = ".def";
 	
-	public static final String CONTENT = "/content";
 	public static final String THEMES_PATH = BASE_ROOT_SLIDE + THEMES;
-	public static final String PAGES_PATH_SLIDE = BASE_ROOT_SLIDE + "/pages/";
+	public static final String PAGES_PATH_SLIDE = BASE_ROOT_SLIDE + ContentConstants.PAGES_START_URI + ContentConstants.SLASH;
 	public static final String THEMES_PREVIEW_PATH = THEMES_PATH + "preview/";
 	
 	public static final String AT = "@";
 	public static final String EMPTY = "";
 	public static final String SEMICOLON = ";";
-	public static final String SLASH = "/";
 	public static final String COMMA = ",";
 	
 	public static final String THEME_SETTINGS = "resources/themes/theme.xml";

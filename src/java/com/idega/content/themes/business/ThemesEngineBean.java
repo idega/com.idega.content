@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.idega.business.IBOServiceBean;
+import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.Theme;
@@ -42,6 +43,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	private static final String PAGE_TITLE = "pageTitle";
 	private static final String PATH_TO_IMAGE_FOLDER = ContentUtil.getBundle().getResourcesPath() + "/images/pageIcons/";
 	
+	private static final String ARTICLE_VIEWER_TEMPLATE_KEY = "article_viewer_page_key";
+	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 
 	/**
@@ -60,7 +63,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		Theme theme = null;
 		String webRoot = helper.getFullWebRoot();
 		
-		String used = "This theme is set as default";
+		String used = "This theme is set as default"; // TODO: make localizable
 		String free = "This theme is not default";
 		for (int i = 0; i < themes.size(); i++) {
 			theme = themes.get(i);
@@ -158,7 +161,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		helper.setLastUsedTheme(theme.getIBPageID());
 		
 		if (applyToPage) { // Apply style to selected page
-			result = setPageStyle(pageID, theme.getIBPageID(), iwc);
+			result = setPageStyle(pageID, theme.getIBPageID(), iwc, null);
 		}
 		else { // Apply style to all pages
 			result = setSiteStyle(theme.getIBPageID(), iwc);
@@ -167,16 +170,44 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return result;
 	}
 	
-	private boolean setPageStyle(String pageID, int templateID, IWContext iwc) {
+	private boolean setPageStyle(String pageID, int templateID, IWContext iwc, ICDomain cachedDomain) {
+		boolean result = setStyle(pageID, templateID, false);
+		if (!result) {
+			return false;
+		}
+		if (cachedDomain == null) {
+			cachedDomain = iwc.getApplicationContext().getDomain();
+		}
+		if (cachedDomain == null) {
+			return result;
+		}
+		int startPageID = cachedDomain.getStartPageID();
+		if (startPageID == Integer.valueOf(pageID).intValue()) { // Setting the same style as front page has
+			String articleViewerID = iwc.getApplicationSettings().getProperty(ARTICLE_VIEWER_TEMPLATE_KEY);
+			if (articleViewerID != null) {
+				result = setStyle(articleViewerID, templateID, true);
+			}
+		}
+		return result;
+	}
+	
+	private boolean setStyle(String pageID, int templateID, boolean ignoreTemplate) {
 		ICPage page = null;
 		if (templateID <= 0) {
 			return false;
 		}
-		page = helper.getThemesService().getICPage(Integer.valueOf(pageID).intValue());
+		int pageKey = -1;
+		try {
+			pageKey = Integer.valueOf(pageID).intValue();
+		} catch (NumberFormatException nfe) {
+			log.error(nfe);
+			return false;
+		}
+		page = helper.getThemesService().getICPage(pageKey);
 		if (page == null) {
 			return false;
 		}
-		if (page.isPage()) {
+		if (page.isPage() || ignoreTemplate) {
 			helper.getThemesService().getBuilderService().setTemplateId(pageID, String.valueOf(templateID));
 			page.setTemplateId(templateID);
 			page.store();
@@ -189,12 +220,13 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (tree == null) {
 			return false;
 		}
+		ICDomain cachedDomain = iwc.getApplicationContext().getDomain();
 		Object o = null;
 		boolean result = true;
 		for (Iterator it = tree.values().iterator(); it.hasNext();) {
 			o = it.next();
 			if (o instanceof ICTreeNode) {
-				result = setPageStyle(((ICTreeNode) o).getId(), templateID, iwc);
+				result = setPageStyle(((ICTreeNode) o).getId(), templateID, iwc, cachedDomain);
 			}
 		}
 		return result;
@@ -299,8 +331,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		}
 		StringBuffer link = new StringBuffer(helper.getFullWebRoot()).append(linkToArticle[0]);
-		if (!link.toString().endsWith(ThemesConstants.SLASH)) {
-			link.append(ThemesConstants.SLASH);
+		if (!link.toString().endsWith(ContentConstants.SLASH)) {
+			link.append(ContentConstants.SLASH);
 		}
 		Locale l = null;
 		Object o = null;
@@ -622,19 +654,16 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		String uri = null;
-		String lastTheme = null;
 		String pageType = builder.getPageKey();
 		String format = builder.getIBXMLFormat();
-		String realID = null;
-		String uriToPage = null;
+		String pageKey = null;
 		
 		TreeNodeStructure node = null;
 		for (int i = 0; i < struct.size(); i++) {
-			uriToPage = null;
 			node = struct.get(i);
 			if (domain != null && node.getParentId() == null) {
 				if (domain.getStartPage() == null) {
-					uri = ThemesConstants.SLASH;
+					uri = ContentConstants.SLASH;
 					isRootPage = true;
 				}
 			}
@@ -643,7 +672,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			if (pageID < 0) { // Error
 				break;
 			}
-			realID = String.valueOf(pageID);
+			pageKey = String.valueOf(pageID);
 			
 			if (domain != null) {
 				if ((domain.getStartPage() == null) && (isTopLevelPage)) { // Marking page as top level page
@@ -655,6 +684,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			if (isRootPage) { // Creating root page and root template
 				createRootPage(pageID, domain, builder, domainID, format);
 				createRootTemplate(domain, builder, domainID, format);
+				createArticlePreviewTemplate(domainID, builder, format);
 				initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
 				IWWelcomeFilter.unload();
 			}
@@ -662,30 +692,46 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			uri = null;
 			isRootPage = false;
 
-			if (!ThemesConstants.EMPTY.equals(node.getTemplateFile())) {
-				String articlePath = helper.createArticle(node.getPageType(), pageID);
-				uriToPage = helper.loadPageToSlide(node.getPageType(), node.getTemplateFile(), articlePath, pageID);
-				if (uriToPage != null) {
-					helper.getThemesService().updatePageWebDav(pageID, uriToPage);
-				}
-				lastTheme = helper.getLastUsedTheme();
-				if (lastTheme != null) {
-					helper.getThemesService().getBuilderService().setTemplateId(realID, lastTheme);
-				}
-			}
+			preparePage(node.getTemplateFile(), node.getPageType(), pageID, pageKey);
+			setLastUsedTemplate(pageKey);
 
 			for (int j = i; j < struct.size(); j++) {
 				if (struct.get(j).getParentId() != null) {
 					if ((struct.get(j).getParentId()).equals(node.getNodeId())) {						
-						struct.get(j).setParentId(realID);		
+						struct.get(j).setParentId(pageKey);		
 					}
 				}
 			}
 
-			newIds.add(realID);
+			newIds.add(pageKey);
 		}
 
 		return newIds;
+	}
+	
+	private boolean preparePage(String templateFile, String pageType, int pageID, String realID) {
+		if (templateFile == null || pageType == null || pageID < 0 || realID == null) {
+			return false;
+		}
+		if (ThemesConstants.EMPTY.equals(templateFile)) {
+			return false;
+		}
+		String articlePath = helper.createArticle(pageType, pageID);
+		String uriToPage = helper.loadPageToSlide(pageType, templateFile, articlePath, pageID);
+		if (uriToPage != null) {
+			helper.getThemesService().updatePageWebDav(pageID, uriToPage);
+		}
+		return true;
+	}
+	
+	private void setLastUsedTemplate(String pageKey) {
+		if (pageKey == null) {
+			return;
+		}
+		String lastTheme = helper.getLastUsedTheme();
+		if (lastTheme != null) {
+			helper.getThemesService().getBuilderService().setTemplateId(pageKey, lastTheme);
+		}
 	}
 	
 	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) {
@@ -841,7 +887,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		domain.setIBPage(newRootPage); // Setting new start page in ICDomain
 		domain.store();
-		newRootPage.setDefaultPageURI(ThemesConstants.SLASH); // Changing uri to new start page
+		newRootPage.setDefaultPageURI(ContentConstants.SLASH); // Changing uri to new start page
 		newRootPage.store();
 		
 		ICPage rootPage = helper.getThemesService().getICPage(currentRoot);
@@ -906,6 +952,27 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		domain.setStartTemplate(helper.getThemesService().getICPage(templateId));
 		domain.store();
 		return templateId;
+	}
+	
+	private boolean createArticlePreviewTemplate(int domainID, BuilderService builder, String format) {
+		if (builder == null) {
+			return false;
+		}
+		String articleTemplateFile = "article_viewer_template.xml";
+		String templateSubType = "viewer";
+		if (helper.existFileInSlide(ThemesConstants.PAGES_PATH_SLIDE + articleTemplateFile)) {
+			return true;
+		}
+		int id = createPage(null, "Article Viewer", builder.getTemplateKey(), null, ContentConstants.ARTICLE_VIEWER_URI, templateSubType, domainID, format, null);
+		String pageKey = String.valueOf(id);
+		boolean result = preparePage(articleTemplateFile, templateSubType, id, pageKey);
+		setLastUsedTemplate(pageKey);
+		IWContext iwc = helper.getIWContext();
+		if (iwc == null) {
+			return result;
+		}
+		iwc.getApplicationSettings().setProperty(ARTICLE_VIEWER_TEMPLATE_KEY, pageKey);
+		return result;
 	}
 	
 	public boolean initializeCachedDomain(String domainName, ICDomain domain) {

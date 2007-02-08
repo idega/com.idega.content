@@ -2,6 +2,8 @@ package com.idega.content.themes.helpers;
 
 import java.util.List;
 
+import com.idega.content.business.ContentConstants;
+
 public class ThemesLoader {
 	
 	private Theme theme = null;
@@ -57,11 +59,11 @@ public class ThemesLoader {
 	}
 	
 	private String getUriWithoutContent(String uri) {
-		int index = uri.indexOf(ThemesConstants.CONTENT);
+		int index = uri.indexOf(ContentConstants.CONTENT);
 		if (index == -1) {
 			return uri;
 		}
-		index += ThemesConstants.CONTENT.length();
+		index += ContentConstants.CONTENT.length();
 		return helper.extractValueFromString(uri, index, uri.length());
 	}
 	

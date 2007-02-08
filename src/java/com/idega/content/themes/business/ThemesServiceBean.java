@@ -13,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.slide.event.ContentEvent;
 
 import com.idega.business.IBOServiceBean;
+import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
@@ -172,14 +173,14 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			}
 			String name = ThemesHelper.getInstance().removeSpaces(theme.getName());
 			id = createIBPage(parentId, theme.getName(), builder.getTemplateKey(), null, ThemesConstants.THEMES + name +
-					ThemesConstants.SLASH, null, domainID, builder.getHTMLTemplateKey(), null);
+					ContentConstants.SLASH, null, domainID, builder.getHTMLTemplateKey(), null);
 			if (id == -1) {
 				return false;
 			}
 			theme.setIBPageID(id);
 		}
 		
-		return updatePageWebDav(theme.getIBPageID(), ThemesConstants.CONTENT + theme.getLinkToSkeleton());
+		return updatePageWebDav(theme.getIBPageID(), ContentConstants.CONTENT + theme.getLinkToSkeleton());
 	}
 	
 	public boolean updatePageWebDav(int id, String uri) {
