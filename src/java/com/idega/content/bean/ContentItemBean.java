@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.28 2007/02/08 19:38:28 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.29 2007/02/08 21:45:19 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -47,10 +47,10 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2007/02/08 19:38:28 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/02/08 21:45:19 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.29 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -668,13 +668,17 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 				if (page != null) {
 					if (page.isPage() && !page.getDeleted()) {
 						if (ThemesConstants.ARTICLE_PAGE_TYPE.equals(page.getSubType())) {
-							moduleIds = builder.getModuleId(pageID, moduleClass);
-							if (moduleIds != null) {
-								for (int i = 0; i < moduleIds.size(); i++) {
-									if (builder.isPropertyValueSet(pageID, moduleIds.get(i), propertyName, propertyValue)) {
-										return ContentConstants.PAGES_START_URI + page.getDefaultPageURI();
+							try {
+								moduleIds = builder.getModuleId(pageID, moduleClass);
+								if (moduleIds != null) {
+									for (int i = 0; i < moduleIds.size(); i++) {
+										if (builder.isPropertyValueSet(pageID, moduleIds.get(i), propertyName, propertyValue)) {
+											return ContentConstants.PAGES_START_URI + page.getDefaultPageURI();
+										}
 									}
 								}
+							} catch (Exception e) {
+								return getDefaultPageUrlByArticleResourcePath();
 							}
 						}
 					}
