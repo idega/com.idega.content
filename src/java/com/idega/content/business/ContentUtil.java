@@ -1,5 +1,5 @@
 /*
- * $Id: ContentUtil.java,v 1.11 2006/12/28 11:50:11 gediminas Exp $
+ * $Id: ContentUtil.java,v 1.12 2007/02/13 19:05:36 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -15,13 +15,14 @@ import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWUserContext;
+import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2006/12/28 11:50:11 $ by $Author: gediminas $
+ * Last modified: $Date: 2007/02/13 19:05:36 $ by $Author: valdas $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class ContentUtil {
 	public static final String CONTENT_PATH = "/files/cms";
@@ -101,5 +102,16 @@ public class ContentUtil {
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Creates path (uri) based on current time
+	 * @return
+	 */
+	public static String getYearMonthPath() {
+		IWTimestamp now = new IWTimestamp();
+		StringBuffer path = new StringBuffer();
+		path.append(now.getYear()).append(ContentConstants.SLASH).append(now.getDateString("MM"));
+		return path.toString();
 	}
 }

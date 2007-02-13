@@ -75,11 +75,18 @@ public class ContentItemFeedBean implements Serializable {
 	 * @param author
 	 * @param language
 	 * @param categories
+	 * @param serverName
+	 * @param updated
+	 * @param published
+	 * @param body
+	 * @param source
+	 * @param comment
+	 * @param linkToComments
 	 * @return
 	 */
 	private SyndFeed createFeedWithEntry(String feedTitle, String serverName, String feedDescription, String title, Timestamp updated,
 			Timestamp published, String description, String body, String author, String language, List<String> categories,
-			String url, String source, String comment) {
+			String url, String source, String comment, String linkToComments) {
 		if (rss == null) {
 			return null;
 		}
@@ -91,7 +98,7 @@ public class ContentItemFeedBean implements Serializable {
 		
 		List<SyndEntry> entries = new ArrayList<SyndEntry>();
 		entries.add(rss.createNewEntry(title, url, updated, published, FEED_ENTRY_DESCRIPTION_TYPE, description, FEED_ENTRY_BODY_TYPE,
-				body, author, language, categories, source, comment));
+				body, author, language, categories, source, comment, linkToComments));
 		feed.setEntries(entries);
 		
 		return feed;
@@ -110,11 +117,15 @@ public class ContentItemFeedBean implements Serializable {
 	 * @param updated
 	 * @param published
 	 * @param body
+	 * @param serverName
+	 * @param source
+	 * @param comment
+	 * @param linkToComments
 	 * @return
 	 */
 	public String getFeedEntryAsXML(String feedTitle, String serverName, String feedDescription, String title, Timestamp updated,
 			Timestamp published, String description, String body, String author, String language, List<String> categories,
-			String url, String source, String comment) {
+			String url, String source, String comment, String linkToComments) {
 		if (rss == null) {
 			return null;
 		}
@@ -123,7 +134,7 @@ public class ContentItemFeedBean implements Serializable {
 		}
 
 		SyndFeed feed = createFeedWithEntry(feedTitle, serverName, feedDescription, title, updated, published, description, body,
-				author, language, categories, url, source, comment);
+				author, language, categories, url, source, comment, linkToComments);
 		if (feed == null) {
 			return null;
 		}

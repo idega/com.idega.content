@@ -192,7 +192,7 @@ public class ThemesHelper implements Singleton {
 		return getSlideService(null);
 	}
 	
-	protected IWSlideService getSlideService(IWContext iwc) {
+	public IWSlideService getSlideService(IWContext iwc) {
 		if (service == null) {
 			synchronized (ThemesHelper.class) {
 				if (iwc == null) {
@@ -1001,7 +1001,7 @@ public class ThemesHelper implements Singleton {
 		String changedFileName = extractValueFromString(fullUrl, fullUrl.lastIndexOf(ContentConstants.SLASH) + 1, fullUrl.length());
 
 		try {
-			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, changedFileName, docContent, ThemesConstants.XML_MIME_TYPE, true);
+			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, changedFileName, docContent, ContentConstants.XML_MIME_TYPE, true);
 		} catch (RemoteException e) {
 			log.error(e);
 		}
@@ -1129,7 +1129,7 @@ public class ThemesHelper implements Singleton {
 		StringBuffer base = new StringBuffer(RESOURCE_PATH_START);
 		base.append(uri).append(RESOURCE_PATH_END).append(ContentConstants.SLASH);
 		try {
-			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base.toString(), file.toString(), article, ThemesConstants.XML_MIME_TYPE, true);
+			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base.toString(), file.toString(), article, ContentConstants.XML_MIME_TYPE, true);
 			return base.toString();
 		} catch (RemoteException e) {
 			log.error(e);
@@ -1151,10 +1151,28 @@ public class ThemesHelper implements Singleton {
 		StringBuffer link = new StringBuffer(server);
 		link.append(ContentConstants.PAGES_START_URI);
 		link.append(uri);
+		String linkToComments = getArticleCommentLink(uri);
 		String user = iwc.getCurrentUser().getName();
 		return getFeedBean().getFeedEntryAsXML(ThemesConstants.ARTICLE_TITLE, server, null, ThemesConstants.ARTICLE_TITLE,
 				new Timestamp(System.currentTimeMillis()), null, summary.toString(), article, user, language, null, link.toString(),
-				null, null);
+				null, null, linkToComments);
+	}
+	
+	public String getArticleCommentLink(String pageURI) {
+		StringBuffer commentPath = new StringBuffer(ContentConstants.CONTENT_ITEM_COMMENTS_URI);
+		if (pageURI == null) {
+			commentPath.append(ContentConstants.SLASH).append(ContentUtil.getYearMonthPath());
+			commentPath.append(ContentConstants.SLASH).append(getSlideService().createUniqueFileName(ContentConstants.COMMENT_SCOPE));
+		} 
+		else {
+			if (pageURI.endsWith(ContentConstants.SLASH)) {
+				pageURI = pageURI.substring(0, pageURI.lastIndexOf(ContentConstants.SLASH));
+			}
+			commentPath.append(pageURI);
+		}
+		commentPath.append(ContentConstants.COMMENT_PREFIX).append(ContentConstants.SLASH).append(ContentConstants.COMMENT_SCOPE);
+		commentPath.append(ThemesConstants.DOT).append(ThemesConstants.XML_EXTENSION);
+		return commentPath.toString();
 	}
 	
 	private void addIDsToModules(Element root, int pageID) {
@@ -1320,6 +1338,10 @@ public class ThemesHelper implements Singleton {
 	public String getFullServerName(IWContext iwc) {
 		StringBuffer server = new StringBuffer();
 		if (iwc == null) {
+			iwc = getIWContext();
+		}
+		
+		if (iwc == null) {
 			return getWebRootWithoutContent();
 		}
 		else {
@@ -1371,7 +1393,7 @@ public class ThemesHelper implements Singleton {
 			id.setText(newLink.toString());
 		}
 		try {
-			getSlideService(iwc).uploadFileAndCreateFoldersFromStringAsRoot(baseDirectory, fileName.toString(), getThemeChanger().getXMLOutputter().outputString(d), ThemesConstants.XML_MIME_TYPE, true);
+			getSlideService(iwc).uploadFileAndCreateFoldersFromStringAsRoot(baseDirectory, fileName.toString(), getThemeChanger().getXMLOutputter().outputString(d), ContentConstants.XML_MIME_TYPE, true);
 		} catch (RemoteException e) {
 			log.error(e);
 			return false;

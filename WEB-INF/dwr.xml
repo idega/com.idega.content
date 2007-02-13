@@ -16,6 +16,9 @@
     <create creator="ibo" javascript="PagePreview" scope="application">
       <param name="class" value="com.idega.content.tree.PagePreview"/>
     </create>
+    <create creator="ibo" javascript="CommentsEngine" scope="application">
+      <param name="class" value="com.idega.content.business.ContentItemCommentsEngine"/>
+    </create>
   </allow>
   
 	<signatures>

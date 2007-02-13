@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewerRenderer.java,v 1.3 2005/09/08 23:10:15 tryggvil Exp $
+ * $Id: ContentItemViewerRenderer.java,v 1.4 2007/02/13 19:05:36 valdas Exp $
  * Created on 16.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -19,10 +19,10 @@ import com.idega.webface.renderkit.ContainerRenderer;
 
 /**
  * 
- *  Last modified: $Date: 2005/09/08 23:10:15 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2007/02/13 19:05:36 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class ContentItemViewerRenderer extends ContainerRenderer {
 	
@@ -40,6 +40,8 @@ public class ContentItemViewerRenderer extends ContainerRenderer {
 		ContentItemViewer viewer = (ContentItemViewer)comp;
 		
 		renderHeader(ctx,viewer);
+		
+		renderJavaScript(ctx, viewer);
 
 		boolean renderToolbarAbove = false;
 		if(renderToolbarAbove){
@@ -55,6 +57,8 @@ public class ContentItemViewerRenderer extends ContainerRenderer {
 		}
 		
 		renderFooter(ctx,viewer);
+		
+		renderComments(ctx, viewer);
 	}
 	
 	
@@ -103,6 +107,22 @@ public class ContentItemViewerRenderer extends ContainerRenderer {
 	public void renderToolbar(FacesContext ctx, ContentItemViewer viewer) throws IOException {
 		UIComponent toolbar = (UIComponent) viewer.getFacets().get(ContentItemViewer.FACET_TOOLBAR);
 		RenderUtils.renderChild(ctx,toolbar);
+	}
+	
+	public void renderComments(FacesContext ctx, ContentItemViewer viewer) throws IOException {
+		UIComponent comments = (UIComponent) viewer.getFacets().get(ContentItemViewer.FACET_ITEM_COMMENTS);
+		if (comments == null) {
+			return;
+		}
+		RenderUtils.renderChild(ctx, comments);
+	}
+	
+	public void renderJavaScript(FacesContext ctx,ContentItemViewer viewer) throws IOException {
+		UIComponent script = (UIComponent) viewer.getFacets().get(ContentItemViewer.FACET_COMMENTS_SCRIPTS);
+		if (script == null) {
+			return;
+		}
+		RenderUtils.renderChild(ctx, script);
 	}
 
 	

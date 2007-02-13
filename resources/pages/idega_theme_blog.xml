@@ -9,7 +9,9 @@
         		<type>java.lang.String</type>
       		</property>
     	</module>
-    	<module id="" class="com.idega.block.article.component.ArticleListViewer" />
+    	<module id="" class="com.idega.block.article.component.ArticleListViewer">
+    		<property name="showComments" value="true" />
+    	</module>
     </region>
     <region id="navcontainer" label="navcontainer">
     	<module id="" class="com.idega.block.navigation.presentation.NavigationList">

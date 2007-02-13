@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.30 2007/02/08 21:49:08 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.31 2007/02/13 19:05:36 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -28,6 +28,7 @@ import org.apache.webdav.lib.util.WebdavStatus;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentConstants;
+import com.idega.content.themes.business.ThemesService;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.builder.business.BuilderService;
@@ -47,10 +48,10 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2007/02/08 21:49:08 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/02/13 19:05:36 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.30 $
+ * @version $Revision: 1.31 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -87,6 +88,8 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	private List versions;
 	
 	private String webDavResourceCategories = null; // This string is parsed from WebDavResource
+	
+	private boolean isUsedDefaultArticlePath = false;
 	
 	/**
 	 * Default constructor.
@@ -616,16 +619,28 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 * @return String of SyndFeed xml if entry was successsfully added to feed, otherwise - null
 	 */
 	public String getFeedEntryAsXML(IWContext iwc, String feedTitle, String feedDescription, String title, String description,
-			String body, String author, List<String> categories, String source, String comment, String moduleClass) {
+			String body, String author, List<String> categories, String source, String comment, String moduleClass,
+			String linkToComments) {
+		isUsedDefaultArticlePath = false;
 		Timestamp published = getPublishedDate();
 		Timestamp updated = getLastModifiedDate();
-		String server = ThemesHelper.getInstance(false).getFullServerName(iwc);
+		String server = ThemesHelper.getInstance().getFullServerName(iwc);
 		StringBuffer articleURL = new StringBuffer(server);
-		articleURL.append(getPageUrlByArticleResourcePath(iwc, moduleClass));
+		String pageUri = getPageUrlByArticleResourcePath(iwc, moduleClass);
+		articleURL.append(pageUri);
+		
+		if (linkToComments == null) {
+			if (isUsedDefaultArticlePath) {
+				linkToComments = ThemesHelper.getInstance().getArticleCommentLink(null);
+			}
+			else {
+				linkToComments = ThemesHelper.getInstance().getArticleCommentLink(pageUri);
+			}
+		}
 		
 		ContentItemFeedBean feedBean = new ContentItemFeedBean(iwc, ContentItemFeedBean.FEED_TYPE_ATOM_1);
 		return feedBean.getFeedEntryAsXML(feedTitle, server, feedDescription, title, updated, published, description,
-				body, author, getLanguage(), categories, articleURL.toString(), source, comment);
+				body, author, getLanguage(), categories, articleURL.toString(), source, comment, linkToComments);
 	}
 	
 	@SuppressWarnings("finally")
@@ -660,11 +675,15 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		if (propertyValue == null) {
 			return getDefaultPageUrlByArticleResourcePath();
 		}
+		ThemesService themesService = ThemesHelper.getInstance().getThemesService();
+		if (themesService == null) {
+			return getDefaultPageUrlByArticleResourcePath();
+		}
 		for (Iterator it = tree.values().iterator(); it.hasNext();) {
 			o = it.next();
 			if (o instanceof ICTreeNode) {
 				pageID = ((ICTreeNode) o).getId();
-				ICPage page = ThemesHelper.getInstance().getThemesService().getICPage(Integer.valueOf(pageID));
+				ICPage page = themesService.getICPage(Integer.valueOf(pageID));
 				if (page != null) {
 					if (page.isPage() && !page.getDeleted()) {
 						if (ThemesConstants.ARTICLE_PAGE_TYPE.equals(page.getSubType())) {
@@ -690,6 +709,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	}
 	
 	private String getDefaultPageUrlByArticleResourcePath () {
+		isUsedDefaultArticlePath = true;
 		String realPath = getResourcePath();
 		if (realPath == null) {
 			return ContentConstants.PAGES_START_URI;

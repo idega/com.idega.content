@@ -181,6 +181,4 @@ public class ThemesConstants {
 	//public static final String NOT_DEFAULT_THEME = ContentUtil.getBundle().getLocalizedString("theme_is_not_used");
 	
 	public static final String ARTICLE_PAGE_TYPE = "text";
-	
-	protected static final String XML_MIME_TYPE = "text/" + ThemesConstants.XML_EXTENSION;
 }
