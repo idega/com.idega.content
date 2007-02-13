@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.9 2007/02/06 00:43:30 laddi Exp $
+ * $Id: CategoryBean.java,v 1.10 2007/02/13 15:40:06 gediminas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -33,6 +33,7 @@ import org.jdom.output.XMLOutputter;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.data.ContentCategory;
+import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.io.MemoryFileBuffer;
@@ -50,10 +51,10 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2007/02/06 00:43:30 $ by $Author: laddi $
+ *  Last modified: $Date: 2007/02/13 15:40:06 $ by $Author: gediminas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class CategoryBean {
 	
@@ -73,7 +74,7 @@ public class CategoryBean {
 	protected CategoryBean(IWMainApplication iwma){
 		this.iwma=iwma;
 		this.categories = loadCategories();
-		if (getCategories().isEmpty()) {
+		if (this.categories == null) {
 			CategoriesMigrator migrator = new CategoriesMigrator();
 			Collection oldCategories = getCategoriesFromString(getCategoriesAsString());
 			migrator.migrate(oldCategories);
@@ -121,6 +122,9 @@ public class CategoryBean {
 		}
 		
 		private void updateCategoriesOnFiles(String resourcePath) {
+			if (resourcePath.indexOf(ThemesConstants.THEMES_PATH) >= 0) {
+				return;
+			}
 			try {
 				String filePath = resourcePath;
 				String serverURI = service.getWebdavServerURI();
@@ -170,9 +174,10 @@ public class CategoryBean {
 						updateCategoriesOnFiles(child);
 					}
 				}
-			
+				
+				resource.close();			
 			} catch (Exception e) {
-				System.err.println("Exception updating categories on resource " + resourcePath);
+				System.err.println("Exception updating categories on resource " + resourcePath + ": " + e.getMessage());
 			}
 		}
 	}
@@ -300,6 +305,10 @@ public class CategoryBean {
 		return StringHandler.stripNonRomanCharacters(category, LEAVE_AS_IS).toLowerCase();
 	}
 	
+	/**
+	 * Loads category definitions from <code>categories.xml</code> file.
+	 * @return categories as Map<String, ContentCategory>, or <code>null</code> if loading failed.
+	 */
 	protected Map loadCategories() {
 		Map map = new HashMap();
 		
@@ -332,8 +341,12 @@ public class CategoryBean {
 				ContentCategory category = new ContentCategory(cat);
 				map.put(category.getId(), category);
 			}
+			
+			in.close();
+			rootResource.close();
 		} catch (IOException e) {
 			System.err.println("Error loading file " + CATEGORY_PROPERTIES_FILE + ": " + e.getMessage());
+			return null;
 		}
 		catch (JDOMException e) {
 			// TODO Auto-generated catch block
@@ -371,7 +384,9 @@ public class CategoryBean {
 			if (!putOK) {
 				System.err.println("Could not store to webdav: " + rootResource.getStatusMessage());
 			}
+			
 			in.close();
+			rootResource.close();
 		} catch (IOException e) {
 			System.err.println("Error storing file " + CATEGORY_PROPERTIES_FILE + ": " + e.getMessage());
 		}
