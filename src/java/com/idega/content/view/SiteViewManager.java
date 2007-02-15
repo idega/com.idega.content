@@ -1,12 +1,3 @@
-/*
- * $Id: ContentViewManager.java,v 1.30 2007/02/15 14:18:20 justinas Exp $
- * Created on 2.11.2004
- *
- * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
- *
- * This software is the proprietary information of Idega hf.
- * Use is subject to license terms.
- */
 package com.idega.content.view;
 
 import java.util.ArrayList;
@@ -22,39 +13,28 @@ import com.idega.core.view.ViewManager;
 import com.idega.core.view.ViewNode;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
-import com.idega.repository.data.Singleton;
 
-
-/**
- *  This is the class modules should use to attatch themselves on to the Content application view structure.
- * 
- *  Last modified: $Date: 2007/02/15 14:18:20 $ by $Author: justinas $
- * 
- * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.30 $
- */
-public class ContentViewManager implements Singleton  {
-
-	private static final String IW_CONTENT_VIEW_MANAGER_KEY = "iw_contentviewmanager";
-	private static final String CONTENT_ID="content";
+public class SiteViewManager {
+	private static final String IW_SITE_VIEW_MANAGER_KEY = "iw_siteviewmanager";
+	private static final String CONTENT_ID="site";
 	private static final String CONTENT_BUNDLE_IDENTIFIER="com.idega.content";
 	private ViewNode contentRootNode;
 	private IWMainApplication iwma;
 	
-	private ContentViewManager(IWMainApplication iwma){
+	private SiteViewManager(IWMainApplication iwma){
 		this.iwma=iwma;
 	}
 
-	  public static synchronized ContentViewManager getInstance(IWMainApplication iwma){
-	    ContentViewManager contentViewManager = (ContentViewManager) iwma.getAttribute(IW_CONTENT_VIEW_MANAGER_KEY);
-	    if(contentViewManager==null){
-	      contentViewManager = new ContentViewManager(iwma);
-	      iwma.setAttribute(IW_CONTENT_VIEW_MANAGER_KEY,contentViewManager);
+	  public static synchronized SiteViewManager getInstance(IWMainApplication iwma){
+		  SiteViewManager siteViewManager = (SiteViewManager) iwma.getAttribute(IW_SITE_VIEW_MANAGER_KEY);
+	    if(siteViewManager==null){
+	    	siteViewManager = new SiteViewManager(iwma);
+	      iwma.setAttribute(IW_SITE_VIEW_MANAGER_KEY,siteViewManager);
 	    }
-	    return contentViewManager;
+	    return siteViewManager;
 	  }	
 	
-	public static ContentViewManager getInstance(FacesContext context){
+	public static SiteViewManager getInstance(FacesContext context){
 		IWMainApplication iwma = IWMainApplication.getIWMainApplication(context);
 		return getInstance(iwma);
 	}
@@ -82,7 +62,7 @@ public class ContentViewManager implements Singleton  {
 		contentNode.setAuthorizedRoles(roles);
 		
 		
-		contentNode.setJspUri(contentBundle.getJSPURI("content.jsp"));
+		contentNode.setJspUri(contentBundle.getJSPURI("site.jsp"));
 		contentNode.setKeyboardShortcut(new KeyboardShortcut("4"));
 		
 		this.contentRootNode = contentNode;
@@ -94,35 +74,31 @@ public class ContentViewManager implements Singleton  {
 		ViewNode contentNode = initalizeContentNode(bundle);
 		
 		/* Page nodes begin */
-
-		DefaultViewNode siteNode = new DefaultViewNode("pages", contentNode);
+		DefaultViewNode siteNode = new DefaultViewNode("site", contentNode);
 		siteNode.setJspUri(bundle.getJSPURI("pages.jsp"));
 		siteNode.setKeyboardShortcut(new KeyboardShortcut("p"));
-		siteNode.setName("#{localizedStrings['com.idega.content']['pages']}");
-		
-//		DefaultViewNode siteNode = new DefaultViewNode("site", contentNode);
-//		siteNode.setJspUri(bundle.getJSPURI("pages.jsp"));
-//		siteNode.setKeyboardShortcut(new KeyboardShortcut("p"));
-//		siteNode.setName("#{localizedStrings['com.idega.content']['site']}");
+		siteNode.setName("#{localizedStrings['com.idega.content']['site']}");
 		
 //		DefaultViewNode themes = new DefaultViewNode("themes_manager", siteNode);
 //		themes.setJspUri(bundle.getJSPURI("themes.jsp"));
 //		themes.setName("#{localizedStrings['com.idega.content']['themes_manager']}");		
-//		
-//		DefaultViewNode siteManagerNode = new DefaultViewNode("site_manager", siteNode);
-//		siteManagerNode.setJspUri(bundle.getJSPURI("site.jsp"));
-//		siteManagerNode.setName("#{localizedStrings['com.idega.content']['site_manager']}");
-//
 
+		DefaultViewNode themes = new DefaultViewNode("themes", siteNode);
+		themes.setJspUri(bundle.getJSPURI("themes.jsp"));
+		themes.setName("#{localizedStrings['com.idega.content']['themes']}");				
 		
-//		DefaultViewNode pagesNode = new DefaultViewNode("pages", siteNode);
-//		pagesNode.setJspUri(bundle.getJSPURI("pages.jsp"));
-//		pagesNode.setName("#{localizedStrings['com.idega.content']['pages']}");		
-//		
-//		DefaultViewNode treeNode = new DefaultViewNode("tree", pagesNode);
-//		treeNode.setJspUri(bundle.getJSPURI("tree.jsp"));
-//		treeNode.setName("#{localizedStrings['com.idega.content']['site_map']}");
-//		treeNode.setVisibleInMenus(false);
+		DefaultViewNode siteManagerNode = new DefaultViewNode("site_manager", siteNode);
+		siteManagerNode.setJspUri(bundle.getJSPURI("site.jsp"));
+		siteManagerNode.setName("#{localizedStrings['com.idega.content']['site_manager']}");
+
+		DefaultViewNode pagesNode = new DefaultViewNode("pages", siteNode);
+		pagesNode.setJspUri(bundle.getJSPURI("pages.jsp"));
+		pagesNode.setName("#{localizedStrings['com.idega.content']['pages']}");		
+		
+		DefaultViewNode treeNode = new DefaultViewNode("tree", pagesNode);
+		treeNode.setJspUri(bundle.getJSPURI("tree.jsp"));
+		treeNode.setName("#{localizedStrings['com.idega.content']['site_map']}");
+		treeNode.setVisibleInMenus(false);
 		
 //		DefaultViewNode pageListNode = new DefaultViewNode("list",pagesNode);
 //		pageListNode.setJspUri(bundle.getJSPURI("pages.jsp"));
@@ -159,11 +135,11 @@ public class ContentViewManager implements Singleton  {
 		/* Page nodes end */
 		
 		
-		DefaultViewNode documentsNode = new DefaultViewNode("documents",contentNode);
-		//documentsNode.setJspUri(bundle.getJSPURI("documents.jsp"));
-		documentsNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
-		documentsNode.setKeyboardShortcut(new KeyboardShortcut("d"));
-		documentsNode.setName("#{localizedStrings['com.idega.content']['documents']}");
+//		DefaultViewNode documentsNode = new DefaultViewNode("documents",contentNode);
+//		//documentsNode.setJspUri(bundle.getJSPURI("documents.jsp"));
+//		documentsNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
+//		documentsNode.setKeyboardShortcut(new KeyboardShortcut("d"));
+//		documentsNode.setName("#{localizedStrings['com.idega.content']['documents']}");
 		
 //		DefaultViewNode previewNode = new DefaultViewNode("preview",documentsNode);
 //		previewNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
@@ -173,10 +149,11 @@ public class ContentViewManager implements Singleton  {
 //		permissionNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
 //		permissionNode.setVisibleInMenus(false);
 		
-		DefaultViewNode searchNode = new DefaultViewNode("search",contentNode);
-		searchNode.setJspUri(bundle.getJSPURI("search.jsp"));	
-		searchNode.setKeyboardShortcut(new KeyboardShortcut("s"));
-		searchNode.setName("#{localizedStrings['com.idega.content']['search']}");
+//		DefaultViewNode searchNode = new DefaultViewNode("search",contentNode);
+//		searchNode.setJspUri(bundle.getJSPURI("search.jsp"));	
+//		searchNode.setKeyboardShortcut(new KeyboardShortcut("s"));
+//		searchNode.setName("#{localizedStrings['com.idega.content']['search']}");
 		
 	}
+
 }
