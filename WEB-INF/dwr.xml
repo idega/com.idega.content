@@ -17,7 +17,7 @@
       <param name="class" value="com.idega.content.tree.PagePreview"/>
     </create>
     <create creator="ibo" javascript="CommentsEngine" scope="application">
-      <param name="class" value="com.idega.content.business.ContentItemCommentsEngine"/>
+      <param name="class" value="com.idega.content.business.CommentsEngine"/>
     </create>
     <convert converter="bean" match="com.idega.content.business.ContentItemComment" />
   </allow>
@@ -32,7 +32,7 @@
 			
   			ThemesEngine.applyMultipleChangesToTheme(String, List<ThemeChange>, String);
   			ThemesEngine.beforeCreatePage(List<TreeNodeStructure>, Boolean);
-  			ContentItemCommentsEngine.getComments(String);
+  			CommentsEngine.getComments(String);
   		]]>
 	</signatures>
 </dwr>

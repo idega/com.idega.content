@@ -3,7 +3,12 @@ package com.idega.content.business;
 import java.rmi.RemoteException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import org.directwebremoting.WebContext;
+import org.directwebremoting.WebContextFactory;
+import org.directwebremoting.proxy.dwr.Util;
 
 import com.idega.block.rss.business.RSSBusiness;
 import com.idega.business.IBOLookup;
@@ -17,15 +22,15 @@ import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 
-public class ContentItemCommentsEngineBean extends IBOServiceBean implements ContentItemCommentsEngine {
+public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine {
 
 	private static final long serialVersionUID = 7299800648381936213L;
 	
 	private RSSBusiness rss = getRSSBusiness();
 
-	public String addComment(String user, String subject, String body, String uri, boolean existsCommentsFile) {
+	public boolean addComment(String user, String subject, String body, String uri) {
 		if (uri == null) {
-			return null;
+			return false;
 		}
 		
 		IWContext iwc = ThemesHelper.getInstance().getIWContext();
@@ -40,23 +45,25 @@ public class ContentItemCommentsEngineBean extends IBOServiceBean implements Con
 		Timestamp date = new Timestamp(System.currentTimeMillis());
 		
 		SyndFeed comments = null;
+		boolean existsCommentsFile = ThemesHelper.getInstance().existFileInSlide(uri);
+		
 		if (existsCommentsFile) {
 			if (rss != null) {
 				comments = rss.getFeed(ThemesHelper.getInstance().getFullWebRoot() + uri);
 			}
 			else {
-				return null;
+				return false;
 			}
 		}
 		else {
 			comments = createFeed(uri, user, subject, body, date, language, iwc);
 		}
 		if (!addNewEntry(comments, subject, uri, date, body, user, language)) {
-			return null;
+			return false;
 		}
 		
 		if (comments == null) {
-			return null;
+			return false;
 		}
 		
 		String commentsXml = null;
@@ -64,21 +71,21 @@ public class ContentItemCommentsEngineBean extends IBOServiceBean implements Con
 			commentsXml = rss.convertFeedToRSS2XMLString(comments);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			return null;
+			return false;
 		}
 		
 		String base = uri.substring(0, uri.lastIndexOf(ContentConstants.SLASH));
 		String file = uri.substring(uri.lastIndexOf(ContentConstants.SLASH));
 		IWSlideService service = ThemesHelper.getInstance().getSlideService(null);
 		try {
-			if (service.uploadFileAndCreateFoldersFromStringAsRoot(base, file, commentsXml, ContentConstants.XML_MIME_TYPE, true)) {
-				return date.toString();
+			if (service.uploadFileAndCreateFoldersFromStringAsRoot(base, file, commentsXml, ContentConstants.XML_MIME_TYPE, true)) {				
+				return true;
 			}
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			return null;
+			return false;
 		}
-		return null;
+		return false;
 	}
 	
 	private boolean addNewEntry(SyndFeed feed, String subject, String uri, Timestamp date, String body, String user, String language) {
@@ -140,7 +147,7 @@ public class ContentItemCommentsEngineBean extends IBOServiceBean implements Con
 	
 	private RSSBusiness getRSSBusiness() {
 		if (rss == null) {
-			synchronized (ContentItemCommentsEngineBean.class) {
+			synchronized (CommentsEngineBean.class) {
 				if (rss == null) {
 					try {
 						rss = (RSSBusiness) IBOLookup.getServiceInstance(IWContext.getInstance(), RSSBusiness.class);
@@ -151,6 +158,20 @@ public class ContentItemCommentsEngineBean extends IBOServiceBean implements Con
 			}
 		}
 		return rss;
+	}
+	
+	public boolean getCommentsForAllPages(String uri) {
+		WebContext wctx = WebContextFactory.get();
+		Collection sessions = wctx.getScriptSessionsByPage(wctx.getCurrentPage());
+		
+		System.out.println("Found sessions: " + sessions.size());
+		
+		Util utilAll = new Util(sessions);
+		utilAll.addFunctionCall("getComments", uri);
+//		ScriptBuffer s = new ScriptBuffer("alert('everywhere refresh');");
+//		utilAll.addScript(s);
+		
+		return true;
 	}
 	
 	public List<ContentItemComment> getComments(String uri) {

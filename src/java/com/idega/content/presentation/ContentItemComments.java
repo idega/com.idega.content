@@ -13,7 +13,6 @@ import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Script;
 import com.idega.presentation.text.Link;
-import com.idega.presentation.text.Text;
 import com.idega.webface.WFDivision;
 import com.sun.syndication.feed.synd.SyndFeed;
 
@@ -22,20 +21,22 @@ public class ContentItemComments extends ContentBlock {
 	private String styleClass = "content_item_comments_style";
 	private String linkToComments = null;
 	
-	private boolean existCommentsFile = false;
+	private boolean showCommentsList = false;
 	
 	protected static final String COMMENTS_BLOCK_ID = "comments_block";
 	
 	private static final String ZERO_COMMENTS = "0";
 	
-	public ContentItemComments(String linkToComments) {
+	public ContentItemComments(String linkToComments, boolean showCommentsList) {
 		super();
 		this.linkToComments = linkToComments;
+		this.showCommentsList = showCommentsList;
 	}
 	
-	public ContentItemComments(String linkToComments, String styleClass) {
+	public ContentItemComments(String linkToComments, boolean showCommentsList, String styleClass) {
 		super();
 		this.linkToComments = linkToComments;
+		this.showCommentsList = showCommentsList;
 		this.styleClass = styleClass;
 	}
 
@@ -53,7 +54,8 @@ public class ContentItemComments extends ContentBlock {
 		StringBuffer comments = new StringBuffer(ContentUtil.getBundle().getLocalizedString("comments"));
 		comments.append(ContentConstants.SPACE).append("(<span id='contentItemCount' class='contentItemCountStyle'>");
 		comments.append(getCommentsCount(commentsFeed)).append("</span>)");
-		Text commentsLabel = new Text(comments.toString());
+		Link commentsLabel = new Link(comments.toString(), "#showCommentsList");
+		commentsLabel.setOnClick("showCommentsList()");
 		container.add(commentsLabel);
 		
 		// Add comment block
@@ -61,10 +63,13 @@ public class ContentItemComments extends ContentBlock {
 		
 		// Comments list will be generated with DWR & JavaScript
 		Script script = new Script();
-		script.addScriptLine("setCommentsTimeOut(60000)"); // Every minute will check for new comments
-		script.addScriptLine("setPostedLabel('"+ContentUtil.getBundle().getLocalizedString("posted")+"')");
-		script.addScriptLine("setCommentsLoadingMessage('"+ContentUtil.getBundle().getLocalizedString("loading_comments")+"')");
-		script.addScriptLine("getCommentsPeriodically('"+linkToComments+"')");
+//		script.addScriptLine("setCommentsTimeOut(60000);"); // Every minute will check for new comments
+		script.addScriptLine("setPostedLabel('"+ContentUtil.getBundle().getLocalizedString("posted")+"');");
+		script.addScriptLine("setCommentsLoadingMessage('"+ContentUtil.getBundle().getLocalizedString("loading_comments")+"');");
+		script.addScriptLine("setLinkToComments('"+linkToComments+"');");
+		if (showCommentsList) {
+			script.addScriptLine("getComments('"+linkToComments+"');");
+		}
 		container.add(script);
 		
 		this.add(container);
@@ -78,7 +83,6 @@ public class ContentItemComments extends ContentBlock {
 		if (!helper.existFileInSlide(linkToComments)) {
 			return null;
 		}
-		existCommentsFile = true;
 		
 		RSSBusiness rss = null;
 		try {
@@ -121,7 +125,7 @@ public class ContentItemComments extends ContentBlock {
 		StringBuffer action = new StringBuffer("addCommentPanel('").append(addComments.getId()).append(separator);
 		action.append(linkToComments).append(separator).append(user).append(separator).append(subject).append(separator);
 		action.append(comment).append(separator).append(posted).append(separator).append(send).append(separator);
-		action.append(sending).append(separator).append(loggedUser).append(separator).append(existCommentsFile).append("')");
+		action.append(sending).append(separator).append(loggedUser).append("')");
 		l.setOnClick(action.toString());
 		addComments.add(l);
 		return addComments;
