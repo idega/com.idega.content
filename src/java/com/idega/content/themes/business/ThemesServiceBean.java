@@ -194,8 +194,11 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		getBuilderService().clearAllCachedPages();
 		return true;
 	}
+	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup){
+		return createIBPage(parentId, name, type, templateId, pageUri, subType, domainId, format, sourceMarkup, null);
+	}
 	
-	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) {
+	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup, String treeOrder) {
 		IWContext iwc = ThemesHelper.getInstance(false).getIWContext();
 		if (iwc == null) {
 			return -1;
@@ -226,7 +229,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			}
 		}
 		
-		return builder.createNewPage(parentId, name, type, templateId, pageUri, tree, iwc, subType, domainId, format, sourceMarkup);
+		return builder.createNewPage(parentId, name, type, templateId, pageUri, tree, iwc, subType, domainId, format, sourceMarkup, treeOrder);
 	}
 	
 	private boolean isNewTheme(String uri) {
