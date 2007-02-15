@@ -7,6 +7,8 @@ import com.idega.core.builder.data.ICDomain;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.business.IBOService;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.rmi.RemoteException;
 
@@ -89,7 +91,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#beforeCreatePage
 	 */
-	public List<String> beforeCreatePage(List<TreeNodeStructure> struct, Boolean isFirst) throws RemoteException;
+	public List<String> beforeCreatePage(List<TreeNodeStructure> struct, Boolean isFirst, String numberInLevel, ArrayList<String> followingNodes) throws RemoteException;
 	
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#createPage
@@ -101,6 +103,11 @@ public interface ThemesEngine extends IBOService {
 	 */
 	public boolean deletePage(String pageId, boolean deleteChildren) throws RemoteException;
 
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#deletePage
+	 */
+	public boolean deletePageAndDecrease(String pageId, boolean deleteChildren, ArrayList<String> followingNodes) throws RemoteException;
+	
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getPageId
 	 */
@@ -114,7 +121,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#movePage
 	 */
-	public boolean movePage(int newParentId, int nodeId) throws RemoteException;
+	public boolean movePage(int newParentId, int nodeId, int numberInLevel, ArrayList<String> nodesToIncrease, ArrayList<String> nodesToDecrease) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getPathToImageFolder

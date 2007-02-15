@@ -3,24 +3,52 @@ var ajaxObjects = new Array();
 var RELOAD_PAGE = false;
 var REFRESH_PAGE_INFO = false;
 	
-function saveMyTree(newParentNodeId, sourceNodeId) {
+function saveMyTree(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncrease, nodesToDecrease) {
+	
+//console.log('saveMyTree');
+//console.log(numberInLevel);
+//console.log(nodesToIncrease);
+//console.log('nodesToIncrease');
+/*
+if(nodesToIncrease){
+	for(var i = 0; i < nodesToIncrease.length; i++)
+		console.log(nodesToIncrease[i]);
+}
+*/
+//console.log('nodesToDecrease');
+//console.log(nodesToDecrease);
+/*
+if(nodesToDecrease){
+	for(var i = 0; i < nodesToDecrease.length; i++)
+		console.log(nodesToDecrease[i]);
+}
+*/
 	showLoadingMessage("Moving...");
 	setPageID(sourceNodeId);
 	REFRESH_PAGE_INFO = !isSiteMap();
-	ThemesEngine.movePage(newParentNodeId, sourceNodeId, empty);
+//alert(numberInLevel);	
+	ThemesEngine.movePage(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncrease, nodesToDecrease, empty);
 }
 
 function getNewId(id){
 	return id;
 }
 
-function deletePage(pageId){
+function deletePage(pageId, followingNodes){
 	var wantToDelete = confirm("Are you sure?");
 	if (wantToDelete){
 		showLoadingMessage("Deleting...");
 		setPageID(null);
 		RELOAD_PAGE = true;
-		ThemesEngine.deletePage(pageId, true, empty);
+		
+		if(followingNodes){
+//console.log('followingNodes1');
+			ThemesEngine.deletePageAndDecrease(pageId, true, followingNodes, empty);
+		}
+		else{
+//console.log('not followingNodes');			
+			ThemesEngine.deletePageAndDecrease(pageId, true, null, empty);
+		}
 	}
 	else {
 		if (treeObj) {

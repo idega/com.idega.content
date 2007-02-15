@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.myfaces.shared_impl.util.BiLevelCacheMap;
 
 import com.idega.business.IBOServiceBean;
 import com.idega.content.business.ContentConstants;
@@ -638,8 +640,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	public List <String> beforeCreatePage(List <TreeNodeStructure> struct, Boolean isTopLevelPage){
+	public List <String> beforeCreatePage(List <TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, ArrayList<String> followingNodes){
 		List <String> newIds = new ArrayList<String>();
+		
+		struct.get(0).setTreeOrder(numberInLevel);
+		struct = getOrderInLevel(struct);
 		
 		BuilderService builder = helper.getThemesService().getBuilderService();
 		ICDomain domain = helper.getThemesService().getDomain();
@@ -668,7 +673,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				}
 			}
 			
-			pageID = createPage(node.getParentId(), node.getNodeName(), pageType, null, uri, node.getPageType(), domainID, format, null);
+			pageID = createPage(node.getParentId(), node.getNodeName(), pageType, null, uri, node.getPageType(), domainID, format, null, node.getTreeOrder());
 			if (pageID < 0) { // Error
 				break;
 			}
@@ -706,7 +711,12 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			newIds.add(pageKey);
 		}
 
+		increaseNodesNumbersInLevel(followingNodes, -1, null);
+		
 		return newIds;
+	}
+	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) {
+		return createPage(parentId, name, type, templateId, pageUri, subType, domainId, format, sourceMarkup, null);
 	}
 	
 	private boolean preparePage(String templateFile, String pageType, int pageID, String realID) {
@@ -734,7 +744,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 	}
 	
-	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) {
+	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup, String treeOrder) {
 		int id = -1;
 		if (pageUri != null) {
 			if (pageUri.equals(ThemesConstants.EMPTY)) {
@@ -742,7 +752,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			}
 		}
 		try {
-			id = helper.getThemesService().createIBPage(parentId, name, type, templateId, pageUri, subType, domainId, format, sourceMarkup);
+			id = helper.getThemesService().createIBPage(parentId, name, type, templateId, pageUri, subType, domainId, format, sourceMarkup, treeOrder);
 		} catch (RemoteException e) {
 			log.error(e);
 			return -1;
@@ -751,10 +761,15 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	public boolean deletePage(String pageId, boolean deleteChildren) {
+		return deletePageAndDecrease(pageId, deleteChildren, null);
+	}
+	
+	public boolean deletePageAndDecrease(String pageId, boolean deleteChildren, ArrayList<String> followingNodes) {
 		if (pageId == null) {
 			return false;
 		}
 		try {
+			decreaseNodesNumbersInLevel(followingNodes, -1, null);			
 			helper.getThemesService().deleteIBPage(pageId, deleteChildren);
 		} catch (RemoteException e) {
 			log.error(e);
@@ -811,15 +826,43 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	public boolean movePage(int newParentId, int nodeId) {
+	public boolean movePage(int newParentId, int nodeId, int numberInLevel, ArrayList<String> nodesToIncrease, ArrayList<String> nodesToDecrease) {
 		IWContext iwc = helper.getIWContext();
+		boolean result = false;
 		if (iwc == null) {
 			return false;
 		}
+		
+		BuilderService service = helper.getThemesService().getBuilderService(); 
+//		setTreeOrder(nodeId, numberInLevel);
+		
+		ICPage page = helper.getThemesService().getICPage(nodeId);
+////		System.out.println("ID "+nodeId);
+//		System.out.println("numberInLevel "+numberInLevel);
+//		System.out.println("before "+page.getTreeOrder());
+				page.setTreeOrder(numberInLevel);
+				page.store();
+				service.setTreeOrder(nodeId, numberInLevel);
+//				page = helper.getThemesService().getICPage(nodeId);
+//		System.out.println("after "+page.getTreeOrder());
+//System.out.println("set "+numberInLevel+" to "+nodeId);
+		if (nodesToIncrease != null)
+			increaseNodesNumbersInLevel(nodesToIncrease, numberInLevel, service);
+		if (nodesToDecrease != null)
+			decreaseNodesNumbersInLevel(nodesToDecrease, numberInLevel, service);
 		if (newParentId <= 0) {
-			return helper.getThemesService().getBuilderService().movePageToTopLevel(nodeId, iwc);
+			result = service.movePageToTopLevel(nodeId, iwc);
+			
+//			page = helper.getThemesService().getICPage(nodeId);
+//System.out.println("after moving top level"+page.getTreeOrder());
+//			setTreeOrder(nodeId, numberInLevel);
+			return result;
 		}
-		return helper.getThemesService().getBuilderService().movePage(newParentId, nodeId, iwc.getDomain());
+		result = service.movePage(newParentId, nodeId, iwc.getDomain());
+//		page = helper.getThemesService().getICPage(nodeId);
+//System.out.println("after moving not top level"+page.getTreeOrder());		
+//		setTreeOrder(nodeId, numberInLevel);
+		return result;
 	}
 	
 	public String getPathToImageFolder(){
@@ -995,4 +1038,120 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return helper.getThemeChanger().applyMultipleChangesToTheme(themeID, changes, themeName);
 	}
 
+	private boolean decreaseNodesNumbersInLevel(ArrayList<String> nodes, int numberInLevel, BuilderService service) {
+		if(nodes == null)
+			return false;
+		
+		if(service == null)
+			service = helper.getThemesService().getBuilderService();
+		
+		int id = -1;
+		
+//System.out.println("decrease level");
+		for (int i = 0; i < nodes.size(); i++){
+//System.out.println(nodes.get(i));
+			id = Integer.valueOf(nodes.get(i)).intValue();
+			ICPage page = helper.getThemesService().getICPage(id);
+			page.setTreeOrder(page.getTreeOrder()-1);
+			service.decreaseTreeOrder(id);
+			page.store();			
+			
+			
+//			page.setTreeOrder(page.getTreeOrder()-1);
+//			if((i != nodes.size()-1) || (numberInLevel == -1)){
+//				page.setTreeOrder(page.getTreeOrder()-1);
+//				service.decreaseTreeOrder(id);
+//			}
+//			else{
+//				service.setTreeOrder(id, numberInLevel);				
+//				page.setTreeOrder(numberInLevel);
+//			}
+//			page.store();
+		}
+		return true;
+	}
+	
+	private boolean increaseNodesNumbersInLevel(ArrayList<String> nodes, int numberInLevel, BuilderService service) {
+		if(nodes == null)
+			return false;
+		if(service == null)
+			service = helper.getThemesService().getBuilderService();
+
+//		Map tree = PageTreeNode.getTree(IWMainApplication.getDefaultIWApplicationContext());		
+//		PageTreeNode childNode = null;
+//		
+		int id = -1;
+		
+//System.out.println("increase level");
+		for (int i = 0; i < nodes.size(); i++){
+//System.out.println(nodes.get(i));
+			id = Integer.valueOf(nodes.get(i)).intValue();
+			ICPage page = helper.getThemesService().getICPage(Integer.valueOf(nodes.get(i)).intValue());
+//			
+			page.setTreeOrder(page.getTreeOrder()+1);
+			service.increaseTreeOrder(id);
+			page.store();
+			
+//			if((i != nodes.size()-1) || (numberInLevel == -1)){
+//				page.setTreeOrder(page.getTreeOrder()+1);
+//				service.increaseTreeOrder(id);
+////				childNode = (PageTreeNode) tree.get(Integer.valueOf(nodes.get(i)).intValue());
+////				childNode.setOrder(childNode.getOrder()+1);
+//			}
+//			else{
+//				page.setTreeOrder(numberInLevel);
+//				service.setTreeOrder(id, numberInLevel);
+//			}
+//			page.store();
+		}
+		
+		return true;
+	}
+	
+	private void setTreeOrder(int nodeId, int numberInLevel){
+		ICPage page = helper.getThemesService().getICPage(Integer.valueOf(""+nodeId).intValue());
+		BuilderService service = helper.getThemesService().getBuilderService();
+//		page.setTreeOrder(-1);
+//		page.setTreeOrder(numberInLevel);
+
+//		System.out.println();
+		
+		page.getId();
+//		page.
+		page.setTreeOrder(page.getTreeOrder()+20);
+		page.store();
+		service.setTreeOrder(nodeId, numberInLevel);
+//System.out.println("Set -1");
+//		ICPage page = helper.getThemesService().getICPage(nodeId);
+//		System.out.println("ID "+nodeId);
+//		System.out.println("numberInLevel "+numberInLevel);
+//		System.out.println("before "+page.getTreeOrder());
+//				page.setTreeOrder(-1);
+//				page.store();
+//				page = helper.getThemesService().getICPage(nodeId);
+//		System.out.println("after "+page.getTreeOrder());		
+	}
+	
+	private List <TreeNodeStructure> getOrderInLevel(List <TreeNodeStructure> struct){
+		Map children = new HashMap ();
+		String parentId = null;
+		int number;
+		for (int i = 0; i < struct.size(); i++){
+			if (struct.get(i).getTreeOrder() == null){
+				parentId = struct.get(i).getParentId();
+				if (children.containsKey(parentId)){
+					number = (Integer)(children.get(parentId)) + 1;
+					children.put(parentId, number);
+					struct.get(i).setTreeOrder(""+number);
+				}
+				else{
+					children.put(parentId, 1);
+					struct.get(i).setTreeOrder("1");
+				}
+					
+			}
+				
+		}
+		return struct; 
+	}
 }

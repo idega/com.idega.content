@@ -38,6 +38,11 @@ public interface ThemesService extends IBOService, IWSlideChangeListener {
 	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) throws RemoteException;
 
 	/**
+	 * @see com.idega.content.themes.business.ThemesServiceBean#createIBPage
+	 */
+	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup, String treeOrder) throws RemoteException;
+
+	/**
 	 * @see com.idega.content.themes.business.ThemesServiceBean#getICPageHome
 	 */
 	public ICPageHome getICPageHome() throws RemoteException, RemoteException;

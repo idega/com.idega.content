@@ -7,7 +7,14 @@ public class TreeNodeStructure {
 	private String nodeName = null;
 	private String pageType = null;
 	private String templateFile = null;
+	private String treeOrder = null;
 	
+	public String getTreeOrder() {
+		return treeOrder;
+	}
+	public void setTreeOrder(String treeOrder) {
+		this.treeOrder = treeOrder;
+	}
 	public String getNodeId() {
 		return nodeId;
 	}

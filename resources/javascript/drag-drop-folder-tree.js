@@ -39,7 +39,9 @@
 		var treeStructure;
 		var parentId;
 		var firstTopPage;
-
+		var previousParentId;
+		var previousPlaceInLevel;
+				
 		this.firstTopPage = false;
 		this.parentid = -1;
 		this.newPageId = -1;
@@ -308,6 +310,25 @@
 			
 			JSTreeObj.dragNode_source = this.parentNode;
 			JSTreeObj.dragNode_parent = this.parentNode.parentNode;
+	
+	
+//			if (JSTreeObj.dragNode_parent.parentNode.tagName == 'SPAN')
+//				JSTreeObj.dragNode_parent = this.parentNode.parentNode.parentNode;
+
+//console.log(JSTreeObj.dragNode_source);
+//console.log(JSTreeObj.dragNode_parent.parentNode);
+/*
+var newParentId = treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null);
+console.log('newParentId');
+console.log(newParentId);
+*/
+			JSTreeObj.previousPlaceInLevel = JSTreeObj.getOrderInLevel(JSTreeObj.dragNode_source.id, JSTreeObj.dragNode_parent.parentNode.id);
+//console.log('previous parent');
+//console.log(JSTreeObj.dragNode_parent.parentNode);
+			JSTreeObj.previousParentId = JSTreeObj.dragNode_parent.parentNode.id;
+//console.log('previousParent');			
+//console.log(document.getElementById(JSTreeObj.previousParentId));			
+//console.log('previous number '+previousNumberInLevel);
 
 			var parentDiv = JSTreeObj.dragNode_parent;
 			while(true){
@@ -498,7 +519,7 @@
 					if (parentDiv.getElementsByTagName('DIV')[0]){
 	
 						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id){
-							saveMyTree(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id);									
+							saveMyTree(treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null), JSTreeObj.dragNode_source.id, null, null, null);									
 						}
 						else
 							break;	
@@ -516,13 +537,15 @@
 			for(var i = 0; i < childs.length; i++){
 				if (nodeChilds[i].parentNode == nodeParent){
 					JSTreeObj.getNodeChilds(nodeChilds[i]);
-					deletePage(childs[i].id);
+					deletePage(childs[i].id, null);
 				}
 			}
 		}
 		,
 		drawTable : function(){
-			var treeContainer = document.getElementById('page_tree_div');
+//console.log('drawTable');			
+//			var treeContainer = document.getElementById('page_tree_div');
+			var treeContainer = document.getElementById('div_id_current_structure_tree');
 			var rootUl = document.createElement('ul');
 			rootUl.setAttribute('id','rootUl');
 			var tempTable = document.createElement('table');
@@ -559,7 +582,7 @@
 					}
 //console.log('calling saveRoot');					
 					JSTreeObj.saveRoot(JSTreeObj.dragNode_source.id, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
-								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, true);
+								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, true, '1', null);
 								
 				JSTreeObj.dropTargetIndicator.style.display='none';				
 				JSTreeObj.dragDropTimer = -1;								
@@ -568,8 +591,11 @@
 				return;
 			}
 			
-			if(JSTreeObj.deleteNodes == true){	
-				deletePage(JSTreeObj.dragNode_source.id);
+			if(JSTreeObj.deleteNodes == true){
+				var followingNodes = JSTreeObj.getFollowingNodes(JSTreeObj.previousParentId, JSTreeObj.previousPlaceInLevel);
+//console.log('followingNodes');				
+//console.log(followingNodes);				
+				deletePage(JSTreeObj.dragNode_source.id, followingNodes);
 				if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
 					if (document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id)){
 						JSTreeObj.floatingContainer.removeChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));
@@ -578,17 +604,27 @@
 				var tmpObj = JSTreeObj.dragNode_parent;
 				var lis = tmpObj.getElementsByTagName('LI');
 				
-				temp = document.getElementById('page_tree_div');
+//				temp = document.getElementById('page_tree_div');
+				temp = document.getElementById('div_id_current_structure_tree');
+//console.log(document.getElementById('div_id_current_structure_tree'));		
+
 				if (temp.childNodes.length == 0)
-					JSTreeObj.drawTable();					
-				else{
+					JSTreeObj.drawTable();
+				else {
+//console.log('temp');					
+//console.log(temp);
+
 					if(lis.length==0){
+//console.log(tmpObj);						
 						var tmpSpan = tmpObj.parentNode;
 						var img = tmpSpan.parentNode.getElementsByTagName('IMG')[0];
 						if (img)
 							img.style.visibility='hidden';	// Hide [+],[-] icon
-						tmpObj.parentNode.removeChild(tmpObj);											
-					}				
+						tmpObj.parentNode.removeChild(tmpObj);
+					}
+if (temp.childNodes.length == 0)
+	JSTreeObj.drawTable();
+//	else console.log(temp.childNodes[0]);
 				}				
 				JSTreeObj.dropTargetIndicator.style.display='none';				
 				JSTreeObj.dragDropTimer = -1;
@@ -603,10 +639,8 @@
 					else if (document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id)){
 						JSTreeObj.floatingContainer.removeChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));
 					}
-					
 					JSTreeObj.dropTargetIndicator.style.display='none';		
 					JSTreeObj.dragDropTimer = -1;	
-
 				}
 				return;
 			}
@@ -635,7 +669,7 @@
 							ul.insertBefore(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id),lis[0]);	
 						}else {	// No sub exists - use the appendChild method - This line should not be executed unless there's something wrong in the HTML, i.e empty <ul>
 							ul.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
-						}								
+						}
 					}else{
 						var ul = document.createElement('UL');
 						ul.style.display='block';
@@ -692,6 +726,8 @@
 					
 					return;*/
 					JSTreeObj.restoreTreeStructure();
+					return;
+//alert(JSTreeObj.previousPlaceInLevel);
 			}
 			JSTreeObj.dropTargetIndicator.style.display='none';		
 			JSTreeObj.dragDropTimer = -1;	
@@ -706,9 +742,72 @@
 					if (parentDiv.getElementsByTagName('DIV')[0]){
 						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id){
 							var newParentId = treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null);
+							
+							var numberInLevel = treeObj.getOrderInLevel(JSTreeObj.dragNode_source.id, newParentId);					
+//console.log('JSTreeObj.previousParentId '+JSTreeObj.previousParentId+' this.idOfTree '+JSTreeObj.idOfTree);							
+//if (document.getElementById(JSTreeObj.previousParentId).tagName != 'LI')							
+//	JSTreeObj.previousParentId = null;
+
+//	JSTreeObj.previousParentId = null;						
+//console.log('newParentId '+newParentId+' JSTreeObj.previousParentId '+JSTreeObj.previousParentId);
+							var movingBackward = false;
+							var nodesToIncrease = null;
+							var nodesToDecrease = null;
+/*
+console.log("newParentId");							
+console.log(newParentId);
+console.log("JSTreeObj.previousParentId");
+console.log(JSTreeObj.previousParentId);
+*/
+
+	var newParent = document.getElementById(JSTreeObj.previousParentId);
+/*	
+console.log('element');
+console.log(newParent);
+console.log(newParent.tagName);
+*/
+			if (newParent.tagName == 'SPAN'){
+//console.log('span');
+				newParent = newParent.parentNode;
+				JSTreeObj.previousParentId = newParent.id;		
+			}
+/*			
+			else console.log(newParent.parentNode);
+console.log('element');
+console.log(newParent);
+*/
+							if ((newParentId == JSTreeObj.previousParentId) || ((document.getElementById(JSTreeObj.previousParentId).tagName != 'LI')&&(!newParentId))){
+//alert('same parent');								
+/*								
+								if (JSTreeObj.previousPlaceInLevel > numberInLevel){
+									var temp = JSTreeObj.previousPlaceInLevel;
+									JSTreeObj.previousPlaceInLevel = numberInLevel;
+									numberInLevel = temp;
+									movingBackward = true;
+								}
+*/
+//console.log('movingBackward '+movingBackward);								
+//								if (movingBackward == true)
+								if(JSTreeObj.previousPlaceInLevel > numberInLevel){
+//									nodesToIncrease = JSTreeObj.getNodesBetween(JSTreeObj.previousParentId, JSTreeObj.previousPlaceInLevel+1, numberInLevel);
+									nodesToIncrease = JSTreeObj.getNodesBetween(JSTreeObj.dragNode_source.id, JSTreeObj.previousParentId, numberInLevel+1, JSTreeObj.previousPlaceInLevel);
+								}
+								else
+									nodesToDecrease = JSTreeObj.getNodesBetween(JSTreeObj.dragNode_source.id, JSTreeObj.previousParentId, JSTreeObj.previousPlaceInLevel, numberInLevel-1);
+							}
+							else {
+//alert('not same parent');																
+								var tempParentId = newParentId;
+								if(!tempParentId){
+									tempParentId = JSTreeObj.dragNode_source.parentNode.parentNode.id;
+								}
+								nodesToDecrease = JSTreeObj.getFollowingNodes(JSTreeObj.previousParentId, JSTreeObj.previousPlaceInLevel);
+								nodesToIncrease = JSTreeObj.getFollowingNodes(tempParentId, numberInLevel+1);
+							}																
+																
 							if (!newParentId)
 								newParentId = -1;
-							saveMyTree(newParentId, JSTreeObj.dragNode_source.id);
+							saveMyTree(newParentId, JSTreeObj.dragNode_source.id, numberInLevel, nodesToIncrease, nodesToDecrease);
 							var newPageUri = "undefined";
 							var linkFirstChild = JSTreeObj.dragNode_source.getElementsByTagName('a')[0];
 							if (linkFirstChild != null) {
@@ -723,17 +822,24 @@
 						}
 						else{
 //							var newParentId = treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null);							
-							var newParentId = treeObj.getNewParent(null,null,'floatingContainer'+JSTreeObj.dragNode_source.id, null);							
+							var newParentId = treeObj.getNewParent(null,null,'floatingContainer'+JSTreeObj.dragNode_source.id, null);					
+							
+							var numberInLevel = treeObj.getOrderInLevel('floatingContainer'+JSTreeObj.dragNode_source.id, newParentId);
+							
+							var followingNodes = treeObj.getFollowingNodes(newParentId, numberInLevel+1);
+//console.log('followingNodes');				
+//console.log(followingNodes);				
+										
 							if(!newParentId) {
 								JSTreeObj.saveRoot(JSTreeObj.dragNode_source.id, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
-								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, false);
+								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, false, numberInLevel, followingNodes);
 							}
 							else {
 //newParentId = JSTreeObj.getParentId('floatingContainer'+JSTreeObj.dragNode_source.id);
 
 								JSTreeObj.saveNewPage(newParentId, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
-								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML);
-}								
+								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, numberInLevel, followingNodes);
+							}								
 						}
 							//need name
 							
@@ -746,22 +852,36 @@
 		}
 		,
 		restoreTreeStructure : function() {
+//console.log('restoreTreeStructure');			
 			if (JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]) {
-				JSTreeObj.dragNode_parent.appendChild(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]);
+//				JSTreeObj.dragNode_parent.appendChild(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]);
+//console.log(JSTreeObj.previousPlaceInLevel);
+//console.log(JSTreeObj.dragNode_parent.childNodes.length);
+//console.log(JSTreeObj.dragNode_parent.childNodes[JSTreeObj.previousPlaceInLevel]);			
+
+if(JSTreeObj.previousPlaceInLevel > JSTreeObj.dragNode_parent.childNodes.length)
+	JSTreeObj.dragNode_parent.appendChild(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]);
+else{
+	JSTreeObj.dragNode_parent.insertBefore(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0], JSTreeObj.dragNode_parent.childNodes[JSTreeObj.previousPlaceInLevel-1]);
+//	console.log(JSTreeObj.dragNode_parent.childNodes[JSTreeObj.previousPlaceInLevel]);
+}
+//console.log(JSTreeObj.dragNode_parent.childNodes[JSTreeObj.previousPlaceInLevel]);			
+
 			}
-			JSTreeObj.dropTargetIndicator.style.display='none';		
-			JSTreeObj.dragDropTimer = -1;	
+			JSTreeObj.dropTargetIndicator.style.display='none';
+			JSTreeObj.dragDropTimer = -1;
+	
 			return;
 		}
 		,
-		saveRoot : function (nodeId, pagetype, templatefile, pageName, isFirst){
+		saveRoot : function (nodeId, pagetype, templatefile, pageName, isFirst, numberInLevel, followingNodes){
 			treeStructure = new Array();
-			var nodes = JSTreeObj.getRootStructure('floatingContainer'+nodeId);			
+			var nodes = JSTreeObj.getRootStructure('floatingContainer'+nodeId, numberInLevel);			
 //			JSTreeObj.getRootStructure('floatingContainer'+nodeId);			
 			document.getElementById('floatingContainer'+nodeId).id = 'rootTemporary';
 			showLoadingMessage("Creating...");			
 //			ThemesEngine.beforeCreatePage(treeStructure, isFirst, JSTreeObj.getNewRootId);
-			ThemesEngine.beforeCreatePage(nodes, isFirst, JSTreeObj.getNewRootId);
+			ThemesEngine.beforeCreatePage(nodes, isFirst, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
 		}	
 		,
 		getNewRootId : function(id) {
@@ -801,8 +921,7 @@
 			}
 		}
 		,		
-		getRootStructure : function(rootId){					
-			
+		getRootStructure : function(rootId, numberInLevel){					
 			var root = document.getElementById(rootId);
 			var newChilds = root.getElementsByTagName('li');
 			var nodeId = root.id;
@@ -817,7 +936,7 @@
 			treeStructure.push(pageType);
 			treeStructure.push(templateFile);				
 			
-			newTreeNodes.push(new newTreeNode (nodeId, parentId, nodeName, pageType, templateFile));						
+			newTreeNodes.push(new newTreeNode (nodeId, parentId, nodeName, pageType, templateFile, numberInLevel));						
 			
 			parentId = nodeId;
 			for (var i = 0; i < newChilds.length; i++){			
@@ -834,7 +953,7 @@
 				treeStructure.push(pageType);
 				treeStructure.push(templateFile);				
 
-				newTreeNodes.push(new newTreeNode (nodeId, parentId, nodeName, pageType, templateFile));			
+				newTreeNodes.push(new newTreeNode (nodeId, parentId, nodeName, pageType, templateFile, null));			
 				
 				parentId = newChilds[i].getAttribute('id');
 			}
@@ -1323,20 +1442,20 @@
 		}
 		,			
 		
-		saveNewPage : function (newParentNodeId, pagetype, templatefile, pageName){
+		saveNewPage : function (newParentNodeId, pagetype, templatefile, pageName, numberInLevel, followingNodes){
 			treeStructure = new Array();
 //			JSTreeObj.getStructure('floatingContainer'+JSTreeObj.dragNode_source.id, newParentNodeId);
-			var nodes = JSTreeObj.getStructure('floatingContainer'+JSTreeObj.dragNode_source.id, newParentNodeId);
+			var nodes = JSTreeObj.getStructure('floatingContainer'+JSTreeObj.dragNode_source.id, newParentNodeId, numberInLevel);
 			
 			document.getElementById('floatingContainer'+JSTreeObj.dragNode_source.id).id = 'rootTemporary';	
 			
 			showLoadingMessage("Creating...");			
 //			ThemesEngine.beforeCreatePage(treeStructure, false, JSTreeObj.getNewRootId); 
-			ThemesEngine.beforeCreatePage(nodes, false, JSTreeObj.getNewRootId);
+			ThemesEngine.beforeCreatePage(nodes, false, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
 		}	
 		,
 
-		getStructure : function(rootId, parentId){
+		getStructure : function(rootId, parentId, numberInLevel){
 	
 			var newTreeNodes = new Array();
 //			newTreeNodes.push(new newTreeNode (nodeId, parentId, nodeName, pageType, templateFile));			
@@ -1356,7 +1475,7 @@
 			treeStructure.push(pageType);
 			treeStructure.push(templateFile);				
 			
-			newTreeNodes.push(new newTreeNode (nodeId, parentId, nodeName, pageType, templateFile));			
+			newTreeNodes.push(new newTreeNode (nodeId, parentId, nodeName, pageType, templateFile, numberInLevel));			
 			
 			parentId = nodeId;
 			
@@ -1374,7 +1493,7 @@
 				treeStructure.push(pageType);
 				treeStructure.push(templateFile);				
 				
-				newTreeNodes.push(new newTreeNode (nodeId, parentId, nodeName, pageType, templateFile));			
+				newTreeNodes.push(new newTreeNode (nodeId, parentId, nodeName, pageType, templateFile, null));			
 				
 				parentId = newChilds[i].getAttribute('id');
 			}
@@ -1436,7 +1555,7 @@
 			for(var i = 0; i < childs.length; i++){
 				if (nodeChilds[i].parentNode == nodeParent){
 					JSTreeObj.saveNewPage(newParentId, childs[i].getAttribute('pagetype'), childs[i].getAttribute('templatefile'), 
-						(childs[i].getElementsByTagName('a')[0]).innerHTML);
+						(childs[i].getElementsByTagName('a')[0]).innerHTML, null, null);
 					JSTreeObj.getNodeChilds(nodeChilds[i], JSTreeObj.newPageId);
 				}
 			}
@@ -1477,6 +1596,188 @@
 			treeElement.setAttribute('onmouseout','JSTreeObj.notAboveTree()');			
 			
 		}
+		, 
+		getOrderInLevel : function(nodeId, parentNodeId){
+
+//			var result = new Array(); //array of int first element - number in level, others - ids of following nodes
+
+			var result = null;
+
+			if (parentNodeId == null){
+				var parentNode = document.getElementById(this.idOfTree);
+				var ulTag = parentNode.childNodes[0].childNodes[0];
+			}
+			else{
+				var parentNode = document.getElementById(parentNodeId);
+//console.log('parentNode');								
+//console.log(parentNode);				
+				var childrenOfParent = parentNode.childNodes;
+//console.log('childrenOfParent');												
+//console.log(childrenOfParent);								
+				var spanTag = childrenOfParent[childrenOfParent.length-1];
+//console.log('spanTag');							
+//console.log(spanTag);								
+				if (spanTag.tagName.toString() == 'SPAN'){
+					var ulTag = spanTag.getElementsByTagName('ul')[0];				
+//console.log('getUL');					
+				}
+				else{
+//console.log(spanTag.tagName+' '+'span');					
+					var ulTag = spanTag;				
+				}
+//console.log(ulTag);
+			}
+			var childrenOfUlTag = ulTag.childNodes;
+			var number = null;
+
+//console.log(ulTag);						
+//console.log('nodeId');
+//console.log(document.getElementById(nodeId));			
+//console.log(childrenOfUlTag);			
+
+			if (ulTag.getElementsByTagName('li').length == 0){
+//				result.push('1');
+				return 1;
+//console.log('li tags not found');
+			}
+			else {
+				for (var i = 0; i < childrenOfUlTag.length; i++){
+//console.log(childrenOfUlTag[i].id+' '+nodeId);					
+					if (number != null){
+						result.push(childrenOfUlTag[i].id);
+					}
+					if (childrenOfUlTag[i].id == nodeId){
+						number = i + 1;
+						return number;
+						result.push(number.toString());
+					}
+				}
+			}
+//console.log(result);			
+			return result;
+		}
+		,
+		getFollowingNodes : function(parentNodeId, placeInLevel){
+//console.log('getFollowingNodes');
+//console.log('placeInLevel '+placeInLevel);
+//console.log('parentNodeId '+parentNodeId);
+			var result = new Array(); //ids of following nodes
+			if (parentNodeId == null){
+				var parentNode = document.getElementById(this.idOfTree);
+				var ulTag = parentNode.childNodes[0].childNodes[0];
+			}
+			else{
+				var parentNode = document.getElementById(parentNodeId);
+				var childrenOfParent = parentNode.childNodes;
+				var spanTag = childrenOfParent[childrenOfParent.length-1];
+//console.log(spanTag);				
+				if (spanTag.childNodes.length == 0)
+					return null;
+				if (spanTag.tagName.toString() == 'SPAN'){
+					var ulTag = spanTag.getElementsByTagName('ul')[0];				
+				}
+				else{
+					var ulTag = spanTag;
+				}
+			}
+//console.log(ulTag)			
+			var childrenOfUlTag = ulTag.childNodes;
+			var number = null;
+
+			if (ulTag.getElementsByTagName('li').length == 0){
+//console.log('emptyList');				
+				return null;
+			}
+			else {
+//console.log('not emptyList');		
+				for (var i = placeInLevel-1; i < childrenOfUlTag.length; i++){
+//console.log(document.getElementById(childrenOfUlTag[i].id));					
+					result.push(childrenOfUlTag[i].id);
+				}
+			}
+			return result;
+				
+		}	
+		,
+/*		
+		getPreviousNodes : function(parentNodeId, placeInLevel){
+console.log('getPreviousNodes');
+			var result = new Array(); //ids of previous nodes
+
+			if (parentNodeId == null){
+				var parentNode = document.getElementById(this.idOfTree);
+				var ulTag = parentNode.childNodes[0].childNodes[0];
+			}
+			else{
+				var parentNode = document.getElementById(parentNodeId);
+				var childrenOfParent = parentNode.childNodes;
+				var spanTag = childrenOfParent[childrenOfParent.length-1];
+				if (spanTag.tagName.toString() == 'SPAN'){
+					var ulTag = spanTag.getElementsByTagName('ul')[0];				
+				}
+				else{
+					var ulTag = spanTag;				
+				}
+			}
+			var childrenOfUlTag = ulTag.childNodes;
+			var number = null;
+
+			if (ulTag.getElementsByTagName('li').length == 0){
+				return null;
+			}
+			else {
+				for (var i = 0; i < placeInLevel; i++){
+					result.push(childrenOfUlTag[i].id);
+console.log(document.getElementById(childrenOfUlTag[i].id));
+				}
+			}
+			return result;				
+		}	
+		,	
+*/
+		getNodesBetween : function(nodeId, parentNodeId, placeFrom, placeTo){
+			
+//console.log('getNodesBetween');		
+/*
+console.log('parentNodeId '+parentNodeId);		
+console.log('placeFrom '+placeFrom);		
+console.log('placeTo '+placeTo);		
+*/ 
+			var result = new Array(); //ids of nodes	
+
+			if (parentNodeId == null){
+				var parentNode = document.getElementById(this.idOfTree);
+				var ulTag = parentNode.childNodes[0].childNodes[0];
+			}
+			else{
+				var parentNode = document.getElementById(parentNodeId);
+				var childrenOfParent = parentNode.childNodes;
+				var spanTag = childrenOfParent[childrenOfParent.length-1];
+				if (spanTag.tagName.toString() == 'SPAN'){
+					var ulTag = spanTag.getElementsByTagName('ul')[0];				
+				}
+				else{
+					var ulTag = spanTag;				
+				}
+			}
+			var childrenOfUlTag = ulTag.childNodes;
+			var number = null;
+
+			if (ulTag.getElementsByTagName('li').length == 0){
+				return null;
+			}
+			else {
+				for (var i = placeFrom-1; i < placeTo; i++){
+					result.push(childrenOfUlTag[i].id);
+//console.log('i '+i);					
+//console.log(document.getElementById(childrenOfUlTag[i].id));					
+				}
+			}
+			
+//result.push(nodeId);				
+
+			return result;					
+		}				
 	}
 	
 	function withEnter(e) {
