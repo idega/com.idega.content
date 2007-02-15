@@ -13,6 +13,7 @@ import com.idega.content.bean.ContentItemFeedBean;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
+import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 
@@ -86,7 +87,7 @@ public class ContentItemCommentsEngineBean extends IBOServiceBean implements Con
 		}
 		List<SyndEntry> entries = initEntries(feed.getEntries());
 		
-		SyndEntry entry = rss.createNewEntry(subject, uri, date, null, "text", getShortBody(body), "text", body, user, language, null,
+		SyndEntry entry = rss.createNewEntry(subject, uri, date, date, "text", getShortBody(body), "text", body, user, language, null,
 				null, null, null);
 		entries.add(entry);
 		feed.setEntries(entries);
@@ -150,5 +151,54 @@ public class ContentItemCommentsEngineBean extends IBOServiceBean implements Con
 			}
 		}
 		return rss;
+	}
+	
+	public List<ContentItemComment> getComments(String uri) {
+		if (uri == null) {
+			return null;
+		}
+		if (!ThemesHelper.getInstance().existFileInSlide(uri)) {
+			return null;
+		}
+		if (rss == null) {
+			return null;
+		}
+		SyndFeed comments = rss.getFeed(ThemesHelper.getInstance().getFullWebRoot() + uri);
+		if (comments == null) {
+			return null;
+		}
+		List entries = comments.getEntries();
+		if (entries == null) {
+			return null;
+		}
+		List<ContentItemComment> items = new ArrayList<ContentItemComment>();
+		ContentItemComment comment = null;
+		Object o = null;
+		SyndEntry entry = null;
+		SyndContent content = null;
+		for (int i = 0; i < entries.size(); i++) {
+			o = entries.get(i);
+			if (o instanceof SyndEntry) {
+				comment = new ContentItemComment();
+				entry = (SyndEntry) o;
+				comment.setUser(entry.getAuthor());
+				comment.setSubject(entry.getTitle());
+				try {
+					if (entry.getContents() != null) {
+						content = (SyndContent) entry.getContents().get(0);
+						comment.setComment(content.getValue());
+					}
+					else {
+						comment.setComment(ContentConstants.EMPTY);
+					}
+				} catch (ClassCastException e) {
+					comment.setComment(ContentConstants.EMPTY);
+				}
+				comment.setPosted(entry.getPublishedDate().toString());
+				items.add(comment);
+			}
+		}
+		
+		return items;
 	}
 }

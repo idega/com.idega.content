@@ -19,6 +19,7 @@
     <create creator="ibo" javascript="CommentsEngine" scope="application">
       <param name="class" value="com.idega.content.business.ContentItemCommentsEngine"/>
     </create>
+    <convert converter="bean" match="com.idega.content.business.ContentItemComment" />
   </allow>
   
 	<signatures>
@@ -27,8 +28,11 @@
   			import com.idega.content.themes.business.ThemesEngine;
   			import com.idega.content.themes.helpers.ThemeChange;
 			import com.idega.content.themes.helpers.TreeNodeStructure;
+			import com.idega.content.business.ContentItemComment;
+			
   			ThemesEngine.applyMultipleChangesToTheme(String, List<ThemeChange>, String);
   			ThemesEngine.beforeCreatePage(List<TreeNodeStructure>, Boolean);
+  			ContentItemCommentsEngine.getComments(String);
   		]]>
 	</signatures>
 </dwr>

@@ -99,6 +99,7 @@ last_modified=Last modified
 list=List
 list_articles=List articles
 list_pages=list_pages
+loading_comments=Loading comments...
 lock=Lock
 locked=Locked
 locked_unlocked=Locked/Unlocked
