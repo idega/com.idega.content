@@ -834,18 +834,12 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		BuilderService service = helper.getThemesService().getBuilderService(); 
-//		setTreeOrder(nodeId, numberInLevel);
 		
 		ICPage page = helper.getThemesService().getICPage(nodeId);
-////		System.out.println("ID "+nodeId);
-//		System.out.println("numberInLevel "+numberInLevel);
-//		System.out.println("before "+page.getTreeOrder());
-				page.setTreeOrder(numberInLevel);
-				page.store();
-				service.setTreeOrder(nodeId, numberInLevel);
-//				page = helper.getThemesService().getICPage(nodeId);
-//		System.out.println("after "+page.getTreeOrder());
-//System.out.println("set "+numberInLevel+" to "+nodeId);
+		page.setTreeOrder(numberInLevel);
+		page.store();
+		service.setTreeOrder(nodeId, numberInLevel);
+
 		if (nodesToIncrease != null)
 			increaseNodesNumbersInLevel(nodesToIncrease, numberInLevel, service);
 		if (nodesToDecrease != null)
@@ -853,15 +847,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (newParentId <= 0) {
 			result = service.movePageToTopLevel(nodeId, iwc);
 			
-//			page = helper.getThemesService().getICPage(nodeId);
-//System.out.println("after moving top level"+page.getTreeOrder());
-//			setTreeOrder(nodeId, numberInLevel);
 			return result;
 		}
 		result = service.movePage(newParentId, nodeId, iwc.getDomain());
-//		page = helper.getThemesService().getICPage(nodeId);
-//System.out.println("after moving not top level"+page.getTreeOrder());		
-//		setTreeOrder(nodeId, numberInLevel);
 		return result;
 	}
 	
@@ -1047,26 +1035,12 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		int id = -1;
 		
-//System.out.println("decrease level");
 		for (int i = 0; i < nodes.size(); i++){
-//System.out.println(nodes.get(i));
 			id = Integer.valueOf(nodes.get(i)).intValue();
 			ICPage page = helper.getThemesService().getICPage(id);
 			page.setTreeOrder(page.getTreeOrder()-1);
 			service.decreaseTreeOrder(id);
 			page.store();			
-			
-			
-//			page.setTreeOrder(page.getTreeOrder()-1);
-//			if((i != nodes.size()-1) || (numberInLevel == -1)){
-//				page.setTreeOrder(page.getTreeOrder()-1);
-//				service.decreaseTreeOrder(id);
-//			}
-//			else{
-//				service.setTreeOrder(id, numberInLevel);				
-//				page.setTreeOrder(numberInLevel);
-//			}
-//			page.store();
 		}
 		return true;
 	}
@@ -1076,33 +1050,14 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		if(service == null)
 			service = helper.getThemesService().getBuilderService();
-
-//		Map tree = PageTreeNode.getTree(IWMainApplication.getDefaultIWApplicationContext());		
-//		PageTreeNode childNode = null;
-//		
 		int id = -1;
 		
-//System.out.println("increase level");
 		for (int i = 0; i < nodes.size(); i++){
-//System.out.println(nodes.get(i));
 			id = Integer.valueOf(nodes.get(i)).intValue();
 			ICPage page = helper.getThemesService().getICPage(Integer.valueOf(nodes.get(i)).intValue());
-//			
 			page.setTreeOrder(page.getTreeOrder()+1);
 			service.increaseTreeOrder(id);
 			page.store();
-			
-//			if((i != nodes.size()-1) || (numberInLevel == -1)){
-//				page.setTreeOrder(page.getTreeOrder()+1);
-//				service.increaseTreeOrder(id);
-////				childNode = (PageTreeNode) tree.get(Integer.valueOf(nodes.get(i)).intValue());
-////				childNode.setOrder(childNode.getOrder()+1);
-//			}
-//			else{
-//				page.setTreeOrder(numberInLevel);
-//				service.setTreeOrder(id, numberInLevel);
-//			}
-//			page.store();
 		}
 		
 		return true;
@@ -1111,25 +1066,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	private void setTreeOrder(int nodeId, int numberInLevel){
 		ICPage page = helper.getThemesService().getICPage(Integer.valueOf(""+nodeId).intValue());
 		BuilderService service = helper.getThemesService().getBuilderService();
-//		page.setTreeOrder(-1);
-//		page.setTreeOrder(numberInLevel);
-
-//		System.out.println();
 		
 		page.getId();
-//		page.
 		page.setTreeOrder(page.getTreeOrder()+20);
 		page.store();
 		service.setTreeOrder(nodeId, numberInLevel);
-//System.out.println("Set -1");
-//		ICPage page = helper.getThemesService().getICPage(nodeId);
-//		System.out.println("ID "+nodeId);
-//		System.out.println("numberInLevel "+numberInLevel);
-//		System.out.println("before "+page.getTreeOrder());
-//				page.setTreeOrder(-1);
-//				page.store();
-//				page = helper.getThemesService().getICPage(nodeId);
-//		System.out.println("after "+page.getTreeOrder());		
 	}
 	
 	private List <TreeNodeStructure> getOrderInLevel(List <TreeNodeStructure> struct){
