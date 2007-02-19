@@ -75,7 +75,8 @@ public class SiteViewManager {
 		
 		/* Page nodes begin */
 		DefaultViewNode siteNode = new DefaultViewNode("site", contentNode);
-		siteNode.setJspUri(bundle.getJSPURI("pages.jsp"));
+//		siteNode.setJspUri(bundle.getJSPURI("pages.jsp"));
+		siteNode.setJspUri(bundle.getJSPURI("site.jsp"));
 		siteNode.setKeyboardShortcut(new KeyboardShortcut("p"));
 		siteNode.setName("#{localizedStrings['com.idega.content']['site']}");
 		
@@ -88,17 +89,23 @@ public class SiteViewManager {
 		themes.setName("#{localizedStrings['com.idega.content']['themes']}");				
 		
 		DefaultViewNode siteManagerNode = new DefaultViewNode("site_manager", siteNode);
-		siteManagerNode.setJspUri(bundle.getJSPURI("site.jsp"));
+		siteManagerNode.setJspUri(bundle.getJSPURI("site_manager.jsp"));
 		siteManagerNode.setName("#{localizedStrings['com.idega.content']['site_manager']}");
 
 		DefaultViewNode pagesNode = new DefaultViewNode("pages", siteNode);
 		pagesNode.setJspUri(bundle.getJSPURI("pages.jsp"));
 		pagesNode.setName("#{localizedStrings['com.idega.content']['pages']}");		
-		
-		DefaultViewNode treeNode = new DefaultViewNode("tree", pagesNode);
+
+		DefaultViewNode treeNode = new DefaultViewNode("tree", siteNode);
 		treeNode.setJspUri(bundle.getJSPURI("tree.jsp"));
 		treeNode.setName("#{localizedStrings['com.idega.content']['site_map']}");
 		treeNode.setVisibleInMenus(false);
+		
+		
+//		DefaultViewNode treeNode = new DefaultViewNode("tree", pagesNode);
+//		treeNode.setJspUri(bundle.getJSPURI("tree.jsp"));
+//		treeNode.setName("#{localizedStrings['com.idega.content']['site_map']}");
+//		treeNode.setVisibleInMenus(false);
 		
 //		DefaultViewNode pageListNode = new DefaultViewNode("list",pagesNode);
 //		pageListNode.setJspUri(bundle.getJSPURI("pages.jsp"));
