@@ -1,5 +1,5 @@
 /**
- * $Id: ContentCategory.java,v 1.3 2007/02/05 21:39:26 gediminas Exp $
+ * $Id: ContentCategory.java,v 1.4 2007/02/20 10:57:51 gediminas Exp $
  * Created in 2007 by gediminas
  *
  * Copyright (C) 2000-2007 Idega Software hf. All Rights Reserved.
@@ -69,7 +69,19 @@ public class ContentCategory {
 	}
 	
 	public String getName(String lang) {
-		return getNames().get(lang);
+		String name = getNames().get(lang);
+		if (name == null) {
+			// try without locale variant is@Reykjavik => is
+			int i = lang.lastIndexOf("@");
+			if (i < 0) {
+				// try without country, e.g. is_IS => is
+				i = lang.lastIndexOf("_");
+			}
+			if (i > 1) {
+				name = getName(lang.substring(0, i - 1));
+			}
+		}
+		return name;
 	}
 	
 	public void addName(String lang, String name) {
@@ -89,7 +101,7 @@ public class ContentCategory {
 		List namesEl = cat.getChildren("name");
 		for (Iterator iter = namesEl.iterator(); iter.hasNext(); ) {
 			Element name = (Element) iter.next();
-			String lang = name.getAttributeValue("lang");
+			String lang = name.getAttributeValue("lang", Namespace.XML_NAMESPACE);
 			String localizedName = name.getText();
 			names.put(lang, localizedName);
 		}
