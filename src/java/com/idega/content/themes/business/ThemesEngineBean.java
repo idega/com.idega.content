@@ -559,7 +559,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	private boolean saveSiteInfoValue(String language, String keyword, String value, IWMainApplicationSettings settings,
 			ICDomain domain, ICDomain cachedDomain) {
-		if (language == null || keyword == null || value == null) {
+		if (language == null || keyword == null) {
 			return false;
 		}
 		
