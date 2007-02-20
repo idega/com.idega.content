@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.10 2007/02/13 15:40:06 gediminas Exp $
+ * $Id: CategoryBean.java,v 1.11 2007/02/20 10:59:12 gediminas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -51,10 +51,10 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2007/02/13 15:40:06 $ by $Author: gediminas $
+ *  Last modified: $Date: 2007/02/20 10:59:12 $ by $Author: gediminas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class CategoryBean {
 	
@@ -226,7 +226,17 @@ public class CategoryBean {
 	}
 	
 	public String getCategoryName(String categoryKey) {
-		return this.categories.get(categoryKey).getName(getCurrentLocale());
+		ContentCategory cat = (ContentCategory) this.categories.get(categoryKey);
+		String lang = getCurrentLocale();
+		String name = cat.getName(lang);
+		if (name == null) {
+			lang = iwma.getDefaultLocale().toString();
+			name = cat.getName(lang);
+		}
+		if (name == null) {
+			name = categoryKey;
+		}
+		return name;
 	}
 	
 	protected String getCurrentLocale() {
