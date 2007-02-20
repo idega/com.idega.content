@@ -45,47 +45,49 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 		Timestamp date = new Timestamp(System.currentTimeMillis());
 		
 		SyndFeed comments = null;
-		boolean existsCommentsFile = ThemesHelper.getInstance().existFileInSlide(uri);
-		
-		if (existsCommentsFile) {
-			if (rss != null) {
-				comments = rss.getFeed(ThemesHelper.getInstance().getFullWebRoot() + uri);
+		synchronized (CommentsEngineBean.class) {
+			boolean existsCommentsFile = ThemesHelper.getInstance().existFileInSlide(uri);
+			
+			if (existsCommentsFile) {
+				if (rss != null) {
+					comments = rss.getFeed(ThemesHelper.getInstance().getFullWebRoot() + uri);
+				}
+				else {
+					return false;
+				}
 			}
 			else {
+				comments = createFeed(uri, user, subject, body, date, language, iwc);
+			}
+			if (!addNewEntry(comments, subject, uri, date, body, user, language)) {
 				return false;
 			}
-		}
-		else {
-			comments = createFeed(uri, user, subject, body, date, language, iwc);
-		}
-		if (!addNewEntry(comments, subject, uri, date, body, user, language)) {
-			return false;
-		}
-		
-		if (comments == null) {
-			return false;
-		}
-		
-		String commentsXml = null;
-		try {
-			commentsXml = rss.convertFeedToRSS2XMLString(comments);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-			return false;
-		}
-		
-		String base = uri.substring(0, uri.lastIndexOf(ContentConstants.SLASH));
-		String file = uri.substring(uri.lastIndexOf(ContentConstants.SLASH));
-		IWSlideService service = ThemesHelper.getInstance().getSlideService(null);
-		try {
-			if (service.uploadFileAndCreateFoldersFromStringAsRoot(base, file, commentsXml, ContentConstants.XML_MIME_TYPE, true)) {				
-				return true;
+			
+			if (comments == null) {
+				return false;
 			}
-		} catch (RemoteException e) {
-			e.printStackTrace();
+			
+			String commentsXml = null;
+			try {
+				commentsXml = rss.convertFeedToRSS2XMLString(comments);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+				return false;
+			}
+			
+			String base = uri.substring(0, uri.lastIndexOf(ContentConstants.SLASH));
+			String file = uri.substring(uri.lastIndexOf(ContentConstants.SLASH));
+			IWSlideService service = ThemesHelper.getInstance().getSlideService(null);
+			try {
+				if (service.uploadFileAndCreateFoldersFromStringAsRoot(base, file, commentsXml, ContentConstants.XML_MIME_TYPE, true)) {				
+					return true;
+				}
+			} catch (RemoteException e) {
+				e.printStackTrace();
+				return false;
+			}
 			return false;
 		}
-		return false;
 	}
 	
 	private boolean addNewEntry(SyndFeed feed, String subject, String uri, Timestamp date, String body, String user, String language) {
@@ -162,14 +164,10 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 	
 	public boolean getCommentsForAllPages(String uri) {
 		WebContext wctx = WebContextFactory.get();
-		Collection sessions = wctx.getScriptSessionsByPage(wctx.getCurrentPage());
+		Collection pages = wctx.getScriptSessionsByPage(wctx.getCurrentPage());
 		
-		System.out.println("Found sessions: " + sessions.size());
-		
-		Util utilAll = new Util(sessions);
+		Util utilAll = new Util(pages);
 		utilAll.addFunctionCall("getComments", uri);
-//		ScriptBuffer s = new ScriptBuffer("alert('everywhere refresh');");
-//		utilAll.addScript(s);
 		
 		return true;
 	}
@@ -213,6 +211,8 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 						comment.setComment(ContentConstants.EMPTY);
 					}
 				} catch (ClassCastException e) {
+					comment.setComment(ContentConstants.EMPTY);
+				} catch (IndexOutOfBoundsException e) {
 					comment.setComment(ContentConstants.EMPTY);
 				}
 				comment.setPosted(entry.getPublishedDate().toString());

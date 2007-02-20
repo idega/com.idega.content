@@ -1162,7 +1162,7 @@ public class ThemesHelper implements Singleton {
 		StringBuffer commentPath = new StringBuffer(ContentConstants.CONTENT_ITEM_COMMENTS_URI);
 		if (pageURI == null) {
 			commentPath.append(ContentConstants.SLASH).append(ContentUtil.getYearMonthPath());
-			commentPath.append(ContentConstants.SLASH).append(getSlideService().createUniqueFileName(ContentConstants.COMMENT_SCOPE));
+			commentPath.append(ContentConstants.SLASH);
 		} 
 		else {
 			if (pageURI.endsWith(ContentConstants.SLASH)) {
@@ -1170,6 +1170,7 @@ public class ThemesHelper implements Singleton {
 			}
 			commentPath.append(pageURI);
 		}
+		commentPath.append(getSlideService().createUniqueFileName(ContentConstants.COMMENT_SCOPE));
 		commentPath.append(ContentConstants.COMMENT_PREFIX).append(ContentConstants.SLASH).append(ContentConstants.COMMENT_SCOPE);
 		commentPath.append(ThemesConstants.DOT).append(ThemesConstants.XML_EXTENSION);
 		return commentPath.toString();

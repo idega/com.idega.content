@@ -3,18 +3,13 @@ package com.idega.content.presentation;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 
-import com.idega.block.rss.business.RSSBusiness;
-import com.idega.business.IBOLookup;
-import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
-import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Script;
 import com.idega.presentation.text.Link;
 import com.idega.webface.WFDivision;
-import com.sun.syndication.feed.synd.SyndFeed;
 
 public class ContentItemComments extends ContentBlock {
 	
@@ -48,14 +43,12 @@ public class ContentItemComments extends ContentBlock {
 		container.setId(COMMENTS_BLOCK_ID);
 		container.setStyleClass(styleClass);
 		
-		SyndFeed commentsFeed = getCommentsFeed(iwc);
-		
 		// Comments label
 		StringBuffer comments = new StringBuffer(ContentUtil.getBundle().getLocalizedString("comments"));
 		comments.append(ContentConstants.SPACE).append("(<span id='contentItemCount' class='contentItemCountStyle'>");
-		comments.append(getCommentsCount(commentsFeed)).append("</span>)");
+		comments.append(ZERO_COMMENTS).append("</span>)");
 		Link commentsLabel = new Link(comments.toString(), "#showCommentsList");
-		commentsLabel.setOnClick("showCommentsList()");
+		commentsLabel.setOnClick("setShowCommentsList(true);showCommentsList()");
 		container.add(commentsLabel);
 		
 		// Add comment block
@@ -63,46 +56,15 @@ public class ContentItemComments extends ContentBlock {
 		
 		// Comments list will be generated with DWR & JavaScript
 		Script script = new Script();
-//		script.addScriptLine("setCommentsTimeOut(60000);"); // Every minute will check for new comments
 		script.addScriptLine("setPostedLabel('"+ContentUtil.getBundle().getLocalizedString("posted")+"');");
 		script.addScriptLine("setCommentsLoadingMessage('"+ContentUtil.getBundle().getLocalizedString("loading_comments")+"');");
 		script.addScriptLine("setLinkToComments('"+linkToComments+"');");
-		if (showCommentsList) {
-			script.addScriptLine("getComments('"+linkToComments+"');");
-		}
+		script.addScriptLine("setActiveReverseAjax(true);");
+		script.addScriptLine("setShowCommentsList("+showCommentsList+");");
+		script.addScriptLine("getAllArticleComments('"+linkToComments+"');");
 		container.add(script);
 		
 		this.add(container);
-	}
-	
-	private SyndFeed getCommentsFeed(IWContext iwc) {
-		if (linkToComments == null) {
-			return null;
-		}
-		ThemesHelper helper = ThemesHelper.getInstance();
-		if (!helper.existFileInSlide(linkToComments)) {
-			return null;
-		}
-		
-		RSSBusiness rss = null;
-		try {
-			rss = (RSSBusiness) IBOLookup.getServiceInstance(iwc, RSSBusiness.class);
-		} catch (IBOLookupException e) {
-			e.printStackTrace();
-			return null;
-		}
-		return rss.getFeed(helper.getFullWebRoot() + linkToComments);
-	}
-	
-	private String getCommentsCount(SyndFeed comments) {
-		if (comments == null) {
-			return ZERO_COMMENTS;
-		}
-		if (comments.getEntries() == null) {
-			return ZERO_COMMENTS;
-		}
-		
-		return String.valueOf(comments.getEntries().size());
 	}
 	
 	private UIComponent getAddCommentBlock(IWContext iwc) {
