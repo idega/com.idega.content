@@ -46,7 +46,6 @@ public class SiteViewManager {
 	
 	public ViewNode getContentNode(){
 		IWBundle iwb = this.iwma.getBundle(CONTENT_BUNDLE_IDENTIFIER);
-		//ViewNode content = root.getChild(CONTENT_ID);
 		if(this.contentRootNode==null){
 			this.contentRootNode = initalizeContentNode(iwb);
 		}
@@ -63,7 +62,7 @@ public class SiteViewManager {
 		
 		
 		contentNode.setJspUri(contentBundle.getJSPURI("site.jsp"));
-		contentNode.setKeyboardShortcut(new KeyboardShortcut("4"));
+//		contentNode.setKeyboardShortcut(new KeyboardShortcut("4")); //TODO: this shortcut duplicates
 		
 		this.contentRootNode = contentNode;
 		return this.contentRootNode;
@@ -73,16 +72,10 @@ public class SiteViewManager {
 	public void initializeStandardNodes(IWBundle bundle){
 		ViewNode contentNode = initalizeContentNode(bundle);
 		
-		/* Page nodes begin */
 		DefaultViewNode siteNode = new DefaultViewNode("site", contentNode);
-//		siteNode.setJspUri(bundle.getJSPURI("pages.jsp"));
 		siteNode.setJspUri(bundle.getJSPURI("site.jsp"));
 		siteNode.setKeyboardShortcut(new KeyboardShortcut("p"));
-		siteNode.setName("#{localizedStrings['com.idega.content']['site']}");
-		
-//		DefaultViewNode themes = new DefaultViewNode("themes_manager", siteNode);
-//		themes.setJspUri(bundle.getJSPURI("themes.jsp"));
-//		themes.setName("#{localizedStrings['com.idega.content']['themes_manager']}");		
+		siteNode.setName("#{localizedStrings['com.idega.content']['site']}");	
 
 		DefaultViewNode themes = new DefaultViewNode("themes", siteNode);
 		themes.setJspUri(bundle.getJSPURI("themes.jsp"));
@@ -100,67 +93,7 @@ public class SiteViewManager {
 		treeNode.setJspUri(bundle.getJSPURI("tree.jsp"));
 		treeNode.setName("#{localizedStrings['com.idega.content']['site_map']}");
 		treeNode.setVisibleInMenus(false);
-		
-		
-//		DefaultViewNode treeNode = new DefaultViewNode("tree", pagesNode);
-//		treeNode.setJspUri(bundle.getJSPURI("tree.jsp"));
-//		treeNode.setName("#{localizedStrings['com.idega.content']['site_map']}");
-//		treeNode.setVisibleInMenus(false);
-		
-//		DefaultViewNode pageListNode = new DefaultViewNode("list",pagesNode);
-//		pageListNode.setJspUri(bundle.getJSPURI("pages.jsp"));
-//		pageListNode.setName("#{localizedStrings['com.idega.content']['list_pages']}");
-		
-//		DefaultViewNode createPageNode = new DefaultViewNode("create",pagesNode);
-//		createPageNode.setJspUri(bundle.getJSPURI("createpage.jsp"));
-//		createPageNode.setName("#{localizedStrings['com.idega.content']['create_page']}");
-//		createPageNode.setVisibleInMenus(false);
-		
-//		DefaultViewNode previewPageNode = new DefaultViewNode("preview",pagesNode);
-//		previewPageNode.setJspUri(bundle.getJSPURI("pagepreview.jsp"));
-//		previewPageNode.setVisibleInMenus(false);
-		
-//		DefaultViewNode detailsPageNode = new DefaultViewNode("details",pagesNode);
-//		detailsPageNode.setJspUri(bundle.getJSPURI("pagedetails.jsp"));
-//		detailsPageNode.setVisibleInMenus(false);
-//		detailsPageNode.setName("#{localizedStrings['com.idega.content']['page_details']}");
-		
-//		DefaultViewNode simpleTemplateNode = new DefaultViewNode("templatesettings",pagesNode);
-//		simpleTemplateNode.setJspUri(bundle.getJSPURI("simpletemplate.jsp"));
-//		simpleTemplateNode.setName("#{localizedStrings['com.idega.content']['template_settings']}");
-//		simpleTemplateNode.setVisibleInMenus(false);
-		
-//		DefaultViewNode pages = new DefaultViewNode("Change pages", pagesNode);
-//		pages.setJspUri(bundle.getJSPURI("pages2.jsp"));
-//		pages.setName("Change pages 2");
-//		pages.setVisibleInMenus(false);
-		
-//		DefaultViewNode templatesTemplateNode = new DefaultViewNode("templates",pagesNode);
-//		templatesTemplateNode.setJspUri(bundle.getJSPURI("templates.jsp"));
-//		templatesTemplateNode.setName("#{localizedStrings['com.idega.content']['Templates']}");
-//		templatesTemplateNode.setVisibleInMenus(false);
-		/* Page nodes end */
-		
-		
-//		DefaultViewNode documentsNode = new DefaultViewNode("documents",contentNode);
-//		//documentsNode.setJspUri(bundle.getJSPURI("documents.jsp"));
-//		documentsNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
-//		documentsNode.setKeyboardShortcut(new KeyboardShortcut("d"));
-//		documentsNode.setName("#{localizedStrings['com.idega.content']['documents']}");
-		
-//		DefaultViewNode previewNode = new DefaultViewNode("preview",documentsNode);
-//		previewNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
-//		previewNode.setVisibleInMenus(false);
-		
-//		DefaultViewNode permissionNode = new DefaultViewNode("permission",documentsNode);
-//		permissionNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
-//		permissionNode.setVisibleInMenus(false);
-		
-//		DefaultViewNode searchNode = new DefaultViewNode("search",contentNode);
-//		searchNode.setJspUri(bundle.getJSPURI("search.jsp"));	
-//		searchNode.setKeyboardShortcut(new KeyboardShortcut("s"));
-//		searchNode.setName("#{localizedStrings['com.idega.content']['search']}");
-		
+
 	}
 
 }
