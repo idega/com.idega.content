@@ -13,7 +13,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.myfaces.shared_impl.util.BiLevelCacheMap;
 
 import com.idega.business.IBOServiceBean;
 import com.idega.content.business.ContentConstants;
@@ -44,6 +43,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	private static final String PAGE_URI = "pageUri";
 	private static final String PAGE_TITLE = "pageTitle";
 	private static final String PATH_TO_IMAGE_FOLDER = ContentUtil.getBundle().getResourcesPath() + "/images/pageIcons/";
+	
+	private static final String ARTICLE_VIEWER_NAME = "Article Viewer";
+	private static final String ARTICLE_VIEWER_SUBTYPE = "viewer";
 	
 	private static final String ARTICLE_VIEWER_TEMPLATE_KEY = "article_viewer_page_key";
 	
@@ -290,9 +292,13 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return null;
 		}
 		
+		if (domain.getStartPageID() == Integer.valueOf(page.getId())) { // Is page a root page?
+			return page.getDefaultPageURI();
+		}
+		
 		if (helper.getThemesService().getBuilderService().changePageUriByTitle(parentId, page, pageTitle, domain.getID())) {
 			if (ThemesConstants.ARTICLE_PAGE_TYPE.equals(page.getSubType())) {
-				setNewLinkInArticleFile(page.getId(),"com.idega.block.article.component.ArticleItemViewer", page.getDefaultPageURI());
+				setNewLinkInArticleFile(page.getId(), "com.idega.block.article.component.ArticleItemViewer", page.getDefaultPageURI());
 			}
 			return page.getDefaultPageURI();
 		}
@@ -989,21 +995,70 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (builder == null) {
 			return false;
 		}
+		IWContext iwc = helper.getIWContext();
+		
 		String articleTemplateFile = "article_viewer_template.xml";
-		String templateSubType = "viewer";
-		if (helper.existFileInSlide(ThemesConstants.PAGES_PATH_SLIDE + articleTemplateFile)) {
+		boolean existInSlide = false;
+		int id = getArticleViewerTemplateId(builder, iwc);
+		existInSlide = helper.existFileInSlide(ThemesConstants.PAGES_PATH_SLIDE + articleTemplateFile);
+		if (existInSlide && id != -1) {
 			return true;
 		}
-		int id = createPage(null, "Article Viewer", builder.getTemplateKey(), null, ContentConstants.ARTICLE_VIEWER_URI, templateSubType, domainID, format, null);
+		
+		if (id == -1) {
+			id = createPage(null, ARTICLE_VIEWER_NAME, builder.getTemplateKey(), null, ContentConstants.ARTICLE_VIEWER_URI, ARTICLE_VIEWER_SUBTYPE, domainID, format, null);
+		}
+		else {
+			if (existInSlide) {
+				return true;
+			}
+		}
+		
 		String pageKey = String.valueOf(id);
-		boolean result = preparePage(articleTemplateFile, templateSubType, id, pageKey);
+		boolean result = preparePage(articleTemplateFile, ARTICLE_VIEWER_SUBTYPE, id, pageKey);
 		setLastUsedTemplate(pageKey);
-		IWContext iwc = helper.getIWContext();
 		if (iwc == null) {
 			return result;
 		}
 		iwc.getApplicationSettings().setProperty(ARTICLE_VIEWER_TEMPLATE_KEY, pageKey);
 		return result;
+	}
+	
+	private int getArticleViewerTemplateId(BuilderService builder, IWContext iwc) {
+		if (builder == null || iwc == null) {
+			return -1;
+		}
+		Collection templates = builder.getTopLevelTemplates(iwc);
+		if (templates == null) {
+			return -1;
+		}
+		if (templates.size() == 0) {
+			return -1;
+		}
+		Object o = null;
+		ICTreeNode treeNode = null;
+		ICPage page = null;
+		int id = -1;
+		for (Iterator it = templates.iterator(); it.hasNext();) {
+			o = it.next();
+			if (o instanceof ICTreeNode) {
+				treeNode = (ICTreeNode) o;
+				if (ARTICLE_VIEWER_NAME.equals(treeNode.getNodeName())) {
+					try {
+						id = Integer.valueOf(treeNode.getId());
+					} catch (NumberFormatException e) {
+						log.error(e);
+						return -1;
+					}
+					page = helper.getThemesService().getICPage(id);
+					if (ARTICLE_VIEWER_SUBTYPE.equals(page.getSubType())) {
+						return id;
+					}
+				}
+			}
+		}
+		
+		return -1;
 	}
 	
 	public boolean initializeCachedDomain(String domainName, ICDomain domain) {
@@ -1063,31 +1118,22 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	private void setTreeOrder(int nodeId, int numberInLevel){
-		ICPage page = helper.getThemesService().getICPage(Integer.valueOf(""+nodeId).intValue());
-		BuilderService service = helper.getThemesService().getBuilderService();
-		
-		page.getId();
-		page.setTreeOrder(page.getTreeOrder()+20);
-		page.store();
-		service.setTreeOrder(nodeId, numberInLevel);
-	}
-	
 	private List <TreeNodeStructure> getOrderInLevel(List <TreeNodeStructure> struct){
-		Map children = new HashMap ();
+		Map<String, Integer> children = new HashMap<String, Integer>();
+		String ONE = "1";
 		String parentId = null;
-		int number;
+		Integer number = null;
 		for (int i = 0; i < struct.size(); i++){
 			if (struct.get(i).getTreeOrder() == null){
 				parentId = struct.get(i).getParentId();
 				if (children.containsKey(parentId)){
 					number = (Integer)(children.get(parentId)) + 1;
 					children.put(parentId, number);
-					struct.get(i).setTreeOrder(""+number);
+					struct.get(i).setTreeOrder(String.valueOf(number));
 				}
 				else{
 					children.put(parentId, 1);
-					struct.get(i).setTreeOrder("1");
+					struct.get(i).setTreeOrder(ONE);
 				}
 					
 			}

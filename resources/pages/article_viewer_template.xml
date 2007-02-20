@@ -12,6 +12,8 @@
 	    		<property name="styleClass" value="blog-entry" />
 				<property name="showAuthor" value="false" />
 				<property name="showCreationDate" value="false" />
+				<property name="showComments" value="false" />
+				<property name="showCommentsList" value="false" />
 	    	</module>
 	    </region>
 	    <region id="sidebar" label="sidebar">
