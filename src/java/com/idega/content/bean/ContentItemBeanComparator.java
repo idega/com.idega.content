@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBeanComparator.java,v 1.3 2006/04/09 12:01:55 laddi Exp $
+ * $Id: ContentItemBeanComparator.java,v 1.4 2007/02/20 13:53:42 valdas Exp $
  * Created on 15.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -15,10 +15,10 @@ import java.util.Date;
 
 /**
  * 
- *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
+ *  Last modified: $Date: 2007/02/20 13:53:42 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class ContentItemBeanComparator implements Comparator {
 
@@ -43,8 +43,8 @@ public class ContentItemBeanComparator implements Comparator {
 		ContentItemBean item2 = (ContentItemBean)o2;
 		int returner = 0;
 		
-		Date item1Date = item1.getCreationDate();
-		Date item2Date = item2.getCreationDate();
+		Date item1Date = item1.getPublishedDate() == null ? item1.getCreationDate() : item1.getPublishedDate();
+		Date item2Date = item2.getPublishedDate() == null ? item2.getCreationDate() : item2.getPublishedDate();
 		
 		if(item1Date==null && item2Date==null){
 			returner = 0;
