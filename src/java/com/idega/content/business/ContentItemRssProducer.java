@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import com.idega.block.rss.business.RSSAbstractProducer;
 import com.idega.block.rss.business.RSSBusiness;
 import com.idega.block.rss.business.RSSProducer;
-import com.idega.block.rss.business.RSSProducerImpl;
+//import com.idega.block.rss.business.RSSProducerImpl;
 import com.idega.block.rss.data.RSSRequest;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -36,7 +36,7 @@ public class ContentItemRssProducer  extends RSSAbstractProducer implements RSSP
 	protected static final String ARTICLE_SEARCH_KEY = "*.xml*";
 	public static final String PATH = ContentConstants.CONTENT + ContentUtil.getContentBaseFolderPath() + "/article";//"/files/cms/article";
 	
-	private static Log log = LogFactory.getLog(RSSProducerImpl.class);
+	private static Log log = LogFactory.getLog(ContentItemRssProducer.class);
 	
 	public ContentItemRssProducer() {
 		super();
