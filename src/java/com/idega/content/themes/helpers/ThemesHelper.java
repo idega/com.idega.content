@@ -243,11 +243,10 @@ public class ThemesHelper implements Singleton {
 			log.error("ContentSearch.doSimpleDASLSearch returned results Collection, which is null: " + results);
 			return;
 		}
-		Iterator it = results.iterator();
 		List <String> urisToThemes = new ArrayList<String>();
 		String uri = null;
 		Object o = null;
-		while (it.hasNext()) {
+		for (Iterator it = results.iterator(); it.hasNext(); ) {
 			o = it.next();
 			if (o instanceof SearchResult) {
 				uri = ((SearchResult) o).getSearchResultURI();
@@ -1209,8 +1208,8 @@ public class ThemesHelper implements Singleton {
 			return;
 		}
 
-		while (allElements.hasNext()) {
-			o = allElements.next();
+		for (Iterator it = allElements; it.hasNext(); ) {
+			o = it.next();
 			if (o instanceof Element) {
 				e = (Element) o;
 				if (e.getName().equals(module)) {
@@ -1427,6 +1426,12 @@ public class ThemesHelper implements Singleton {
 			log.error(e);
 			return false;
 		}
+	}
+	
+	public String getUniqueIdByNumberAndDate(String scope) {
+		StringBuffer id = new StringBuffer();
+		id.append(getRandomNumber(Integer.MAX_VALUE)).append(getSlideService().createUniqueFileName(scope));
+		return id.toString();
 	}
 
 }

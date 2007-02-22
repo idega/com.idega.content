@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.31 2007/02/13 19:05:36 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.32 2007/02/22 15:38:57 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -48,10 +48,10 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2007/02/13 19:05:36 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/02/22 15:38:57 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.31 $
+ * @version $Revision: 1.32 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -628,6 +628,11 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		StringBuffer articleURL = new StringBuffer(server);
 		String pageUri = getPageUrlByArticleResourcePath(iwc, moduleClass);
 		articleURL.append(pageUri);
+
+		if (published == null) { // Setting published date the same as creation
+			published = new Timestamp(System.currentTimeMillis());
+			setPublishedDate(published);
+		}
 		
 		if (linkToComments == null) {
 			if (isUsedDefaultArticlePath) {
@@ -637,7 +642,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 				linkToComments = ThemesHelper.getInstance().getArticleCommentLink(pageUri);
 			}
 		}
-		
+
 		ContentItemFeedBean feedBean = new ContentItemFeedBean(iwc, ContentItemFeedBean.FEED_TYPE_ATOM_1);
 		return feedBean.getFeedEntryAsXML(feedTitle, server, feedDescription, title, updated, published, description,
 				body, author, getLanguage(), categories, articleURL.toString(), source, comment, linkToComments);

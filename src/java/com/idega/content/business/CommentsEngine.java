@@ -9,7 +9,7 @@ public interface CommentsEngine extends IBOService {
 	/**
 	 * @see com.idega.content.business.CommentsEngineBean#addComment
 	 */
-	public boolean addComment(String user, String subject, String body, String uri) throws RemoteException;
+	public boolean addComment(String user, String subject, String email, String body, String uri) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.business.CommentsEngineBean#getCommentsForAllPages
@@ -20,4 +20,9 @@ public interface CommentsEngine extends IBOService {
 	 * @see com.idega.content.business.CommentsEngineBean#getComments
 	 */
 	public List<ContentItemComment> getComments(String uri) throws RemoteException;
+
+	/**
+	 * @see com.idega.content.business.CommentsEngineBean#getCommentsCount
+	 */
+	public int getCommentsCount(String uri) throws RemoteException;
 }

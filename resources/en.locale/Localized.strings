@@ -216,3 +216,7 @@ send=Send
 sending=Sending...
 anonymous=Anonymous
 loading_comments=Loading comments...
+atom_feed=Atom Feed
+rss_feed=RSS Feed
+email=E-mail
+comment_form=Comment form

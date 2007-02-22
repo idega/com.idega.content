@@ -4,8 +4,10 @@ public class ContentItemComment {
 	
 	private String user = null;
 	private String subject = null;
+	private String email = null;
 	private String comment = null;
 	private String posted = null;
+	private String id = null;
 	
 	public String getComment() {
 		return comment;
@@ -30,6 +32,18 @@ public class ContentItemComment {
 	}
 	public void setUser(String user) {
 		this.user = user;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
 	}
 
 }
