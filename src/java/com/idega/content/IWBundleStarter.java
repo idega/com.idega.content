@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.16 2007/02/15 14:17:34 justinas Exp $
+ * $Id: IWBundleStarter.java,v 1.17 2007/02/22 15:13:36 justinas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -16,9 +16,13 @@ import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.Map;
 
+import com.idega.block.rss.business.RSSProducer;
+import com.idega.block.rss.business.RSSProducerRegistry;
+import com.idega.block.rss.data.RSSRequest;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentIWActionURIHandler;
+import com.idega.content.business.ContentItemRssProducer;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.business.ThemesService;
 import com.idega.content.themes.helpers.Setting;
@@ -31,16 +35,17 @@ import com.idega.idegaweb.DefaultIWBundle;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWBundleStartable;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.include.GlobalIncludeManager;
 import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2007/02/15 14:17:34 $ by $Author: justinas $
+ *  Last modified: $Date: 2007/02/22 15:13:36 $ by $Author: justinas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.17 $
  */
 //public class IWBundleStarter implements IWBundleStartable, JarLoader {
 public class IWBundleStarter implements IWBundleStartable{
@@ -79,11 +84,12 @@ public class IWBundleStarter implements IWBundleStartable{
 
 	    loadThemeValues(starterBundle);
 //	    loadSiteTemplateFilesFromBundles(starterBundle.getApplication());
-	    new TemplatesLoader(starterBundle.getApplication(), true);
-	    
-		SiteViewManager sViewManager = SiteViewManager.getInstance(starterBundle.getApplication());
+	    IWMainApplication iwmain = starterBundle.getApplication();
+	    new TemplatesLoader(iwmain, true);
+		SiteViewManager sViewManager = SiteViewManager.getInstance(iwmain);
 		sViewManager.initializeStandardNodes(starterBundle);
-	    
+		
+	    RSSProducerRegistry.getInstance().addRSSProducer("files/cms/article", ContentItemRssProducer.getInstance(iwmain));
 	}
 
 	/* (non-Javadoc)
