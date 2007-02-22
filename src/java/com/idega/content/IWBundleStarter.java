@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.17 2007/02/22 15:13:36 justinas Exp $
+ * $Id: IWBundleStarter.java,v 1.18 2007/02/22 15:44:35 eiki Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -16,13 +16,8 @@ import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.Map;
 
-import com.idega.block.rss.business.RSSProducer;
-import com.idega.block.rss.business.RSSProducerRegistry;
-import com.idega.block.rss.data.RSSRequest;
-import com.idega.business.IBOLookup;
-import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentIWActionURIHandler;
-import com.idega.content.business.ContentItemRssProducer;
+import com.idega.content.business.ContentRSSProducer;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.business.ThemesService;
 import com.idega.content.themes.helpers.Setting;
@@ -30,22 +25,14 @@ import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.content.view.ContentViewManager;
 import com.idega.content.view.SiteViewManager;
-import com.idega.core.uri.IWActionURIManager;
-import com.idega.idegaweb.DefaultIWBundle;
-import com.idega.idegaweb.IWApplicationContext;
-import com.idega.idegaweb.IWBundle;
-import com.idega.idegaweb.IWBundleStartable;
-import com.idega.idegaweb.IWMainApplication;
-import com.idega.idegaweb.IWMainApplicationSettings;
-import com.idega.idegaweb.include.GlobalIncludeManager;
 import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2007/02/22 15:13:36 $ by $Author: justinas $
+ *  Last modified: $Date: 2007/02/22 15:44:35 $ by $Author: eiki $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 //public class IWBundleStarter implements IWBundleStartable, JarLoader {
 public class IWBundleStarter implements IWBundleStartable{
@@ -64,6 +51,7 @@ public class IWBundleStarter implements IWBundleStartable{
 	 */
 	public void start(IWBundle starterBundle) {
 		addIWActionURIHandlers();
+		addRSSProducers(starterBundle);
 		
 		ContentViewManager cViewManager = ContentViewManager.getInstance(starterBundle.getApplication());
 		cViewManager.initializeStandardNodes(starterBundle);
@@ -136,6 +124,26 @@ public class IWBundleStarter implements IWBundleStartable{
 				applicationSettings.setProperty(key, setting.getDefaultValue());
 			}
 		}
+	}
+	
+	private void addRSSProducers(IWBundle starterBundle) {
+		RSSProducerRegistry registry = RSSProducerRegistry.getInstance();
+		
+		//ContentRSSProducer, also a IWSlideChangeListener
+		
+		ContentRSSProducer contentProducer = new ContentRSSProducer();
+		registry.addRSSProducer("content", contentProducer);
+		
+		 IWApplicationContext iwac = starterBundle.getApplication().getIWApplicationContext();
+	        try {
+	            IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(iwac,IWSlideService.class);
+	            service.addIWSlideChangeListeners(contentProducer);
+	            
+	        } catch (IBOLookupException e) {
+	            e.printStackTrace();
+	        } catch (RemoteException e) {
+	            e.printStackTrace();
+	        }
 	}
 
 //	public void loadSiteTemplateFilesFromBundles(IWBundle bundle) {
