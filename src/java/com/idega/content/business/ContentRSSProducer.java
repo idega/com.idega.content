@@ -1,5 +1,5 @@
 /*
- * $Id: ContentRSSProducer.java,v 1.2 2007/02/22 15:44:35 eiki Exp $
+ * $Id: ContentRSSProducer.java,v 1.3 2007/02/22 16:07:40 justinas Exp $
  * Created on Sep 13, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -27,6 +27,7 @@ import org.apache.webdav.lib.WebdavResources;
 import com.idega.block.rss.business.RSSAbstractProducer;
 import com.idega.block.rss.business.RSSProducer;
 import com.idega.block.rss.data.RSSRequest;
+import com.idega.slide.business.IWContentEvent;
 import com.idega.slide.business.IWSlideChangeListener;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.FileUtil;
@@ -42,10 +43,10 @@ import com.sun.syndication.feed.synd.SyndFeedImpl;
  * The rss file for a folder is called "content.xml" and is stored in a hidden folder called ".rss" under the folder that was requested.
  * An IWSlideChangeListener see's to it that a cachemap containing which rssfiles are up to date is invalidated.
  * 
- *  Last modified: $Date: 2007/02/22 15:44:35 $ by $Author: eiki $
+ *  Last modified: $Date: 2007/02/22 16:07:40 $ by $Author: justinas $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ContentRSSProducer extends RSSAbstractProducer implements RSSProducer, IWSlideChangeListener {
 
@@ -232,6 +233,11 @@ public class ContentRSSProducer extends RSSAbstractProducer implements RSSProduc
 	 */
 	protected void setRssFileURIsCacheMap(Map rssFileURIsCacheMap) {
 		this.rssFileURIsCacheMap = rssFileURIsCacheMap;
+	}
+
+	public void onSlideChange(IWContentEvent contentEvent) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: PageCreationManagedBean.java,v 1.11 2006/12/27 08:53:37 valdas Exp $
+ * $Id: PageCreationManagedBean.java,v 1.12 2007/02/22 16:07:14 justinas Exp $
  * Created on 2.5.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -9,6 +9,7 @@
  */
 package com.idega.content.bean;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +26,9 @@ import javax.faces.model.SelectItem;
 import org.apache.myfaces.custom.tree2.TreeNode;
 import org.apache.myfaces.custom.tree2.TreeNodeBase;
 
+import com.idega.block.rss.business.RSSProducer;
+import com.idega.block.rss.data.RSSRequest;
+import com.idega.content.business.ContentItemRssProducer;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
@@ -44,10 +48,10 @@ import com.idega.webface.WFTreeNode;
 
 /**
  * 
- *  Last modified: $Date: 2006/12/27 08:53:37 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/02/22 16:07:14 $ by $Author: justinas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class PageCreationManagedBean implements ActionListener {
 
