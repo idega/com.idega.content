@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.11 2007/02/20 10:59:12 gediminas Exp $
+ * $Id: CategoryBean.java,v 1.12 2007/02/23 14:33:32 gediminas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -21,6 +22,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.webdav.lib.PropertyName;
 import org.apache.webdav.lib.WebdavResource;
 import org.apache.webdav.lib.util.WebdavStatus;
@@ -51,12 +54,13 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2007/02/20 10:59:12 $ by $Author: gediminas $
+ *  Last modified: $Date: 2007/02/23 14:33:32 $ by $Author: gediminas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class CategoryBean {
+	private static final Log log = LogFactory.getLog(CategoryBean.class);
 	
 	private static String BEAN_KEY="ContentCategoryBean";
 	
@@ -82,6 +86,7 @@ public class CategoryBean {
 	}
 
 	protected class CategoriesMigrator {
+		private final Log log = LogFactory.getLog(CategoriesMigrator.class);
 		private final String PROPERTY_NAME_CATEGORIES = new PropertyName("DAV","categories").toString();
 
 		private HashMap valuesToKeys;
@@ -89,7 +94,7 @@ public class CategoryBean {
 		private IWSlideService service;
 		
 		protected void migrate(Collection cats) {
-			System.out.println("Migrating " + CATEGORY_CONFIG_FILE + " to new format at " + CATEGORY_PROPERTIES_FILE);
+			log.info("Migrating " + CATEGORY_CONFIG_FILE + " to new format at " + CATEGORY_PROPERTIES_FILE);
 			categories = new HashMap();
 			valuesToKeys = new HashMap();
 			String lang = getCurrentLocale();
@@ -112,7 +117,7 @@ public class CategoryBean {
 				updateCategoriesOnFiles(CATEGORY_CONFIG_PATH);
 	
 				/*
-				System.out.println("Deleting old file " + CATEGORY_CONFIG_FILE);
+				log.info("Deleting old file " + CATEGORY_CONFIG_FILE);
 				WebdavResource resource = session.getWebdavResource(service.getURI(CATEGORY_CONFIG_FILE));
 				resource.deleteMethod();
 				*/
@@ -145,8 +150,8 @@ public class CategoryBean {
 				}
 				
 				if (!oldCats.equals(CATEGORY_DELIMETER) && !oldCats.equals("")) {
-					System.out.println("Updating categories on resource " + resourcePath);
-					System.out.println("- " + oldCats);
+					log.info("Updating categories on resource " + resourcePath);
+					log.info("- " + oldCats);
 					
 					StringTokenizer tokenizer = new StringTokenizer(oldCats, CATEGORY_DELIMETER);
 					StringBuffer newCats = new StringBuffer(CATEGORY_DELIMETER);
@@ -162,7 +167,7 @@ public class CategoryBean {
 						newCats.append(CATEGORY_DELIMETER);
 					}
 	
-					System.out.println("+ " + newCats.toString());
+					log.info("+ " + newCats.toString());
 					resource.proppatchMethod(PROPERTY_NAME_CATEGORIES, newCats.toString(), true);
 				}
 				
@@ -177,7 +182,7 @@ public class CategoryBean {
 				
 				resource.close();			
 			} catch (Exception e) {
-				System.err.println("Exception updating categories on resource " + resourcePath + ": " + e.getMessage());
+				log.error("Exception updating categories on resource " + resourcePath + ": " + e.getMessage());
 			}
 		}
 	}
@@ -226,7 +231,10 @@ public class CategoryBean {
 	}
 	
 	public String getCategoryName(String categoryKey) {
-		ContentCategory cat = (ContentCategory) this.categories.get(categoryKey);
+		ContentCategory cat = this.categories.get(categoryKey);
+		if (cat == null) {
+			return categoryKey;
+		}
 		String lang = getCurrentLocale();
 		String name = cat.getName(lang);
 		if (name == null) {
@@ -254,8 +262,6 @@ public class CategoryBean {
 		try {
 			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwuc,IWSlideSession.class);
 			WebdavRootResource rootResource = session.getWebdavRootResource();
-//			String filePath = service.getURI(CATEGORY_FILE_PATH);
-//			System.out.println("Loading categories for "+filePath);
 			
 			String path = getSlideService().getURI(CATEGORY_CONFIG_FILE);
 			
@@ -302,9 +308,15 @@ public class CategoryBean {
 	 * @param category
 	 */
 	public void addCategory(String category) {
+		if (category == null || category.equals("")) {
+			return;
+		}
 		String key = getCategoryKey(category);
 		String lang = getCurrentLocale();
-		ContentCategory cat = new ContentCategory(key);
+		ContentCategory cat = this.categories.get(key);
+		if (cat == null) {
+			cat = new ContentCategory(key);
+		}
 		cat.addName(lang, category);
 		this.categories.put(key, cat);
 		storeCategories();
@@ -328,7 +340,6 @@ public class CategoryBean {
 			InputStream in = rootResource.getMethodData(resourcePath);
 
 			if (rootResource.getStatusCode() != WebdavStatus.SC_OK) {
-				System.err.println("Could not load from webdav: " + rootResource.getStatusMessage());
 				throw new FileNotFoundException("File not found " + CATEGORY_PROPERTIES_FILE);
 			}
 			
@@ -349,13 +360,17 @@ public class CategoryBean {
 			while (cats.hasNext()) {
 				Element cat = (Element) cats.next();
 				ContentCategory category = new ContentCategory(cat);
-				map.put(category.getId(), category);
+				String key = category.getId();
+				if (key == null || key.equals("")) {
+					continue;
+				}
+				map.put(key, category);
 			}
 			
 			in.close();
 			rootResource.close();
 		} catch (IOException e) {
-			System.err.println("Error loading file " + CATEGORY_PROPERTIES_FILE + ": " + e.getMessage());
+			log.warn("Error loading categories: " + e.getMessage());
 			return null;
 		}
 		catch (JDOMException e) {
@@ -387,18 +402,18 @@ public class CategoryBean {
 			MemoryInputStream in = new MemoryInputStream(buf);
 
 			String resourcePath = getSlideService().getURI(CATEGORY_PROPERTIES_FILE);
-			System.out.println("Writing file to " + resourcePath);
+			log.debug("Writing file to " + resourcePath);
 	
 			WebdavRootResource rootResource = getSlideSession().getWebdavRootResource();
 			boolean putOK = rootResource.putMethod(resourcePath, in);
 			if (!putOK) {
-				System.err.println("Could not store to webdav: " + rootResource.getStatusMessage());
+				log.error("Could not store to webdav: " + rootResource.getStatusMessage());
 			}
 			
 			in.close();
 			rootResource.close();
 		} catch (IOException e) {
-			System.err.println("Error storing file " + CATEGORY_PROPERTIES_FILE + ": " + e.getMessage());
+			log.error("Error storing file " + CATEGORY_PROPERTIES_FILE + ": " + e.getMessage());
 		}
 	}
 
