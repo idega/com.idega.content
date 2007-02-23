@@ -82,7 +82,7 @@
                         <!--                    <w:filelist columns="name,modifieddate,createdate,size" folder="http://localhost/files/myfolder" />
     -->
                     </div>
-                    <iframe src="documentContent.jsp" style="left: 252px; top: 324px; position: absolute"/>
+                    <iframe src="documentContent.jsp" style="left: 252px; top: 324px; position: absolute">iframe</iframe>
                 </h:form>
 	</ws:page>
     </f:view>

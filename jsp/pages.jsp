@@ -43,7 +43,7 @@ version="1.2">
 					
 					<x:div>
 						<jsf:verbatim>
-							<iframe id="treePages" class="pagePreviewFrame" />
+							<iframe id="treePages" class="pagePreviewFrame">iframe</iframe>
 						</jsf:verbatim>
 					</x:div>
                 

@@ -24,7 +24,7 @@ version="1.2">
 				<wf:wfblock id="themeManagerBlock" title="#{localizedStrings['com.idega.content']['themes']}" >
 					<x:div id="themePreviewContainer" forceId="true" style="width: auto">
 						<jsf:verbatim>
-							<iframe id="themePreview" />
+							<iframe id="themePreview">iframe</iframe>
 						</jsf:verbatim>
 					</x:div>
 					
