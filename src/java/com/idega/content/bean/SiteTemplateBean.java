@@ -38,7 +38,8 @@ public class SiteTemplateBean {
 		pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache("pageMap");
 
 		if (!pageTemplatesFromCache.containsKey("pageMap")){
-			new TemplatesLoader(iwma, true);
+		    TemplatesLoader templatesLoader = new TemplatesLoader(iwma);
+		    templatesLoader.loadSiteTemplateFilesFromBundles();
 		}
 		
 		pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get("pageMap");

@@ -45,7 +45,8 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		siteTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache("siteMap");
 		
 		if (!pageTemplatesFromCache.containsKey("pageMap") || !pageTemplatesFromCache.containsKey("siteMap")){
-			new TemplatesLoader(iwma, true);
+		    TemplatesLoader templatesLoader = new TemplatesLoader(iwma);
+		    templatesLoader.loadSiteTemplateFilesFromBundles();
 		}		
 		
 		pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get("pageMap");		

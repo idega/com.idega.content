@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.19 2007/02/22 16:06:50 justinas Exp $
+ * $Id: IWBundleStarter.java,v 1.20 2007/02/23 14:56:16 gediminas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -41,10 +41,10 @@ import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2007/02/22 16:06:50 $ by $Author: justinas $
+ *  Last modified: $Date: 2007/02/23 14:56:16 $ by $Author: gediminas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.20 $
  */
 //public class IWBundleStarter implements IWBundleStartable, JarLoader {
 public class IWBundleStarter implements IWBundleStartable{
@@ -85,8 +85,11 @@ public class IWBundleStarter implements IWBundleStartable{
 	    loadThemeValues(starterBundle);
 //	    loadSiteTemplateFilesFromBundles(starterBundle.getApplication());
 	    IWMainApplication iwmain = starterBundle.getApplication();
-	    new TemplatesLoader(iwmain, true);
-		SiteViewManager sViewManager = SiteViewManager.getInstance(iwmain);
+	    
+	    TemplatesLoader templatesLoader = new TemplatesLoader(iwmain);
+	    templatesLoader.loadSiteTemplateFilesFromBundles();
+	
+	    SiteViewManager sViewManager = SiteViewManager.getInstance(iwmain);
 		sViewManager.initializeStandardNodes(starterBundle);
 		
 	    RSSProducerRegistry.getInstance().addRSSProducer("files/cms/article", ContentItemRssProducer.getInstance(iwmain));

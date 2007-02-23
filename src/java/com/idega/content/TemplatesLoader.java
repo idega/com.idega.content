@@ -29,16 +29,7 @@ public class TemplatesLoader implements JarLoader {
 		this.iwma = iwma;
 	}			
 	
-	public TemplatesLoader(IWMainApplication iwma, boolean loadTemplatesFromConstructor) {
-		super();
-		this.iwma = iwma;
-		if(loadTemplatesFromConstructor)
-			loadSiteTemplateFilesFromBundles();
-	}		
-	
 	public void loadSiteTemplateFilesFromBundles() {
-
-//		iwma = bundle.getApplication();
 		IWModuleLoader loader = new IWModuleLoader(iwma);		
 		loader.getJarLoaders().add(this);
 		loader.loadBundlesFromJars();
@@ -48,13 +39,10 @@ public class TemplatesLoader implements JarLoader {
 		JarEntry pageTemplatesEntry = jarFile.getJarEntry("resources/templates/page-templates.xml");
 		JarEntry siteTemplatesEntry = jarFile.getJarEntry("resources/templates/site-templates.xml");
 
-		Map <String, PageTemplate> pageMap = null;
-		Map <String, SiteTemplateStructure> siteMap = null;
-		
-		Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache("pageMap");
-		Map siteTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache("siteMap");
-		
 		if (pageTemplatesEntry != null) {
+			Map <String, PageTemplate> pageMap;
+			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache("pageMap");
+
 			try {
 				InputStream stream = jarFile.getInputStream(pageTemplatesEntry);
 				Document pageDocument = ThemesHelper.getInstance(false).getXMLDocument(stream);
@@ -87,6 +75,9 @@ public class TemplatesLoader implements JarLoader {
 			}
 		}
 		if (siteTemplatesEntry != null) {
+			Map <String, SiteTemplateStructure> siteMap;
+			Map siteTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache("siteMap");
+
 			try {
 				InputStream stream = jarFile.getInputStream(siteTemplatesEntry);
 				Document pageDocument = ThemesHelper.getInstance(false).getXMLDocument(stream);
@@ -147,14 +138,6 @@ public class TemplatesLoader implements JarLoader {
 		}
 		
 		return currNode;
-	}
-
-	public IWMainApplication getIwma() {
-		return iwma;
-	}
-
-	public void setIwma(IWMainApplication iwma) {
-		this.iwma = iwma;
 	}
 
 }
