@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.25 2007/02/13 19:05:36 valdas Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.26 2007/02/23 17:25:49 valdas Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -33,10 +33,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2007/02/13 19:05:36 $ by $Author: valdas $
+ * Last modified: $Date: 2007/02/23 17:25:49 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.25 $
+ * @version $Revision: 1.26 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -190,7 +190,7 @@ public class ContentItemViewer extends WFContainer {
 			initializeComponent(attr[i]);
 		}
 		initializeToolbar();
-		initializeComments();
+		initializeComments(context);
 	}
 
 	/**
@@ -209,7 +209,7 @@ public class ContentItemViewer extends WFContainer {
 		}
 	}
 	
-	protected void initializeComments() {
+	protected void initializeComments(FacesContext context) {
 		// Override and implement this method
 	}
 

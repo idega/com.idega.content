@@ -13,12 +13,15 @@ import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.Image;
 import com.idega.presentation.Script;
 import com.idega.presentation.text.Link;
+import com.idega.presentation.text.Text;
 import com.idega.webface.WFDivision;
 
 public class ContentItemComments extends ContentBlock {
 	
+	private String cacheKey = null;
 	private String styleClass = "content_item_comments_style";
 	private String linkToComments = null;
 	
@@ -27,16 +30,18 @@ public class ContentItemComments extends ContentBlock {
 	
 	private static final String COMMENTS_BLOCK_ID = "comments_block";
 	
-	public ContentItemComments(String linkToComments, boolean showCommentsList) {
-		this(linkToComments, showCommentsList, false, "content_item_comments_style");
+	public ContentItemComments(String cacheKey, String linkToComments, boolean showCommentsList) {
+		this(cacheKey, linkToComments, showCommentsList, false, "content_item_comments_style");
 	}
 	
-	public ContentItemComments(String linkToComments, boolean showCommentsList, boolean isForumPage) {
-		this(linkToComments, showCommentsList, isForumPage, "content_item_comments_style");
+	public ContentItemComments(String cacheKey, String linkToComments, boolean showCommentsList, boolean isForumPage) {
+		this(cacheKey, linkToComments, showCommentsList, isForumPage, "content_item_comments_style");
 	}
 	
-	public ContentItemComments(String linkToComments, boolean showCommentsList, boolean isForumPage, String styleClass) {
+	public ContentItemComments(String cacheKey, String linkToComments, boolean showCommentsList, boolean isForumPage,
+			String styleClass) {
 		super();
+		this.cacheKey = cacheKey;
 		this.linkToComments = linkToComments;
 		this.showCommentsList = showCommentsList;
 		this.isForumPage = isForumPage;
@@ -53,28 +58,53 @@ public class ContentItemComments extends ContentBlock {
 		
 		// Comments label
 		int commentsCount = getCommentsCount(iwc);
+		WFDivision articleComments = new WFDivision();
+		articleComments.setId("article_comments_link_label_container");
 		StringBuffer comments = new StringBuffer(ContentUtil.getBundle().getLocalizedString("comments"));
 		comments.append(ContentConstants.SPACE).append("(<span id='contentItemCount' class='contentItemCountStyle'>");
 		comments.append(commentsCount).append("</span>)");
 		Link commentsLabel = new Link(comments.toString(), "#showCommentsList");
 		commentsLabel.setOnClick("getCommentsList()");
-		container.add(commentsLabel);
+		articleComments.add(commentsLabel);
+		
+		// Simple space
+		Text emptyText = new Text(ContentConstants.SPACE);
+		articleComments.add(emptyText);
+		
+		// Link - Atom feed
+		StringBuffer linkToAtomFeedImage = new StringBuffer(ContentUtil.getBundle().getResourcesPath());
+		linkToAtomFeedImage.append("/images/feed.png");
+		if (commentsCount > 0) {
+			Image atom = new Image(linkToAtomFeedImage.toString(), ContentUtil.getBundle().getLocalizedString("atom_feed"));
+			Link linkToFeed = new Link();
+			linkToFeed.setId("article_comments_link_to_feed");
+			linkToFeed.setImage(atom);
+			linkToFeed.setURL(ThemesHelper.getInstance().getFullServerName(iwc) + ContentConstants.CONTENT + linkToComments);
+			articleComments.add(linkToFeed);
+		}
+		container.add(articleComments);
 		
 		// Add comment block
 		container.add(getAddCommentBlock(iwc));
 		
 		// Comments list will be generated with DWR & JavaScript
 		Script script = new Script();
+		script.addScriptLine("setComponentCacheKey('"+cacheKey+"');");
 		script.addScriptLine("setPostedLabel('"+ContentUtil.getBundle().getLocalizedString("posted")+"');");
 		script.addScriptLine("setCommentsLoadingMessage('"+ContentUtil.getBundle().getLocalizedString("loading_comments")+"');");
 		script.addScriptLine("setLinkToComments('"+linkToComments+"');");
-		script.addScriptLine("setActiveReverseAjax();");
 		script.addScriptLine("setCommentsAtomLinkTitle('"+ContentUtil.getBundle().getLocalizedString("atom_feed")+"');");
 		script.addScriptLine("setCommentsAtomsServer('"+ThemesHelper.getInstance().getFullServerName(iwc) + "/content');");
+		script.addScriptLine("setLinkToAtomFeedImage('"+linkToAtomFeedImage.toString()+"');");
+		script.addScriptLine("setAddNotificationText('"+ContentUtil.getBundle().getLocalizedString("need_send_notification")+"');");
+		script.addScriptLine("setYesText('"+ContentUtil.getBundle().getLocalizedString("yes")+"');");
+		script.addScriptLine("setNoText('"+ContentUtil.getBundle().getLocalizedString("no")+"');");
+		script.addScriptLine("setEnterEmailText('"+ContentUtil.getBundle().getLocalizedString("enter_email_text")+"');");
 		if (commentsCount > 0) {
-			script.addScriptLine("addAtomLinkForComments();");
+			script.addScriptLine("setAddedLinkToAtomInBody(true);");
+			script.addScriptLine("addAtomLinkInHeader();");
 		}
-		script.addScriptLine("getCommentsCount();");
+		script.addScriptLine("setActiveReverseAjax();");
 		if (showCommentsList) {
 			script.addScriptLine("getAllArticleComments('"+linkToComments+"');");
 		}
@@ -129,12 +159,13 @@ public class ContentItemComments extends ContentBlock {
 	}
 	
 	public Object saveState(FacesContext context) {
-		Object values[] = new Object[5];
+		Object values[] = new Object[6];
 		values[0] = super.saveState(context);
 		values[1] = linkToComments;
 		values[2] = styleClass;
 		values[3] = showCommentsList;
 		values[4] = isForumPage;
+		values[5] = cacheKey;
 		return values;
 	}
 
@@ -145,6 +176,7 @@ public class ContentItemComments extends ContentBlock {
 		styleClass = values[2].toString();
 		showCommentsList = (Boolean) values[3];
 		isForumPage = (Boolean) values[4];
+		cacheKey = values[5].toString();
 	}
 
 	public String getLinkToComments() {

@@ -939,7 +939,7 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	private Document preparePageDocument(Document doc, String type, String articlePath, int pageID) {
-		if (ThemesConstants.ARTICLE_PAGE_TYPE.equals(type) && articlePath != null && !ThemesConstants.MINUS_ONE.equals(articlePath)) {
+		if (ThemesConstants.ARTICLE_PAGE_TYPE.contains(type) && articlePath != null && !ThemesConstants.MINUS_ONE.equals(articlePath)) {
 			Object o = null;
 			Element e = null;
 			Attribute a = null;
@@ -1088,7 +1088,7 @@ public class ThemesHelper implements Singleton {
 		if (id == -1) {
 			return null;
 		}
-		if (!ThemesConstants.ARTICLE_PAGE_TYPE.equals(type)) {
+		if (!ThemesConstants.ARTICLE_PAGE_TYPE.contains(type)) {
 			return ThemesConstants.MINUS_ONE;
 		}
 		

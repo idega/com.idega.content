@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.32 2007/02/22 15:38:57 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.33 2007/02/23 17:25:49 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -48,10 +48,10 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2007/02/22 15:38:57 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/02/23 17:25:49 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.32 $
+ * @version $Revision: 1.33 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -691,7 +691,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 				ICPage page = themesService.getICPage(Integer.valueOf(pageID));
 				if (page != null) {
 					if (page.isPage() && !page.getDeleted()) {
-						if (ThemesConstants.ARTICLE_PAGE_TYPE.equals(page.getSubType())) {
+						if (ThemesConstants.ARTICLE_PAGE_TYPE.contains(page.getSubType())) {
 							try {
 								moduleIds = builder.getModuleId(pageID, moduleClass);
 								if (moduleIds != null) {

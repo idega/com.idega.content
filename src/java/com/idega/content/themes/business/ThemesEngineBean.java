@@ -297,7 +297,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		if (helper.getThemesService().getBuilderService().changePageUriByTitle(parentId, page, pageTitle, domain.getID())) {
-			if (ThemesConstants.ARTICLE_PAGE_TYPE.equals(page.getSubType())) {
+			if (ThemesConstants.ARTICLE_PAGE_TYPE.contains(page.getSubType())) {
 				setNewLinkInArticleFile(page.getId(), "com.idega.block.article.component.ArticleItemViewer", page.getDefaultPageURI());
 			}
 			return page.getDefaultPageURI();

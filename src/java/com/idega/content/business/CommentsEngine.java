@@ -9,7 +9,7 @@ public interface CommentsEngine extends IBOService {
 	/**
 	 * @see com.idega.content.business.CommentsEngineBean#addComment
 	 */
-	public boolean addComment(String user, String subject, String email, String body, String uri) throws RemoteException;
+	public boolean addComment(String cacheKey, String user, String subject, String email, String body, String uri, boolean notify) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.business.CommentsEngineBean#getCommentsForAllPages

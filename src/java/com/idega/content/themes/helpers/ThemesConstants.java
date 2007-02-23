@@ -180,5 +180,7 @@ public class ThemesConstants {
 	//public static final String DEFAULT_THEME = ContentUtil.getBundle().getLocalizedString("theme_is_used");
 	//public static final String NOT_DEFAULT_THEME = ContentUtil.getBundle().getLocalizedString("theme_is_not_used");
 	
-	public static final String ARTICLE_PAGE_TYPE = "text";
+	private static final String[] _ARTICLE_PAGE_TYPE = new String[] {"text", "forum"};
+	public static final List <String> ARTICLE_PAGE_TYPE = Collections.unmodifiableList(Arrays.asList(_ARTICLE_PAGE_TYPE));
+
 }

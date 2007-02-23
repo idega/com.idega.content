@@ -1,5 +1,6 @@
 package com.idega.content.business;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -11,6 +12,9 @@ import java.util.Map;
 import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;
 import org.directwebremoting.proxy.dwr.Util;
+
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 import com.idega.block.rss.business.RSSBusiness;
 import com.idega.business.IBOLookup;
@@ -38,9 +42,19 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 	
 	private RSSBusiness rss = getRSSBusiness();
 	private WireFeedOutput wfo = new WireFeedOutput();
+	private BASE64Encoder encoder = new BASE64Encoder();
+	private BASE64Decoder decoder = new BASE64Decoder();
+	
+	private String newComment = ContentUtil.getBundle().getLocalizedString("new_comment");
+	private String newCommentMessage = ContentUtil.getBundle().getLocalizedString("new_comment_message");
+	
+	private List<String> parsedEmails = new ArrayList<String>();
 
-	public boolean addComment(String user, String subject, String email, String body, String uri) {
+	public boolean addComment(String cacheKey, String user, String subject, String email, String body, String uri, boolean notify) {
 		if (uri == null) {
+			return false;
+		}
+		if (ContentConstants.EMPTY.equals(uri)) {
 			return false;
 		}
 		
@@ -65,11 +79,12 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 				return false;
 			}
 			
-			if (!addNewEntry(comments, subject, uri, date, body, user, language, email)) {
+			if (!addNewEntry(comments, subject, uri, date, body, user, language, email, notify)) {
 				return false;
 			}
 			
 			putFeedToCache(comments, uri, iwc);
+			removeArticleFromCache(iwc, cacheKey);
 			
 			String commentsXml = null;
 			try {
@@ -82,8 +97,15 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 				return false;
 			}
 			
-			String base = uri.substring(0, uri.lastIndexOf(ContentConstants.SLASH));
-			String file = uri.substring(uri.lastIndexOf(ContentConstants.SLASH));
+			sendNotification(comments, email, iwc);
+			
+			String base = uri;
+			String file = uri;
+			int index = uri.lastIndexOf(ContentConstants.SLASH);
+			if (index != -1) {
+				base = uri.substring(0, index);
+				file = uri.substring(index);
+			}
 			IWSlideService service = ThemesHelper.getInstance().getSlideService(iwc);
 			try {
 				if (service.uploadFileAndCreateFoldersFromStringAsRoot(base, file, commentsXml, ContentConstants.XML_MIME_TYPE, true)) {				
@@ -97,8 +119,100 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 		}
 	}
 	
+	private boolean removeArticleFromCache(IWContext iwc, String cacheKey) {
+		if (cacheKey == null) {
+			return false;
+		}
+		if (iwc == null) {
+			iwc = ThemesHelper.getInstance().getIWContext();
+		}
+		if (iwc == null) {
+			return false;
+		}
+		IWCacheManager2 cache = IWCacheManager2.getInstance(iwc.getIWMainApplication());
+		if (cache == null) {
+			return false;
+		}
+		Map articles = cache.getCache("article");
+		if (articles == null) {
+			return false;
+		}
+		if (articles.containsKey(cacheKey)) {
+			articles.remove(cacheKey);
+		}
+		else {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private boolean sendNotification(Feed comments, String email, IWContext iwc) {
+		List<String> emails = getEmails(comments, email);
+		StringBuffer body = new StringBuffer(newCommentMessage);
+		WebContext wctx = WebContextFactory.get();
+		body.append(ThemesHelper.getInstance().getFullServerName(iwc)).append(wctx.getCurrentPage());
+		// TODO: remove testing info
+		String host = iwc.getApplicationSettings().getProperty("messagebox_smtp_mailserver");
+		if (host == null) {
+			host = "mail.simnet.is";
+		}
+		String from = iwc.getApplicationSettings().getProperty("messagebox_from_mailaddress");
+		if (from == null) {
+			from = "testing@formbuilder.idega.is";
+		}
+		Thread sender = new Thread(new CommentsNotificationSender(emails, from, newComment,	body.toString(), host));
+		sender.start();
+		return true;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<String> getEmails(Feed comments, String email) {
+		List<String> emails = new ArrayList<String>();
+		if (comments == null) {
+			return emails;
+		}
+		List<Entry> entries = comments.getEntries();
+		if (entries == null) {
+			return emails;
+		}
+		Entry entry = null;
+		Object o = null;
+		Object oo = null;
+		List<Person> authors = null;
+		Person author = null;
+		String mail = null;
+		parsedEmails = new ArrayList<String>();
+		for (int i = 0; i < entries.size(); i++) {
+			o = entries.get(i);
+			if (o instanceof Entry) {
+				entry = (Entry) o;
+				authors = entry.getAuthors();
+				if (authors != null) {
+					for (int j = 0; j < authors.size(); j++) {
+						oo = authors.get(j);
+						if (oo instanceof Person) {
+							author = (Person) oo;
+							mail = author.getEmail();
+							if (mail != null) {
+								mail = decodeMail(mail);
+								if (!mail.equals(email)) {
+									if (!parsedEmails.contains(mail)) {
+										parsedEmails.add(mail);
+										emails.add(mail);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return emails;
+	}
+	
 	private boolean addNewEntry(Feed feed, String subject, String uri, Timestamp date, String body, String user, String language,
-			String email) {
+			String email, boolean notify) {
 		if (feed == null) {
 			return false;
 		}
@@ -132,7 +246,9 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 		// Author & Email
 		Person author = new Person();
 		author.setName(user);
-		author.setEmail(email);
+		if (notify) {
+			author.setEmail(encodeMail(email));
+		}
 		List<Person> authors = new ArrayList<Person>();
 		authors.add(author);
 		entry.setAuthors(authors);
@@ -275,23 +391,19 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 				// ID
 				comment.setId(entry.getId());
 
-				// Author & Email
+				// Author
 				try {
 					if (entry.getAuthors() != null) {
 						author = (Person) entry.getAuthors().get(0);
 						comment.setUser(author.getName());
-						comment.setEmail(author.getEmail());
 					}
 					else {
 						comment.setUser(ContentConstants.EMPTY);
-						comment.setEmail(ContentConstants.EMPTY);
 					}
 				} catch(ClassCastException e) {
 					comment.setUser(ContentConstants.EMPTY);
-					comment.setEmail(ContentConstants.EMPTY);
 				} catch (IndexOutOfBoundsException e) {
 					comment.setUser(ContentConstants.EMPTY);
-					comment.setEmail(ContentConstants.EMPTY);
 				}
 				
 				// Subject
@@ -403,6 +515,25 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 		try {
 			return (Feed) o;
 		} catch (ClassCastException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	private String encodeMail(String email) {
+		if (email == null) {
+			return email;
+		}
+		return encoder.encode(email.getBytes());
+	}
+	
+	private String decodeMail(String email) {
+		if (email == null) {
+			return email;
+		}
+		try {
+			return new String(decoder.decodeBuffer(email));
+		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
