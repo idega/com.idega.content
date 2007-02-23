@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.19 2007/02/04 20:45:14 valdas Exp $
+ * $Id: WebDAVCategories.java,v 1.20 2007/02/23 14:35:48 gediminas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -41,10 +41,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2007/02/04 20:45:14 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/02/23 14:35:48 $ by $Author: gediminas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.20 $
  */
 public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -55,7 +55,6 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	private static final String ADD_CATEGORY_TEXT_ID = "addCategoryID";
 	private static final String CATEGORY = "category_";		//Prefix for the id in the userinterface
 	*/
-	private static final String RESOURCE_PATH = "resourcePath";	//key
 	private static final int COLLUMNS = 3;		//Number of collumns to display the categories in
 
 	private String resourcePath;
@@ -151,9 +150,6 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 					String id = getCategoryId()+count;
 	//				System.out.println("CATEGORY-COMPONENT-ID:"+id);
 					smc.setId(id);
-					if(this.resourcePath!=null){
-						smc.getAttributes().put(RESOURCE_PATH, this.resourcePath);
-					}
 					categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					//Text
 					HtmlOutputText catText = new HtmlOutputText();
@@ -173,13 +169,10 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 					//Checkbox
 					HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
 					setCategory(smc,categoryKey);
-					smc.setValue(new Boolean(false));
+					smc.setValue(Boolean.FALSE);
 					String id = getCategoryId(count);
 //					System.out.println("CATEGORY-COMPONENT-ID:"+id);
 					smc.setId(id);
-					if(this.resourcePath!=null){
-						smc.getAttributes().put(RESOURCE_PATH,this.resourcePath);
-					}
 					categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
 					//Text
 					HtmlOutputText catText = new HtmlOutputText();
@@ -190,18 +183,21 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 				}
 			}
 
+			
+			categoriesTable.setColumns(Math.min(count,COLLUMNS));
 			count--;
+			categoriesTable.setRows(count/COLLUMNS + 1);
+
 			if(getDisplaySaveButton()){
 				//Add the save button
 				if(this.resourcePath!=null && this.resourcePath.length()>0) {
 					WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
 					HtmlCommandButton addCategoryButton = localizer.getButtonVB(getSaveButtonId(), "save", this);
 					categoriesTable.add(addCategoryButton,1,count/COLLUMNS + 2);
+					categoriesTable.setRows(count/COLLUMNS + 2);
 				}
 			}
 			
-			categoriesTable.setColumns(Math.min(count+1,COLLUMNS));
-			categoriesTable.setRows(count/COLLUMNS + 2);
 			categoriesTable.setId(categoriesTable.getId() + "_ver");
 //			categoriesTable.setRowStyleClass(1,"wf_listheading");
 			categoriesTable.setStyleClass("wf_listtable");
@@ -260,9 +256,7 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 			}
 		}
 		else if(this.setCategories!=null){
-			Collection selectedCategories=null;
-			selectedCategories = CategoryBean.getCategoriesFromString(this.setCategories);
-			return selectedCategories;
+			return CategoryBean.getCategoriesFromString(this.setCategories);
 		}
 		return null;
 	}
@@ -340,132 +334,43 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 			}
 			return;
 		}
-		if(id.equalsIgnoreCase(getSaveButtonId())) {
-			saveCategoriesSettings(null, realCategories);
-/*			
-			//save the selection of categories to the article
-			//Build together the categories string
-			StringBuffer categories = new StringBuffer();
-			Iterator iter = CategoryUtil.getCategories().iterator();
-			HtmlSelectBooleanCheckbox smc = null;
-			while(iter.hasNext()) {
-				String text = iter.next().toString();
-				smc = (HtmlSelectBooleanCheckbox)comp.getParent().findComponent(CATEGORY+text);
-
-				boolean bool = ((Boolean)smc.getValue()).booleanValue();
-//				System.out.println("Category "+text+" was set to "+bool);
-				if(bool) {
-					categories.append(text).append(",");
-				}
-			}
-			if(smc!=null) {
-				//Store categories to file and folder
-				resourcePath = (String)smc.getAttributes().get(RESOURCE_PATH);
-				IWContext iwc = IWContext.getInstance();
-				try {
-					IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-					IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
-					String filePath = resourcePath;
-					String serverURI = service.getWebdavServerURI();
-					if(!resourcePath.startsWith(serverURI)) {
-						filePath = service.getURI(resourcePath);
-					}
-					WebdavRootResource rootResource = session.getWebdavRootResource();
-	
-					//Store new settings
-					if(categories.length()>0) {
-//						System.out.println("Proppatch: filepath="+filePath+" categories value="+categories);
-						rootResource.proppatchMethod(filePath,new PropertyName("DAV:","categories"),categories.toString(),true);
-						//Also set the metadata on the parent folder
-						String parent = getParentWOContext(filePath);
-//						System.out.println("Proppatch: filepath="+parent+" categories value="+categories);
-						rootResource.proppatchMethod(parent,new PropertyName("DAV:","categories"),categories.toString(),true);
-					}
-					//Clear the cashed data so that it will be reloaded.
-					WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
-							iwc, WebDAVMetadataResource.class);
-					resource.clear();
-				}
-				catch (RemoteException e) {
-					e.printStackTrace();
-				}
-				catch (HttpException e) {
-					e.printStackTrace();
-				}
-				catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-
-			return;
-*/
+		else if (id.equalsIgnoreCase(getSaveButtonId())) {
+			realCategories.saveCategoriesSettings();
 		}
 	}
 	
-	public void saveCategoriesSettings(){
-		saveCategoriesSettings(this.resourcePath,this);
-	}
-	
-	public static String getEnabledCategories(WebDAVCategories categoriesUi) {
+	public String getEnabledCategories() {
 		StringBuffer categories = new StringBuffer(CategoryBean.CATEGORY_DELIMETER);
-		if (categoriesUi == null) {
-			return categories.toString();
-		}
 		CategoryBean categoryBean = CategoryBean.getInstance();
 		int categoriesCount = categoryBean.getCategories().size();
 		HtmlSelectBooleanCheckbox smc = null;
 		//int count = 0;
-		String categoryKey = "";
-		String checkId = null;
-		UIComponent parent = null;
+		String categoryKey;
+		String checkId;
 		for (int i = 0; i < categoriesCount; i++) {
-			categoryKey = "";
-			checkId = categoriesUi.getCategoryId(i);
-			parent = categoriesUi.getParent();
-			smc = (HtmlSelectBooleanCheckbox)parent.findComponent(checkId);
-			categoryKey = categoriesUi.getCategory(smc);
-			boolean bool = ((Boolean)smc.getValue()).booleanValue();
-			if(bool) {
+			checkId = getCategoryId(i);
+			smc = (HtmlSelectBooleanCheckbox) getParent().findComponent(checkId);
+			categoryKey = getCategory(smc);
+			if (smc.isSelected()) {
 				categories.append(categoryKey).append(CategoryBean.CATEGORY_DELIMETER);
 			}
 		}
 		return categories.toString();
 	}
 	
-	public static void saveCategoriesSettings(String resourcePath, WebDAVCategories categoriesUi) {
-		if(resourcePath==null){
+	public void saveCategoriesSettings() {
+		if (this.resourcePath == null){
 			throw new RuntimeException("resourcePath is null");
 		}
 		//save the selection of categories to the article
-		CategoryBean categoryBean = CategoryBean.getInstance();
-		int categoriesCount = categoryBean.getCategories().size();
-		HtmlSelectBooleanCheckbox smc = null;
-		String checkId = null;
-		UIComponent parent = null;
-		int count = 0;
-		while(count < categoriesCount) {
-			checkId = categoriesUi.getCategoryId(count++);
-			parent = categoriesUi.getParent();
-			smc = (HtmlSelectBooleanCheckbox)parent.findComponent(checkId);
-		}
-		String categories = getEnabledCategories(categoriesUi);
-		if(smc!=null) {
-			//Store categories to file and folder
-			if(resourcePath == null) {
-				resourcePath = (String)smc.getAttributes().get(RESOURCE_PATH);
-			}
+		String categories = getEnabledCategories();
 			
-			IWContext iwuc = IWContext.getInstance();
-			try {
-				WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(iwuc, WebDAVMetadataResource.class);
-				resource.setCategories(resourcePath, categories.toString(), categoriesUi.getSetCategoriesOnParent());
-			} catch (IBOLookupException e) {
-				throw new RuntimeException(e);
-			} catch (RemoteException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+		IWContext iwuc = IWContext.getInstance();
+		try {
+			WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(iwuc, WebDAVMetadataResource.class);
+			resource.setCategories(resourcePath, categories.toString(), getSetCategoriesOnParent());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
