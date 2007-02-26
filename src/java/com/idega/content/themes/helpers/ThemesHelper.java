@@ -47,6 +47,7 @@ import com.idega.content.bean.ContentItemFeedBean;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentSearch;
 import com.idega.content.business.ContentUtil;
+import com.idega.content.themes.bean.ThemesManagerBean;
 import com.idega.content.themes.business.ThemesEngine;
 import com.idega.content.themes.business.ThemesService;
 import com.idega.core.builder.data.ICDomain;
@@ -67,6 +68,7 @@ import com.idega.presentation.IWContext;
 import com.idega.repository.data.Singleton;
 import com.idega.slide.business.IWSlideService;
 import com.idega.util.ListUtil;
+import com.idega.webface.WFUtil;
 
 public class ThemesHelper implements Singleton {
 	
@@ -100,7 +102,6 @@ public class ThemesHelper implements Singleton {
 	
 	private String fullWebRoot; // For cache
 	private String webRoot;
-	private String lastVisitedPage;
 	
 	private static final String RESOURCE_PATH_START = ThemesConstants.BASE_ROOT_SLIDE + "/article";
 	private static final String RESOURCE_PATH_END = ThemesConstants.DOT + "article";
@@ -890,11 +891,15 @@ public class ThemesHelper implements Singleton {
 	}
 
 	public String getLastVisitedPage() {
-		return lastVisitedPage;
+		Object lastVisitedPage = WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "getLastVisitedPageId");
+		if (lastVisitedPage != null) {
+			return lastVisitedPage.toString();
+		}
+		return null;
 	}
 
 	public void setLastVisitedPage(String lastVisitedPage) {
-		this.lastVisitedPage = lastVisitedPage;
+		WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "setLastVisitedPageId", lastVisitedPage, String.class);
 	}
 	
 	public String getLastUsedTheme() {
@@ -922,7 +927,7 @@ public class ThemesHelper implements Singleton {
 		if (id == -1) {
 			return;
 		}
-		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
+		IWMainApplicationSettings settings = ContentUtil.getBundle().getApplication().getSettings();
 		try {
 			settings.setProperty(ThemesConstants.LAST_USED_THEME, String.valueOf(id));
 		} catch (NumberFormatException e) {
@@ -1432,6 +1437,15 @@ public class ThemesHelper implements Singleton {
 		StringBuffer id = new StringBuffer();
 		id.append(getRandomNumber(Integer.MAX_VALUE)).append(getSlideService().createUniqueFileName(scope));
 		return id.toString();
+	}
+	
+	public String getLocalizedText(String key) {
+		try {
+			return ContentUtil.getBundle().getLocalizedString(key);
+		} catch (Exception e) {
+			log.error(e);
+			return key;
+		}
 	}
 
 }

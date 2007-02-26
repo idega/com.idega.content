@@ -16,7 +16,7 @@
 			<property name="showCreationDate" value="false" />
 			<property name="showComments" value="true" />
 			<property name="showCommentsList" value="false" />
-			<property name="isForumPage" value="true" />
+			<property name="forumPage" value="true" />
     	</module>
     </region>
     <region id="navcontainer" label="navcontainer">

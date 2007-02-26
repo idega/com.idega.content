@@ -37,17 +37,14 @@
 		<component-type>WebDAVList</component-type>
 		<component-class>com.idega.content.presentation.WebDAVList</component-class>
 	</component>
-	
 	<component>
 		<component-type>WebDAVFileDetails</component-type>
 		<component-class>com.idega.content.presentation.WebDAVFileDetails</component-class>
 	</component>
-	
 	<component>
 		<component-type>tree</component-type>
 		<component-class>com.idega.content.tree.HtmlTreeNew</component-class>
 	</component>
-	
 	<component>
 		<component-type>ContentViewer</component-type>
 		<component-class>com.idega.content.presentation.ContentViewer</component-class>
@@ -132,12 +129,10 @@
 			<property-class>java.lang.String</property-class>
 		</property>
 	</component>
-	
 	<component>
 		<component-type>ContentItemListViewer</component-type>
 		<component-class>com.idega.content.presentation.ContentItemListViewer</component-class>
 	</component>
-
 	<component>
 		<component-type>WebDAVDocumentDeleter</component-type>
 		<component-class>com.idega.content.presentation.WebDAVDocumentDeleter</component-class>
@@ -153,7 +148,6 @@
 			</idegaweb-info>
 		</component-extension>
 	</component>
-    
 	<component>
 		<component-type>WebDAVUpload</component-type>
 		<component-class>com.idega.content.presentation.WebDAVUpload</component-class>
@@ -269,17 +263,14 @@
 			</idegaweb-info>
 		</component-extension>
 	</component>
-	
 	<component>
 		<component-type>ThemesManager</component-type>
 		<component-class>com.idega.content.themes.presentation.ThemesManager</component-class>
 	</component>
-	
 	<component> 
   		<component-type>siteTemplatesViewer</component-type> 
   		<component-class>com.idega.content.tree.SiteTemplatesViewer</component-class> 
  	</component>
- 	
  	<component>
 		<component-type>PageInfo</component-type>
 		<component-class>com.idega.content.themes.presentation.PageInfo</component-class>
@@ -289,7 +280,6 @@
 			<property-class>java.lang.String</property-class>
 		</property>
 	</component>
-	
 	<component>
 		<component-type>SiteInfo</component-type>
 		<component-class>com.idega.content.themes.presentation.SiteInfoJsf</component-class>
@@ -303,6 +293,7 @@
 		<component-type>WFBlockWithToolbar</component-type>
 		<component-class>com.idega.content.presentation.WFBlockWithToolbar</component-class>
 	</component>
+	
     <managed-bean>
         <managed-bean-name>SessionBean1</managed-bean-name>
         <managed-bean-class>documentmanagementprototype2.SessionBean1</managed-bean-class>
@@ -408,37 +399,31 @@
         <managed-bean-class>com.idega.content.presentation.MetadataListManagedBean</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
-
 	<managed-bean>
 		<managed-bean-name>caseListBean</managed-bean-name>
 		<managed-bean-class>com.idega.content.bean.CaseListBean</managed-bean-class>
 		<managed-bean-scope>session</managed-bean-scope>
 	</managed-bean>
-	
 	<managed-bean>
 		<managed-bean-name>relatedItemsListBean</managed-bean-name>
 		<managed-bean-class>com.idega.content.bean.CaseListBean</managed-bean-class>
 		<managed-bean-scope>session</managed-bean-scope>
 	</managed-bean>
-	
 	<managed-bean>
 		<managed-bean-name>pageCreationBean</managed-bean-name>
 		<managed-bean-class>com.idega.content.bean.PageCreationManagedBean</managed-bean-class>
 		<managed-bean-scope>request</managed-bean-scope>
 	</managed-bean>
-	
    <managed-bean> 
       <managed-bean-name>treeIframe</managed-bean-name>
       <managed-bean-class>com.idega.content.tree.TreeIframe</managed-bean-class> 
       <managed-bean-scope>request</managed-bean-scope> 
    </managed-bean>
-
 	<managed-bean>
-		<managed-bean-name>themesManagerBean</managed-bean-name>
-		<managed-bean-class>com.idega.content.bean.ThemesManagerBean</managed-bean-class>
-		<managed-bean-scope>request</managed-bean-scope>
+		<managed-bean-name>ThemesManagerBean</managed-bean-name>
+		<managed-bean-class>com.idega.content.themes.bean.ThemesManagerBean</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
 	</managed-bean>
-
 	<managed-bean>
 		<managed-bean-name>siteTemplateBean</managed-bean-name>
 		<managed-bean-class>com.idega.content.bean.SiteTemplateBean</managed-bean-class>

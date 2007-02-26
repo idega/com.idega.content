@@ -31,7 +31,7 @@
 			import com.idega.content.business.ContentItemComment;
 			
   			ThemesEngine.applyMultipleChangesToTheme(String, List<ThemeChange>, String);
-  			ThemesEngine.beforeCreatePage(List<TreeNodeStructure>, Boolean);
+  			ThemesEngine.beforeCreatePage(List<TreeNodeStructure>, Boolean, String, List<String>);
   			CommentsEngine.getComments(String);
   		]]>
 	</signatures>

@@ -61,7 +61,7 @@ function insertStyleVariations(variations) {
 		setIfUsedTheme(theme.used);
 	}
 	else {
-		setIfUsedTheme("");
+		setIfUsedTheme(false);
 	}
 	var oldVariation = document.getElementById("themeStyleVariations");
 	if (oldVariation == null) {
@@ -282,9 +282,6 @@ function getThemesCallback(themes) {
 }
 
 function setIfUsedTheme(used) {
-	if (used == null) {
-		return;
-	}
 	var element = document.getElementById("themeUsability");
 	if (element == null) {
 		return;
@@ -294,7 +291,14 @@ function setIfUsedTheme(used) {
 			element.removeChild(element.childNodes[i]);
 		}
 	}
-	element.appendChild(document.createTextNode(used));
+	var text = "";
+	if (used == "true") {
+		text = document.getElementById("defaultThemeLabel").value;
+	}
+	else {
+		text = document.getElementById("notDefaultThemeLabel").value;
+	}
+	element.appendChild(document.createTextNode(text));
 }
 
 function Theme(themeName, url, urlToBig, id, used) {
@@ -303,6 +307,7 @@ function Theme(themeName, url, urlToBig, id, used) {
 	this.urlToBig = urlToBig;
 	this.id = id;
 	this.applyStyle = false;
+	this.used = false;
 	this.used = used;
 }
 

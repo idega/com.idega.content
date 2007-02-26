@@ -67,8 +67,6 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		Theme theme = null;
 		String webRoot = helper.getFullWebRoot();
 		
-		String used = "This theme is set as default"; // TODO: make localizable
-		String free = "This theme is not default";
 		for (int i = 0; i < themes.size(); i++) {
 			theme = themes.get(i);
 			if (theme.isPropertiesExtracted()) {
@@ -95,10 +93,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				info.append(theme.getId());
 				info.append(ThemesConstants.AT);
 				if (isUsedTheme(theme.getIBPageID())) {
-					info.append(used);
+					info.append(Boolean.TRUE);
 				}
 				else {
-					info.append(free);
+					info.append(Boolean.FALSE);
 				}
 				
 				if (i + 1 < themes.size()) {
@@ -646,7 +644,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	public List <String> beforeCreatePage(List <TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, ArrayList<String> followingNodes){
+	public List <String> beforeCreatePage(List <TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, List<String> followingNodes){
 		List <String> newIds = new ArrayList<String>();
 		
 		struct.get(0).setTreeOrder(numberInLevel);
@@ -802,12 +800,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	public String getPageId() {
-		String id = null;
-		id = helper.getLastVisitedPage();
+		String id = helper.getLastVisitedPage();
 		if (id != null) {
 			if (!ThemesConstants.MINUS_ONE.equals(id)) {
 				if (isPageDeleted(id)) {
-					return ThemesConstants.MINUS_ONE;
+					return String.valueOf(getRootPageId());
 				}
 				return id;
 			}
@@ -926,13 +923,14 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		domain.store();
 		newRootPage.setDefaultPageURI(ContentConstants.SLASH); // Changing uri to new start page
 		newRootPage.store();
+		builder.createTopLevelPageFromExistingPage(newRoot, domain, iwc); // New root page now is also top level page
 		
 		ICPage rootPage = helper.getThemesService().getICPage(currentRoot);
 		if (rootPage == null) {
 			return null;
 		}
-		changePageUri(rootPage.getPageKey(), rootPage.getName().toLowerCase(), false);
-		builder.createTopLevelPageFromExistingPage(currentRoot, domain, iwc);
+		changePageUri(rootPage.getPageKey(), rootPage.getName().toLowerCase(), false); // Changing page uri from "/" to some other
+		builder.createTopLevelPageFromExistingPage(currentRoot, domain, iwc); // Old root page now is a simple top level page
 		
 		TreeableEntity parent = newRootPage.getParentEntity();
 		if (parent instanceof ICPage) {
@@ -1100,19 +1098,23 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	private boolean increaseNodesNumbersInLevel(ArrayList<String> nodes, int numberInLevel, BuilderService service) {
-		if(nodes == null)
+	private boolean increaseNodesNumbersInLevel(List<String> nodes, int numberInLevel, BuilderService service) {
+		if (nodes == null) {
 			return false;
-		if(service == null)
+		}
+		if (service == null) {
 			service = helper.getThemesService().getBuilderService();
+		}
 		int id = -1;
-		
+		ICPage page = null;
 		for (int i = 0; i < nodes.size(); i++){
 			id = Integer.valueOf(nodes.get(i)).intValue();
-			ICPage page = helper.getThemesService().getICPage(Integer.valueOf(nodes.get(i)).intValue());
-			page.setTreeOrder(page.getTreeOrder()+1);
-			service.increaseTreeOrder(id);
-			page.store();
+			page = helper.getThemesService().getICPage(Integer.valueOf(nodes.get(i)).intValue());
+			if (page != null) {
+				page.setTreeOrder(page.getTreeOrder()+1);
+				service.increaseTreeOrder(id);
+				page.store();
+			}
 		}
 		
 		return true;

@@ -5,10 +5,9 @@ import com.idega.content.themes.helpers.ThemeChange;
 import com.idega.content.themes.helpers.TreeNodeStructure;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.idegaweb.IWMainApplicationSettings;
+import java.util.ArrayList;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.business.IBOService;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.rmi.RemoteException;
 
@@ -42,6 +41,11 @@ public interface ThemesEngine extends IBOService {
 	 * @see com.idega.content.themes.business.ThemesEngineBean#changePageUri
 	 */
 	public String changePageUri(String pageID, String pageTitle, boolean needSetPageTitle) throws RemoteException;
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#setNewLinkInArticleFile
+	 */
+	public boolean setNewLinkInArticleFile(String pageKey, String moduleClass, String pageUri) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#savePageInfo
@@ -91,12 +95,17 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#beforeCreatePage
 	 */
-	public List<String> beforeCreatePage(List<TreeNodeStructure> struct, Boolean isFirst, String numberInLevel, ArrayList<String> followingNodes) throws RemoteException;
-	
+	public List<String> beforeCreatePage(List<TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, List<String> followingNodes) throws RemoteException;
+
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#createPage
 	 */
 	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) throws RemoteException;
+
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#createPage
+	 */
+	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup, String treeOrder) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#deletePage
@@ -104,10 +113,10 @@ public interface ThemesEngine extends IBOService {
 	public boolean deletePage(String pageId, boolean deleteChildren) throws RemoteException;
 
 	/**
-	 * @see com.idega.content.themes.business.ThemesEngineBean#deletePage
+	 * @see com.idega.content.themes.business.ThemesEngineBean#deletePageAndDecrease
 	 */
 	public boolean deletePageAndDecrease(String pageId, boolean deleteChildren, ArrayList<String> followingNodes) throws RemoteException;
-	
+
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getPageId
 	 */
@@ -151,11 +160,5 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#applyMultipleChangesToTheme
 	 */
-	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes, String themeName);
-	
-	/**
-	 * @see com.idega.content.themes.business.ThemesEngineBean#setNewLinkInArticleFile
-	 */
-	public boolean setNewLinkInArticleFile(String pageKey, String moduleClass, String pageUri);
-	
+	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes, String themeName) throws RemoteException;
 }

@@ -152,15 +152,14 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 		StringBuffer body = new StringBuffer(newCommentMessage);
 		WebContext wctx = WebContextFactory.get();
 		body.append(ThemesHelper.getInstance().getFullServerName(iwc)).append(wctx.getCurrentPage());
-		// TODO: remove testing info
 		String host = iwc.getApplicationSettings().getProperty("messagebox_smtp_mailserver");
-		if (host == null) {
-			host = "mail.simnet.is";
-		}
+//		if (host == null) {
+//			host = "mail.simnet.is";
+//		}
 		String from = iwc.getApplicationSettings().getProperty("messagebox_from_mailaddress");
-		if (from == null) {
-			from = "testing@formbuilder.idega.is";
-		}
+//		if (from == null) {
+//			from = "testing@formbuilder.idega.is";
+//		}
 		Thread sender = new Thread(new CommentsNotificationSender(emails, from, newComment,	body.toString(), host));
 		sender.start();
 		return true;

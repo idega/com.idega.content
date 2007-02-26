@@ -4,6 +4,7 @@ import javax.faces.context.FacesContext;
 
 import com.idega.content.presentation.ContentBlock;
 import com.idega.content.presentation.WebDAVUpload;
+import com.idega.content.themes.bean.ThemesManagerBean;
 import com.idega.webface.WFBlock;
 import com.idega.webface.WFTitlebar;
 
@@ -22,7 +23,7 @@ public class ThemesManager extends ContentBlock {
 		upload.setId(idExtension);
 		upload.setOnClickAction(getOnClickAction(idExtension));
 		upload.setAccept(MIME_TYPE);
-		upload.setPathProviderBeanWithMethod("#{themesManagerBean.getThemesPath}");
+		upload.setPathProviderBeanWithMethod("#{"+ThemesManagerBean.THEMES_MANAGER_BEAN_ID+".getThemesPath}");
 		upload.setUploadMethod("uploadZipFileContents");
 		uploadBlock.add(upload);
 		

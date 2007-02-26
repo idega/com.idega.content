@@ -157,6 +157,7 @@ public class ApplicationPropertyViewer extends Block {
 		return values;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void addPropertyEditAction(IWContext iwc, PresentationObject component, String key) {
 		if (iwc == null || component == null || key == null) {
 			return;

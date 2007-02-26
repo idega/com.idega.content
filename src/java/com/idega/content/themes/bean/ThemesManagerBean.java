@@ -1,4 +1,4 @@
-package com.idega.content.bean;
+package com.idega.content.themes.bean;
 
 import java.io.Serializable;
 
@@ -8,7 +8,11 @@ public class ThemesManagerBean implements Serializable {
 	
 	private static final long serialVersionUID = -187806294166511859L;
 	
+	private String lastVisitedPageId = null;
 	public final static String THEMES_MANAGER_BEAN_ID = "ThemesManagerBean";
+	
+	public ThemesManagerBean() {
+	}
 	
 	public String getThemesPath() {
 		return ThemesConstants.THEMES_PATH;
@@ -20,6 +24,14 @@ public class ThemesManagerBean implements Serializable {
 
 	public String getBeanId() {
 		return THEMES_MANAGER_BEAN_ID;
+	}
+
+	public String getLastVisitedPageId() {
+		return lastVisitedPageId;
+	}
+
+	public void setLastVisitedPageId(String lastVisitedPageId) {
+		this.lastVisitedPageId = lastVisitedPageId;
 	}
 
 }
