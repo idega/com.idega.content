@@ -3,6 +3,8 @@ package com.idega.content.business;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.ZipInputStream;
 
 import javax.faces.component.UIComponent;
@@ -16,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.webdav.lib.PropertyName;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.presentation.IWContext;
@@ -298,11 +301,13 @@ public class WebDAVUploadBean implements Serializable{
 		
 		uploadFilePath = ThemesHelper.getInstance(false).changeFileUploadPath(getUploadFilePath() + uploadFile.getName().substring(0, uploadFile.getName().lastIndexOf(".")));
 		String path = getUploadFilePath();
+		List<String> filesToClean = new ArrayList<String>();
 		if (uploadingTheme) {
 			ThemesHelper.getInstance(false).addThemeToQueue(path);
+			filesToClean = ThemesConstants.FILTER;
 		}
 		
-		if (service.uploadZipFileContents(new ZipInputStream(new BufferedInputStream(uploadFile.getInputStream())), path)) {
+		if (service.uploadZipFileContents(new ZipInputStream(new BufferedInputStream(uploadFile.getInputStream())), path, filesToClean)) {
 			resultInfo = "Success uploading zip file's contents";
 			result = true;
 		}

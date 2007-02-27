@@ -1,6 +1,5 @@
 package com.idega.content.themes.business;
 
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,13 +14,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.idega.block.rss.business.NoSuchRSSProducerException;
-import com.idega.block.rss.business.RSSProducer;
-import com.idega.block.rss.business.RSSProducerRegistry;
-import com.idega.block.rss.data.RSSRequest;
 import com.idega.business.IBOServiceBean;
 import com.idega.content.business.ContentConstants;
-import com.idega.content.business.ContentItemRssProducer;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.Theme;
@@ -56,6 +50,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	private static final String ARTICLE_VIEWER_TEMPLATE_KEY = "article_viewer_page_key";
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
+
 	/**
 	 * Returns info about themes in slide
 	 */
@@ -854,7 +849,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			decreaseNodesNumbersInLevel(nodesToDecrease, numberInLevel, service);
 		if (newParentId <= 0) {
 			result = service.movePageToTopLevel(nodeId, iwc);
-						
+			
 			return result;
 		}
 		result = service.movePage(newParentId, nodeId, iwc.getDomain());
@@ -862,10 +857,6 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	public String getPathToImageFolder(){
-//test		
-//		System.out.println("getPathToImageFolder");
-//		callHandleRSSRequest();
-//test		
 		return PATH_TO_IMAGE_FOLDER;
 	}
 	
@@ -931,11 +922,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		domain.setIBPage(newRootPage); // Setting new start page in ICDomain
 		domain.store();
 		newRootPage.setDefaultPageURI(ContentConstants.SLASH); // Changing uri to new start page
-//		newRootPage.store();
 		builder.createTopLevelPageFromExistingPage(newRoot, domain, iwc); // New root page now is also top level page
-		
-		if (newRootPage.getParentNode() != null)
+		if (newRootPage.getParentNode() != null) {
 			newRootPage.setTreeOrder(builder.setAsLastInLevel(true, null)-1);
+		}
 		newRootPage.store();
 		
 		ICPage rootPage = helper.getThemesService().getICPage(currentRoot);
@@ -1155,32 +1145,6 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				
 		}
 		return struct; 
-	}	
-	public void callHandleRSSRequest(){
-//System.out.println("callHandleRSSRequest");
-
-		IWContext iwc = IWContext.getInstance();
-		RSSRequest rssReq = new RSSRequest(iwc.getRequest(), iwc.getResponse());
-		rssReq.setIdentifier("content");
-		RSSProducerRegistry factory = RSSProducerRegistry.getInstance();		
-		try {
-			RSSProducer producer = factory.getRSSProducerByIdentifier(rssReq.getIdentifier());
-			producer.handleRSSRequest(rssReq);
-		} catch (NoSuchRSSProducerException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		
-		RSSProducer rss = ContentItemRssProducer.getInstance(iwc);
-		try {
-			rss.handleRSSRequest(new RSSRequest(iwc.getRequest(), iwc.getResponse()));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
+
 }

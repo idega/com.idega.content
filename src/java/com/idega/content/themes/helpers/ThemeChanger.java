@@ -74,7 +74,7 @@ public class ThemeChanger {
 	private static final String TAG_ATTRIBUTE_VALUE_CSS = "text/css";
 	private static final String TAG_ATTRIBUTE_VALUE_SCREEN = "screen";
 	
-	private static final String COPY_AND_SPACE = "&copy;&nbsp;";
+	private static final String COPY_AND_SPACE = ContentConstants.EMPTY;//"&copy;&nbsp;";
 	private static final String NEW_LINE = "\n";
 	private static final String COMMENT_BEGIN = "/*";
 	private static final String COMMENT_END = "*/";
@@ -115,6 +115,7 @@ public class ThemeChanger {
 		if (skeleton.indexOf(ThemesConstants.SPACE) != -1) {
 			skeleton = helper.urlEncode(skeleton);
 		}
+		
 		Document doc = helper.getXMLDocument(helper.getFullWebRoot() + skeleton);
 		if (doc == null) {
 			return false;
@@ -172,7 +173,6 @@ public class ThemeChanger {
 			return false;
 		}
 
-		Iterator it = styles.values().iterator();
 		ThemeStyleGroupMember member = null;
 		List <String> files = null;
 		int index = theme.getLinkToBase().indexOf(ThemesConstants.THEMES);
@@ -189,7 +189,7 @@ public class ThemeChanger {
 		
 		Replaces[] r = new Replaces[]{getReplace(CUSTOM_REPLACE, replacement.toString())};
 		
-		while (it.hasNext()) {
+		for (Iterator it = styles.values().iterator(); it.hasNext(); ) {
 			member = (ThemeStyleGroupMember) it.next();
 			files = member.getStyleFiles();
 			for (index = 0; index < files.size(); index++) {
@@ -431,15 +431,13 @@ public class ThemeChanger {
 			}
 		}
 		
-		Iterator <Element> ite = elementsNeedsRegions.iterator();
-		while (ite.hasNext()) {
+		for (Iterator<Element> ite = elementsNeedsRegions.iterator(); ite.hasNext(); ) {
 			e = ite.next();
 			e.addContent(getCommentsCollection(fixValue(e.getTextNormalize())));
 		}
 
-		Iterator <Text> itt = textElements.iterator();
 		Text t = null;
-		while (itt.hasNext()) {
+		for (Iterator <Text> itt = textElements.iterator(); itt.hasNext(); ) {
 			t = itt.next();
 			if (needAddRegion(ThemesConstants.REGIONS, t.getTextNormalize())) {
 				head.addContent(getCommentsCollection(fixValue(t.getTextNormalize())));
@@ -510,10 +508,23 @@ public class ThemeChanger {
 		if (nodes == null) {
 			return false;
 		}
-		Iterator it = nodes.iterator();
-		while (it.hasNext()) {
+		for (Iterator it = nodes.iterator(); it.hasNext(); ) {
 			addRegion((Element) it.next());
 		}
+		
+		List<Text> needlessText = new ArrayList<Text>();
+		List allElements = body.getContent();
+		Object o = null;
+		for (int i = 0; i < allElements.size(); i++) { // Finding Text elements
+			o = allElements.get(i);
+			if (o instanceof Text) {
+				needlessText.add((Text) o);
+			}
+		}
+		for (int i = 0; i < needlessText.size(); i++) { // Removing needless Text elements
+			needlessText.get(i).detach();
+		}
+		
 		return true;
 	}
 	
@@ -702,7 +713,7 @@ public class ThemeChanger {
 		
 		if (regionID != null) {
 			if (regionID.equals(REGION_TO_EXPAND)) {
-				e.addContent(getElement("div", "&nbsp;", "style", "height:"+THEME_HEIGHT+";visibility:hidden")); // Expanding theme
+				e.addContent(getElement("div", "idega_theme", "style", "height:"+THEME_HEIGHT+";visibility:hidden")); // Expanding theme
 			}
 		}
 		
@@ -938,8 +949,7 @@ public class ThemeChanger {
 			head.addContent(index, getNewStyleElement(linkToBase, newStyle));
 		}
 		
-		Iterator <Element> it = uselessStyles.iterator();
-		while (it.hasNext()) {
+		for (Iterator <Element> it = uselessStyles.iterator(); it.hasNext(); ) {
 			it.next().detach();
 		}
 		
@@ -1159,8 +1169,8 @@ public class ThemeChanger {
 	
 	private void disableStyle(Theme theme, String styleGroupName) {
 		ThemeStyleGroupMember member = null;
-		Iterator <ThemeStyleGroupMember> it = theme.getStyleGroupsMembers().values().iterator();
-		while (it.hasNext()) {
+		Collection<ThemeStyleGroupMember> styleMembers = theme.getStyleGroupsMembers().values();
+		for (Iterator <ThemeStyleGroupMember> it = styleMembers.iterator(); it.hasNext(); ) {
 			member = it.next();
 			if (member.getGroupName().equals(styleGroupName)) {
 				member.setEnabled(false);

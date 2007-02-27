@@ -18,8 +18,12 @@ public class ThemesLoader {
 			return false;
 		}
 
-		encodedUri = getUriWithoutContent(encodedUri);
-		originalUri = getUriWithoutContent(originalUri);
+		if (encodedUri.startsWith(ContentConstants.CONTENT)) {
+			encodedUri = getUriWithoutContent(encodedUri);
+		}
+		if (originalUri.startsWith(ContentConstants.CONTENT)) {
+			originalUri = getUriWithoutContent(originalUri);
+		}
 		
 		if (createNewTheme(originalUri, encodedUri, newTheme, manuallyCreated) == null) {
 			return false;
@@ -67,7 +71,7 @@ public class ThemesLoader {
 		return helper.extractValueFromString(uri, index, uri.length());
 	}
 	
-	protected synchronized String createNewTheme(String originalUri, String encodedUri, boolean newTheme, boolean manuallyCreated) {		
+	protected synchronized String createNewTheme(String originalUri, String encodedUri, boolean newTheme, boolean manuallyCreated) {
 		helper.addUriToTheme(originalUri);
 		
 		initTheme(newTheme);

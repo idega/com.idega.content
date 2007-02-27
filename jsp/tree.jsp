@@ -25,16 +25,16 @@
 			<h:form id="createpageform">			
 
 				<x:div id="site_tree_container" forceId="true">
-	               	<c:block_with_toolbar id="page_tree_div" styleClass="site_tree_container_site" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png">
-						<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
-							<f:facet name="PageTreeNode">
-								<h:outputLink onclick="setPageID(this.parentNode.id);return false;">
-									<h:outputText value="#{node.description}"/>
-								</h:outputLink>
-							</f:facet>
-						</wf:iwtree>				
-					</c:block_with_toolbar>
-				</x:div>
+	                	<c:block_with_toolbar id="page_tree_div" styleClass="site_tree_container_site" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png">
+							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
+								<f:facet name="PageTreeNode">
+									<h:outputLink onclick="setPageID(this.parentNode.id);return false;">
+										<h:outputText value="#{node.description}"/>
+									</h:outputLink>
+								</f:facet>
+							</wf:iwtree>
+						</c:block_with_toolbar>
+					</x:div>
 					
 				<x:div id="pagesTypesContainer" forceId="true">
 					<wf:wfblock id="dhtmlgoodies_tree2" title="#{localizedStrings['com.idega.content']['page_types']}" styleClass="pagesTypesContainer">

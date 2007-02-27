@@ -431,21 +431,26 @@ public class ThemesHelper implements Singleton {
 		return false;
 	}
 	
-	protected void addTheme(Theme themeInfo) {
-		themes.put(themeInfo.getId(), themeInfo);
+	protected void addTheme(Theme theme) {
+		themes.put(theme.getId(), theme);
 	}
 	
 	public Collection <Theme> getThemesCollection() {
 		return themes.values();
 	}
 	
-	protected void addUriToTheme(String uri) {
+	protected synchronized void addUriToTheme(String uri) {
 		urisToThemes.add(uri);
 	}
 	
-	public boolean existTheme(String uri) {
-		if (urisToThemes.contains(uri)) {
-			return true;
+	public synchronized boolean existTheme(String uri) {
+		if (urisToThemes == null) {
+			return false;
+		}
+		for (int i = 0; i < urisToThemes.size(); i++) {
+			if (urisToThemes.get(i).equals(uri)) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -1111,7 +1116,7 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		
-		String language = "en";
+		String language = Locale.ENGLISH.getLanguage();
 		Locale l = iwc.getCurrentLocale();
 		if (l != null) {
 			if (l.getLanguage() != null) {
@@ -1131,7 +1136,14 @@ public class ThemesHelper implements Singleton {
 		StringBuffer file = new StringBuffer(language);
 		file.append(ThemesConstants.DOT).append(ThemesConstants.XML_EXTENSION);
 		StringBuffer base = new StringBuffer(RESOURCE_PATH_START);
-		base.append(uri).append(RESOURCE_PATH_END).append(ContentConstants.SLASH);
+		base.append(uri);
+		if (uri.equals(ContentConstants.EMPTY)) {
+			if (!base.toString().endsWith(ContentConstants.SLASH)) {
+				base.append(ContentConstants.SLASH);
+			}
+			base.append("root_page_article");
+		}
+		base.append(RESOURCE_PATH_END).append(ContentConstants.SLASH);
 		try {
 			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base.toString(), file.toString(), article, ContentConstants.XML_MIME_TYPE, true);
 			return base.toString();

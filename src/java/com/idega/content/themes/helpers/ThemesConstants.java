@@ -53,7 +53,7 @@ public class ThemesConstants {
 	protected static final List <String> IMAGE_POSITIONS = Collections.unmodifiableList(Arrays.asList(_IMAGE_POSITIONS));
 	
 	private static final String[] _FILTER = new String[] {"htm", "html", "xhtml", "ibxml", "jsp"};
-	protected static final List <String> FILTER = Collections.unmodifiableList(Arrays.asList(_FILTER));
+	public static final List <String> FILTER = Collections.unmodifiableList(Arrays.asList(_FILTER));
 	
 	private static final String[] _PROPERTIES_FILES = new String[] {"Theme.plist", IDEGA_THEME_INFO};
 	protected static final List <String> PROPERTIES_FILES = Collections.unmodifiableList(Arrays.asList(_PROPERTIES_FILES));
