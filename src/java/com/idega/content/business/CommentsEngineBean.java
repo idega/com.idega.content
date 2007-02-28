@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;
 import org.directwebremoting.proxy.dwr.Util;
@@ -22,6 +24,8 @@ import com.idega.business.IBOLookupException;
 import com.idega.business.IBOServiceBean;
 import com.idega.content.bean.ContentItemFeedBean;
 import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.core.builder.business.BuilderService;
+import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.core.cache.IWCacheManager2;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
@@ -37,6 +41,7 @@ import com.sun.syndication.io.WireFeedOutput;
 public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine {
 
 	private static final long serialVersionUID = 7299800648381936213L;
+	private static final Log log = LogFactory.getLog(CommentsEngineBean.class);
 	
 	private static final String COMMENTS_CACHE_NAME = "article_comments_feeds_cache";
 	
@@ -49,6 +54,8 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 	private String newCommentMessage = ContentUtil.getBundle().getLocalizedString("new_comment_message");
 	
 	private List<String> parsedEmails = new ArrayList<String>();
+	
+	private volatile BuilderService builder = null;
 
 	public boolean addComment(String cacheKey, String user, String subject, String email, String body, String uri, boolean notify) {
 		if (uri == null) {
@@ -84,7 +91,13 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 			}
 			
 			putFeedToCache(comments, uri, iwc);
-			removeArticleFromCache(iwc, cacheKey);
+			String splitter = "view";
+			String newValue = "edit";
+			if (ContentUtil.hasContentEditorRoles(iwc)) {
+				splitter = "edit";
+				newValue = "view";
+			}
+			removeArticleFromCache(iwc, getAllCacheKeysFromClient(cacheKey, splitter, newValue));
 			
 			String commentsXml = null;
 			try {
@@ -108,7 +121,8 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 			}
 			IWSlideService service = ThemesHelper.getInstance().getSlideService(iwc);
 			try {
-				if (service.uploadFileAndCreateFoldersFromStringAsRoot(base, file, commentsXml, ContentConstants.XML_MIME_TYPE, true)) {				
+				if (service.uploadFileAndCreateFoldersFromStringAsRoot(base, file, commentsXml, ContentConstants.XML_MIME_TYPE,
+						true)) {				
 					return true;
 				}
 			} catch (RemoteException e) {
@@ -119,8 +133,8 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 		}
 	}
 	
-	private boolean removeArticleFromCache(IWContext iwc, String cacheKey) {
-		if (cacheKey == null) {
+	private boolean removeArticleFromCache(IWContext iwc, List<String> cacheKeys) {
+		if (cacheKeys == null) {
 			return false;
 		}
 		if (iwc == null) {
@@ -137,14 +151,38 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 		if (articles == null) {
 			return false;
 		}
-		if (articles.containsKey(cacheKey)) {
-			articles.remove(cacheKey);
+		for (int i = 0; i < cacheKeys.size(); i++) {
+			removeArticleFromCache(iwc, articles, cacheKeys.get(i));
 		}
-		else {
+
+		return true;
+	}
+	
+	private boolean removeArticleFromCache(IWContext iwc, Map articles, String cacheKey) {
+		if (cacheKey == null) {
 			return false;
 		}
-		
-		return true;
+		if (articles == null) {
+			if (iwc == null) {
+				iwc = ThemesHelper.getInstance().getIWContext();
+			}
+			if (iwc == null) {
+				return false;
+			}
+			IWCacheManager2 cache = IWCacheManager2.getInstance(iwc.getIWMainApplication());
+			if (cache == null) {
+				return false;
+			}
+			articles = cache.getCache("article");
+			if (articles == null) {
+				return false;
+			}
+		}
+		if (articles.containsKey(cacheKey)) {
+			articles.remove(cacheKey);
+			return true;
+		}
+		return false;
 	}
 	
 	private boolean sendNotification(Feed comments, String email, IWContext iwc) {
@@ -358,8 +396,15 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 	
 	public boolean getCommentsForAllPages(String uri) {
 		WebContext wctx = WebContextFactory.get();
+		if (wctx == null) {
+			return false;
+		}
 		Collection pages = wctx.getScriptSessionsByPage(wctx.getCurrentPage());
-		
+		if (pages == null) {
+			return false;
+		}
+		log.info("Found JavaScript sessions on same page ('"+wctx.getCurrentPage()+"'): " + pages.size());
+
 		Util utilAll = new Util(pages);
 		utilAll.addFunctionCall("getComments", uri);
 		
@@ -536,5 +581,56 @@ public class CommentsEngineBean extends IBOServiceBean implements CommentsEngine
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	private BuilderService getBuilderService() {
+		if (builder == null) {
+			synchronized (CommentsEngineBean.class) {
+				if (builder == null) {
+					try {
+						builder = BuilderServiceFactory.getBuilderService(getIWApplicationContext());
+					} catch (RemoteException e) {
+						log.error(e);
+					}
+				}
+			}
+		}
+		return builder;
+	}
+	
+	public boolean setModuleProperty(String pageKey, String moduleId, String propName, String propValue, String cacheKey) {
+		BuilderService builder = getBuilderService();
+		if (builder == null) {
+			return false;
+		}
+		IWContext iwc = ThemesHelper.getInstance().getIWContext();
+		if (iwc == null) {
+			return false;
+		}
+		String[] property = new String[1];
+		property[0] = propValue;
+		if (builder.setProperty(pageKey, moduleId, propName, property, iwc.getIWMainApplication())) {
+			removeArticleFromCache(iwc, getAllCacheKeysFromClient(cacheKey, "edit", "view"));
+		}
+		return true;
+	}
+	
+	private List<String> getAllCacheKeysFromClient(String originalKey, String splitter, String newValue) {
+		List<String> keys = new ArrayList<String>();
+		keys.add(originalKey);
+		if (originalKey.indexOf(splitter) == -1) {
+			return keys;
+		}
+		String[] keyParts = originalKey.split(splitter);
+		if (keyParts == null) {
+			return keys;
+		}
+		if (keyParts.length != 2) {
+			return keys;
+		}
+		StringBuffer newKey = new StringBuffer(keyParts[0]);
+		newKey.append(newValue).append(keyParts[1]);
+		keys.add(newKey.toString());
+		return keys;
 	}
 }

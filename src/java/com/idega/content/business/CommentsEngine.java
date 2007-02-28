@@ -25,4 +25,9 @@ public interface CommentsEngine extends IBOService {
 	 * @see com.idega.content.business.CommentsEngineBean#getCommentsCount
 	 */
 	public int getCommentsCount(String uri) throws RemoteException;
+	
+	/**
+	 * @see com.idega.content.business.CommentsEngineBean#setModuleProperty
+	 */
+	public boolean setModuleProperty(String pageKey, String moduleId, String propName, String propValue, String cacheKey) throws RemoteException;
 }
