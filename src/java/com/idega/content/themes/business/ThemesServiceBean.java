@@ -34,7 +34,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	private static final long serialVersionUID = -1765120426660957585L;
 	private static final Log log = LogFactory.getLog(ThemesServiceBean.class);
 	
-	private BuilderService builder = null;
+	private volatile BuilderService builder = null;
 
 	public void onSlideChange(IWContentEvent idegaWebContentEvent) {
 		String uri = idegaWebContentEvent.getContentEvent().getUri();

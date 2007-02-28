@@ -223,3 +223,4 @@ values=Values
 version=Version
 version_comment=and a version comment (optional)
 yes=Yes
+enable_comments=Enable comments

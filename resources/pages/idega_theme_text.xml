@@ -16,6 +16,7 @@
 			<property name="showCreationDate" value="false" />
 			<property name="showComments" value="true" />
 			<property name="showCommentsList" value="false" />
+			<property name="showCommentsForAllUsers" value="true" />
     	</module>
     </region>
     <region id="navcontainer" label="navcontainer">
