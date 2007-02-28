@@ -919,13 +919,94 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (newRootPage == null) {
 			return null;
 		}
+		
+//
+		Collection topLevelPages = builder.getTopLevelPages(iwc);
+		int nodeOrder;
+		int newRootOrder;
+		if (newRootPage.getParentNode() != null){ //not top level page			
+//			topLevelPages = builder.getTopLevelPages(iwc);
+			for (Iterator iter = topLevelPages.iterator(); iter.hasNext();) {
+				ICTreeNode element = (ICTreeNode) iter.next();
+				ICPage page = helper.getThemesService().getICPage(Integer.valueOf(element.getId()).intValue());
+				page.setTreeOrder(page.getTreeOrder()+1);
+				page.store();
+			}
+			
+			
+			List<String> decreaseLevelOnTop = new ArrayList<String>();
+			Collection siblings = newRootPage.getParentNode().getChildren();
+			for (Iterator iter = siblings.iterator(); iter.hasNext();) {
+				ICTreeNode element = (ICTreeNode) iter.next();
+				nodeOrder = (helper.getThemesService().getICPage(Integer.valueOf(element.getId()).intValue())).getTreeOrder();
+				newRootOrder = helper.getThemesService().getICPage(newRoot).getTreeOrder();
+//				if(Integer.valueOf(element.getId()).intValue() > newRoot)
+				if(nodeOrder > newRootOrder)
+					decreaseLevelOnTop.add(element.getId());				
+			}
+			decreaseNodesNumbersInLevel(decreaseLevelOnTop, -1, builder);
+//			newRootPage.setTreeOrder(builder.setAsLastInLevel(true, null)-1);
+		}
+		else {			//top level page
+			List<String> increaseLevelOnTop = new ArrayList<String>();
+			for (Iterator iter = topLevelPages.iterator(); iter.hasNext();) {
+				ICTreeNode element = (ICTreeNode) iter.next();
+				nodeOrder = (helper.getThemesService().getICPage(Integer.valueOf(element.getId()).intValue())).getTreeOrder();
+				newRootOrder = helper.getThemesService().getICPage(newRoot).getTreeOrder();
+				if(nodeOrder < newRootOrder)
+					increaseLevelOnTop.add(element.getId());				
+			}
+			
+			increaseNodesNumbersInLevel(increaseLevelOnTop, -1, builder);
+
+		}		
+//		
+		
 		domain.setIBPage(newRootPage); // Setting new start page in ICDomain
 		domain.store();
 		newRootPage.setDefaultPageURI(ContentConstants.SLASH); // Changing uri to new start page
 		builder.createTopLevelPageFromExistingPage(newRoot, domain, iwc); // New root page now is also top level page
-		if (newRootPage.getParentNode() != null) {
-			newRootPage.setTreeOrder(builder.setAsLastInLevel(true, null)-1);
-		}
+		
+//		Collection topLevelPages = builder.getTopLevelPages(iwc);
+//		int nodeOrder;
+//		int newRootOrder;
+//		if (newRootPage.getParentNode() != null){ //not top level page			
+////			topLevelPages = builder.getTopLevelPages(iwc);
+//			for (Iterator iter = topLevelPages.iterator(); iter.hasNext();) {
+//				ICTreeNode element = (ICTreeNode) iter.next();
+//				ICPage page = helper.getThemesService().getICPage(Integer.valueOf(element.getId()).intValue());
+//				page.setTreeOrder(page.getTreeOrder()+1);
+//				page.store();
+//			}
+//			
+//			
+//			List<String> decreaseLevelOnTop = new ArrayList<String>();
+//			Collection siblings = newRootPage.getParentNode().getChildren();
+//			for (Iterator iter = siblings.iterator(); iter.hasNext();) {
+//				ICTreeNode element = (ICTreeNode) iter.next();
+//				nodeOrder = (helper.getThemesService().getICPage(Integer.valueOf(element.getId()).intValue())).getTreeOrder();
+//				newRootOrder = helper.getThemesService().getICPage(newRoot).getTreeOrder();
+////				if(Integer.valueOf(element.getId()).intValue() > newRoot)
+//				if(nodeOrder > newRootOrder)
+//					decreaseLevelOnTop.add(element.getId());				
+//			}
+//			decreaseNodesNumbersInLevel(decreaseLevelOnTop, -1, builder);
+////			newRootPage.setTreeOrder(builder.setAsLastInLevel(true, null)-1);
+//		}
+//		else {			//top level page
+//			List<String> increaseLevelOnTop = new ArrayList<String>();
+//			for (Iterator iter = topLevelPages.iterator(); iter.hasNext();) {
+//				ICTreeNode element = (ICTreeNode) iter.next();
+//				nodeOrder = (helper.getThemesService().getICPage(Integer.valueOf(element.getId()).intValue())).getTreeOrder();
+//				newRootOrder = helper.getThemesService().getICPage(newRoot).getTreeOrder();
+//				if(nodeOrder < newRootOrder)
+//					increaseLevelOnTop.add(element.getId());				
+//			}
+//			
+//			increaseNodesNumbersInLevel(increaseLevelOnTop, -1, builder);
+//
+//		}
+		newRootPage.setTreeOrder(1);			
 		newRootPage.store();
 		
 		ICPage rootPage = helper.getThemesService().getICPage(currentRoot);
@@ -1082,7 +1163,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return helper.getThemeChanger().applyMultipleChangesToTheme(themeID, changes, themeName);
 	}
 
-	private boolean decreaseNodesNumbersInLevel(ArrayList<String> nodes, int numberInLevel, BuilderService service) {
+	private boolean decreaseNodesNumbersInLevel(List<String> nodes, int numberInLevel, BuilderService service) {
 		if(nodes == null)
 			return false;
 		
