@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.31 2007/02/20 13:12:23 valdas Exp $
+ * $Id: ContentViewManager.java,v 1.32 2007/03/01 14:10:30 justinas Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -28,10 +28,10 @@ import com.idega.repository.data.Singleton;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2007/02/20 13:12:23 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/03/01 14:10:30 $ by $Author: justinas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.31 $
+ * @version $Revision: 1.32 $
  */
 public class ContentViewManager implements Singleton  {
 
@@ -95,10 +95,10 @@ public class ContentViewManager implements Singleton  {
 		
 		/* Page nodes begin */
 
-//		DefaultViewNode siteNode = new DefaultViewNode("pages", contentNode);
-//		siteNode.setJspUri(bundle.getJSPURI("pages.jsp"));
-//		siteNode.setKeyboardShortcut(new KeyboardShortcut("p"));
-//		siteNode.setName("#{localizedStrings['com.idega.content']['pages']}");
+		DefaultViewNode siteNode = new DefaultViewNode("pages", contentNode);
+		siteNode.setJspUri(bundle.getJSPURI("pages.jsp"));
+		siteNode.setKeyboardShortcut(new KeyboardShortcut("p"));
+		siteNode.setName("#{localizedStrings['com.idega.content']['pages']}");
 		
 //		DefaultViewNode siteNode = new DefaultViewNode("site", contentNode);
 //		siteNode.setJspUri(bundle.getJSPURI("pages.jsp"));
