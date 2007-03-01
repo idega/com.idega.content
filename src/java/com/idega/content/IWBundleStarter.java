@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.20 2007/02/23 14:56:16 gediminas Exp $
+ * $Id: IWBundleStarter.java,v 1.21 2007/03/01 13:04:06 justinas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.Map;
 
+import com.idega.block.rss.business.RSSProducer;
 import com.idega.block.rss.business.RSSProducerRegistry;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -41,10 +42,10 @@ import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2007/02/23 14:56:16 $ by $Author: gediminas $
+ *  Last modified: $Date: 2007/03/01 13:04:06 $ by $Author: justinas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.20 $
+ * @version $Revision: 1.21 $
  */
 //public class IWBundleStarter implements IWBundleStartable, JarLoader {
 public class IWBundleStarter implements IWBundleStartable{
@@ -92,7 +93,8 @@ public class IWBundleStarter implements IWBundleStartable{
 	    SiteViewManager sViewManager = SiteViewManager.getInstance(iwmain);
 		sViewManager.initializeStandardNodes(starterBundle);
 		
-	    RSSProducerRegistry.getInstance().addRSSProducer("files/cms/article", ContentItemRssProducer.getInstance(iwmain));
+//	    RSSProducerRegistry.getInstance().addRSSProducer("files/cms/article", ContentItemRssProducer.getInstance(iwmain));
+//	    RSSProducerRegistry.getInstance().addRSSProducer("files/cms/article", new ContentItemRssProducer());
 	}
 
 	/* (non-Javadoc)
@@ -149,10 +151,17 @@ public class IWBundleStarter implements IWBundleStartable{
 		ContentRSSProducer contentProducer = new ContentRSSProducer();
 		registry.addRSSProducer("content", contentProducer);
 		
+		ContentItemRssProducer itemProducer = new ContentItemRssProducer();
+		registry.addRSSProducer("article", itemProducer);		
+//	    RSSProducerRegistry.getInstance().addRSSProducer("files/cms/article", new ContentItemRssProducer());
+		
+		
 		 IWApplicationContext iwac = starterBundle.getApplication().getIWApplicationContext();
 	        try {
 	            IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(iwac,IWSlideService.class);
 	            service.addIWSlideChangeListeners(contentProducer);
+	            
+	            service.addIWSlideChangeListeners(itemProducer);
 	            
 	        } catch (IBOLookupException e) {
 	            e.printStackTrace();
