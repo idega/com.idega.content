@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.faces.context.FacesContext;
 import javax.servlet.ServletException;
 
 import org.apache.commons.httpclient.HttpException;
@@ -23,7 +22,6 @@ import org.apache.webdav.lib.WebdavResources;
 import com.idega.block.rss.business.RSSAbstractProducer;
 import com.idega.block.rss.business.RSSBusiness;
 import com.idega.block.rss.business.RSSProducer;
-import com.idega.block.rss.business.RSSProducerImpl;
 import com.idega.block.rss.data.RSSRequest;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
