@@ -8,7 +8,6 @@ import javax.faces.context.FacesContext;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
-import com.idega.content.business.CommentsEngine;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.ThemesHelper;
@@ -57,40 +56,26 @@ public class ContentItemComments extends ContentBlock {
 	@Override
 	protected void initializeComponent(FacesContext context) {
 		IWContext iwc = IWContext.getIWContext(context);
-		
-		if (!ContentUtil.hasContentEditorRoles(iwc) && !showCommentsForAllUsers) {
-			return;
-		}
+		boolean hasValidRights = ContentUtil.hasContentEditorRoles(iwc);
 		
 		WFDivision container = new WFDivision();
 		container.setId(COMMENTS_BLOCK_ID);
 		container.setStyleClass(styleClass);
+		this.add(container);
+		
+		if (!hasValidRights && !showCommentsForAllUsers) {
+			return;
+		}
 		
 		int commentsCount = getCommentsCount(iwc);
 		StringBuffer linkToAtomFeedImage = new StringBuffer(ContentUtil.getBundle().getResourcesPath());
-		linkToAtomFeedImage.append("/images/feed.png");
+		linkToAtomFeedImage.append("");
 		
 		// JavaScript
 		Script script = new Script();
-		script.addScriptLine("setComponentCacheKey('"+cacheKey+"');");
-		script.addScriptLine("setPostedLabel('"+ContentUtil.getBundle().getLocalizedString("posted")+"');");
-		script.addScriptLine("setCommentsLoadingMessage('"+ContentUtil.getBundle().getLocalizedString("loading_comments")+"');");
-		script.addScriptLine("setLinkToComments('"+linkToComments+"');");
-		script.addScriptLine("setCommentsAtomLinkTitle('"+ContentUtil.getBundle().getLocalizedString("atom_feed")+"');");
-		script.addScriptLine("setCommentsAtomsServer('"+ThemesHelper.getInstance().getFullServerName(iwc) + "/content');");
-		script.addScriptLine("setLinkToAtomFeedImage('"+linkToAtomFeedImage.toString()+"');");
-		script.addScriptLine("setAddNotificationText('"+ContentUtil.getBundle().getLocalizedString("need_send_notification")+"');");
-		script.addScriptLine("setYesText('"+ContentUtil.getBundle().getLocalizedString("yes")+"');");
-		script.addScriptLine("setNoText('"+ContentUtil.getBundle().getLocalizedString("no")+"');");
-		script.addScriptLine("setEnterEmailText('"+ContentUtil.getBundle().getLocalizedString("enter_email_text")+"');");
-		if (commentsCount > 0) {
-			script.addScriptLine("setAddedLinkToAtomInBody(true);");
-			script.addScriptLine("addAtomLinkInHeader();");
-		}
-		script.addScriptLine("setActiveReverseAjax();");
-		if (showCommentsList) {
-			script.addScriptLine("getAllArticleComments('"+linkToComments+"');");
-		}
+		StringBuffer action = new StringBuffer("setCommentStartInfo('");
+		action.append(cacheKey).append("', '").append(linkToComments).append("', ").append(showCommentsList).append(");");
+		script.addScriptLine(action.toString());
 		container.add(script);
 		
 		// Enable comments container
@@ -123,8 +108,6 @@ public class ContentItemComments extends ContentBlock {
 		
 		// Add comment block
 		container.add(getAddCommentBlock(iwc));
-		
-		this.add(container);
 	}
 	
 	private void addEnableCommentsCheckboxContainer(IWContext iwc, WFDivision container) {
@@ -154,6 +137,7 @@ public class ContentItemComments extends ContentBlock {
 		}
 		WFDivision showCommentsContainer = new WFDivision();
 		CheckBox enableCheckBox = new CheckBox("enableComments");
+		enableCheckBox.setId("manageCommentsBlockCheckBox");
 		enableCheckBox.setOnClick("enableComments(this.checked, '"+pageKey+"', '"+moduleIds.get(0)+"', 'showCommentsForAllUsers');");
 		enableCheckBox.setChecked(isShowCommentsForAllUsers());
 		Text enableText = new Text(ContentUtil.getBundle().getLocalizedString("enable_comments"));
@@ -163,25 +147,26 @@ public class ContentItemComments extends ContentBlock {
 	}
 	
 	private int getCommentsCount(IWContext iwc) {
-		CommentsEngine comments = null;
-		try {
-			comments = (CommentsEngine) IBOLookup.getServiceInstance(iwc, CommentsEngine.class);
-		} catch (IBOLookupException e) {
-			e.printStackTrace();
-			return 0;
-		}
-		try {
-			return comments.getCommentsCount(linkToComments);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-			return 0;
-		}
+//		CommentsEngine comments = null;
+//		try {
+//			comments = (CommentsEngine) IBOLookup.getServiceInstance(iwc, CommentsEngine.class);
+//		} catch (IBOLookupException e) {
+//			e.printStackTrace();
+//			return 0;
+//		}
+//		try {
+//			return comments.getCommentsCount(linkToComments);
+//		} catch (RemoteException e) {
+//			e.printStackTrace();
+//			return 0;
+//		}
+		return 0;
 	}
 	
 	private UIComponent getAddCommentBlock(IWContext iwc) {
 		WFDivision addComments = new WFDivision();
 		addComments.setId("add_comment_block");
-		Link l = new Link(ContentUtil.getBundle().getLocalizedString("add_your_comment"), "#" + addComments.getId());
+		Link label = new Link(ContentUtil.getBundle().getLocalizedString("add_your_comment"), "#" + addComments.getId());
 		String user = ContentUtil.getBundle().getLocalizedString("principal_name");
 		String subject = ContentUtil.getBundle().getLocalizedString("subject");
 		String comment = ContentUtil.getBundle().getLocalizedString("comment");
@@ -201,8 +186,8 @@ public class ContentItemComments extends ContentBlock {
 		action.append(sending).append(separator).append(loggedUser).append(separator);
 		action.append(ContentUtil.getBundle().getLocalizedString("email")).append(separator);
 		action.append(ContentUtil.getBundle().getLocalizedString("comment_form")).append("',").append(isForumPage).append(")");
-		l.setOnClick(action.toString());
-		addComments.add(l);
+		label.setOnClick(action.toString());
+		addComments.add(label);
 		return addComments;
 	}
 	

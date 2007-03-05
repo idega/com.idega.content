@@ -14,10 +14,11 @@
     		<property name="styleClass" value="blog-entry" />
 			<property name="showAuthor" value="false" />
 			<property name="showCreationDate" value="false" />
-			<property name="showComments" value="true" />
+    	</module>
+    	<module id="" class="com.idega.block.article.component.CommentsViewer">
 			<property name="showCommentsList" value="false" />
 			<property name="showCommentsForAllUsers" value="true" />
-    	</module>
+		</module>
     </region>
     <region id="navcontainer" label="navcontainer">
     	<module id="" class="com.idega.block.navigation.presentation.NavigationList">

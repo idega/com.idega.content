@@ -107,6 +107,7 @@ public class ThemesHelper implements Singleton {
 	private static final String RESOURCE_PATH_END = ThemesConstants.DOT + "article";
 	private static final String ATTRIBUTE_NAME = "property";
 	private static final String ATTRIBUTE_PROPERTY = "value";
+	private static final String ROOT_PAGE_ARTICLE = "root_page_article";
 	
 	private Random numberGenerator = null;
 	
@@ -1141,7 +1142,7 @@ public class ThemesHelper implements Singleton {
 			if (!base.toString().endsWith(ContentConstants.SLASH)) {
 				base.append(ContentConstants.SLASH);
 			}
-			base.append("root_page_article");
+			base.append(ROOT_PAGE_ARTICLE);
 		}
 		base.append(RESOURCE_PATH_END).append(ContentConstants.SLASH);
 		try {
@@ -1181,6 +1182,9 @@ public class ThemesHelper implements Singleton {
 			commentPath.append(ContentConstants.SLASH);
 		} 
 		else {
+			if (pageURI.equals(ContentConstants.SLASH)) {
+				pageURI += ROOT_PAGE_ARTICLE;
+			}
 			if (pageURI.endsWith(ContentConstants.SLASH)) {
 				pageURI = pageURI.substring(0, pageURI.lastIndexOf(ContentConstants.SLASH));
 			}
