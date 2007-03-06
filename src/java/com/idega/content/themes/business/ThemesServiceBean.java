@@ -259,6 +259,20 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		return builder;
 	}
 	
+	public ICPage getICPage(String pageKey) {
+		if (pageKey == null) {
+			return null;
+		}
+		int id = -1;
+		try {
+			id = Integer.valueOf(pageKey);
+		} catch (NumberFormatException e) {
+			log.error(e);
+			return null;
+		}
+		return getICPage(id);
+	}
+	
 	public ICPage getICPage(int id) {
 		ICPage page = null;
 		try {

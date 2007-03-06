@@ -61,4 +61,9 @@ public interface ThemesService extends IBOService, IWSlideChangeListener {
 	 * @see com.idega.content.themes.business.ThemesServiceBean#getDomain
 	 */
 	public ICDomain getDomain();
+	
+	/**
+	 * @see com.idega.content.themes.business.ThemesServiceBean#getICPage
+	 */
+	public ICPage getICPage(String pageKey);
 }
