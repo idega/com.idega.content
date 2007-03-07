@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.21 2007/03/01 13:04:06 justinas Exp $
+ * $Id: IWBundleStarter.java,v 1.22 2007/03/07 08:50:23 justinas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -42,10 +42,10 @@ import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2007/03/01 13:04:06 $ by $Author: justinas $
+ *  Last modified: $Date: 2007/03/07 08:50:23 $ by $Author: justinas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.21 $
+ * @version $Revision: 1.22 $
  */
 //public class IWBundleStarter implements IWBundleStartable, JarLoader {
 public class IWBundleStarter implements IWBundleStartable{
@@ -151,8 +151,6 @@ public class IWBundleStarter implements IWBundleStartable{
 		ContentRSSProducer contentProducer = new ContentRSSProducer();
 		registry.addRSSProducer("content", contentProducer);
 		
-		ContentItemRssProducer itemProducer = new ContentItemRssProducer();
-		registry.addRSSProducer("article", itemProducer);		
 //	    RSSProducerRegistry.getInstance().addRSSProducer("files/cms/article", new ContentItemRssProducer());
 		
 		
@@ -160,8 +158,6 @@ public class IWBundleStarter implements IWBundleStartable{
 	        try {
 	            IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(iwac,IWSlideService.class);
 	            service.addIWSlideChangeListeners(contentProducer);
-	            
-	            service.addIWSlideChangeListeners(itemProducer);
 	            
 	        } catch (IBOLookupException e) {
 	            e.printStackTrace();

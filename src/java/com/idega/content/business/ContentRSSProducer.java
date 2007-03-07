@@ -1,5 +1,5 @@
 /*
- * $Id: ContentRSSProducer.java,v 1.3 2007/02/22 16:07:40 justinas Exp $
+ * $Id: ContentRSSProducer.java,v 1.4 2007/03/07 08:51:21 justinas Exp $
  * Created on Sep 13, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -43,10 +43,10 @@ import com.sun.syndication.feed.synd.SyndFeedImpl;
  * The rss file for a folder is called "content.xml" and is stored in a hidden folder called ".rss" under the folder that was requested.
  * An IWSlideChangeListener see's to it that a cachemap containing which rssfiles are up to date is invalidated.
  * 
- *  Last modified: $Date: 2007/02/22 16:07:40 $ by $Author: justinas $
+ *  Last modified: $Date: 2007/03/07 08:51:21 $ by $Author: justinas $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class ContentRSSProducer extends RSSAbstractProducer implements RSSProducer, IWSlideChangeListener {
 
@@ -207,19 +207,6 @@ public class ContentRSSProducer extends RSSAbstractProducer implements RSSProduc
 		this.getIWSlideService(rssRequest).uploadFileAndCreateFoldersFromStringAsRoot(uri+RSS_FOLDER_NAME+"/", RSS_FILE_NAME, feedXML,this.getRSSContentType(),true);
 	}
 
-	
-	/* (non-Javadoc)
-	 * @see com.idega.slide.business.IWSlideChangeListener#onSlideChange(org.apache.slide.event.ContentEvent)
-	 */
-	public void onSlideChange(ContentEvent contentEvent) {
-		//On a file change this code checks if an rss file already exists and if so updates it (overwrites) with a new folder list
-		String URI = contentEvent.getUri();
-		int index = URI.lastIndexOf("/");
-		URI = URI.substring(0,index+1);
-		
-		getRssFileURIsCacheMap().remove(URI);
-		
-	}
 
 	/**
 	 * @return Returns the rssFileURIsCacheMap.
@@ -236,8 +223,12 @@ public class ContentRSSProducer extends RSSAbstractProducer implements RSSProduc
 	}
 
 	public void onSlideChange(IWContentEvent contentEvent) {
-		// TODO Auto-generated method stub
+//		On a file change this code checks if an rss file already exists and if so updates it (overwrites) with a new folder list
+		String URI = contentEvent.getContentEvent().getUri();
+		int index = URI.lastIndexOf("/");
+		URI = URI.substring(0,index+1);
 		
+		getRssFileURIsCacheMap().remove(URI);
 	}
 	
 }

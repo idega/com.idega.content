@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.29 2007/01/23 15:31:30 gediminas Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.30 2007/03/07 08:52:35 justinas Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2007/01/23 15:31:30 $ by $Author: gediminas $ This class
+ * Last modified: $Date: 2007/03/07 08:52:35 $ by $Author: justinas $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -83,7 +83,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.29 $
+ * @version $Revision: 1.30 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -710,28 +710,52 @@ public class ContentSearch extends Object implements SearchPlugin{
 	}
 	
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.idega.core.search.business.SearchPlugin#getSearchName()
-	 */
+	* (non-Javadoc)
+	* 
+	* @see com.idega.core.search.business.SearchPlugin#getSearchName()
+	*/
 	public String getSearchName() {
-		IWBundle bundle = ContentUtil.getBundle();
-		return bundle.getResourceBundle(IWContext.getInstance()).getLocalizedString(SEARCH_NAME_LOCALIZABLE_KEY,
-				"Documents");
+	IWBundle bundle = ContentUtil.getBundle();
+
+	try {
+	IWContext iwc = IWContext.getInstance();
+	return bundle.getResourceBundle(iwc).getLocalizedString(SEARCH_NAME_LOCALIZABLE_KEY,"Documents");
+	} catch (UnavailableIWContext e) {
+//	e.printStackTrace();
+//	no context, we must be running in a servlet or just a pojo
 	}
+
+	return "Documents";
+	}
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see com.idega.core.search.business.SearchPlugin#getSearchDescription()
+//	 */
+//	public String getSearchDescription() {
+//		IWBundle bundle = ContentUtil.getBundle();
+//		return bundle.getResourceBundle(IWContext.getInstance()).getLocalizedString(SEARCH_DESCRIPTION_LOCALIZABLE_KEY,
+//				"Searches the contents of documents in an IdegaWeb file system.");
+//	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.idega.core.search.business.SearchPlugin#getSearchDescription()
-	 */
+	* (non-Javadoc)
+	* 
+	* @see com.idega.core.search.business.SearchPlugin#getSearchDescription()
+	*/
 	public String getSearchDescription() {
-		IWBundle bundle = ContentUtil.getBundle();
-		return bundle.getResourceBundle(IWContext.getInstance()).getLocalizedString(SEARCH_DESCRIPTION_LOCALIZABLE_KEY,
-				"Searches the contents of documents in an IdegaWeb file system.");
+	IWBundle bundle = ContentUtil.getBundle();
+
+	try {
+	IWContext iwc = IWContext.getInstance();
+	return bundle.getResourceBundle(iwc).getLocalizedString(SEARCH_DESCRIPTION_LOCALIZABLE_KEY,"Searches the contents of documents in an IdegaWeb file system.");
+	} catch (UnavailableIWContext e) {
+//	e.printStackTrace();
+//	no context, we must be running in a servlet or just a pojo
 	}
 
-
+	return "Searches the contents of documents in an IdegaWeb file system.";
+	}
 	
 	/**
 	 * @return the propertyToOrderBy
