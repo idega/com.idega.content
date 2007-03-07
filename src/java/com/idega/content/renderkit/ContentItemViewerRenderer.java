@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewerRenderer.java,v 1.4 2007/02/13 19:05:36 valdas Exp $
+ * $Id: ContentItemViewerRenderer.java,v 1.5 2007/03/07 17:26:30 justinas Exp $
  * Created on 16.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -19,10 +19,10 @@ import com.idega.webface.renderkit.ContainerRenderer;
 
 /**
  * 
- *  Last modified: $Date: 2007/02/13 19:05:36 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/03/07 17:26:30 $ by $Author: justinas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ContentItemViewerRenderer extends ContainerRenderer {
 	
@@ -59,6 +59,8 @@ public class ContentItemViewerRenderer extends ContainerRenderer {
 		renderFooter(ctx,viewer);
 		
 		renderComments(ctx, viewer);
+		
+		renderFeedScript(ctx, viewer);
 	}
 	
 	
@@ -125,5 +127,12 @@ public class ContentItemViewerRenderer extends ContainerRenderer {
 		RenderUtils.renderChild(ctx, script);
 	}
 
+	public void renderFeedScript(FacesContext ctx,ContentItemViewer viewer) throws IOException {
+		UIComponent script = (UIComponent) viewer.getFacets().get(ContentItemViewer.FACET_FEED_SCRIPT);
+		if (script == null) {
+			return;
+		}
+		RenderUtils.renderChild(ctx, script);
+	}
 	
 }

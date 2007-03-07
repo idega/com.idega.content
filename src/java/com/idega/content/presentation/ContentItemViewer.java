@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.26 2007/02/23 17:25:49 valdas Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.27 2007/03/07 17:25:20 justinas Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -33,10 +33,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2007/02/23 17:25:49 $ by $Author: valdas $
+ * Last modified: $Date: 2007/03/07 17:25:20 $ by $Author: justinas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.26 $
+ * @version $Revision: 1.27 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -50,6 +50,7 @@ public class ContentItemViewer extends WFContainer {
 	public static final String FACET_ITEM_DETAILS_COMMAND = "item_details_command";
 	public static final String FACET_ITEM_COMMENTS = "item_comments";
 	public static final String FACET_COMMENTS_SCRIPTS = "item_comments_scripts";
+	public static final String FACET_FEED_SCRIPT = "item_feed_script";
 	public static final String DEFAULT_RENDERER_TYPE = "content_item_viewer";
 	/*
 	 * The field requestedResourcePath is used to store the path that is
