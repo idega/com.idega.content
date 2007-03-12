@@ -1,11 +1,9 @@
 /**
- * $Id: ContentCategory.java,v 1.1.2.3 2007/02/07 03:31:55 gediminas Exp $
- * Created in 2007 by gediminas
- *
+ * $Id: ContentCategory.java,v 1.1.2.4 2007/03/12 08:30:39 laddi Exp $ Created in 2007 by gediminas
+ * 
  * Copyright (C) 2000-2007 Idega Software hf. All Rights Reserved.
- *
- * This software is the proprietary information of Idega hf.
- * Use is subject to license terms.
+ * 
+ * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package com.idega.content.data;
 
@@ -17,26 +15,22 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
-
 /**
  * Describes a category
  * 
  * @author <a href="mailto:gediminas@idega.com">Gediminas Paulauskas</a>
  */
 public class ContentCategory {
-	
+
 	private String id;
 	private boolean disabled = false;
 	private Map names;
-	
-	private ContentCategory() {
-	}
 
 	public ContentCategory(String id) {
 		this.id = id;
 		this.names = new HashMap();
 	}
-	
+
 	/**
 	 * @param cat
 	 */
@@ -47,27 +41,27 @@ public class ContentCategory {
 	public String getId() {
 		return this.id;
 	}
-	
+
 	public void setId(String id) {
 		this.id = id;
 	}
-	
+
 	public boolean isDisabled() {
 		return this.disabled;
 	}
-	
+
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
 	}
-	
+
 	public Map getNames() {
 		return this.names;
 	}
-	
+
 	public void setNames(Map names) {
 		this.names = names;
 	}
-	
+
 	public String getName(String lang) {
 		String name = (String) getNames().get(lang);
 		if (name == null) {
@@ -83,7 +77,7 @@ public class ContentCategory {
 		}
 		return name;
 	}
-	
+
 	public void addName(String lang, String name) {
 		getNames().put(lang, name);
 	}
@@ -99,7 +93,7 @@ public class ContentCategory {
 		}
 		this.names = new HashMap();
 		List namesEl = cat.getChildren("name");
-		for (Iterator iter = namesEl.iterator(); iter.hasNext(); ) {
+		for (Iterator iter = namesEl.iterator(); iter.hasNext();) {
 			Element name = (Element) iter.next();
 			String lang = name.getAttributeValue("lang", Namespace.XML_NAMESPACE);
 			String localizedName = name.getText();
@@ -107,14 +101,14 @@ public class ContentCategory {
 		}
 
 	}
-	
+
 	public Element getAsXML() {
 		Element cat = new Element("category");
 		cat.setAttribute("id", getId());
 		if (isDisabled()) {
 			cat.setAttribute("disabled", String.valueOf(isDisabled()));
 		}
-		for (Iterator iter = getNames().keySet().iterator(); iter.hasNext(); ) {
+		for (Iterator iter = getNames().keySet().iterator(); iter.hasNext();) {
 			String lang = (String) iter.next();
 			String name = (String) getNames().get(lang);
 			Element locName = new Element("name");
@@ -124,5 +118,5 @@ public class ContentCategory {
 		}
 		return cat;
 	}
-	
+
 }
