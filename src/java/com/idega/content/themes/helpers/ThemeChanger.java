@@ -137,9 +137,16 @@ public class ThemeChanger {
 		int index = getElementIndex(head.getContent(), ThemesConstants.TAG_ATTRIBUTE_TYPE, TAG_ATTRIBUTE_VALUE_CSS);
 		// Adding enabled styles
 		List <ThemeStyleGroupMember> members = getEnabledStyles(theme);
+		Collection<Element> neededElement = null;
 		for (int i = 0; i < members.size(); i++) {
-			head.addContent(index, getNewStyleElement(ContentConstants.CONTENT + theme.getLinkToBase(), members.get(i)));
-			index++;
+			neededElement = getNewStyleElement(ContentConstants.CONTENT + theme.getLinkToBase(), members.get(i));
+			if (index > head.getContentSize()) {
+				head.addContent(neededElement);
+			}
+			else {
+				head.addContent(index, neededElement);
+				index++;
+			}
 		}
 		
 		if (!uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.getFileNameWithExtension(theme.getLinkToSkeleton()), theme,
@@ -946,7 +953,13 @@ public class ThemeChanger {
 		}
 		
 		if (newStyle != null) {
-			head.addContent(index, getNewStyleElement(linkToBase, newStyle));
+			Collection<Element> replacement = getNewStyleElement(linkToBase, newStyle);
+			if (index > head.getContentSize()) {
+				head.addContent(replacement);
+			}
+			else {
+				head.addContent(index, replacement);
+			}
 		}
 		
 		for (Iterator <Element> it = uselessStyles.iterator(); it.hasNext(); ) {
