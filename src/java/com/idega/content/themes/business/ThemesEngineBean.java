@@ -834,7 +834,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			increaseNodesNumbersInLevel(nodesToIncrease, numberInLevel, service);
 		if (nodesToDecrease != null)
 			decreaseNodesNumbersInLevel(nodesToDecrease, numberInLevel, service);
-		if (newParentId <= 0) {
+//		if (newParentId <= 0) {
+		if (newParentId < 0) {
 			result = service.movePageToTopLevel(nodeId, iwc);
 			
 			return result;
