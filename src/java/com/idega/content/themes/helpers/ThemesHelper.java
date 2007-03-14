@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.ejb.CreateException;
@@ -85,7 +86,7 @@ public class ThemesHelper implements Singleton {
 	private volatile ThemesEngine themesEngine = null;
 	private volatile ContentItemFeedBean feedBean = null;
 	
-	private Map <String, Theme> themes = null;
+	private SortedMap <String, Theme> themes = null;
 	private Map <String, Setting> themeSettings = null;
 	private Map <String, Setting> pageSettings = null;
 	private Map <String, Document> pages = null;
@@ -112,7 +113,7 @@ public class ThemesHelper implements Singleton {
 	private Random numberGenerator = null;
 	
 	private ThemesHelper(boolean canUseSlide) {
-		themes = new HashMap <String, Theme> ();
+		themes = Collections.synchronizedSortedMap(new TreeMap <String, Theme> ());
 		themeSettings = Collections.synchronizedMap(new TreeMap<String, Setting>());
 		pageSettings = new HashMap <String, Setting> ();
 		pages = new HashMap <String, Document> ();
@@ -438,6 +439,21 @@ public class ThemesHelper implements Singleton {
 	
 	public Collection <Theme> getThemesCollection() {
 		return themes.values();
+	}
+	
+	public List<Theme> getSortedThemes() {
+		List<Theme> sorted = new ArrayList<Theme>();
+		List<Theme> notSorted = new ArrayList<Theme>(getThemesCollection());
+		if (notSorted == null) {
+			return sorted;
+		}
+		
+		SortedMap<String, Theme> sortedMap = Collections.synchronizedSortedMap(new TreeMap<String, Theme>());
+		for (int i = 0; i < notSorted.size(); i++) {
+			sortedMap.put(notSorted.get(i).getName(), notSorted.get(i));
+		}
+		sorted = new ArrayList<Theme>(sortedMap.values());
+		return sorted;
 	}
 	
 	protected synchronized void addUriToTheme(String uri) {

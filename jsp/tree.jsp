@@ -16,13 +16,19 @@
 					/dwr/interface/BuilderService.js,
 					/dwr/interface/PagePreview.js,
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
-        			/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous-js-1.6.2/lib/prototype.js,
-        			/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous-js-1.6.2/src/scriptaculous.js,
+        			/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous/1.7.0/lib/prototype.js,
+        			/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous/1.7.0/src/scriptaculous.js,
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js,
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
         			/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
-        			/idegaweb/bundles/com.idega.content.bundle/resources/javascript/SiteInfoHelper.js">
-			<h:form id="createpageform">			
+        			/idegaweb/bundles/com.idega.content.bundle/resources/javascript/SiteManagerHelper.js">
+			<h:form id="createpageform">
+				<f:verbatim>
+                	<script type="text/javascript">
+                		addEvent(window, "load", getLocalizedTextForThemes);
+                		addEvent(window, "load", initializeTree);
+                	</script>
+                </f:verbatim>
 
 				<x:div id="site_tree_container" forceId="true">
 	                	<c:block_with_toolbar id="page_tree_div" styleClass="site_tree_container_site" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png">
@@ -56,7 +62,6 @@
 					</wf:wfblock>
 				</x:div>
 
-				<f:verbatim><script type="text/javascript">setIsSiteMap(true);setNeedRedirect(true);</script></f:verbatim>
 				<f:verbatim>
 					<script type="text/javascript">	
 						treeObj = new JSDragDropTree();
@@ -79,16 +84,6 @@
 					<c:SiteInfo id="siteInfo" styleClass="siteInfoStyle"></c:SiteInfo>
 				</x:div>
 
-				<f:verbatim><script type="text/javascript">setActiveLanguage();</script></f:verbatim>
-				<f:verbatim>
-					<script type="text/javascript">
-						resizeContainer("site_tree_container", "site_tree_container_site", 335, true);
-						resizeContainer("pagesTypesContainer", "pagesTypesContainer", 302, false);
-						resizeContainer("siteTemplatesContainer", "siteTemplatesContainer", 302, false);
-						resizeContainer("siteTemplatesContainer", "siteTemplatesContainer", 287, true);
-						checkIfNotEmptySiteTree("div_id_current_structure_tree");
-					</script>
-				</f:verbatim>
 			</h:form>
 		</ic:page>
 	</f:view>

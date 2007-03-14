@@ -59,7 +59,7 @@ function getSiteInfoValuesCallback(values) {
 }
 
 function saveSiteInfo() {
-	showLoadingMessage("Saving...");
+	showLoadingMessage(getThemeSavingText());
 	if (KEYWORDS == null) {
 		ThemesEngine.getSiteInfoElements(proceedSaving);
 	}
@@ -128,4 +128,15 @@ function proceedSaving(keywords) {
 
 function saveSiteInfoCallback(result) {
 	closeLoadingMessage();
+}
+
+function initialiazeSiteManager() {
+	setIsSiteMap(true);
+	setNeedRedirect(false);
+	setActiveLanguage();
+	resizeContainer("site_tree_container", "site_tree_container_site", 412, true);
+	resizeContainer("pagesTypesContainer", "pagesTypesContainer", 502, false);
+	resizeContainer("siteTemplatesContainer", "siteTemplatesContainer", 502, false);
+	resizeContainer("siteTemplatesContainer", "siteTemplatesContainer", 287, true);
+	checkIfNotEmptySiteTree("div_id_current_structure_tree");
 }

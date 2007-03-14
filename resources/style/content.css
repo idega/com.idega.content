@@ -370,6 +370,18 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	clear: left;
 }
 
+.usedThemeName {
+	text-align: center;
+	color: #FFCC00;
+	clear: left;
+}
+
+.selectedThemeName {
+	text-align: center;
+	color: #025FD0;
+	clear: left;
+}
+
 .themesTicker {
 	position: absolute;
 	left: 29px;
@@ -747,3 +759,15 @@ overflow: auto !important;
 }
 
 /*IE7 workspace quickfix ends*/
+
+.themeVariationGroupName {
+	font-weight: bold;
+}
+
+.themeVariationGroup li {
+	list-style-type: none;
+}
+
+.themeUsabilityStyle {
+	font-weight: bold;
+}

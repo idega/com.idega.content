@@ -11,15 +11,18 @@ version="1.2">
 	<jsf:view>
         <ws:page id="themeManager" javascripturls="/dwr/engine.js,
         				/dwr/interface/ThemesEngine.js,
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous-js-1.6.2/lib/prototype.js,
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous-js-1.6.2/src/scriptaculous.js,
+        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous/1.7.0/lib/prototype.js,
+        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous/1.7.0/src/scriptaculous.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/PageInfoHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
 						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/reflection.js">
-			<h:form id="uploadForm" enctype="multipart/form-data" onsubmit="showLoadingMessage('Uploading theme...');">
+			<h:form id="uploadForm" enctype="multipart/form-data" onsubmit="showLoadingMessage(getUploadingThemeText());">
 				<jsf:verbatim>
-					<script type="text/javascript">insertStyleFile();initScript(false, true, true);getThemes(null, true);</script>
+					<script type="text/javascript">
+						addEvent(window, "load", getLocalizedTextForThemes);
+						addEvent(window, "load", initializeThemes);
+					</script>
 				</jsf:verbatim>
 				<wf:wfblock id="themeManagerBlock" title="#{localizedStrings['com.idega.content']['themes']}" >
 					<x:div id="themePreviewContainer" forceId="true" style="width: auto">

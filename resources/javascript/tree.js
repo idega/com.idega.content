@@ -4,29 +4,9 @@ var RELOAD_PAGE = false;
 var REFRESH_PAGE_INFO = false;
 	
 function saveMyTree(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncrease, nodesToDecrease) {
-	
-//console.log('saveMyTree');
-//console.log(numberInLevel);
-//console.log(nodesToIncrease);
-//console.log('nodesToIncrease');
-/*
-if(nodesToIncrease){
-	for(var i = 0; i < nodesToIncrease.length; i++)
-		console.log(nodesToIncrease[i]);
-}
-*/
-//console.log('nodesToDecrease');
-//console.log(nodesToDecrease);
-/*
-if(nodesToDecrease){
-	for(var i = 0; i < nodesToDecrease.length; i++)
-		console.log(nodesToDecrease[i]);
-}
-*/
-	showLoadingMessage("Moving...");
+	showLoadingMessage(getMovingText());
 	setPageID(sourceNodeId);
 	REFRESH_PAGE_INFO = !isSiteMap();
-//alert(numberInLevel);	
 	ThemesEngine.movePage(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncrease, nodesToDecrease, empty);
 }
 
@@ -35,18 +15,16 @@ function getNewId(id){
 }
 
 function deletePage(pageId, followingNodes){
-	var wantToDelete = confirm("Are you sure?");
-	if (wantToDelete){
-		showLoadingMessage("Deleting...");
+	var wantToDelete = confirm(getAreYouSureText());
+	if (wantToDelete) {
+		showLoadingMessage(getDeletingText());
 		setPageID(null);
 		RELOAD_PAGE = true;
 		
-		if(followingNodes){
-//console.log('followingNodes1');
+		if (followingNodes) {
 			ThemesEngine.deletePageAndDecrease(pageId, true, followingNodes, empty);
 		}
-		else{
-//console.log('not followingNodes');			
+		else {	
 			ThemesEngine.deletePageAndDecrease(pageId, true, null, empty);
 		}
 	}
@@ -70,6 +48,16 @@ function empty(param) {
 }
 
 function setFrameUrl(url) {
+	if (url == null) {
+		return;
+	}
+	if (url == "") {
+		return;
+	}
+	if (url.charAt(url.length-1) != "/") {
+		url += "/";
+	}
+	//url += "?view=builder";
 	var frame = document.getElementById('treePages');
 	if (frame != null) {
 		frame.src=url;
@@ -85,6 +73,16 @@ function getId(){
 }
 
 function changeName() {
-//	document.getElementById('treePages').id=url;
-	document.getElementById('page_tree_div').id=url;
+	document.getElementById('page_tree_div').id = url;
+}
+
+function initializeTree() {
+	setIsSiteMap(true);
+	setNeedRedirect(true);
+	setActiveLanguage();
+	resizeContainer("site_tree_container", "site_tree_container_site", 335, true);
+	resizeContainer("pagesTypesContainer", "pagesTypesContainer", 302, false);
+	resizeContainer("siteTemplatesContainer", "siteTemplatesContainer", 302, false);
+	resizeContainer("siteTemplatesContainer", "siteTemplatesContainer", 287, true);
+	checkIfNotEmptySiteTree("div_id_current_structure_tree");
 }

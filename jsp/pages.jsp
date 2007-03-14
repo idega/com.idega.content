@@ -14,8 +14,8 @@ version="1.2">
         				/dwr/interface/BuilderService.js,
 						/dwr/interface/PagePreview.js,
 						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous-js-1.6.2/lib/prototype.js,
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous-js-1.6.2/src/scriptaculous.js,
+        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous/1.7.0/lib/prototype.js,
+        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous/1.7.0/src/scriptaculous.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/PageInfoHelper.js,
@@ -23,8 +23,10 @@ version="1.2">
 						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js">
 			<h:form id="pagesForm">
 				<jsf:verbatim>
-                	<script type="text/javascript">initScript(true, false, false);</script>
-                	<script type="text/javascript">getGlobalPageId();</script>
+                	<script type="text/javascript">
+                		addEvent(window, "load", getLocalizedTextForThemes);
+                		addEvent(window, "load", initializePages);
+                	</script>
                 </jsf:verbatim>
                 
                 <wf:wfblock maximizedVertically="true" id="pagesBlock" title="#{localizedStrings['com.idega.content']['pages']}">
@@ -47,6 +49,8 @@ version="1.2">
 						</jsf:verbatim>
 					</x:div>
                 
+                	<x:inputHidden id="defaultThemeLabel" forceId="true" value="#{localizedStrings['com.idega.content']['theme_is_default']}"></x:inputHidden>
+					<x:inputHidden id="notDefaultThemeLabel" forceId="true" value="#{localizedStrings['com.idega.content']['theme_is_not_default']}"></x:inputHidden>
 	                <x:div id="themesSliderContainer" forceId="true" styleClass="theme_slider" style="display: none">
 						<x:div id="leftScrollerContainer" forceId="true" styleClass="leftThemeScroller">	
 							<x:graphicImage url="/idegaweb/bundles/com.idega.content.bundle/resources/images/left.gif" onclick="scroll(this.id)" id="leftScroller" forceId="true" title="#{localizedStrings['com.idega.content']['scroll_left']}"></x:graphicImage>
@@ -107,13 +111,5 @@ version="1.2">
 				</x:div>
 			</h:form>
 		</ws:page>
-		<jsf:verbatim>
-			<script type="text/javascript">showSlider(document.getElementById("themesSliderContainer"));</script>
-			<script type="text/javascript">resizeFrame();</script>
-			<script type="text/javascript">getPageInfoValues();</script>
-			<script type="text/javascript">isStartPage(getPageID());</script>
-			<script type="text/javascript">checkIfNotEmptySiteTree("div_id_current_structure_tree");</script>
-			<script type="text/javascript">document.onclick = managePageInfoComponents;</script>
-		</jsf:verbatim>
 	</jsf:view>
 </jsp:root>

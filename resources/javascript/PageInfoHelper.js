@@ -24,7 +24,7 @@ function getScrollerImageWidth() {
 }
 
 function savePageInfo() {
-	showLoadingMessage("Saving...");
+	showLoadingMessage(getThemeSavingText());
 	if (KEYWORDS == null) {
 		ThemesEngine.getPageInfoElements(getPageInfoElementsCallback);
 	}
@@ -96,14 +96,14 @@ function manageSlider(buttonID) {
 		return;
 	}
 	if (container.style.display == "none") {
-		button.value = "Hide Themes";
+		button.value = getHideThemesText();
 		showSlider(container);
 		changeFrameHeight(-FRAME_CHANGE);
 	}
 	else {
 		removeStyleOptions();
 		new Effect.Fade(container);
-		button.value = "Show Themes";
+		button.value = getShowThemesText();
 		changeFrameHeight(FRAME_CHANGE);
 	}
 }
@@ -161,20 +161,20 @@ function chooseOption(themeID) {
 		
 		var divp = document.createElement("div");
 		divp.className = "themeChooseStyleText";
-		divp.setAttribute("title", "Select style for current page");
-		divp.setAttribute("alt", "Select style for current page");
+		divp.setAttribute("title", getStyleForCurrentPage());
+		divp.setAttribute("alt", getStyleForCurrentPage());
 		pageSpan = document.createElement("span");
 		pageSpan.setAttribute("id", "pageStyle");
-		pageSpan.appendChild(document.createTextNode("Page"));
+		pageSpan.appendChild(document.createTextNode(getChooseStyleForPage()));
 		divp.appendChild(pageSpan);
 	
 		var divs = document.createElement("div");
 		divs.className = "themeChooseStyleText";
-		divs.setAttribute("title", "Select style for all pages");
-		divs.setAttribute("alt", "Select style for all pages");
+		divs.setAttribute("title", getStyleForSite());
+		divs.setAttribute("alt", getStyleForSite());
 		siteSpan = document.createElement("span");
 		siteSpan.setAttribute("id", "siteStyle");
-		siteSpan.appendChild(document.createTextNode("Site"));
+		siteSpan.appendChild(document.createTextNode(getChooseStyleForSite()));
 		divs.appendChild(siteSpan);
 		
 		if (typeof div.attachEvent != 'undefined') {
@@ -196,34 +196,6 @@ function chooseOption(themeID) {
 	div.style.display = "block";
 }
 
-function getAbsoluteLeft(objectId) {
-	o = document.getElementById(objectId);
-	if (o == null) {
-		return 0;
-	}
-	oLeft = o.offsetLeft;
-	while(o.offsetParent != null) {
-		oParent = o.offsetParent;
-		oLeft += oParent.offsetLeft;
-		o = oParent;
-	}
-	return oLeft;
-}
-
-function getAbsoluteTop(objectId) {
-	o = document.getElementById(objectId);
-	if (o == null) {
-		return 0;
-	}
-	oTop = o.offsetTop;
-	while(o.offsetParent != null) {
-		oParent = o.offsetParent;
-		oTop += oParent.offsetTop;
-		o = oParent;
-	}
-	return oTop;
-}
-
 function setStyle(isPage) {
 	removeStyleOptions();
 	if (getThemeForStyle() == null) {
@@ -232,7 +204,9 @@ function setStyle(isPage) {
 	if (isPage && getPageID() == null) {
 		return;
 	}
-	showLoadingMessage("Applying style...");
+	showLoadingMessage(getApplyingStyleText());
+	setNewStyleToElements("usedThemeName", "themeName");
+	setNewStyleForSelectedElement(getThemeForStyle() + "_themeNameContainer", "usedThemeName");
 	ThemesEngine.setSelectedStyle(getThemeForStyle(), getPageID(), isPage, setStyleCallback);
 }
 
@@ -275,7 +249,7 @@ function newPage() {
 	}
 	else {
 		CLICKED_CREATE = true;
-		setButtonText("newPageButton", "Close");
+		setButtonText("newPageButton", getCloseText());
 		new Effect.Appear(newPage);
 	}
 }
@@ -363,15 +337,15 @@ function isStartPageCallback(isStart) {
 	}
 	button.disabled = isStart;
 	if (isStart) {
-		button.value = "This Page is A Start Page";
+		button.value = getStartPageText();
 	}
 	else {
-		button.value = "Make This Page As Start Page";
+		button.value = getMakeStartPageText();
 	}
 }
 
 function makePageAsStartPage() {
-	showLoadingMessage("Changing structure...");
+	showLoadingMessage(getChangingStructureText());
 	ThemesEngine.setAsStartPage(getPageID(), setAsStartPageCallback);
 }
 
@@ -387,9 +361,21 @@ function closeNewPage(newPage) {
 	if (newPage != null) {
 		newPage.style.display = "none";
 	}
-	setButtonText("newPageButton", "New Page");
+	setButtonText("newPageButton", getNewPageText());
 }
 
 function managePageInfoComponents() {
 	removeStyleOptions();
+}
+
+function initializePages() {
+	initScript(true, false, false);
+	getGlobalPageId();
+
+	showSlider(document.getElementById("themesSliderContainer"));
+	resizeFrame();
+	getPageInfoValues();
+	isStartPage(getPageID());
+	checkIfNotEmptySiteTree("div_id_current_structure_tree");
+	addEvent(document, "click", managePageInfoComponents);	
 }

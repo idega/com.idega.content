@@ -30,6 +30,7 @@ import com.idega.core.builder.data.ICPage;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.data.TreeableEntity;
+import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
@@ -50,6 +51,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	private static final String ARTICLE_VIEWER_TEMPLATE_KEY = "article_viewer_page_key";
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
+	
+	private volatile List<String> localizedText = null;
 
 	/**
 	 * Returns info about themes in slide
@@ -61,7 +64,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			log.info("Error extracting theme's properties");
 		}
 		
-		List <Theme> themes = new ArrayList<Theme>(helper.getThemesCollection());
+		List <Theme> themes = helper.getSortedThemes();
 		StringBuffer info = new StringBuffer();
 		
 		Theme theme = null;
@@ -553,15 +556,19 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (language == null || keyword == null) {
 			return false;
 		}
-		
+
 		if (keyword.indexOf(ThemesConstants.SYSTEM_SETTINGS) == -1) {
 			if (settings == null) {
 				return false;
 			}
-			if (value == null || value.equals(ThemesConstants.EMPTY)) {
-				settings.removeProperty(ThemesConstants.THEMES_PROPERTY_START + keyword + language);
+			String key = new StringBuffer(ThemesConstants.THEMES_PROPERTY_START).append(keyword).append(language).toString();
+			if (value == null) {
+				settings.removeProperty(key);
 			}
 			else {
+				if (value.equals("               ") || value.equals(ContentConstants.SPACE)) {
+					value = ContentConstants.EMPTY;
+				}
 				settings.setProperty(ThemesConstants.THEMES_PROPERTY_START + keyword + language, value);
 			}
 		}
@@ -1201,6 +1208,52 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			decreaseNodesNumbersInLevel(decreaseLevelOnTop, -1, builder);
 		}
 		return true;
+	}
+	
+	private void initializeLocalizedText() {
+		localizedText = new ArrayList<String>();
+		IWBundle bundle = ContentUtil.getBundle();
+		if (bundle == null) {
+			return;
+		}
+		try {
+			localizedText.add(bundle.getLocalizedString("uploading_theme"));			// 0
+			localizedText.add(bundle.getLocalizedString("changing_theme"));				// 1
+			localizedText.add(bundle.getLocalizedString("saving"));						// 2
+			localizedText.add(bundle.getLocalizedString("generating_preview"));			// 3
+			localizedText.add(bundle.getLocalizedString("restoring_theme"));			// 4
+			localizedText.add(bundle.getLocalizedString("hide_themes"));				// 5
+			localizedText.add(bundle.getLocalizedString("show_themes"));				// 6
+			localizedText.add(bundle.getLocalizedString("style_for_current_page"));		// 7
+			localizedText.add(bundle.getLocalizedString("style_for_site"));				// 8
+			localizedText.add(bundle.getLocalizedString("applying_style"));				// 9
+			localizedText.add(bundle.getLocalizedString("close"));						// 10
+			localizedText.add(bundle.getLocalizedString("start_page_text"));			// 11
+			localizedText.add(bundle.getLocalizedString("make_start_page"));			// 12
+			localizedText.add(bundle.getLocalizedString("changing_structure"));			// 13
+			localizedText.add(bundle.getLocalizedString("new_page"));					// 14
+			localizedText.add(bundle.getLocalizedString("moving"));						// 15
+			localizedText.add(bundle.getLocalizedString("are_you_sure"));				// 16
+			localizedText.add(bundle.getLocalizedString("deleting"));					// 17
+			localizedText.add(bundle.getLocalizedString("page"));						// 18
+			localizedText.add(bundle.getLocalizedString("site"));						// 19
+			localizedText.add(bundle.getLocalizedString("drop_templates_here"));		// 20
+			localizedText.add(bundle.getLocalizedString("no_page_exist"));				// 21
+			localizedText.add(bundle.getLocalizedString("loading"));					// 22
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+	
+	public List<String> getLocalizedText() {
+		if (localizedText == null) {
+			synchronized (ThemesEngineBean.class) {
+				if (localizedText == null) {
+					initializeLocalizedText();
+				}
+			}
+		}
+		return localizedText;
 	}
 
 }

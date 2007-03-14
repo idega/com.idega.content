@@ -123,8 +123,10 @@ public class ThemeChanger {
 		Element root = doc.getRootElement();
 		Element head = root.getChild(HTML_HEAD, namespace);
 		
+		String path = new StringBuffer(ContentConstants.CONTENT).append(theme.getLinkToBase()).toString();
+		
 		// Removing needles content (like "%pathto")
-		if (!proceedHeadContent(ContentConstants.CONTENT + theme.getLinkToBase(), head)) {
+		if (!proceedHeadContent(path, head)) {
 			return false;
 		}
 		
@@ -133,27 +135,35 @@ public class ThemeChanger {
 			return false;
 		}
 		
-		// Finding where to insert element
-		int index = getElementIndex(head.getContent(), ThemesConstants.TAG_ATTRIBUTE_TYPE, TAG_ATTRIBUTE_VALUE_CSS);
 		// Adding enabled styles
 		List <ThemeStyleGroupMember> members = getEnabledStyles(theme);
-		Collection<Element> neededElement = null;
+		// Finding where to insert element
+		int index = getElementIndex(head.getContent(), ThemesConstants.TAG_ATTRIBUTE_TYPE, TAG_ATTRIBUTE_VALUE_CSS);
 		for (int i = 0; i < members.size(); i++) {
-			neededElement = getNewStyleElement(ContentConstants.CONTENT + theme.getLinkToBase(), members.get(i));
-			if (index > head.getContentSize()) {
-				head.addContent(neededElement);
-			}
-			else {
-				head.addContent(index, neededElement);
-				index++;
-			}
+			addContentToElement(head, getNewStyleElement(path, members.get(i)), index);
+			index++;
 		}
 		
-		if (!uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.getFileNameWithExtension(theme.getLinkToSkeleton()), theme,
-				true)) {
+		if (uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.getFileNameWithExtension(theme.getLinkToSkeleton()), theme,	true)) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private boolean addContentToElement(Element parent, Collection<Element> content, int index) {
+		if (parent == null || content == null) {
 			return false;
 		}
-		
+		if (index < 0) {
+			return false;
+		}
+		if (index > parent.getContentSize()) {
+			parent.addContent(content);
+		}
+		else {
+			parent.addContent(index, content);
+		}
 		return true;
 	}
 	
@@ -315,15 +325,15 @@ public class ThemeChanger {
 
 		// Uploading modified file
 		try {
-			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(helper.getLinkToBase(helper.decodeUrl(linkToStyle)), helper.getFileNameWithExtension(linkToStyle), content, null, true)) {
-				return false;
+			if (helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(helper.getLinkToBase(helper.decodeUrl(linkToStyle)), helper.getFileNameWithExtension(linkToStyle), content, null, true)) {
+				return true;
 			}
 		} catch (RemoteException e) {
 			log.error(e);
 			return false;
 		}
 		
-		return true;
+		return false;
 	}
 	
 	/**
@@ -543,17 +553,17 @@ public class ThemeChanger {
 			return ThemesConstants.EMPTY;
 		}
 		
-		String value = ThemesConstants.EMPTY;
+		StringBuffer value = new StringBuffer();
 		if (begin != null) {
-			value += begin;
+			value.append(begin);
 		}
 		if (defaultValue != null) {
-			value += defaultValue;
+			value.append(defaultValue);
 		}
 		if (end != null) {
-			value += end;
+			value.append(end);
 		}
-		return value;
+		return value.toString();
 	}
 	
 	private Collection <Element> getNavigatorContent(String propertyKey, boolean addID) {
@@ -640,28 +650,35 @@ public class ThemeChanger {
 	 * @return String
 	 */
 	private String getRegion(String value) {
-		String region = ThemesConstants.COMMENT_BEGIN + ThemesConstants.TEMPLATE_REGION_BEGIN + value +
-			ThemesConstants.TEMPLATE_REGION_MIDDLE + ThemesConstants.COMMENT_END;
+		StringBuffer region = new StringBuffer(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_BEGIN);
+		region.append(value).append(ThemesConstants.TEMPLATE_REGION_MIDDLE).append(ThemesConstants.COMMENT_END);
+		
 		IWMainApplicationSettings settings  = IWMainApplication.getDefaultIWMainApplication().getSettings();
-		String propertyValue = settings.getProperty(ThemesConstants.THEMES_PROPERTY_START + value +
-				ThemesConstants.THEMES_PROPERTY_END);
+		StringBuffer key = new StringBuffer(ThemesConstants.THEMES_PROPERTY_START).append(value);
+		key.append(ThemesConstants.THEMES_PROPERTY_END);
+		String propertyValue = settings.getProperty(key.toString());
 		if (propertyValue != null) {
 			if (value.equals(ThemesConstants.TOOLBAR)) {
-				return region + getBasicReplace(TOOLBAR_REPLACE_BEGIN, propertyValue, TOOLBAR_REPLACE_END) +
-					ThemesConstants.COMMENT_BEGIN +	ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
+				region.append(getBasicReplace(TOOLBAR_REPLACE_BEGIN, propertyValue, TOOLBAR_REPLACE_END));
+				region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END);
+				region.append(ThemesConstants.COMMENT_END);
+				return region.toString();
 			}
 			if (value.equals(FOOTER)) {
-				return region + COPY_AND_SPACE + getBasicReplace(null, propertyValue, null) + ThemesConstants.COMMENT_BEGIN +
-					ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
+				region.append(COPY_AND_SPACE).append(getBasicReplace(null, propertyValue, null));
+				region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END);
+				region.append(ThemesConstants.COMMENT_END);
+				return region.toString();
 			}
 			if (value.equals(CONTENT)) {
-				return region + getContentReplace(propertyValue) + ThemesConstants.COMMENT_BEGIN +
-				ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
+				region.append(getContentReplace(propertyValue)).append(ThemesConstants.COMMENT_BEGIN);
+				region.append(ThemesConstants.TEMPLATE_REGION_END).append(ThemesConstants.COMMENT_END);
+				return region.toString();
 			}
-			region += propertyValue;
+			region.append(propertyValue);
 		}
-		
-		return region + ThemesConstants.COMMENT_BEGIN +	ThemesConstants.TEMPLATE_REGION_END + ThemesConstants.COMMENT_END;
+		region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END).append(ThemesConstants.COMMENT_END);
+		return region.toString();
 	}
 	
 	/**
@@ -953,13 +970,7 @@ public class ThemeChanger {
 		}
 		
 		if (newStyle != null) {
-			Collection<Element> replacement = getNewStyleElement(linkToBase, newStyle);
-			if (index > head.getContentSize()) {
-				head.addContent(replacement);
-			}
-			else {
-				head.addContent(index, replacement);
-			}
+			addContentToElement(head, getNewStyleElement(linkToBase, newStyle), index);
 		}
 		
 		for (Iterator <Element> it = uselessStyles.iterator(); it.hasNext(); ) {

@@ -22,7 +22,7 @@ public class ThemeStyleVariations {
 	private static final String RADIO_INPUT = "radio";
 	private static final String CHECKBOX_INPUT = "checkbox";
 	
-	private static final String DIV_OPENER = "<div styleClass=\"";
+	private static final String DIV_OPENER = "<div class=\"";
 	private static final String DIV_CLOSER = "</div>";
 	private static final String VARIATION_GROUP_STYLE = "themeVariationGroup\">";
 	private static final String VARIATION_GROUP_NAME_STYLE = "themeVariationGroupName\">";
