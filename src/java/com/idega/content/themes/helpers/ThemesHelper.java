@@ -1133,13 +1133,7 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		
-		String language = Locale.ENGLISH.getLanguage();
-		Locale l = iwc.getCurrentLocale();
-		if (l != null) {
-			if (l.getLanguage() != null) {
-				language = l.getLanguage();
-			}
-		}
+		String language = getCurrentLanguage(iwc);
 		
 		String article = getArticleDocument(language, uri, iwc);
 		if (article == null) {
@@ -1478,6 +1472,20 @@ public class ThemesHelper implements Singleton {
 			log.error(e);
 			return key;
 		}
+	}
+	
+	public String getCurrentLanguage(IWContext iwc) {
+		if (iwc == null) {
+			iwc = getIWContext();
+		}
+		if (iwc == null) {
+			return Locale.ENGLISH.getLanguage();
+		}
+		Locale l = iwc.getCurrentLocale();
+		if (l == null) {
+			return Locale.ENGLISH.getLanguage();
+		}
+		return l.toString();
 	}
 
 }

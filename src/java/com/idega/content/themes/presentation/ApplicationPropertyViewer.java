@@ -1,7 +1,6 @@
 package com.idega.content.themes.presentation;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
@@ -38,6 +37,7 @@ public class ApplicationPropertyViewer extends Block {
 	
 	private static final String LIST_STYLE = "list-style-type: none; width: 100%";
 	private static final String USELESS_STYLE_CLASS = "empty_useless_style_class";
+	private static final String FIFTEEN_SPACE = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 
 	private String applicationPropertyKey = null;
 	
@@ -50,17 +50,16 @@ public class ApplicationPropertyViewer extends Block {
 		String settingKey = applicationPropertyKey;
 		String key = null;
 		if (applicationPropertyKey.indexOf(ThemesConstants.THEMES_PROPERTY_START) == -1) {
-			applicationPropertyKey = ThemesConstants.THEMES_PROPERTY_START + applicationPropertyKey;
+			applicationPropertyKey = new StringBuffer(ThemesConstants.THEMES_PROPERTY_START).append(applicationPropertyKey).toString();
 		}
 		
 		String value = null;
-		Locale locale = iwc.getCurrentLocale();
-		if (locale != null) { // Getting value, based on Locale
-			key = applicationPropertyKey + ThemesConstants.DOT + locale.getLanguage();
-			value = iwc.getApplicationSettings().getProperty(key);
-		}
+		String language = ThemesHelper.getInstance().getCurrentLanguage(iwc);
+		
+		key = new StringBuffer(applicationPropertyKey).append(ThemesConstants.DOT).append(language).toString();
+		value = iwc.getApplicationSettings().getProperty(key);
 		if (value == null) { // Didn't find localized value, getting default value
-			key = applicationPropertyKey + ThemesConstants.THEMES_PROPERTY_END;
+			key = new StringBuffer(applicationPropertyKey).append(ThemesConstants.THEMES_PROPERTY_END).toString();
 			value = iwc.getApplicationSettings().getProperty(key);
 		}
 		
@@ -68,22 +67,24 @@ public class ApplicationPropertyViewer extends Block {
 			return;
 		}
 		
-		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + LOGO + ThemesConstants.DOT) != -1) {
+		if (key.indexOf(getCheckKey(LOGO)) != -1) {
 			String siteLogo = "site_logo";
-			if (!ThemesConstants.EMPTY.equals(value)) {
-				Image image = new Image(value, ContentUtil.getBundle().getLocalizedString(siteLogo));
-				image.setID(siteLogo);
-				addPropertyEditAction(iwc, image, key, settingKey);
-				this.add(image);
+			String name = ContentUtil.getBundle().getLocalizedString(siteLogo);
+			if (value.equals(ContentConstants.EMPTY)) {
+				name = FIFTEEN_SPACE;
 			}
+			Image image = new Image(value, name);
+			image.setID(siteLogo);
+			addPropertyEditAction(iwc, image, key, settingKey);
+			this.add(image);
 			return;
 		}
 		
 		if (value.equals(ContentConstants.EMPTY)) {
-			value = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+			value = FIFTEEN_SPACE;
 		}
 		
-		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + ThemesConstants.NAVIGATION + ThemesConstants.DOT) != -1) {
+		if (key.indexOf(getCheckKey(ThemesConstants.NAVIGATION)) != -1) {
 			ICPage page = ThemesHelper.getInstance().getThemesService().getICPage(iwc.getCurrentIBPageID());
 			if (page != null) {
 				if (page.getWebDavUri() != null) {
@@ -104,7 +105,7 @@ public class ApplicationPropertyViewer extends Block {
 			return;
 		}
 		
-		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + ThemesConstants.TOOLBAR + ThemesConstants.DOT) != -1) {
+		if (key.indexOf(getCheckKey(ThemesConstants.TOOLBAR)) != -1) {
 			Link l = new Link();
 			l.setText(value);
 			addPropertyEditAction(iwc, l, key, settingKey);
@@ -112,7 +113,7 @@ public class ApplicationPropertyViewer extends Block {
 			return;
 		}
 		
-		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + ThemesConstants.BREADCRUMB + ThemesConstants.DOT) != -1) {
+		if (key.indexOf(getCheckKey(ThemesConstants.BREADCRUMB)) != -1) {
 			Link l = new Link();
 			l.setText(value);
 			addPropertyEditAction(iwc, l, key, settingKey);
@@ -120,14 +121,14 @@ public class ApplicationPropertyViewer extends Block {
 			return;
 		}
 		
-		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + ThemesConstants.SITE_TITLE + ThemesConstants.DOT) != -1) {
+		if (key.indexOf(getCheckKey(ThemesConstants.SITE_TITLE)) != -1) {
 			Heading1 h1 = new Heading1(value);
 			addPropertyEditAction(iwc, h1, key, settingKey);
 			this.add(h1);
 			return;
 		}
 		
-		if (key.indexOf(ThemesConstants.THEMES_PROPERTY_START + ThemesConstants.SITE_SLOGAN + ThemesConstants.DOT) != -1) {
+		if (key.indexOf(getCheckKey(ThemesConstants.SITE_SLOGAN)) != -1) {
 			Heading2 h2 = new Heading2(value);
 			addPropertyEditAction(iwc, h2, key, settingKey);
 			this.add(h2);
@@ -193,5 +194,9 @@ public class ApplicationPropertyViewer extends Block {
 			return "ApplicationPropertyViewer";
 		}
 		return name;
+	}
+	
+	private String getCheckKey(String keyWord) {
+		return new StringBuffer(ThemesConstants.THEMES_PROPERTY_START).append(keyWord).append(ThemesConstants.DOT).toString();
 	}
 }

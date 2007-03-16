@@ -30,9 +30,9 @@ import com.idega.core.builder.data.ICPage;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.data.TreeableEntity;
-import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
+import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.servlet.filter.IWWelcomeFilter;
 
@@ -606,11 +606,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (iwc == null) {
 			return false;
 		}
-		Locale l = iwc.getCurrentLocale();
-		if (l == null) {
-			return false;
-		}
-		String language = l.getLanguage();
+		String language = helper.getCurrentLanguage(iwc);
 		if (language == null) {
 			return false;
 		}
@@ -1212,34 +1208,39 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	private void initializeLocalizedText() {
 		localizedText = new ArrayList<String>();
-		IWBundle bundle = ContentUtil.getBundle();
-		if (bundle == null) {
+		IWResourceBundle resourceBundle = null;
+		try {
+			resourceBundle = ContentUtil.getBundle().getResourceBundle(helper.getIWContext());
+		} catch (Exception e) {
+			log.error(e);
+		}
+		if (resourceBundle == null) {
 			return;
 		}
 		try {
-			localizedText.add(bundle.getLocalizedString("uploading_theme"));			// 0
-			localizedText.add(bundle.getLocalizedString("changing_theme"));				// 1
-			localizedText.add(bundle.getLocalizedString("saving"));						// 2
-			localizedText.add(bundle.getLocalizedString("generating_preview"));			// 3
-			localizedText.add(bundle.getLocalizedString("restoring_theme"));			// 4
-			localizedText.add(bundle.getLocalizedString("hide_themes"));				// 5
-			localizedText.add(bundle.getLocalizedString("show_themes"));				// 6
-			localizedText.add(bundle.getLocalizedString("style_for_current_page"));		// 7
-			localizedText.add(bundle.getLocalizedString("style_for_site"));				// 8
-			localizedText.add(bundle.getLocalizedString("applying_style"));				// 9
-			localizedText.add(bundle.getLocalizedString("close"));						// 10
-			localizedText.add(bundle.getLocalizedString("start_page_text"));			// 11
-			localizedText.add(bundle.getLocalizedString("make_start_page"));			// 12
-			localizedText.add(bundle.getLocalizedString("changing_structure"));			// 13
-			localizedText.add(bundle.getLocalizedString("new_page"));					// 14
-			localizedText.add(bundle.getLocalizedString("moving"));						// 15
-			localizedText.add(bundle.getLocalizedString("are_you_sure"));				// 16
-			localizedText.add(bundle.getLocalizedString("deleting"));					// 17
-			localizedText.add(bundle.getLocalizedString("page"));						// 18
-			localizedText.add(bundle.getLocalizedString("site"));						// 19
-			localizedText.add(bundle.getLocalizedString("drop_templates_here"));		// 20
-			localizedText.add(bundle.getLocalizedString("no_page_exist"));				// 21
-			localizedText.add(bundle.getLocalizedString("loading"));					// 22
+			localizedText.add(resourceBundle.getLocalizedString("uploading_theme"));			// 0
+			localizedText.add(resourceBundle.getLocalizedString("changing_theme"));				// 1
+			localizedText.add(resourceBundle.getLocalizedString("saving"));						// 2
+			localizedText.add(resourceBundle.getLocalizedString("generating_preview"));			// 3
+			localizedText.add(resourceBundle.getLocalizedString("restoring_theme"));			// 4
+			localizedText.add(resourceBundle.getLocalizedString("hide_themes"));				// 5
+			localizedText.add(resourceBundle.getLocalizedString("show_themes"));				// 6
+			localizedText.add(resourceBundle.getLocalizedString("style_for_current_page"));		// 7
+			localizedText.add(resourceBundle.getLocalizedString("style_for_site"));				// 8
+			localizedText.add(resourceBundle.getLocalizedString("applying_style"));				// 9
+			localizedText.add(resourceBundle.getLocalizedString("close"));						// 10
+			localizedText.add(resourceBundle.getLocalizedString("start_page_text"));			// 11
+			localizedText.add(resourceBundle.getLocalizedString("make_start_page"));			// 12
+			localizedText.add(resourceBundle.getLocalizedString("changing_structure"));			// 13
+			localizedText.add(resourceBundle.getLocalizedString("new_page"));					// 14
+			localizedText.add(resourceBundle.getLocalizedString("moving"));						// 15
+			localizedText.add(resourceBundle.getLocalizedString("are_you_sure"));				// 16
+			localizedText.add(resourceBundle.getLocalizedString("deleting"));					// 17
+			localizedText.add(resourceBundle.getLocalizedString("page"));						// 18
+			localizedText.add(resourceBundle.getLocalizedString("site"));						// 19
+			localizedText.add(resourceBundle.getLocalizedString("drop_templates_here"));		// 20
+			localizedText.add(resourceBundle.getLocalizedString("no_page_exist"));				// 21
+			localizedText.add(resourceBundle.getLocalizedString("loading"));					// 22
 		} catch (Exception e) {
 			log.error(e);
 		}

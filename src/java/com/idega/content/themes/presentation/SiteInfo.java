@@ -52,7 +52,7 @@ public class SiteInfo extends Block {
 			locales.setOnChange(onChnageAction);
 		}
 		if (locale == null) {
-			locale = iwc.getCurrentLocale().getLanguage();
+			locale = ThemesHelper.getInstance().getCurrentLanguage(iwc);
 			locales.setSelectedElement(locale);
 		}
 		return locales;

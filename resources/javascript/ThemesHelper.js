@@ -296,7 +296,7 @@ function getLocalizedTextForThemesCallback(list) {
 	UPLOADING_THEME = list[0];
 	CHANGING_THEME = list[1];
 	SAVING_THEME = list[2];
-	GENERATING_PREVIEW = lsit[3];
+	GENERATING_PREVIEW = list[3];
 	RESTORING_THEME = list[4];
 	HIDE_THEMES = list[5];
 	SHOW_THEMES = list[6];
