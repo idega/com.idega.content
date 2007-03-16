@@ -22,7 +22,6 @@ public class ThemesConstants {
 	public static final String XML_EXTENSION = "xml";
 	
 	private static final String BASE_ROOT_APPL = ContentUtil.getBundle().getResourcesPath();
-	protected static final String BASE_ROOT_SLIDE = ContentUtil.getContentBaseFolderPath();
 	
 	protected static final String BASE_THEME_IMAGES = BASE_ROOT_APPL + "/images/themes/";
 	
@@ -151,8 +150,8 @@ public class ThemesConstants {
 	public static final String THEMES_PROPERTY_START = "theme.";
 	public static final String THEMES_PROPERTY_END = ".def";
 	
-	public static final String THEMES_PATH = BASE_ROOT_SLIDE + THEMES;
-	public static final String PAGES_PATH_SLIDE = BASE_ROOT_SLIDE + ContentConstants.PAGES_START_URI + ContentConstants.SLASH;
+	public static final String THEMES_PATH = ContentConstants.BASE_ROOT_SLIDE + THEMES;
+	public static final String PAGES_PATH_SLIDE = ContentConstants.BASE_ROOT_SLIDE + ContentConstants.PAGES_START_URI + ContentConstants.SLASH;
 	public static final String THEMES_PREVIEW_PATH = THEMES_PATH + "preview/";
 	
 	public static final String AT = "@";

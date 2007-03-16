@@ -104,7 +104,6 @@ public class ThemesHelper implements Singleton {
 	private String fullWebRoot; // For cache
 	private String webRoot;
 	
-	private static final String RESOURCE_PATH_START = ThemesConstants.BASE_ROOT_SLIDE + "/article";
 	private static final String RESOURCE_PATH_END = ThemesConstants.DOT + "article";
 	private static final String ATTRIBUTE_NAME = "property";
 	private static final String ATTRIBUTE_PROPERTY = "value";
@@ -1146,7 +1145,7 @@ public class ThemesHelper implements Singleton {
 
 		StringBuffer file = new StringBuffer(language);
 		file.append(ThemesConstants.DOT).append(ThemesConstants.XML_EXTENSION);
-		StringBuffer base = new StringBuffer(RESOURCE_PATH_START);
+		StringBuffer base = new StringBuffer(ContentConstants.ARTICLE_PATH_START);
 		base.append(uri);
 		if (uri.equals(ContentConstants.EMPTY)) {
 			if (!base.toString().endsWith(ContentConstants.SLASH)) {
@@ -1154,6 +1153,7 @@ public class ThemesHelper implements Singleton {
 			}
 			base.append(ROOT_PAGE_ARTICLE);
 		}
+		base.append(getSlideService().createUniqueFileName(ContentConstants.ARTICLE_SCOPE));
 		base.append(RESOURCE_PATH_END).append(ContentConstants.SLASH);
 		try {
 			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base.toString(), file.toString(), article, ContentConstants.XML_MIME_TYPE, true);
@@ -1186,7 +1186,7 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public String getArticleCommentLink(String pageURI) {
-		StringBuffer commentPath = new StringBuffer(ContentConstants.CONTENT_ITEM_COMMENTS_URI);
+		StringBuffer commentPath = new StringBuffer(ContentConstants.ARTICLE_PATH_START);
 		if (pageURI == null) {
 			commentPath.append(ContentConstants.SLASH).append(ContentUtil.getYearMonthPath());
 			commentPath.append(ContentConstants.SLASH);
