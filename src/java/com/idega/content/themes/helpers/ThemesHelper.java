@@ -55,7 +55,6 @@ import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.component.business.ICObjectBusiness;
 import com.idega.core.component.data.ICObject;
-import com.idega.core.component.data.ICObjectBMPBean;
 import com.idega.core.component.data.ICObjectHome;
 import com.idega.core.component.data.ICObjectInstance;
 import com.idega.core.component.data.ICObjectInstanceHome;
@@ -68,7 +67,6 @@ import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
 import com.idega.repository.data.Singleton;
 import com.idega.slide.business.IWSlideService;
-import com.idega.util.ListUtil;
 import com.idega.webface.WFUtil;
 
 public class ThemesHelper implements Singleton {
@@ -92,10 +90,6 @@ public class ThemesHelper implements Singleton {
 	private Map <String, Document> pages = null;
 	private List <String> themeQueue = null;
 	private List <String> urisToThemes = null;
-	
-	private List elements = null;
-	private List blocks = null;
-	private List jsf = null;
 	
 	private boolean checkedFromSlide = false;
 	private boolean loadedThemeSettings = false;
@@ -1224,8 +1218,7 @@ public class ThemesHelper implements Singleton {
 		String pageKey = String.valueOf(pageID);
 		String moduleID = null;
 		
-		int newICObjectTypeID = -1;
-		boolean canSetID = false;
+		int icObjectId = -1;
 		
 		ICObjectInstanceHome icoiHome = null;
 		ICObjectHome icoHome = null;
@@ -1243,32 +1236,23 @@ public class ThemesHelper implements Singleton {
 			o = it.next();
 			if (o instanceof Element) {
 				e = (Element) o;
-				if (e.getName().equals(module)) {
-					newICObjectTypeID = getNewICObjectTypeID(e.getAttributeValue(className), icoHome);
-					if (newICObjectTypeID == -1) {
-						canSetID = false;
-					}
-					else {
+				if (module.equals(e.getName())) {
+					icObjectId = getICObjectId(e.getAttributeValue(className), icoHome);
+					if (icObjectId != -1) {
 						try {
 							instance = icoiHome.create();
-							instance.setICObjectID(newICObjectTypeID);
+							instance.setICObjectID(icObjectId);
 							instance.setIBPageByKey(pageKey);
-							instance.store();
-							
 							moduleID = ICObjectBusiness.UUID_PREFIX + instance.getUniqueId();
-							canSetID = true;
+							instance.store();
+							moduleId = e.getAttribute(id);
+							if (moduleId != null) {
+								if (moduleId.getValue() == null || ThemesConstants.EMPTY.equals(moduleId.getValue())) {
+									moduleId.setValue(moduleID);
+								}
+							}
 						} catch (CreateException ce) {
 							log.error(ce);
-							canSetID = false;
-						}
-					}
-					
-					if (canSetID) {
-						moduleId = e.getAttribute(id);
-						if (moduleId != null) {
-							if (moduleId.getValue() == null || moduleId.getValue().equals(ThemesConstants.EMPTY)) {
-								moduleId.setValue(moduleID);
-							}
 						}
 					}
 				}
@@ -1276,76 +1260,21 @@ public class ThemesHelper implements Singleton {
 		}
 	}
 	
-	private int getNewICObjectTypeID(String moduleClassName, ICObjectHome icoHome) {
-		if (moduleClassName == null || icoHome == null) {
+	private int getICObjectId(String className, ICObjectHome icoHome) {
+		ICObject object = null;
+		try {
+			object = icoHome.findByClassName(className);
+		} catch (FinderException e) {
+			log.error(e);
 			return -1;
 		}
-		
-		int newICObjectTypeID = -1;
-		
-		if (elements == null) {
-			try {
-				elements = ListUtil.convertCollectionToList(icoHome.findAllByObjectTypeOrdered(ICObjectBMPBean.COMPONENT_TYPE_ELEMENT));
-			} catch (FinderException e) {
-				log.error(e);
-			}
-		}
-		newICObjectTypeID = getNewICObjectTypeID(moduleClassName, elements);
-		if (newICObjectTypeID != -1) {
-			return newICObjectTypeID;
-		}
-		
-		if (blocks == null) {
-			try {
-				blocks = ListUtil.convertCollectionToList(icoHome.findAllByObjectTypeOrdered(ICObjectBMPBean.COMPONENT_TYPE_BLOCK));
-			} catch (FinderException e) {
-				e.printStackTrace();
-			}
-		}
-		newICObjectTypeID = getNewICObjectTypeID(moduleClassName, blocks);
-		if (newICObjectTypeID != -1) {
-			return newICObjectTypeID;
-		}
-		
-		if (jsf == null) {
-			try {
-				jsf = ListUtil.convertCollectionToList(icoHome.findAllByObjectTypeOrdered(ICObjectBMPBean.COMPONENT_TYPE_JSFUICOMPONENT));
-			} catch (FinderException e) {
-				log.error(e);
-			}
-		}
-		newICObjectTypeID = getNewICObjectTypeID(moduleClassName, jsf);
-		if (newICObjectTypeID != -1) {
-			return newICObjectTypeID;
-		}
-		
-		return -1;
-	}
-	
-	private int getNewICObjectTypeID(String moduleClassName, List modules) {
-		if (moduleClassName == null || modules == null) {
+		String key = object.getPrimaryKey().toString();
+		try {
+			return Integer.valueOf(key);
+		} catch (NumberFormatException e) {
+			log.error(e);
 			return -1;
 		}
-		
-		ICObject item = null;
-		Object o = null;
-		
-		String newICObjectTypeID = null;
-		boolean found = false;
-		for (int i = 0; (i < modules.size() && !found); i++) {
-			o = modules.get(i);
-			if (o instanceof ICObject) {
-				item = (ICObject) o;
-				if (item.getClassName().equals(moduleClassName)) {
-					newICObjectTypeID = item.getPrimaryKey().toString();
-					found = true;
-				}
-			}
-		}
-		if (newICObjectTypeID != null) {
-			return Integer.valueOf(newICObjectTypeID).intValue();
-		}
-		return -1;
 	}
 	
 	private String getArticle() {
@@ -1479,11 +1408,11 @@ public class ThemesHelper implements Singleton {
 			iwc = getIWContext();
 		}
 		if (iwc == null) {
-			return Locale.ENGLISH.getLanguage();
+			return Locale.ENGLISH.toString();
 		}
 		Locale l = iwc.getCurrentLocale();
 		if (l == null) {
-			return Locale.ENGLISH.getLanguage();
+			return Locale.ENGLISH.toString();
 		}
 		return l.toString();
 	}
