@@ -1238,7 +1238,10 @@ public class ThemesHelper implements Singleton {
 				e = (Element) o;
 				if (module.equals(e.getName())) {
 					icObjectId = getICObjectId(e.getAttributeValue(className), icoHome);
-					if (icObjectId != -1) {
+					if (icObjectId == -1) {
+						log.error("Didn't get ICObject for: " + e.getAttributeValue(className));
+					}
+					else {
 						try {
 							instance = icoiHome.create();
 							instance.setICObjectID(icObjectId);
@@ -1248,7 +1251,6 @@ public class ThemesHelper implements Singleton {
 							moduleId = e.getAttribute(id);
 							if (moduleId != null) {
 								moduleId.setValue(moduleID);
-								System.out.println("Set uuid: " + moduleID);
 							}
 						} catch (CreateException ce) {
 							log.error(ce);
