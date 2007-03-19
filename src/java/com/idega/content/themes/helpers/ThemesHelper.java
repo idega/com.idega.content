@@ -1243,12 +1243,13 @@ public class ThemesHelper implements Singleton {
 							instance = icoiHome.create();
 							instance.setICObjectID(icObjectId);
 							instance.setIBPageByKey(pageKey);
-							moduleID = ICObjectBusiness.UUID_PREFIX + instance.getUniqueId();
 							instance.store();
+							moduleID = ICObjectBusiness.UUID_PREFIX + instance.getUniqueId();
 							moduleId = e.getAttribute(id);
 							if (moduleId != null) {
 								if (moduleId.getValue() == null || ThemesConstants.EMPTY.equals(moduleId.getValue())) {
 									moduleId.setValue(moduleID);
+									System.out.println("Set uuid: " + moduleID);
 								}
 							}
 						} catch (CreateException ce) {
