@@ -1247,10 +1247,8 @@ public class ThemesHelper implements Singleton {
 							moduleID = ICObjectBusiness.UUID_PREFIX + instance.getUniqueId();
 							moduleId = e.getAttribute(id);
 							if (moduleId != null) {
-								if (moduleId.getValue() == null || ThemesConstants.EMPTY.equals(moduleId.getValue())) {
-									moduleId.setValue(moduleID);
-									System.out.println("Set uuid: " + moduleID);
-								}
+								moduleId.setValue(moduleID);
+								System.out.println("Set uuid: " + moduleID);
 							}
 						} catch (CreateException ce) {
 							log.error(ce);
