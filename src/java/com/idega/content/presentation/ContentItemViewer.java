@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.27 2007/03/07 17:25:20 justinas Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.28 2007/03/19 08:51:06 valdas Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -33,10 +33,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2007/03/07 17:25:20 $ by $Author: justinas $
+ * Last modified: $Date: 2007/03/19 08:51:06 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.28 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -488,6 +488,7 @@ public class ContentItemViewer extends WFContainer {
 		for (int i = 0; i < attr.length; i++) {
 			updateComponentValue(attr[i]);
 		}
+		updateComments();
 	}
 
 	/**
@@ -547,7 +548,6 @@ public class ContentItemViewer extends WFContainer {
 		}
 		updateDetailsCommand();
 		updateToolbar();
-		updateComments();
 	}
 
 	public void processDecodes(FacesContext context) {
