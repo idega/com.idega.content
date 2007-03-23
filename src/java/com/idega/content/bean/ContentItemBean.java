@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.33 2007/02/23 17:25:49 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.34 2007/03/23 14:49:53 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -15,7 +15,6 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -27,13 +26,8 @@ import org.apache.webdav.lib.util.WebdavStatus;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
-import com.idega.content.business.ContentConstants;
-import com.idega.content.themes.business.ThemesService;
-import com.idega.content.themes.helpers.ThemesConstants;
+import com.idega.content.business.ContentItemHelper;
 import com.idega.content.themes.helpers.ThemesHelper;
-import com.idega.core.builder.business.BuilderService;
-import com.idega.core.builder.data.ICPage;
-import com.idega.core.data.ICTreeNode;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
@@ -48,10 +42,10 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2007/02/23 17:25:49 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/03/23 14:49:53 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.33 $
+ * @version $Revision: 1.34 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -88,8 +82,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	private List versions;
 	
 	private String webDavResourceCategories = null; // This string is parsed from WebDavResource
-	
-	private boolean isUsedDefaultArticlePath = false;
 	
 	/**
 	 * Default constructor.
@@ -621,12 +613,12 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	public String getFeedEntryAsXML(IWContext iwc, String feedTitle, String feedDescription, String title, String description,
 			String body, String author, List<String> categories, String source, String comment, String moduleClass,
 			String linkToComments) {
-		isUsedDefaultArticlePath = false;
 		Timestamp published = getPublishedDate();
 		Timestamp updated = getLastModifiedDate();
 		String server = ThemesHelper.getInstance().getFullServerName(iwc);
 		StringBuffer articleURL = new StringBuffer(server);
-		String pageUri = getPageUrlByArticleResourcePath(iwc, moduleClass);
+		ContentItemHelper helper = new ContentItemHelper(getResourcePath());
+		String pageUri = helper.getPageUrlByArticleResourcePath(iwc, moduleClass);
 		articleURL.append(pageUri);
 
 		if (published == null) { // Setting published date the same as creation
@@ -635,7 +627,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		}
 		
 		if (linkToComments == null) {
-			if (isUsedDefaultArticlePath) {
+			if (helper.isUsedDefaultArticlePath()) {
 				linkToComments = ThemesHelper.getInstance().getArticleCommentLink(null);
 			}
 			else {
@@ -658,92 +650,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		} finally {
 			return t;
 		}
-	}
-	
-	private String getPageUrlByArticleResourcePath(IWContext iwc, String moduleClass) {
-		if (iwc == null) {
-			return getDefaultPageUrlByArticleResourcePath();
-		}
-		BuilderService builder = ThemesHelper.getInstance().getThemesService().getBuilderService();
-		if (builder == null) {
-			return getDefaultPageUrlByArticleResourcePath();
-		}
-		Map tree = builder.getTree(iwc);
-		if (tree == null) {
-			return getDefaultPageUrlByArticleResourcePath();
-		}
-		Object o = null;
-		String pageID = null;
-		List<String> moduleIds = null;
-		String propertyName = "resourcePath";
-		String propertyValue = getPathAppliedForSearch();
-		if (propertyValue == null) {
-			return getDefaultPageUrlByArticleResourcePath();
-		}
-		ThemesService themesService = ThemesHelper.getInstance().getThemesService();
-		if (themesService == null) {
-			return getDefaultPageUrlByArticleResourcePath();
-		}
-		for (Iterator it = tree.values().iterator(); it.hasNext();) {
-			o = it.next();
-			if (o instanceof ICTreeNode) {
-				pageID = ((ICTreeNode) o).getId();
-				ICPage page = themesService.getICPage(Integer.valueOf(pageID));
-				if (page != null) {
-					if (page.isPage() && !page.getDeleted()) {
-						if (ThemesConstants.ARTICLE_PAGE_TYPE.contains(page.getSubType())) {
-							try {
-								moduleIds = builder.getModuleId(pageID, moduleClass);
-								if (moduleIds != null) {
-									for (int i = 0; i < moduleIds.size(); i++) {
-										if (builder.isPropertyValueSet(pageID, moduleIds.get(i), propertyName, propertyValue)) {
-											return ContentConstants.PAGES_START_URI + page.getDefaultPageURI();
-										}
-									}
-								}
-							} catch (Exception e) {
-								e.printStackTrace();
-								return getDefaultPageUrlByArticleResourcePath();
-							}
-						}
-					}
-				}
-			}
-		}
-		return getDefaultPageUrlByArticleResourcePath();
-	}
-	
-	private String getDefaultPageUrlByArticleResourcePath () {
-		isUsedDefaultArticlePath = true;
-		String realPath = getResourcePath();
-		if (realPath == null) {
-			return ContentConstants.PAGES_START_URI;
-		}
-		realPath = realPath.substring(0, realPath.lastIndexOf(ContentConstants.SLASH));
-		StringBuffer defaultPath = new StringBuffer("/idegaweb/action/preview/article");
-		defaultPath.append(realPath);
-		return defaultPath.toString();
-	}
-	
-	private String getPathAppliedForSearch() {
-		String realPath = getResourcePath();
-		if (realPath == null) {
-			return null;
-		}
-		String[] pathParts = realPath.split(ContentConstants.SLASH);
-		if (pathParts == null) {
-			return getResourcePath();
-		}
-		if (pathParts.length == 0) {
-			return getResourcePath();
-		}
-		StringBuffer appliedPath = new StringBuffer();
-		for (int i = 0; i + 1 < pathParts.length; i++) {
-			if (ContentConstants.CONTENT.indexOf(pathParts[i]) == -1) {
-				appliedPath.append(ContentConstants.SLASH).append(pathParts[i]);
-			}
-		}
-		return appliedPath.toString();
 	}
 	
 }
