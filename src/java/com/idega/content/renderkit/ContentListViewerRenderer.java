@@ -1,5 +1,5 @@
 /*
- * $Id: ContentListViewerRenderer.java,v 1.10 2006/05/11 16:09:47 eiki Exp $ Created on
+ * $Id: ContentListViewerRenderer.java,v 1.11 2007/03/26 10:24:06 valdas Exp $ Created on
  * 27.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -25,20 +25,23 @@ import org.apache.myfaces.shared_tomahawk.renderkit.html.HtmlRendererUtils;
 import org.apache.myfaces.shared_tomahawk.util.ArrayUtils;
 import org.apache.myfaces.shared_tomahawk.util.StringUtils;
 import com.idega.content.presentation.ContentItemListViewer;
+import com.idega.content.presentation.ContentItemViewer;
 import com.idega.util.RenderUtils;
 import com.idega.webface.WFContainer;
 import com.idega.webface.renderkit.BaseRenderer;
 
 /**
  * 
- * Last modified: $Date: 2006/05/11 16:09:47 $ by $Author: eiki $
+ * Last modified: $Date: 2007/03/26 10:24:06 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class ContentListViewerRenderer extends BaseRenderer {
 	
 	public static final String DIV_ELEM = "div";
+	
+	public static final String FACET_ITEM_COMMENTS_CONTROLLER = "comments_controller_in_list";
 
 	/**
 	 * Gets the default Logger. By default it uses the package and the class
@@ -68,7 +71,25 @@ public class ContentListViewerRenderer extends BaseRenderer {
 		writer.writeAttribute(HTML.ID_ATTR, uiComponent.getClientId(facesContext), null);
 		HtmlRendererUtils.renderHTMLAttributes(writer, uiComponent, HTML.COMMON_PASSTROUGH_ATTRIBUTES);
 //		renderFacet(facesContext, writer, (UIData) uiComponent, true);
+		renderCommentsScript(facesContext, uiComponent);
+		renderCommentsController(facesContext, uiComponent);
 		renderHeader(facesContext,(UIData)uiComponent);
+	}
+	
+	private void renderCommentsScript(FacesContext facesContext, UIComponent list) throws IOException {
+		UIComponent script = (UIComponent) list.getFacets().get(ContentItemViewer.FACET_COMMENTS_SCRIPTS);
+		if (script == null) {
+			return;
+		}
+		RenderUtils.renderChild(facesContext, script);
+	}
+	
+	private void renderCommentsController(FacesContext facesContext, UIComponent list) throws IOException {
+		UIComponent comments = (UIComponent) list.getFacets().get(FACET_ITEM_COMMENTS_CONTROLLER);
+		if (comments == null) {
+			return;
+		}
+		RenderUtils.renderChild(facesContext, comments);
 	}
 
 	/**
