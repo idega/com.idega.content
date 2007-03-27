@@ -50,6 +50,7 @@ comment=Comment
 configure=Configure
 content=Content
 content_home=Content home
+content_search.name=Documents
 content_type=Content type
 create=Create
 create_a_folder=Create a folder
