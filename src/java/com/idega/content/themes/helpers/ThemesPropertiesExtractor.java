@@ -8,6 +8,9 @@ import java.util.Map;
 import org.jdom.Document;
 import org.jdom.Element;
 
+import com.idega.content.business.ContentConstants;
+import com.idega.util.StringHandler;
+
 public class ThemesPropertiesExtractor {
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
@@ -89,7 +92,7 @@ public class ThemesPropertiesExtractor {
 		}
 		
 		// Getting theme name, which will be used to search for configuration file
-		String searchName = helper.removeSpaces(theme.getName());
+		String searchName = StringHandler.removeCharacters(theme.getName(), ContentConstants.SPACE, ContentConstants.UNDER);
 		String skeletonName = null;
 		if (theme.getLinkToSkeleton().indexOf(ThemesConstants.THEME) != -1) {
 			skeletonName = helper.decode(helper.getFileNameWithExtension(theme.getLinkToSkeleton()), true);

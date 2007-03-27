@@ -28,6 +28,8 @@ import org.jdom.output.XMLOutputter;
 import com.idega.content.business.ContentConstants;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
+import com.idega.util.CoreConstants;
+import com.idega.util.StringHandler;
 
 public class ThemeChanger {
 	
@@ -63,6 +65,7 @@ public class ThemeChanger {
 	private static final String[] HREF_REPLACE = new String[] {"href^=", "href$="};
 	private static final String HREF_REPLACEMENT = "href~=";
 	private static final String[] IMAGE_URL_REPLACE = new String[] {"url(images"};
+	private static final String[] HTML_REPLACE = new String[] {">html"};
 	
 	private static final String HTML_HEAD = "head";
 	private static final String HTML_BODY = "body";
@@ -81,7 +84,12 @@ public class ThemeChanger {
 	private static final String OPENER = "{";
 	private static final String CLOSER = "}";
 	
-	private static final int THEME_HEIGHT = 300;
+	private static final String ELEMENT_SCRIPT_NAME = "script";
+	private static final String ELEMENT_LINK_NAME = "link";
+	
+	private static final String COLOR_STRING = "color";
+	
+	private static final int THEME_HEIGHT = 450;
 	
 	private static final String REGION_TO_EXPAND = "contentContainer";
 	
@@ -131,7 +139,7 @@ public class ThemeChanger {
 		}
 		
 		// Adding IBPage regions
-		if (!proceedBodyContent(root.getChild(HTML_BODY, namespace))) {
+		if (!proceedBodyContent(path, root.getChild(HTML_BODY, namespace))) {
 			return false;
 		}
 		
@@ -181,9 +189,7 @@ public class ThemeChanger {
 			return true; // Theme allready prepared
 		}
 		
-		if (!prepareThemeDefaultStyleFiles(theme)) {
-			return false;
-		}
+		prepareThemeDefaultStyleFiles(theme);
 		
 		Map styles = theme.getStyleGroupsMembers();
 		if (styles == null) {
@@ -204,15 +210,14 @@ public class ThemeChanger {
 		replacement.append(theme.getLinkToBase());
 		replacement.append(IMAGES);
 		
-		Replaces[] r = new Replaces[]{getReplace(CUSTOM_REPLACE, replacement.toString())};
+		Replaces[] r = new Replaces[]{getReplace(CUSTOM_REPLACE, replacement.toString()), getReplace(IMAGE_URL_REPLACE,
+				replacement.toString()), getReplace(HTML_REPLACE, ThemesConstants.EMPTY)};
 		
 		for (Iterator it = styles.values().iterator(); it.hasNext(); ) {
 			member = (ThemeStyleGroupMember) it.next();
 			files = member.getStyleFiles();
 			for (index = 0; index < files.size(); index++) {
-				if (!proceedStyleFile(theme.getLinkToBase() + files.get(index), r)) {
-					return false;
-				}
+				proceedStyleFile(theme.getLinkToBase() + files.get(index), r);
 			}
 		}
 		return true;
@@ -233,7 +238,7 @@ public class ThemeChanger {
 		StringBuffer replacement = new StringBuffer();
 		replacement.append(CSS_IMAGE_URL).append(ContentConstants.CONTENT).append(theme.getLinkToBase()).append(IMAGES);
 		Replaces[] r = new Replaces[]{getReplace(HREF_REPLACE, HREF_REPLACEMENT), getReplace(IMAGE_URL_REPLACE,
-				replacement.toString())};	
+				replacement.toString()), getReplace(HTML_REPLACE, ThemesConstants.EMPTY)};	
 		for (int i = 0; i < defaultStyles.size(); i++) {
 			if (!proceedStyleFile(theme.getLinkToBase() + defaultStyles.get(i), r)) {
 				return false;
@@ -245,6 +250,31 @@ public class ThemeChanger {
 	private String scanLine(String line) {
 		if (line == null) {
 			return ThemesConstants.EMPTY;
+		}
+		
+		// Checking for incorrect hexidecimal values
+		if (line.indexOf(CoreConstants.NUMBER_SIGN) != -1 && line.indexOf(COLOR_STRING) != -1) {
+			String[] colorValue = line.split(CoreConstants.NUMBER_SIGN);
+			if (colorValue == null) {
+				return line;
+			}
+			if (colorValue.length != 2) {
+				return line;
+			}
+			String color = colorValue[1];
+			int index = StringHandler.getNotHexValueIndexInHexValue(color);
+			String letterToReplace = null;
+			while (index >= 0) {
+				letterToReplace = CoreConstants.HEXIDECIMAL_LETTERS.get(helper.getRandomNumber(CoreConstants.HEXIDECIMAL_LETTERS.size()));
+				if (index == color.length() - 1) {
+					color = color.replace(color.substring(index), letterToReplace);
+				}
+				else {
+					color = color.replace(color.substring(index, index + 1), letterToReplace);
+				}
+				index = StringHandler.getNotHexValueIndexInHexValue(color);
+			}
+			line = new StringBuffer(colorValue[0]).append(CoreConstants.NUMBER_SIGN).append(color).toString();
 		}
 		
 		if (line.indexOf(OPENER) == -1 && line.indexOf(CLOSER) == -1) {
@@ -280,18 +310,25 @@ public class ThemeChanger {
 		// Getting css file
 		InputStream is = helper.getInputStream(helper.getFullWebRoot() + linkToStyle);
 		if (is == null) {
+			log.error(new StringBuilder("Cann't get CSS file: '").append(linkToStyle).append("' from Theme pack!"));
 			return false;
 		}
 		InputStreamReader isr = new InputStreamReader(is);
 		BufferedReader buf = new BufferedReader(isr);
 		StringBuffer sb = new StringBuffer();
 		String line;
+		String changedLine = null;
+		boolean needToReplace = false;
 		try {
 			while ((line = buf.readLine()) != null) {
+				changedLine = line;
 				if (line.indexOf(COMMENT_BEGIN) == -1 && line.indexOf(COMMENT_END) == -1) {
-					line = scanLine(line);
+					changedLine = scanLine(line);
 				}
-				sb.append(line).append(NEW_LINE);
+				sb.append(changedLine).append(NEW_LINE);
+				if (!line.equals(changedLine)) {	// If line was modified
+					needToReplace = true;
+				}
 			}
 		} catch (IOException e) {
 			log.error(e);
@@ -303,7 +340,6 @@ public class ThemeChanger {
 		}
 		// Changing content
 		String content = sb.toString();
-		boolean needToReplace = false;
 		String[] whatToReplace = null;
 		String replacement = null;
 		for (int i = 0; i < replaces.length; i++) {
@@ -424,22 +460,11 @@ public class ThemeChanger {
 		List <Text> textElements = new ArrayList <Text> ();
 		List <Element> elementsNeedsRegions = new ArrayList <Element> ();
 		Element e = null;
-		Attribute a = null;
-		
 		for (int i = 0; i < headElements.size(); i++) {
 			o = headElements.get(i);
 			if (o instanceof Element) {
 				e = (Element) o;
-				if (!needAddRegion(ThemesConstants.REGIONS, e.getTextNormalize())) {
-					e.setText(fixValue(e.getTextNormalize()));
-				}
-				a = e.getAttribute(ThemesConstants.TAG_ATTRIBUTE_HREF);
-				if (a == null) {
-					a = e.getAttribute(ThemesConstants.TAG_ATTRIBUTE_SRC);
-				}
-				if (a != null) {
-					a.setValue(linkToBase + fixValue(a.getValue())); // Fixing attribute's value
-				}
+				fixDocumentElement(e, linkToBase);
 			}
 			else {
 				if (o instanceof Text) {
@@ -463,6 +488,23 @@ public class ThemeChanger {
 		}
 		
 		return true;
+	}
+	
+	private void fixDocumentElement(Element e, String linkToBase) {
+		if (e == null || linkToBase == null) {
+			return;
+		}
+		Attribute a = null;
+		if (!needAddRegion(ThemesConstants.REGIONS, e.getTextNormalize())) {
+			e.setText(fixValue(e.getTextNormalize()));
+		}
+		a = e.getAttribute(ThemesConstants.TAG_ATTRIBUTE_HREF);
+		if (a == null) {
+			a = e.getAttribute(ThemesConstants.TAG_ATTRIBUTE_SRC);
+		}
+		if (a != null) {
+			a.setValue(linkToBase + fixValue(a.getValue())); // Fixing attribute's value
+		}
 	}
 	
 	/**
@@ -509,7 +551,7 @@ public class ThemeChanger {
 	 * @param body
 	 * @return boolean
 	 */
-	private boolean proceedBodyContent(Element body) {
+	private boolean proceedBodyContent(String linkToBase, Element body) {
 		if (body == null) {
 			return false;
 		}
@@ -532,10 +574,19 @@ public class ThemeChanger {
 		List<Text> needlessText = new ArrayList<Text>();
 		List allElements = body.getContent();
 		Object o = null;
+		Element e = null;
 		for (int i = 0; i < allElements.size(); i++) { // Finding Text elements
 			o = allElements.get(i);
 			if (o instanceof Text) {
 				needlessText.add((Text) o);
+			}
+			else {
+				if (o instanceof Element) {
+					e = (Element) o;
+					if (ELEMENT_LINK_NAME.equals(e.getName()) || ELEMENT_SCRIPT_NAME.equals(e.getName())) {
+						fixDocumentElement(e, linkToBase);
+					}
+				}
 			}
 		}
 		for (int i = 0; i < needlessText.size(); i++) { // Removing needless Text elements
@@ -1223,7 +1274,7 @@ public class ThemeChanger {
 		if (!decodedLinkToBase.endsWith(ContentConstants.SLASH)) {
 			decodedLinkToBase += ContentConstants.SLASH;
 		}
-		String themeName = helper.removeSpaces(newName + ThemesConstants.THEME);
+		String themeName = StringHandler.removeCharacters(new StringBuilder(newName).append(ThemesConstants.THEME).toString(), ContentConstants.SPACE, ContentConstants.UNDER);
 		try {
 			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(decodedLinkToBase,	themeName, is, null, true)) {
 				return false;

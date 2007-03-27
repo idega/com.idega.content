@@ -67,6 +67,7 @@ import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
 import com.idega.repository.data.Singleton;
 import com.idega.slide.business.IWSlideService;
+import com.idega.util.StringHandler;
 import com.idega.webface.WFUtil;
 
 public class ThemesHelper implements Singleton {
@@ -84,7 +85,7 @@ public class ThemesHelper implements Singleton {
 	private volatile ThemesEngine themesEngine = null;
 	private volatile ContentItemFeedBean feedBean = null;
 	
-	private SortedMap <String, Theme> themes = null;
+	private Map <String, Theme> themes = null;
 	private Map <String, Setting> themeSettings = null;
 	private Map <String, Setting> pageSettings = null;
 	private Map <String, Document> pages = null;
@@ -106,7 +107,7 @@ public class ThemesHelper implements Singleton {
 	private Random numberGenerator = null;
 	
 	private ThemesHelper(boolean canUseSlide) {
-		themes = Collections.synchronizedSortedMap(new TreeMap <String, Theme> ());
+		themes = new HashMap <String, Theme> ();
 		themeSettings = Collections.synchronizedMap(new TreeMap<String, Setting>());
 		pageSettings = new HashMap <String, Setting> ();
 		pages = new HashMap <String, Document> ();
@@ -255,6 +256,9 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	protected String getFileName(String uri) {
+		if (uri == null) {
+			return null;
+		}
 		String name = null;
 		int begin = uri.lastIndexOf(ContentConstants.SLASH);
 		int end = uri.lastIndexOf(ThemesConstants.DOT);
@@ -268,6 +272,9 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	protected String getFileNameWithExtension(String uri) {
+		if (uri == null) {
+			return null;
+		}
 		String name = null;
 		int begin = uri.lastIndexOf(ContentConstants.SLASH);
 		if (begin == -1) {
@@ -300,6 +307,9 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	protected String getFileExtension(String uri) {
+		if (uri == null) {
+			return null;
+		}
 		String type = null;
 		int begin = uri.lastIndexOf(ThemesConstants.DOT);
 		if (begin != -1) {
@@ -309,6 +319,9 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	protected List getFiles(String folderURI) {
+		if (folderURI == null) {
+			return null;
+		}
 		List files = null;
 		try {
 			files = getSlideService().getChildPathsExcludingFoldersAndHiddenFiles(folderURI);
@@ -442,8 +455,15 @@ public class ThemesHelper implements Singleton {
 		}
 		
 		SortedMap<String, Theme> sortedMap = Collections.synchronizedSortedMap(new TreeMap<String, Theme>());
-		for (int i = 0; i < notSorted.size(); i++) {
-			sortedMap.put(notSorted.get(i).getName(), notSorted.get(i));
+		try {
+			for (int i = 0; i < notSorted.size(); i++) {
+				sortedMap.put(notSorted.get(i).getName(), notSorted.get(i));
+			}
+		} catch(Exception e) {
+			log.error(e);
+		}
+		if (sortedMap == null) {
+			return new ArrayList<Theme>();
 		}
 		sorted = new ArrayList<Theme>(sortedMap.values());
 		return sorted;
@@ -734,7 +754,11 @@ public class ThemesHelper implements Singleton {
 			uriToImage = theme.getLinkToThemePreview();
 		}
 		encodedUriToImage = encode(uriToImage, true);
-		String extension = helper.getFileExtension(uriToImage).toLowerCase();
+		String extension = helper.getFileExtension(uriToImage);
+		if (extension == null) {
+			return false;
+		}
+		extension = extension.toLowerCase();
 		String mimeType = ThemesConstants.DEFAULT_MIME_TYPE + extension;
 		InputStream input = null;
 		
@@ -813,7 +837,7 @@ public class ThemesHelper implements Singleton {
 		
 		root.setContent(rootElements);
 		doc.setRootElement(root);
-		return getThemeChanger().uploadDocument(doc, theme.getLinkToBaseAsItIs(), removeSpaces(theme.getName()) + ThemesConstants.IDEGA_THEME_INFO, theme, false);
+		return getThemeChanger().uploadDocument(doc, theme.getLinkToBaseAsItIs(), StringHandler.removeCharacters(theme.getName(), ContentConstants.SPACE, ContentConstants.UNDER) + ThemesConstants.IDEGA_THEME_INFO, theme, false);
 	}
 	
 	public String[] getPageValues(Setting s, String value) {
@@ -892,17 +916,6 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		return themesEngine;
-	}
-	
-	public String removeSpaces(String value) {
-		if (value == null) {
-			return null;
-		}
-		value = value.trim();
-		while (value.indexOf(ThemesConstants.SPACE) != -1) {
-			value = value.replace(ThemesConstants.SPACE, ThemesConstants.UNDER);
-		}
-		return value;
 	}
 
 	public String getLastVisitedPage() {
@@ -1045,7 +1058,10 @@ public class ThemesHelper implements Singleton {
 		if (fileName == null) {
 			return null;
 		}
-		fileName = removeSpaces(fileName);
+		fileName = StringHandler.removeCharacters(fileName, ContentConstants.SPACE, ContentConstants.UNDER);
+		fileName = StringHandler.removeCharacters(fileName, ContentConstants.BRACKET_OPENING, ContentConstants.EMPTY);
+		fileName = StringHandler.removeCharacters(fileName, ContentConstants.BRACKET_CLOSING, ContentConstants.EMPTY);
+
 		String fileRoot = fileName;
 		String fileType = ThemesConstants.EMPTY;
 		if (fileName.indexOf(ThemesConstants.DOT) != -1) {
@@ -1065,7 +1081,9 @@ public class ThemesHelper implements Singleton {
 		if (path == null) {
 			return null;
 		}
-		path = removeSpaces(path);
+		path = StringHandler.removeCharacters(path, ContentConstants.SPACE, ContentConstants.UNDER);
+		path = StringHandler.removeCharacters(path, ContentConstants.BRACKET_OPENING, ContentConstants.EMPTY);
+		path = StringHandler.removeCharacters(path, ContentConstants.BRACKET_CLOSING, ContentConstants.EMPTY);
 		int i = 1;
 		String tempPath = path;
 		while (existInSlide(tempPath)) {

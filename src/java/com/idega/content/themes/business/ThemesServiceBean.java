@@ -28,6 +28,7 @@ import com.idega.data.IDOLookupException;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWContentEvent;
 import com.idega.slide.business.IWSlideChangeListener;
+import com.idega.util.StringHandler;
 
 public class ThemesServiceBean extends IBOServiceBean implements ThemesService, IWSlideChangeListener{
 
@@ -171,7 +172,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 				ThemesHelper.getInstance().getThemesEngine().initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
 				parentId = String.valueOf(topTemplate);
 			}
-			String name = ThemesHelper.getInstance().removeSpaces(theme.getName());
+			String name = StringHandler.removeCharacters(theme.getName(), ContentConstants.SPACE, ContentConstants.UNDER);
 			id = createIBPage(parentId, theme.getName(), builder.getTemplateKey(), null, ThemesConstants.THEMES + name +
 					ContentConstants.SLASH, null, domainID, builder.getHTMLTemplateKey(), null);
 			if (id == -1) {

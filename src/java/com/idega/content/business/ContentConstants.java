@@ -8,6 +8,9 @@ public class ContentConstants {
 	public static final String SPACE = " ";
 	public static final String EMPTY = "";
 	public static final String DOT = ".";
+	public static final String UNDER = "_";
+	public static final String BRACKET_OPENING = "(";
+	public static final String BRACKET_CLOSING = ")";
 	
 	public static final String BASE_ROOT_SLIDE = ContentUtil.getContentBaseFolderPath();
 	

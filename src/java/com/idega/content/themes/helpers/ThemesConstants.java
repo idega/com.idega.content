@@ -61,7 +61,7 @@ public class ThemesConstants {
 	protected static final List <String> USELESS_CONTENT = Collections.unmodifiableList(Arrays.asList(_USELESS_CONTENT));
 	
 	private static final String[] _REGIONS = new String[] {"%logo%", "%content%", "%toolbar%", "%sidebar_title%", "%sidebar%",
-		"%plugin_sidebar%", "%breadcrumb%", "%footer%"};
+		"%plugin_sidebar%", "%breadcrumb%", "%footer%", "%site_title%", "%site_slogan%"};
 	protected static final List <String> REGIONS = Collections.unmodifiableList(Arrays.asList(_REGIONS));
 	
 	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "sidebarContainer",
