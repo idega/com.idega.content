@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.20.2.13 2007/01/19 10:14:33 gediminas Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.20.2.14 2007/03/28 13:28:31 eiki Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2007/01/19 10:14:33 $ by $Author: gediminas $ 
+ * Last modified: $Date: 2007/03/28 13:28:31 $ by $Author: eiki $ 
  * This class implements the Searchplugin interface and can therefore be used in a Search block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
  * system. To use it simply register this class as a iw.searchable component in
@@ -82,7 +82,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.20.2.13 $
+ * @version $Revision: 1.20.2.14 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -715,8 +715,16 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 */
 	public String getSearchName() {
 		IWBundle bundle = ContentUtil.getBundle();
-		return bundle.getResourceBundle(IWContext.getInstance()).getLocalizedString(SEARCH_NAME_LOCALIZABLE_KEY,
-				"Documents");
+		
+		try {
+			IWContext iwc = IWContext.getInstance();
+			return bundle.getResourceBundle(iwc).getLocalizedString(SEARCH_NAME_LOCALIZABLE_KEY,"Documents");
+		} catch (UnavailableIWContext e) {
+			//e.printStackTrace();
+			//no context, we must be running in a servlet or just a pojo
+		}
+		
+		return "Documents";
 	}
 
 	/*
@@ -726,8 +734,16 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 */
 	public String getSearchDescription() {
 		IWBundle bundle = ContentUtil.getBundle();
-		return bundle.getResourceBundle(IWContext.getInstance()).getLocalizedString(SEARCH_DESCRIPTION_LOCALIZABLE_KEY,
-				"Searches the contents of documents in an IdegaWeb file system.");
+		
+		try {
+			IWContext iwc = IWContext.getInstance();
+			return bundle.getResourceBundle(iwc).getLocalizedString(SEARCH_DESCRIPTION_LOCALIZABLE_KEY,"Searches the contents of documents in an IdegaWeb file system.");
+		} catch (UnavailableIWContext e) {
+			//e.printStackTrace();
+			//no context, we must be running in a servlet or just a pojo
+		}
+		
+		return "Searches the contents of documents in an IdegaWeb file system.";
 	}
 
 
