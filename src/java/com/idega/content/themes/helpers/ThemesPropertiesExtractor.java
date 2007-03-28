@@ -1,10 +1,14 @@
 package com.idega.content.themes.helpers;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -17,6 +21,8 @@ public class ThemesPropertiesExtractor {
 	
 	private static final String LIMITED_SELECTION = "1";
 	private static final String CSS_EXTENSION = ".css";
+	
+	private static final Log log = LogFactory.getLog(ThemesPropertiesExtractor.class);
 	
 	public boolean prepareThemes() {
 		boolean result = true;
@@ -73,14 +79,14 @@ public class ThemesPropertiesExtractor {
 				linkToProperties = helper.urlEncode(linkToProperties);
 			}
 			theme.setLinkToProperties(linkToProperties);
-			extractProperties(theme, url + linkToProperties);
+			extractProperties(theme, new StringBuffer(url).append(linkToProperties).toString());
 			if (theme.isNewTheme()) {
 				helper.getThemeChanger().prepareThemeForUsage(theme);
 				helper.getThemeChanger().prepareThemeStyleFiles(theme);
 				try {
 					helper.getThemesService().createIBPage(theme);
 				} catch (RemoteException e) {
-					e.printStackTrace();
+					log.error(e);
 					return false;
 				}
 			}
@@ -102,7 +108,7 @@ public class ThemesPropertiesExtractor {
 		// Searching for configuration file
 		String linkToConfig = null;
 		for (int i = 0; (i < files.size() && linkToConfig == null); i++) {
-			if (files.get(i).toString().endsWith(searchName + ThemesConstants.IDEGA_THEME_INFO)) {
+			if (files.get(i).toString().endsWith(new StringBuffer(searchName).append(ThemesConstants.IDEGA_THEME_INFO).toString())) {
 				linkToConfig = files.get(i).toString();
 			}
 		}
@@ -112,7 +118,7 @@ public class ThemesPropertiesExtractor {
 			if (linkToConfig.indexOf(ThemesConstants.SPACE) != -1) {
 				linkToConfig = helper.urlEncode(linkToConfig);
 			}
-			extractConfiguration(theme, url + linkToConfig);
+			extractConfiguration(theme, new StringBuffer(url).append(linkToConfig).toString());
 		}
 		
 		// Searching for previews
@@ -122,8 +128,10 @@ public class ThemesPropertiesExtractor {
 		
 		// No previews where found, generating big preview
 		if (theme.getLinkToThemePreview() == null) {
-			if (helper.getImageGenerator().generatePreview(webRoot + theme.getLinkToSkeleton(), theme.getName() + ThemesConstants.THEME_PREVIEW, theme.getLinkToBaseAsItIs(), ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT, true)) {
-				theme.setLinkToThemePreview(theme.getName() + ThemesConstants.THEME_PREVIEW + ThemesConstants.DOT +	helper.getImageGenerator().getFileExtension());
+			String urlToFile = new StringBuffer(webRoot).append(theme.getLinkToSkeleton()).toString();
+			String fileName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_PREVIEW).toString();
+			if (helper.getImageGenerator().generatePreview(urlToFile,  fileName, theme.getLinkToBaseAsItIs(), ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT, true)) {
+				theme.setLinkToThemePreview(new StringBuffer(fileName).append(ThemesConstants.DOT).append(helper.getImageGenerator().getFileExtension()).toString());
 			}
 		}
 		
@@ -170,7 +178,11 @@ public class ThemesPropertiesExtractor {
 		theme.setLinkToSmallPreview(smallPreview.getTextNormalize());
 		
 		Element pageId = root.getChild(ThemesConstants.CON_PAGE_ID);
-		theme.setIBPageID(Integer.valueOf(pageId.getTextNormalize()).intValue());
+		try {
+			theme.setIBPageID(Integer.valueOf(pageId.getTextNormalize()));
+		} catch (NumberFormatException e) {
+			log.error(e);
+		}
 	}
 	
 	private void setEnabledStyles(Theme theme, Element style) {
@@ -190,11 +202,11 @@ public class ThemesPropertiesExtractor {
 		for (int i = 0; i < groupNames.size(); i++) {
 			styleGroupName = groupNames.get(i);
 			int j = 0;
-			member = styleMembers.get(styleGroupName + ThemesConstants.AT + j);
+			member = helper.getThemeChanger().getMember(styleMembers, styleGroupName, j);
 			while (member != null) {
 				member.setEnabled(false);
 				j++;
-				member = styleMembers.get(styleGroupName + ThemesConstants.AT + j);
+				member = helper.getThemeChanger().getMember(styleMembers, styleGroupName, j);
 			}
 		}
 	}
@@ -208,11 +220,11 @@ public class ThemesPropertiesExtractor {
 		boolean foundSmall = false;
 		for (int i = 0; (i < files.size() && !foundBig && !foundSmall); i++) {
 			uri = files.get(i).toString();
-			if ((theme.getName() + ThemesConstants.THEME_PREVIEW).equals(helper.getFileName(uri))) {
+			if ((new StringBuffer(theme.getName()).append(ThemesConstants.THEME_PREVIEW).toString()).equals(helper.getFileName(uri))) {
 				theme.setLinkToThemePreview(helper.getFileNameWithExtension(uri));
 			}
 			else {
-				if ((theme.getName() + ThemesConstants.THEME_SMALL_PREVIEW).equals(helper.getFileName(uri))) {
+				if ((new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).toString()).equals(helper.getFileName(uri))) {
 					theme.setLinkToSmallPreview(helper.getFileNameWithExtension(uri));
 				}
 			}
@@ -244,14 +256,14 @@ public class ThemesPropertiesExtractor {
 		String selectionLimit = null;
 		for (int i = 0; i < styleGroups.size(); i++) {
 			style = (Element) styleGroups.get(i);
-			
 			styleGroupName = getValueFromNextElement(ThemesConstants.RW_GROUP_NAME, style);
-			theme.addStyleGroupName(styleGroupName);
-			
 			selectionLimit = getValueFromNextElement(ThemesConstants.RW_SELECTION_LIMIT, style);
-			
-			if (!extractStyleVariations(theme, styleGroupName, getStyleGroupElements(style), LIMITED_SELECTION.equals(selectionLimit))) {
-				return false;
+			extractStyleVariations(theme, styleGroupName, getStyleGroupElements(style), LIMITED_SELECTION.equals(selectionLimit));
+			if (theme.getStyleGroupsMember(new StringBuffer(styleGroupName).append(ThemesConstants.AT).append(0).toString()) == null) {
+				log.info(new StringBuffer("Style group '").append(styleGroupName).append("' has no CSS file! Disabling this group."));
+			}
+			else {
+				theme.addStyleGroupName(styleGroupName);
 			}
 
 		}
@@ -284,18 +296,32 @@ public class ThemesPropertiesExtractor {
 		return styleElements.getChildren();
 	}
 	
-	private boolean extractStyleVariationFiles(ThemeStyleGroupMember member, Element styleFiles) {
-		if (styleFiles == null) {
+	private boolean extractStyleVariationFiles(ThemeStyleGroupMember member, Element styleFiles, String linkToBase) {
+		if (styleFiles == null || linkToBase == null) {
 			return false;
 		}
 		List files = styleFiles.getChildren();
+		if (files == null) {
+			return false;
+		}
 		String file = null;
-		for (int k = 0; k < files.size(); k++) {
-			file = ((Element)files.get(k)).getText();
+		for (int i = 0; i < files.size(); i++) {
+			file = ((Element)files.get(i)).getText();
+			file = StringHandler.removeCharacters(file, ContentConstants.SPACE, ContentConstants.UNDER);
+			file = StringHandler.removeCharacters(file, ContentConstants.BRACKET_OPENING, ContentConstants.EMPTY);
+			file = StringHandler.removeCharacters(file, ContentConstants.BRACKET_CLOSING, ContentConstants.EMPTY);
 			if (!file.endsWith(CSS_EXTENSION)) { // In Theme.plist sometimes occurs errors, e.g. css file with .png extension
-				file = helper.getFileName(file) + CSS_EXTENSION;
+				if (!existsFile(new StringBuffer(linkToBase).append(file).toString())) {
+					file = new StringBuffer(helper.getFileName(file)).append(CSS_EXTENSION).toString();
+				}
 			}
-			member.addStyleFile(file);
+			if (existsFile(new StringBuffer(linkToBase).append(file).toString())) {
+				member.addStyleFile(file);
+			}
+			else {
+				log.info(new StringBuffer("File '").append(file).append("' does not exist!"));
+				return false;
+			}
 		}
 		return true;
 	}
@@ -305,7 +331,8 @@ public class ThemesPropertiesExtractor {
 			return false;
 		}
 		
-		ThemeStyleGroupMember member = null; 
+		ThemeStyleGroupMember member = null;
+		int styleGroupMemberIndex = 0;
 		for (int i = 0; i < styleVariations.size(); i++) {
 			Element styleMember = (Element) styleVariations.get(i);
 			
@@ -321,13 +348,11 @@ public class ThemesPropertiesExtractor {
 				}
 			}
 			
-			if (!extractStyleVariationFiles(member, getNextElement(ThemesConstants.TAG_FILES, styleMember.getChildren()))) {
-				return false;
+			if (extractStyleVariationFiles(member, getNextElement(ThemesConstants.TAG_FILES, styleMember.getChildren()), theme.getLinkToBase())) {
+				member.setLimitedSelection(limitedSelection);
+				theme.addStyleGroupMember(new StringBuffer(styleGroupName).append(ThemesConstants.AT).append(styleGroupMemberIndex).toString(), member);
+				styleGroupMemberIndex++;
 			}
-			
-			member.setLimitedSelection(limitedSelection);
-			
-			theme.addStyleGroupMember(styleGroupName + ThemesConstants.AT + i, member);
 		}
 		return true;
 	}
@@ -368,6 +393,22 @@ public class ThemesPropertiesExtractor {
 			return value;
 		}
 		return ((Element) children.get(index)).getTextNormalize();
+	}
+	
+	private boolean existsFile(String file) {
+		if (file == null) {
+			return false;
+		}
+		try {
+			return helper.getSlideService().getExistence(file);
+		} catch (HttpException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 }

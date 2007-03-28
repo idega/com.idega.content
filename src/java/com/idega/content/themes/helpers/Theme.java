@@ -102,9 +102,16 @@ public class Theme {
 	public Map<String, ThemeStyleGroupMember> getStyleGroupsMembers() {
 		return styleGroupsMembers;
 	}
+	
+	public ThemeStyleGroupMember getStyleGroupsMember(String styleGroupName) {
+		if (styleGroupsMembers == null) {
+			return null;
+		}
+		return styleGroupsMembers.get(styleGroupName);
+	}
 
-	public void addStyleGroupMember(String groupName, ThemeStyleGroupMember groupMember) {
-		styleGroupsMembers.put(groupName, groupMember);
+	public void addStyleGroupMember(String styleGroupName, ThemeStyleGroupMember groupMember) {
+		styleGroupsMembers.put(styleGroupName, groupMember);
 	}
 
 	public String getLinkToDraft() {
