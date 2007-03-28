@@ -314,11 +314,13 @@
         <managed-bean-class>documentmanagementprototype2.WebDavTreeBean</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
+    <!-- is it some kind of workaround or just crap? - delete please
     <managed-bean>
         <managed-bean-name>folderTree</managed-bean-name>
         <managed-bean-class>documentmanagementprototype2.folderTree</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
+    -->
     <managed-bean>
     		<managed-bean-name>WebDAVListBean</managed-bean-name>
         <managed-bean-class>com.idega.content.presentation.WebDAVListManagedBean</managed-bean-class>
