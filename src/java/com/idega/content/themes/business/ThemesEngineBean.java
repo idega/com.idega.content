@@ -51,8 +51,6 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	private static final String ARTICLE_VIEWER_TEMPLATE_KEY = "article_viewer_page_key";
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
-	
-	private volatile List<String> localizedText = null;
 
 	/**
 	 * Returns info about themes in slide
@@ -1205,8 +1203,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	private void initializeLocalizedText() {
-		localizedText = new ArrayList<String>();
+	public List<String> getLocalizedText() {
+		List <String>localizedText = new ArrayList<String>();
 		IWResourceBundle resourceBundle = null;
 		try {
 			resourceBundle = ContentUtil.getBundle().getResourceBundle(helper.getIWContext());
@@ -1214,7 +1212,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			log.error(e);
 		}
 		if (resourceBundle == null) {
-			return;
+			return localizedText;
 		}
 		try {
 			localizedText.add(resourceBundle.getLocalizedString("uploading_theme", "Uploading..."));							// 0
@@ -1242,16 +1240,6 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			localizedText.add(resourceBundle.getLocalizedString("loading", "Loading..."));										// 22
 		} catch (Exception e) {
 			log.error(e);
-		}
-	}
-	
-	public List<String> getLocalizedText() {
-		if (localizedText == null) {
-			synchronized (ThemesEngineBean.class) {
-				if (localizedText == null) {
-					initializeLocalizedText();
-				}
-			}
 		}
 		return localizedText;
 	}
