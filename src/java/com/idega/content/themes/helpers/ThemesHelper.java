@@ -455,9 +455,21 @@ public class ThemesHelper implements Singleton {
 		}
 		
 		SortedMap<String, Theme> sortedMap = Collections.synchronizedSortedMap(new TreeMap<String, Theme>());
+		String newName = ContentConstants.EMPTY;
 		try {
 			for (int i = 0; i < notSorted.size(); i++) {
-				sortedMap.put(notSorted.get(i).getName(), notSorted.get(i));
+				if (sortedMap.get(notSorted.get(i).getName()) == null) {
+					sortedMap.put(notSorted.get(i).getName(), notSorted.get(i));
+				}
+				else {	// Theme with the same name exist!
+					int j = 0;
+					newName = new StringBuffer(notSorted.get(i).getName()).append(j).toString();
+					while (sortedMap.get(newName) != null) {
+						j++;
+						newName = new StringBuffer(notSorted.get(i).getName()).append(j).toString();
+					}
+					sortedMap.put(newName, notSorted.get(i));
+				}
 			}
 		} catch(Exception e) {
 			log.error(e);

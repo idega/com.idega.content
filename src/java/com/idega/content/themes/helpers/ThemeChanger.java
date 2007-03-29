@@ -1,7 +1,6 @@
 package com.idega.content.themes.helpers;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.rmi.RemoteException;
@@ -28,7 +27,6 @@ import org.jdom.output.XMLOutputter;
 import com.idega.content.business.ContentConstants;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
-import com.idega.util.CoreConstants;
 import com.idega.util.StringHandler;
 
 public class ThemeChanger {
@@ -78,16 +76,9 @@ public class ThemeChanger {
 	private static final String TAG_ATTRIBUTE_VALUE_SCREEN = "screen";
 	
 	private static final String COPY_AND_SPACE = ContentConstants.EMPTY;//"&copy;&nbsp;";
-	private static final String NEW_LINE = "\n";
-	private static final String COMMENT_BEGIN = "/*";
-	private static final String COMMENT_END = "*/";
-	private static final String OPENER = "{";
-	private static final String CLOSER = "}";
 	
 	private static final String ELEMENT_SCRIPT_NAME = "script";
 	private static final String ELEMENT_LINK_NAME = "link";
-	
-	private static final String COLOR_STRING = "color";
 	
 	private static final int THEME_HEIGHT = 550;
 	
@@ -96,9 +87,6 @@ public class ThemeChanger {
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
 	private XMLOutputter out = null;
-	
-	private int openers = 0;
-	private int closers = 0;
 	
 	public ThemeChanger() {
 		out = new XMLOutputter();
@@ -247,61 +235,6 @@ public class ThemeChanger {
 		return true;
 	}
 	
-	private String scanLine(String line) {
-		if (line == null) {
-			return ThemesConstants.EMPTY;
-		}
-		
-		// Checking for incorrect hexidecimal values
-		if (line.indexOf(CoreConstants.NUMBER_SIGN) != -1 && line.indexOf(COLOR_STRING) != -1) {
-			String[] colorValue = line.split(CoreConstants.NUMBER_SIGN);
-			if (colorValue == null) {
-				return line;
-			}
-			if (colorValue.length != 2) {
-				return line;
-			}
-			String color = colorValue[1];
-			int index = StringHandler.getNotHexValueIndexInHexValue(color);
-			String letterToReplace = null;
-			while (index >= 0) {
-				letterToReplace = CoreConstants.HEXIDECIMAL_LETTERS.get(helper.getRandomNumber(CoreConstants.HEXIDECIMAL_LETTERS.size()));
-				if (index == color.length() - 1) {
-					color = color.replace(color.substring(index), letterToReplace);
-				}
-				else {
-					color = color.replace(color.substring(index, index + 1), letterToReplace);
-				}
-				index = StringHandler.getNotHexValueIndexInHexValue(color);
-			}
-			line = new StringBuffer(colorValue[0]).append(CoreConstants.NUMBER_SIGN).append(color).toString();
-		}
-		
-		if (line.indexOf(OPENER) == -1 && line.indexOf(CLOSER) == -1) {
-			return line;
-		}
-		
-		if (line.indexOf(OPENER) != -1 && line.indexOf(CLOSER) != -1 && openers == closers) {
-			return line;
-		}
-		
-		if (line.indexOf(OPENER) != -1 && line.indexOf(CLOSER) == -1) {
-			openers++;
-			return line;
-		}
-		if (line.indexOf(OPENER) == -1 && line.indexOf(CLOSER) != -1) {
-			closers++;
-			if (closers != openers) {
-				line = line.replace(CLOSER, ThemesConstants.EMPTY);
-			}
-			openers = 0;
-			closers = 0;
-			return line;
-		}
-		
-		return line;
-	}
-	
 	private boolean proceedStyleFile(String linkToStyle, Replaces[] replaces) {
 		if (linkToStyle == null || replaces == null) {
 			return false;
@@ -315,31 +248,20 @@ public class ThemeChanger {
 		}
 		InputStreamReader isr = new InputStreamReader(is);
 		BufferedReader buf = new BufferedReader(isr);
-		StringBuffer sb = new StringBuffer();
-		String line;
-		String changedLine = null;
-		boolean needToReplace = false;
-		try {
-			while ((line = buf.readLine()) != null) {
-				changedLine = line;
-				if (line.indexOf(COMMENT_BEGIN) == -1 && line.indexOf(COMMENT_END) == -1) {
-					changedLine = scanLine(line);
-				}
-				sb.append(changedLine).append(NEW_LINE);
-				if (!line.equals(changedLine)) {	// If line was modified
-					needToReplace = true;
-				}
-			}
-		} catch (IOException e) {
-			log.error(e);
-			return false;
-		} finally {
-			helper.closeInputStream(is);
-			helper.closeInputStreamReader(isr);
-			helper.closeBufferedReader(buf);
+		CssScanner scanner = new CssScanner(buf);
+		
+		helper.closeInputStream(is);
+		helper.closeInputStreamReader(isr);
+		helper.closeBufferedReader(buf);
+		
+		StringBuffer result = scanner.getResultBuffer();
+		if (result == null) {
+			return true;
 		}
+		boolean needToReplace = scanner.isNeedToReplace();
+		
 		// Changing content
-		String content = sb.toString();
+		String content = result.toString();
 		String[] whatToReplace = null;
 		String replacement = null;
 		for (int i = 0; i < replaces.length; i++) {
@@ -670,10 +592,10 @@ public class ThemeChanger {
 	private String getContentReplace(String defaultValue) {
 		StringBuffer content = new StringBuffer();
 		if (defaultValue != null && !ThemesConstants.EMPTY.equals(defaultValue)) {
-			content.append(defaultValue).append(NEW_LINE);
+			content.append(defaultValue).append(ThemesConstants.NEW_LINE);
 		}
 		Date d = new Date();
-		content.append(CONTENT_BEGIN).append(NEW_LINE);
+		content.append(CONTENT_BEGIN).append(ThemesConstants.NEW_LINE);
 		for (int i = 0; i < ThemesConstants.DUMMY_ARTICLES.size(); i++) {
 			content.append(CONTENT_PARAGRAPH_TITLE).append(ThemesConstants.ARTICLE_TITLE);
 			if (ThemesConstants.DUMMY_ARTICLES.size() > 1) {
@@ -690,7 +612,7 @@ public class ThemeChanger {
 			content.append(ThemesConstants.SINGLE_QUOTE).append(IMAGE_END);
 			content.append(ThemesConstants.DUMMY_ARTICLES.get(i)).append(CONTENT_PARAGRAPH_END);
 		}
-		content.append(CONTENT_END).append(NEW_LINE);
+		content.append(CONTENT_END).append(ThemesConstants.NEW_LINE);
 		return content.toString();
 	}
 	

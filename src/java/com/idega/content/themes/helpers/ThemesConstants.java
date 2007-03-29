@@ -178,5 +178,7 @@ public class ThemesConstants {
 	
 	private static final String[] _ARTICLE_PAGE_TYPE = new String[] {"text", "forum"};
 	public static final List <String> ARTICLE_PAGE_TYPE = Collections.unmodifiableList(Arrays.asList(_ARTICLE_PAGE_TYPE));
+	
+	protected static final String NEW_LINE = "\n";
 
 }

@@ -68,7 +68,6 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		StringBuffer info = new StringBuffer();
 		
 		Theme theme = null;
-		String webRoot = helper.getFullWebRoot();
 		
 		for (int i = 0; i < themes.size(); i++) {
 			theme = themes.get(i);
@@ -80,11 +79,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 					info.append(theme.getName());
 				}
 				info.append(ThemesConstants.AT);
-				info.append(webRoot);
+				info.append(ContentConstants.CONTENT);
 				info.append(theme.getLinkToBase());
 				info.append(helper.encode(theme.getLinkToSmallPreview(), true));
 				info.append(ThemesConstants.AT);
-				info.append(webRoot);
+				info.append(ContentConstants.CONTENT);
 				info.append(theme.getLinkToBase());
 				if (theme.getLinkToDraftPreview() != null) {
 					info.append(helper.encode(theme.getLinkToDraftPreview(), true));
@@ -1218,29 +1217,29 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return;
 		}
 		try {
-			localizedText.add(resourceBundle.getLocalizedString("uploading_theme"));			// 0
-			localizedText.add(resourceBundle.getLocalizedString("changing_theme"));				// 1
-			localizedText.add(resourceBundle.getLocalizedString("saving"));						// 2
-			localizedText.add(resourceBundle.getLocalizedString("generating_preview"));			// 3
-			localizedText.add(resourceBundle.getLocalizedString("restoring_theme"));			// 4
-			localizedText.add(resourceBundle.getLocalizedString("hide_themes"));				// 5
-			localizedText.add(resourceBundle.getLocalizedString("show_themes"));				// 6
-			localizedText.add(resourceBundle.getLocalizedString("style_for_current_page"));		// 7
-			localizedText.add(resourceBundle.getLocalizedString("style_for_site"));				// 8
-			localizedText.add(resourceBundle.getLocalizedString("applying_style"));				// 9
-			localizedText.add(resourceBundle.getLocalizedString("close"));						// 10
-			localizedText.add(resourceBundle.getLocalizedString("start_page_text"));			// 11
-			localizedText.add(resourceBundle.getLocalizedString("make_start_page"));			// 12
-			localizedText.add(resourceBundle.getLocalizedString("changing_structure"));			// 13
-			localizedText.add(resourceBundle.getLocalizedString("new_page"));					// 14
-			localizedText.add(resourceBundle.getLocalizedString("moving"));						// 15
-			localizedText.add(resourceBundle.getLocalizedString("are_you_sure"));				// 16
-			localizedText.add(resourceBundle.getLocalizedString("deleting"));					// 17
-			localizedText.add(resourceBundle.getLocalizedString("page"));						// 18
-			localizedText.add(resourceBundle.getLocalizedString("site"));						// 19
-			localizedText.add(resourceBundle.getLocalizedString("drop_templates_here"));		// 20
-			localizedText.add(resourceBundle.getLocalizedString("no_page_exist"));				// 21
-			localizedText.add(resourceBundle.getLocalizedString("loading"));					// 22
+			localizedText.add(resourceBundle.getLocalizedString("uploading_theme", "Uploading..."));							// 0
+			localizedText.add(resourceBundle.getLocalizedString("changing_theme", "Changing..."));								// 1
+			localizedText.add(resourceBundle.getLocalizedString("saving", "Saving..."));										// 2
+			localizedText.add(resourceBundle.getLocalizedString("generating_preview", "Generating preview..."));				// 3
+			localizedText.add(resourceBundle.getLocalizedString("restoring_theme", "Restoring..."));							// 4
+			localizedText.add(resourceBundle.getLocalizedString("hide_themes", "Hide Themes"));									// 5
+			localizedText.add(resourceBundle.getLocalizedString("show_themes", "Show Themes"));									// 6
+			localizedText.add(resourceBundle.getLocalizedString("style_for_current_page", "Select style for current page"));	// 7
+			localizedText.add(resourceBundle.getLocalizedString("style_for_site", "Select style for all pages"));				// 8
+			localizedText.add(resourceBundle.getLocalizedString("applying_style", "Applying style..."));						// 9
+			localizedText.add(resourceBundle.getLocalizedString("close", "Close"));												// 10
+			localizedText.add(resourceBundle.getLocalizedString("start_page_text", "This Page is A Start Page"));				// 11
+			localizedText.add(resourceBundle.getLocalizedString("make_start_page", "Make This Page As Start Page"));			// 12
+			localizedText.add(resourceBundle.getLocalizedString("changing_structure", "Changing structure..."));				// 13
+			localizedText.add(resourceBundle.getLocalizedString("new_page", "New Page"));										// 14
+			localizedText.add(resourceBundle.getLocalizedString("moving", "Moving..."));										// 15
+			localizedText.add(resourceBundle.getLocalizedString("are_you_sure", "Are you sure?"));								// 16
+			localizedText.add(resourceBundle.getLocalizedString("deleting", "Deleting..."));									// 17
+			localizedText.add(resourceBundle.getLocalizedString("page", "Page"));												// 18
+			localizedText.add(resourceBundle.getLocalizedString("site", "Site"));												// 19
+			localizedText.add(resourceBundle.getLocalizedString("drop_templates_here", "Drop templates here"));					// 20
+			localizedText.add(resourceBundle.getLocalizedString("no_page_exist", "No page exist"));								// 21
+			localizedText.add(resourceBundle.getLocalizedString("loading", "Loading..."));										// 22
 		} catch (Exception e) {
 			log.error(e);
 		}
