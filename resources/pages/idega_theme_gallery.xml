@@ -30,11 +30,6 @@
 				<value>150</value>
 				<type>java.lang.String</type>
 			</property>
-			<property>
-				<name>:method:1:implied:void:setPopUpOriginalImageOnClick:boolean:</name>
-				<value>Y</value>
-				<type>java.lang.String</type>
-			</property>
     	</module>
     </region>
     <region id="navcontainer" label="navcontainer">
