@@ -506,7 +506,7 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public Document getXMLDocument(InputStream stream) {
-		if(stream == null){
+		if (stream == null) {
 			log.info("Stream is null");
 			return null;
 		}
