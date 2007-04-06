@@ -23,6 +23,7 @@ import com.idega.idegaweb.JarLoader;
 public class TemplatesLoader implements JarLoader {
 	
 	private IWMainApplication iwma = null;
+	public static final String PAGES_MAP_KEY = "pageMap";
 	
 	public TemplatesLoader(IWMainApplication iwma) {
 		super();
@@ -41,7 +42,7 @@ public class TemplatesLoader implements JarLoader {
 
 		if (pageTemplatesEntry != null) {
 			Map <String, PageTemplate> pageMap;
-			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache("pageMap");
+			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(PAGES_MAP_KEY);
 
 			try {
 				InputStream stream = jarFile.getInputStream(pageTemplatesEntry);
@@ -51,8 +52,8 @@ public class TemplatesLoader implements JarLoader {
 				Collection siteRoot = root.getChildren();								
 				Iterator itr = siteRoot.iterator();
 				String pageType = null;
-				if (pageTemplatesFromCache.containsKey("pageMap")){
-					pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get("pageMap");
+				if (pageTemplatesFromCache.containsKey(PAGES_MAP_KEY)){
+					pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(PAGES_MAP_KEY);
 				}
 				else {			
 					pageMap = new HashMap <String, PageTemplate> ();
@@ -68,7 +69,7 @@ public class TemplatesLoader implements JarLoader {
 					page.setTemplateFile(current.getAttributeValue("templatefile"));
 					pageMap.put(pageType, page);
 				}
-				pageTemplatesFromCache.put("pageMap", pageMap);				
+				pageTemplatesFromCache.put(PAGES_MAP_KEY, pageMap);				
 			}
 			catch (Exception e) {
 				e.printStackTrace();
@@ -139,5 +140,16 @@ public class TemplatesLoader implements JarLoader {
 		
 		return currNode;
 	}
+	
+	public static Map<String, PageTemplate> getPageTemplates(IWMainApplication iwma) {
+		
+		Map p_templates = IWCacheManager2.getInstance(iwma).getCache(PAGES_MAP_KEY);
 
+		if (!p_templates.containsKey(PAGES_MAP_KEY)) {
+		    TemplatesLoader templatesLoader = new TemplatesLoader(iwma);
+		    templatesLoader.loadSiteTemplateFilesFromBundles();
+		}
+		
+		return (Map <String, PageTemplate>)p_templates.get(PAGES_MAP_KEY);
+	}
 }
