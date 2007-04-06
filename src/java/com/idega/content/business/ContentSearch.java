@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.30 2007/03/07 08:52:35 justinas Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.31 2007/04/06 00:12:16 eiki Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2007/03/07 08:52:35 $ by $Author: justinas $ This class
+ * Last modified: $Date: 2007/04/06 00:12:16 $ by $Author: eiki $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -83,7 +83,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.30 $
+ * @version $Revision: 1.31 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -604,7 +604,6 @@ public class ContentSearch extends Object implements SearchPlugin{
 			fileURI = entity.getHref();
 
 			if (!fileURI.equalsIgnoreCase(servletMapping)) {
-				// TODO remove temp stuff when accesscontrol is fixed
 				Enumeration props = entity.getProperties();
 				Map properties = new HashMap();
 //				System.out.println(fileURI + " properties:");
