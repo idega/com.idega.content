@@ -19,12 +19,14 @@ import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
+import com.idega.core.builder.business.ICDomainLookup;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICDomainHome;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.builder.data.ICPageHome;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
+import com.idega.idegaweb.IWApplicationContextFactory;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWContentEvent;
 import com.idega.slide.business.IWSlideChangeListener;
@@ -289,7 +291,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	}
 	
 	public ICDomain getDomain() {
-		ICDomainHome domainHome = null;
+		/*ICDomainHome domainHome = null;
 		try {
 			domainHome = (ICDomainHome) IDOLookup.getHome(ICDomain.class);
 		} catch (IDOLookupException e) {
@@ -301,6 +303,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		} catch (FinderException e) {
 			log.error(e);
 			return null;
-		}
+		}*/
+		return IWApplicationContextFactory.getCurrentIWApplicationContext().getDomain();
 	}
 }
