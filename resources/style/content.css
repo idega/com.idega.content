@@ -445,7 +445,7 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	position: absolute;
 	width: 275px;
 	height: 150px;
-	bottom: 24px;
+	bottom: 15px;
 	border: 1px solid #D7D7D7;
 	z-index: 1;
 }
@@ -770,4 +770,8 @@ overflow: auto !important;
 
 .themeUsabilityStyle {
 	font-weight: bold;
+}
+
+.pagePreviewContainer {
+	overflow: auto;
 }

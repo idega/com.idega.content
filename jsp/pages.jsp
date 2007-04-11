@@ -43,7 +43,7 @@ version="1.2">
 						</c:block_with_toolbar>
 					</x:div>
 					
-					<x:div>
+					<x:div styleClass="pagePreviewContainer">
 						<jsf:verbatim>
 							<iframe id="treePages" class="pagePreviewFrame">iframe</iframe>
 						</jsf:verbatim>
@@ -107,7 +107,7 @@ version="1.2">
 				</x:div>
 				<x:div styleClass="rightButtonStyle">
 					<x:commandButton id="saveButton" forceId="true" type="button" onclick="savePageInfo()" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
-					<x:commandButton id="showThemesButton" forceId="true" type="button" onclick="manageSlider(this.id)" value="#{localizedStrings['com.idega.content']['hide_themes']}"></x:commandButton>
+					<x:commandButton id="showThemesButton" forceId="true" type="button" onclick="manageSlider(this.id)" value="#{localizedStrings['com.idega.content']['show_themes']}"></x:commandButton>
 				</x:div>
 			</h:form>
 		</ws:page>

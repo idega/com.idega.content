@@ -2,9 +2,9 @@ var THEME_ID = null;
 
 var SCROLLER_IMAGE_WIDTH = 23;
 var SPACE_FROM_LEFT = 290;
-var FRAME_CHANGE = 155;
+var FRAME_CHANGE = 153;
 
-var RESERVED_HEIGHT = 255;
+var RESERVED_HEIGHT = 90;
 var RESERVED_WIDTH = 500;
 
 var CLICKED_CREATE = false;
@@ -79,7 +79,7 @@ function savePageInfoCallback(result) {
 function showSlider(container) {
 	resizeSlider();
 	container.style.position = "absolute";
-	container.style.bottom = "24px";
+	container.style.bottom = "15px";
 	container.style.left = SPACE_FROM_LEFT + "px";
 	container.className = "theme_slider";
 	new Effect.Appear(container);
@@ -144,7 +144,7 @@ function sleepAndApply(themeID) {
 
 function chooseOption(themeID) {
 	var leftPosition = (getAbsoluteLeft(themeID + "_container") + 3);
-	if (getTotalWidth() - (leftPosition + getImageWidth())< 0) {
+	if (getTotalWidth() - (leftPosition + getImageWidth()) < 0) {
 		return; // There is not enough space
 	}
 	
@@ -177,14 +177,14 @@ function chooseOption(themeID) {
 		siteSpan.appendChild(document.createTextNode(getChooseStyleForSite()));
 		divs.appendChild(siteSpan);
 		
-		if (typeof div.attachEvent != 'undefined') {
-			pageSpan.attachEvent('onclick', function(e){setStyle(true);});
-	   		siteSpan.attachEvent('onclick', function(e){setStyle(false);});
-	   		div.attachEvent('onclick', function(e){removeStyleOptions();});
+		if (typeof div.attachEvent == "undefined") {
+			pageSpan.addEventListener("click", function(e){setStyle(true);}, false);
+	    	siteSpan.addEventListener("click", function(e){setStyle(false);}, false);
+	    	div.addEventListener("click", function(e){removeStyleOptions();}, false);
 		} else {
-			pageSpan.addEventListener('click', function(e){setStyle(true);}, false);
-	    	siteSpan.addEventListener('click', function(e){setStyle(false);}, false);
-	    	div.addEventListener('click', function(e){removeStyleOptions();}, false);
+			pageSpan.attachEvent("onclick", function(e){setStyle(true);});
+	   		siteSpan.attachEvent("onclick", function(e){setStyle(false);});
+	   		div.attachEvent("onclick", function(e){removeStyleOptions();});
 		}
 		
 		div.appendChild(divp);
@@ -372,7 +372,6 @@ function initializePages() {
 	initScript(true, false, false);
 	getGlobalPageId();
 
-	showSlider(document.getElementById("themesSliderContainer"));
 	resizeFrame();
 	getPageInfoValues();
 	isStartPage(getPageID());
