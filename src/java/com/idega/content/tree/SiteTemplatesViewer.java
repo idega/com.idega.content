@@ -93,18 +93,6 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 			Script script = new Script();
 			script.addScriptLine("appendIdOfTree(\'tree\'+"+panelID+");");
 			this.getChildren().add(script);		
-//			getFacets().put(ContentItemViewer.FACET_FEED_SCRIPT, script);
-
-		    
-//			StringBuffer b = new StringBuffer();
-//			b.append("<script> \n\tappendIdOfTree(\'tree\'+"+panelID+");\n</script>\n")			
-//			.append("\tappendIdOfTree(\'tree\'+"+panelID+");\n")
-////			.append("\ttreeObj"+panelID+" = new JSDragDropTree();\n")
-////			.append("\ttreeObj"+panelID+".setTreeId('tree"+panelID+"');\n")
-////			.append("\ttreeObj"+panelID+".initTree();\n")			
-////			.append("\ttreeObj"+panelID+".expandAll();\n")
-//			.append("</script>\n");
-//			this.getChildren().add(new Text(b.toString()));		
 		}
 				
 	}	
