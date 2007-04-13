@@ -57,8 +57,8 @@ function setFrameUrl(url) {
 	if (url.charAt(url.length-1) != "/") {
 		url += "/";
 	}
-	//url += "?view=builder";
-	var frame = document.getElementById('treePages');
+	url += "?view=builder";
+	var frame = document.getElementById("treePages");
 	if (frame != null) {
 		frame.src=url;
 	}
