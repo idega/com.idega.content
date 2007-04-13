@@ -67,6 +67,10 @@ public class ApplicationPropertyViewer extends Block {
 			return;
 		}
 		
+		if (!ContentUtil.hasContentEditorRoles(iwc) && ContentConstants.EMPTY.equals(value)) {	// Nothing to display
+			return;
+		}
+		
 		if (key.indexOf(getCheckKey(LOGO)) != -1) {
 			String siteLogo = "site_logo";
 			String name = ContentUtil.getBundle().getLocalizedString(siteLogo);
