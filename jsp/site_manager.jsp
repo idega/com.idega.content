@@ -26,6 +26,7 @@
                 	<script type="text/javascript">
                 		addEvent(window, "load", getLocalizedTextForThemes);
                 		addEvent(window, "load", initialiazeSiteManager);
+                		addEvent(window, "load", getPathToImageFolder);
                 	</script>
                 </f:verbatim>
 			
@@ -65,19 +66,32 @@
 
 					<f:verbatim>
 						<script type="text/javascript">	
-							treeObj = new JSDragDropTree();
-							treeObj.setTreeId('current_structure_tree');
-							treeObj.setMaximumDepth(7);
-							treeObj.setMessageMaximumDepthReached('Maximum depth reached'); // If you want to show a message when maximum depth is reached, i.e. on drop.
-							treeObj.initTree();
+								
+//							console.log('------------------');	
+//							getPathToImageFolder();
+
+//							appendIdOfTree('current_structure_tree');
+							appendIdOfTree('page_chooser22');
+//							appendIdOfTree('current_structure_tree');							
+							appendIdOfAdvancedTree('current_structure_tree');							
+							
+//							treeObj = new JSDragDropTree();
+//							treeObj.setTreeId('current_structure_tree');
+//							treeObj.setMaximumDepth(7);
+//							treeObj.setMessageMaximumDepthReached('Maximum depth reached'); // If you want to show a message when maximum depth is reached, i.e. on drop.
+//							treeObj.getPathToImageFolder();
+//							treeObj.initTree();
+/*
 							treeObj.checkIfOverTree('current_structure_tree');							
 							treeObj.getNodeOrders();
 							treeObj.expandAll();	
-
+*/							
+/*
 							treeObj22 = new JSDragDropTree();
 							treeObj22.setTreeId('page_chooser22');
 							treeObj22.initTree(); 
 							treeObj22.expandAll();
+*/							
 						</script>
 					</f:verbatim>
  				

@@ -18,11 +18,13 @@ import org.jdom.input.SAXBuilder;
 
 import com.idega.block.web2.presentation.Accordion;
 import com.idega.content.TemplatesLoader;
+import com.idega.content.presentation.ContentItemViewer;
 import com.idega.core.cache.IWCacheManager2;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.data.IWTreeNode;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWBaseComponent;
+import com.idega.presentation.Script;
 import com.idega.presentation.text.Text;
 import com.idega.webface.IWTree;
 import com.idega.webface.WFTreeNode;
@@ -88,14 +90,21 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 
 		    acc.addPanel("panel"+panelID, new Text(panelName), tree); 
 		    
-			StringBuffer b = new StringBuffer();
-			b.append("<script> \n")
-			.append("\ttreeObj"+panelID+" = new JSDragDropTree();\n")
-			.append("\ttreeObj"+panelID+".setTreeId('tree"+panelID+"');\n")
-			.append("\ttreeObj"+panelID+".initTree();\n")			
-			.append("\ttreeObj"+panelID+".expandAll();\n")
-			.append("</script>\n");
-			this.getChildren().add(new Text(b.toString()));		
+			Script script = new Script();
+			script.addScriptLine("appendIdOfTree(\'tree\'+"+panelID+");");
+			this.getChildren().add(script);		
+//			getFacets().put(ContentItemViewer.FACET_FEED_SCRIPT, script);
+
+		    
+//			StringBuffer b = new StringBuffer();
+//			b.append("<script> \n\tappendIdOfTree(\'tree\'+"+panelID+");\n</script>\n")			
+//			.append("\tappendIdOfTree(\'tree\'+"+panelID+");\n")
+////			.append("\ttreeObj"+panelID+" = new JSDragDropTree();\n")
+////			.append("\ttreeObj"+panelID+".setTreeId('tree"+panelID+"');\n")
+////			.append("\ttreeObj"+panelID+".initTree();\n")			
+////			.append("\ttreeObj"+panelID+".expandAll();\n")
+//			.append("</script>\n");
+//			this.getChildren().add(new Text(b.toString()));		
 		}
 				
 	}	

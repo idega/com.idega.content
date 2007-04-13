@@ -6,6 +6,11 @@
 	var globalDivId = null;
 	var saveOnDrop = false;
 	var movingNode = false;
+	var iconFolder = '';
+	var idsOfTrees = new Array();
+	var idsOfAdvancedTrees = new Array();
+	var treeObj = null;
+//	var iconFolder = null;
 		
 	/* Constructor */
 	function JSDragDropTree()
@@ -50,7 +55,8 @@
 		this.actionOnMouseUp = 'empty';
 		
 		this.imageFolder = '/idegaweb/bundles/com.idega.content.bundle/resources/images/';
-		this.iconFolder = '/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/';
+//		this.iconFolder = '/idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/';
+		this.iconFolder = '';
 //		this.folderImage = 'dhtmlgoodies_folder.gif';
 //		this.folderImage = 'treeviewer_node_leaf.gif';
 		this.folderImage = 'text.png';
@@ -87,7 +93,6 @@
 
 		this.messageMaximumDepthReached = ''; // Use '' if you don't want to display a message 
 	}
-	
 	
 	/* JSDragDropTree class */
 	JSDragDropTree.prototype = {
@@ -1220,12 +1225,26 @@ else{
 		,
 		folderPath : function (path){
 			JSTreeObj.iconFolder = path;
+			iconFolder = path;
+			this.iconFolder = path;
+			
+			JSTreeObj.initTree();
+		}
+		,
+		getPathToImageFolder : function(){
+			JSTreeObj = this;
+			ThemesEngine.getPathToImageFolder(JSTreeObj.folderPath);
 		}
 		,
 		initTree : function()
 		{					
 			JSTreeObj = this;
-			ThemesEngine.getPathToImageFolder(JSTreeObj.folderPath);
+			treeObj = this;
+			
+//console.log(this.iconFolder);			
+			
+//			if(iconFolder == '')
+//				ThemesEngine.getPathToImageFolder(JSTreeObj.folderPath);
 			JSTreeObj.createDropIndicator();
 			document.documentElement.onselectstart = JSTreeObj.cancelSelectionEvent;
 			document.documentElement.ondragstart = JSTreeObj.cancelEvent;
@@ -1261,11 +1280,14 @@ else{
 					iconfile = tmpVar;
 				else {
 					var pageType = menuItems[no].getAttribute('pagetype');
-					if (pageType)
+					if (pageType){
 //						iconfile = this.imageFolder + menuItems[no].getAttribute('pagetype') +'.png';
-						iconfile = JSTreeObj.iconFolder + menuItems[no].getAttribute('pagetype') +'.png';
+//						iconfile = JSTreeObj.iconFolder + menuItems[no].getAttribute('pagetype') +'.png';
+						iconfile = iconFolder + menuItems[no].getAttribute('pagetype') +'.png';
+					}
 					else
-						iconfile = JSTreeObj.iconFolder + this.folderImage;
+//						iconfile = JSTreeObj.iconFolder + this.folderImage;
+						iconfile = iconFolder + this.folderImage;						
 				}
 
 				var templatefile = null;		 
@@ -1403,7 +1425,6 @@ else{
 			input.onkeypress = withEnter;
 						
 			aTag.onclick = okToNavigate;				
-
 				aTag.ondblclick = initEditLabel;
 				if(!noDrag)aTag.onmousedown = JSTreeObj.initDrag;
 				if(!noChildren)aTag.onmousemove = JSTreeObj.moveDragableNodes;
@@ -1875,3 +1896,52 @@ console.log('placeTo '+placeTo);
 		this.pageType = pageType;
 		this.templateFile = templateFile;
 	}	
+	
+	function getPathToImageFolder(){
+		ThemesEngine.getPathToImageFolder(setFolderPath);	
+//				console.log('getPathToImageFolder');
+	}
+	
+	function setFolderPath(path){
+		iconFolder = path;
+		initializeTrees();
+//		console.log(idsOfTrees);
+
+	}
+
+	function initializeTrees(){
+		var treeObj = null;
+		for(var i = 0; i < idsOfTrees.length; i++){
+			var treeObj2 = new JSDragDropTree();
+			treeObj2.setTreeId(idsOfTrees[i]);
+			treeObj2.initTree();			
+			treeObj2.expandAll();				
+		}
+ 
+/*
+		for(var i = 0; i < idsOfAdvancedTrees.length; i++){
+			var treeObj3 = new JSDragDropTree();
+			treeObj3.setTreeId(idsOfAdvancedTrees[i]);
+			treeObj3.initTree();			
+			treeObj3.checkIfOverTree(idsOfAdvancedTrees[i]);	
+			treeObj3.getNodeOrders();
+			treeObj3.expandAll();s
+		}		
+*/
+		var treeObj = new JSDragDropTree();
+		treeObj.setTreeId(idsOfAdvancedTrees[0]);
+		treeObj.initTree();			
+		treeObj.checkIfOverTree(idsOfAdvancedTrees[0]);	
+		treeObj.getNodeOrders();
+		treeObj.expandAll();
+//console.log('end');		
+	}
+	
+	function appendIdOfTree(id){
+		idsOfTrees.push(id);		
+	}
+
+	function appendIdOfAdvancedTree(id){
+		idsOfAdvancedTrees.push(id);		
+	}
+	
