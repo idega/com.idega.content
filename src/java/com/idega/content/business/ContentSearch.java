@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.20.2.14 2007/03/28 13:28:31 eiki Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.20.2.15 2007/04/16 00:59:37 eiki Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2007/03/28 13:28:31 $ by $Author: eiki $ 
+ * Last modified: $Date: 2007/04/16 00:59:37 $ by $Author: eiki $ 
  * This class implements the Searchplugin interface and can therefore be used in a Search block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
  * system. To use it simply register this class as a iw.searchable component in
@@ -82,7 +82,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.20.2.14 $
+ * @version $Revision: 1.20.2.15 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -383,9 +383,12 @@ public class ContentSearch extends Object implements SearchPlugin{
 			for (int i = 0; i < tokens.length; i++) {
 				String searchWord = tokens[i];
 				SearchExpression orExpression = s.contains(queryString);
-				orExpression = s.or(orExpression, s.or(s.compare(CompareOperator.LIKE, DISPLAYNAME, "*" + searchWord
-						+ "*"), s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME, searchWord), s.compare(
-						CompareOperator.LIKE, COMMENT, "*" + searchWord + "*"))));
+				//Don't ever do **asdf** searches, only *asdf* the extra * causes errors in Slide
+				String wildCardSearchWord = getWildCardSearchWord(searchWord);
+				
+				
+				orExpression = s.or(orExpression, s.or(s.compare(CompareOperator.LIKE, DISPLAYNAME, wildCardSearchWord), s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME, searchWord), s.compare(
+						CompareOperator.LIKE, COMMENT, wildCardSearchWord))));
 				if (expression != null) {
 					expression = s.and(orExpression, expression);
 				}
@@ -411,6 +414,22 @@ public class ContentSearch extends Object implements SearchPlugin{
 		return searchXML;
 	}
 
+/**
+ * Returns the searchword as "*searchword*"
+ * @param modSearchWord
+ * @return
+ */
+	protected String getWildCardSearchWord(String modSearchWord) {
+		if(!"*".equals(modSearchWord)){
+			if(!modSearchWord.startsWith("*")){
+				modSearchWord = "*" + modSearchWord;
+			}
+			if(!modSearchWord.endsWith("*")){
+				modSearchWord = modSearchWord+"*";
+			}
+		}
+		return modSearchWord;
+	}
 	protected String getContentSearch(SearchQuery searchQuery) throws SearchException {
 		//TODO update to pure XML with folder ignoring
 		SearchRequest s = new SearchRequest();
@@ -448,9 +467,10 @@ public class ContentSearch extends Object implements SearchPlugin{
 		String[] tokens = queryString.split(" ");
 		for (int i = 0; i < tokens.length; i++) {
 			String searchWord = tokens[i];
-			SearchExpression orExpression = s.or(s.compare(CompareOperator.LIKE, DISPLAYNAME, "*" + searchWord + "*"),
+			String wildCardSearchWord = getWildCardSearchWord(searchWord);
+			SearchExpression orExpression = s.or(s.compare(CompareOperator.LIKE, DISPLAYNAME, wildCardSearchWord),
 					s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME, searchWord), s.compare(
-							CompareOperator.LIKE, COMMENT, "*" + searchWord + "*")));
+							CompareOperator.LIKE, COMMENT,wildCardSearchWord)));
 			if (expression != null) {
 				expression = s.and(orExpression, expression);
 			}
