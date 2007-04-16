@@ -15,8 +15,6 @@
 					/dwr/interface/BuilderService.js,
 					/dwr/interface/PagePreview.js,
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
-        			/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous/1.7.0/lib/prototype.js,
-        			/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous/1.7.0/src/scriptaculous.js,
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js,
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
         			/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
