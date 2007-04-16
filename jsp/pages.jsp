@@ -26,6 +26,7 @@ version="1.2">
                 	<script type="text/javascript">
                 		addEvent(window, "load", getLocalizedTextForThemes);
                 		addEvent(window, "load", initializePages);
+                		addEvent(window, "load", getPathToImageFolder);                		
                 	</script>
                 </jsf:verbatim>
                 
@@ -86,19 +87,8 @@ version="1.2">
 				<jsf:verbatim><script type="text/javascript">setIsSiteMap(false);</script></jsf:verbatim>
 				<jsf:verbatim>
 					<script type="text/javascript">	
-						treeObj = new JSDragDropTree();
-						treeObj.setTreeId('current_structure_tree');
-						treeObj.setMaximumDepth(7);
-						treeObj.setMessageMaximumDepthReached('Maximum depth reached');
-						treeObj.initTree();
-						treeObj.checkIfOverTree('current_structure_tree');
-						treeObj.getNodeOrders();
-						treeObj.expandAll();
-							
-						treeObj22 = new JSDragDropTree();
-						treeObj22.setTreeId('new_page_tree');
-						treeObj22.initTree(); 
-						treeObj22.expandAll();
+						appendIdOfTree('new_page_tree');
+						appendIdOfAdvancedTree('current_structure_tree');							
 					</script>
 				</jsf:verbatim>
                 
