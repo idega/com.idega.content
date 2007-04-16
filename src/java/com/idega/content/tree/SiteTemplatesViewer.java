@@ -59,10 +59,13 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		Iterator itrKeySet = siteMap.keySet().iterator();
 		String mapKey = null;
 		Accordion acc = new Accordion("site_templates");
+//		acc.setIncludeJavascript(false);
+		
 		getChildren().add(acc);
-		acc.setHeight("240");
-		int panelID = 0;
 
+		int panelID = 0;
+		Script script = new Script();
+		
 		while(itrKeySet.hasNext()){
 			panelID++;
 			mapKey = itrKeySet.next().toString();
@@ -89,11 +92,11 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		    tree.getAttributes().put("sourceTree", "true");
 
 		    acc.addPanel("panel"+panelID, new Text(panelName), tree); 
-		    
-			Script script = new Script();
-			script.addScriptLine("appendIdOfTree(\'tree\'+"+panelID+");");
-			this.getChildren().add(script);		
+		    script.addScriptLine("appendIdOfTree(\'tree\'+"+panelID+");");
+			
 		}
+		
+		this.getChildren().add(script);		
 				
 	}	
 	
