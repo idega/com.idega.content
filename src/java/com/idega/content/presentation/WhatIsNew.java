@@ -1,5 +1,5 @@
 /*
- * $Id: WhatIsNew.java,v 1.5 2006/11/09 10:11:20 gimmi Exp $
+ * $Id: WhatIsNew.java,v 1.6 2007/04/16 12:30:33 eiki Exp $
  * Created on Jun 21, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -35,10 +35,10 @@ import com.idega.slide.business.IWSlideSession;
  * It extends SearchResults block and forces it to only use a DASL search (ContentSearch) with specific settings<br>
  * and the query is by default set to "*" and the path to "files" but that can be changed.
  * 
- *  Last modified: $Date: 2006/11/09 10:11:20 $ by $Author: gimmi $
+ *  Last modified: $Date: 2007/04/16 12:30:33 $ by $Author: eiki $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class WhatIsNew extends SearchResults {
 
@@ -165,7 +165,7 @@ public class WhatIsNew extends SearchResults {
 	 * @see com.idega.core.search.presentation.SearchResults#getQueryString(com.idega.presentation.IWContext)
 	 */
 	protected String getSearchQueryString(IWContext iwc) {
-		String query = "*";
+		String query = "*.*";
 		if(super.searchQueryString==null){
 			return query;
 		}
