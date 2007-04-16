@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.31 2007/04/06 00:12:16 eiki Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.32 2007/04/16 00:46:02 eiki Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -60,8 +60,8 @@ import com.idega.core.search.data.SimpleSearchQuery;
 import com.idega.core.search.presentation.SearchResults;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
-import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2007/04/06 00:12:16 $ by $Author: eiki $ This class
+ * Last modified: $Date: 2007/04/16 00:46:02 $ by $Author: eiki $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -83,7 +83,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.31 $
+ * @version $Revision: 1.32 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -383,9 +383,12 @@ public class ContentSearch extends Object implements SearchPlugin{
 			for (int i = 0; i < tokens.length; i++) {
 				String searchWord = tokens[i];
 				SearchExpression orExpression = s.contains(queryString);
-				orExpression = s.or(orExpression, s.or(s.compare(CompareOperator.LIKE, DISPLAYNAME, "*" + searchWord
-						+ "*"), s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME, searchWord), s.compare(
-						CompareOperator.LIKE, COMMENT, "*" + searchWord + "*"))));
+				//Don't ever do **asdf** searches, only *asdf* the extra * causes errors in Slide
+				String wildCardSearchWord = getWildCardSearchWord(searchWord);
+				
+				
+				orExpression = s.or(orExpression, s.or(s.compare(CompareOperator.LIKE, DISPLAYNAME, wildCardSearchWord), s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME, searchWord), s.compare(
+						CompareOperator.LIKE, COMMENT, wildCardSearchWord))));
 				if (expression != null) {
 					expression = s.and(orExpression, expression);
 				}
@@ -409,6 +412,23 @@ public class ContentSearch extends Object implements SearchPlugin{
 		searchXML = addOrderingAndLimitingToDASLSearchXML(searchXML);
 		
 		return searchXML;
+	}
+
+/**
+ * Returns the searchword as "*searchword*"
+ * @param modSearchWord
+ * @return
+ */
+	protected String getWildCardSearchWord(String modSearchWord) {
+		if(!"*".equals(modSearchWord)){
+			if(!modSearchWord.startsWith("*")){
+				modSearchWord = "*" + modSearchWord;
+			}
+			if(!modSearchWord.endsWith("*")){
+				modSearchWord = modSearchWord+"*";
+			}
+		}
+		return modSearchWord;
 	}
 
 	protected String getContentSearch(SearchQuery searchQuery) throws SearchException {
@@ -448,9 +468,10 @@ public class ContentSearch extends Object implements SearchPlugin{
 		String[] tokens = queryString.split(" ");
 		for (int i = 0; i < tokens.length; i++) {
 			String searchWord = tokens[i];
-			SearchExpression orExpression = s.or(s.compare(CompareOperator.LIKE, DISPLAYNAME, "*" + searchWord + "*"),
+			String wildCardSearchWord = getWildCardSearchWord(searchWord);
+			SearchExpression orExpression = s.or(s.compare(CompareOperator.LIKE, DISPLAYNAME, wildCardSearchWord),
 					s.or(s.compare(CompareOperator.LIKE, CREATOR_DISPLAY_NAME, searchWord), s.compare(
-							CompareOperator.LIKE, COMMENT, "*" + searchWord + "*")));
+							CompareOperator.LIKE, COMMENT,wildCardSearchWord)));
 			if (expression != null) {
 				expression = s.and(orExpression, expression);
 			}
@@ -492,10 +513,11 @@ public class ContentSearch extends Object implements SearchPlugin{
 		String[] tokens = queryString.split(" ");
 		for (int i = 0; i < tokens.length; i++) {
 			String searchWord = tokens[i];
-			searchXML.append("<D:contains>*").append(searchWord).append("*</D:contains>")
-			.append("<S:property-contains><D:prop><D:displayname/></D:prop><D:literal>*").append(searchWord).append("*</D:literal></S:property-contains>")
-			.append("<S:property-contains><D:prop><D:creator-displayname/></D:prop><D:literal>*").append(searchWord).append("*</D:literal></S:property-contains>")
-			.append("<S:property-contains><D:prop><D:comment/></D:prop><D:literal>*").append(searchWord).append("*</D:literal></S:property-contains>");
+			String wildCardSearchWord = getWildCardSearchWord(searchWord);
+			searchXML.append("<D:contains>").append(wildCardSearchWord).append("</D:contains>")
+			.append("<S:property-contains><D:prop><D:displayname/></D:prop><D:literal>").append(wildCardSearchWord).append("</D:literal></S:property-contains>")
+			.append("<S:property-contains><D:prop><D:creator-displayname/></D:prop><D:literal>").append(wildCardSearchWord).append("</D:literal></S:property-contains>")
+			.append("<S:property-contains><D:prop><D:comment/></D:prop><D:literal>").append(wildCardSearchWord).append("</D:literal></S:property-contains>");
 		}
 		
 		searchXML.append("</D:or>");
