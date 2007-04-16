@@ -1077,16 +1077,26 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	private boolean decreaseNodesNumbersInLevel(List<String> nodes, int numberInLevel, BuilderService service) {
 		if (nodes == null) {
 			return false;
-		}
-		
+		}		
 		if (service == null) {
 			service = helper.getThemesService().getBuilderService();
 		}
 		
 		int id = -1;
+		ICPage page = null;
 		for (int i = 0; i < nodes.size(); i++) {
-			id = Integer.valueOf(nodes.get(i));
-			ICPage page = helper.getThemesService().getICPage(id);
+			try {
+				id = Integer.valueOf(nodes.get(i)).intValue();
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block				
+				e.printStackTrace();				
+			} catch (NullPointerException e) {
+				// TODO: handle exception
+				System.out.println("List element nr. " + i + " is null");
+				e.printStackTrace();
+			}
+			if (id != -1)
+				page = helper.getThemesService().getICPage(id);
 			if (page != null) {
 				page.setTreeOrder(page.getTreeOrder()-1);
 				service.decreaseTreeOrder(id);
@@ -1106,8 +1116,20 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		int id = -1;
 		ICPage page = null;
 		for (int i = 0; i < nodes.size(); i++){
-			id = Integer.valueOf(nodes.get(i)).intValue();
-			page = helper.getThemesService().getICPage(Integer.valueOf(nodes.get(i)).intValue());
+			try {
+				id = Integer.valueOf(nodes.get(i)).intValue();
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+				System.out.println("Can't convert "+nodes.get(i)+"to integer");
+				e.printStackTrace();
+			} catch (NullPointerException e) {
+				System.out.println("List element nr. " + i + " is null");
+				e.printStackTrace();
+				// TODO: handle exception
+			}
+//			page = helper.getThemesService().getICPage(Integer.valueOf(nodes.get(i)).intValue());
+			if (id != -1)
+				page = helper.getThemesService().getICPage(id);
 			if (page != null) {
 				page.setTreeOrder(page.getTreeOrder()+1);
 				service.increaseTreeOrder(id);
