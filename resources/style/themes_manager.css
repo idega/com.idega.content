@@ -168,3 +168,11 @@ img#themePreview {/*
 	float: right;
 	margin-top: 52px;
 }
+
+div#siteTemplatesContainer .wf_blockmainarea{
+	/*border: solid 1px red;*/
+	height: auto;
+	top: 0;
+	margin-top: 22px;
+	position: relative;
+}
