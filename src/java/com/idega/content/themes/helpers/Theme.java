@@ -30,7 +30,7 @@ public class Theme {
 	private List <ThemeChange> changes;
 	private Map <String, ThemeStyleGroupMember> styleGroupsMembers;
 	
-	private int IBPageID = -1;
+	private int templateId = -1;
 
 	public Theme(String themeId) {
 		styleGroupsNames = new ArrayList<String>();
@@ -191,11 +191,11 @@ public class Theme {
 	}
 	
 	public int getIBPageID() {
-		return IBPageID;
+		return templateId;
 	}
 
 	public void setIBPageID(int pageID) {
-		IBPageID = pageID;
+		templateId = pageID;
 	}
 	
 }

@@ -13,20 +13,22 @@ version="1.2">
         				/dwr/interface/ThemesEngine.js,
         				/dwr/interface/BuilderService.js,
 						/dwr/interface/PagePreview.js,
-						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous/1.7.0/lib/prototype.js,
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/scriptaculous/1.7.0/src/scriptaculous.js,
+						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/prototype/1.5.0/prototype.js,
+						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/behaviour.js,
+        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.0.0/mootools-all-compressed.js,
+        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/reflection.js,
+        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/PageInfoHelper.js,
-						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/reflection.js,
 						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js">
 			<h:form id="pagesForm">
 				<jsf:verbatim>
                 	<script type="text/javascript">
-                		addEvent(window, "load", getLocalizedTextForThemes);
-                		addEvent(window, "load", initializePages);
-                		addEvent(window, "load", getPathToImageFolder);                		
+                		registerEvent(window, "load", getLocalizedTextForThemes);
+                		registerEvent(window, "load", initializePages);
+                		registerEvent(window, "load", getPathToImageFolder);
+                		registerEvent(window, "load", registerPageInfoActions);
                 	</script>
                 </jsf:verbatim>
                 
@@ -54,7 +56,7 @@ version="1.2">
 					<x:inputHidden id="notDefaultThemeLabel" forceId="true" value="#{localizedStrings['com.idega.content']['theme_is_not_default']}"></x:inputHidden>
 	                <x:div id="themesSliderContainer" forceId="true" styleClass="theme_slider" style="display: none">
 						<x:div id="leftScrollerContainer" forceId="true" styleClass="leftThemeScroller">	
-							<x:graphicImage url="/idegaweb/bundles/com.idega.content.bundle/resources/images/left.gif" onclick="scroll(this.id)" id="leftScroller" forceId="true" title="#{localizedStrings['com.idega.content']['scroll_left']}"></x:graphicImage>
+							<x:graphicImage url="/idegaweb/bundles/com.idega.content.bundle/resources/images/left.gif" onclick="scroll(this.id);" id="leftScroller" forceId="true" title="#{localizedStrings['com.idega.content']['scroll_left']}"></x:graphicImage>
 						</x:div>	
 								
 						<x:div id="themesTickerContainer" forceId="true" styleClass="themesTicker">
@@ -62,7 +64,7 @@ version="1.2">
 						</x:div>
 								
 						<x:div id="rightScrollerContainer" forceId="true" styleClass="rightThemeScroller">
-							<x:graphicImage url="/idegaweb/bundles/com.idega.content.bundle/resources/images/right.gif" onclick="scroll(this.id)" id="rightScroller" forceId="true" title="#{localizedStrings['com.idega.content']['scroll_right']}"></x:graphicImage>
+							<x:graphicImage url="/idegaweb/bundles/com.idega.content.bundle/resources/images/right.gif" onclick="scroll(this.id);" id="rightScroller" forceId="true" title="#{localizedStrings['com.idega.content']['scroll_right']}"></x:graphicImage>
 						</x:div>
 					</x:div>
 					
@@ -93,11 +95,11 @@ version="1.2">
 				</jsf:verbatim>
                 
                 <x:div styleClass="pageInfoButtonsContainer">
-					<x:commandButton id="newPageButton" forceId="true" type="button" onclick="newPage()" value="#{localizedStrings['com.idega.content']['new_page']}"></x:commandButton>
+					<x:commandButton id="newPageButton" forceId="true" styleClass="newPageButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['new_page']}"></x:commandButton>
 				</x:div>
 				<x:div styleClass="rightButtonStyle">
-					<x:commandButton id="saveButton" forceId="true" type="button" onclick="savePageInfo()" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
-					<x:commandButton id="showThemesButton" forceId="true" type="button" onclick="manageSlider(this.id)" value="#{localizedStrings['com.idega.content']['show_themes']}"></x:commandButton>
+					<x:commandButton id="saveButton" forceId="true" styleClass="saveButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
+					<x:commandButton id="showThemesButton" forceId="true" styleClass="showThemesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['show_themes']}"></x:commandButton>
 				</x:div>
 			</h:form>
 		</ws:page>

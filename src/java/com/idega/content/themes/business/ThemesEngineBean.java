@@ -18,6 +18,7 @@ import com.idega.business.IBOServiceBean;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.Setting;
+import com.idega.content.themes.helpers.SimplifiedTheme;
 import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemeChange;
 import com.idega.content.themes.helpers.ThemesConstants;
@@ -55,7 +56,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	/**
 	 * Returns info about themes in slide
 	 */
-	public String getThemesPreviewsInfo() {
+	public List<SimplifiedTheme> getThemes() {
 		helper.searchForThemes(); // It is done in ThemesHelper's constructor, but it's possible to pass a paremeter not to search
 
 		if (!helper.getThemesPropertiesExtractor().prepareThemes()) {
@@ -63,48 +64,49 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		List <Theme> themes = helper.getSortedThemes();
-		StringBuffer info = new StringBuffer();
-		
+		List <SimplifiedTheme> simpleThemes = new ArrayList<SimplifiedTheme>();
 		Theme theme = null;
-		
+		SimplifiedTheme simpleTheme = null;
+		StringBuffer link = null;
 		for (int i = 0; i < themes.size(); i++) {
 			theme = themes.get(i);
 			if (theme.isPropertiesExtracted()) {
-				if (theme.getChangedName() != null) {
-					info.append(theme.getChangedName());
+				simpleTheme = new SimplifiedTheme();
+				
+				// Name
+				if (theme.getChangedName() == null) {
+					simpleTheme.setName(theme.getName());
 				}
 				else {
-					info.append(theme.getName());
-				}
-				info.append(ThemesConstants.AT);
-				info.append(ContentConstants.CONTENT);
-				info.append(theme.getLinkToBase());
-				info.append(helper.encode(theme.getLinkToSmallPreview(), true));
-				info.append(ThemesConstants.AT);
-				info.append(ContentConstants.CONTENT);
-				info.append(theme.getLinkToBase());
-				if (theme.getLinkToDraftPreview() != null) {
-					info.append(helper.encode(theme.getLinkToDraftPreview(), true));
-				}
-				else {
-					info.append(helper.encode(theme.getLinkToThemePreview(), true));
-				}
-				info.append(ThemesConstants.AT);
-				info.append(theme.getId());
-				info.append(ThemesConstants.AT);
-				if (isUsedTheme(theme.getIBPageID())) {
-					info.append(Boolean.TRUE);
-				}
-				else {
-					info.append(Boolean.FALSE);
+					simpleTheme.setName(theme.getChangedName());
 				}
 				
-				if (i + 1 < themes.size()) {
-					info.append(ThemesConstants.SEMICOLON);
+				// Small preview
+				link = new StringBuffer(ContentConstants.CONTENT).append(theme.getLinkToBase());
+				link.append(helper.encode(theme.getLinkToSmallPreview(), true));
+				simpleTheme.setLinkToSmallPreview(link.toString());
+				
+				// Big preview
+				link = new StringBuffer(ContentConstants.CONTENT).append(theme.getLinkToBase());
+				if (theme.getLinkToDraftPreview() == null) {
+					link.append(helper.encode(theme.getLinkToThemePreview(), true));
 				}
+				else {
+					link.append(helper.encode(theme.getLinkToDraftPreview(), true));
+				}
+				simpleTheme.setLinkToBigPreview(link.toString());
+				
+				// Id
+				simpleTheme.setId(theme.getId());
+				
+				// Is used?
+				simpleTheme.setUsed(isUsedTheme(theme.getIBPageID()));
+				
+				simpleThemes.add(simpleTheme);
 			}
 		}
-		return info.toString();
+		
+		return simpleThemes;
 	}
 	
 	private boolean isUsedTheme(int templateID) {

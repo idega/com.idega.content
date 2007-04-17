@@ -25,8 +25,8 @@
 			<h:form id="createpageform">
 				<f:verbatim>
                 	<script type="text/javascript">
-                		addEvent(window, "load", getLocalizedTextForThemes);
-                		addEvent(window, "load", initializeTree);
+                		registerEvent(window, "load", getLocalizedTextForThemes);
+                		registerEvent(window, "load", initializeTree);
                 	</script>
                 </f:verbatim>
 

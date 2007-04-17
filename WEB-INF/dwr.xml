@@ -4,17 +4,20 @@
 <dwr>
   <allow>
     <create creator="ibo" javascript="ThemesEngine" scope="application">
-      <param name="class" value="com.idega.content.themes.business.ThemesEngine"/>
+      <param name="class" value="com.idega.content.themes.business.ThemesEngine" />
     </create>
+    <convert converter="bean" match="com.idega.content.themes.helpers.SimplifiedTheme" />
     <convert converter="bean" match="com.idega.content.themes.helpers.ThemeChange">
-    	<param name="exclude" value="limitedSelection"/>
+    	<param name="exclude" value="limitedSelection" />
     </convert>
     <convert converter="bean" match="com.idega.content.themes.helpers.TreeNodeStructure" />
+    
     <create creator="ibo" javascript="NodeID" scope="application">
-      <param name="class" value="com.idega.content.tree.NodeID"/>
+      <param name="class" value="com.idega.content.tree.NodeID" />
     </create>
+    
     <create creator="ibo" javascript="PagePreview" scope="application">
-      <param name="class" value="com.idega.content.tree.PagePreview"/>
+      <param name="class" value="com.idega.content.tree.PagePreview" />
     </create>
   </allow>
   
@@ -22,9 +25,11 @@
 		<![CDATA[
   			import java.util.List;
   			import com.idega.content.themes.business.ThemesEngine;
+  			import com.idega.content.themes.helpers.SimplifiedTheme;
   			import com.idega.content.themes.helpers.ThemeChange;
 			import com.idega.content.themes.helpers.TreeNodeStructure;
 			
+			ThemesEngine.getThemes();
   			ThemesEngine.applyMultipleChangesToTheme(String, List<ThemeChange>, String);
   			ThemesEngine.beforeCreatePage(List<TreeNodeStructure>, Boolean, String, List<String>);
   		]]>

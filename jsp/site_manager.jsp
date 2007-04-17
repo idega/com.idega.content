@@ -22,9 +22,9 @@
 			<h:form id="createpageform">
 				<f:verbatim>
                 	<script type="text/javascript">
-                		addEvent(window, "load", getLocalizedTextForThemes);
-                		addEvent(window, "load", initialiazeSiteManager);
-                		addEvent(window, "load", getPathToImageFolder);
+                		registerEvent(window, "load", getLocalizedTextForThemes);
+                		registerEvent(window, "load", initialiazeSiteManager);
+                		registerEvent(window, "load", getPathToImageFolder);
                 	</script>
                 </f:verbatim>
 			
