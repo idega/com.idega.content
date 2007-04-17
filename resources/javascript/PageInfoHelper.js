@@ -6,6 +6,7 @@ var FRAME_CHANGE = 153;
 
 var RESERVED_HEIGHT = 90;
 var RESERVED_WIDTH = 500;
+var SHOW_ELEMENT_TRANSITION_DURATION = 500;
 
 var CLICKED_CREATE = false;
 
@@ -82,7 +83,9 @@ function showSlider(container) {
 	container.style.bottom = "15px";
 	container.style.left = SPACE_FROM_LEFT + "px";
 	container.className = "theme_slider";
-	new Effect.Appear(container);
+	var showSlider = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
+	showSlider.start(0, 1);
+	window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'block')", SHOW_ELEMENT_TRANSITION_DURATION);
 	getThemes(null, true);
 }
 
@@ -102,10 +105,23 @@ function manageSlider(buttonID) {
 	}
 	else {
 		removeStyleOptions();
-		new Effect.Fade(container);
+		var hideSlider = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
+		hideSlider.start(1, 0);
+		window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'none')", SHOW_ELEMENT_TRANSITION_DURATION);
 		button.value = getShowThemesText();
 		changeFrameHeight(FRAME_CHANGE);
 	}
+}
+
+function setDisplayPropertyToElement(id, property) {
+	if (id == null || property == null) {
+		return;
+	}
+	var element = document.getElementById(id);
+	if (element == null) {
+		return;
+	}
+	element.style.display = property;
 }
 
 function chooseStyle(themeID) {
@@ -250,7 +266,9 @@ function newPage() {
 	else {
 		CLICKED_CREATE = true;
 		setButtonText("newPageButton", getCloseText());
-		new Effect.Appear(newPage);
+		var showNewPage = new Fx.Style(newPage, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
+		showNewPage.start(0, 1);
+		window.setTimeout("setDisplayPropertyToElement('"+newPage.id+"', 'block')", SHOW_ELEMENT_TRANSITION_DURATION);
 	}
 }
 
@@ -359,7 +377,9 @@ function setAsStartPageCallback(result) {
 function closeNewPage(newPage) {
 	CLICKED_CREATE = false;
 	if (newPage != null) {
-		newPage.style.display = "none";
+		var hideNewPage = new Fx.Style(newPage, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
+		hideNewPage.start(1, 0);
+		window.setTimeout("setDisplayPropertyToElement('"+newPage.id+"', 'none')", SHOW_ELEMENT_TRANSITION_DURATION);
 	}
 	setButtonText("newPageButton", getNewPageText());
 }
@@ -376,5 +396,27 @@ function initializePages() {
 	getPageInfoValues();
 	isStartPage(getPageID());
 	checkIfNotEmptySiteTree("div_id_current_structure_tree");
-	addEvent(document, "click", managePageInfoComponents);	
+	registerEvent(document, "click", managePageInfoComponents);	
+}
+
+function registerPageInfoActions() {
+	var pageRules = {
+		'input.newPageButtonStyleClass' : function(element) {
+			element.onclick = function() {
+				newPage();
+			}
+		},
+		'input.saveButtonStyleClass' : function(element) {
+			element.onclick = function() {
+				savePageInfo();
+			}
+		},
+		'input.showThemesButtonStyleClass' : function(element) {
+			element.onclick = function() {
+				manageSlider(element.id);
+			}
+		}
+	};
+	Behaviour.register(pageRules);
+	Behaviour.apply();
 }

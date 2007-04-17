@@ -1,11 +1,12 @@
 var THEME_ID = null;
-var themesArray = new Array();
+var THEMES = new Array();
 var themeChanges = new Array();
 
 var imageWidth = 149;
 var imageHeight = 112;
 var currentIndex = 0;
 var waitForStyle = 100;
+var SLIDE_DURATION = 500;
 
 var containerID = "themes";
 var themesContainerID = "themesSliderContainer";
@@ -54,7 +55,7 @@ function getThemeStyleVariations(themeID) {
 		var oldTheme = getTheme(THEME_ID);
 		if (oldTheme != null) {
 			var oldClassName = "themeName";
-			if (oldTheme.used == "true") {
+			if (oldTheme.used) {
 				oldClassName = "usedThemeName";
 			}
 			setNewStyleForSelectedElement(oldTheme.id + "_themeNameContainer", oldClassName);
@@ -63,7 +64,7 @@ function getThemeStyleVariations(themeID) {
 	showLoadingMessage(getLoadingText());
 	setGlobalId(themeID);
 	var newTheme = getTheme(THEME_ID);
-	if (newTheme.used != "true") {
+	if (!newTheme.used) {
 		setNewStyleForSelectedElement(newTheme.id + "_themeNameContainer", "selectedThemeName");
 	}
 	setThemeForPreview(themeID);
@@ -165,34 +166,122 @@ function scroll(id) {
 		return;
 	}
 	
+	var themesToSlide = 1;
 	var move = true;
+	
+	var moveToPosition = 0;
+	var containerLeftValue = 0;
+	if ($(containerID).style.left) {
+		var pixelsFromLeft = $(containerID).style.left;
+		temp = pixelsFromLeft.split("px");
+		if (temp != null) {
+			containerLeftValue = temp[0];
+			containerLeftValue++;
+			containerLeftValue--;
+			moveToPosition = containerLeftValue;
+		}
+	}
+	
+	// Getting ticker length
+	var tickerFrom = getAbsoluteLeft("themesTickerContainer");
+	var tickerTo = getAbsoluteLeft("rightScrollerContainer");
+	var tickerWidth = tickerTo - tickerFrom;
+	
+	// Checking if need to scroll
+	var containerWidth = 0;
+	var containerWidthWithPixels = $(containerID).style.width;
+	var temp = containerWidthWithPixels.split("px");
+	if (temp != null) {
+		var widthValue = temp[0];
+		widthValue++;
+		widthValue--;
+		containerWidth = widthValue;
+	}
+	if (tickerWidth > containerWidth) {	// All themes are visible in slider
+		moveSlider(0);	// Restoring slider
+		return;
+	}
+	themesToSlide = Math.floor(tickerWidth / getAllImageSpace());
+	if (themesToSlide < 0) {	// No space to slide?
+		return;
+	}
 	
 	if (id == "leftScroller") {
 		// Move to the left
-		if ((currentIndex - 1) >= 0) {
-			currentIndex--;
+		if ((currentIndex - themesToSlide) >= 0) {
+			currentIndex -= themesToSlide;
+			moveToPosition += (getAllImageSpace() * themesToSlide);
 		}
 		else {
 			move = false;
 		}
-		
-		if (move){
-			new Effect.MoveBy(document.getElementById(containerID), 0, getAllImageSpace(), {duration: 0.01 });
+	}
+	else {
+		if (id == "rightScroller") {
+			// Move to the right
+			if ((currentIndex + themesToSlide) < THEMES.length) {
+				currentIndex += themesToSlide;
+				moveToPosition -= (getAllImageSpace() * themesToSlide);
+			}
+			else {
+				move = false;
+			}
 		}
-		return;
 	}
 		
-	if (id == "rightScroller") {
-		// Move to the right
-		if ((currentIndex + 1) < themesArray.length) {
-			currentIndex++;
+	if (move) {
+		hideThemeSliderButtons();
+		moveSlider(moveToPosition);
+	}
+}
+
+function moveSlider(moveToPosition) {
+	var slideMove = $(containerID).effect('left', {duration: SLIDE_DURATION, transition: Fx.Transitions.quadOut});
+	slideMove.start(moveToPosition);
+	window.setTimeout("showThemeSliderButtons()", SLIDE_DURATION);
+}
+
+function showThemeSliderButtons() {
+	var ids = new Array();
+	ids.push("leftScrollerContainer");
+	ids.push("rightScrollerContainer");
+	setElementsVisibilityProperty(ids, "visible");
+}
+
+function hideThemeSliderButtons() {
+	var ids = new Array();
+	ids.push("leftScrollerContainer");
+	ids.push("rightScrollerContainer");
+	setElementsVisibilityProperty(ids, "hidden");
+}
+
+function setElementsVisibilityProperty(ids, property) {
+	if (ids == null) {
+		return;
+	}
+	var element = null;
+	for (var i = 0; i < ids.length; i++) {
+		element = document.getElementById(ids[i]);
+		if (element != null) {
+			element.style.visibility = property;
 		}
-		else {
-			move = false;
-		}
-		
-		if (move){
-			new Effect.MoveBy(document.getElementById(containerID), 0, -(getAllImageSpace()), {duration: 0.01 });
+	}
+}
+
+function removeChildren(element) {
+	if (element == null) {
+		return;
+	}
+	var children = element.childNodes;
+	if (children == null) {
+		return;
+	}
+	var size = children.length;
+	var child = null;
+	for (var i = 0; i < size; i++) {
+		child = children[0];
+		if (child != null) {
+			element.removeChild(child);
 		}
 	}
 }
@@ -201,7 +290,7 @@ function getThemes(themeID, addReflect) {
 	showLoadingMessage(getGeneratingPreviewText());
 	setGlobalId(themeID);
 	needReflection = addReflect;
-	ThemesEngine.getThemesPreviewsInfo(getThemesCallback);
+	ThemesEngine.getThemes(getThemesCallback);
 }
 
 function getThemesCallback(themes) {
@@ -210,46 +299,50 @@ function getThemesCallback(themes) {
 		closeLoadingMessage();
 		return;
 	}
-	if (themes == "") {
-		hideThemesContainer();
-		closeLoadingMessage();
-		return;
-	}
+
 	showThemesContainer();
 	var container = document.getElementById(containerID);
 	if (container == null) {
 		closeLoadingMessage();
 		return;
 	}
-	container.innerHTML = "";
-	themesArray = new Array();
-	var info = themes.split(";");
+	
+	removeChildren(container);
+	
+	THEMES = new Array();
+	var simpleTheme = null;
 	var date = new Date();
 	var time = null;
-	for (var i = 0; i < info.length; i++) {
-		var themeFields = info[i].split("@");
+	var theme = null
+	for (var i = 0; i < themes.length; i++) {
+		simpleTheme = themes[i];
+		
 		time = date.getTime()
-		var theme = new Theme(themeFields[0], themeFields[1] + "?" + time, themeFields[2] + "?" + time, themeFields[3], themeFields[4]);
+		theme = new Theme(simpleTheme.name, simpleTheme.linkToSmallPreview + "?" + time, simpleTheme.linkToBigPreview + "?" + time, simpleTheme.id, simpleTheme.used);
+		
 		var div = document.createElement("div");
 		div.setAttribute("id", theme.id + "_mainContainer");
 		div.className = "imageGallery";
-		if (theme.used == "true") {
+		
+		// Is used?
+		if (theme.used) {
 			div.setAttribute("title", document.getElementById("defaultThemeLabel").value);
 		}
 		else {
 			div.setAttribute("title", document.getElementById("notDefaultThemeLabel").value);
 		}
 		
+		// Name
 		var textDiv = document.createElement("div");
 		textDiv.setAttribute("id", theme.id + "_themeNameContainer");
-		if (theme.used == "true") {
+		if (theme.used) {
 			textDiv.className = "usedThemeName";
 		}
 		else {
 			textDiv.className = "themeName";
 		}
 		var themeNameContainer = document.createElement("strong");
-		themeNameContainer.appendChild(document.createTextNode(theme.themeName));
+		themeNameContainer.appendChild(document.createTextNode(theme.name));
 		textDiv.appendChild(themeNameContainer);
 		div.appendChild(textDiv);
 		
@@ -257,26 +350,26 @@ function getThemesCallback(themes) {
 		imageDiv.setAttribute("id", theme.id + "_container");
 		var image = document.createElement("img"); 
    		image.setAttribute("id", theme.id); 
-   		image.setAttribute("src", theme.url);
+   		image.setAttribute("src", theme.linkToSmallPreview);
    		image.setAttribute("width", getImageWidth() + "px");
    		image.setAttribute("height", getImageHeight() + "px");
    		//image.setAttribute("title", theme.themeName);
-   		if (typeof container.attachEvent != 'undefined') {
+   		if (typeof container.attachEvent == "undefined") {
    			if (enableStyleVariations) {
-            	image.attachEvent('onclick', function(e){getThemeStyleVariations(this.id);});
-   			}
-            if (enableStyleFunctions) {
-	            image.attachEvent('onmouseover', function(e){chooseStyle(this.id);});
-	            image.attachEvent('onmouseout', function(e){recallStyle(this.id);});
-            }
-        } else {
-        	if (enableStyleVariations) {
-        		image.addEventListener('click', function(e){getThemeStyleVariations(this.id);}, true);
+        		image.addEventListener("click", function(e){getThemeStyleVariations(this.id);}, true);
         	}
         	if (enableStyleFunctions) {
-	        	image.addEventListener('mouseover', function(e){chooseStyle(this.id);}, true);
-	        	image.addEventListener('mouseout', function(e){recallStyle(this.id);}, true);
+	        	image.addEventListener("mouseover", function(e){chooseStyle(this.id);}, true);
+	        	image.addEventListener("mouseout", function(e){recallStyle(this.id);}, true);
         	}
+        } else {
+        	if (enableStyleVariations) {
+            	image.attachEvent("onclick", function(e){getThemeStyleVariations(this.id);});
+   			}
+            if (enableStyleFunctions) {
+	            image.attachEvent("onmouseover", function(e){chooseStyle(this.id);});
+	            image.attachEvent("onmouseout", function(e){recallStyle(this.id);});
+            }
         }
         image.className = "reflect rheight18 ropacity68";
         imageDiv.className = "galleryImage firstInRow";
@@ -284,16 +377,16 @@ function getThemesCallback(themes) {
         div.appendChild(imageDiv);
         
 		container.appendChild(div);
-		themesArray.push(theme);
+		THEMES.push(theme);
 	}
-	container.style.width = Math.round(themesArray.length * getAllImageSpace()) + "px";
+	container.style.width = Math.round(THEMES.length * getAllImageSpace()) + "px";
 	
-	var theme = null;
+	theme = null;
 	if (THEME_ID != null) {
 		theme = getTheme(THEME_ID);
 	}
 	else {
-		theme = themesArray[0];
+		theme = THEMES[0];
 	}
 	if (theme != null) {
 		setIfUsedTheme(theme.used);
@@ -321,23 +414,23 @@ function setIfUsedTheme(used) {
 		}
 	}
 	var text = "";
-	if (used == "true") {
+	if (used) {
 		text = document.getElementById("defaultThemeLabel").value;
 	}
 	else {
 		text = document.getElementById("notDefaultThemeLabel").value;
 	}
 	element.appendChild(document.createTextNode(text));
-	new Effect.Highlight(element);
+	
+	element.effect('background-color', {duration: 1500}).start("#ffff99", "#F2F2F2");	// Highlight
 }
 
-function Theme(themeName, url, urlToBig, id, used) {
-	this.themeName = themeName;
-	this.url = url;
-	this.urlToBig = urlToBig;
+function Theme(name, linkToSmallPreview, linkToBigPreview, id, used) {
+	this.name = name;
+	this.linkToSmallPreview = linkToSmallPreview;
+	this.linkToBigPreview = linkToBigPreview;
 	this.id = id;
 	this.applyStyle = false;
-	this.used = false;
 	this.used = used;
 }
 
@@ -351,8 +444,8 @@ function setPreview(url) {
 
 function getTheme(themeID) {
 	var theme = null;
-	for (var i = 0; i < themesArray.length; i++) {
-		theme = themesArray[i];
+	for (var i = 0; i < THEMES.length; i++) {
+		theme = THEMES[i];
 		if (theme.id == themeID) {
 			return theme;
 		}
@@ -363,15 +456,15 @@ function getTheme(themeID) {
 function setThemeForPreview(themeID) {
 	var theme = getTheme(themeID);
 	if (theme != null) {
-		setPreview(theme.urlToBig);
-		setThemeName(theme.themeName);
+		setPreview(theme.linkToBigPreview);
+		setThemeName(theme.name);
 	}
 }
 
 function getThemeIndex(themeID) {
 	var theme = null;
-	for (var i = 0; i < themesArray.length; i++) {
-		theme = themesArray[i];
+	for (var i = 0; i < THEMES.length; i++) {
+		theme = THEMES[i];
 		if (theme.id == themeID) {
 			return i;
 		}
@@ -427,8 +520,8 @@ function addReflectionToThemes() {
 }
 
 function addAfterSleep() {
-	for (var i = 0; i < themesArray.length; i++) {
-		Reflection.add(document.getElementById(themesArray[i].id), { height: 18/100, opacity: 68/100 });
+	for (var i = 0; i < THEMES.length; i++) {
+		Reflection.add(document.getElementById(THEMES[i].id), { height: 18/100, opacity: 68/100 });
 	}
 }
 
