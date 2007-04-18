@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.33 2007/04/18 13:42:42 eiki Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.34 2007/04/18 13:43:17 eiki Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2007/04/18 13:42:42 $ by $Author: eiki $ This class
+ * Last modified: $Date: 2007/04/18 13:43:17 $ by $Author: eiki $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -83,7 +83,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.33 $
+ * @version $Revision: 1.34 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -945,7 +945,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 * @return returns a collection of SearchResult objects
 	 */
 	public Collection doSimpleDASLSearch(String searchString, String scope){
-	
+
 		Map<String, String> queryMap = new HashMap<String, String>();
 		queryMap.put("mysearchstring", searchString);
 		SearchQuery query = new SimpleSearchQuery(queryMap);	
