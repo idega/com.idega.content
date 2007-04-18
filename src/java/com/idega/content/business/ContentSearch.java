@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.32 2007/04/16 00:46:02 eiki Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.33 2007/04/18 13:42:42 eiki Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2007/04/16 00:46:02 $ by $Author: eiki $ This class
+ * Last modified: $Date: 2007/04/18 13:42:42 $ by $Author: eiki $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -83,7 +83,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.32 $
+ * @version $Revision: 1.33 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -536,6 +536,45 @@ public class ContentSearch extends Object implements SearchPlugin{
 		return daslXML;
 	}
 
+	/**
+	 * Only searches the display name for files
+	 * @param searchQuery
+	 * @return
+	 * @throws SearchException
+	 */
+	protected String getDisplayNameSearch(SearchQuery searchQuery) {
+		String queryString = ((SimpleSearchQuery) searchQuery).getSimpleSearchQuery();
+		StringBuffer searchXML = new StringBuffer();
+		searchXML.append("<D:searchrequest xmlns:D='DAV:' xmlns:S='http://jakarta.apache.org/slide/'><D:basicsearch><D:select><D:prop><D:getcontentlength/><D:creationdate/><D:displayname/><D:getlastmodified/></D:prop></D:select>")
+		.append("<D:from>")
+		.append("<D:scope><D:href>").append(getScopeURI()).append("</D:href><D:depth>infinity</D:depth></D:scope>")
+		.append("</D:from>")
+		.append("<D:where>");
+		if(isSetToIgnoreFolders()){
+			searchXML.append("<D:and>");
+		}
+		String[] tokens = queryString.split(" ");
+		for (int i = 0; i < tokens.length; i++) {
+			String searchWord = tokens[i];
+			String wildCardSearchWord = getWildCardSearchWord(searchWord);
+			searchXML.append("<S:property-contains><D:prop><D:displayname/></D:prop><D:literal>").append(wildCardSearchWord).append("</D:literal></S:property-contains>");
+		}
+		
+		if(isSetToIgnoreFolders()){
+			searchXML.append("<D:not-is-collection/>")
+			.append("</D:and>");
+		}
+		
+		searchXML.append("</D:where>")
+		.append("</D:basicsearch>")
+		.append("</D:searchrequest>");
+
+//Add ordering and limiting		
+	//	String daslXML = addOrderingAndLimitingToDASLSearchXML(searchXML.toString());
+		
+		return searchXML.toString();
+	}
+
 
 	/**
 	 * @param searchXML
@@ -900,8 +939,8 @@ public class ContentSearch extends Object implements SearchPlugin{
     }
     
 	/**
-	 * Does a simple DASL search and returns a collection of SearchResult objects. ContentSearch must have been initialized!
-	 * @param searchString The text you want to search for
+	 * Does a simple DASL search (only displayname) and returns a collection of SearchResult objects. ContentSearch must have been initialized!
+	 * @param searchString The display name you want to search for
 	 * @param scope from what point in Slide you want to start e.g. /files/public
 	 * @return returns a collection of SearchResult objects
 	 */
@@ -913,28 +952,12 @@ public class ContentSearch extends Object implements SearchPlugin{
 		
 		
 		this.setScopeURI(scope);
-		Search search = this.createSearch(query);
+		String combinedSearch = getDisplayNameSearch(query);
+		ArrayList<String> l = new ArrayList<String>();
+		l.add(combinedSearch);
+		
+		Search search = createSearch(query,l);
 		Collection results = search.getSearchResults();
-		
-//		MORE OPTIONS FOR ANOTHER METHOD YOU COULD CREATE
-//		contentSearch.setScopeURI(getStartingPointURI());
-//		contentSearch.setPropertyToOrderBy(getOrderByProperty());
-//		contentSearch.setToUseDescendingOrder(isUsingDescendingOrder());
-//		contentSearch.setNumberOfResultItemsToReturn(getNumberOfResultItemsToDisplay());
-//		contentSearch.setToIgnoreFolders(isIgnoreFolders());
-//		contentSearch.setToUseRootAccessForSearch(isUsingRootAccessForSearch());
-//		contentSearch.setToHideParentFolderPath(isSetToHideParentFolderPath());
-//		contentSearch.setToHideFileExtensions(isSetToHideFileExtension());
-		
-//		while (iterator.hasNext()) {
-//			SearchResult result = (SearchResult) iterator.next();
-//			String textOnLink = result.getSearchResultName();
-//			String uri = result.getSearchResultURI();
-//			String abstractText = result.getSearchResultAbstract();
-//			String extraInfo = result.getSearchResultExtraInformation();
-//			Map extraParameters = result.getSearchResultAttributes();
-//		...
-//		}
 		
 		return results;
 		
