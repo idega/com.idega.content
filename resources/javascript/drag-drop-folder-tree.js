@@ -575,7 +575,9 @@
 				deletePage(JSTreeObj.dragNode_source.id, followingNodes);
 				if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
 					if (document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id)){
-						JSTreeObj.floatingContainer.removeChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));
+						var childToRemove = document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id);
+//						JSTreeObj.floatingContainer.removeChild(childToRemove);
+						JSTreeObj.floatingContainer.removeChild(JSTreeObj.floatingContainer.firstChild);
 					}
 				}
 				var tmpObj = JSTreeObj.dragNode_parent;
@@ -598,7 +600,10 @@
 				}				
 				JSTreeObj.dropTargetIndicator.style.display='none';				
 				JSTreeObj.dragDropTimer = -1;
-
+				if(JSTreeObj.deleteNodes == true){
+					JSTreeObj.prepareToDelete();	
+				}
+				
 				return;
 			}				
 
