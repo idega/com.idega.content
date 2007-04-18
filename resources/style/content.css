@@ -347,6 +347,7 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	position: absolute;
 	cursor: pointer;
 	bottom: 75px;
+	z-index: 100;
 }
 
 .rightThemeScroller{
