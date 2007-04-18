@@ -2,13 +2,13 @@
   <parent>
     <artifactId>com.idega.block.base</artifactId>
     <groupId>com.idega.block.platform</groupId>
-    <version>3.5.0</version>
+    <version>4.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.idega.block.platform</groupId>
   <artifactId>com.idega.content</artifactId>
   <name>idegaWeb Content</name>
-  <version>3.5.0</version>
+  <version>4.0-SNAPSHOT</version>
   <description>idegaWeb is the new ContentManagement System and Framework</description>
   <inceptionYear>2004</inceptionYear>
   <developers>
@@ -53,17 +53,17 @@
     <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.core</artifactId>
-      <version>3.5.0</version>
+      <version>4.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.slide</artifactId>
-      <version>3.5.0</version>
+      <version>4.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.webface</artifactId>
-      <version>3.5.0</version>
+      <version>4.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>commons-vfs</groupId>
@@ -73,12 +73,12 @@
   	<dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.graphics</artifactId>
-      <version>3.5.0</version>
+      <version>4.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.block.rss</artifactId>
-      <version>3.5.0</version>
+      <version>4.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.idega.block.platform</groupId>
