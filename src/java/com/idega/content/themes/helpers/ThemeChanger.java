@@ -477,6 +477,7 @@ public class ThemeChanger {
 		if (body == null) {
 			return false;
 		}
+		
 		List nodes = null;
 		JDOMXPath xp = null;
 		try {
@@ -494,25 +495,56 @@ public class ThemeChanger {
 		}
 		
 		List<Text> needlessText = new ArrayList<Text>();
+		List<Element> needlessElements = new ArrayList<Element>();
 		List allElements = body.getContent();
+		List attributes = null;
+		Collection<Element> scripts = new ArrayList<Element>();
+		
 		Object o = null;
+		Object oo = null;
 		Element e = null;
-		for (int i = 0; i < allElements.size(); i++) { // Finding Text elements
+		Element script = null;
+		Attribute scriptAttribute = null;
+		Attribute temp = null;
+		for (int i = 0; i < allElements.size(); i++) {
 			o = allElements.get(i);
-			if (o instanceof Text) {
+			if (o instanceof Text) {	// Finding Text elements - they are needless
 				needlessText.add((Text) o);
 			}
 			else {
-				if (o instanceof Element) {
+				if (o instanceof Element) {	// Fixing <link> and/or <script> attributes values
 					e = (Element) o;
-					if (ELEMENT_LINK_NAME.equals(e.getName()) || ELEMENT_SCRIPT_NAME.equals(e.getName())) {
+					if (ELEMENT_LINK_NAME.equals(e.getName())) {
 						fixDocumentElement(e, linkToBase);
+					}
+					if (ELEMENT_SCRIPT_NAME.equals(e.getName())) {	// <script> tags needs advanced handling
+						script = new Element(ELEMENT_SCRIPT_NAME, namespace);
+						attributes = e.getAttributes();
+						if (attributes != null) {
+							for (int j = 0; j < attributes.size(); j++) {
+								oo = attributes.get(j);
+								if (oo instanceof Attribute) {
+									temp = (Attribute) oo;
+									scriptAttribute = new Attribute(temp.getName(), temp.getValue());
+									script.setAttribute(scriptAttribute);
+								}
+							}
+						}
+						fixDocumentElement(script, linkToBase);
+						scripts.add(script);
+						needlessElements.add(e);
 					}
 				}
 			}
 		}
-		for (int i = 0; i < needlessText.size(); i++) { // Removing needless Text elements
+		for (int i = 0; i < needlessText.size(); i++) {	// Removing needless Text elements
 			needlessText.get(i).detach();
+		}		
+		for (int i = 0; i < needlessElements.size(); i++) {	// Removing needless elements
+			needlessElements.get(i).detach();
+		}
+		if (scripts.size() > 0) {
+			body.addContent(scripts);	// Appending <script> tags to the end of document
 		}
 		
 		return true;
