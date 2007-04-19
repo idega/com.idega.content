@@ -75,17 +75,13 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		IWContext iwc = ThemesHelper.getInstance(false).getIWContext();
 		int userID = -1;
+		ICDomain domain = null;
 		if (iwc != null) {
 			userID = iwc.getCurrentUserId();
+			domain = iwc.getDomain();
 		}
 		getBuilderService();
-		ICDomain domain = null;
-		try {
-			domain = builder.getCurrentDomain();
-		} catch (RemoteException e) {
-			log.error(e);
-			return false;
-		}
+		
 		boolean result = false;
 		result = builder.deletePage(String.valueOf(theme.getIBPageID()), false, null, userID, domain);
 		if (result) {
@@ -113,14 +109,11 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 
 		Map tree = builder.getTree(iwc);
 
-		ICDomain domain = null;
-		try {
-			domain = builder.getCurrentDomain();
-		} catch (RemoteException e) {
-			log.error(e);
-			return false;
+		ICDomain domain = iwc.getDomain();
+		int domainId = -1;
+		if (domain != null) {
+			domainId = domain.getID();
 		}
-		int domainId = domain.getID();
 		
 		if (pageID.equals(ThemesHelper.getInstance().getLastVisitedPage())) {
 			ThemesHelper.getInstance().setLastVisitedPage(null);
@@ -218,11 +211,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		
 		if (parentId == null && domainId == -1) { // Creating top level page
 			ICDomain domain = null;
-			try {
-				domain = builder.getCurrentDomain();
-			} catch (RemoteException e) {
-				log.error(e);
-			}
+			domain = iwc.getDomain();
 			if (domain != null) {
 				domainId = domain.getID();
 			}

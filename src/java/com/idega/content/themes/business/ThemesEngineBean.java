@@ -278,10 +278,14 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		ICDomain domain = null;
-		try {
-			domain = helper.getThemesService().getBuilderService().getCurrentDomain();
-		} catch (RemoteException e) {
-			log.error(e);
+		IWContext iwc = helper.getIWContext();
+		if (iwc == null) {
+			return null;
+		}
+		else {
+			domain = iwc.getDomain();
+		}
+		if (domain == null) {
 			return null;
 		}
 		
@@ -518,11 +522,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		else { // System Settings
 			if (domain == null) {
-				try {
-					domain = helper.getThemesService().getBuilderService().getCurrentDomain();
-				} catch (RemoteException e) {
-					log.error(e);
-					return ThemesConstants.EMPTY;
+				IWContext iwc = helper.getIWContext();
+				if (iwc != null) {
+					domain = iwc.getDomain();
 				}
 			}
 			if (domain == null) {
@@ -892,18 +894,13 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		BuilderService builder = helper.getThemesService().getBuilderService();
 		
-		ICDomain domain = null;
-		try {
-			domain = builder.getCurrentDomain();
-		} catch (RemoteException e) {
-			log.error(e);
-			return null;
-		}
-		
 		IWContext iwc = helper.getIWContext();
 		if (iwc == null) {
 			return null;
 		}
+		
+		ICDomain domain = null;
+		domain = iwc.getDomain();
 		
 		ICPage newRootPage = helper.getThemesService().getICPage(newRoot);
 		if (newRootPage == null) {

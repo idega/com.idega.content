@@ -243,7 +243,6 @@ function moveSlider(moveToPosition) {
 	window.setTimeout("showThemeSliderButtons()", SLIDE_DURATION);
 	var slideMove = new Fx.Style(themesContainer, 'left', {duration: SLIDE_DURATION, transition: Fx.Transitions.quadOut});
 	slideMove.start(moveToPosition);
-	//window.setTimeout("showThemeSliderButtons()", SLIDE_DURATION);
 }
 
 function showThemeSliderButtons() {
@@ -269,24 +268,6 @@ function setElementsVisibilityProperty(ids, property) {
 		element = document.getElementById(ids[i]);
 		if (element != null) {
 			element.style.visibility = property;
-		}
-	}
-}
-
-function removeChildren(element) {
-	if (element == null) {
-		return;
-	}
-	var children = element.childNodes;
-	if (children == null) {
-		return;
-	}
-	var size = children.length;
-	var child = null;
-	for (var i = 0; i < size; i++) {
-		child = children[0];
-		if (child != null) {
-			element.removeChild(child);
 		}
 	}
 }
