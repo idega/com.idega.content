@@ -722,6 +722,7 @@
 								JSTreeObj.previousParentId = newParent.id;		
 							}
 							if ((newParentId == JSTreeObj.previousParentId) || ((document.getElementById(JSTreeObj.previousParentId).tagName != 'LI')&&(!newParentId))){
+// same parent								
 								if(JSTreeObj.previousPlaceInLevel > numberInLevel){
 									nodesToIncrease = JSTreeObj.getNodesBetween(JSTreeObj.dragNode_source.id, JSTreeObj.previousParentId, numberInLevel+1, JSTreeObj.previousPlaceInLevel);
 								}
@@ -1445,7 +1446,8 @@
 			}
 			else {
 				for (var i = placeInLevel-1; i < childrenOfUlTag.length; i++){
-					result.push(childrenOfUlTag[i].id);
+					if(childrenOfUlTag[i].tagName == 'LI')
+						result.push(childrenOfUlTag[i].id);
 				}
 			}
 			return result;
@@ -1479,7 +1481,8 @@
 			}
 			else {
 				for (var i = placeFrom-1; i < placeTo; i++){
-					result.push(childrenOfUlTag[i].id);
+					if(childrenOfUlTag[i].tagName == 'LI')
+						result.push(childrenOfUlTag[i].id);
 				}
 			}
 			
