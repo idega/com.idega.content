@@ -160,7 +160,13 @@ public class ThemesPropertiesExtractor {
 		disableAllStyles(theme);
 		
 		Element root = doc.getRootElement();
+		if (root == null) {
+			return;
+		}
 		Element name = root.getChild(ThemesConstants.CON_NAME);
+		if (name == null) {
+			return;
+		}
 		theme.setName(name.getTextNormalize());
 		
 		List styles = root.getChild(ThemesConstants.CON_STYLES).getChildren();

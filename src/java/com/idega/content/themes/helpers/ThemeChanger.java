@@ -80,7 +80,7 @@ public class ThemeChanger {
 	private static final String ELEMENT_SCRIPT_NAME = "script";
 	private static final String ELEMENT_LINK_NAME = "link";
 	
-	private static final int THEME_HEIGHT = 550;
+	private static final int THEME_HEIGHT = 350;
 	
 	private static final String REGION_TO_EXPAND = "contentContainer";
 	
@@ -336,6 +336,7 @@ public class ThemeChanger {
 			docContent = addRegions(docContent);
 			docContent = getFixedDocumentContent(docContent);
 		}
+		
 		theme.setLocked(true);
 		try {
 			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(linkToBase, fileName, docContent, null, true)) {
@@ -407,6 +408,27 @@ public class ThemeChanger {
 				head.addContent(getCommentsCollection(fixValue(t.getTextNormalize())));
 			}
 			t.detach();
+		}
+	
+		// Removing all <script> tags from <head>
+		List<Element> elementsToRemove = new ArrayList<Element>();
+		List elements = head.getContent();
+		Object element = null;
+		Element script = null;
+		if (elements != null) {
+			for (int i = 0; i < elements.size(); i++) {
+				element = elements.get(i);
+				if (element instanceof Element) {
+					script = (Element) element;
+					if (ELEMENT_SCRIPT_NAME.equals(script.getName())) {
+						elementsToRemove.add(script);
+					}
+				}
+			}
+
+		}
+		for (int i = 0; i < elementsToRemove.size(); i++) {
+			elementsToRemove.get(i).detach();
 		}
 		
 		return true;
@@ -497,15 +519,15 @@ public class ThemeChanger {
 		List<Text> needlessText = new ArrayList<Text>();
 		List<Element> needlessElements = new ArrayList<Element>();
 		List allElements = body.getContent();
-		List attributes = null;
+//		List attributes = null;
 		Collection<Element> scripts = new ArrayList<Element>();
 		
 		Object o = null;
-		Object oo = null;
+//		Object oo = null;
 		Element e = null;
-		Element script = null;
-		Attribute scriptAttribute = null;
-		Attribute temp = null;
+//		Element script = null;
+//		Attribute scriptAttribute = null;
+//		Attribute temp = null;
 		for (int i = 0; i < allElements.size(); i++) {
 			o = allElements.get(i);
 			if (o instanceof Text) {	// Finding Text elements - they are needless
@@ -518,20 +540,20 @@ public class ThemeChanger {
 						fixDocumentElement(e, linkToBase);
 					}
 					if (ELEMENT_SCRIPT_NAME.equals(e.getName())) {	// <script> tags needs advanced handling
-						script = new Element(ELEMENT_SCRIPT_NAME, namespace);
-						attributes = e.getAttributes();
-						if (attributes != null) {
-							for (int j = 0; j < attributes.size(); j++) {
-								oo = attributes.get(j);
-								if (oo instanceof Attribute) {
-									temp = (Attribute) oo;
-									scriptAttribute = new Attribute(temp.getName(), temp.getValue());
-									script.setAttribute(scriptAttribute);
-								}
-							}
-						}
-						fixDocumentElement(script, linkToBase);
-						scripts.add(script);
+//						script = new Element(ELEMENT_SCRIPT_NAME, namespace);
+//						attributes = e.getAttributes();
+//						if (attributes != null) {
+//							for (int j = 0; j < attributes.size(); j++) {
+//								oo = attributes.get(j);
+//								if (oo instanceof Attribute) {
+//									temp = (Attribute) oo;
+//									scriptAttribute = new Attribute(temp.getName(), temp.getValue());
+//									script.setAttribute(scriptAttribute);
+//								}
+//							}
+//						}
+//						fixDocumentElement(script, linkToBase);
+//						scripts.add(script);
 						needlessElements.add(e);
 					}
 				}
@@ -724,6 +746,7 @@ public class ThemeChanger {
 		if (e == null) {
 			return false;
 		}
+		
 		String regionID = e.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_ID);
 		
 		if (needAddRegion(ThemesConstants.BASIC_IDS_FOR_REGIONS, regionID)) {
@@ -741,10 +764,31 @@ public class ThemeChanger {
 		
 		if (regionID != null) {
 			if (regionID.equals(REGION_TO_EXPAND)) {
-				e.addContent(getElement("div", "idega_theme", "style", new StringBuffer("height:").append(THEME_HEIGHT).append(";visibility:hidden").toString())); // Expanding theme
+				e.addContent(getElement("div", "idega_theme", "style", new StringBuffer("height:").append(THEME_HEIGHT).append("px;visibility:hidden").toString())); // Expanding theme
 			}
 		}
 		
+		if (!hasElementChildren(e)) {
+			Collection<Comment> comment = new ArrayList<Comment>();
+			Comment c = new Comment("idega");
+			comment.add(c);
+			e.addContent(comment);
+		}
+		
+		return true;
+	}
+	
+	private boolean hasElementChildren(Element e) {
+		if (e == null) {
+			return false;
+		}
+		List children = e.getChildren();
+		if (children == null) {
+			return false;
+		}
+		if (children.size() == 0) {
+			return false;
+		}
 		return true;
 	}
 	
