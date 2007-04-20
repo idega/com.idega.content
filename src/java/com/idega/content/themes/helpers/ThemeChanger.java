@@ -84,6 +84,8 @@ public class ThemeChanger {
 	
 	private static final String REGION_TO_EXPAND = "contentContainer";
 	
+	private static final String IDEGA_COMMENT = "idega";
+	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
 	private XMLOutputter out = null;
@@ -410,8 +412,7 @@ public class ThemeChanger {
 			t.detach();
 		}
 	
-		// Removing all <script> tags from <head>
-		List<Element> elementsToRemove = new ArrayList<Element>();
+		// Adding fake (comment) element to <script> - to get <script ...></script> in HTML code
 		List elements = head.getContent();
 		Object element = null;
 		Element script = null;
@@ -421,14 +422,11 @@ public class ThemeChanger {
 				if (element instanceof Element) {
 					script = (Element) element;
 					if (ELEMENT_SCRIPT_NAME.equals(script.getName())) {
-						elementsToRemove.add(script);
+						script.addContent(getComment(IDEGA_COMMENT));
 					}
 				}
 			}
 
-		}
-		for (int i = 0; i < elementsToRemove.size(); i++) {
-			elementsToRemove.get(i).detach();
 		}
 		
 		return true;
@@ -474,6 +472,12 @@ public class ThemeChanger {
 		return c;
 	}
 	
+	private Collection<Comment> getComment(String comment) {
+		Collection<Comment> comments = new ArrayList<Comment>();
+		comments.add(new Comment(comment));
+		return comments;
+	}
+	
 	/**
 	 * Checks if need to add a region to tag
 	 * @param regions
@@ -517,17 +521,9 @@ public class ThemeChanger {
 		}
 		
 		List<Text> needlessText = new ArrayList<Text>();
-		List<Element> needlessElements = new ArrayList<Element>();
 		List allElements = body.getContent();
-//		List attributes = null;
-		Collection<Element> scripts = new ArrayList<Element>();
-		
 		Object o = null;
-//		Object oo = null;
 		Element e = null;
-//		Element script = null;
-//		Attribute scriptAttribute = null;
-//		Attribute temp = null;
 		for (int i = 0; i < allElements.size(); i++) {
 			o = allElements.get(i);
 			if (o instanceof Text) {	// Finding Text elements - they are needless
@@ -540,33 +536,16 @@ public class ThemeChanger {
 						fixDocumentElement(e, linkToBase);
 					}
 					if (ELEMENT_SCRIPT_NAME.equals(e.getName())) {	// <script> tags needs advanced handling
-//						script = new Element(ELEMENT_SCRIPT_NAME, namespace);
-//						attributes = e.getAttributes();
-//						if (attributes != null) {
-//							for (int j = 0; j < attributes.size(); j++) {
-//								oo = attributes.get(j);
-//								if (oo instanceof Attribute) {
-//									temp = (Attribute) oo;
-//									scriptAttribute = new Attribute(temp.getName(), temp.getValue());
-//									script.setAttribute(scriptAttribute);
-//								}
-//							}
-//						}
-//						fixDocumentElement(script, linkToBase);
-//						scripts.add(script);
-						needlessElements.add(e);
+						fixDocumentElement(e, linkToBase);
+						if (!hasElementChildren(e)) {
+							e.addContent(getComment(IDEGA_COMMENT));
+						}
 					}
 				}
 			}
 		}
 		for (int i = 0; i < needlessText.size(); i++) {	// Removing needless Text elements
 			needlessText.get(i).detach();
-		}		
-		for (int i = 0; i < needlessElements.size(); i++) {	// Removing needless elements
-			needlessElements.get(i).detach();
-		}
-		if (scripts.size() > 0) {
-			body.addContent(scripts);	// Appending <script> tags to the end of document
 		}
 		
 		return true;
@@ -769,10 +748,7 @@ public class ThemeChanger {
 		}
 		
 		if (!hasElementChildren(e)) {
-			Collection<Comment> comment = new ArrayList<Comment>();
-			Comment c = new Comment("idega");
-			comment.add(c);
-			e.addContent(comment);
+			e.addContent(getComment(IDEGA_COMMENT));
 		}
 		
 		return true;
