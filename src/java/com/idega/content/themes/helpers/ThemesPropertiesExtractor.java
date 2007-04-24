@@ -23,34 +23,16 @@ public class ThemesPropertiesExtractor {
 	private static final Log log = LogFactory.getLog(ThemesPropertiesExtractor.class);
 	
 	public boolean prepareThemes(boolean useThread) {
-		boolean prepared = true;
-		List <Theme> themes = null;
-		synchronized (ThemesPropertiesExtractor.class) {
-			themes = new ArrayList<Theme>(helper.getThemesCollection());
-		}
-		if (themes == null) {
-			return false;
-		}
-		
-		// Initializing ImageGenerator
+		//	Initializing ImageGenerator
 		helper.getImageGenerator(null);
 		
+		boolean prepared = true;
+		
 		//	Firstly getting unprepared themes
-		List<Theme> themesToPrepare = new ArrayList<Theme>();
-		Theme theme = null;
-		synchronized (ThemesPropertiesExtractor.class) {
-			for (int i = 0; i < themes.size(); i++) {
-				theme = themes.get(i);
-				//	Checking if it is possible to extract properties
-				if (!theme.isLoading() && !theme.isPropertiesExtracted()) {
-					theme.setLoading(true);
-					themesToPrepare.add(theme);
-				}
-			}
-		}
+		List<Theme> themesToPrepare = getUnPreparedThemes();
 		
 		if (themesToPrepare.size() > 0) {
-			System.out.println("Preparing themes, using threads :" + useThread);
+			System.out.println("Preparing themes, using threads: " + useThread);
 		}
 		//	Preparing new theme(s)
 		for (int i = 0; (i < themesToPrepare.size() && prepared); i++) {
@@ -59,14 +41,33 @@ public class ThemesPropertiesExtractor {
 		return prepared;
 	}
 	
+	private synchronized List<Theme> getUnPreparedThemes() {
+		List<Theme> newThemes = new ArrayList<Theme>();
+		List <Theme> themes = new ArrayList<Theme>(helper.getThemesCollection());
+		if (themes == null) {
+			return newThemes;
+		}
+		
+		Theme theme = null;
+		for (int i = 0; i < themes.size(); i++) {
+			theme = themes.get(i);
+			//	Checking if it is possible to extract properties
+			if (!theme.isLoading() && !theme.isPropertiesExtracted()) {
+				theme.setLoading(true);
+				newThemes.add(theme);
+			}
+		}
+		return newThemes;
+	}
+	
 	private boolean prepareTheme(Theme theme, boolean useThread) {
-		if (useThread) {
+		//if (useThread) {
 			ThemePropertiesExtractor extractor = new ThemePropertiesExtractor(theme, this);
 			extractor.start();
 			return true;
-		}
+		//}
 		
-		return prepareTheme(theme);
+		//return prepareTheme(theme);
 	}
 	
 	protected boolean prepareTheme(Theme theme) {

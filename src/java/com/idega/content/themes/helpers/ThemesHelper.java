@@ -246,6 +246,7 @@ public class ThemesHelper implements Singleton {
 			checkedFromSlide = true;
 		}
 		
+		long start = System.currentTimeMillis();
 		System.out.println("Started simple DASL search");
 		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
 		Collection results = search.doSimpleDASLSearch(ThemesConstants.THEME_SEARCH_KEY, ContentConstants.CONTENT + ThemesConstants.THEMES_PATH);
@@ -265,7 +266,8 @@ public class ThemesHelper implements Singleton {
 				}
 			}
 		}
-		System.out.println("Finished simple DASL search");
+		long finish = System.currentTimeMillis();
+		System.out.println("Finished simple DASL search, took time: " + ((finish - start) / 1000) + " second(s)");
 	
 		getThemesLoader().loadThemes(urisToThemes, false, true);
 		getThemesPropertiesExtractor().prepareThemes(true);
@@ -1474,7 +1476,12 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public int getLoadedThemesCount() {
+		System.out.println("Allready loaded themes: " + loadedThemes.size());
 		return loadedThemes.size();
+	}
+	
+	public boolean isCheckedFromSlide() {
+		return checkedFromSlide;
 	}
 
 }

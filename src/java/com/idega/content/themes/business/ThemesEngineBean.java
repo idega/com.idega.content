@@ -60,13 +60,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		System.out.println("Started getThemes");
 		List <SimplifiedTheme> simpleThemes = new ArrayList<SimplifiedTheme>();
 		
-		//	It is done in ThemesHelper's constructor, but it's possible to pass a paremeter to skip search
 		helper.searchForThemes();
-		
-		if (!helper.getThemesPropertiesExtractor().prepareThemes(false)) {
-			log.info("Error extracting theme's properties");
-		}
-		
+
 		//	Checking if exist themes in system
 		Collection themesCollection = helper.getThemesCollection();
 		if (themesCollection == null) {
@@ -76,13 +71,15 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (themesCount == 0) {
 			return simpleThemes;	// No themes in system
 		}
-		System.out.println("Themes in system: " + themesCount);
+		
+		//	Preparing themes
+		helper.getThemesPropertiesExtractor().prepareThemes(false);
 		
 		if (helper.getLoadedThemesCount() < themesCount) {
 			long startLoading = System.currentTimeMillis();
 			long elapsedTime = startLoading;
 			//	Waiting until all themes are loaded, but not more than 2 minutes
-			while ((helper.getLoadedThemesCount() < themesCount) && (elapsedTime - startLoading < 120000)) {
+			while ((helper.getLoadedThemesCount() < themesCount)/* && (elapsedTime - startLoading < 120000)*/) {
 				elapsedTime = System.currentTimeMillis();
 			}
 			System.out.println("Loaded themes, elapsed time: " + ((elapsedTime - startLoading) / 1000) + " second(s)");
