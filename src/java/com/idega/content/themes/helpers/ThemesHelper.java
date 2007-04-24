@@ -95,7 +95,7 @@ public class ThemesHelper implements Singleton {
 	private boolean checkedFromSlide = false;
 	private boolean loadedThemeSettings = false;
 	private boolean loadedPageSettings = false;
-	private boolean firstThemeWasLoaded = false;
+	private boolean firstThemeLoaded = false;
 	
 	private String fullWebRoot; // For cache
 	private String webRoot;
@@ -256,10 +256,9 @@ public class ThemesHelper implements Singleton {
 				}
 			}
 		}
-		checkedFromSlide = getThemesLoader().loadThemes(urisToThemes, false, true);
-		if (checkedFromSlide) {
-			getThemesPropertiesExtractor().prepareThemes(true);
-		}
+	
+		getThemesLoader().loadThemes(urisToThemes, false, true);
+		getThemesPropertiesExtractor().prepareThemes(true);
 	}
 	
 	protected String getFileName(String uri) {
@@ -1456,14 +1455,15 @@ public class ThemesHelper implements Singleton {
 	}
 
 	public boolean isFirstThemeWasLoaded() {
-		return firstThemeWasLoaded;
+		return firstThemeLoaded;
 	}
 
-	protected void setFirstThemeWasLoaded(boolean firstThemeWasLoaded) {
-		if (this.firstThemeWasLoaded) {	// Need only the first 'true' value
+	protected void setFirstThemeWasLoaded(boolean firstThemeLoaded) {
+		if (this.firstThemeLoaded) {	// Need only the first 'true' value
 			return;
 		}
-		this.firstThemeWasLoaded = firstThemeWasLoaded;
+		System.out.println("First theme was loaded: " + firstThemeLoaded);
+		this.firstThemeLoaded = firstThemeLoaded;
 	}
 
 }
