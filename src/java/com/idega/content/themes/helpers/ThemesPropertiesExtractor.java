@@ -23,7 +23,7 @@ public class ThemesPropertiesExtractor {
 	private static final Log log = LogFactory.getLog(ThemesPropertiesExtractor.class);
 	
 	public boolean prepareThemes(boolean useThread) {
-		boolean result = true;
+		boolean prepared = true;
 		List <Theme> themes = null;
 		synchronized (ThemesPropertiesExtractor.class) {
 			themes = new ArrayList<Theme>(helper.getThemesCollection());
@@ -35,25 +35,28 @@ public class ThemesPropertiesExtractor {
 		// Initializing ImageGenerator
 		helper.getImageGenerator(null);
 		
-		for (int i = 0; (i < themes.size() && result); i++) {
-			result = prepareTheme(themes.get(i), useThread);
+		//	Firstly getting unprepared themes
+		List<Theme> themesToPrepare = new ArrayList<Theme>();
+		Theme theme = null;
+		synchronized (ThemesPropertiesExtractor.class) {
+			for (int i = 0; i < themes.size(); i++) {
+				theme = themes.get(i);
+				//	Checking if it is possible to extract properties
+				if (!theme.isLoading() && !theme.isPropertiesExtracted()) {
+					theme.setLoading(true);
+					themesToPrepare.add(theme);
+				}
+			}
 		}
-		return result;
+		
+		//	Preparing new theme(s)
+		for (int i = 0; (i < themesToPrepare.size() && prepared); i++) {
+			prepared = prepareTheme(themesToPrepare.get(i), useThread);
+		}
+		return prepared;
 	}
 	
 	private boolean prepareTheme(Theme theme, boolean useThread) {
-		synchronized (ThemesPropertiesExtractor.class) {
-			//	Checking if it is possible to extract properties
-			if (theme.isLoading()) {
-				return true;
-			}
-			if (theme.isPropertiesExtracted()) {
-				return true;
-			}
-			
-			theme.setLoading(true);
-		}
-		
 		if (useThread) {
 			ThemePropertiesExtractor extractor = new ThemePropertiesExtractor(theme, this);
 			extractor.start();
