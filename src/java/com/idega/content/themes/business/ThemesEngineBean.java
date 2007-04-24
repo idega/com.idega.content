@@ -57,6 +57,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	 * Returns info about themes in slide
 	 */
 	public List<SimplifiedTheme> getThemes() {
+		System.out.println("Started getThemes");
 		List <SimplifiedTheme> simpleThemes = new ArrayList<SimplifiedTheme>();
 		
 		//	It is done in ThemesHelper's constructor, but it's possible to pass a paremeter to skip search
@@ -77,6 +78,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		//	Waiting until any theme will be fully loaded
 		while (!helper.isFirstThemeWasLoaded());
+		System.out.println("Loaded themes");
 		
 		List <Theme> themes = helper.getSortedThemes();
 		Theme theme = null;
