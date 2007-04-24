@@ -55,7 +55,7 @@ public class ThemesPropertiesExtractor {
 		}
 		
 		if (useThread) {
-			ThemePropertiesExtractor extractor = new ThemePropertiesExtractor(theme, helper, this);
+			ThemePropertiesExtractor extractor = new ThemePropertiesExtractor(theme, this);
 			extractor.start();
 			return true;
 		}
@@ -164,6 +164,9 @@ public class ThemesPropertiesExtractor {
 		theme.setNewTheme(false);
 		theme.setPropertiesExtracted(true);
 		theme.setLoading(false);
+		
+		helper.setFirstThemeWasLoaded(true);
+		
 		return true;
 	}
 	
