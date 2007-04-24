@@ -134,6 +134,11 @@
       <name>3.1.19</name>
       <tag>CONTENT_3_1_19</tag>
     </version>
+    <version>
+      <id>3.1.20</id>
+      <name>3.1.20</name>
+      <tag>CONTENT_3_1_20</tag>
+    </version>
   </versions>
   <branches/>
   <developers>
