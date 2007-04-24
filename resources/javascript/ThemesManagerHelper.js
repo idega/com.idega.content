@@ -483,7 +483,8 @@ function scrollToDefaultTheme() {
 	var availableWidth = getThemesTickerContainerLength();
 	var visibleThemes = Math.floor(availableWidth / getAllImageSpace());
 	
-	var timesToSlide = Math.floor(index / visibleThemes);
+	var realIndex = index - 1;
+	var timesToSlide = Math.floor(realIndex / visibleThemes);
 	for (var i = 0; i < timesToSlide; i++) {
 		scrollThemes("right", visibleThemes, false);
 	}
