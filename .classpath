@@ -25,7 +25,7 @@
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/rome/jars/rome-fetcher-0.7.jar">
   </classpathentry>
-  <classpathentry kind="var" path="MAVEN_REPO/rome/jars/rome-modules-0.2.1j1.4.2.jar">
+  <classpathentry kind="var" path="MAVEN_REPO/rome/jars/rome-modules-0.2j1.4.2.jar">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/jdom/jars/jdom-1.0.jar">
   </classpathentry>
