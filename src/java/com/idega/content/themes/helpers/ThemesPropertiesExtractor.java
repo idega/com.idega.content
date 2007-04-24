@@ -101,7 +101,6 @@ public class ThemesPropertiesExtractor {
 					helper.getThemesService().createIBPage(theme);
 				} catch (RemoteException e) {
 					e.printStackTrace();
-					return false;
 				}
 			}
 		}
@@ -164,8 +163,7 @@ public class ThemesPropertiesExtractor {
 		theme.setNewTheme(false);
 		theme.setPropertiesExtracted(true);
 		theme.setLoading(false);
-		
-		helper.setFirstThemeWasLoaded(true);
+		helper.addLoadedTheme(theme.getId());
 		
 		return true;
 	}

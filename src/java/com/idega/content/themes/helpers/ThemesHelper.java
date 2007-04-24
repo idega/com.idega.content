@@ -91,11 +91,11 @@ public class ThemesHelper implements Singleton {
 	private Map <String, Document> pages = null;
 	private List <String> themeQueue = null;
 	private List <String> urisToThemes = null;
+	private List <String> loadedThemes = null;
 	
 	private boolean checkedFromSlide = false;
 	private boolean loadedThemeSettings = false;
 	private boolean loadedPageSettings = false;
-	private boolean firstThemeLoaded = false;
 	
 	private String fullWebRoot; // For cache
 	private String webRoot;
@@ -109,11 +109,15 @@ public class ThemesHelper implements Singleton {
 	
 	private ThemesHelper(boolean canUseSlide) {
 		themes = new HashMap <String, Theme> ();
-		themeSettings = Collections.synchronizedMap(new TreeMap<String, Setting>());
 		pageSettings = new HashMap <String, Setting> ();
 		pages = new HashMap <String, Document> ();
+		
+		themeSettings = Collections.synchronizedMap(new TreeMap<String, Setting>());
+		
 		themeQueue = new ArrayList <String> ();
 		urisToThemes = new ArrayList <String> ();
+		loadedThemes = new ArrayList<String>();
+		
 		numberGenerator = new Random();
 		if (canUseSlide) {
 			searchForThemes();
@@ -1453,17 +1457,18 @@ public class ThemesHelper implements Singleton {
 		}
 		return l.toString();
 	}
-
-	public boolean isFirstThemeWasLoaded() {
-		return firstThemeLoaded;
-	}
-
-	protected void setFirstThemeWasLoaded(boolean firstThemeLoaded) {
-		if (this.firstThemeLoaded) {	// Need only the first 'true' value
+	
+	protected void addLoadedTheme(String id) {
+		if (loadedThemes.contains(id)) {
+			System.out.println("Exists theme: " + id);
 			return;
 		}
-		System.out.println("First theme was loaded: " + firstThemeLoaded);
-		this.firstThemeLoaded = firstThemeLoaded;
+		System.out.println("Adding theme: " + id);
+		loadedThemes.add(id);
+	}
+	
+	public int getLoadedThemesCount() {
+		return loadedThemes.size();
 	}
 
 }

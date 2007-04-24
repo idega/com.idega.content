@@ -72,13 +72,20 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (themesCollection == null) {
 			return simpleThemes;	// No themes in system
 		}
-		if (themesCollection.size() == 0) {
+		int themesCount = themesCollection.size();
+		if (themesCount == 0) {
 			return simpleThemes;	// No themes in system
 		}
+		System.out.println("Themes in system: " + themesCount);
 		
-		//	Waiting until any theme will be fully loaded
-		while (!helper.isFirstThemeWasLoaded());
+		long startLoading = System.currentTimeMillis();
+		long elapsedTime = startLoading;
+		//	Waiting until all themes are loaded, but not more than 1 minute
+		while ((helper.getLoadedThemesCount() < themesCount) && (elapsedTime - startLoading < 60000)) {
+			elapsedTime = System.currentTimeMillis();
+		}
 		System.out.println("Loaded themes");
+		System.out.println("Elapsed time: " + ((elapsedTime - startLoading) / 1000) + " second(s)");
 		
 		List <Theme> themes = helper.getSortedThemes();
 		Theme theme = null;
