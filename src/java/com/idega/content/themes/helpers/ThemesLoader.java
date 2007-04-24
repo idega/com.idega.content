@@ -39,12 +39,7 @@ public class ThemesLoader {
 		
 		boolean result = true;
 		for (int i = 0; (i < urisToThemes.size() && result); i++) {
-			//TODO load each one in a thread
 			result = loadTheme(helper.decodeUrl(urisToThemes.get(i)), urisToThemes.get(i), newThemes, manuallyCreated);
-		
-//			ThemeLoaderThread loader = new ThemeLoaderThread(this, helper,urisToThemes.get(i), newThemes, manuallyCreated);
-//			loader.start();
-			
 		}
 			
 		return result;
@@ -105,27 +100,3 @@ public class ThemesLoader {
 	}
 
 }
-
-class ThemeLoaderThread extends Thread implements Runnable {
-	private ThemesLoader loader;
-	boolean success = false;
-	ThemesHelper helper;
-	String uriToTheme;
-	boolean newTheme;
-	boolean manuallyCreated;
-
-	public ThemeLoaderThread(ThemesLoader loader,ThemesHelper helper,String uriToTheme, boolean newTheme, boolean manuallyCreated){
-		setDaemon(true);
-		this.loader = loader;
-		this.helper = helper;
-		this.uriToTheme = uriToTheme;
-		this.newTheme = newTheme;
-		this.manuallyCreated = manuallyCreated;
-	}
-
-	public void run() {
-		success = loader.loadTheme(helper.decodeUrl(uriToTheme), uriToTheme, newTheme, manuallyCreated);
-	}
-	
-}
-			

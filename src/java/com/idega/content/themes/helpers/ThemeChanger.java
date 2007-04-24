@@ -868,12 +868,12 @@ public class ThemeChanger {
 
 		String uploadDir = new StringBuffer(helper.getFullWebRoot()).append(theme.getLinkToDraft()).toString();
 		String fileName = new StringBuffer(theme.getName()).append(ThemesConstants.DRAFT_PREVIEW).toString();
-		boolean result = helper.getImageGenerator().generatePreview(uploadDir, fileName, theme.getLinkToBaseAsItIs(), ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT, true);
+		boolean result = helper.getImageGenerator(null).generatePreview(uploadDir, fileName, theme.getLinkToBaseAsItIs(), ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT, true);
 		if (!result) {
 			return false;
 		}
 
-		theme.setLinkToDraftPreview(new StringBuffer(fileName).append(ThemesConstants.DOT).append(helper.getImageGenerator().getFileExtension()).toString());
+		theme.setLinkToDraftPreview(new StringBuffer(fileName).append(ThemesConstants.DOT).append(helper.getImageGenerator(null).getFileExtension()).toString());
 		helper.createSmallImage(theme, true);
 		
 		return true;
@@ -1200,7 +1200,7 @@ public class ThemeChanger {
 		InputStream is = helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(theme.getLinkToBase()).append(helper.encode(theme.getLinkToThemePreview(), true)).toString());
 		String extension = helper.getFileExtension(theme.getLinkToThemePreview());
 		String fileName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).append(ThemesConstants.DOT).append(extension).toString();
-		helper.getImageGenerator().encodeAndUploadImage(theme.getLinkToBaseAsItIs(), fileName, new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString(), is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
+		helper.getImageGenerator(null).encodeAndUploadImage(theme.getLinkToBaseAsItIs(), fileName, new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString(), is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
 		theme.setLinkToSmallPreview(fileName);
 		helper.closeInputStream(is);
 		
@@ -1303,7 +1303,7 @@ public class ThemeChanger {
 		// Setting Theme small preview
 		is = helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(linkToBase).append(endodedLinkToPreview).toString());
 		fileName = new StringBuffer(child.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).append(ThemesConstants.DOT).append(extension).toString();
-		helper.getImageGenerator().encodeAndUploadImage(decodedLinkToBase, fileName, new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString(),	is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
+		helper.getImageGenerator(null).encodeAndUploadImage(decodedLinkToBase, fileName, new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString(),	is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
 		child.setLinkToSmallPreview(fileName);
 		helper.closeInputStream(is);
 		

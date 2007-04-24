@@ -95,6 +95,7 @@ public class ThemesHelper implements Singleton {
 	private boolean checkedFromSlide = false;
 	private boolean loadedThemeSettings = false;
 	private boolean loadedPageSettings = false;
+	private boolean firstThemeWasLoaded = false;
 	
 	private String fullWebRoot; // For cache
 	private String webRoot;
@@ -141,11 +142,14 @@ public class ThemesHelper implements Singleton {
 		return helper;
 	}
 	
-	protected Generator getImageGenerator() {
+	protected Generator getImageGenerator(IWContext iwc) {
 		if (generator == null) {
 			synchronized (ThemesHelper.class) {
 				if (generator == null) {
-					generator = new ImageGenerator();
+					if (iwc == null) {
+						iwc = getIWContext();
+					}
+					generator = new ImageGenerator(iwc);
 				}
 			}
 		}
@@ -253,6 +257,9 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		checkedFromSlide = getThemesLoader().loadThemes(urisToThemes, false, true);
+		if (checkedFromSlide) {
+			getThemesPropertiesExtractor().prepareThemes(true);
+		}
 	}
 	
 	protected String getFileName(String uri) {
@@ -777,7 +784,7 @@ public class ThemesHelper implements Singleton {
 		// Reducing and encoding original image, saving as new image
 		input = getInputStream(getFullWebRoot() + theme.getLinkToBase() + encodedUriToImage);
 		String newName = theme.getName() + ThemesConstants.THEME_SMALL_PREVIEW + ThemesConstants.DOT + extension;
-		getImageGenerator().encodeAndUploadImage(theme.getLinkToBaseAsItIs(), newName, mimeType, input, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
+		getImageGenerator(null).encodeAndUploadImage(theme.getLinkToBaseAsItIs(), newName, mimeType, input, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
 		theme.setLinkToSmallPreview(newName);
 		closeInputStream(input);
 		
@@ -1446,6 +1453,17 @@ public class ThemesHelper implements Singleton {
 			return Locale.ENGLISH.toString();
 		}
 		return l.toString();
+	}
+
+	public boolean isFirstThemeWasLoaded() {
+		return firstThemeWasLoaded;
+	}
+
+	protected void setFirstThemeWasLoaded(boolean firstThemeWasLoaded) {
+		if (this.firstThemeWasLoaded) {	// Need only the first 'true' value
+			return;
+		}
+		this.firstThemeWasLoaded = firstThemeWasLoaded;
 	}
 
 }
