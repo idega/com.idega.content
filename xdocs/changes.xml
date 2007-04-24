@@ -5,6 +5,12 @@
   </properties>
   <body>
   
+    <release version="3.1.21" date="2007-04-24">
+      <action dev="eiki" type="update">
+		Updated com.idega.block.rss to 3.1.12 (fixed version)
+      </action>
+    </release>
+    
     <release version="3.1.20" date="2007-04-24">
       <action dev="eiki" type="update">
 		Updated com.idega.block.rss to 3.1.11 (merged with changes from HEAD)

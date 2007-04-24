@@ -11,7 +11,7 @@
   </classpathentry>
   <classpathentry kind="src" path="/com.idega.webface">
   </classpathentry>
-  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.rss-3.1.11.jar">
+   <classpathentry kind="src" path="/com.idega.block.rss">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/slide/jars/jakarta-slide-webdavlib-2.2pre1.iwbuild5.jar">
   </classpathentry>

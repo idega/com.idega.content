@@ -4,7 +4,7 @@
   <extend>${base.project.dir}/base-dependencies.xml</extend>
   <name>idegaWeb Content</name>
   <artifactId>com.idega.content</artifactId>
-  <currentVersion>3.1.20</currentVersion>
+  <currentVersion>3.1.21</currentVersion>
   <inceptionYear>2004</inceptionYear>
   <shortDescription>idegaWeb is the new ContentManagement System and Framework</shortDescription>
   <issueTrackingUrl>http://issues.idega.is</issueTrackingUrl>
@@ -219,7 +219,7 @@
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.block.rss</artifactId>
-      <version>3.1.11</version>
+      <version>3.1.12</version>
       <type>jar</type>
       <url>http://www.idega.com/</url>
     </dependency>
