@@ -238,10 +238,15 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public void searchForThemes() {
-		if (checkedFromSlide) {
-			return;
+		synchronized (ThemesHelper.class) {
+			if (checkedFromSlide) {
+				System.out.println("Search was initialized allready, returning");
+				return;
+			}
+			checkedFromSlide = true;
 		}
-		checkedFromSlide = true;
+		
+		System.out.println("Started simple DASL search");
 		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
 		Collection results = search.doSimpleDASLSearch(ThemesConstants.THEME_SEARCH_KEY, ContentConstants.CONTENT + ThemesConstants.THEMES_PATH);
 		if (results == null) {
@@ -260,6 +265,7 @@ public class ThemesHelper implements Singleton {
 				}
 			}
 		}
+		System.out.println("Finished simple DASL search");
 	
 		getThemesLoader().loadThemes(urisToThemes, false, true);
 		getThemesPropertiesExtractor().prepareThemes(true);

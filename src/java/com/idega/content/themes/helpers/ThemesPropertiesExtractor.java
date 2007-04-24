@@ -49,6 +49,9 @@ public class ThemesPropertiesExtractor {
 			}
 		}
 		
+		if (themesToPrepare.size() > 0) {
+			System.out.println("Preparing themes, using threads :" + useThread);
+		}
 		//	Preparing new theme(s)
 		for (int i = 0; (i < themesToPrepare.size() && prepared); i++) {
 			prepared = prepareTheme(themesToPrepare.get(i), useThread);

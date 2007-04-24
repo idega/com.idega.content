@@ -81,8 +81,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (helper.getLoadedThemesCount() < themesCount) {
 			long startLoading = System.currentTimeMillis();
 			long elapsedTime = startLoading;
-			//	Waiting until all themes are loaded, but not more than 1 minute
-			while ((helper.getLoadedThemesCount() < themesCount) && (elapsedTime - startLoading < 60000)) {
+			//	Waiting until all themes are loaded, but not more than 2 minutes
+			while ((helper.getLoadedThemesCount() < themesCount) && (elapsedTime - startLoading < 120000)) {
 				elapsedTime = System.currentTimeMillis();
 			}
 			System.out.println("Loaded themes, elapsed time: " + ((elapsedTime - startLoading) / 1000) + " second(s)");
