@@ -1,12 +1,14 @@
 var THEME_ID = null;
 var THEMES = new Array();
-var themeChanges = new Array();
+var THEME_CHANGES = new Array();
 
 var imageWidth = 149;
 var imageHeight = 112;
-var currentIndex = 0;
+var CURRENT_THEME_INDEX = 0;
 var waitForStyle = 100;
 var SLIDE_DURATION = 500;
+var SHOW_SLIDER_BUTTONS_ID = 0;
+var THEMES_REFLECTION_ID = 0;
 
 var containerID = "themes";
 var themesContainerID = "themesSliderContainer";
@@ -105,7 +107,7 @@ function changeTheme(themeID, styleGroupName, newStyleMember, type, checked) {
 }
 
 function changeThemeCallback(themeID) {
-	themeChanges = new Array();
+	THEME_CHANGES = new Array();
 	closeLoadingMessage();
 	if (themeID == null) {
 		document.getElementById('themeSaveButton').disabled = true;
@@ -113,7 +115,7 @@ function changeThemeCallback(themeID) {
 	else {
 		setGlobalId(themeID);
 		document.getElementById('themeSaveButton').disabled = false;
-		getThemes(themeID, true);
+		getThemes(themeID, true, false);
 	}
 }
 
@@ -131,7 +133,7 @@ function saveThemeCallback(result) {
 	closeLoadingMessage();
 	if (result) {
 		document.getElementById('themeSaveButton').disabled = false;
-		getThemes(THEME_ID, true);
+		getThemes(THEME_ID, true, false);
 	}
 	else {
 		if (needApplyThemeForSite) {
@@ -160,34 +162,11 @@ function setThemeName(themeName) {
 	}
 }
 
-function scroll(id) {
-	removeStyleOptions();
-	if (id == null) {
-		return;
+function getThemesContainerLength() {
+	var container = $(containerID);
+	if (container == null) {
+		return 0;
 	}
-	
-	var themesToSlide = 1;
-	var move = true;
-	
-	var moveToPosition = 0;
-	var containerLeftValue = 0;
-	if ($(containerID).style.left) {
-		var pixelsFromLeft = $(containerID).style.left;
-		temp = pixelsFromLeft.split("px");
-		if (temp != null) {
-			containerLeftValue = temp[0];
-			containerLeftValue++;
-			containerLeftValue--;
-			moveToPosition = containerLeftValue;
-		}
-	}
-	
-	// Getting ticker length
-	var tickerFrom = getAbsoluteLeft("themesTickerContainer");
-	var tickerTo = getAbsoluteLeft("rightScrollerContainer");
-	var tickerWidth = tickerTo - tickerFrom;
-	
-	// Checking if need to scroll
 	var containerWidth = 0;
 	var containerWidthWithPixels = $(containerID).style.width;
 	var temp = containerWidthWithPixels.split("px");
@@ -197,6 +176,47 @@ function scroll(id) {
 		widthValue--;
 		containerWidth = widthValue;
 	}
+	return containerWidth;
+}
+
+function getThemesContainerLeftValue() {
+	var themesLength = 0;
+	var containerLeftValue = 0;
+	if ($(containerID).style.left) {
+		var pixelsFromLeft = $(containerID).style.left;
+		temp = pixelsFromLeft.split("px");
+		if (temp != null) {
+			containerLeftValue = temp[0];
+			containerLeftValue++;
+			containerLeftValue--;
+			themesLength = containerLeftValue;
+		}
+	}
+	
+	return themesLength;
+}
+
+function getThemesTickerContainerLength() {
+	var tickerFrom = getAbsoluteLeft("themesTickerContainer");
+	var tickerTo = getAbsoluteLeft("rightScrollerContainer");
+	return (tickerTo - tickerFrom);
+}
+
+function scroll(id) {
+	removeStyleOptions();
+	if (id == null) {
+		return;
+	}
+	
+	var themesToSlide = 1;
+	
+	// Getting ticker length
+	var tickerWidth = getThemesTickerContainerLength();
+	
+	// Getting themes container length
+	var containerWidth = getThemesContainerLength();
+	
+	// Checking if need to scroll
 	if (tickerWidth > containerWidth) {	// All themes are visible in slider
 		moveSlider(0);	// Restoring slider
 		return;
@@ -206,10 +226,27 @@ function scroll(id) {
 		return;
 	}
 	
+	var direction = "right";
 	if (id == "leftScroller") {
+		direction = "left";
+	}
+	
+	scrollThemes(direction, themesToSlide, true);
+}
+
+function scrollThemes(direction, themesToSlide, useMooTools) {
+	if (direction == null || themesToSlide == null) {
+		return;
+	}
+	
+	var move = true;
+	
+	var moveToPosition = getThemesContainerLeftValue();
+	
+	if (direction == "left") {
 		// Move to the left
-		if ((currentIndex - themesToSlide) >= 0) {
-			currentIndex -= themesToSlide;
+		if ((CURRENT_THEME_INDEX - themesToSlide) >= 0) {
+			CURRENT_THEME_INDEX -= themesToSlide;
 			moveToPosition += (getAllImageSpace() * themesToSlide);
 		}
 		else {
@@ -217,10 +254,10 @@ function scroll(id) {
 		}
 	}
 	else {
-		if (id == "rightScroller") {
+		if (direction == "right") {
 			// Move to the right
-			if ((currentIndex + themesToSlide) < THEMES.length) {
-				currentIndex += themesToSlide;
+			if ((CURRENT_THEME_INDEX + themesToSlide) < THEMES.length) {
+				CURRENT_THEME_INDEX += themesToSlide;
 				moveToPosition -= (getAllImageSpace() * themesToSlide);
 			}
 			else {
@@ -230,19 +267,24 @@ function scroll(id) {
 	}
 		
 	if (move) {
-		moveSlider(moveToPosition);
+		moveSlider(moveToPosition, useMooTools);
 	}
 }
 
-function moveSlider(moveToPosition) {
+function moveSlider(moveToPosition, useMooTools) {
 	var themesContainer = document.getElementById(containerID);
 	if (themesContainer == null) {
 		return;
 	}
-	hideThemeSliderButtons();
-	window.setTimeout("showThemeSliderButtons()", SLIDE_DURATION);
-	var slideMove = new Fx.Style(themesContainer, 'left', {duration: SLIDE_DURATION, transition: Fx.Transitions.quadOut});
-	slideMove.start(moveToPosition);
+	if (useMooTools) {
+		hideThemeSliderButtons();
+		SHOW_SLIDER_BUTTONS_ID = window.setTimeout("showThemeSliderButtons()", SLIDE_DURATION);
+		var slideMove = new Fx.Style(themesContainer, 'left', {duration: SLIDE_DURATION, transition: Fx.Transitions.quadOut});
+		slideMove.start(moveToPosition);
+	}
+	else {
+		themesContainer.style.left = moveToPosition + "px";
+	}
 }
 
 function showThemeSliderButtons() {
@@ -250,6 +292,7 @@ function showThemeSliderButtons() {
 	ids.push("leftScrollerContainer");
 	ids.push("rightScrollerContainer");
 	setElementsVisibilityProperty(ids, "visible");
+	window.clearTimeout(SHOW_SLIDER_BUTTONS_ID);
 }
 
 function hideThemeSliderButtons() {
@@ -272,14 +315,18 @@ function setElementsVisibilityProperty(ids, property) {
 	}
 }
 
-function getThemes(themeID, addReflect) {
+function getThemes(themeID, addReflect, needScrollToDefaultTheme) {
 	showLoadingMessage(getGeneratingPreviewText());
 	setGlobalId(themeID);
 	needReflection = addReflect;
-	ThemesEngine.getThemes(getThemesCallback);
+	ThemesEngine.getThemes({
+		callback: function(themes) {
+			getThemesCallback(themes, needScrollToDefaultTheme);
+		}
+	});
 }
 
-function getThemesCallback(themes) {
+function getThemesCallback(themes, needScrollToDefaultTheme) {
 	closeLoadingMessage();
 	if (themes == null) {
 		hideThemesContainer();
@@ -366,24 +413,97 @@ function getThemesCallback(themes) {
 	}
 	container.style.width = Math.round(THEMES.length * getAllImageSpace()) + "px";
 	
-	theme = null;
-	if (THEME_ID != null) {
-		theme = getTheme(THEME_ID);
+	// Setting default theme
+	if (needScrollToDefaultTheme) {
+		theme = getDefaultTheme();
+		if (theme != null) {
+			scrollToDefaultTheme();
+		}
 	}
 	else {
+		if (THEME_ID != null) {
+			theme = getTheme(THEME_ID);	// Getting last used theme
+		}
+	}
+	
+	// No default or last used theme - getting the first from list
+	if (theme == null) {
 		theme = THEMES[0];
 	}
+	
 	if (theme != null) {
 		if (enableStyleVariations) {
 			getThemeStyleVariations(theme.id);
 		}
 		setGlobalId(theme.id);
 	}
+	
+	// Adding reflection
 	addReflectionToThemes();
+	
 	if (needApplyThemeForSite) {
 		needApplyThemeForSite = false;
 		applyThemeForSite(THEME_ID);
 	}
+}
+
+function getDefaultTheme() {
+	var theme = null;
+	for (var i = 0; i < THEMES.length; i++) {
+		theme = THEMES[i];
+		if (theme.used) {
+			return theme;
+		}
+	}
+	return null;
+}
+
+function scrollToDefaultTheme() {
+	if (THEMES == null) {
+		return;
+	}
+	
+	var theme = null;
+	var index = 0;
+	var foundDefault = false;
+	for (index = 0; (index < THEMES.length && !foundDefault); index++) {
+		theme = THEMES[index];
+		if (theme.used) {
+			foundDefault = true;
+		}
+	}
+	if (!foundDefault) {
+		return;
+	}
+	
+	if (isVisibleDefaultTheme(index)) {
+		return;
+	}
+	
+	var availableWidth = getThemesTickerContainerLength();
+	var visibleThemes = Math.floor(availableWidth / getAllImageSpace());
+	
+	var timesToSlide = Math.floor(index / visibleThemes);
+	for (var i = 0; i < timesToSlide; i++) {
+		scrollThemes("right", visibleThemes, false);
+	}
+}
+
+function isVisibleDefaultTheme(index) {
+	if (index == null) {
+		return true;
+	}
+	
+	var neededWidthForDefaultTheme = index * getAllImageSpace();
+	var availableWidth = getThemesTickerContainerLength();
+	if (availableWidth <= 0) {
+		return true;
+	}
+	var visibleThemes = Math.floor(availableWidth / getAllImageSpace());
+	if (visibleThemes >= index) {
+		return true;
+	}
+	return false;
 }
 
 function setIfUsedTheme(used) {
@@ -495,12 +615,13 @@ function restoreTheme() {
 
 function restoreThemeCallback(result) {
 	closeLoadingMessage();
-	getThemes(THEME_ID, true);
+	getThemes(THEME_ID, true, false);
 }
 
 function addReflectionToThemes() {
 	if (needReflection) {
-		setTimeout("addAfterSleep()", 1000); // Needs to stop script, because reflection is added before images are loaded
+		// Needs to stop script, because reflection is added before images are loaded
+		THEMES_REFLECTION_ID = setTimeout("addAfterSleep()", 1000);
 	}
 }
 
@@ -508,6 +629,7 @@ function addAfterSleep() {
 	for (var i = 0; i < THEMES.length; i++) {
 		Reflection.add(document.getElementById(THEMES[i].id), { height: 18/100, opacity: 68/100 });
 	}
+	window.clearTimeout(THEMES_REFLECTION_ID);
 }
 
 function saveAndApplyTheme() {
@@ -522,16 +644,16 @@ function changeVariations() {
 	if (THEME_ID == null) {
 		return false;
 	}
-	if (themeChanges == null) {
+	if (THEME_CHANGES == null) {
 		return false;
 	}
-	if (themeChanges.length == 0) {
+	if (THEME_CHANGES.length == 0) {
 		return false;
 	}
 	var themeNameObj = document.getElementById("theme_name");
 	if (themeNameObj != null) {
 		showLoadingMessage(getThemeChangingText());
-		ThemesEngine.applyMultipleChangesToTheme(THEME_ID, themeChanges, themeNameObj.value, changeThemeCallback);
+		ThemesEngine.applyMultipleChangesToTheme(THEME_ID, THEME_CHANGES, themeNameObj.value, changeThemeCallback);
 	}
 }
 
@@ -544,11 +666,11 @@ function ThemeChange(themeId, styleGroupName, variation, radio, enabled) {
 }
 
 function removeThemeChange(index, elementsToRemove) {
-	if (themeChanges == null) {
+	if (THEME_CHANGES == null) {
 		return false;
 	}
-	if (index >= 0 && index < themeChanges.length) {
-		themeChanges.splice(index, elementsToRemove);
+	if (index >= 0 && index < THEME_CHANGES.length) {
+		THEME_CHANGES.splice(index, elementsToRemove);
 		return true;
 	}
 	return false;
@@ -556,7 +678,7 @@ function removeThemeChange(index, elementsToRemove) {
 
 function addThemeChange(themeId, styleGroupName, variation, variationType, enabled) {
 	if (THEME_ID != themeId) {
-		themeChanges = new Array();	// Reseting array of changes
+		THEME_CHANGES = new Array();	// Reseting array of changes
 	}
 	var radio = true;
 	if (variationType == "checkbox") {
@@ -569,18 +691,18 @@ function addThemeChange(themeId, styleGroupName, variation, variationType, enabl
 	
 	var index = existThemeChange(themeId, styleGroupName, variation, radio, enabled);
 	if (index < 0) {
-		themeChanges.push(new ThemeChange(themeId, styleGroupName, variation, radio, enabled));
+		THEME_CHANGES.push(new ThemeChange(themeId, styleGroupName, variation, radio, enabled));
 	}
 }
 
 function removeSameGroupChanges(themeId, styleGroupName) {
-	if (themeChanges == null) {
+	if (THEME_CHANGES == null) {
 		return false;
 	}
 	var themeChange = null;
 	var elementsToRemove = new Array();
-	for (var i = 0; i < themeChanges.length; i++) {
-		themeChange = themeChanges[i];
+	for (var i = 0; i < THEME_CHANGES.length; i++) {
+		themeChange = THEME_CHANGES[i];
 		if (themeChange.themeId == themeId && themeChange.styleGroupName == styleGroupName) {
 			elementsToRemove.push(i);
 		}
@@ -591,14 +713,14 @@ function removeSameGroupChanges(themeId, styleGroupName) {
 }
 
 function existThemeChange(themeId, styleGroupName, variation, radio, enabled) {
-	if (themeChanges == null) {
+	if (THEME_CHANGES == null) {
 		return -1;
 	}
 	var existChange = false;
 	var themeChange = null;
 	var i = 0;
-	for (i = 0; (i < themeChanges.length && !existChange); i++) {
-		themeChange = themeChanges[i];
+	for (i = 0; (i < THEME_CHANGES.length && !existChange); i++) {
+		themeChange = THEME_CHANGES[i];
 		if (themeChange.themeId == themeId && themeChange.styleGroupName == styleGroupName && themeChange.variation == variation) {
 			existChange = true;
 		}
@@ -615,5 +737,5 @@ function existThemeChange(themeId, styleGroupName, variation, radio, enabled) {
 function initializeThemes() {
 	insertStyleFile();
 	initScript(false, true, true);
-	getThemes(null, true);
+	getThemes(null, true, true);
 }

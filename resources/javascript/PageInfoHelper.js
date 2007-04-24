@@ -3,12 +3,14 @@ var THEME_ID = null;
 var SCROLLER_IMAGE_WIDTH = 23;
 var SPACE_FROM_LEFT = 290;
 var FRAME_CHANGE = 153;
-
 var RESERVED_HEIGHT = 90;
 var RESERVED_WIDTH = 500;
 var SHOW_ELEMENT_TRANSITION_DURATION = 500;
+var SET_DISPLAY_PROPERTY_ID = 0;
+var GET_THEMES_ID = 0;
 
 var CLICKED_CREATE = false;
+var SLIDER_SHOWED_FIRST_TIME = true;
 
 var KEYWORDS = null;
 
@@ -85,8 +87,16 @@ function showSlider(container) {
 	container.className = "theme_slider";
 	var showSlider = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 	showSlider.start(0, 1);
-	window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'block')", SHOW_ELEMENT_TRANSITION_DURATION);
-	getThemes(null, true);
+	SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'block')", SHOW_ELEMENT_TRANSITION_DURATION);
+	GET_THEMES_ID = window.setTimeout("getThemesSlider()", SHOW_ELEMENT_TRANSITION_DURATION + 50);
+}
+
+function getThemesSlider() {
+	var slideToDefault = SLIDER_SHOWED_FIRST_TIME;
+	SLIDER_SHOWED_FIRST_TIME = false;
+	getThemes(null, true, slideToDefault);
+	
+	window.clearTimeout(GET_THEMES_ID);
 }
 
 function manageSlider(buttonID) {
@@ -107,7 +117,7 @@ function manageSlider(buttonID) {
 		removeStyleOptions();
 		var hideSlider = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 		hideSlider.start(1, 0);
-		window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'none')", SHOW_ELEMENT_TRANSITION_DURATION);
+		SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'none')", SHOW_ELEMENT_TRANSITION_DURATION);
 		button.value = getShowThemesText();
 		changeFrameHeight(FRAME_CHANGE);
 	}
@@ -122,6 +132,7 @@ function setDisplayPropertyToElement(id, property) {
 		return;
 	}
 	element.style.display = property;
+	window.clearTimeout(SET_DISPLAY_PROPERTY_ID);
 }
 
 function chooseStyle(themeID) {
@@ -268,7 +279,7 @@ function newPage() {
 		setButtonText("newPageButton", getCloseText());
 		var showNewPage = new Fx.Style(newPage, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 		showNewPage.start(0, 1);
-		window.setTimeout("setDisplayPropertyToElement('"+newPage.id+"', 'block')", SHOW_ELEMENT_TRANSITION_DURATION);
+		SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+newPage.id+"', 'block')", SHOW_ELEMENT_TRANSITION_DURATION);
 	}
 }
 
@@ -379,7 +390,7 @@ function closeNewPage(newPage) {
 	if (newPage != null) {
 		var hideNewPage = new Fx.Style(newPage, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 		hideNewPage.start(1, 0);
-		window.setTimeout("setDisplayPropertyToElement('"+newPage.id+"', 'none')", SHOW_ELEMENT_TRANSITION_DURATION);
+		SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+newPage.id+"', 'none')", SHOW_ELEMENT_TRANSITION_DURATION);
 	}
 	setButtonText("newPageButton", getNewPageText());
 }
