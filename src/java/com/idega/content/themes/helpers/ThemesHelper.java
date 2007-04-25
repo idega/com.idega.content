@@ -238,6 +238,8 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public void searchForThemes() {
+		long start = System.currentTimeMillis();
+		System.out.println("Started main search");
 		synchronized (ThemesHelper.class) {
 			if (checkedFromSlide) {
 				System.out.println("Search was initialized allready, returning");
@@ -246,31 +248,68 @@ public class ThemesHelper implements Singleton {
 			checkedFromSlide = true;
 		}
 		
-		long start = System.currentTimeMillis();
-		System.out.println("Started simple DASL search");
-		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
-		Collection results = search.doSimpleDASLSearch(ThemesConstants.THEME_SEARCH_KEY, ContentConstants.CONTENT + ThemesConstants.THEMES_PATH);
-		if (results == null) {
-			log.error("ContentSearch.doSimpleDASLSearch returned results Collection, which is null: " + results);
+		String searchScope = new StringBuffer(ContentConstants.CONTENT).append(ThemesConstants.THEMES_PATH).toString();
+		
+		Collection themes = search(ThemesConstants.THEME_SEARCH_KEY, searchScope);
+		if (themes == null) {
+			log.error("ContentSearch.doSimpleDASLSearch returned results Collection, which is null: " + themes);
+			checkedFromSlide = false;
 			return;
 		}
-		List <String> urisToThemes = new ArrayList<String>();
+		List<String> themesSkeletons = loadSearchResults(themes, ThemesConstants.THEME_SKELETONS_FILTER);
+		
+		String propSearchKey = new StringBuffer("*").append(ThemesConstants.THEME_PROPERTIES_FILE_END).toString();
+		Collection propertiesLists = search(propSearchKey, searchScope);
+		List<String> pLists = loadSearchResults(propertiesLists, null);
+		System.out.println("Founded pLists: " + pLists.size());
+		
+		String configSearchKey = new StringBuffer("*").append(ThemesConstants.IDEGA_THEME_INFO).toString();
+		Collection configurationXmls = search(configSearchKey, searchScope);
+		List<String> configurations = loadSearchResults(configurationXmls, null);
+		System.out.println("Founded config: " + configurations.size());
+		
+		long finish = System.currentTimeMillis();
+		System.out.println("Finished main search, took time: " + ((finish - start) / 1000) + " second(s)");
+	
+		getThemesLoader().loadThemes(themesSkeletons, false, true);
+		getThemesPropertiesExtractor().prepareThemes(pLists, configurations, true);
+	}
+	
+	private List<String> loadSearchResults(Collection searchResults, List<String> filter) {
+		List <String> loadedResults = new ArrayList<String>();
+		if (searchResults == null) {
+			return loadedResults;
+		}
+		
 		String uri = null;
 		Object o = null;
-		for (Iterator it = results.iterator(); it.hasNext(); ) {
+		for (Iterator it = searchResults.iterator(); it.hasNext(); ) {
 			o = it.next();
 			if (o instanceof SearchResult) {
 				uri = ((SearchResult) o).getSearchResultURI();
-				if (isCorrectFile(uri)) {
-					urisToThemes.add(uri);
+				if (isCorrectFile(uri, filter)) {
+					loadedResults.add(uri);
 				}
 			}
 		}
+		return loadedResults;
+	}
+	
+	protected Collection search(String searchKey, String searchScope) {
+		if (searchKey == null || searchScope == null) {
+			return null;
+		}
+		
+		long start = System.currentTimeMillis();
+		System.out.println("Started simple DASL search for: " + searchKey + " in: " + searchScope);
+		
+		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
+		Collection results = search.doSimpleDASLSearch(searchKey, searchScope);
+		
 		long finish = System.currentTimeMillis();
 		System.out.println("Finished simple DASL search, took time: " + ((finish - start) / 1000) + " second(s)");
-	
-		getThemesLoader().loadThemes(urisToThemes, false, true);
-		getThemesPropertiesExtractor().prepareThemes(true);
+		
+		return results;
 	}
 	
 	protected String getFileName(String uri) {
@@ -395,10 +434,10 @@ public class ThemesHelper implements Singleton {
 		return fileName.equals(nameTemplate);
 	}
 	
-	public boolean isCorrectFile(String fileName) {
+	public boolean isCorrectFile(String fileName, List<String> filter) {
 		boolean result = false;
 		if (fileName == null) {
-			return result;
+			return false;
 		}
 		if (isSystemFile(fileName)) {
 			return false;
@@ -409,13 +448,16 @@ public class ThemesHelper implements Singleton {
 		
 		int index = fileName.lastIndexOf(ThemesConstants.DOT);
 		if (index == -1) {
-			return result;
+			return false;
 		}
-		String fileExtension = fileName.substring(index + 1).toLowerCase();
-		for (int i = 0; (i < ThemesConstants.FILTER.size() && !result); i++) {
-			if (isCorrectFile(fileExtension, ThemesConstants.FILTER.get(i))) {
-				result = true;
-			}
+		String fileExtension = fileName.substring(index + 1);
+		
+		if (filter == null) {
+			return true;
+		}
+		
+		for (int i = 0; (i < filter.size() && !result); i++) {
+			result = isCorrectFile(fileExtension, filter.get(i));
 		}
 		return result;
 	}
@@ -451,7 +493,7 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	protected boolean isPropertiesFile(String uri) {
-		if (ThemesConstants.PROPERTIES_FILES.contains(uri)) {
+		if (ThemesConstants.THEME_PROPERTIES_FILES.contains(uri)) {
 			return true;
 		}
 		return false;
@@ -1476,7 +1518,6 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public int getLoadedThemesCount() {
-		System.out.println("Allready loaded themes: " + loadedThemes.size());
 		return loadedThemes.size();
 	}
 	

@@ -304,7 +304,7 @@ public class WebDAVUploadBean implements Serializable{
 		List<String> filesToClean = new ArrayList<String>();
 		if (uploadingTheme) {
 			ThemesHelper.getInstance(false).addThemeToQueue(path);
-			filesToClean = ThemesConstants.FILTER;
+			filesToClean = ThemesConstants.THEME_SKELETONS_FILTER;
 		}
 		
 		if (service.uploadZipFileContents(new ZipInputStream(new BufferedInputStream(uploadFile.getInputStream())), path, filesToClean)) {

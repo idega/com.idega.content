@@ -22,7 +22,7 @@ public class ThemesPropertiesExtractor {
 	
 	private static final Log log = LogFactory.getLog(ThemesPropertiesExtractor.class);
 	
-	public boolean prepareThemes(boolean useThread) {
+	public boolean prepareThemes(List<String> pLists, List<String> configs, boolean useThread) {
 		//	Initializing ImageGenerator
 		helper.getImageGenerator(null);
 		
@@ -36,7 +36,7 @@ public class ThemesPropertiesExtractor {
 		}
 		//	Preparing new theme(s)
 		for (int i = 0; (i < themesToPrepare.size() && prepared); i++) {
-			prepared = prepareTheme(themesToPrepare.get(i), useThread);
+			prepared = prepareTheme(themesToPrepare.get(i), pLists, configs, useThread);
 		}
 		return prepared;
 	}
@@ -60,17 +60,51 @@ public class ThemesPropertiesExtractor {
 		return newThemes;
 	}
 	
-	private boolean prepareTheme(Theme theme, boolean useThread) {
-		//if (useThread) {
-			ThemePropertiesExtractor extractor = new ThemePropertiesExtractor(theme, this);
+	private boolean prepareTheme(Theme theme, List<String> pLists, List<String> configs, boolean useThread) {
+		if (useThread) {
+			ThemePropertiesExtractor extractor = new ThemePropertiesExtractor(theme, this, pLists, configs);
 			extractor.start();
 			return true;
-		//}
+		}
 		
-		//return prepareTheme(theme);
+		return prepareTheme(theme, pLists, configs);
 	}
 	
-	protected boolean prepareTheme(Theme theme) {
+	private String getPropertiesFile(Theme theme, List<String> pLists) {
+		if (pLists == null) {
+			return null;
+		}
+		String pList = null;
+		for (int i = 0; i < pLists.size(); i++) {
+			pList = pLists.get(i);
+			if (pList.indexOf(theme.getLinkToBaseAsItIs()) != -1) {
+				System.out.println("Founded pList: " + pList + " for: " + theme.getLinkToBaseAsItIs());
+				return pList;
+			}
+		}
+		return null;
+	}
+	
+	private String getConfigFile(Theme theme, String searchName, List<String> configs) {
+		if (configs == null) {
+			return null;
+		}
+		String config = null;
+		searchName = new StringBuffer(searchName).append(ThemesConstants.IDEGA_THEME_INFO).toString();
+		for (int i = 0; i < configs.size(); i++) {
+			config = configs.get(i);
+//			System.out.println("Look in: " + config + " for: " + theme.getLinkToBaseAsItIs() + " and result: "+ config.indexOf(theme.getLinkToBaseAsItIs()));
+			if (config.indexOf(theme.getLinkToBaseAsItIs()) != -1) {
+				if (config.endsWith(searchName)) {
+					System.out.println("Founded config: " + config + " for: " + theme.getLinkToSkeleton());
+					return config;
+				}
+			}
+		}
+		return null;
+	}
+	
+	protected boolean prepareTheme(Theme theme, List<String> pLists, List<String> configs) {
 		if (theme == null) {
 			return false;
 		}
@@ -78,22 +112,30 @@ public class ThemesPropertiesExtractor {
 		String webRoot = helper.getFullWebRoot();
 		String url = helper.getWebRootWithoutContent(webRoot);
 		String linkToProperties = null;
+		String searchResult = null;
 		boolean foundedPropertiesFile = false;
 		
-		// Looking for properties file
-		String searchResult = null;
-		for (int i = 0; (i < ThemesConstants.PROPERTIES_FILES.size() && !foundedPropertiesFile); i++) {
-			linkToProperties = new StringBuffer(ThemesConstants.PROPERTIES_FILES.get(i)).toString();
-			searchResult = existsFile(theme, linkToProperties);
-			if (searchResult != null) {
-				if (helper.isCorrectFile(helper.getFileNameWithExtension(searchResult), ThemesConstants.PROPERTIES_FILES.get(i))) {
-					foundedPropertiesFile = true;
+		//	Looking for properties file
+		linkToProperties = getPropertiesFile(theme, pLists);
+		if (linkToProperties != null) {
+			foundedPropertiesFile = true;
+		}
+		if (!foundedPropertiesFile) {
+			for (int i = 0; (i < ThemesConstants.THEME_PROPERTIES_FILES.size() && !foundedPropertiesFile); i++) {
+				linkToProperties = new StringBuffer(ThemesConstants.THEME_PROPERTIES_FILES.get(i)).toString();
+				searchResult = existsFile(theme, linkToProperties);
+				if (searchResult != null) {
+					if (helper.isCorrectFile(helper.getFileNameWithExtension(searchResult), ThemesConstants.THEME_PROPERTIES_FILES.get(i))) {
+						foundedPropertiesFile = true;
+					}
 				}
 			}
+			linkToProperties = searchResult;
+			searchResult = null;
 		}
-		linkToProperties = searchResult;
-		searchResult = null;
 		
+		long stPro = System.currentTimeMillis();
+		System.out.println("Started extract properties ("+theme.getId()+")");
 		// Extraxting properties and preparing theme, style files for usage
 		if (foundedPropertiesFile) {
 			if (linkToProperties.indexOf(ThemesConstants.SPACE) != -1) {
@@ -111,13 +153,15 @@ public class ThemesPropertiesExtractor {
 				}
 			}
 		}
+		long ndProp = System.currentTimeMillis();
+		System.out.println("Finished extracting properties ("+theme.getId()+"), took time: " + ((ndProp - stPro)/1000) + " secs");
 		
 		// Setting default theme if it does not exit
 		if (theme.getName() == null) {
 			theme.setName(helper.getFileName(theme.getLinkToSkeleton()));
 		}
 		
-		// Getting theme name, which will be used to search for configuration file
+		//	Getting theme name, which will be used to search for configuration file
 		String searchName = StringHandler.removeCharacters(theme.getName(), ContentConstants.SPACE, ContentConstants.UNDER);
 		String skeletonName = null;
 		if (theme.getLinkToSkeleton().indexOf(ThemesConstants.THEME) != -1) {
@@ -125,14 +169,14 @@ public class ThemesPropertiesExtractor {
 			searchName = helper.extractValueFromString(skeletonName, 0, skeletonName.indexOf(ThemesConstants.THEME));
 		}
 		
-		// Searching for configuration file
 		String linkToConfig = null;
-		String searchLink = new StringBuffer(searchName).append(ThemesConstants.IDEGA_THEME_INFO).toString();
-		searchResult = existsFile(theme, searchLink);
-		if (searchResult != null) {
-			linkToConfig = searchResult;
+		//	Trying to get config file from list
+		linkToConfig = getConfigFile(theme, searchName, configs);
+		if (linkToConfig == null) {
+			//	Searching for configuration file
+			String searchLink = new StringBuffer(searchName).append(ThemesConstants.IDEGA_THEME_INFO).toString();
+			linkToConfig = existsFile(theme, searchLink);
 		}
-		searchResult = null;
 		
 		// Extracting configuration
 		if (linkToConfig != null) {

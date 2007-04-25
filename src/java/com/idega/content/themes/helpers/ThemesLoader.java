@@ -32,16 +32,14 @@ public class ThemesLoader {
 		return true;
 	}
 	
-	public synchronized boolean loadThemes(List <String> urisToThemes, boolean newThemes, boolean manuallyCreated) {
-		if (urisToThemes == null) {
+	public synchronized boolean loadThemes(List<String> skeletons, boolean newThemes, boolean manuallyCreated) {
+		if (skeletons == null) {
 			return false;
 		}
-		
 		boolean result = true;
-		for (int i = 0; (i < urisToThemes.size() && result); i++) {
-			result = loadTheme(helper.decodeUrl(urisToThemes.get(i)), urisToThemes.get(i), newThemes, manuallyCreated);
+		for (int i = 0; (i < skeletons.size() && result); i++) {
+			result = loadTheme(helper.decodeUrl(skeletons.get(i)), skeletons.get(i), newThemes, manuallyCreated);
 		}
-			
 		return result;
 	}
 	

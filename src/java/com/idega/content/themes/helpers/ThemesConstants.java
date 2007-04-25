@@ -38,6 +38,8 @@ public class ThemesConstants {
 	protected static final String DRAFT_PREVIEW = "_draft_preview";
 	
 	protected static final String THEME_SEARCH_KEY = "*.htm*";
+	protected static final String THEME_PROPERTIES_FILE_END = ".plist";
+	protected static final String THEME_PROPERTIES_FILE = "Theme" + THEME_PROPERTIES_FILE_END;
 	protected static final String IDEGA_THEME_INFO = UNDER + IDEGA_THEME + DOT + XML_EXTENSION;
 	
 	public static final String ARTICLE_TITLE = "Article";
@@ -51,11 +53,11 @@ public class ThemesConstants {
 	private static final String[] _IMAGE_POSITIONS = new String[] {"left", "right"};
 	protected static final List <String> IMAGE_POSITIONS = Collections.unmodifiableList(Arrays.asList(_IMAGE_POSITIONS));
 	
-	private static final String[] _FILTER = new String[] {"htm", "html", "xhtml", "ibxml", "jsp"};
-	public static final List <String> FILTER = Collections.unmodifiableList(Arrays.asList(_FILTER));
+	private static final String[] _THEME_SKELETONS_FILTER = new String[] {"htm", "html", "xhtml", "ibxml", "jsp"};
+	public static final List <String> THEME_SKELETONS_FILTER = Collections.unmodifiableList(Arrays.asList(_THEME_SKELETONS_FILTER));
 	
-	private static final String[] _PROPERTIES_FILES = new String[] {"Theme.plist", IDEGA_THEME_INFO};
-	protected static final List <String> PROPERTIES_FILES = Collections.unmodifiableList(Arrays.asList(_PROPERTIES_FILES));
+	private static final String[] _THEME_PROPERTIES_FILES = new String[] {THEME_PROPERTIES_FILE, IDEGA_THEME_INFO};
+	protected static final List <String> THEME_PROPERTIES_FILES = Collections.unmodifiableList(Arrays.asList(_THEME_PROPERTIES_FILES));
 	
 	private static final String[] _USELESS_CONTENT = new String[] {"%pathto(", ")%", "%", " xml:space=\"preserve\""};
 	protected static final List <String> USELESS_CONTENT = Collections.unmodifiableList(Arrays.asList(_USELESS_CONTENT));

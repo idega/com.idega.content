@@ -73,7 +73,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		//	Preparing themes
-		helper.getThemesPropertiesExtractor().prepareThemes(false);
+		helper.getThemesPropertiesExtractor().prepareThemes(null, null, false);
 		
 		if (helper.getLoadedThemesCount() < themesCount) {
 			long startLoading = System.currentTimeMillis();
