@@ -1465,18 +1465,23 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public boolean existFileInSlide(String path) {
-		try {
-			return getSlideService().getExistence(path);
-		} catch (HttpException e) {
-			log.error(e);
-			return false;
-		} catch (RemoteException e) {
-			log.error(e);
-			return false;
-		} catch (IOException e) {
-			log.error(e);
+		if (path == null) {
 			return false;
 		}
+		InputStream stream = null;
+		StringBuffer url = null;
+		if (path.startsWith(ContentConstants.CONTENT)) {
+			url = new StringBuffer(getWebRootWithoutContent());
+		}
+		else {
+			url = new StringBuffer(getFullWebRoot());
+		}
+		stream = getInputStream(url.append(path).toString());
+		if (stream == null) {
+			return false;
+		}
+		closeInputStream(stream);
+		return true;
 	}
 	
 	public String getUniqueIdByNumberAndDate(String scope) {

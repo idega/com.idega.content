@@ -915,7 +915,11 @@ public class ThemeChanger {
 		if (root == null) {
 			return null;
 		}
-		if (!changeThemeStyle(new StringBuffer(ContentConstants.CONTENT).append(theme.getLinkToBase()).toString(), root.getChild(HTML_HEAD, namespace), oldStyle,
+		String linkToBase = new StringBuffer(ContentConstants.CONTENT).append(theme.getLinkToBase()).toString();
+		/*if (!availableStyleMember(linkToBase, newStyle)){
+			return null;
+		}*/
+		if (!changeThemeStyle(linkToBase, root.getChild(HTML_HEAD, namespace), oldStyle,
 				newStyle)) {
 			return null;
 		}

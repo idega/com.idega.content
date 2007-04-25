@@ -27,12 +27,14 @@ public class ThemeStyleVariations {
 	private static final String VARIATION_GROUP_STYLE = "themeVariationGroup\">";
 	private static final String VARIATION_GROUP_NAME_STYLE = "themeVariationGroupName\">";
 	
+	private ThemesHelper helper = ThemesHelper.getInstance();
+	
 	public String getThemeStyleVariations(String themeID) {
 		StringBuffer buffer = new StringBuffer();
 		if (themeID == null) {
 			return buffer.toString();
 		}
-		Theme theme = ThemesHelper.getInstance().getTheme(themeID);
+		Theme theme =helper.getTheme(themeID);
 		if (theme == null) {
 			return buffer.toString();
 		}
@@ -63,44 +65,63 @@ public class ThemeStyleVariations {
 		
 		Map <String, ThemeStyleGroupMember> themeVariations = theme.getStyleGroupsMembers();
 		ThemeStyleGroupMember member = null;
-		int i = 0;
+//		int i = 0;
 		String type = null;
-		while (themeVariations.get(styleGroupName + ThemesConstants.AT + i) != null) {
+		for (int i = 0; themeVariations.get(styleGroupName + ThemesConstants.AT + i) != null; i++) {
 			member = themeVariations.get(styleGroupName + ThemesConstants.AT + i);
-			result.append(TAG_LI_OPEN);
-			result.append(INPUT_TYPE);
-			if (member.isLimitedSelection()) {
-				result.append(RADIO_INPUT);
-				type = RADIO_INPUT;
+			if (availableStyleMember(theme.getLinkToBase(), member)) {
+				result.append(TAG_LI_OPEN);
+				result.append(INPUT_TYPE);
+				if (member.isLimitedSelection()) {
+					result.append(RADIO_INPUT);
+					type = RADIO_INPUT;
+				}
+				else {
+					result.append(CHECKBOX_INPUT);
+					type = CHECKBOX_INPUT;
+				}
+				result.append(INPUT_NAME);
+				result.append(styleGroupName);
+				result.append(INPUT_VALUE);
+				result.append(member.getName());
+				result.append(INPUT_ONCLICK);
+				result.append(theme.getId());
+				result.append(SEPERATOR);
+				result.append(styleGroupName);
+				result.append(SEPERATOR);
+				result.append(member.getName());
+				result.append(SEPERATOR);
+				result.append(type);
+				result.append(PARAM_CHECKED);
+				result.append(CLOSING_ONCLICK);
+				if (member.isEnabled()) {
+					result.append(INPUT_CHECKED);
+				}
+				result.append(CLOSING_TAG);
+				result.append(member.getName());
+	//			i++;
 			}
-			else {
-				result.append(CHECKBOX_INPUT);
-				type = CHECKBOX_INPUT;
-			}
-			result.append(INPUT_NAME);
-			result.append(styleGroupName);
-			result.append(INPUT_VALUE);
-			result.append(member.getName());
-			result.append(INPUT_ONCLICK);
-			result.append(theme.getId());
-			result.append(SEPERATOR);
-			result.append(styleGroupName);
-			result.append(SEPERATOR);
-			result.append(member.getName());
-			result.append(SEPERATOR);
-			result.append(type);
-			result.append(PARAM_CHECKED);
-			result.append(CLOSING_ONCLICK);
-			if (member.isEnabled()) {
-				result.append(INPUT_CHECKED);
-			}
-			result.append(CLOSING_TAG);
-			result.append(member.getName());
-			i++;
 		}
 		
 		result.append("</ul>");
 		return result.toString();
+	}
+	
+	private boolean availableStyleMember(String linkToBase, ThemeStyleGroupMember styleMember) {
+		if (styleMember == null) {
+			return false;
+		}
+		List<String> files = styleMember.getStyleFiles();
+		if (files == null) {
+			return false;
+		}
+		
+		for (int i = 0; i < files.size(); i++) {
+			if (!helper.existFileInSlide(new StringBuffer(linkToBase).append(files.get(i)).toString())) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

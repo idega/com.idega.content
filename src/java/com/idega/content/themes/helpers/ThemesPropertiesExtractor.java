@@ -220,14 +220,22 @@ public class ThemesPropertiesExtractor {
 	}
 	
 	private void extractProperties(Theme theme, String link) {
+		long start = System.currentTimeMillis();
+		System.out.println("START prop file for: " + theme.getId());
 		Document doc = helper.getXMLDocument(link);
 		if (doc == null) {
 			return;
 		}
+		long end = System.currentTimeMillis();
+		System.out.println("END prop file for: " + theme.getId() + ", took time: " + ((end - start) / 1000));
 		Element base = doc.getRootElement().getChild(ThemesConstants.TAG_DICT);
 		theme.setName(getValueFromNextElement(ThemesConstants.RW_THEME_NAME, base));
 		
+		start = System.currentTimeMillis();
+		System.out.println("START extracting styles: " + theme.getId());
 		extractStyles(theme, ThemesConstants.RW_STYLE_VARIATIONS, base.getChildren());
+		end = System.currentTimeMillis();
+		System.out.println("END extracting styles: " + theme.getId() + ", took time: " + ((end - start) / 1000));
 	}
 	
 	private boolean extractStyles(Theme theme, String elementSearchKey, List elements) {
@@ -303,8 +311,9 @@ public class ThemesPropertiesExtractor {
 		
 		ThemeStyleGroupMember member = null;
 		int styleGroupMemberIndex = 0;
+		Element styleMember = null;
 		for (int i = 0; i < styleVariations.size(); i++) {
-			Element styleMember = (Element) styleVariations.get(i);
+			styleMember = (Element) styleVariations.get(i);
 			
 			member = new ThemeStyleGroupMember();
 			member.setName(getValueFromNextElement(ThemesConstants.TAG_NAME, styleMember));
@@ -368,18 +377,18 @@ public class ThemesPropertiesExtractor {
 			file = StringHandler.removeCharacters(file, ContentConstants.BRACKET_OPENING, ContentConstants.EMPTY);
 			file = StringHandler.removeCharacters(file, ContentConstants.BRACKET_CLOSING, ContentConstants.EMPTY);
 			//	In Theme.plist sometimes occurs errors, e.g. css file with .png extension
-			if (!file.endsWith(ThemesPropertiesExtractor.CSS_EXTENSION)) {
+			/*if (!file.endsWith(ThemesPropertiesExtractor.CSS_EXTENSION)) {
 				if (!helper.existFileInSlide(new StringBuffer(linkToBase).append(file).toString())) {
 					file = new StringBuffer(helper.getFileName(file)).append(ThemesPropertiesExtractor.CSS_EXTENSION).toString();
 				}
-			}
-			if (helper.existFileInSlide(new StringBuffer(linkToBase).append(file).toString())) {
+			}*/
+			//if (helper.existFileInSlide(new StringBuffer(linkToBase).append(file).toString())) {
 				member.addStyleFile(file);
-			}
+			/*}
 			else {
 				log.info(new StringBuffer("File '").append(file).append("' does not exist!"));
 				return false;
-			}
+			}*/
 		}
 		return true;
 	}
