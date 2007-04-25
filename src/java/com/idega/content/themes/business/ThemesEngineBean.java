@@ -75,19 +75,20 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		//	Preparing themes
 		helper.getThemesPropertiesExtractor().prepareThemes(null, null, false);
 		
-		if (helper.getLoadedThemesCount() < themesCount) {
+		/*if (helper.getLoadedThemesCount() < themesCount) {
 			long startLoading = System.currentTimeMillis();
 			long elapsedTime = startLoading;
 			//	Waiting until all themes are loaded, but not more than 2 minutes
-			while ((helper.getLoadedThemesCount() < themesCount)/* && (elapsedTime - startLoading < 120000)*/) {
+			while ((helper.getLoadedThemesCount() < themesCount) && (elapsedTime - startLoading < 120000)) {
 				elapsedTime = System.currentTimeMillis();
 			}
 			System.out.println("Loaded themes, elapsed time: " + ((elapsedTime - startLoading) / 1000) + " second(s)");
 		}
 		else {
 			System.out.println("All themes are loaded");
-		}
+		}*/
 		
+		try {
 		List <Theme> themes = helper.getSortedThemes();
 		Theme theme = null;
 		SimplifiedTheme simpleTheme = null;
@@ -129,7 +130,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				simpleThemes.add(simpleTheme);
 			}
 		}
-
+		} catch (Exception e) {
+			log.error(e);
+		}
 		return simpleThemes;
 	}
 	
