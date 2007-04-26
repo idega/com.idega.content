@@ -77,7 +77,6 @@ public class ThemesHelper implements Singleton {
 	private volatile static ThemesHelper helper = null;
 	private volatile Generator generator = null;
 	private volatile ThemeChanger changer = null;
-	private volatile ThemeStyleVariations variations = null;
 	private volatile ThemesPropertiesExtractor extractor = null;
 	private volatile ThemesLoader loader = null;
 	private volatile IWSlideService service = null;
@@ -169,17 +168,6 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		return changer;
-	}
-	
-	public ThemeStyleVariations getThemeStyleVariations() {
-		if (variations == null) {
-			synchronized (ThemesHelper.class) {
-				if (variations == null) {
-					variations = new ThemeStyleVariations();
-				}
-			}
-		}
-		return variations;
 	}
 	
 	public ThemesPropertiesExtractor getThemesPropertiesExtractor() {
