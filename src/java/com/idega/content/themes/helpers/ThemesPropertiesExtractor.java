@@ -31,9 +31,6 @@ public class ThemesPropertiesExtractor {
 		//	Firstly getting unprepared themes
 		List<Theme> themesToPrepare = getUnPreparedThemes();
 		
-		if (themesToPrepare.size() > 0) {
-			System.out.println("Preparing themes, using threads: " + useThread);
-		}
 		//	Preparing new theme(s)
 		for (int i = 0; (i < themesToPrepare.size() && prepared); i++) {
 			prepared = prepareTheme(themesToPrepare.get(i), pLists, configs, useThread);
@@ -78,7 +75,6 @@ public class ThemesPropertiesExtractor {
 		for (int i = 0; i < pLists.size(); i++) {
 			pList = pLists.get(i);
 			if (pList.indexOf(theme.getLinkToBaseAsItIs()) != -1) {
-				System.out.println("Founded pList: " + pList + " for: " + theme.getLinkToBaseAsItIs());
 				return pList;
 			}
 		}
@@ -93,10 +89,8 @@ public class ThemesPropertiesExtractor {
 		searchName = new StringBuffer(searchName).append(ThemesConstants.IDEGA_THEME_INFO).toString();
 		for (int i = 0; i < configs.size(); i++) {
 			config = configs.get(i);
-//			System.out.println("Look in: " + config + " for: " + theme.getLinkToBaseAsItIs() + " and result: "+ config.indexOf(theme.getLinkToBaseAsItIs()));
 			if (config.indexOf(theme.getLinkToBaseAsItIs()) != -1) {
 				if (config.endsWith(searchName)) {
-					System.out.println("Founded config: " + config + " for: " + theme.getLinkToSkeleton());
 					return config;
 				}
 			}
@@ -134,8 +128,6 @@ public class ThemesPropertiesExtractor {
 			searchResult = null;
 		}
 		
-		long stPro = System.currentTimeMillis();
-		System.out.println("Started extract properties ("+theme.getId()+")");
 		// Extraxting properties and preparing theme, style files for usage
 		if (foundedPropertiesFile) {
 			if (linkToProperties.indexOf(ThemesConstants.SPACE) != -1) {
@@ -153,8 +145,6 @@ public class ThemesPropertiesExtractor {
 				}
 			}
 		}
-		long ndProp = System.currentTimeMillis();
-		System.out.println("Finished extracting properties ("+theme.getId()+"), took time: " + ((ndProp - stPro)/1000) + " secs");
 		
 		// Setting default theme if it does not exit
 		if (theme.getName() == null) {
@@ -220,22 +210,14 @@ public class ThemesPropertiesExtractor {
 	}
 	
 	private void extractProperties(Theme theme, String link) {
-		long start = System.currentTimeMillis();
-		System.out.println("START prop file for: " + theme.getId());
 		Document doc = helper.getXMLDocument(link);
 		if (doc == null) {
 			return;
 		}
-		long end = System.currentTimeMillis();
-		System.out.println("END prop file for: " + theme.getId() + ", took time: " + ((end - start) / 1000));
 		Element base = doc.getRootElement().getChild(ThemesConstants.TAG_DICT);
 		theme.setName(getValueFromNextElement(ThemesConstants.RW_THEME_NAME, base));
 		
-		start = System.currentTimeMillis();
-		System.out.println("START extracting styles: " + theme.getId());
 		extractStyles(theme, ThemesConstants.RW_STYLE_VARIATIONS, base.getChildren());
-		end = System.currentTimeMillis();
-		System.out.println("END extracting styles: " + theme.getId() + ", took time: " + ((end - start) / 1000));
 	}
 	
 	private boolean extractStyles(Theme theme, String elementSearchKey, List elements) {
@@ -376,19 +358,7 @@ public class ThemesPropertiesExtractor {
 			file = StringHandler.removeCharacters(file, ContentConstants.SPACE, ContentConstants.UNDER);
 			file = StringHandler.removeCharacters(file, ContentConstants.BRACKET_OPENING, ContentConstants.EMPTY);
 			file = StringHandler.removeCharacters(file, ContentConstants.BRACKET_CLOSING, ContentConstants.EMPTY);
-			//	In Theme.plist sometimes occurs errors, e.g. css file with .png extension
-			/*if (!file.endsWith(ThemesPropertiesExtractor.CSS_EXTENSION)) {
-				if (!helper.existFileInSlide(new StringBuffer(linkToBase).append(file).toString())) {
-					file = new StringBuffer(helper.getFileName(file)).append(ThemesPropertiesExtractor.CSS_EXTENSION).toString();
-				}
-			}*/
-			//if (helper.existFileInSlide(new StringBuffer(linkToBase).append(file).toString())) {
-				member.addStyleFile(file);
-			/*}
-			else {
-				log.info(new StringBuffer("File '").append(file).append("' does not exist!"));
-				return false;
-			}*/
+			member.addStyleFile(file);
 		}
 		return true;
 	}

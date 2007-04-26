@@ -18,9 +18,7 @@ public class ThemePropertiesExtractor extends Thread implements Runnable {
 	}
 
 	public void run() {
-		System.out.println("Started theme: " + theme.getId());
 		extractor.prepareTheme(theme, pLists, configs);
-		System.out.println("Finished theme: " + theme.getId());
 	}
 	
 }

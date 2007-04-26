@@ -238,11 +238,8 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public void searchForThemes() {
-		long start = System.currentTimeMillis();
-		System.out.println("Started main search");
 		synchronized (ThemesHelper.class) {
 			if (checkedFromSlide) {
-				System.out.println("Search was initialized allready, returning");
 				return;
 			}
 			checkedFromSlide = true;
@@ -258,24 +255,19 @@ public class ThemesHelper implements Singleton {
 		}
 		List<String> themesSkeletons = loadSearchResults(themes, ThemesConstants.THEME_SKELETONS_FILTER);
 		
-		String propSearchKey = new StringBuffer("*").append(ThemesConstants.THEME_PROPERTIES_FILE_END).toString();
-		Collection propertiesLists = search(propSearchKey, searchScope);
-		List<String> pLists = loadSearchResults(propertiesLists, null);
-		System.out.println("Founded pLists: " + pLists.size());
-		
-		String configSearchKey = new StringBuffer("*").append(ThemesConstants.IDEGA_THEME_INFO).toString();
-		Collection configurationXmls = search(configSearchKey, searchScope);
-		List<String> configurations = loadSearchResults(configurationXmls, null);
-		System.out.println("Founded config: " + configurations.size());
-		
-		long finish = System.currentTimeMillis();
-		System.out.println("Finished main search, took time: " + ((finish - start) / 1000) + " second(s)");
+//		String propSearchKey = new StringBuffer("*").append(ThemesConstants.THEME_PROPERTIES_FILE_END).toString();
+//		Collection propertiesLists = search(propSearchKey, searchScope);
+//		List<String> pLists = loadSearchResults(propertiesLists, null);
+//		
+//		String configSearchKey = new StringBuffer("*").append(ThemesConstants.IDEGA_THEME_INFO).toString();
+//		Collection configurationXmls = search(configSearchKey, searchScope);
+//		List<String> configurations = loadSearchResults(configurationXmls, null);
 	
 		getThemesLoader().loadThemes(themesSkeletons, false, true);
 //		getThemesPropertiesExtractor().prepareThemes(pLists, configurations, true);
 	}
 	
-	private List<String> loadSearchResults(Collection searchResults, List<String> filter) {
+	public List<String> loadSearchResults(Collection searchResults, List<String> filter) {
 		List <String> loadedResults = new ArrayList<String>();
 		if (searchResults == null) {
 			return loadedResults;
@@ -295,19 +287,13 @@ public class ThemesHelper implements Singleton {
 		return loadedResults;
 	}
 	
-	protected Collection search(String searchKey, String searchScope) {
+	public Collection search(String searchKey, String searchScope) {
 		if (searchKey == null || searchScope == null) {
 			return null;
 		}
 		
-		long start = System.currentTimeMillis();
-		System.out.println("Started simple DASL search for: " + searchKey + " in: " + searchScope);
-		
 		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
 		Collection results = search.doSimpleDASLSearch(searchKey, searchScope);
-		
-		long finish = System.currentTimeMillis();
-		System.out.println("Finished simple DASL search, took time: " + ((finish - start) / 1000) + " second(s)");
 		
 		return results;
 	}
@@ -1515,10 +1501,8 @@ public class ThemesHelper implements Singleton {
 	
 	protected void addLoadedTheme(String id) {
 		if (loadedThemes.contains(id)) {
-			System.out.println("Exists theme: " + id);
 			return;
 		}
-		System.out.println("Adding theme: " + id);
 		loadedThemes.add(id);
 	}
 	

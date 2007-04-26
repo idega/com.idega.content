@@ -56,14 +56,27 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	private static final String ARTICLE_VIEWER_TEMPLATE_KEY = "article_viewer_page_key";
 	
-	private ThemesHelper helper = ThemesHelper.getInstance(true);
+	private ThemesHelper helper = ThemesHelper.getInstance(false);
 
 	/**
 	 * Returns info about themes in slide
 	 */
 	public List<SimplifiedTheme> getThemes() {
-		System.out.println("Started getThemes");
 		List <SimplifiedTheme> simpleThemes = new ArrayList<SimplifiedTheme>();
+		
+		List<String> pLists = null;
+		List<String> configs = null;
+		if (!helper.isCheckedFromSlide()) {
+			String searchScope = new StringBuffer(ContentConstants.CONTENT).append(ThemesConstants.THEMES_PATH).toString();
+			
+			String propSearchKey = new StringBuffer("*").append(ThemesConstants.THEME_PROPERTIES_FILE_END).toString();
+			Collection propertiesLists = helper.search(propSearchKey, searchScope);
+			pLists = helper.loadSearchResults(propertiesLists, null);
+			
+			String configSearchKey = new StringBuffer("*").append(ThemesConstants.IDEGA_THEME_INFO).toString();
+			Collection configurationXmls = helper.search(configSearchKey, searchScope);
+			configs = helper.loadSearchResults(configurationXmls, null);
+		}
 		
 		helper.searchForThemes();
 
@@ -78,22 +91,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		//	Preparing themes
-		helper.getThemesPropertiesExtractor().prepareThemes(null, null, false);
+		helper.getThemesPropertiesExtractor().prepareThemes(pLists, configs, false);
 		
-		/*if (helper.getLoadedThemesCount() < themesCount) {
-			long startLoading = System.currentTimeMillis();
-			long elapsedTime = startLoading;
-			//	Waiting until all themes are loaded, but not more than 2 minutes
-			while ((helper.getLoadedThemesCount() < themesCount) && (elapsedTime - startLoading < 120000)) {
-				elapsedTime = System.currentTimeMillis();
-			}
-			System.out.println("Loaded themes, elapsed time: " + ((elapsedTime - startLoading) / 1000) + " second(s)");
-		}
-		else {
-			System.out.println("All themes are loaded");
-		}*/
-		
-//		try {
 		List <Theme> themes = helper.getSortedThemes();
 		Theme theme = null;
 		SimplifiedTheme simpleTheme = null;
@@ -135,9 +134,6 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				simpleThemes.add(simpleTheme);
 			}
 		}
-//		} catch (Exception e) {
-//			log.error(e);
-//		}
 		return simpleThemes;
 	}
 	
@@ -176,7 +172,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 
 		WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "setThemeId", themeID, String.class);
-		return service.getRenderedPresentationObject(iwc, new ThemeStyleVariations(), false);
+		return service.getRenderedPresentationObject(iwc, new ThemeStyleVariations(), true);
 	}
 	
 	/**

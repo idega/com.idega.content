@@ -38,9 +38,9 @@ public class ThemesConstants {
 	protected static final String DRAFT_PREVIEW = "_draft_preview";
 	
 	protected static final String THEME_SEARCH_KEY = "*.htm*";
-	protected static final String THEME_PROPERTIES_FILE_END = ".plist";
+	public static final String THEME_PROPERTIES_FILE_END = ".plist";
 	protected static final String THEME_PROPERTIES_FILE = "Theme" + THEME_PROPERTIES_FILE_END;
-	protected static final String IDEGA_THEME_INFO = UNDER + IDEGA_THEME + DOT + XML_EXTENSION;
+	public static final String IDEGA_THEME_INFO = UNDER + IDEGA_THEME + DOT + XML_EXTENSION;
 	
 	public static final String ARTICLE_TITLE = "Article";
 	
