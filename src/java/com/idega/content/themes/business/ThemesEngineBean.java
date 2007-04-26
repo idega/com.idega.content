@@ -13,10 +13,12 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jdom.Document;
 
 import com.idega.business.IBOServiceBean;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
+import com.idega.content.themes.bean.ThemesManagerBean;
 import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.SimplifiedTheme;
 import com.idega.content.themes.helpers.Theme;
@@ -24,7 +26,9 @@ import com.idega.content.themes.helpers.ThemeChange;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.content.themes.helpers.TreeNodeStructure;
+import com.idega.content.themes.presentation.ThemeStyleVariations;
 import com.idega.core.builder.business.BuilderService;
+import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.core.builder.data.CachedDomain;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
@@ -36,6 +40,7 @@ import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.servlet.filter.IWWelcomeFilter;
+import com.idega.webface.WFUtil;
 
 public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 
@@ -88,7 +93,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			System.out.println("All themes are loaded");
 		}*/
 		
-		try {
+//		try {
 		List <Theme> themes = helper.getSortedThemes();
 		Theme theme = null;
 		SimplifiedTheme simpleTheme = null;
@@ -130,9 +135,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				simpleThemes.add(simpleTheme);
 			}
 		}
-		} catch (Exception e) {
-			log.error(e);
-		}
+//		} catch (Exception e) {
+//			log.error(e);
+//		}
 		return simpleThemes;
 	}
 	
@@ -153,8 +158,25 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	/**
 	 * 
 	 */
-	public String getThemeStyleVariations(String themeID) {
-		return helper.getThemeStyleVariations().getThemeStyleVariations(themeID);
+	public Document getThemeStyleVariations(String themeID) {
+//		return helper.getThemeStyleVariations().getThemeStyleVariations(themeID);
+		
+		IWContext iwc = helper.getIWContext();
+		if (iwc == null) {
+			return null;
+		}
+		BuilderService service = helper.getThemesService().getBuilderService();
+		if (service == null) {
+			try {
+				service = BuilderServiceFactory.getBuilderService(iwc);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+
+		WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "setThemeId", themeID, String.class);
+		return service.getRenderedPresentationObject(iwc, new ThemeStyleVariations(), false);
 	}
 	
 	/**

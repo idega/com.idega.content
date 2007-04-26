@@ -27,6 +27,7 @@ public class Theme {
 	private String changedName;
 	
 	private List <String> styleGroupsNames;
+	private List <String> styleVariationsCacheKeys;
 	private List <ThemeChange> changes;
 	private Map <String, ThemeStyleGroupMember> styleGroupsMembers;
 	
@@ -35,6 +36,7 @@ public class Theme {
 	public Theme(String themeId) {
 		styleGroupsNames = new ArrayList<String>();
 		changes = new ArrayList<ThemeChange>();
+		styleVariationsCacheKeys = new ArrayList<String>();
 		styleGroupsMembers = new HashMap<String, ThemeStyleGroupMember>();
 		this.id = themeId;
 	}
@@ -198,4 +200,18 @@ public class Theme {
 		templateId = pageID;
 	}
 	
+	public void addStyleVariationsCacheKey(String cacheKey) {
+		if (styleVariationsCacheKeys.contains(cacheKey)) {
+			return;
+		}
+		styleVariationsCacheKeys.add(cacheKey);
+	}
+	
+	public List<String> getStyleVariationsCacheKeys() {
+		return styleVariationsCacheKeys;
+	}
+	
+	public void clearStyleVariationsCacheKeys() {
+		styleVariationsCacheKeys.clear();
+	}
 }

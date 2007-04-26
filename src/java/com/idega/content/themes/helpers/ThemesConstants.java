@@ -182,5 +182,9 @@ public class ThemesConstants {
 	public static final List <String> ARTICLE_PAGE_TYPE = Collections.unmodifiableList(Arrays.asList(_ARTICLE_PAGE_TYPE));
 	
 	protected static final String NEW_LINE = "\n";
+	
+	public static final String THEME_STYLE_VARIATIONS_CACHE_KEY = "theme_style_variations_block";
+	
+	public static final String THEME_ID_APPLICATION_ATTRIBUTE = "theme_id_application_attribute";
 
 }

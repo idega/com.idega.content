@@ -769,6 +769,10 @@ overflow: auto !important;
 	list-style-type: none;
 }
 
+.allThemeVariations ul {
+	list-style-type: none;
+}
+
 .themeUsabilityStyle {
 	text-align: center;
 	font-weight: bold;

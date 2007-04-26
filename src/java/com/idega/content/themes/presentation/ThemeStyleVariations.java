@@ -1,0 +1,164 @@
+package com.idega.content.themes.presentation;
+
+import java.util.List;
+import java.util.Map;
+
+import com.idega.content.themes.bean.ThemesManagerBean;
+import com.idega.content.themes.helpers.Theme;
+import com.idega.content.themes.helpers.ThemeStyleGroupMember;
+import com.idega.content.themes.helpers.ThemesConstants;
+import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.presentation.Block;
+import com.idega.presentation.IWContext;
+import com.idega.presentation.Layer;
+import com.idega.presentation.text.ListItem;
+import com.idega.presentation.text.Lists;
+import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.CheckBox;
+import com.idega.presentation.ui.GenericInput;
+import com.idega.presentation.ui.RadioButton;
+import com.idega.webface.WFUtil;
+
+public class ThemeStyleVariations extends Block {
+	
+	private static final String VARIATION_GROUP_STYLE = "themeVariationGroup";
+	private static final String VARIATION_GROUP_NAME_STYLE = "themeVariationGroupName";
+	
+	private static final String ON_CLICK_ACTION = "addThemeChange('";
+	private static final String SEPERATOR = "', '";
+	private static final String INPUT_CHECKED = "', this.checked);";
+	
+	private static final String RADIO_INPUT = "radio";
+	private static final String CHECKBOX_INPUT = "checkbox";
+	private static final String INPUT_CHECKED_ATTRIBUTE = "checked";
+	
+	private ThemesHelper helper = ThemesHelper.getInstance();
+	
+	public ThemeStyleVariations() {
+		setCacheable(getCacheKey());
+	}
+	
+	public String getCacheKey() {
+		return ThemesConstants.THEME_STYLE_VARIATIONS_CACHE_KEY;
+	}
+	
+	protected String getCacheState(IWContext iwc, String cacheStatePrefix) {
+		String themeID = getThemeId();
+		if (themeID == null) {
+			return cacheStatePrefix;
+		}
+		String cacheKey = new StringBuffer(cacheStatePrefix).append(themeID).toString();
+		Theme theme = helper.getTheme(themeID);
+		if (theme != null) {
+			theme.addStyleVariationsCacheKey(new StringBuffer(getCacheKey()).append(cacheKey).toString());
+		}
+		return cacheKey;
+	}
+	
+	private String getThemeId() {
+		Object themeID = WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "getThemeId");
+		if (themeID == null) {
+			return null;
+		}
+		return themeID.toString();
+	}
+	
+	public void main(IWContext iwc) throws Exception {
+		Theme theme = helper.getTheme(getThemeId());
+		if (theme == null) {
+			return;
+		}
+		
+		Layer container = new Layer();
+		container.setStyleClass("allThemeVariations");
+		
+		Lists styles = new Lists();
+		addVariations(theme, styles);
+		
+		container.add(styles);
+		this.add(container);
+	}
+	
+	private void addVariations(Theme theme, Lists styles) {
+		String styleGroupName = null;
+		List <String> styleGroups = theme.getStyleGroupsNames();
+		
+		Layer groupContainer = null;
+		Layer nameContainer = null;
+		ListItem groupVariations = null;
+		for (int i = 0; i < styleGroups.size(); i++) {
+			styleGroupName = styleGroups.get(i);
+			
+			groupContainer = new Layer();
+			groupContainer.setStyleClass(VARIATION_GROUP_STYLE);
+			groupVariations = new ListItem();
+			groupContainer.add(groupVariations);
+			
+			nameContainer = new Layer();
+			nameContainer.setStyleClass(VARIATION_GROUP_NAME_STYLE);
+			nameContainer.add(new Text(styleGroupName));
+			groupVariations.add(nameContainer);
+			
+			groupVariations.add(getGroupVariations(theme, styleGroupName));
+			
+			styles.add(groupContainer);
+		}
+	}
+	
+	private Lists getGroupVariations(Theme theme, String groupName) {
+		Lists variations = new Lists();
+		
+		ListItem variationContainer = null;
+		Map <String, ThemeStyleGroupMember> allVariations = theme.getStyleGroupsMembers();
+		ThemeStyleGroupMember variation = null;
+		String type = null;
+		String nameInMap = new StringBuffer(groupName).append(ThemesConstants.AT).toString();
+		GenericInput input = null;
+		StringBuffer action = null;
+		for (int i = 0; allVariations.get(new StringBuffer(nameInMap).append(i).toString()) != null; i++) {
+			variation = allVariations.get(new StringBuffer(nameInMap).append(i).toString());
+			if (availableStyleMember(theme.getLinkToBase(), variation)) {
+				variationContainer = new ListItem();
+				if (variation.isLimitedSelection()) {
+					input = new RadioButton();
+					type = RADIO_INPUT;
+				}
+				else {
+					input = new CheckBox();
+					type = CHECKBOX_INPUT;
+				}
+				input.setName(groupName);
+				input.setValue(variation.getName());
+				action = new StringBuffer(ON_CLICK_ACTION).append(theme.getId()).append(SEPERATOR).append(groupName).append(SEPERATOR);
+				action.append(variation.getName()).append(SEPERATOR).append(type).append(INPUT_CHECKED);
+				input.setOnClick(action.toString());
+				if (variation.isEnabled()) {
+					input.setMarkupAttribute(INPUT_CHECKED_ATTRIBUTE, true);
+				}
+				variationContainer.add(input);
+				variationContainer.add(new Text(variation.getName()));
+				variations.add(variationContainer);
+			}
+		}
+		
+		return variations;
+	}
+	
+	private boolean availableStyleMember(String linkToBase, ThemeStyleGroupMember styleMember) {
+		if (styleMember == null) {
+			return false;
+		}
+		List<String> files = styleMember.getStyleFiles();
+		if (files == null) {
+			return false;
+		}
+		
+		for (int i = 0; i < files.size(); i++) {
+			if (!helper.existFileInSlide(new StringBuffer(linkToBase).append(files.get(i)).toString())) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+}

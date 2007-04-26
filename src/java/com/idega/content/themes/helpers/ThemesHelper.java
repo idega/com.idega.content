@@ -272,7 +272,7 @@ public class ThemesHelper implements Singleton {
 		System.out.println("Finished main search, took time: " + ((finish - start) / 1000) + " second(s)");
 	
 		getThemesLoader().loadThemes(themesSkeletons, false, true);
-		getThemesPropertiesExtractor().prepareThemes(pLists, configurations, true);
+//		getThemesPropertiesExtractor().prepareThemes(pLists, configurations, true);
 	}
 	
 	private List<String> loadSearchResults(Collection searchResults, List<String> filter) {

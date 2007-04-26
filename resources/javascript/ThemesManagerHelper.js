@@ -70,11 +70,14 @@ function getThemeStyleVariations(themeID) {
 		setNewStyleForSelectedElement(newTheme.id + "_themeNameContainer", "selectedThemeName");
 	}
 	setThemeForPreview(themeID);
-	ThemesEngine.getThemeStyleVariations(themeID, insertStyleVariations);
+	ThemesEngine.getThemeStyleVariations(themeID, getThemeStyleVariationsCallback);
 }
 
-function insertStyleVariations(variations) {
+function getThemeStyleVariationsCallback(variations) {
 	closeLoadingMessage();
+	if (variations == null) {
+		return;
+	}
 	var theme = getTheme(THEME_ID);
 	if (theme != null) {
 		setIfUsedTheme(theme.used);
@@ -82,16 +85,12 @@ function insertStyleVariations(variations) {
 	else {
 		setIfUsedTheme(false);
 	}
-	var oldVariation = document.getElementById("themeStyleVariations");
-	if (oldVariation == null) {
+	var container = document.getElementById("themeStyleVariations");
+	if (container == null) {
 		return;
 	}
-	if (oldVariation.childNodes) {
-		while (oldVariation.childNodes.length > 0) {
-			oldVariation.removeChild(oldVariation.childNodes[0]);
-		}
-	}
-	oldVariation.innerHTML = variations;
+	removeChildren(container);
+	insertNodesToContainer(variations, container);
 }
 
 function changeTheme(themeID, styleGroupName, newStyleMember, type, checked) {

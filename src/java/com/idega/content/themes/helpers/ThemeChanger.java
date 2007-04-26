@@ -27,6 +27,7 @@ import org.jdom.output.XMLOutputter;
 import com.idega.content.business.ContentConstants;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
+import com.idega.presentation.IWContext;
 import com.idega.util.StringHandler;
 
 public class ThemeChanger {
@@ -831,6 +832,26 @@ public class ThemeChanger {
 		return mainContainer;
 	}
 	
+	private boolean clearThemeVariationsFromCache(String themeID) {
+		if (themeID == null) {
+			return false;
+		}
+		Theme theme = helper.getTheme(themeID);
+		if (theme == null) {
+			return false;
+		}
+		List<String> keys = theme.getStyleVariationsCacheKeys();
+		if (keys == null) {
+			return false;
+		}
+		IWContext iwc = helper.getIWContext();
+		for (int i = 0; i < keys.size(); i++) {
+			helper.getThemesService().getBuilderService().removeBlockObjectFromCache(iwc, keys.get(i));
+		}
+		theme.clearStyleVariationsCacheKeys();
+		return true;
+	}
+	
 	/**
 	 * Changes theme with new style variation, creates draft and creates new preview image
 	 * @param themeID
@@ -875,6 +896,7 @@ public class ThemeChanger {
 
 		theme.setLinkToDraftPreview(new StringBuffer(fileName).append(ThemesConstants.DOT).append(helper.getImageGenerator(null).getFileExtension()).toString());
 		helper.createSmallImage(theme, true);
+		clearThemeVariationsFromCache(theme.getId());
 		
 		return true;
 	}
@@ -1207,6 +1229,8 @@ public class ThemeChanger {
 		helper.getImageGenerator(null).encodeAndUploadImage(theme.getLinkToBaseAsItIs(), fileName, new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString(), is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
 		theme.setLinkToSmallPreview(fileName);
 		helper.closeInputStream(is);
+		
+		clearThemeVariationsFromCache(theme.getId());
 		
 		return true;
 	}

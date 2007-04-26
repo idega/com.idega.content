@@ -29,7 +29,7 @@ public class ThemeStyleGroupMember {
 		this.styleFiles = new ArrayList <String> (parent.getStyleFiles());
 	}
 
-	protected boolean isEnabled() {
+	public boolean isEnabled() {
 		return enabled;
 	}
 
@@ -37,7 +37,7 @@ public class ThemeStyleGroupMember {
 		this.enabled = enabled;
 	}
 
-	protected String getName() {
+	public String getName() {
 		return name;
 	}
 
@@ -45,7 +45,7 @@ public class ThemeStyleGroupMember {
 		this.name = name;
 	}
 
-	protected List<String> getStyleFiles() {
+	public List<String> getStyleFiles() {
 		return styleFiles;
 	}
 
@@ -61,7 +61,7 @@ public class ThemeStyleGroupMember {
 		this.type = type;
 	}
 
-	protected boolean isLimitedSelection() {
+	public boolean isLimitedSelection() {
 		return limitedSelection;
 	}
 
