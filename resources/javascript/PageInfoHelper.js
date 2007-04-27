@@ -371,6 +371,8 @@ function isStartPageCallback(isStart) {
 	else {
 		button.value = getMakeStartPageText();
 	}
+	
+	boldCurrentTreeElement();
 }
 
 function makePageAsStartPage() {
@@ -403,11 +405,12 @@ function initializePages() {
 	initScript(true, false, false);
 	getGlobalPageId();
 
+
 	resizeFrame();
 	getPageInfoValues();
 	isStartPage(getPageID());
 	checkIfNotEmptySiteTree("div_id_current_structure_tree");
-	registerEvent(document, "click", managePageInfoComponents);	
+	registerEvent(document, "click", managePageInfoComponents);
 }
 
 function registerPageInfoActions() {
@@ -430,6 +433,12 @@ function registerPageInfoActions() {
 		'a.pageTreeNames' : function(element) {
 			element.onclick = function() { 
 				boldSelectedTreeElement(element);
+				
+				setPageID(element.parentNode.id);
+				getPrewUrl(element.parentNode.id);
+				getPageInfoValues();
+				isStartPage(element.parentNode.id);
+				return false;
 			}
 		}
 	};
@@ -437,16 +446,36 @@ function registerPageInfoActions() {
 	Behaviour.apply();
 }
 
+function boldCurrentTreeElement() {
+	var liElement = document.getElementById(getPageID());
+	if (liElement == null) {
+		return;
+	}
+	var children = liElement.childNodes;
+	if (children == null) {
+		return;
+	}
+	var element = null;
+	for (var i = 0; i < children.length; i++) {
+		if (children[i].tagName == "a" || children[i].tagName == "A") {
+			boldSelectedTreeElement(children[i]);
+			return;
+		}
+	}
+}
+
 function boldSelectedTreeElement(element) {
+	if (element == null) {
+		return;
+	}
+	// Unbolding
 	var list = document.getElementsByClassName("pageTreeNames");
-			for(var i = 0; i < list.length; i++){
-				list[i].style.fontWeight = 'normal';
-			}
-			
-			element.style.fontWeight = 'bold';
-			setPageID(element.parentNode.id);
-			getPrewUrl(element.parentNode.id);
-			getPageInfoValues();
-			isStartPage(element.parentNode.id);
-			return false;
+	if (list != null) {
+		for (var i = 0; i < list.length; i++) {
+			list[i].style.fontWeight = 'normal';
+		}
+	}
+	
+	// Bold
+	element.style.fontWeight = 'bold';
 }
