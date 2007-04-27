@@ -1501,5 +1501,33 @@ public class ThemesHelper implements Singleton {
 	public boolean isCheckedFromSlide() {
 		return checkedFromSlide;
 	}
+	
+	protected boolean clearVariationFromCache(String themeID) {
+		if (themeID == null) {
+			return false;
+		}
+		Theme theme = getTheme(themeID);
+		if (theme == null) {
+			return false;
+		}
+		List<String> keys = theme.getStyleVariationsCacheKeys();
+		if (keys == null) {
+			return false;
+		}
+		IWContext iwc = getIWContext();
+		
+		//	Removing Block from cache
+		for (int i = 0; i < keys.size(); i++) {
+			getThemesService().getBuilderService().removeBlockObjectFromCache(iwc, keys.get(i));
+		}
+		
+		//	Removing cache keys
+		theme.clearStyleVariationsCacheKeys();
+		
+		//	Removing rendered variations (to Document) from cache
+		getThemesEngine().clearVariationFromCache(themeID, iwc);
+		
+		return true;
+	}
 
 }

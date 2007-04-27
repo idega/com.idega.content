@@ -27,7 +27,6 @@ import org.jdom.output.XMLOutputter;
 import com.idega.content.business.ContentConstants;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
-import com.idega.presentation.IWContext;
 import com.idega.util.StringHandler;
 
 public class ThemeChanger {
@@ -833,23 +832,7 @@ public class ThemeChanger {
 	}
 	
 	private boolean clearThemeVariationsFromCache(String themeID) {
-		if (themeID == null) {
-			return false;
-		}
-		Theme theme = helper.getTheme(themeID);
-		if (theme == null) {
-			return false;
-		}
-		List<String> keys = theme.getStyleVariationsCacheKeys();
-		if (keys == null) {
-			return false;
-		}
-		IWContext iwc = helper.getIWContext();
-		for (int i = 0; i < keys.size(); i++) {
-			helper.getThemesService().getBuilderService().removeBlockObjectFromCache(iwc, keys.get(i));
-		}
-		theme.clearStyleVariationsCacheKeys();
-		return true;
+		return helper.clearVariationFromCache(themeID);
 	}
 	
 	/**

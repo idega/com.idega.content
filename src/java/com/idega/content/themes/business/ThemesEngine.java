@@ -5,6 +5,8 @@ import com.idega.content.themes.helpers.ThemeChange;
 import com.idega.content.themes.helpers.TreeNodeStructure;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.idegaweb.IWMainApplicationSettings;
+import com.idega.presentation.IWContext;
+
 import java.util.ArrayList;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.business.IBOService;
@@ -168,4 +170,9 @@ public interface ThemesEngine extends IBOService {
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getLocalizedText
 	 */
 	public List<String> getLocalizedText();
+	
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#clearVariationFromCache
+	 */
+	public boolean clearVariationFromCache(String themeID, IWContext iwc);
 }

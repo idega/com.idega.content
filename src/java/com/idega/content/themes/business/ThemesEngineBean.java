@@ -32,6 +32,7 @@ import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.core.builder.data.CachedDomain;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
+import com.idega.core.cache.IWCacheManager2;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.data.TreeableEntity;
@@ -151,16 +152,68 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return false;
 	}
 	
+	private Map getVariationsCache(IWContext iwc) {
+		IWCacheManager2 cache = IWCacheManager2.getInstance(iwc.getIWMainApplication());
+		if (cache == null) {
+			return null;
+		}
+		return cache.getCache(ThemesConstants.THEME_STYLE_VARIATIONS_CACHE_KEY);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void putVariationsToCache(Document variation, IWContext iwc, String themeID) {
+		if (variation == null || iwc == null || themeID == null) {
+			return;
+		}
+		Map variations = getVariationsCache(iwc);
+		variations.put(themeID, variation);
+	}
+	
+	public boolean clearVariationFromCache(String themeID, IWContext iwc) {
+		if (themeID == null) {
+			return false;
+		}
+		if (iwc == null) {
+			iwc = helper.getIWContext();
+			if (iwc == null) {
+				return false;
+			}
+		}
+		Map variations = getVariationsCache(iwc);
+		Object removed = variations.remove(themeID);
+		if (removed == null) {
+			return false;
+		}
+		return true;
+	}
+	
+	private Document getVariationsFromCache(String themeID, IWContext iwc) {
+		Map variations = getVariationsCache(iwc);
+		Object o = variations.get(themeID);
+		if (o instanceof Document) {
+			return (Document) o;
+		}
+		return null;
+	}
+	
 	/**
 	 * 
 	 */
 	public Document getThemeStyleVariations(String themeID) {
-//		return helper.getThemeStyleVariations().getThemeStyleVariations(themeID);
+		if (themeID == null) {
+			return null;
+		}
 		
 		IWContext iwc = helper.getIWContext();
 		if (iwc == null) {
 			return null;
 		}
+		
+		Document cachedVariations = getVariationsFromCache(themeID, iwc);
+		if (cachedVariations != null) {
+			return cachedVariations;
+		}
+		
 		BuilderService service = helper.getThemesService().getBuilderService();
 		if (service == null) {
 			try {
@@ -172,7 +225,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 
 		WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "setThemeId", themeID, String.class);
-		return service.getRenderedPresentationObject(iwc, new ThemeStyleVariations(), true);
+		Document variation = service.getRenderedPresentationObject(iwc, new ThemeStyleVariations(), true);
+		putVariationsToCache(variation, iwc, themeID);
+		return variation;
 	}
 	
 	/**
