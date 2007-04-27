@@ -426,8 +426,27 @@ function registerPageInfoActions() {
 			element.onclick = function() {
 				manageSlider(element.id);
 			}
+		},
+		'a.pageTreeNames' : function(element) {
+			element.onclick = function() { 
+				boldSelectedTreeElement(element);
+			}
 		}
 	};
 	Behaviour.register(pageRules);
 	Behaviour.apply();
+}
+
+function boldSelectedTreeElement(element) {
+	var list = document.getElementsByClassName("pageTreeNames");
+			for(var i = 0; i < list.length; i++){
+				list[i].style.fontWeight = 'normal';
+			}
+			
+			element.style.fontWeight = 'bold';
+			setPageID(element.parentNode.id);
+			getPrewUrl(element.parentNode.id);
+			getPageInfoValues();
+			isStartPage(element.parentNode.id);
+			return false;
 }

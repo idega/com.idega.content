@@ -38,7 +38,7 @@ version="1.2">
 	                	<c:block_with_toolbar id="page_tree_div" styleClass="site_tree_container_pages" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png">
 							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 								<jsf:facet name="PageTreeNode">
-									<h:outputLink onclick="setPageID(this.parentNode.id);getPrewUrl(this.parentNode.id);getPageInfoValues();isStartPage(this.parentNode.id);return false;">
+									<h:outputLink styleClass="pageTreeNames">
 										<h:outputText value="#{node.description}"/>
 									</h:outputLink>
 								</jsf:facet>
