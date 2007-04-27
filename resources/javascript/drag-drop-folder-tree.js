@@ -7,6 +7,7 @@
 	var saveOnDrop = false;
 	var movingNode = false;
 	var iconFolder = '';
+	var imageFolder = '';	
 	var idsOfTrees = new Array();
 	var idsOfAdvancedTrees = new Array();
 	var treeObj = null;
@@ -53,7 +54,8 @@
 		this.sourceTreee = true;
 		this.actionOnMouseUp = 'empty';
 		
-		this.imageFolder = '/idegaweb/bundles/com.idega.content.bundle/resources/images/';
+//		this.imageFolder = '/idegaweb/bundles/com.idega.content.bundle/resources/images/';
+		this.imageFolder = '';
 		this.iconFolder = '';
 		this.folderImage = 'text.png';
 		this.plusImage = 'nav-plus.gif';
@@ -282,7 +284,7 @@
 				JSTreeObj.floatingContainer.style.display='block';
 				var tempNode = JSTreeObj.dragNode_source.cloneNode(true);
 				tempNode.id = 'floatingContainer'+ tempNode.id;
-				JSTreeObj.floatingContainer.appendChild(tempNode);									
+				JSTreeObj.floatingContainer.appendChild(tempNode);
 			}
 		}
 		,		
@@ -799,7 +801,7 @@
 			if (id == null) {
 				return;
 			}			
-			
+						
 			var root = document.getElementById('rootTemporary');
 			(document.getElementById('rootTemporary')).setAttribute("id", id[0]);	
 			JSTreeObj.initNode(document.getElementById(id[0]));		
@@ -823,6 +825,13 @@
 			setPageID(lastID);
 			getPrewUrl(lastID);
 			isChangingSiteMap();
+			var aTag = document.getElementById(id).getElementsByTagName('a')[0];
+			aTag.className = 'pageTreeNames';
+			if (!isSiteMap()){
+				boldSelectedTreeElement(aTag);
+				registerPageInfoActions();
+			}
+			
 			closeLoadingMessage();
 			if (isNeedRelaodBuilderPage() && isSiteMap() && isNeedRedirect()) {
 				showLoadingMessage("Redirecting...");
@@ -876,7 +885,8 @@
 			this.dropTargetIndicator.style.position = 'absolute';			
 			this.dropTargetIndicator.style.display='none';			
 			var img = document.createElement('IMG');
-			img.src = this.imageFolder + 'dragDrop_ind1.gif';
+//			img.src = this.imageFolder + 'dragDrop_ind1.gif';
+			img.src = imageFolder + 'dragDrop_ind1.gif';
 			img.id = 'dragDropIndicatorImage';
 			this.dropTargetIndicator.appendChild(img);
 			document.body.appendChild(this.dropTargetIndicator);			
@@ -1043,21 +1053,25 @@
 			}
 		}
 		,
+/*
 		folderPath : function (path){
 			JSTreeObj.iconFolder = path;
+			
 			iconFolder = path;
 			this.iconFolder = path;
 			
 			JSTreeObj.initTree();
 		}
 		,
+ 
 		getPathToImageFolder : function(){
 			JSTreeObj = this;
 			ThemesEngine.getPathToImageFolder(JSTreeObj.folderPath);
 		}
 		,
+*/
 		initTree : function()
-		{					
+		{				
 			JSTreeObj = this;
 			treeObj = this;
 			JSTreeObj.createDropIndicator();
@@ -1112,7 +1126,8 @@
 				nodeId++;
 				var subItems = menuItems[no].getElementsByTagName('UL');
 				var img = document.createElement('IMG');
-				img.src = this.imageFolder + this.plusImage;
+//				img.src = this.imageFolder + this.plusImage;
+				img.src = imageFolder + this.plusImage;
 				img.onclick = JSTreeObj.showHideNode;
 				
 				if(subItems.length==0)
@@ -1160,9 +1175,11 @@
 				if(!noChildren)folderImg.onmousemove = JSTreeObj.moveDragableNodes;
 				
 				if(menuItems[no].className){
-					folderImg.src = this.imageFolder + menuItems[no].className;
+//					folderImg.src = this.imageFolder + menuItems[no].className;
+					folderImg.src = imageFolder + menuItems[no].className;
 				}else{
-					folderImg.src = this.imageFolder + this.folderImage;					
+//					folderImg.src = this.imageFolder + this.folderImage;					
+					folderImg.src = imageFolder + this.folderImage;					
 				}
 				if(iconfile)
 					folderImg.src = iconfile;
@@ -1245,10 +1262,12 @@
 				if(!noChildren)folderImg.onmousemove = JSTreeObj.moveDragableNodes;
 				
 				if(node.className){
-					folderImg.src = this.imageFolder + node.className;
+//					folderImg.src = this.imageFolder + node.className;
+					folderImg.src = imageFolder + node.className;
 				}else{
-					folderImg.src = this.imageFolder + this.folderImage;					
-					folderImg.src = this.imageFolder + this.iconFolder;					
+//					folderImg.src = this.imageFolder + this.folderImage;					
+//					folderImg.src = this.imageFolder + this.iconFolder;					
+					folderImg.src = imageFolder + this.iconFolder;					
 				}
 				if(iconfile)
 					folderImg.src = iconfile;
@@ -1585,7 +1604,8 @@
 	}
 	
 	function setFolderPath(path){
-		iconFolder = path;
+		imageFolder = path;
+		iconFolder = path + 'pageIcons/';
 		initializeTrees();
 	}
 
