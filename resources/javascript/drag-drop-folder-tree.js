@@ -1605,7 +1605,7 @@
 	
 	function setFolderPath(path){
 		imageFolder = path;
-		iconFolder = path + 'pageIcons/';
+		iconFolder = path;
 		initializeTrees();
 	}
 
