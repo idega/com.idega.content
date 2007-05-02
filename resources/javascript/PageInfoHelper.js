@@ -405,7 +405,6 @@ function initializePages() {
 	initScript(true, false, false);
 	getGlobalPageId();
 
-
 	resizeFrame();
 	getPageInfoValues();
 	isStartPage(getPageID());
@@ -445,7 +444,7 @@ function registerPageInfoActions() {
 	Behaviour.register(pageRules);
 	Behaviour.apply();
 }
-
+/*
 function boldCurrentTreeElement() {
 	var liElement = document.getElementById(getPageID());
 	if (liElement == null) {
@@ -479,3 +478,4 @@ function boldSelectedTreeElement(element) {
 	// Bold
 	element.style.fontWeight = 'bold';
 }
+*/

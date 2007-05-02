@@ -433,4 +433,74 @@ function setNewStyleForSelectedElement(id, newClassName) {
 		return;
 	}
 	element.className = newClassName;
-}	
+}
+/*
+function registerPageInfoActions() {
+	
+	var pageRules = {
+		'input.newPageButtonStyleClass' : function(element) {
+			element.onclick = function() {
+				newPage();
+			}
+		},
+		'input.saveButtonStyleClass' : function(element) {
+			element.onclick = function() {
+				savePageInfo();
+			}
+		},
+		'input.showThemesButtonStyleClass' : function(element) {
+			element.onclick = function() {
+				manageSlider(element.id);
+			}
+		},
+		'a.pageTreeNames' : function(element) {
+			element.onclick = function() { 
+				boldSelectedTreeElement(element);
+				
+				setPageID(element.parentNode.id);
+				getPrewUrl(element.parentNode.id);
+				getPageInfoValues();
+				isStartPage(element.parentNode.id);
+				return false;
+			}
+		}
+	};
+console.log('behaviour');
+console.log(Behaviour);	
+	Behaviour.register(pageRules);
+	Behaviour.apply();
+}
+*/
+function boldCurrentTreeElement() {
+	var liElement = document.getElementById(getPageID());
+	if (liElement == null) {
+		return;
+	}
+	var children = liElement.childNodes;
+	if (children == null) {
+		return;
+	}
+	var element = null;
+	for (var i = 0; i < children.length; i++) {
+		if (children[i].tagName == "a" || children[i].tagName == "A") {
+			boldSelectedTreeElement(children[i]);
+			return;
+		}
+	}
+}
+
+function boldSelectedTreeElement(element) {
+	if (element == null) {
+		return;
+	}
+	// Unbolding
+	var list = document.getElementsByClassName("pageTreeNames");
+	if (list != null) {
+		for (var i = 0; i < list.length; i++) {
+			list[i].style.fontWeight = 'normal';
+		}
+	}
+	
+	// Bold
+	element.style.fontWeight = 'bold';
+}		

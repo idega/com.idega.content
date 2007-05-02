@@ -825,9 +825,9 @@
 			setPageID(lastID);
 			getPrewUrl(lastID);
 			isChangingSiteMap();
-			var aTag = document.getElementById(id).getElementsByTagName('a')[0];
-			aTag.className = 'pageTreeNames';
 			if (!isSiteMap()){
+				var aTag = document.getElementById(id).getElementsByTagName('a')[0];
+				aTag.className = 'pageTreeNames';				
 				boldSelectedTreeElement(aTag);
 				registerPageInfoActions();
 			}
@@ -1161,6 +1161,7 @@
 				if(!noDrag)aTag.onmousedown = JSTreeObj.initDrag;
 				if(!noChildren)aTag.onmousemove = JSTreeObj.moveDragableNodes;
 				if(sourceTree)aTag.onmousedown = JSTreeObj.copyDragableNode;
+				if(sourceTree)aTag.onclick = JSTreeObj.createNodeOnClick;
 								
 				menuItems[no].insertBefore(img,input);
 
@@ -1281,7 +1282,7 @@
 			treeStructure = new Array();
 			var nodes = JSTreeObj.getStructure('floatingContainer'+JSTreeObj.dragNode_source.id, newParentNodeId, numberInLevel);			
 			document.getElementById('floatingContainer'+JSTreeObj.dragNode_source.id).id = 'rootTemporary';				
-			showLoadingMessage("Creating...");			
+			showLoadingMessage("Creating...");	
 			ThemesEngine.beforeCreatePage(nodes, false, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
 		}	
 		,
@@ -1465,8 +1466,9 @@
 			}
 			else {
 				for (var i = placeInLevel-1; i < childrenOfUlTag.length; i++){
-					if(childrenOfUlTag[i].tagName == 'LI')
+					if(childrenOfUlTag[i].tagName == 'LI'){
 						result.push(childrenOfUlTag[i].id);
+					}
 				}
 			}
 			return result;
@@ -1507,6 +1509,51 @@
 			
 			return result;					
 		}				
+		,
+		createNodeOnClick : function(){
+			
+			JSTreeObj.dragNode_source = this.parentNode;			
+			JSTreeObj.floatingContainer.style.display='block';
+			var tempNode = JSTreeObj.dragNode_source.cloneNode(true);
+			tempNode.id = 'floatingContainer'+ tempNode.id;
+			JSTreeObj.floatingContainer.appendChild(tempNode);
+			
+			var activePageId = getPageID();
+			JSTreeObj.dragNode_destination = document.getElementById(activePageId);
+			
+					var uls = JSTreeObj.dragNode_destination.getElementsByTagName('UL');
+					if(uls.length>0){
+						ul = uls[0];
+						ul.style.display='block';
+						var lis = ul.getElementsByTagName('LI');						
+						
+						var li = JSTreeObj.dragNode_source.getElementsByTagName('LI')[0];
+						
+						if(lis.length>0){	// Sub elements exists - drop dragable node before the first one
+							ul.insertBefore(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id),lis[0]);	
+						}else {	// No sub exists - use the appendChild method - This line should not be executed unless there's something wrong in the HTML, i.e empty <ul>
+							ul.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
+						}
+					}else{
+						var ul = document.createElement('UL');
+						ul.style.display='block';
+						JSTreeObj.dragNode_destination.appendChild(ul);
+						var childElement = document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id);
+						ul.appendChild(childElement);											
+					}
+					var img = JSTreeObj.dragNode_destination.getElementsByTagName('IMG')[0];	
+
+					img.style.visibility='visible';
+					img.src = img.src.replace(JSTreeObj.plusImage,JSTreeObj.minusImage);			
+			
+			
+			
+
+			var followingNodes = treeObj.getFollowingNodes(activePageId, 3);
+			JSTreeObj.saveNewPage(activePageId, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
+								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, 1, followingNodes);
+		return false;
+		}
 	}
 	
 	function withEnter(e) {
