@@ -1,5 +1,5 @@
 /*
- * $Id: WhatIsNew.java,v 1.6 2007/04/16 12:30:33 eiki Exp $
+ * $Id: WhatIsNew.java,v 1.7 2007/05/02 15:30:28 eiki Exp $
  * Created on Jun 21, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -22,6 +22,7 @@ import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.content.business.ContentSearch;
+import com.idega.content.business.IWCacheInvalidatorIWSlideListener;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.search.business.SearchPlugin;
 import com.idega.core.search.presentation.SearchResults;
@@ -35,14 +36,15 @@ import com.idega.slide.business.IWSlideSession;
  * It extends SearchResults block and forces it to only use a DASL search (ContentSearch) with specific settings<br>
  * and the query is by default set to "*" and the path to "files" but that can be changed.
  * 
- *  Last modified: $Date: 2007/04/16 12:30:33 $ by $Author: eiki $
+ *  Last modified: $Date: 2007/05/02 15:30:28 $ by $Author: eiki $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class WhatIsNew extends SearchResults {
 
 	public static final String STYLE_CLASS_WHATISNEW = "whatisnew";
+	public static final String WHAT_IS_NEW_CACHE_KEY = "iw_whatisnew";
 	protected String startingPointURI = "files";
 	protected String orderByProperty = "getlastmodified";
 	protected boolean useDescendingOrder = true;
@@ -60,7 +62,56 @@ public class WhatIsNew extends SearchResults {
 
 	public WhatIsNew(){
 		super();
+		this.setCacheable(WHAT_IS_NEW_CACHE_KEY, 0);
 		this.setStyleClass(STYLE_CLASS_WHATISNEW);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.idega.presentation.PresentationObject#main(com.idega.presentation.IWContext)
+	 */
+	public void main(IWContext iwc) throws Exception {
+		//just listen for changes
+		startCachingStrategy();
+		
+		super.main(iwc);
+		
+	}
+	
+	protected void startCachingStrategy() {
+		try {
+			this.getIWSlideSession().getIWSlideService().addIWSlideChangeListeners(new IWCacheInvalidatorIWSlideListener(getStartingPointURI(),WHAT_IS_NEW_CACHE_KEY));
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+
+	protected String getCacheState(IWContext iwc, String cacheStatePrefix) {
+		StringBuffer buffer = new StringBuffer(cacheStatePrefix);
+		buffer.append(getSearchQueryString(iwc))
+		.append(getStartingPointURI())
+		.append(getNumberOfResultItemsToDisplay())
+		.append(getOrderByProperty())
+		.append(isSetToHideFileExtension())
+		.append(isSetToHideParentFolderPath())
+		.append(isSetToShowAllResultProperties())
+		.append(isSetToShowDeleteLink())
+		.append(isUsingDescendingOrder())
+		.append(isUsingRootAccessForSearch())
+		.append(getAbstractTextStyleClass())
+		.append(getExtraAttributeTextEvenStyleClass())
+		.append(getExtraAttributeTextOddStyleClass())
+		.append(getExtraInformationTextStyleClass())
+		.append(getSearchNameStyleClass())
+		.append(getRowEvenStyleClass())
+		.append(getRowOddStyleClass());
+		
+		//hope I got them all!
+		
+		return buffer.toString();
 	}
 
 	/* (non-Javadoc)
@@ -145,6 +196,7 @@ public class WhatIsNew extends SearchResults {
 			}
 		}
 	}
+
 	
 	protected IWSlideSession getIWSlideSession() {
 		try {
@@ -165,7 +217,7 @@ public class WhatIsNew extends SearchResults {
 	 * @see com.idega.core.search.presentation.SearchResults#getQueryString(com.idega.presentation.IWContext)
 	 */
 	protected String getSearchQueryString(IWContext iwc) {
-		String query = "*.*";
+		String query = "*";
 		if(super.searchQueryString==null){
 			return query;
 		}

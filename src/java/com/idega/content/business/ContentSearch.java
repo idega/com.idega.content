@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.34 2007/04/18 13:43:17 eiki Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.35 2007/05/02 15:30:28 eiki Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2007/04/18 13:43:17 $ by $Author: eiki $ This class
+ * Last modified: $Date: 2007/05/02 15:30:28 $ by $Author: eiki $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -83,7 +83,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.34 $
+ * @version $Revision: 1.35 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -512,12 +512,12 @@ public class ContentSearch extends Object implements SearchPlugin{
 		
 		String[] tokens = queryString.split(" ");
 		for (int i = 0; i < tokens.length; i++) {
-			String searchWord = tokens[i];
-			String wildCardSearchWord = getWildCardSearchWord(searchWord);
-			searchXML.append("<D:contains>").append(wildCardSearchWord).append("</D:contains>")
-			.append("<S:property-contains><D:prop><D:displayname/></D:prop><D:literal>").append(wildCardSearchWord).append("</D:literal></S:property-contains>")
-			.append("<S:property-contains><D:prop><D:creator-displayname/></D:prop><D:literal>").append(wildCardSearchWord).append("</D:literal></S:property-contains>")
-			.append("<S:property-contains><D:prop><D:comment/></D:prop><D:literal>").append(wildCardSearchWord).append("</D:literal></S:property-contains>");
+			String searchWord = getWildCardSearchWord(tokens[i]);
+			
+			searchXML.append("<D:contains>").append(searchWord).append("</D:contains>")
+			.append("<S:property-contains><D:prop><D:displayname/></D:prop><D:literal>").append(searchWord).append("</D:literal></S:property-contains>")
+			.append("<S:property-contains><D:prop><D:creator-displayname/></D:prop><D:literal>").append(searchWord).append("</D:literal></S:property-contains>")
+			.append("<S:property-contains><D:prop><D:comment/></D:prop><D:literal>").append(searchWord).append("</D:literal></S:property-contains>");
 		}
 		
 		searchXML.append("</D:or>");
@@ -581,7 +581,9 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 * @return
 	 */
 	protected String addOrderingAndLimitingToDASLSearchXML(String searchXML) {		
-		String orderAscendingOrDescending = ContentSearch.ORDER_ASCENDING;
+		//		Fixme ordering in Slide doesn't really work yet but limiting does, uncomment and remove manual ordering and limiting when it works again
+		//Eiki, see my email to the slide developers list 2.may 2007
+		/*String orderAscendingOrDescending = ContentSearch.ORDER_ASCENDING;
 		if(isSetToUseDescendingOrder()){
 			orderAscendingOrDescending = ContentSearch.ORDER_DESCENDING;
 		}
@@ -596,6 +598,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 		
 		int index = searchXML.indexOf(DASL_WHERE_XML_SNIPPET);
 		searchXML = searchXML.substring(0, index + DASL_WHERE_XML_SNIPPET.length()) + extraXML.toString()+ searchXML.substring(index + DASL_WHERE_XML_SNIPPET.length());
+		*/
 		return searchXML;
 	}
 
@@ -627,22 +630,22 @@ public class ContentSearch extends Object implements SearchPlugin{
 
 	protected void executeSearch(List results, String servletMapping, SearchMethod method, HttpClient client)
 	throws IOException, HttpException {
-		/*int state =*/ client.executeMethod(method);
-//		todo remove
-		//System.out.println("DASL Search result status code: " + state);
-		//System.out.println("DASL Search result status text: " + method.getStatusText());
-//		Header[] headers = method.getResponseHeaders();
-//		for (int i = 0; i < headers.length; i++) {
-//		System.out.println(headers[i].toString());
-//		}
-//		todo remove when access control is ok, also change search to ignore
-//		folders?
+		/*int state =*/ 
+		
+//		Timer timer = new Timer();
+//		timer.start();
+		
+		client.executeMethod(method);
 		Enumeration enumerator = method.getResponses();
+//		timer.stop();
+//		timer.logTime("ContentSearch");
+	
 		String fileName;
 		String fileURI;
 		String lastModifiedDate;
 		String parentFolderPath;
 		BasicSearchResult result;
+		ArrayList tempResults = new ArrayList();
 		Property prop;
 		
 		Locale locale = null;
@@ -657,7 +660,10 @@ public class ContentSearch extends Object implements SearchPlugin{
 			locale = IWMainApplication.getDefaultIWApplicationContext().getApplicationSettings().getDefaultLocale();
 		}
 		
-		//ONLY NEEDED UNTIL ORDERING / SORTING WORKS IN SLIDE!!
+//		timer.reset();
+//		timer.start();
+		
+		//fixme ONLY NEEDED UNTIL ORDERING / SORTING WORKS IN SLIDE!!, remove when ordering works and put back in the ordering and limiting xml
 		SearchResultComparator comparator = new SearchResultComparator(locale,getPropertyToOrderBy(),isSetToUseDescendingOrder());
 
 		while (enumerator.hasMoreElements()) {
@@ -716,20 +722,25 @@ public class ContentSearch extends Object implements SearchPlugin{
 				}
 				
 				result.setSearchResultAttributes(properties);
-				results.add(result);
+				tempResults.add(result);
 			}
 		}
 		
-		Collections.sort(results,comparator);
+		Collections.sort(tempResults,comparator);
 		
-		/*
-		System.out.println("Results sorted by " + getPropertyToOrderBy());
-		for (Iterator iter = results.iterator(); iter.hasNext();) {
-			BasicSearchResult result = (BasicSearchResult) iter.next();
-			System.out.println("| " + result.getSearchResultAttributes().get(this.propertyToOrderBy).toString() + " | " + result.getSearchResultName());
+		//fixme LIMITING THE DIRTY WAY, must be done after the order, remove when ordering works in slide and put back in xml ordering and limiting
+		if(getNumberOfResultItemsToReturn()!=-1){
+			results.addAll(tempResults.subList(0, Math.min(tempResults.size(),getNumberOfResultItemsToReturn())));
 		}
-		*/
+		else{
+			results.addAll(tempResults);
+		}
+		
+//		System.out.println("Results size"+results.size());
+		
+//		timer.logTime("ContentSearch");
 	}
+
 
 	public void setToShowDeleteLink(boolean show) {
 		this.showDeleteLink = show;
