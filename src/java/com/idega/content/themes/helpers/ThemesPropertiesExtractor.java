@@ -162,11 +162,6 @@ public class ThemesPropertiesExtractor {
 		String linkToConfig = null;
 		//	Trying to get config file from list
 		linkToConfig = getConfigFile(theme, searchName, configs);
-		if (linkToConfig == null) {
-			//	Searching for configuration file
-			String searchLink = new StringBuffer(searchName).append(ThemesConstants.IDEGA_THEME_INFO).toString();
-			linkToConfig = existsFile(theme, searchLink);
-		}
 		
 		// Extracting configuration
 		if (linkToConfig != null) {
@@ -176,23 +171,10 @@ public class ThemesPropertiesExtractor {
 			extractConfiguration(theme, new StringBuffer(url).append(linkToConfig).toString());
 		}
 		
-		// Searching for previews
+		//	Checking previews
 		if (theme.getLinkToThemePreview() == null || theme.getLinkToSmallPreview() == null) {
-			searchForPreviews(theme);
-		}
-		
-		// No previews where found, generating big preview
-		if (theme.getLinkToThemePreview() == null) {
-			String urlToFile = new StringBuffer(webRoot).append(theme.getLinkToSkeleton()).toString();
-			String fileName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_PREVIEW).toString();
-			if (helper.getImageGenerator(null).generatePreview(urlToFile,  fileName, theme.getLinkToBaseAsItIs(), ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT, true)) {
-				theme.setLinkToThemePreview(new StringBuffer(fileName).append(ThemesConstants.DOT).append(helper.getImageGenerator(null).getFileExtension()).toString());
-			}
-		}
-		
-		// If does not exist small preview, we'll get it from big preview, also encoding will be done for both images
-		if (theme.getLinkToSmallPreview() == null) {
-			helper.createSmallImage(theme, false);
+			//	And creating if don't exist
+			helper.generatePreviewsForTheme(theme, false, true, 1f);
 		}
 		
 		// Creating configuration file
@@ -425,24 +407,6 @@ public class ThemesPropertiesExtractor {
 				j++;
 				member = helper.getThemeChanger().getMember(styleMembers, styleGroupName, j);
 			}
-		}
-	}
-	
-	private void searchForPreviews(Theme theme) {
-		if (theme == null) {
-			return;
-		}
-		
-		String bigPreview = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_PREVIEW).toString();
-		String searchResult = existsFile(theme, bigPreview);
-		if (searchResult != null) {
-			theme.setLinkToThemePreview(helper.getFileNameWithExtension(bigPreview));
-		}
-		
-		String smallPreview = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).toString();
-		searchResult = existsFile(theme, smallPreview);
-		if (searchResult != null) {
-			theme.setLinkToSmallPreview(helper.getFileNameWithExtension(smallPreview));
 		}
 	}
 	

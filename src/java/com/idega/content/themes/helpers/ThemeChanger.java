@@ -870,15 +870,10 @@ public class ThemeChanger {
 			return false;
 		}
 
-		String uploadDir = new StringBuffer(helper.getFullWebRoot()).append(theme.getLinkToDraft()).toString();
-		String fileName = new StringBuffer(theme.getName()).append(ThemesConstants.DRAFT_PREVIEW).toString();
-		boolean result = helper.getImageGenerator(null).generatePreview(uploadDir, fileName, theme.getLinkToBaseAsItIs(), ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT, true);
-		if (!result) {
+		if (!helper.generatePreviewsForTheme(theme, true, true, 1f)) {
 			return false;
 		}
-
-		theme.setLinkToDraftPreview(new StringBuffer(fileName).append(ThemesConstants.DOT).append(helper.getImageGenerator(null).getFileExtension()).toString());
-		helper.createSmallImage(theme, true);
+		
 		clearThemeVariationsFromCache(theme.getId());
 		
 		return true;
@@ -1206,12 +1201,7 @@ public class ThemeChanger {
 		theme.setLinkToDraft(null);
 		theme.setChanges(new ArrayList<ThemeChange>());
 		
-		InputStream is = helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(theme.getLinkToBase()).append(helper.encode(theme.getLinkToThemePreview(), true)).toString());
-		String extension = helper.getFileExtension(theme.getLinkToThemePreview());
-		String fileName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).append(ThemesConstants.DOT).append(extension).toString();
-		helper.getImageGenerator(null).encodeAndUploadImage(theme.getLinkToBaseAsItIs(), fileName, new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString(), is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
-		theme.setLinkToSmallPreview(fileName);
-		helper.closeInputStream(is);
+		helper.createSmallImage(theme, false);
 		
 		clearThemeVariationsFromCache(theme.getId());
 		
@@ -1312,11 +1302,8 @@ public class ThemeChanger {
 		}
 		
 		// Setting Theme small preview
-		is = helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(linkToBase).append(endodedLinkToPreview).toString());
-		fileName = new StringBuffer(child.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).append(ThemesConstants.DOT).append(extension).toString();
-		helper.getImageGenerator(null).encodeAndUploadImage(decodedLinkToBase, fileName, new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString(),	is, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
-		child.setLinkToSmallPreview(fileName);
-		helper.closeInputStream(is);
+		String url = new StringBuffer(helper.getFullWebRoot()).append(linkToBase).append(endodedLinkToPreview).toString();
+		helper.createSmallImage(child, url);
 		
 		child.setPropertiesExtracted(true);
 		restoreTheme(parent);

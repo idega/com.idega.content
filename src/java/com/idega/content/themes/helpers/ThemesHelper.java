@@ -1,5 +1,8 @@
 package com.idega.content.themes.helpers;
 
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,6 +64,7 @@ import com.idega.core.component.data.ICObjectInstanceHome;
 import com.idega.core.search.business.SearchResult;
 import com.idega.data.IDOLookup;
 import com.idega.graphics.business.Generator;
+import com.idega.graphics.business.GraphicsConstants;
 import com.idega.graphics.business.ImageGenerator;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
@@ -790,6 +794,48 @@ public class ThemesHelper implements Singleton {
 		return encoded.toString();
 	}
 	
+	protected boolean createSmallImage(Theme theme, String url) {
+		if (theme == null || url == null) {
+			return false;
+		}
+		
+		String extension = getFileExtension(url);
+		if (extension == null) {
+			return false;
+		}
+		extension = extension.toLowerCase();
+		String mimeType = new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString();
+		String newName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).append(ThemesConstants.DOT).append(extension).toString();
+		boolean isJpg = extension.equals(GraphicsConstants.JPG_FILE_NAME_EXTENSION);
+		
+		Generator imageGenerator = getImageGenerator(null);
+		InputStream stream = getInputStream(url);
+		if (stream == null) {
+			return false;
+		}
+		Image image = imageGenerator.getScaledImage(stream, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT, isJpg);
+		if (image == null) {
+			return false;
+		}
+		stream = imageGenerator.getImageInputStream(image, extension);
+		if (stream == null) {
+			return false;
+		}
+		boolean uploadedSuccessfully = true;
+		try {
+			uploadedSuccessfully = getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), newName, stream, mimeType, true);
+		} catch (RemoteException e) {
+			log.error(e);
+			return false;
+		}
+		if (uploadedSuccessfully) {
+			theme.setLinkToSmallPreview(newName);
+		}
+		closeInputStream(stream);
+		
+		return uploadedSuccessfully;
+	}
+	
 	protected boolean createSmallImage(Theme theme, boolean useDraftPreview) {
 		String encodedUriToImage = null;
 		String uriToImage = null;
@@ -800,22 +846,9 @@ public class ThemesHelper implements Singleton {
 			uriToImage = theme.getLinkToThemePreview();
 		}
 		encodedUriToImage = encode(uriToImage, true);
-		String extension = helper.getFileExtension(uriToImage);
-		if (extension == null) {
-			return false;
-		}
-		extension = extension.toLowerCase();
-		String mimeType = ThemesConstants.DEFAULT_MIME_TYPE + extension;
-		InputStream input = null;
 		
-		// Reducing and encoding original image, saving as new image
-		input = getInputStream(getFullWebRoot() + theme.getLinkToBase() + encodedUriToImage);
-		String newName = theme.getName() + ThemesConstants.THEME_SMALL_PREVIEW + ThemesConstants.DOT + extension;
-		getImageGenerator(null).encodeAndUploadImage(theme.getLinkToBaseAsItIs(), newName, mimeType, input, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT);
-		theme.setLinkToSmallPreview(newName);
-		closeInputStream(input);
-		
-		return true;
+		String url = new StringBuffer(getFullWebRoot()).append(theme.getLinkToBase()).append(encodedUriToImage).toString();
+		return createSmallImage(theme, url);
 	}
 	
 	public ThemesService getThemesService() {
@@ -1526,6 +1559,75 @@ public class ThemesHelper implements Singleton {
 		
 		//	Removing rendered variations (to Document) from cache
 		getThemesEngine().clearVariationFromCache(themeID, iwc);
+		
+		return true;
+	}
+	
+	/**
+	 * Generates big and small previews for single theme
+	 * @param theme
+	 * @param useDraft
+	 * @param isJpg
+	 * @param quality
+	 * @return true - success, false - failure
+	 */
+	protected boolean generatePreviewsForTheme(Theme theme, boolean useDraft, boolean isJpg, float quality) {
+		String url = getFullWebRoot();
+		String bigPreviewName = null;
+		String smallPreviewName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).toString();
+		if (useDraft) {
+			url = new StringBuffer(url).append(theme.getLinkToDraft()).toString();
+			bigPreviewName = new StringBuffer(theme.getName()).append(ThemesConstants.DRAFT_PREVIEW).toString();
+		}
+		else {
+			url = new StringBuffer(url).append(theme.getLinkToSkeleton()).toString();
+			bigPreviewName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_PREVIEW).toString();
+		}
+		
+		List<Dimension> dimensions = new ArrayList<Dimension>(2);
+		dimensions.add(new Dimension(ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT));
+		dimensions.add(new Dimension(ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT));
+	
+		Generator imageGenerator = getImageGenerator(null);
+		
+		List<BufferedImage> images = imageGenerator.generatePreviews(url, dimensions, isJpg, quality);
+		if (images == null) {
+			return false;
+		}
+		
+		String extension = imageGenerator.getFileExtension();
+		String mimeType = new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString();
+		bigPreviewName = new StringBuffer(bigPreviewName).append(ThemesConstants.DOT).append(extension).toString();
+		smallPreviewName = new StringBuffer(smallPreviewName).append(ThemesConstants.DOT).append(extension).toString();
+		
+		BufferedImage image = null;
+		InputStream stream = null;
+		IWSlideService slide = getSlideService();
+		for (int i = 0; i < images.size(); i++) {
+			image = images.get(i);
+			stream = imageGenerator.getImageInputStream(image, extension);
+			try {
+				if (image.getWidth() == ThemesConstants.PREVIEW_WIDTH) {	// Is it a big image?
+					if (slide.uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), bigPreviewName, stream, mimeType, true)) {
+						if (useDraft) {
+							theme.setLinkToDraftPreview(bigPreviewName);
+						}
+						else {
+							theme.setLinkToThemePreview(bigPreviewName);
+						}
+					}
+				}
+				else {	//	Small image
+					if (slide.uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), smallPreviewName, stream, mimeType, true)) {
+						theme.setLinkToSmallPreview(smallPreviewName);
+					}
+				}
+			} catch (RemoteException e) {
+				log.error(e);
+			} finally {
+				closeInputStream(stream);
+			}
+		}
 		
 		return true;
 	}
