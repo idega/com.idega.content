@@ -465,8 +465,6 @@ function registerPageInfoActions() {
 			}
 		}
 	};
-console.log('behaviour');
-console.log(Behaviour);	
 	Behaviour.register(pageRules);
 	Behaviour.apply();
 }
@@ -487,6 +485,7 @@ function boldCurrentTreeElement() {
 			return;
 		}
 	}
+	return false;
 }
 
 function boldSelectedTreeElement(element) {

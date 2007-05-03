@@ -140,3 +140,28 @@ function initialiazeSiteManager() {
 	resizeContainer("siteTemplatesContainer", "siteTemplatesContainer", 287, true);
 	checkIfNotEmptySiteTree("div_id_current_structure_tree");
 }
+
+function registerSiteActions() {
+
+/*	var pageRules = {
+		'a.pageTreeNames' : function(element) {
+			element.onclick = function() { 
+				boldSelectedTreeElement(element);				
+				setPageID(element.parentNode.id);
+//				getPrewUrl(element.parentNode.id);
+				return false;
+			}
+		}
+	};
+*/
+	window.addEvent('domready', function(){
+    	$$('a.pageTreeNames').each(function(element){
+			element.onclick = function() { 
+				boldSelectedTreeElement(element);				
+				setPageID(element.parentNode.id);
+				return false;
+			}
+    	});
+	});
+	boldCurrentTreeElement();
+}

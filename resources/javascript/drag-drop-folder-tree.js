@@ -831,6 +831,14 @@
 				boldSelectedTreeElement(aTag);
 				registerPageInfoActions();
 			}
+			else{
+				for (var i = 0; i < id.length; i++){
+					var aTag = document.getElementById(id[0]).getElementsByTagName('a')[0];
+					aTag.className = 'pageTreeNames';				
+					boldSelectedTreeElement(aTag);
+				}
+				registerSiteActions();				
+			}
 			
 			closeLoadingMessage();
 			if (isNeedRelaodBuilderPage() && isSiteMap() && isNeedRedirect()) {
@@ -1053,23 +1061,6 @@
 			}
 		}
 		,
-/*
-		folderPath : function (path){
-			JSTreeObj.iconFolder = path;
-			
-			iconFolder = path;
-			this.iconFolder = path;
-			
-			JSTreeObj.initTree();
-		}
-		,
- 
-		getPathToImageFolder : function(){
-			JSTreeObj = this;
-			ThemesEngine.getPathToImageFolder(JSTreeObj.folderPath);
-		}
-		,
-*/
 		initTree : function()
 		{				
 			JSTreeObj = this;
@@ -1652,7 +1643,7 @@
 	
 	function setFolderPath(path){
 		imageFolder = path;
-		iconFolder = path;
+		iconFolder = path + 'pageIcons/';
 		initializeTrees();
 	}
 
