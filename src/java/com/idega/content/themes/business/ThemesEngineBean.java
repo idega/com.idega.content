@@ -50,7 +50,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	private static final String PAGE_URI = "pageUri";
 	private static final String PAGE_TITLE = "pageTitle";
-	private static final String PATH_TO_IMAGE_FOLDER = ContentUtil.getBundle().getResourcesPath() + "/images/pageIcons/";
+//	private static final String PATH_TO_IMAGE_FOLDER = ContentUtil.getBundle().getResourcesPath() + "/images/pageIcons/";
+	private static final String PATH_TO_IMAGE_FOLDER = ContentUtil.getBundle().getResourcesPath() + "/images/";
 	
 	private static final String ARTICLE_VIEWER_NAME = "Article Viewer";
 	private static final String ARTICLE_VIEWER_SUBTYPE = "viewer";
@@ -742,6 +743,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	public List <String> beforeCreatePage(List <TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, List<String> followingNodes){
+
 		List <String> newIds = new ArrayList<String>();
 		
 		struct.get(0).setTreeOrder(numberInLevel);
