@@ -14,7 +14,7 @@
         			/dwr/interface/ThemesEngine.js,
 					/dwr/interface/BuilderService.js,
 					/dwr/interface/PagePreview.js,
-					/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/behaviourWithoutPrototype.js,	
+					/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/behaviour-mootools.js,	
 
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js,
