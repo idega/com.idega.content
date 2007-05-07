@@ -434,41 +434,7 @@ function setNewStyleForSelectedElement(id, newClassName) {
 	}
 	element.className = newClassName;
 }
-/*
-function registerPageInfoActions() {
-	
-	var pageRules = {
-		'input.newPageButtonStyleClass' : function(element) {
-			element.onclick = function() {
-				newPage();
-			}
-		},
-		'input.saveButtonStyleClass' : function(element) {
-			element.onclick = function() {
-				savePageInfo();
-			}
-		},
-		'input.showThemesButtonStyleClass' : function(element) {
-			element.onclick = function() {
-				manageSlider(element.id);
-			}
-		},
-		'a.pageTreeNames' : function(element) {
-			element.onclick = function() { 
-				boldSelectedTreeElement(element);
-				
-				setPageID(element.parentNode.id);
-				getPrewUrl(element.parentNode.id);
-				getPageInfoValues();
-				isStartPage(element.parentNode.id);
-				return false;
-			}
-		}
-	};
-	Behaviour.register(pageRules);
-	Behaviour.apply();
-}
-*/
+
 function boldCurrentTreeElement() {
 	var liElement = document.getElementById(getPageID());
 	if (liElement == null) {
@@ -502,4 +468,11 @@ function boldSelectedTreeElement(element) {
 	
 	// Bold
 	element.style.fontWeight = 'bold';
-}		
+}
+
+function startBuilderApplication() {
+	ThemesEngine.startBuilderApplication(startBuilderApplicationCallback);
+}
+
+function startBuilderApplicationCallback(result) {
+}

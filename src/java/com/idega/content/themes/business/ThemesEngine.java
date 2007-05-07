@@ -175,4 +175,9 @@ public interface ThemesEngine extends IBOService {
 	 * @see com.idega.content.themes.business.ThemesEngineBean#clearVariationFromCache
 	 */
 	public boolean clearVariationFromCache(String themeID, IWContext iwc);
+	
+	/**
+	 * @see ThemesEngineBean#startBuilderApplication
+	 */
+	public boolean startBuilderApplication();
 }

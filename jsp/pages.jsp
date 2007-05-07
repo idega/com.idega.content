@@ -25,6 +25,7 @@ version="1.2">
 			<h:form id="pagesForm">
 				<jsf:verbatim>
                 	<script type="text/javascript">
+                		registerEvent(window, "load", startBuilderApplication);
                 		registerEvent(window, "load", getLocalizedTextForThemes);
                 		registerEvent(window, "load", initializePages);
                 		registerEvent(window, "load", getPathToImageFolder);
