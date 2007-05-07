@@ -174,7 +174,7 @@ public class ThemesPropertiesExtractor {
 		//	Checking previews
 		if (theme.getLinkToThemePreview() == null || theme.getLinkToSmallPreview() == null) {
 			//	And creating if don't exist
-			helper.generatePreviewsForTheme(theme, false, true, 1f);
+			helper.generatePreviewsForTheme(theme, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY);
 		}
 		
 		// Creating configuration file

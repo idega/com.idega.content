@@ -156,7 +156,12 @@ public class ThemesHelper implements Singleton {
 					if (iwc == null) {
 						iwc = getIWContext();
 					}
-					generator = new ImageGenerator(iwc);
+					if (iwc == null) {
+						generator = new ImageGenerator();
+					}
+					else {
+						generator = new ImageGenerator(iwc);
+					}
 				}
 			}
 		}
@@ -817,7 +822,7 @@ public class ThemesHelper implements Singleton {
 		if (image == null) {
 			return false;
 		}
-		stream = imageGenerator.getImageInputStream(image, extension);
+		stream = imageGenerator.getImageInputStream(image, extension, isJpg);
 		if (stream == null) {
 			return false;
 		}
@@ -827,11 +832,12 @@ public class ThemesHelper implements Singleton {
 		} catch (RemoteException e) {
 			log.error(e);
 			return false;
+		} finally {
+			closeInputStream(stream);
 		}
 		if (uploadedSuccessfully) {
 			theme.setLinkToSmallPreview(newName);
 		}
-		closeInputStream(stream);
 		
 		return uploadedSuccessfully;
 	}

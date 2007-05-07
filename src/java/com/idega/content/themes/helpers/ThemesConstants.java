@@ -187,4 +187,6 @@ public class ThemesConstants {
 	
 	public static final String THEME_ID_APPLICATION_ATTRIBUTE = "theme_id_application_attribute";
 
+	protected static final Boolean IS_THEME_PREVIEW_JPG = true;
+	protected static final Float THEME_PREVIEW_QUALITY = new Float(1f);
 }

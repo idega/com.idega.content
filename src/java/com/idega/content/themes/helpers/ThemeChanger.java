@@ -870,7 +870,7 @@ public class ThemeChanger {
 			return false;
 		}
 
-		if (!helper.generatePreviewsForTheme(theme, true, true, 1f)) {
+		if (!helper.generatePreviewsForTheme(theme, true, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY)) {
 			return false;
 		}
 		
