@@ -525,9 +525,7 @@ function setIfUsedTheme(used) {
 	}
 	element.appendChild(document.createTextNode(text));
 	
-	// Highlight
-	var highlight = new Fx.Style(element, 'background-color', {duration: 1500});
-	highlight.start("#ffff99", "#F2F2F2");
+	highlightElement(element, 1500, "#F2F2F2");
 }
 
 function Theme(name, linkToSmallPreview, linkToBigPreview, id, used) {
