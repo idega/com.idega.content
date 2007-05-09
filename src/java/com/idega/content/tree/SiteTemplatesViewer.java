@@ -18,7 +18,6 @@ import org.jdom.input.SAXBuilder;
 
 import com.idega.block.web2.presentation.Accordion;
 import com.idega.content.TemplatesLoader;
-import com.idega.content.presentation.ContentItemViewer;
 import com.idega.core.cache.IWCacheManager2;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.data.IWTreeNode;
