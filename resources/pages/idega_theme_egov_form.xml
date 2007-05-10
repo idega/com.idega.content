@@ -2,7 +2,11 @@
 <xml>
   <page type="text">
     <module id="" class="com.idega.presentation.text.Heading4">
-	    <property><name>:method:1:implied:void:setText:java.lang.String:</name><value>This could be a very nice egov form page</value><type>java.lang.String</type></property>
+	    <property>
+	    	<name>:method:1:implied:void:setText:java.lang.String:</name>
+	    	<value>This could be a very nice egov form page</value>
+	    	<type>java.lang.String</type>
+	    </property>
     </module>
     <module id="" class="com.idega.block.form.presentation.FormViewer" />
   </page>

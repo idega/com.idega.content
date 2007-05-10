@@ -71,7 +71,7 @@
     	<module id="" class="com.idega.block.navigation.presentation.NavigationBreadCrumbsList" />
     </region>
     <region id="footer" label="footer">
-    	<module class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
+    	<module id="" class="com.idega.content.themes.presentation.ApplicationPropertyViewer">
       		<property>
         		<name>:method:1:implied:void:setApplicationPropertyKey:java.lang.String:</name>
         		<value>footer</value>
