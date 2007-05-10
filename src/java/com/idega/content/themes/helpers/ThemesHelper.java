@@ -1578,6 +1578,8 @@ public class ThemesHelper implements Singleton {
 	 * @return true - success, false - failure
 	 */
 	protected boolean generatePreviewsForTheme(Theme theme, boolean useDraft, boolean isJpg, float quality) {
+		isJpg = false;	//	TODO: remove it
+		
 		String url = getFullWebRoot();
 		String bigPreviewName = null;
 		String smallPreviewName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).toString();

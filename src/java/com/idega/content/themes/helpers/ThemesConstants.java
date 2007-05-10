@@ -131,8 +131,8 @@ public class ThemesConstants {
 	protected static final String CON_SMALL_PREVIEW = "small-preview";
 	protected static final String CON_PAGE_ID = "page-id";
 	
-	protected static final int SMALL_PREVIEW_WIDTH = 120;
-	protected static final int SMALL_PREVIEW_HEIGHT = 140;
+	protected static final int SMALL_PREVIEW_WIDTH = 149;
+	protected static final int SMALL_PREVIEW_HEIGHT = 112;
 	
 	protected static final int PREVIEW_WIDTH = 800;
 	protected static final int PREVIEW_HEIGHT = 600;
