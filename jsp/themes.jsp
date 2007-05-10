@@ -45,7 +45,7 @@ version="1.2">
 					</x:div>
 					
 					<x:div styleClass="theme_container">
-						<wf:wfblock id="themeStyleVariationsBlock" title="#{localizedStrings['com.idega.content']['theme_variations']}">
+						<x:div id="themeStyleVariationsBlock" forceId="true">
 							<x:inputHidden id="defaultThemeLabel" forceId="true" value="#{localizedStrings['com.idega.content']['theme_is_default']}"></x:inputHidden>
 							<x:inputHidden id="notDefaultThemeLabel" forceId="true" value="#{localizedStrings['com.idega.content']['theme_is_not_default']}"></x:inputHidden>
 							<x:div id="themeStyleVariations" forceId="true"></x:div>
@@ -60,7 +60,7 @@ version="1.2">
 									<x:commandButton id="themeRestoreButton" type="button" forceId="true" onclick="restoreTheme()" title="#{localizedStrings['com.idega.content']['restore_theme']}" value="#{localizedStrings['com.idega.content']['restore_theme']}"></x:commandButton>
 								</x:div>
 							</x:div>
-						</wf:wfblock>
+						</x:div>
 						<c:ThemesManager id="uploadBlock"></c:ThemesManager>
 					</x:div>
                	</wf:wfblock>
