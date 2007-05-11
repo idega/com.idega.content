@@ -28,9 +28,7 @@ import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import javax.ejb.CreateException;
 import javax.ejb.FinderException;
-import javax.faces.context.FacesContext;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpURL;
@@ -71,6 +69,7 @@ import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
 import com.idega.repository.data.Singleton;
 import com.idega.slide.business.IWSlideService;
+import com.idega.util.CoreUtil;
 import com.idega.util.StringHandler;
 import com.idega.webface.WFUtil;
 
@@ -92,6 +91,7 @@ public class ThemesHelper implements Singleton {
 	private Map <String, Setting> themeSettings = null;
 	private Map <String, Setting> pageSettings = null;
 	private Map <String, Document> pages = null;
+	private List<String> moduleIds = null;
 	private List <String> themeQueue = null;
 	private List <String> urisToThemes = null;
 	private List <String> loadedThemes = null;
@@ -107,6 +107,8 @@ public class ThemesHelper implements Singleton {
 	private static final String ATTRIBUTE_NAME = "property";
 	private static final String ATTRIBUTE_PROPERTY = "value";
 	private static final String ROOT_PAGE_ARTICLE = "root_page_article";
+	private static final String MODULE_ID_SCOPE = "module_id";
+	private static final String IDEGA_PAGES_SCOPE = "idega_pages";
 	
 	private Random numberGenerator = null;
 	
@@ -120,6 +122,7 @@ public class ThemesHelper implements Singleton {
 		themeQueue = new ArrayList <String> ();
 		urisToThemes = new ArrayList <String> ();
 		loadedThemes = new ArrayList<String>();
+		moduleIds = new ArrayList<String>();
 		
 		numberGenerator = new Random();
 		if (canUseSlide) {
@@ -154,7 +157,7 @@ public class ThemesHelper implements Singleton {
 			synchronized (ThemesHelper.class) {
 				if (generator == null) {
 					if (iwc == null) {
-						iwc = getIWContext();
+						iwc = CoreUtil.getIWContext();
 					}
 					if (iwc == null) {
 						generator = new ImageGenerator();
@@ -198,7 +201,7 @@ public class ThemesHelper implements Singleton {
 		if (service == null) {
 			synchronized (ThemesHelper.class) {
 				if (iwc == null) {
-					iwc = getIWContext();
+					iwc = CoreUtil.getIWContext();
 				}
 				if (service == null) {
 					try {
@@ -671,8 +674,8 @@ public class ThemesHelper implements Singleton {
 			settings.put(setting.getCode(), setting);
 		}
 	}
-	
-	protected InputStream getInputStream(String link) {
+
+	private InputStream getInputStream(String link, boolean printError) {
 		InputStream is = null;
         try {
         	URL url = getUrl(link);
@@ -680,14 +683,17 @@ public class ThemesHelper implements Singleton {
         		return null;
         	}
             is = url.openStream();
-        } catch (java.net.MalformedURLException e) {
-        	log.info("Error getting: " + link);
-            log.error(e);
-        } catch (java.io.IOException e) {
-        	log.info("Error getting: " + link);
-            log.error(e);
+        } catch (Exception e) {
+        	if (printError) {
+        		log.info("Error getting: " + link);
+        		log.error(e);
+        	}
         }
         return is;
+	}
+	
+	protected InputStream getInputStream(String link) {
+		return getInputStream(link, false);
 	}
 	
 	protected boolean closeInputStream(InputStream is) {
@@ -861,7 +867,7 @@ public class ThemesHelper implements Singleton {
 		if (themesService == null) {
 			synchronized (ThemesHelper.class) {
 				try {
-					themesService = (ThemesService) IBOLookup.getServiceInstance(getIWContext(), ThemesService.class);
+					themesService = (ThemesService) IBOLookup.getServiceInstance(CoreUtil.getIWContext(), ThemesService.class);
 				} catch (IBOLookupException e) {
 					log.error(e);
 				}
@@ -994,7 +1000,7 @@ public class ThemesHelper implements Singleton {
 		if (themesEngine == null) {
 			synchronized (ThemesHelper.class) {
 				try {
-					themesEngine = (ThemesEngine) IBOLookup.getServiceInstance(getIWContext(), ThemesEngine.class);
+					themesEngine = (ThemesEngine) IBOLookup.getServiceInstance(CoreUtil.getIWContext(), ThemesEngine.class);
 				} catch (IBOLookupException e) {
 					log.error(e);
 				}
@@ -1139,43 +1145,49 @@ public class ThemesHelper implements Singleton {
 		return false;
 	}
 	
-	protected String changeUploadFileName(String fileName) {
+	private String getFixedSlideFileName(String fileName) {
 		if (fileName == null) {
 			return null;
 		}
 		fileName = StringHandler.removeCharacters(fileName, ContentConstants.SPACE, ContentConstants.UNDER);
 		fileName = StringHandler.removeCharacters(fileName, ContentConstants.BRACKET_OPENING, ContentConstants.EMPTY);
 		fileName = StringHandler.removeCharacters(fileName, ContentConstants.BRACKET_CLOSING, ContentConstants.EMPTY);
-
-		String fileRoot = fileName;
+		
+		return fileName;
+	}
+	
+	private String changeUploadFileName(String fileName) {
+		if (fileName == null) {
+			return null;
+		}
+		
+		String fileRoot = getFixedSlideFileName(fileName);
 		String fileType = ThemesConstants.EMPTY;
 		if (fileName.indexOf(ThemesConstants.DOT) != -1) {
 			fileRoot = extractValueFromString(fileName, 0, fileName.lastIndexOf(ThemesConstants.DOT));
 			fileType = getFileExtension(fileName);
 		}
-		int i = 1;
-		String path = fileRoot + ThemesConstants.DOT + fileType;
-		while (existInSlide(path)) {
-			path = fileRoot + i + ThemesConstants.DOT + fileType;
-			i++;
-		}
-		return path;
+		
+		StringBuffer path = new StringBuffer(fileRoot).append(ContentConstants.UNDER);
+		path.append(getUniqueIdByNumberAndDate(IDEGA_PAGES_SCOPE)).append(ThemesConstants.DOT).append(fileType);
+		
+		return path.toString();
 	}
 	
 	public String changeFileUploadPath(String path) {
 		if (path == null) {
 			return null;
 		}
-		path = StringHandler.removeCharacters(path, ContentConstants.SPACE, ContentConstants.UNDER);
-		path = StringHandler.removeCharacters(path, ContentConstants.BRACKET_OPENING, ContentConstants.EMPTY);
-		path = StringHandler.removeCharacters(path, ContentConstants.BRACKET_CLOSING, ContentConstants.EMPTY);
+
+		path = getFixedSlideFileName(path);
+		StringBuffer tempPath = new StringBuffer(path);
+		
 		int i = 1;
-		String tempPath = path;
-		while (existInSlide(tempPath)) {
-			tempPath = path + i;
+		while (existInSlide(tempPath.toString())) {
+			tempPath = new StringBuffer(path).append(i);
 			i++;
 		}
-		path = tempPath;
+		path = tempPath.toString();
 		return path;
 	}
 	
@@ -1224,7 +1236,7 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		
-		IWContext iwc = getIWContext();
+		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return null;
 		}
@@ -1303,17 +1315,17 @@ public class ThemesHelper implements Singleton {
 		return commentPath.toString();
 	}
 	
-	private void addIDsToModules(Element root, int pageID) {
+	private boolean addIDsToModules(Element root, int pageID) {
 		if (root == null || pageID < 1) {
-			return;
+			return false;
 		}
 		Iterator allElements = root.getDescendants();
 		if (allElements == null) {
-			return;
+			return false;
 		}
 		Element e = null;
 		Object o = null;
-		Attribute moduleId = null;
+		Attribute moduleIdAttribute = null;
 		
 		String module = "module";
 		String id = "id";
@@ -1330,41 +1342,51 @@ public class ThemesHelper implements Singleton {
 		try {
 			icoiHome = (ICObjectInstanceHome) IDOLookup.getHome(ICObjectInstance.class);
 			icoHome = (ICObjectHome)IDOLookup.getHome(ICObject.class);
-		} catch (Exception ex) {
-			log.error(ex);
-			return;
-		}
-
-		for (Iterator it = allElements; it.hasNext(); ) {
-			o = it.next();
-			if (o instanceof Element) {
-				e = (Element) o;
-				if (module.equals(e.getName())) {
-					icObjectId = getICObjectId(e.getAttributeValue(className), icoHome);
-					if (icObjectId == -1) {
-						log.error("Didn't get ICObject for: " + e.getAttributeValue(className));
-					}
-					else {
-						try {
+			for (Iterator it = allElements; it.hasNext(); ) {
+				o = it.next();
+				moduleID = null;
+				if (o instanceof Element) {
+					e = (Element) o;
+					if (module.equals(e.getName())) {
+						icObjectId = getICObjectId(e.getAttributeValue(className), icoHome);
+						if (icObjectId == -1) {
+							log.error(new StringBuffer("Didn't get ICObject for: ").append(e.getAttributeValue(className)));
+							log.info("Generating unique module id");
+							moduleID = getUniqueIdByNumberAndDate(MODULE_ID_SCOPE);
+							while (moduleIds.contains(moduleID)) {
+								moduleID = getUniqueIdByNumberAndDate(MODULE_ID_SCOPE);
+							}
+							moduleIds.add(moduleID);
+							moduleID = new StringBuffer(ICObjectBusiness.UUID_PREFIX).append(moduleID).toString();
+						}
+						else {
 							instance = icoiHome.create();
 							instance.setICObjectID(icObjectId);
 							instance.setIBPageByKey(pageKey);
 							instance.store();
-							moduleID = ICObjectBusiness.UUID_PREFIX + instance.getUniqueId();
-							moduleId = e.getAttribute(id);
-							if (moduleId != null) {
-								moduleId.setValue(moduleID);
-							}
-						} catch (CreateException ce) {
-							log.error(ce);
+							moduleID = new StringBuffer(ICObjectBusiness.UUID_PREFIX).append(instance.getUniqueId()).toString();
+						}
+						moduleIdAttribute = e.getAttribute(id);
+						if (moduleIdAttribute != null) {
+							moduleIdAttribute.setValue(moduleID);
+						}
+						else {
+							log.error(new StringBuffer("Didn't find module id attribute for: ").append(e.getAttributeValue(className)));
 						}
 					}
 				}
 			}
+		} catch (Exception ex) {
+			log.error(ex);
 		}
+		return true;
 	}
 	
 	private int getICObjectId(String className, ICObjectHome icoHome) {
+		if (className == null || icoHome == null) {
+			return -1;
+		}
+		
 		ICObject object = null;
 		try {
 			object = icoHome.findByClassName(className);
@@ -1402,7 +1424,7 @@ public class ThemesHelper implements Singleton {
 	public String getFullServerName(IWContext iwc) {
 		StringBuffer server = new StringBuffer();
 		if (iwc == null) {
-			iwc = getIWContext();
+			iwc = CoreUtil.getIWContext();
 		}
 		
 		if (iwc == null) {
@@ -1465,19 +1487,7 @@ public class ThemesHelper implements Singleton {
 		return true;
 	}
 	
-	public IWContext getIWContext() {
-		FacesContext context = FacesContext.getCurrentInstance();
-		if (context == null) {
-			return null;
-		}
-		IWContext iwc = IWContext.getIWContext(context);
-		if (iwc == null) {
-			return null;
-		}
-		return iwc;
-	}
-	
-	public boolean existFileInSlide(String path) {
+	private boolean existFileInSlide(String path, boolean printError) {
 		if (path == null) {
 			return false;
 		}
@@ -1497,6 +1507,10 @@ public class ThemesHelper implements Singleton {
 		return true;
 	}
 	
+	public boolean existFileInSlide(String path) {
+		return existFileInSlide(path, false);
+	}
+	
 	public String getUniqueIdByNumberAndDate(String scope) {
 		StringBuffer id = new StringBuffer();
 		id.append(getRandomNumber(Integer.MAX_VALUE)).append(getSlideService().createUniqueFileName(scope));
@@ -1514,7 +1528,7 @@ public class ThemesHelper implements Singleton {
 	
 	public String getCurrentLanguage(IWContext iwc) {
 		if (iwc == null) {
-			iwc = getIWContext();
+			iwc = CoreUtil.getIWContext();
 		}
 		if (iwc == null) {
 			return Locale.ENGLISH.toString();
@@ -1553,7 +1567,7 @@ public class ThemesHelper implements Singleton {
 		if (keys == null) {
 			return false;
 		}
-		IWContext iwc = getIWContext();
+		IWContext iwc = CoreUtil.getIWContext();
 		
 		//	Removing Block from cache
 		for (int i = 0; i < keys.size(); i++) {
@@ -1578,8 +1592,6 @@ public class ThemesHelper implements Singleton {
 	 * @return true - success, false - failure
 	 */
 	protected boolean generatePreviewsForTheme(Theme theme, boolean useDraft, boolean isJpg, float quality) {
-		isJpg = false;	//	TODO: remove it
-		
 		String url = getFullWebRoot();
 		String bigPreviewName = null;
 		String smallPreviewName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).toString();
@@ -1615,7 +1627,7 @@ public class ThemesHelper implements Singleton {
 			image = images.get(i);
 			stream = imageGenerator.getImageInputStream(image, extension);
 			try {
-				if (image.getWidth() == ThemesConstants.PREVIEW_WIDTH) {	// Is it a big image?
+				if (image.getWidth() >= ThemesConstants.PREVIEW_WIDTH) {	// Is it a big image?
 					if (slide.uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), bigPreviewName, stream, mimeType, true)) {
 						if (useDraft) {
 							theme.setLinkToDraftPreview(bigPreviewName);

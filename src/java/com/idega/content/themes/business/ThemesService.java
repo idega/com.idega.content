@@ -31,6 +31,11 @@ public interface ThemesService extends IBOService, IWSlideChangeListener {
 	 * @see com.idega.content.themes.business.ThemesServiceBean#updatePageWebDav
 	 */
 	public boolean updatePageWebDav(int id, String uri);
+	
+	/**
+	 * @see ThemesServiceBean#updatePageWebDav(int, String, boolean)
+	 */
+	public boolean updatePageWebDav(int id, String uri, boolean clearCache);
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesServiceBean#createIBPage

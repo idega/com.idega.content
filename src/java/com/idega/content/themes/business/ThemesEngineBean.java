@@ -41,6 +41,7 @@ import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.servlet.filter.IWWelcomeFilter;
+import com.idega.util.CoreUtil;
 import com.idega.webface.WFUtil;
 
 public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
@@ -174,7 +175,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		}
 		if (iwc == null) {
-			iwc = helper.getIWContext();
+			iwc = CoreUtil.getIWContext();
 			if (iwc == null) {
 				return false;
 			}
@@ -204,7 +205,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return null;
 		}
 		
-		IWContext iwc = helper.getIWContext();
+		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return null;
 		}
@@ -248,7 +249,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	 * 
 	 */
 	public boolean setSelectedStyle(String themeID, String pageID, boolean applyToPage) {
-		IWContext iwc = helper.getIWContext();
+		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return false;
 		}
@@ -340,7 +341,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		}
 		
-		IWContext iwc = helper.getIWContext();
+		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return false;
 		}
@@ -381,7 +382,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		ICDomain domain = null;
-		IWContext iwc = helper.getIWContext();
+		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return null;
 		}
@@ -414,7 +415,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (builder == null) {
 			return false;
 		}
-		IWContext iwc = helper.getIWContext();
+		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return false;
 		}
@@ -468,7 +469,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (keywords.length != values.length) {
 			return null;
 		}
-		IWContext iwc = helper.getIWContext();
+		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return null;
 		}
@@ -529,7 +530,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (ThemesConstants.MINUS_ONE.equals(pageID)) {
 			return null;
 		}
-		IWContext iwc = helper.getIWContext();
+		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return null;
 		}
@@ -626,7 +627,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		else {
 			//	System Settings
 			if (domain == null) {
-				IWContext iwc = helper.getIWContext();
+				IWContext iwc = CoreUtil.getIWContext();
 				if (iwc != null) {
 					domain = iwc.getDomain();
 				}
@@ -708,7 +709,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		}
 		
-		IWContext iwc = helper.getIWContext();
+		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return false;
 		}
@@ -770,6 +771,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		String format = builder.getIBXMLFormat();
 		String pageKey = null;
 		
+		List<String> createdPages = new ArrayList<String>();
+		
 		TreeNodeStructure node = null;
 		for (int i = 0; i < struct.size(); i++) {
 			node = struct.get(i);
@@ -786,6 +789,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				break;
 			}
 			pageKey = String.valueOf(pageID);
+			createdPages.add(pageKey);
 			
 			if (domain != null) {
 				if ((domain.getStartPage() == null) && (isTopLevelPage)) {
@@ -807,8 +811,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			uri = null;
 			isRootPage = false;
 
-			preparePage(node.getTemplateFile(), node.getPageType(), pageID, pageKey);
-			setLastUsedTemplate(pageKey);
+			preparePage(node.getTemplateFile(), node.getPageType(), pageID, pageKey, false);
 
 			for (int j = i; j < struct.size(); j++) {
 				if (struct.get(j).getParentId() != null) {
@@ -820,7 +823,17 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 
 			newIds.add(pageKey);
 		}
+		
+		//	Clearing cache
+		builder.clearAllCachedPages();
+		
+		//	Setting template id for new page(s)
+		String lastUsedTemplate = helper.getLastUsedTheme();
+		for (int i = 0; i < createdPages.size(); i++) {
+			setLastUsedTemplate(createdPages.get(i), lastUsedTemplate);
+		}
 
+		//	Creating new tree order
 		increaseNodesNumbersInLevel(followingNodes, -1, null);
 		
 		return newIds;
@@ -830,7 +843,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return createPage(parentId, name, type, templateId, pageUri, subType, domainId, format, sourceMarkup, null);
 	}
 	
-	private boolean preparePage(String templateFile, String pageType, int pageID, String realID) {
+	private boolean preparePage(String templateFile, String pageType, int pageID, String realID, boolean clearCache) {
 		if (templateFile == null || pageType == null || pageID < 0 || realID == null) {
 			return false;
 		}
@@ -840,19 +853,20 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		String articlePath = helper.createArticle(pageType, pageID);
 		String uriToPage = helper.loadPageToSlide(pageType, templateFile, articlePath, pageID);
 		if (uriToPage != null) {
-			helper.getThemesService().updatePageWebDav(pageID, uriToPage);
+			helper.getThemesService().updatePageWebDav(pageID, uriToPage, clearCache);
 		}
 		return true;
 	}
 	
 	private void setLastUsedTemplate(String pageKey) {
-		if (pageKey == null) {
+		setLastUsedTemplate(pageKey, helper.getLastUsedTheme());
+	}
+	
+	private void setLastUsedTemplate(String pageKey, String templateKey) {
+		if (pageKey == null || templateKey == null) {
 			return;
 		}
-		String lastTheme = helper.getLastUsedTheme();
-		if (lastTheme != null) {
-			helper.getThemesService().getBuilderService().setTemplateId(pageKey, lastTheme);
-		}
+		helper.getThemesService().getBuilderService().setTemplateId(pageKey, templateKey);
 	}
 	
 	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup, String treeOrder) {
@@ -931,7 +945,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	public boolean movePage(int newParentId, int nodeId, int numberInLevel, ArrayList<String> nodesToIncrease, ArrayList<String> nodesToDecrease) {
-		IWContext iwc = helper.getIWContext();
+		IWContext iwc = CoreUtil.getIWContext();
 		boolean result = false;
 		if (iwc == null) {
 			return false;
@@ -1007,41 +1021,51 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		BuilderService builder = helper.getThemesService().getBuilderService();
 		
-		IWContext iwc = helper.getIWContext();
+		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return null;
 		}
-		
-		ICDomain domain = null;
-		domain = iwc.getDomain();
 		
 		ICPage newRootPage = helper.getThemesService().getICPage(newRoot);
 		if (newRootPage == null) {
 			return null;
 		}
 		
+		//	Setting new tree order
 		manageNewSiteTreeOrder(iwc, builder, newRootPage, newRoot);
 
-		domain.setIBPage(newRootPage); // Setting new start page in ICDomain
-		domain.store();
-		newRootPage.setDefaultPageURI(ContentConstants.SLASH); // Changing uri to new start page
-		builder.createTopLevelPageFromExistingPage(newRoot, domain, iwc); // New root page now is also top level page
+		//	Setting new page root for ICDomain
+		ICDomain domain = iwc.getDomain();
+		if (domain != null) {
+			//	Setting new start page in ICDomain
+			domain.setIBPage(newRootPage);
+			domain.store();
+		}
+		
+		//	Changing uri to new start page
+		newRootPage.setDefaultPageURI(ContentConstants.SLASH);
+		//	New root page now is also top level page
+		builder.createTopLevelPageFromExistingPage(newRoot, domain, iwc);
 
+		//	Setting new tree order
 		newRootPage.setTreeOrder(1);			
 		newRootPage.store();
 		
+		//	Changing old root page's properties
 		ICPage rootPage = helper.getThemesService().getICPage(currentRoot);
 		if (rootPage == null) {
 			return null;
 		}
-		changePageUri(rootPage.getPageKey(), rootPage.getName().toLowerCase(), false); // Changing page uri from "/" to some other
-		builder.createTopLevelPageFromExistingPage(currentRoot, domain, iwc); // Old root page now is a simple top level page
+		//	Changing page uri from "/" to some other
+		changePageUri(rootPage.getPageKey(), rootPage.getName().toLowerCase(), false);
+		//	Old root page now is a simple top level page
+		builder.createTopLevelPageFromExistingPage(currentRoot, domain, iwc);
 		
 		TreeableEntity parent = newRootPage.getParentEntity();
 		if (parent instanceof ICPage) {
 			ICPage parentPage = (ICPage) parent;
 			try {
-				parentPage.removeChild(newRootPage); // Removing new root as child from his old parent node
+				parentPage.removeChild(newRootPage);	//	Removing new root as child from his old parent node
 			} catch (SQLException e) {
 				log.error(e);
 			}
@@ -1098,7 +1122,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (builder == null) {
 			return false;
 		}
-		IWContext iwc = helper.getIWContext();
+		IWContext iwc = CoreUtil.getIWContext();
 		
 		String articleTemplateFile = "article_viewer_template.xml";
 		boolean existInSlide = false;
@@ -1118,7 +1142,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		String pageKey = String.valueOf(id);
-		boolean result = preparePage(articleTemplateFile, ARTICLE_VIEWER_SUBTYPE, id, pageKey);
+		boolean result = preparePage(articleTemplateFile, ARTICLE_VIEWER_SUBTYPE, id, pageKey, true);
 		setLastUsedTemplate(pageKey);
 		if (iwc == null) {
 			return result;
@@ -1339,7 +1363,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		List <String>localizedText = new ArrayList<String>();
 		IWResourceBundle resourceBundle = null;
 		try {
-			resourceBundle = ContentUtil.getBundle().getResourceBundle(helper.getIWContext());
+			resourceBundle = ContentUtil.getBundle().getResourceBundle(CoreUtil.getIWContext());
 		} catch (Exception e) {
 			log.error(e);
 		}
@@ -1377,7 +1401,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	public boolean startBuilderApplication() {
-		IWContext iwc = helper.getIWContext();
+		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return false;
 		}
