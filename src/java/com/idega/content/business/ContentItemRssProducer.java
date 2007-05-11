@@ -33,6 +33,7 @@ import com.idega.slide.business.IWContentEvent;
 import com.idega.slide.business.IWSlideChangeListener;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.util.WebdavExtendedResource;
+import com.idega.util.CoreUtil;
 import com.idega.util.FileUtil;
 //import com.sun.jmx.snmp.Timestamp;
 import com.sun.syndication.feed.synd.SyndContent;
@@ -113,7 +114,7 @@ public class ContentItemRssProducer  extends RSSAbstractProducer implements RSSP
 	}
 	public void searchForArticles() {
 //	public void createRSSFile(RSSRequest rssRequest, String fixedUri) {
-		IWContext iwc = ThemesHelper.getInstance().getIWContext();
+		IWContext iwc = CoreUtil.getIWContext();
 		System.out.println("Context: " + iwc);
 		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
 		
