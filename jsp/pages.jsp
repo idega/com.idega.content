@@ -6,6 +6,8 @@
         xmlns:ws="http://xmlns.idega.com/com.idega.workspace"
  		xmlns:c="http://xmlns.idega.com/com.idega.content"
         xmlns:x="http://myfaces.apache.org/tomahawk"
+        xmlns:web2="http://xmlns.idega.com/com.idega.block.web2.0"
+        xmlns:f="http://java.sun.com/jsf/core"
 version="1.2">
 	<jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 	<jsf:view>
@@ -13,9 +15,7 @@ version="1.2">
         				/dwr/interface/ThemesEngine.js,
         				/dwr/interface/BuilderService.js,
 						/dwr/interface/PagePreview.js,
-						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/prototype/1.5.0/prototype.js,
-						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/behaviour.js,
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.0.0/mootools-all-compressed.js,
+						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/behaviour-mootools.js,	
         				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/reflection.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
@@ -34,7 +34,36 @@ version="1.2">
                 </jsf:verbatim>
                 
                 <wf:wfblock maximizedVertically="true" id="pagesBlock" title="#{localizedStrings['com.idega.content']['pages']}">
- 
+                <x:div id="leftSide" forceId="true" styleClass="accordionInPages">
+					<web2:accordion accordionId="myAccordion" includeJavascript="true">
+							<f:facet name="PANELS">
+								<x:div id="accordion" forceId="true">
+										<x:div id="siteMapInformation" forceId="true" styleClass="acTogglemyAccordion"><h:outputText value="Site map info"/></x:div>
+										<x:div id="sitemap" forceId="true" styleClass="acStretchmyAccordion">
+ 										
+											<x:div id="site_tree_container" forceId="true">
+							                	<c:block_with_toolbar id="page_tree_div" styleClass="site_tree_container_site_accordion" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png">
+													<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
+														<jsf:facet name="PageTreeNode">
+															<h:outputLink onclick="setPageID(this.parentNode.id);return false;">
+																<h:outputText value="#{node.description}"/>
+															</h:outputLink>
+														</jsf:facet>
+													</wf:iwtree>
+												</c:block_with_toolbar>
+											</x:div>										
+
+										</x:div>
+																				
+									<x:div id="siteinformation" forceId="true" styleClass="acTogglemyAccordion"><h:outputText value="Site info"/></x:div>
+									<x:div id="siteInfoToggle" forceId="true" styleClass="acStretchmyAccordion">
+						<c:PageInfo id="customizePage" styleClass="pageInfoStyle_accordion"></c:PageInfo>
+									</x:div>
+								</x:div>
+							</f:facet>
+					</web2:accordion>     
+					</x:div>           
+ <!-- 
 					<x:div id="site_tree_container" forceId="true">
 	                	<c:block_with_toolbar id="page_tree_div" styleClass="site_tree_container_pages" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png">
 							<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
@@ -46,7 +75,7 @@ version="1.2">
 							</wf:iwtree>
 						</c:block_with_toolbar>
 					</x:div>
-					
+ -->					
 					<x:div styleClass="pagePreviewContainer">
 						<jsf:verbatim>
 							<iframe id="treePages" class="pagePreviewFrame">iframe</iframe>
@@ -68,11 +97,11 @@ version="1.2">
 							<x:graphicImage url="/idegaweb/bundles/com.idega.content.bundle/resources/images/right.gif" onclick="scroll(this.id);" id="rightScroller" forceId="true" title="#{localizedStrings['com.idega.content']['scroll_right']}"></x:graphicImage>
 						</x:div>
 					</x:div>
-					
+<!-- 
 					<x:div id="pageInfoContainer" forceId="true">
 						<c:PageInfo id="customizePage" styleClass="pageInfoStyle"></c:PageInfo>
 					</x:div>
-					
+ -->										
                 </wf:wfblock>
                 
                 <x:div id="newPageContainer" forceId="true" styleClass="newPageContainerStyle" style="display: none; left: 8px;">
