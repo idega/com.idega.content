@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xml>
-  <page type="text">
-    <module id="" class="com.idega.presentation.text.Heading4">
-	    <property>
-	    	<name>:method:1:implied:void:setText:java.lang.String:</name>
-	    	<value>This could be a very nice egov form page</value>
-	    	<type>java.lang.String</type>
-	    </property>
-    </module>
-    <module id="" class="com.idega.block.form.presentation.FormViewer" />
+  <page type="formbuilder_form">
+	<region id="left" label="left">
+		<module id="" class="com.idega.block.form.presentation.FormViewer">
+			<property name="regionId" value="left" />
+		</module>
+	</region>
   </page>
 </xml>
