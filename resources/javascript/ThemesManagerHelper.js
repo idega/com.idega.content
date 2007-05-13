@@ -90,7 +90,7 @@ function getThemeStyleVariationsCallback(variations) {
 		return;
 	}
 	removeChildren(container);
-	insertNodesToContainer(variations, container);
+	container.innerHTML = variations;
 }
 
 function changeTheme(themeID, styleGroupName, newStyleMember, type, checked) {
@@ -402,7 +402,6 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
 	            image.attachEvent("onmouseout", function(e){recallStyle(this.id);});
             }
         }
-        image.className = "reflect rheight18 ropacity68";
         imageDiv.className = "galleryImage firstInRow";
         imageDiv.appendChild(image);
         div.appendChild(imageDiv);
@@ -430,20 +429,20 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
 		theme = THEMES[0];
 	}
 	
-	if (theme != null) {
-		if (enableStyleVariations) {
-			getThemeStyleVariations(theme.id);
-		}
-		setGlobalId(theme.id);
-	}
-	
-	// Adding reflection
-	addReflectionToThemes();
-	
 	if (needApplyThemeForSite) {
 		needApplyThemeForSite = false;
 		applyThemeForSite(THEME_ID);
 	}
+	
+	if (theme != null) {
+		setGlobalId(theme.id);
+		if (enableStyleVariations) {
+			getThemeStyleVariations(theme.id);
+		}	
+	}
+	
+	// Adding reflection
+	//addReflectionToThemes();
 }
 
 function getDefaultTheme() {

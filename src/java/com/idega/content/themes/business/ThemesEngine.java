@@ -13,8 +13,6 @@ import com.idega.business.IBOService;
 import java.util.List;
 import java.rmi.RemoteException;
 
-import org.jdom.Document;
-
 public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getThemesPreviewsInfo
@@ -24,7 +22,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getThemeStyleVariations
 	 */
-	public Document getThemeStyleVariations(String themeID) throws RemoteException;
+	public String getThemeStyleVariations(String themeID) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#changeTheme

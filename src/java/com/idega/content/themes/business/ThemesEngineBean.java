@@ -13,7 +13,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jdom.Document;
 
 import com.idega.business.IBOServiceBean;
 import com.idega.content.business.ContentConstants;
@@ -162,12 +161,12 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void putVariationsToCache(Document variation, IWContext iwc, String themeID) {
-		if (variation == null || iwc == null || themeID == null) {
+	private void putVariationsToCache(String variations, IWContext iwc, String themeID) {
+		if (variations == null || iwc == null || themeID == null) {
 			return;
 		}
-		Map variations = getVariationsCache(iwc);
-		variations.put(themeID, variation);
+		Map variationsCache = getVariationsCache(iwc);
+		variationsCache.put(themeID, variations);
 	}
 	
 	public boolean clearVariationFromCache(String themeID, IWContext iwc) {
@@ -188,11 +187,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	private Document getVariationsFromCache(String themeID, IWContext iwc) {
+	private String getVariationsFromCache(String themeID, IWContext iwc) {
 		Map variations = getVariationsCache(iwc);
 		Object o = variations.get(themeID);
-		if (o instanceof Document) {
-			return (Document) o;
+		if (o instanceof String) {
+			return (String) o;
 		}
 		return null;
 	}
@@ -200,7 +199,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	/**
 	 * 
 	 */
-	public Document getThemeStyleVariations(String themeID) {
+	public String getThemeStyleVariations(String themeID) {
 		if (themeID == null) {
 			return null;
 		}
@@ -210,7 +209,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return null;
 		}
 		
-		Document cachedVariations = getVariationsFromCache(themeID, iwc);
+		String cachedVariations = getVariationsFromCache(themeID, iwc);
 		if (cachedVariations != null) {
 			return cachedVariations;
 		}
@@ -226,9 +225,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 
 		WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "setThemeId", themeID, String.class);
-		Document variation = service.getRenderedPresentationObject(iwc, new ThemeStyleVariations(), true);
-		putVariationsToCache(variation, iwc, themeID);
-		return variation;
+		String variations = service.getRenderedPresentationObjectAsString(iwc, new ThemeStyleVariations(), false);
+		putVariationsToCache(variations, iwc, themeID);
+		return variations;
 	}
 	
 	/**
