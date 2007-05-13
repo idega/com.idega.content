@@ -9,10 +9,15 @@
 version="1.2">
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 	<jsf:view>
-        <ws:page id="themeManager" javascripturls="/dwr/engine.js,
+        <ws:page id="themeManager" javascripturls="
+        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.1.0/mootools-all-compressed.js,
+						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/for_mootools/1.1/reflection.js,
+						
+						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/transcorners/Transcorners.js,
+						
+						/dwr/engine.js,
         				/dwr/interface/ThemesEngine.js,
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.0.0/mootools-all-compressed.js,
-						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/reflection.js,
+						
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/PageInfoHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js">
@@ -21,6 +26,7 @@ version="1.2">
 					<script type="text/javascript">
 						registerEvent(window, "load", getLocalizedTextForThemes);
 						registerEvent(window, "load", initializeThemes);
+						registerEvent(window, "load", roundThemesSliderCorners);
 					</script>
 				</jsf:verbatim>
 				<wf:wfblock id="themeManagerBlock" title="#{localizedStrings['com.idega.content']['themes']}" >

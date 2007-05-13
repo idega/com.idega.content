@@ -452,7 +452,6 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 }
 
 .pageInfoStyle_accordion {
-
 	position: relative;
 	top : 0px;
 	z-index: 1;
@@ -477,6 +476,15 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	bottom: 0px;
 	border: 1px solid #D7D7D7;
 	z-index: 1;
+}
+
+.siteInfoStyle_accordion {
+	position: relative;
+	z-index: 1;
+	width: 260px;
+	height: 280px;
+	border: 1px solid #D7D7D7;
+	overflow: auto;
 }
 
 .currentStructureStyle {
@@ -768,15 +776,19 @@ margin: 0 !important;
 }
 
 #siteInfoContainer .wf_titlebar{
-display: block !important;
-background: #fff;
+	display: none !important;
+	background: #fff;
 }
+
 #siteInfoToggle .wf_titlebar{
-display: none;
-background: #fff;
+	display: none;
+	background: #fff;
 }
 
-
+#pageInfoToggle .wf_titlebar{
+	display: none;
+	background: #fff;
+}
 
 /* Various site manager styles end */
 
@@ -851,4 +863,8 @@ overflow: auto !important;
 }
 #sitemap{
 	overflow-y:auto !important;	
+}
+
+#makeStartPage {
+	left: 50%;
 }

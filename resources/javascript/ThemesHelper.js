@@ -476,3 +476,11 @@ function startBuilderApplication() {
 
 function startBuilderApplicationCallback(result) {
 }
+
+function roundThemesSliderCorners() {
+	/*var container = document.getElementById('themesSliderContainer');
+	if (container == null) {
+		return;
+	}
+	container.makeRounded();*/
+}
