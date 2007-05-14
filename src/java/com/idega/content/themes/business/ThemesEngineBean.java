@@ -1070,7 +1070,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			}
 		}
 		
-		builder.clearAllCachedPages();
+		builder.clearAllCaches();
 		
 		return newRootPage.getDefaultPageURI();
 	}
