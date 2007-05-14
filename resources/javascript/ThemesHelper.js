@@ -269,8 +269,9 @@ var STYLE_FOR_CURRENT_PAGE = "Select style for current page";
 var STYLE_FOR_SITE = "Select style for all pages";
 var APPLYING_STYLE = "Applying style...";
 var CLOSE_TEXT = "Close";
-var START_PAGE_TEXT = "This Page is A Start Page";
-var MAKE_START_PAGE_TEXT = "Make This Page As Start Page";
+var START_PAGE_TEXT = "Start Page";
+var MAKE_START_PAGE_TEXT = "Make Start Page";
+var MAKE_THIS_PAGE_START_PAGE_TEXT="Make This Page As Start Page";
 var CHANGING_STRUCTURE_TEXT = "Changing structure...";
 var NEW_PAGE_TEXT = "New Page";
 var MOVING = "Moving...";
@@ -290,7 +291,7 @@ function getLocalizedTextForThemesCallback(list) {
 	if (list == null) {
 		return;
 	}
-	if (list.length != 23) {
+	if (list.length != 24) {
 		return;
 	}
 	UPLOADING_THEME = list[0];
@@ -316,6 +317,7 @@ function getLocalizedTextForThemesCallback(list) {
 	DROP_TEMPLATES_HERE = list[20];
 	NO_PAGE_EXISTS_TEXT = list[21];
 	LOADING_TEXT = list[22];
+	MAKE_THIS_PAGE_START_PAGE_TEXT = list[23];
 }
 
 function getUploadingThemeText() {
@@ -408,6 +410,10 @@ function getNoPageExistsText() {
 
 function getLoadingText() {
 	return LOADING_TEXT;
+}
+
+function getMakeThisPageStartPageText() {
+	return MAKE_THIS_PAGE_START_PAGE_TEXT;
 }
 // Localized text ends
 

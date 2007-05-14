@@ -17,7 +17,6 @@ import com.idega.presentation.TableRow;
 import com.idega.presentation.TableRowGroup;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.webface.WFBlock;
-import com.idega.webface.WFMenu;
 import com.idega.webface.WFTitlebar;
 
 public class PageInfo extends ContentBlock {
@@ -33,15 +32,13 @@ public class PageInfo extends ContentBlock {
 		
 		pageInfo.setTitle(getBundle().getLocalizedString("page_info"));
 		
-		pageInfo.setToolbar(getToolbar());
-		
 		WFTitlebar bar = new WFTitlebar();
 		bar.addTitleText(getBundle().getLocalizedText("page_info"));
 		pageInfo.setTitlebar(bar);
 		
 		ThemesHelper.getInstance().loadPageSettings(ThemesHelper.getInstance().getWebRootWithoutContent() +
 				ThemesConstants.PAGE_SETTINGS);
-		Iterator <Setting> it = ThemesHelper.getInstance().getPageSettings().values().iterator();
+		Iterator <Setting> pageSettings = ThemesHelper.getInstance().getPageSettings().values().iterator();
 		Setting s = null;
 		HtmlOutputText label = null;
 		HtmlInputText input = null;
@@ -51,7 +48,7 @@ public class PageInfo extends ContentBlock {
 		TableRow row = null;
 		TableCell2 cell = null;
 		String keyPressAction = "return savePageInfoWithEnter(event)";
-		while(it.hasNext()) {
+		for (Iterator<Setting> it = pageSettings; it.hasNext();) {
 			s = it.next();
 			label = new HtmlOutputText();
 			label.setValue(s.getLabel());
@@ -68,6 +65,13 @@ public class PageInfo extends ContentBlock {
 		}
 
 		pageInfo.add(table);
+		
+		GenericButton save = new GenericButton("saveButton", ContentUtil.getBundle().getLocalizedString("save"));
+		save.setInputType("button");
+		save.setId("saveButton");
+		save.setStyleClass("saveButtonStyleClass");
+		pageInfo.add(save);
+		
 		add(pageInfo);
 	}
 
@@ -77,16 +81,6 @@ public class PageInfo extends ContentBlock {
 
 	public void setStyleClass(String styleClass) {
 		this.styleClass = styleClass;
-	}
-	
-	private WFMenu getToolbar() {
-		WFMenu toolbar = new WFMenu();
-		GenericButton button = new GenericButton("makeStartPage", ContentUtil.getBundle().getLocalizedString("make_start_page"));
-		button.setOnClick("makePageAsStartPage();");
-		button.setInputType("button");
-		button.setId("makeStartPage");
-		toolbar.setMenuHeader(button);
-		return toolbar;
 	}
 
 }

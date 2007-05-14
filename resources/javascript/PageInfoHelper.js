@@ -370,6 +370,7 @@ function isStartPageCallback(isStart) {
 	}
 	else {
 		button.value = getMakeStartPageText();
+		button.title = getMakeThisPageStartPageText();
 	}
 	
 	boldCurrentTreeElement();

@@ -369,6 +369,7 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	text-align: center;
 	color: #FFFFFF;
 	clear: left;
+	font-family: Trebuchet MS,Verdana,Sans-serif;
 }
 
 .usedThemeName {
@@ -837,7 +838,7 @@ overflow: auto !important;
 
 #site_tree_container .site_tree_container_site_accordion {
 	right: 0px;
-	width: 260px;
+	width: 275px;
 	height: 400px !important;
 }
 
@@ -860,6 +861,7 @@ overflow: auto !important;
 }
 #site_tree_container{
 	height: 400px !important;
+	width: 275px;
 }
 #sitemap{
 	overflow-y:auto !important;	

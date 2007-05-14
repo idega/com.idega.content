@@ -47,7 +47,7 @@ version="1.2">
 									
 									<x:div id="sitemap" forceId="true" styleClass="acStretchmyAccordion">
 	 									<x:div id="site_tree_container" forceId="true">
-	 										<c:block_with_toolbar id="page_tree_div" styleClass="site_tree_container_site_accordion" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png">
+	 										<c:block_with_toolbar id="page_tree_div" styleClass="site_tree_container_site_accordion" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png" addStartPageButton="true">
 												<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 													<jsf:facet name="PageTreeNode">
 														<h:outputLink styleClass="pageTreeNames">
@@ -118,7 +118,6 @@ version="1.2">
 					<x:commandButton id="newPageButton" forceId="true" styleClass="newPageButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['new_page']}"></x:commandButton>
 				</x:div>
 				<x:div styleClass="rightButtonStyle">
-					<x:commandButton id="saveButton" forceId="true" styleClass="saveButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
 					<x:commandButton id="showThemesButton" forceId="true" styleClass="showThemesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['show_themes']}"></x:commandButton>
 				</x:div>
 			</h:form>

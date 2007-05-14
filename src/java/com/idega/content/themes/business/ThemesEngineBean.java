@@ -1381,8 +1381,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			localizedText.add(resourceBundle.getLocalizedString("style_for_site", "Select style for all pages"));				// 8
 			localizedText.add(resourceBundle.getLocalizedString("applying_style", "Applying style..."));						// 9
 			localizedText.add(resourceBundle.getLocalizedString("close", "Close"));												// 10
-			localizedText.add(resourceBundle.getLocalizedString("start_page_text", "This Page is A Start Page"));				// 11
-			localizedText.add(resourceBundle.getLocalizedString("make_start_page", "Make This Page As Start Page"));			// 12
+			localizedText.add(resourceBundle.getLocalizedString("start_page_text", "Start Page"));								// 11
+			localizedText.add(resourceBundle.getLocalizedString("make_start_page", "Make Start Page"));							// 12
 			localizedText.add(resourceBundle.getLocalizedString("changing_structure", "Changing structure..."));				// 13
 			localizedText.add(resourceBundle.getLocalizedString("new_page", "New Page"));										// 14
 			localizedText.add(resourceBundle.getLocalizedString("moving", "Moving..."));										// 15
@@ -1393,6 +1393,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			localizedText.add(resourceBundle.getLocalizedString("drop_templates_here", "Drop templates here"));					// 20
 			localizedText.add(resourceBundle.getLocalizedString("no_page_exist", "No page exist"));								// 21
 			localizedText.add(resourceBundle.getLocalizedString("loading", "Loading..."));										// 22
+			localizedText.add(resourceBundle.getLocalizedString("make_this_page_start_page", "Make This Page As Start Page"));	// 23
 		} catch (Exception e) {
 			log.error(e);
 		}

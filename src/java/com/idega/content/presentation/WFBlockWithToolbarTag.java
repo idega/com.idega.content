@@ -1,5 +1,5 @@
 /*
- * $Id: WFBlockWithToolbarTag.java,v 1.1 2007/01/23 06:52:29 justinas Exp $
+ * $Id: WFBlockWithToolbarTag.java,v 1.2 2007/05/14 09:44:24 valdas Exp $
  * 
  * Copyright (C) 2004 Idega. All Rights Reserved.
  * 
@@ -17,12 +17,13 @@ public class WFBlockWithToolbarTag extends WFBlockTag {
 
 	public WFBlockWithToolbarTag() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	private String collapseAllValue;
 	private String expandAllValue;
 	private String trashCanImage;
+	
+	private boolean addStartPageButton = false;
 
 	public String getCollapseAllValue() {
 		return collapseAllValue;
@@ -48,6 +49,14 @@ public class WFBlockWithToolbarTag extends WFBlockTag {
 		this.trashCanImage = trashCanImage;
 	}
 
+	public boolean isAddStartPageButton() {
+		return addStartPageButton;
+	}
+
+	public void setAddStartPageButton(boolean addStartPageButton) {
+		this.addStartPageButton = addStartPageButton;
+	}
+
 	public String getComponentType() {
 		return "WFBlockWithToolbar";
 	}
@@ -57,21 +66,24 @@ public class WFBlockWithToolbarTag extends WFBlockTag {
 		collapseAllValue = null;
 		expandAllValue = null;
 		trashCanImage = null;
+		addStartPageButton = false;
 	}
 
 	protected void setProperties(UIComponent component) {
 		super.setProperties(component);
 		if (component instanceof WFBlockWithToolbar) {
 			WFBlockWithToolbar blockToolbar = (WFBlockWithToolbar) component;
-			if (collapseAllValue != null)
+			if (collapseAllValue != null) {
 				blockToolbar.setCollapseAllValue(collapseAllValue);
-			// component.getAttributes().put("collapseAllValue", collapseAllValue);
-			if (expandAllValue != null)
+			}
+			if (expandAllValue != null) {
 				blockToolbar.setExpandAllValue(expandAllValue);
-			// component.getAttributes().put("expandAllValue", expandAllValue);
-			if (trashCanImage != null)
+			}
+			if (trashCanImage != null) {
 				blockToolbar.setTrashCanImage(trashCanImage);
-			// component.getAttributes().put("trashCanImage", trashCanImage);
+			}
+			blockToolbar.setAddStartPageButton(isAddStartPageButton());
+			
 			blockToolbar.setToolbarForSiteMap();
 		}
 	}
