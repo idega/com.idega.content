@@ -109,13 +109,62 @@ img#themePreview {/*
 .theme_container {
 	position: absolute;
 	top: 8px;
-	bottom: -1px;
+	bottom: 0px;
 	right: 0px;
 	width: 205px;
 	z-index: 1;
+	height: auto;
 	border: 1px solid #d7d7d7;
 	border-width: 1px 0 0 1px
+	overflow: hidden;
 }
+
+.theme_container .wf_block{
+position: absolute;
+height: 80px; !important;
+top: auto !important;
+bottom: 0 !important;
+}
+
+#themeStyleVariations{
+top: 2px !important;
+bottom: 168px !important;
+height: auto !important;
+position: absolute;
+overflow: auto;
+left: 0;
+}
+
+.themeVariationGroup li input{
+margin-bottom: -2px;
+}
+
+div#themeSaveArea{
+position: absolute;
+bottom: 85px !important;
+top: auto !important;
+height: auto !important;
+border-width: 1px 0;
+width: 100% !important;
+left: 3px
+}
+
+div#themeUsability{
+bottom: 150px;
+position: absolute;
+width: 100%;
+left: -1px;
+}
+
+div#themeSaveArea input#changeVariationsButton{
+margin-top: 5px;
+}
+
+div.themeVariationGroup{
+width: 175px !important;
+overflow: hidden;
+}
+
 
 .theme_container ul{
 	margin: 0;
