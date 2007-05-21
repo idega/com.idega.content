@@ -5,6 +5,12 @@
   </properties>
   <body>
   
+   	<release version="3.1.23" date="2007-05-21">
+      <action dev="laddi" type="update">
+		Added specific style class for each item (xxx_item_1, xxx_item_2 etc.)
+      </action>
+    </release>
+    
    	<release version="3.1.22" date="2007-05-02">
       <action dev="eiki" type="update">
 		Added manual limiting to the contentsearch results and temporarely disabled Slide DASL ordering since it doesn't work.
