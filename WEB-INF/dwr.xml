@@ -24,12 +24,10 @@
 	<signatures>
 		<![CDATA[
   			import java.util.List;
-  			import com.idega.content.themes.business.ThemesEngine;
   			import com.idega.content.themes.helpers.SimplifiedTheme;
   			import com.idega.content.themes.helpers.ThemeChange;
 			import com.idega.content.themes.helpers.TreeNodeStructure;
 			
-			ThemesEngine.getThemes();
   			ThemesEngine.applyMultipleChangesToTheme(String, List<ThemeChange>, String);
   			ThemesEngine.beforeCreatePage(List<TreeNodeStructure>, Boolean, String, List<String>);
   		]]>
