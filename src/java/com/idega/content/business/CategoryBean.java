@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.12 2007/02/23 14:33:32 gediminas Exp $
+ * $Id: CategoryBean.java,v 1.13 2007/05/30 15:15:04 gediminas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -14,13 +14,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,6 +38,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.content.data.CategoryComparator;
 import com.idega.content.data.ContentCategory;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.idegaweb.IWMainApplication;
@@ -54,10 +58,10 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2007/02/23 14:33:32 $ by $Author: gediminas $
+ *  Last modified: $Date: 2007/05/30 15:15:04 $ by $Author: gediminas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class CategoryBean {
 	private static final Log log = LogFactory.getLog(CategoryBean.class);
@@ -75,6 +79,11 @@ public class CategoryBean {
 	
 	public static final String CATEGORY_DELIMETER = ",";
 
+	public CategoryBean() {
+		this.iwma = IWMainApplication.getDefaultIWMainApplication();
+		this.categories = loadCategories();
+	}
+	
 	protected CategoryBean(IWMainApplication iwma){
 		this.iwma=iwma;
 		this.categories = loadCategories();
@@ -84,6 +93,7 @@ public class CategoryBean {
 			migrator.migrate(oldCategories);
 		}
 	}
+	
 
 	protected class CategoriesMigrator {
 		private final Log log = LogFactory.getLog(CategoriesMigrator.class);
@@ -95,7 +105,7 @@ public class CategoryBean {
 		
 		protected void migrate(Collection cats) {
 			log.info("Migrating " + CATEGORY_CONFIG_FILE + " to new format at " + CATEGORY_PROPERTIES_FILE);
-			categories = new HashMap();
+			categories = new TreeMap();
 			valuesToKeys = new HashMap();
 			String lang = getCurrentLocale();
 			for (Iterator iter = cats.iterator(); iter.hasNext();) {
@@ -223,11 +233,22 @@ public class CategoryBean {
 	}
 	
 	/**
-	 * <p> Get a collection of categories </p>
+	 * <p> Get a collection of categories, sorted by keys </p>
 	 * @return collection of strings
 	 */
-	public Collection getCategories() {
-		return this.categories.keySet();
+	public Collection<ContentCategory> getCategories() {
+		return this.categories.values();
+	}
+	
+	/**
+	 * <p> Get a collection of categories, sorted by given locale </p>
+	 * @return collection of strings
+	 */
+	public Collection<ContentCategory> getCategories(Locale locale) {
+		CategoryComparator comparator = new CategoryComparator(locale);
+		List list = new ArrayList(this.categories.values());
+		Collections.sort(list, comparator);
+		return Collections.unmodifiableCollection(list);
 	}
 	
 	public String getCategoryName(String categoryKey) {
@@ -332,7 +353,7 @@ public class CategoryBean {
 	 * @return categories as Map<String, ContentCategory>, or <code>null</code> if loading failed.
 	 */
 	protected Map loadCategories() {
-		Map map = new HashMap();
+		Map map = new TreeMap();
 		
 		try {
 			String resourcePath = getSlideService().getURI(CATEGORY_PROPERTIES_FILE);
