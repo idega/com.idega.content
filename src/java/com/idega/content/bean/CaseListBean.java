@@ -1,5 +1,5 @@
 /*
- * $Id: CaseListBean.java,v 1.4 2006/04/09 12:01:55 laddi Exp $
+ * $Id: CaseListBean.java,v 1.5 2007/05/30 15:20:09 gediminas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -18,7 +18,7 @@ import javax.faces.component.html.HtmlOutputText;
 import javax.faces.event.ActionListener;
 import javax.faces.model.DataModel;
 
-import com.idega.webface.WFPage;
+import com.idega.content.business.ContentUtil;
 import com.idega.webface.WFUtil;
 import com.idega.webface.bean.WFListBean;
 import com.idega.webface.model.WFDataModel;
@@ -26,10 +26,10 @@ import com.idega.webface.model.WFDataModel;
 /**
  * Bean for content item case list rows.   
  * <p>
- * Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
+ * Last modified: $Date: 2007/05/30 15:20:09 $ by $Author: gediminas $
  *
  * @author Anders Lindman
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 
 public class CaseListBean implements WFListBean, Serializable {
@@ -47,11 +47,11 @@ public class CaseListBean implements WFListBean, Serializable {
 	private String _status = null;
 	
 	private String[] testColumnHeaders = {
-		WFPage.CONTENT_BUNDLE + ".description", 
-		WFPage.CONTENT_BUNDLE + ".created", 
-		WFPage.CONTENT_BUNDLE + ".last_modified",
-		WFPage.CONTENT_BUNDLE + ".author",
-		WFPage.CONTENT_BUNDLE + ".status"
+		"description", 
+		"created", 
+		"last_modified",
+		"author",
+		"status"
 	};				
 	
 	/**
@@ -128,7 +128,7 @@ public class CaseListBean implements WFListBean, Serializable {
 
 		for (int i = 0; i < cols; i++) {
 			UIColumn c = new UIColumn();
-			c.setHeader(WFUtil.getTextVB(this.testColumnHeaders[i]));
+			c.setHeader(WFUtil.getTextVB(ContentUtil.IW_BUNDLE_IDENTIFIER, this.testColumnHeaders[i]));
 			columns[i] = c;
 		}
 		

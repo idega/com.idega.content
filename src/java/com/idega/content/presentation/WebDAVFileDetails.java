@@ -19,6 +19,7 @@ import javax.faces.event.ActionListener;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.util.WebdavStatus;
 import com.idega.business.IBOLookup;
+import com.idega.content.business.ContentUtil;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
@@ -110,7 +111,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 					table.add(getText("locked_unlocked"), 1, ++row);
 					if (resource.isLocked()) {
 						HtmlGraphicImage lock = new HtmlGraphicImage();
-						lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/locked.gif");
+						lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(ContentUtil.getBundle().getResourcesVirtualPath())+"/images/locked.gif");
 						lock.setId(this.getId()+"_lock");
 						lock.setHeight("16");// sizes that make sense 16/32/64/128
 						lock.setStyle("alignment:bottom");

@@ -9,7 +9,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-
 import javax.faces.component.UIColumn;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
@@ -22,11 +21,10 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import javax.faces.model.DataModel;
-
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.WebdavResources;
-
 import com.idega.business.IBOLookup;
+import com.idega.content.business.ContentUtil;
 import com.idega.content.business.WebDAVBeanComparator;
 import com.idega.content.data.WebDAVBean;
 import com.idega.core.search.presentation.SearchResults;
@@ -471,7 +469,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		if (showColumn(COLUMN_LOCK)) {
 			HtmlGraphicImage lock = new HtmlGraphicImage();
 			lock.setValueBinding("rendered", WFUtil.createValueBinding("#{"+var+".isLocked}"));
-			lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/locked.gif");
+			lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(ContentUtil.getBundle().getResourcesVirtualPath())+"/images/locked.gif");
 			lock.setId(P_ID+"_lock");
 			lock.setHeight(imageSize);// sizes that make sense 16/32/64/128
 
@@ -537,7 +535,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			delLink.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 			delLink.setId(P_ID+"_delLink");
 			HtmlGraphicImage delete = new HtmlGraphicImage();
-			delete.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(WFUtil.getContentBundle().getResourcesVirtualPath())+"/images/delete.gif");
+			delete.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(ContentUtil.getBundle().getResourcesVirtualPath())+"/images/delete.gif");
 			delete.setId(P_ID+"_delete");
 			delete.setHeight(imageSize);// sizes that make sense 16/32/64/128
 			delLink.getChildren().add(delete);
