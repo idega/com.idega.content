@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.23 2007/05/09 11:36:19 justinas Exp $
+ * $Id: IWBundleStarter.java,v 1.24 2007/06/02 18:22:54 eiki Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -40,10 +40,10 @@ import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2007/05/09 11:36:19 $ by $Author: justinas $
+ *  Last modified: $Date: 2007/06/02 18:22:54 $ by $Author: eiki $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.23 $
+ * @version $Revision: 1.24 $
  */
 //public class IWBundleStarter implements IWBundleStartable, JarLoader {
 public class IWBundleStarter implements IWBundleStartable{
@@ -163,117 +163,4 @@ public class IWBundleStarter implements IWBundleStartable{
 	            e.printStackTrace();
 	        }
 	}
-
-//	public void loadSiteTemplateFilesFromBundles(IWBundle bundle) {
-//
-//		iwma = bundle.getApplication();
-//		IWModuleLoader loader = new IWModuleLoader(iwma);
-//		loader.getJarLoaders().add(this);
-//		loader.loadBundlesFromJars();
-//	}
-
-//	public void loadJar(File bundleJarFile, JarFile jarFile, String jarPath) {
-//		JarEntry pageTemplatesEntry = jarFile.getJarEntry("resources/templates/page-templates.xml");
-//		JarEntry siteTemplatesEntry = jarFile.getJarEntry("resources/templates/site-templates.xml");
-//
-//		Map <String, PageTemplate> pageMap = null;
-//		Map <String, SiteTemplateStructure> siteMap = null;
-//		
-//		Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache("pageMap");
-//		Map siteTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache("siteMap");
-//		
-//		if (pageTemplatesEntry != null) {
-//			try {
-//				InputStream stream = jarFile.getInputStream(pageTemplatesEntry);
-//				Document pageDocument = ThemesHelper.getInstance(false).getXMLDocument(stream);
-//						
-//				Element root = pageDocument.getRootElement();		
-//				Collection siteRoot = root.getChildren();								
-//				Iterator itr = siteRoot.iterator();
-//				String pageType = null;
-//				if (pageTemplatesFromCache.containsKey("pageMap")){
-//					pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get("pageMap");
-//				}
-//				else {			
-//					pageMap = new HashMap <String, PageTemplate> ();
-//				}				
-//				
-//				while(itr.hasNext()){
-//					Element current = (Element)itr.next();
-//					PageTemplate page = new PageTemplate();
-//					pageType = current.getAttributeValue("type");
-//					page.setName(current.getAttributeValue("name"));
-//					page.setType(pageType);
-//					page.setIconFile(current.getAttributeValue("iconfile"));
-//					page.setTemplateFile(current.getAttributeValue("templatefile"));
-//					pageMap.put(pageType, page);
-//				}
-//				pageTemplatesFromCache.put("pageMap", pageMap);				
-//			}
-//			catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		if (siteTemplatesEntry != null) {
-//			try {
-//				InputStream stream = jarFile.getInputStream(siteTemplatesEntry);
-//				Document pageDocument = ThemesHelper.getInstance(false).getXMLDocument(stream);
-//						
-//				Element root = pageDocument.getRootElement();		
-//				
-//				if (siteTemplatesFromCache.containsKey("siteMap")){
-//					siteMap = (Map <String, SiteTemplateStructure>)siteTemplatesFromCache.get("siteMap");
-//				}
-//				else {			
-//					siteMap = new HashMap<String, SiteTemplateStructure>();
-//				}						
-//				siteMap = getSiteInfo(root, siteMap);
-//				siteTemplatesFromCache.put("siteMap", siteMap);
-//				
-//			}
-//			catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}		
-//	}	
-//	public Map <String, SiteTemplateStructure> getSiteInfo(Element root, Map siteMap) {
-//		
-//		Collection siteRoot = root.getChildren();			
-//		Iterator itr = siteRoot.iterator();
-//		
-//		while(itr.hasNext()){
-//			SiteTemplateStructure siteStruct = new SiteTemplateStructure();
-//			Element currentSite = (Element)itr.next();
-//			String panelName = currentSite.getAttributeValue("name");			
-//			Element structure = (Element)currentSite.getChildren().get(0);			
-//			siteStruct = getNode(structure);
-//			siteMap.put(panelName, siteStruct);		
-//		}		
-//		return siteMap;
-//	}
-
-//	public SiteTemplateStructure getNode(Element currElement){
-//		String pageName = null;	
-//		String pageType = null;
-//		String iconFile = null;
-//		String templateFile = null;
-//		SiteTemplateStructure currNode = new SiteTemplateStructure();
-//		pageType = currElement.getAttributeValue("type");
-//		currNode.setType(pageType);
-//		pageName = currElement.getAttributeValue("name");
-//		currNode.setName(pageName);
-//
-//		iconFile = currElement.getAttributeValue("iconfile");			
-//		templateFile = currElement.getAttributeValue("templatefile");				
-//		if (iconFile != null)
-//			currNode.setIconFile(iconFile);
-//		if (templateFile != null)
-//			currNode.setTemplateFile(templateFile);
-//		Iterator it = (currElement.getChildren()).iterator();
-//		while(it.hasNext()){
-//			currNode.addChild(getNode((Element)it.next()));
-//		}
-//		
-//		return currNode;
-//	}	
 }
