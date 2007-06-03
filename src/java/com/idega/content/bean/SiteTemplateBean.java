@@ -13,10 +13,9 @@ import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-import com.idega.content.TemplatesLoader;
+import com.idega.content.themes.business.TemplatesLoader;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.content.tree.PageTemplate;
-import com.idega.core.cache.IWCacheManager2;
 import com.idega.core.data.IWTreeNode;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.webface.WFTreeNode;
@@ -32,17 +31,11 @@ public class SiteTemplateBean {
 	
 	public SiteTemplateBean() {
 		super();
-		Map pageTemplatesFromCache = null;
 		FacesContext ctx = FacesContext.getCurrentInstance();
 		IWMainApplication iwma = IWMainApplication.getIWMainApplication(ctx);		
-		pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache("pageMap");
-
-		if (!pageTemplatesFromCache.containsKey("pageMap")){
-		    TemplatesLoader templatesLoader = new TemplatesLoader(iwma);
-		    templatesLoader.loadSiteTemplateFilesFromBundles();
-		}
 		
-		pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get("pageMap");
+		
+		pageMap = TemplatesLoader.getInstance(iwma).getPageTemplates();
 	}
 		
 	public WFTreeNode getPage(WFTreeNode currNode){

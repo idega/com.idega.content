@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.24 2007/06/02 18:22:54 eiki Exp $
+ * $Id: IWBundleStarter.java,v 1.25 2007/06/03 16:05:36 eiki Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -22,6 +22,7 @@ import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentIWActionURIHandler;
 import com.idega.content.business.ContentRSSProducer;
 import com.idega.content.business.ContentUtil;
+import com.idega.content.themes.business.TemplatesLoader;
 import com.idega.content.themes.business.ThemesService;
 import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.ThemesConstants;
@@ -40,10 +41,10 @@ import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2007/06/02 18:22:54 $ by $Author: eiki $
+ *  Last modified: $Date: 2007/06/03 16:05:36 $ by $Author: eiki $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.24 $
+ * @version $Revision: 1.25 $
  */
 //public class IWBundleStarter implements IWBundleStartable, JarLoader {
 public class IWBundleStarter implements IWBundleStartable{
@@ -85,8 +86,8 @@ public class IWBundleStarter implements IWBundleStartable{
 //	    loadSiteTemplateFilesFromBundles(starterBundle.getApplication());
 	    IWMainApplication iwmain = starterBundle.getApplication();
 	    
-	    TemplatesLoader templatesLoader = new TemplatesLoader(iwmain);
-	    templatesLoader.loadSiteTemplateFilesFromBundles();
+	    TemplatesLoader templatesLoader = TemplatesLoader.getInstance(iwmain);
+	    templatesLoader.loadTemplatesFromBundles();
 	
 	    SiteViewManager sViewManager = SiteViewManager.getInstance(iwmain);
 		sViewManager.initializeStandardNodes(starterBundle);

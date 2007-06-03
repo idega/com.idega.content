@@ -17,8 +17,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 import com.idega.block.web2.presentation.Accordion;
-import com.idega.content.TemplatesLoader;
-import com.idega.core.cache.IWCacheManager2;
+import com.idega.content.themes.business.TemplatesLoader;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.data.IWTreeNode;
 import com.idega.idegaweb.IWMainApplication;
@@ -37,21 +36,10 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 	public SiteTemplatesViewer() {
 		super();
 		// TODO Auto-generated constructor stub
-		Map pageTemplatesFromCache = null;
-		Map siteTemplatesFromCache = null;
 		FacesContext ctx = FacesContext.getCurrentInstance();
 		IWMainApplication iwma = IWMainApplication.getIWMainApplication(ctx);
-		
-		pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache("pageMap");
-		siteTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache("siteMap");
-		
-		if (!pageTemplatesFromCache.containsKey("pageMap") || !pageTemplatesFromCache.containsKey("siteMap")){
-		    TemplatesLoader templatesLoader = new TemplatesLoader(iwma);
-		    templatesLoader.loadSiteTemplateFilesFromBundles();
-		}		
-		
-		pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get("pageMap");		
-		siteMap = (Map <String, SiteTemplateStructure>)siteTemplatesFromCache.get("siteMap");		
+		pageMap = (Map <String, PageTemplate>)TemplatesLoader.getInstance(iwma).getPageTemplates();		
+		siteMap = (Map <String, SiteTemplateStructure>)TemplatesLoader.getInstance(iwma).getSiteTemplates();		
 	}
 	
 	protected void initializeComponent(FacesContext context) {	
