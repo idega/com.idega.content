@@ -1,5 +1,5 @@
 /*
- * $Id: PageCreationManagedBean.java,v 1.12 2007/02/22 16:07:14 justinas Exp $
+ * $Id: PageCreationManagedBean.java,v 1.13 2007/06/04 20:29:30 justinas Exp $
  * Created on 2.5.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -9,12 +9,13 @@
  */
 package com.idega.content.bean;
 
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.ejb.FinderException;
 import javax.faces.component.UICommand;
@@ -26,16 +27,16 @@ import javax.faces.model.SelectItem;
 import org.apache.myfaces.custom.tree2.TreeNode;
 import org.apache.myfaces.custom.tree2.TreeNodeBase;
 
-import com.idega.block.rss.business.RSSProducer;
-import com.idega.block.rss.data.RSSRequest;
-import com.idega.content.business.ContentItemRssProducer;
+import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.content.tree.PageTemplate;
 import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.builder.data.ICPageHome;
+import com.idega.core.cache.IWCacheManager2;
 import com.idega.core.data.ICTreeNode;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
@@ -48,10 +49,10 @@ import com.idega.webface.WFTreeNode;
 
 /**
  * 
- *  Last modified: $Date: 2007/02/22 16:07:14 $ by $Author: justinas $
+ *  Last modified: $Date: 2007/06/04 20:29:30 $ by $Author: justinas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class PageCreationManagedBean implements ActionListener {
 
@@ -68,7 +69,7 @@ public class PageCreationManagedBean implements ActionListener {
 	private static final String RELATIVE_LOCATION_BEFORE = "before";
 	private String relativeLocation = RELATIVE_LOCATION_BEFORE;
 	private String templateIdentifier = this.SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED;
-	
+	private Map<String, PageTemplate> pageMap = null;
 	
 	/**
 	 * 
@@ -145,8 +146,43 @@ public class PageCreationManagedBean implements ActionListener {
 				}
 			}
 		}
+		node = settingIconURIs(node);
 		return node;
 	}	
+	
+	private WFTreeNode settingIconURIs(WFTreeNode node){
+		node.setIconURI(getIconUriByPageType(node.getPageType()));
+		List<WFTreeNode> nodeChildren = node.getChildren();
+		if (nodeChildren != null)
+			for (int i = 0; i < nodeChildren.size(); i++){
+				nodeChildren.set(i, settingIconURIs(nodeChildren.get(i)));
+			}
+		
+		return node;
+	}
+	
+	private String getIconUriByPageType(String pageType){
+		
+		if (pageMap == null){
+			IWContext iwc = IWContext.getInstance();
+			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwc.getApplicationContext().getIWMainApplication()).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
+			
+			if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
+				pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
+			}
+			else {
+				pageMap = new HashMap <String, PageTemplate> ();
+				pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
+			}		
+		}
+		
+		if(pageMap.get(pageType) != null)
+			return pageMap.get(pageType).getIconFile();
+		else {
+			System.out.println("pageType "+pageType);
+			return "";
+		}
+	}
 	
 	public String getResourceRealPath(){
 		return ContentUtil.getBundle().getResourcesRealPath();

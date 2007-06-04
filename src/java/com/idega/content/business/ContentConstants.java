@@ -29,4 +29,9 @@ public class ContentConstants {
 	public static final String COMMENT_PREFIX = DOT + COMMENT_SCOPE;
 	
 	public static final String XML_MIME_TYPE = "text/" + ThemesConstants.XML_EXTENSION;
+	
+	public static final String SITE_MAP_KEY = "siteMap";
+	public static final String PAGES_MAP_KEY = "pageMap";
+	
+	public static final String PAGE_TYPES_CACHE_KEY = "IWPageTypes";
 }

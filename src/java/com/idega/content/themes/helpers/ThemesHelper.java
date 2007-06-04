@@ -1092,7 +1092,9 @@ public class ThemesHelper implements Singleton {
 			doc = preparePageDocument(doc, type, articlePath, pageID);
 			return getThemeChanger().getXMLOutputter().outputString(doc);
 		}
-		doc = getXMLDocument(getWebRootWithoutContent() + ThemesConstants.PAGES_PATH_APPL + fileName);
+//		doc = getXMLDocument(getWebRootWithoutContent() + ThemesConstants.PAGES_PATH_APPL + fileName);
+		doc = getXMLDocument(getWebRootWithoutContent() + fileName);
+				
 		if (doc == null) {
 			return null;
 		}

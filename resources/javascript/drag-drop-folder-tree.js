@@ -57,7 +57,7 @@
 //		this.imageFolder = '/idegaweb/bundles/com.idega.content.bundle/resources/images/';
 		this.imageFolder = '';
 		this.iconFolder = '';
-		this.folderImage = 'text.png';
+		this.folderImage = 'default.png';
 		this.plusImage = 'nav-plus.gif';
 		this.minusImage = 'nav-minus.gif';
 		this.maximumDepth = 6;
@@ -1099,12 +1099,14 @@
 				if(tmpVar)
 					iconfile = tmpVar;
 				else {
+/*					
 					var pageType = menuItems[no].getAttribute('pagetype');
 					if (pageType){
 						iconfile = iconFolder + menuItems[no].getAttribute('pagetype') +'.png';
 					}
 					else
-						iconfile = iconFolder + this.folderImage;						
+*/
+					iconfile = iconFolder + this.folderImage;						
 				}
 
 				var templatefile = null;		 
@@ -1165,16 +1167,21 @@
 						folderImg.onmousedown = JSTreeObj.initDrag;
 				}
 				if(!noChildren)folderImg.onmousemove = JSTreeObj.moveDragableNodes;
-				
-				if(menuItems[no].className){
+
+				if(iconfile){	
+					if (iconfile.toString() == '')
+						folderImg.src = imageFolder + this.folderImage;	
+					else
+						folderImg.src = iconfile;
+				}
+				else if(menuItems[no].className){
 //					folderImg.src = this.imageFolder + menuItems[no].className;
 					folderImg.src = imageFolder + menuItems[no].className;
 				}else{
 //					folderImg.src = this.imageFolder + this.folderImage;					
 					folderImg.src = imageFolder + this.folderImage;					
 				}
-				if(iconfile)
-					folderImg.src = iconfile;
+				
 				menuItems[no].insertBefore(folderImg,input);				
 			}	
 		
@@ -1208,11 +1215,14 @@
 			if(tmpVar)
 				iconfile = tmpVar;
 			else {
+				folderImg.src = imageFolder + this.iconFolder;	
+/*				
 				var pageType = node.getAttribute('pagetype');
 				if (pageType)
 					iconfile = this.iconFolder + node.getAttribute('pagetype') +'.png';
 				else
 					iconfile = this.iconFolder + this.folderImage;
+*/
 			}
 
 			var templatefile = null;		 
@@ -1653,12 +1663,12 @@
 			var treeObj2 = new JSDragDropTree();
 			treeObj2.setTreeId(idsOfTrees[i]);
 			treeObj2.initTree();			
-			treeObj2.expandAll();				
+			treeObj2.expandAll();
 		}
  
 		var treeObj = new JSDragDropTree();
 		treeObj.setTreeId(idsOfAdvancedTrees[0]);
-		treeObj.initTree();			
+		treeObj.initTree();
 		treeObj.checkIfOverTree(idsOfAdvancedTrees[0]);	
 		treeObj.getNodeOrders();
 		treeObj.expandAll();

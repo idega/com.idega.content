@@ -14,6 +14,7 @@ import org.jdom.Element;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.content.tree.PageTemplate;
 import com.idega.content.tree.SiteTemplateStructure;
@@ -39,10 +40,9 @@ public class TemplatesLoader implements JarLoader {
 	
 	public static final String SITE_TEMPLATES_XML_FILE_NAME = "site-templates.xml";
 	public static final String PAGE_TEMPLATES_XML_FILE_NAME = "page-templates.xml";
-	public static final String PAGE_TYPES_CACHE_KEY = "IWPageTypes";
-	public static final String PAGES_MAP_KEY = "pageMap";
+	
 	public static final String SITE_TEMPLATES_CACHE_KEY = "IWSiteTemplates";
-	public static final String SITE_MAP_KEY = "siteMap";
+	
 
 	private ThemesHelper themesHelper;
 	
@@ -59,6 +59,7 @@ public class TemplatesLoader implements JarLoader {
 			iwma.setAttribute(TEMPLATES_LOADER_APPLICATION_ATTIBUTE, loader);
 		}
 		
+		
 		return loader;
 	}
 	
@@ -69,8 +70,11 @@ public class TemplatesLoader implements JarLoader {
 	}
 	
 	public void loadJar(File bundleJarFile, JarFile jarFile, String jarPath) {
+
 		JarEntry pageTemplatesEntry = jarFile.getJarEntry("resources/templates/"+PAGE_TEMPLATES_XML_FILE_NAME);
 		JarEntry siteTemplatesEntry = jarFile.getJarEntry("resources/templates/"+SITE_TEMPLATES_XML_FILE_NAME);
+		
+//		pageTemplatesEntry.getAttributes().g
 		if (pageTemplatesEntry != null) {
 			try {
 				InputStream stream = jarFile.getInputStream(pageTemplatesEntry);
@@ -99,7 +103,7 @@ public class TemplatesLoader implements JarLoader {
 	 * @param pageDocument
 	 */
 	public void addPageTypesFromDocument(Document pageDocument) {
-		Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(PAGE_TYPES_CACHE_KEY);
+		Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
 		
 		Map<String, PageTemplate> pageMap;
 		Element root = pageDocument.getRootElement();		
@@ -107,22 +111,30 @@ public class TemplatesLoader implements JarLoader {
 		Iterator itr = siteRoot.iterator();
 		String pageType = null;
 		
-		if (pageTemplatesFromCache.containsKey(PAGES_MAP_KEY)){
-			pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(PAGES_MAP_KEY);
+		if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
+			pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
 		}
-		else {			
+		else {
 			pageMap = new HashMap <String, PageTemplate> ();
-			pageTemplatesFromCache.put(PAGES_MAP_KEY, pageMap);
+			pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
 		}				
+//		IWContext iwc = null;
+//		iwc.get
+//		System.out.println("context_url: "+iwma.get);
+//		iwma.getApplicationSpecialVirtualPath();
 		
+		 
 		while(itr.hasNext()){
 			Element current = (Element)itr.next();
 			PageTemplate page = new PageTemplate();
 			pageType = current.getAttributeValue("type");
 			page.setName(current.getAttributeValue("name"));
 			page.setType(pageType);
-			page.setIconFile(current.getAttributeValue("iconfile"));
-			page.setTemplateFile(current.getAttributeValue("templatefile"));
+			if (!current.getAttributeValue("iconfile").equals(""))
+				page.setIconFile(iwma.getApplicationContextURI() + current.getAttributeValue("iconfile"));
+			else
+				page.setIconFile("");
+			page.setTemplateFile(iwma.getApplicationContextURI() + current.getAttributeValue("templatefile"));
 			pageMap.put(pageType, page);
 		}
 	}
@@ -131,8 +143,8 @@ public class TemplatesLoader implements JarLoader {
 		Map <String, SiteTemplateStructure> siteMap;
 		Map siteTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(SITE_TEMPLATES_CACHE_KEY);
 		
-		if (siteTemplatesFromCache.containsKey(SITE_MAP_KEY)){
-			siteMap = (Map <String, SiteTemplateStructure>)siteTemplatesFromCache.get(SITE_MAP_KEY);
+		if (siteTemplatesFromCache.containsKey(ContentConstants.SITE_MAP_KEY)){
+			siteMap = (Map <String, SiteTemplateStructure>)siteTemplatesFromCache.get(ContentConstants.SITE_MAP_KEY);
 		}
 		else {			
 			siteMap = new HashMap<String, SiteTemplateStructure>();
@@ -152,7 +164,7 @@ public class TemplatesLoader implements JarLoader {
 			siteMap.put(panelName, siteStruct);		
 		}		
 		
-		siteTemplatesFromCache.put(SITE_MAP_KEY, siteMap);
+		siteTemplatesFromCache.put(ContentConstants.SITE_MAP_KEY, siteMap);
 	}	
 	private SiteTemplateStructure getNode(Element currElement){
 		String pageName = null;	
@@ -164,11 +176,21 @@ public class TemplatesLoader implements JarLoader {
 		currNode.setType(pageType);
 		pageName = currElement.getAttributeValue("name");
 		currNode.setName(pageName);
-
-		iconFile = currElement.getAttributeValue("iconfile");			
-		templateFile = currElement.getAttributeValue("templatefile");				
-		if (iconFile != null)
+		iconFile = currElement.getAttributeValue("iconfile");
+		if (iconFile != null){
+			if (!currElement.getAttributeValue("iconfile").equals(""))
+				currNode.setIconFile(iwma.getApplicationContextURI() + currElement.getAttributeValue("iconfile"));
+			else
+				currNode.setIconFile("");
 			currNode.setIconFile(iconFile);
+		}
+		currNode.setTemplateFile(iwma.getApplicationContextURI() + currElement.getAttributeValue("templatefile"));		
+		
+		
+//		iconFile = currElement.getAttributeValue("iconfile");			
+//		templateFile = currElement.getAttributeValue("templatefile");				
+//		if (iconFile != null)
+//			currNode.setIconFile(iconFile);
 		if (templateFile != null)
 			currNode.setTemplateFile(templateFile);
 		Iterator it = (currElement.getChildren()).iterator();
@@ -180,11 +202,11 @@ public class TemplatesLoader implements JarLoader {
 	}
 	
 	public Map<String, PageTemplate> getPageTemplates() {
-		Map pageTemplates = IWCacheManager2.getInstance(iwma).getCache(TemplatesLoader.PAGE_TYPES_CACHE_KEY);
+		Map pageTemplates = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
 		ThemesHelper helper = ThemesHelper.getInstance(false);
 		
 		
-		if (!pageTemplates.containsKey(TemplatesLoader.PAGES_MAP_KEY)) {
+		if (!pageTemplates.containsKey(ContentConstants.PAGES_MAP_KEY)) {
 		    loadTemplatesFromBundles();
 		}
 		
@@ -202,14 +224,14 @@ public class TemplatesLoader implements JarLoader {
 			}
 		}
 		
-		return (Map <String, PageTemplate>)pageTemplates.get(TemplatesLoader.PAGES_MAP_KEY);
+		return (Map <String, PageTemplate>)pageTemplates.get(ContentConstants.PAGES_MAP_KEY);
 	}
 	
 	public Map<String, SiteTemplateStructure> getSiteTemplates() {
 		ThemesHelper helper = ThemesHelper.getInstance(false);
 		Map siteTemplates = IWCacheManager2.getInstance(iwma).getCache(TemplatesLoader.SITE_TEMPLATES_CACHE_KEY);
 
-		if (!siteTemplates.containsKey(TemplatesLoader.SITE_MAP_KEY)) {
+		if (!siteTemplates.containsKey(ContentConstants.SITE_MAP_KEY)) {
 		    loadTemplatesFromBundles();
 		}
 		
@@ -228,7 +250,7 @@ public class TemplatesLoader implements JarLoader {
 			}
 		}
 		
-		return (Map <String, SiteTemplateStructure>)siteTemplates.get(TemplatesLoader.SITE_MAP_KEY);
+		return (Map <String, SiteTemplateStructure>)siteTemplates.get(ContentConstants.SITE_MAP_KEY);
 	}
 	
 	protected IWSlideService getIWSlideService() throws IBOLookupException{

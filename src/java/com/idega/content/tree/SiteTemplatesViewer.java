@@ -42,8 +42,10 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		siteMap = (Map <String, SiteTemplateStructure>)TemplatesLoader.getInstance(iwma).getSiteTemplates();		
 	}
 	
-	protected void initializeComponent(FacesContext context) {	
-		Iterator itrKeySet = siteMap.keySet().iterator();
+	protected void initializeComponent(FacesContext context) {
+		Iterator itrKeySet = null;
+		if (siteMap.keySet() != null)
+			itrKeySet = siteMap.keySet().iterator();
 		String mapKey = null;
 		Accordion acc = new Accordion("site_templates");
 //		acc.setIncludeJavascript(false);
@@ -105,11 +107,16 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 			newNode.setPageType(pageType);
 			
 			iconFile = current.getIconFile();			
-			templateFile = current.getTemplateFile();				
-			if ((iconFile == null) && (pageType != null))
-				iconFile = pageMap.get(pageType).getIconFile();
+			templateFile = current.getTemplateFile();
+			
+			PageTemplate pageTemplate = pageMap.get(pageType);
+			if ((iconFile == null) && (pageType != null)){
+				if (pageTemplate != null)
+					iconFile = pageMap.get(pageType).getIconFile();
+			}
 			if ((templateFile == null) && (pageType != null))
-				templateFile = pageMap.get(pageType).getTemplateFile();				
+				if (pageTemplate != null)
+					templateFile = pageMap.get(pageType).getTemplateFile();				
 			newNode.setIconURI(iconFile);
 			newNode.setTemplateURI(templateFile);
 			
