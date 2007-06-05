@@ -2,24 +2,24 @@
 <!DOCTYPE dwr PUBLIC "-//GetAhead Limited//DTD Direct Web Remoting 2.0//EN" "http://www.getahead.ltd.uk/dwr//dwr20.dtd">
 
 <dwr>
-  <allow>
-    <create creator="ibo" javascript="ThemesEngine" scope="application">
-      <param name="class" value="com.idega.content.themes.business.ThemesEngine" />
-    </create>
-    <convert converter="bean" match="com.idega.content.themes.helpers.SimplifiedTheme" />
-    <convert converter="bean" match="com.idega.content.themes.helpers.ThemeChange">
-    	<param name="exclude" value="limitedSelection" />
-    </convert>
-    <convert converter="bean" match="com.idega.content.themes.helpers.TreeNodeStructure" />
+	<allow>
+		<create creator="ibo" javascript="ThemesEngine" scope="application">
+      		<param name="class" value="com.idega.content.themes.business.ThemesEngine" />
+    	</create>
+    	<convert converter="bean" match="com.idega.content.themes.helpers.SimplifiedTheme" />
+    	<convert converter="bean" match="com.idega.content.themes.helpers.ThemeChange">
+    		<param name="exclude" value="limitedSelection" />
+    	</convert>
+    	<convert converter="bean" match="com.idega.content.themes.helpers.TreeNodeStructure" />
     
-    <create creator="ibo" javascript="NodeID" scope="application">
-      <param name="class" value="com.idega.content.tree.NodeID" />
-    </create>
+    	<create creator="ibo" javascript="NodeID" scope="application">
+      		<param name="class" value="com.idega.content.tree.NodeID" />
+    	</create>
     
-    <create creator="ibo" javascript="PagePreview" scope="application">
-      <param name="class" value="com.idega.content.tree.PagePreview" />
-    </create>
-  </allow>
+    	<create creator="ibo" javascript="PagePreview" scope="application">
+      		<param name="class" value="com.idega.content.tree.PagePreview" />
+    	</create>
+	</allow>
   
 	<signatures>
 		<![CDATA[
