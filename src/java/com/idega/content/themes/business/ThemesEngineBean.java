@@ -225,7 +225,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 
 		WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "setThemeId", themeID, String.class);
-		String variations = service.getRenderedPresentationObjectAsString(iwc, new ThemeStyleVariations(), false);
+		String variations = service.getRenderedComponent(new ThemeStyleVariations(), iwc, false);
 		putVariationsToCache(variations, iwc, themeID);
 		return variations;
 	}
