@@ -1,5 +1,5 @@
 /*
- * $Id: ContentUtil.java,v 1.12 2007/02/13 19:05:36 valdas Exp $
+ * $Id: ContentUtil.java,v 1.13 2007/06/06 12:08:03 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -9,25 +9,27 @@
  */
 package com.idega.content.business;
 
+import java.rmi.RemoteException;
+
 import javax.faces.context.FacesContext;
 import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.accesscontrol.business.StandardRoles;
+import com.idega.core.builder.business.BuilderService;
+import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWUserContext;
-import com.idega.util.IWTimestamp;
+import com.idega.presentation.IWContext;
+import com.idega.util.CoreConstants;
 
 /**
  * 
- * Last modified: $Date: 2007/02/13 19:05:36 $ by $Author: valdas $
+ * Last modified: $Date: 2007/06/06 12:08:03 $ by $Author: valdas $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class ContentUtil {
-	public static final String CONTENT_PATH = "/files/cms";
-	public static final String PAGES_PATH = "/files/cms/pages";
-	
 	public static final String MODULE_PREFIX = "cms_";
 	public static final String IW_BUNDLE_IDENTIFIER = "com.idega.content";
 	
@@ -64,7 +66,7 @@ public class ContentUtil {
 	 * @return
 	 */
 	public static String getContentBaseFolderPath(){
-		return CONTENT_PATH;
+		return CoreConstants.CONTENT_PATH;
 	}
 	
 	public static String getParentPath(String path){
@@ -108,10 +110,15 @@ public class ContentUtil {
 	 * Creates path (uri) based on current time
 	 * @return
 	 */
-	public static String getYearMonthPath() {
-		IWTimestamp now = new IWTimestamp();
-		StringBuffer path = new StringBuffer();
-		path.append(now.getYear()).append(ContentConstants.SLASH).append(now.getDateString("MM"));
-		return path.toString();
+	public static String getYearMonthPath(IWContext iwc) {
+		BuilderService service = null;
+		try {
+			service = BuilderServiceFactory.getBuilderService(iwc);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		return service.getYearMonthPath();
 	}
 }

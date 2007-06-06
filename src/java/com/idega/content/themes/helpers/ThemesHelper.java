@@ -1289,17 +1289,17 @@ public class ThemesHelper implements Singleton {
 		StringBuffer link = new StringBuffer(server);
 		link.append(ContentConstants.PAGES_START_URI);
 		link.append(uri);
-		String linkToComments = getArticleCommentLink(uri);
+		String linkToComments = getArticleCommentLink(iwc, uri);
 		String user = iwc.getCurrentUser().getName();
 		return getFeedBean().getFeedEntryAsXML(ThemesConstants.ARTICLE_TITLE, server, null, ThemesConstants.ARTICLE_TITLE,
 				new Timestamp(System.currentTimeMillis()), null, summary.toString(), article, user, language, null, link.toString(),
 				null, null, linkToComments);
 	}
 	
-	public String getArticleCommentLink(String pageURI) {
+	public String getArticleCommentLink(IWContext iwc, String pageURI) {
 		StringBuffer commentPath = new StringBuffer(ContentConstants.ARTICLE_PATH_START);
 		if (pageURI == null) {
-			commentPath.append(ContentConstants.SLASH).append(ContentUtil.getYearMonthPath());
+			commentPath.append(ContentConstants.SLASH).append(ContentUtil.getYearMonthPath(iwc));
 			commentPath.append(ContentConstants.SLASH);
 		} 
 		else {
