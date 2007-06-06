@@ -3,7 +3,9 @@ package com.idega.content.tree;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.faces.component.html.HtmlOutputLink;
@@ -17,11 +19,14 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 import com.idega.block.web2.presentation.Accordion;
+import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.business.TemplatesLoader;
+import com.idega.core.cache.IWCacheManager2;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.data.IWTreeNode;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWBaseComponent;
+import com.idega.presentation.IWContext;
 import com.idega.presentation.Script;
 import com.idega.presentation.text.Text;
 import com.idega.webface.IWTree;
@@ -62,7 +67,8 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 			String panelName = mapKey;
 			WFTreeNode rootNode = new WFTreeNode(new IWTreeNode(panelName));
 			
-			rootNode = getPage(currentSite, rootNode);			
+			rootNode = getPage(currentSite, rootNode);
+			rootNode = settingIconURIsAndTemplateFiles(rootNode);
 			IWTree tree = new IWTree();
 			tree.setValue(rootNode);
 		    tree.setShowRootNode(false);	
@@ -88,6 +94,77 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		this.getChildren().add(script);		
 				
 	}	
+	
+	private WFTreeNode settingIconURIsAndTemplateFiles(WFTreeNode node){
+		node.setIconURI(getIconUriByPageType(node.getPageType()));
+		node.setTemplateURI(getTemplateFileByPageType(node.getPageType()));
+		List<WFTreeNode> nodeChildren = node.getChildren();
+		if (nodeChildren != null)
+			for (int i = 0; i < nodeChildren.size(); i++){
+				nodeChildren.set(i, settingIconURIsAndTemplateFiles(nodeChildren.get(i)));
+			}
+		
+		return node;
+	}
+	private String getTemplateFileByPageType(String pageType){
+		if (pageMap == null){
+			IWContext iwc = IWContext.getInstance();
+			IWMainApplication iwma = iwc.getApplicationContext().getIWMainApplication();
+			TemplatesLoader loader = new TemplatesLoader(iwma);
+			pageMap = loader.getPageMap();
+			if(pageMap.isEmpty()){
+				loader.loadTemplatesFromBundles();
+				pageMap = loader.getPageMap();
+			}			
+//			IWContext iwc = IWContext.getInstance();
+//			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwc.getApplicationContext().getIWMainApplication()).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
+//			
+//			if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
+//				pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
+//			}
+//			else {
+//				pageMap = new HashMap <String, PageTemplate> ();
+//				pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
+//			}		
+		}
+	
+		if(pageMap.get(pageType) != null)
+			return pageMap.get(pageType).getTemplateFile();
+		else {
+			System.out.println("pageType not set");
+			return "";
+		}
+	}
+	private String getIconUriByPageType(String pageType){
+		
+		if (pageMap == null){
+			IWContext iwc = IWContext.getInstance();
+			IWMainApplication iwma = iwc.getApplicationContext().getIWMainApplication();
+			TemplatesLoader loader = new TemplatesLoader(iwma);
+			pageMap = loader.getPageMap();
+			if(pageMap.isEmpty()){
+				loader.loadTemplatesFromBundles();
+				pageMap = loader.getPageMap();
+			}			
+//			IWContext iwc = IWContext.getInstance();
+//			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwc.getApplicationContext().getIWMainApplication()).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
+//			
+//			if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
+//				pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
+//			}
+//			else {
+//				pageMap = new HashMap <String, PageTemplate> ();
+//				pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
+//			}		
+		}
+		
+		if(pageMap.get(pageType) != null)
+			return pageMap.get(pageType).getIconFile();
+		else {
+			System.out.println("pageType not set");
+			return "";
+		}
+	}
 	
 	public TreeNode getTree(IWTreeNode rootNode){
 		ICTreeNode icnode = rootNode;

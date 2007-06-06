@@ -46,7 +46,7 @@ public class TemplatesLoader implements JarLoader {
 
 	private ThemesHelper themesHelper;
 	
-	protected TemplatesLoader(IWMainApplication iwma) {
+	public TemplatesLoader(IWMainApplication iwma) {
 		super();
 		this.iwma = iwma;
 		themesHelper = ThemesHelper.getInstance(false);
@@ -111,13 +111,15 @@ public class TemplatesLoader implements JarLoader {
 		Iterator itr = siteRoot.iterator();
 		String pageType = null;
 		
-		if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
-			pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
-		}
-		else {
-			pageMap = new HashMap <String, PageTemplate> ();
-			pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
-		}				
+		pageMap = getPageMap();
+		
+//		if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
+//			pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
+//		}
+//		else {
+//			pageMap = new HashMap <String, PageTemplate> ();
+//			pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
+//		}				
 //		IWContext iwc = null;
 //		iwc.get
 //		System.out.println("context_url: "+iwma.get);
@@ -257,4 +259,16 @@ public class TemplatesLoader implements JarLoader {
 		return (IWSlideService) IBOLookup.getServiceInstance(iwma.getIWApplicationContext(), IWSlideService.class);
 	}
 	
+	public Map<String, PageTemplate> getPageMap(){
+		Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
+		Map pageMap = null;
+		if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
+			pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
+		}
+		else {
+			pageMap = new HashMap <String, PageTemplate> ();
+			pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
+		}	
+		return pageMap;
+	}
 }

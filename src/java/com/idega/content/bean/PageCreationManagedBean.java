@@ -1,5 +1,5 @@
 /*
- * $Id: PageCreationManagedBean.java,v 1.13 2007/06/04 20:29:30 justinas Exp $
+ * $Id: PageCreationManagedBean.java,v 1.14 2007/06/06 11:01:32 justinas Exp $
  * Created on 2.5.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -12,7 +12,6 @@ package com.idega.content.bean;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +28,7 @@ import org.apache.myfaces.custom.tree2.TreeNodeBase;
 
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
+import com.idega.content.themes.business.TemplatesLoader;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.content.tree.PageTemplate;
@@ -41,6 +41,7 @@ import com.idega.core.data.ICTreeNode;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWBundle;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
 import com.idega.webface.WFTreeNode;
 
@@ -49,10 +50,10 @@ import com.idega.webface.WFTreeNode;
 
 /**
  * 
- *  Last modified: $Date: 2007/06/04 20:29:30 $ by $Author: justinas $
+ *  Last modified: $Date: 2007/06/06 11:01:32 $ by $Author: justinas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class PageCreationManagedBean implements ActionListener {
 
@@ -146,40 +147,107 @@ public class PageCreationManagedBean implements ActionListener {
 				}
 			}
 		}
-		node = settingIconURIs(node);
+		node = settingIconURIsAndTemplateFiles(node);
 		return node;
 	}	
 	
-	private WFTreeNode settingIconURIs(WFTreeNode node){
+	private WFTreeNode settingIconURIsAndTemplateFiles(WFTreeNode node){
 		node.setIconURI(getIconUriByPageType(node.getPageType()));
+		node.setTemplateURI(getTemplateFileByPageType(node.getPageType()));
 		List<WFTreeNode> nodeChildren = node.getChildren();
 		if (nodeChildren != null)
 			for (int i = 0; i < nodeChildren.size(); i++){
-				nodeChildren.set(i, settingIconURIs(nodeChildren.get(i)));
-			}
-		
+				nodeChildren.set(i, settingIconURIsAndTemplateFiles(nodeChildren.get(i)));
+			}		
 		return node;
 	}
+	private String getTemplateFileByPageType(String pageType){
+		if (pageMap == null){
+			IWContext iwc = IWContext.getInstance();
+			IWMainApplication iwma = iwc.getApplicationContext().getIWMainApplication();
+			TemplatesLoader loader = new TemplatesLoader(iwma);
+			pageMap = loader.getPageMap();
+			if(pageMap.isEmpty()){
+				loader.loadTemplatesFromBundles();
+				pageMap = loader.getPageMap();
+			}
+//			IWContext iwc = IWContext.getInstance();
+//			IWMainApplication iwma = iwc.getApplicationContext().getIWMainApplication();
+//			TemplatesLoader loader = new TemplatesLoader(iwma);
+//			loader.loadTemplatesFromBundles();
+//			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
+//			pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
+			
+//			IWContext iwc = IWContext.getInstance();
+//			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwc.getApplicationContext().getIWMainApplication()).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
+//			
+//			if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
+//				pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
+//			}
+//			else {
+//				pageMap = new HashMap <String, PageTemplate> ();
+//				pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
+//			}		
+		}
 	
+		if(pageMap.get(pageType) != null)
+			return pageMap.get(pageType).getTemplateFile();
+		else {
+			return "";
+		}
+	}
 	private String getIconUriByPageType(String pageType){
 		
 		if (pageMap == null){
 			IWContext iwc = IWContext.getInstance();
-			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwc.getApplicationContext().getIWMainApplication()).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
-			
-			if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
-				pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
+			IWMainApplication iwma = iwc.getApplicationContext().getIWMainApplication();
+			TemplatesLoader loader = new TemplatesLoader(iwma);
+			pageMap = loader.getPageMap();
+			if(pageMap.isEmpty()){
+				loader.loadTemplatesFromBundles();
+				pageMap = loader.getPageMap();
 			}
-			else {
-				pageMap = new HashMap <String, PageTemplate> ();
-				pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
-			}		
+				
+			
+			
+//			IWContext iwc = IWContext.getInstance();
+//			IWMainApplication iwma = iwc.getApplicationContext().getIWMainApplication();
+//			TemplatesLoader loader = new TemplatesLoader(iwma);
+//			loader.loadTemplatesFromBundles();
+//			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
+//			pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
+//			IWContext iwc = IWContext.getInstance();
+//			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwc.getApplicationContext().getIWMainApplication()).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
+//			Element root = pageDocument.getRootElement();		
+//			Collection siteRoot = root.getChildren();								
+//			Iterator itr = siteRoot.iterator();
+//			
+//			if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
+//				pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
+//			}
+//			else {
+//				pageMap = new HashMap <String, PageTemplate> ();
+//				pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
+//			}		
+//			while(itr.hasNext()){
+//				Element current = (Element)itr.next();
+//				PageTemplate page = new PageTemplate();
+//				pageType = current.getAttributeValue("type");
+//				page.setName(current.getAttributeValue("name"));
+//				page.setType(pageType);
+//				if (!current.getAttributeValue("iconfile").equals(""))
+//					page.setIconFile(iwma.getApplicationContextURI() + current.getAttributeValue("iconfile"));
+//				else
+//					page.setIconFile("");
+//				page.setTemplateFile(iwma.getApplicationContextURI() + current.getAttributeValue("templatefile"));
+//				pageMap.put(pageType, page);
+//			}			
 		}
 		
 		if(pageMap.get(pageType) != null)
 			return pageMap.get(pageType).getIconFile();
 		else {
-			System.out.println("pageType "+pageType);
+//			System.out.println("pageType "+pageType);
 			return "";
 		}
 	}
