@@ -1123,7 +1123,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		IWContext iwc = CoreUtil.getIWContext();
 		
-		String articleTemplateFile = "article_viewer_template.xml";
+		String articleTemplateFile = "/idegaweb/bundles/com.idega.block.article.bundle/resources/pages/article_viewer_template.xml";
 		boolean existInSlide = false;
 		int id = getArticleViewerTemplateId(builder, iwc);
 		existInSlide = helper.existFileInSlide(ThemesConstants.PAGES_PATH_SLIDE + articleTemplateFile);
