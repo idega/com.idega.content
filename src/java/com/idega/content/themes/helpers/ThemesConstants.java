@@ -56,7 +56,7 @@ public class ThemesConstants {
 	private static final String[] _THEME_SKELETONS_FILTER = new String[] {"htm", "html", "xhtml", "ibxml", "jsp"};
 	public static final List <String> THEME_SKELETONS_FILTER = Collections.unmodifiableList(Arrays.asList(_THEME_SKELETONS_FILTER));
 	
-	private static final String[] _THEME_PROPERTIES_FILES = new String[] {THEME_PROPERTIES_FILE, IDEGA_THEME_INFO};
+	private static final String[] _THEME_PROPERTIES_FILES = new String[] {THEME_PROPERTIES_FILE, IDEGA_THEME_INFO, "theme" + THEME_PROPERTIES_FILE_END};
 	protected static final List <String> THEME_PROPERTIES_FILES = Collections.unmodifiableList(Arrays.asList(_THEME_PROPERTIES_FILES));
 	
 	private static final String[] _USELESS_CONTENT = new String[] {"%pathto(", ")%", "%", " xml:space=\"preserve\""};

@@ -178,4 +178,9 @@ public interface ThemesEngine extends IBOService {
 	 * @see ThemesEngineBean#startBuilderApplication
 	 */
 	public boolean startBuilderApplication();
+	
+	/**
+	 * @see ThemesEngineBean#reloadThemeProperties
+	 */
+	public String reloadThemeProperties(String themeId);
 }

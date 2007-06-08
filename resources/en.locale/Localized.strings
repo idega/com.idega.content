@@ -233,3 +233,5 @@ values=Values
 version=Version
 version_comment=and a version comment (optional)
 yes=Yes
+properties=Properties
+reload_properties_for_theme=Reload properties for this theme

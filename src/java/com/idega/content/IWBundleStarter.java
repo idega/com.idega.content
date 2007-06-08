@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.25 2007/06/03 16:05:36 eiki Exp $
+ * $Id: IWBundleStarter.java,v 1.26 2007/06/08 08:43:24 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -19,9 +19,9 @@ import java.util.Map;
 import com.idega.block.rss.business.RSSProducerRegistry;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentIWActionURIHandler;
 import com.idega.content.business.ContentRSSProducer;
-import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.business.TemplatesLoader;
 import com.idega.content.themes.business.ThemesService;
 import com.idega.content.themes.helpers.Setting;
@@ -41,10 +41,10 @@ import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2007/06/03 16:05:36 $ by $Author: eiki $
+ *  Last modified: $Date: 2007/06/08 08:43:24 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.25 $
+ * @version $Revision: 1.26 $
  */
 //public class IWBundleStarter implements IWBundleStartable, JarLoader {
 public class IWBundleStarter implements IWBundleStartable{
@@ -67,7 +67,7 @@ public class IWBundleStarter implements IWBundleStartable{
 		
 		ContentViewManager cViewManager = ContentViewManager.getInstance(starterBundle.getApplication());
 		cViewManager.initializeStandardNodes(starterBundle);
-		GlobalIncludeManager.getInstance().addBundleStyleSheet(ContentUtil.IW_BUNDLE_IDENTIFIER,"/style/content.css");
+		GlobalIncludeManager.getInstance().addBundleStyleSheet(ContentConstants.CONTENT_BUNDLE,"/style/content.css");
 		
 		
 		IWApplicationContext iwac = starterBundle.getApplication().getIWApplicationContext();
@@ -118,7 +118,7 @@ public class IWBundleStarter implements IWBundleStartable{
 		try {
 			String sBundlesDirectory = System.getProperty(DefaultIWBundle.SYSTEM_BUNDLES_RESOURCE_DIR);
 			if (sBundlesDirectory != null) {
-				String filePath = sBundlesDirectory + File.separator + ContentUtil.IW_BUNDLE_IDENTIFIER + File.separator + ThemesConstants.THEME_SETTINGS;
+				String filePath = sBundlesDirectory + File.separator + ContentConstants.CONTENT_BUNDLE + File.separator + ThemesConstants.THEME_SETTINGS;
 				stream = new FileInputStream(filePath);
 			}
 			else {

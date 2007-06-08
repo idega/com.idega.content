@@ -3,13 +3,16 @@ package com.idega.content.themes.presentation;
 import java.util.List;
 import java.util.Map;
 
+import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.bean.ThemesManagerBean;
 import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemeStyleGroupMember;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.ListItem;
 import com.idega.presentation.text.Lists;
@@ -72,11 +75,30 @@ public class ThemeStyleVariations extends Block {
 		Layer container = new Layer();
 		container.setStyleClass("allThemeVariations");
 		
+		addRehreshThemeBlock(iwc, theme, container);
+		
 		Lists styles = new Lists();
 		addVariations(theme, styles);
 		
 		container.add(styles);
 		this.add(container);
+	}
+	
+	private void addRehreshThemeBlock(IWContext iwc, Theme theme, Layer container) {
+		if (!iwc.isSuperAdmin()) {
+			return;
+		}
+		Layer refresh = new Layer();
+		container.add(refresh);
+		
+		IWResourceBundle iwrb = getResourceBundle(iwc);
+		StringBuffer name = new StringBuffer(iwrb.getLocalizedString("properties", "Properties")).append(" :: ");
+		name.append(iwrb.getLocalizedString("reload_properties_for_theme", "Reload properties for this theme"));
+		Image reload = new Image(getBundle(iwc).getVirtualPathWithFileNameString("images/reload.png"), name.toString(), 24, 24);
+		reload.setStyleClass("reload_properties_for_theme");
+		reload.setMarkupAttribute("current_theme_id", theme.getId());
+		
+		refresh.add(reload);
 	}
 	
 	private void addVariations(Theme theme, Lists styles) {
@@ -159,6 +181,10 @@ public class ThemeStyleVariations extends Block {
 			}
 		}
 		return true;
+	}
+	
+	public String getBundleIdentifier()	{
+		return ContentConstants.CONTENT_BUNDLE;
 	}
 
 }

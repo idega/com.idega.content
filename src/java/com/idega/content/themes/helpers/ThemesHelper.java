@@ -1557,7 +1557,7 @@ public class ThemesHelper implements Singleton {
 		return checkedFromSlide;
 	}
 	
-	protected boolean clearVariationFromCache(String themeID) {
+	public boolean clearVariationFromCache(String themeID) {
 		if (themeID == null) {
 			return false;
 		}
@@ -1579,7 +1579,7 @@ public class ThemesHelper implements Singleton {
 		//	Removing cache keys
 		theme.clearStyleVariationsCacheKeys();
 		
-		//	Removing rendered variations (to Document) from cache
+		//	Removing rendered variations (to String) from cache
 		getThemesEngine().clearVariationFromCache(themeID, iwc);
 		
 		return true;

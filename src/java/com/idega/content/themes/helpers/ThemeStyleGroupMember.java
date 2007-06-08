@@ -69,7 +69,7 @@ public class ThemeStyleGroupMember {
 		this.limitedSelection = limitedSelection;
 	}
 
-	protected String getGroupName() {
+	public String getGroupName() {
 		return groupName;
 	}
 

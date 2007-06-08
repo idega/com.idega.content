@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import javax.faces.context.FacesContext;
 
+import com.idega.content.business.ContentConstants;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.view.ApplicationViewNode;
 import com.idega.core.view.DefaultViewNode;
@@ -42,7 +43,7 @@ public class SiteViewManager {
 	}
 	
 	public ViewNode getSiteNode(){
-		IWBundle iwb = this.iwma.getBundle(ContentViewManager.CONTENT_BUNDLE_IDENTIFIER);
+		IWBundle iwb = this.iwma.getBundle(ContentConstants.CONTENT_BUNDLE);
 		if (this.siteRootNode == null) {
 			this.siteRootNode = initalizeSiteNode(iwb);
 		}

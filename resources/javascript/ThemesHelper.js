@@ -282,6 +282,7 @@ var CHOOSE_STYLE_FOR_SITE = "Site";
 var DROP_TEMPLATES_HERE = "Drop templates here";
 var NO_PAGE_EXISTS_TEXT = "No page exist";
 var LOADING_TEXT = "Loading...";
+var RELOADING_TEXT = 'Reloading...';
 
 function getLocalizedTextForThemes() {
 	ThemesEngine.getLocalizedText(getLocalizedTextForThemesCallback);
@@ -291,7 +292,7 @@ function getLocalizedTextForThemesCallback(list) {
 	if (list == null) {
 		return;
 	}
-	if (list.length != 24) {
+	if (list.length != 25) {
 		return;
 	}
 	UPLOADING_THEME = list[0];
@@ -318,6 +319,7 @@ function getLocalizedTextForThemesCallback(list) {
 	NO_PAGE_EXISTS_TEXT = list[21];
 	LOADING_TEXT = list[22];
 	MAKE_THIS_PAGE_START_PAGE_TEXT = list[23];
+	RELOADING_TEXT = list[24];
 }
 
 function getUploadingThemeText() {
@@ -414,6 +416,10 @@ function getLoadingText() {
 
 function getMakeThisPageStartPageText() {
 	return MAKE_THIS_PAGE_START_PAGE_TEXT;
+}
+
+function getReloadingText() {
+	return RELOADING_TEXT;
 }
 // Localized text ends
 

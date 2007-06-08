@@ -214,4 +214,10 @@ public class Theme {
 	public void clearStyleVariationsCacheKeys() {
 		styleVariationsCacheKeys.clear();
 	}
+	
+	public void reloadProperties() {
+		styleGroupsNames.clear();
+		styleVariationsCacheKeys.clear();
+		styleGroupsMembers.clear();
+	}
 }

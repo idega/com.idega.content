@@ -916,9 +916,6 @@ public class ThemeChanger {
 			return null;
 		}
 		String linkToBase = new StringBuffer(ContentConstants.CONTENT).append(theme.getLinkToBase()).toString();
-		/*if (!availableStyleMember(linkToBase, newStyle)){
-			return null;
-		}*/
 		if (!changeThemeStyle(linkToBase, root.getChild(HTML_HEAD, namespace), oldStyle,
 				newStyle)) {
 			return null;
@@ -1176,6 +1173,24 @@ public class ThemeChanger {
 		return helper.createThemeConfig(theme);
 	}
 	
+	public boolean setSelectedStyles(Theme theme, List<ThemeChange> enabledStyles) {
+		if (theme == null) {
+			return false;
+		}
+		
+		ThemeChange change = null;
+		ThemeStyleGroupMember member = null;
+		for (int i = 0; i < enabledStyles.size(); i++) {
+			change = enabledStyles.get(i);
+			member = getStyleMember(theme, change.getStyleGroupName(), change.getVariation());
+			if (member != null) {
+				member.setEnabled(change.isEnabled());
+			}
+		}
+		
+		return true;
+	}
+	
 	private boolean restoreTheme(Theme theme) {
 		if (theme == null) {
 			return false;
@@ -1191,7 +1206,7 @@ public class ThemeChanger {
 			member = getStyleMember(theme, change.getStyleGroupName(), change.getVariation());
 			if (member != null) {
 				if (change.isLimitedSelection()) {
-					disableStyle(theme, member.getGroupName());
+					setEnabledStyles(theme, member.getGroupName(), false);
 				}
 				member.setEnabled(!change.isEnabled());
 			}
@@ -1219,13 +1234,13 @@ public class ThemeChanger {
 		return restoreTheme(theme);
 	}
 	
-	private void disableStyle(Theme theme, String styleGroupName) {
+	private void setEnabledStyles(Theme theme, String styleGroupName, boolean enable) {
 		ThemeStyleGroupMember member = null;
 		Collection<ThemeStyleGroupMember> styleMembers = theme.getStyleGroupsMembers().values();
 		for (Iterator <ThemeStyleGroupMember> it = styleMembers.iterator(); it.hasNext(); ) {
 			member = it.next();
 			if (member.getGroupName().equals(styleGroupName)) {
-				member.setEnabled(false);
+				member.setEnabled(enable);
 			}
 		}
 	}

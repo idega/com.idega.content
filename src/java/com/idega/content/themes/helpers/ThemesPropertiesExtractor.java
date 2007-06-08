@@ -98,7 +98,7 @@ public class ThemesPropertiesExtractor {
 		return null;
 	}
 	
-	protected boolean prepareTheme(Theme theme, List<String> pLists, List<String> configs) {
+	public boolean prepareTheme(Theme theme, List<String> pLists, List<String> configs) {
 		if (theme == null) {
 			return false;
 		}

@@ -3,6 +3,8 @@ package com.idega.content.business;
 import com.idega.content.themes.helpers.ThemesConstants;
 
 public class ContentConstants {
+	
+	public static final String CONTENT_BUNDLE = "com.idega.content";
 
 	public static final String SLASH = "/";
 	public static final String SPACE = " ";

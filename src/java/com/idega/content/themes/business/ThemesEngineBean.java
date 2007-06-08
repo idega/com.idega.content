@@ -22,6 +22,7 @@ import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.SimplifiedTheme;
 import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemeChange;
+import com.idega.content.themes.helpers.ThemeStyleGroupMember;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.content.themes.helpers.TreeNodeStructure;
@@ -1394,6 +1395,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			localizedText.add(resourceBundle.getLocalizedString("no_page_exist", "No page exist"));								// 21
 			localizedText.add(resourceBundle.getLocalizedString("loading", "Loading..."));										// 22
 			localizedText.add(resourceBundle.getLocalizedString("make_this_page_start_page", "Make This Page As Start Page"));	// 23
+			localizedText.add(resourceBundle.getLocalizedString("reloading", "Reloading..."));									//	24
 		} catch (Exception e) {
 			log.error(e);
 		}
@@ -1411,6 +1413,46 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		builder.startBuilderSession(iwc);
 		return true;
+	}
+	
+	public String reloadThemeProperties(String themeId) {
+		if (themeId == null) {
+			return null;
+		}
+		Theme theme = helper.getTheme(themeId);
+		if (theme == null) {
+			return null;
+		}
+		
+		List<ThemeChange> enabledStyles = getEnabledStyles(theme);				//	Getting current state
+		helper.clearVariationFromCache(themeId);								//	Clearing cache
+		theme.reloadProperties();												//	Clearing properties
+		helper.getThemesPropertiesExtractor().prepareTheme(theme, null, null);	//	Extracting new properties (also setting default state)
+		helper.getThemeChanger().setSelectedStyles(theme, enabledStyles);		//	Restoring current state
+		
+		return getThemeStyleVariations(themeId);
+	}
+	
+	private List<ThemeChange> getEnabledStyles(Theme theme) {
+		List<ThemeChange> enabled = new ArrayList<ThemeChange>();
+		
+		if (theme == null) {
+			return enabled;
+		}
+		
+		ThemeChange change = null;
+		ThemeStyleGroupMember member = null;
+		for (Iterator<ThemeStyleGroupMember> it = theme.getStyleGroupsMembers().values().iterator(); it.hasNext(); ) {
+			member = it.next();
+			change = new ThemeChange();
+			change.setStyleGroupName(member.getGroupName());
+			change.setVariation(member.getName());
+			change.setEnabled(member.isEnabled());
+			change.setLimitedSelection(member.isLimitedSelection());
+			enabled.add(change);
+		}
+		
+		return enabled;
 	}
 
 }

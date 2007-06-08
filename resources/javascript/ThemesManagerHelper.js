@@ -91,6 +91,8 @@ function getThemeStyleVariationsCallback(variations) {
 	}
 	removeChildren(container);
 	container.innerHTML = variations;
+	
+	registerThemesActions();
 }
 
 function changeTheme(themeID, styleGroupName, newStyleMember, type, checked) {
@@ -739,4 +741,29 @@ function initializeThemes() {
 	insertStyleFile();
 	initScript(false, true, true);
 	getThemes(null, true, true);
+}
+
+function registerThemesActions() {
+	$$('img.reload_properties_for_theme').each(
+		function(element) {
+			initToolTipForElement(element);
+			element.onclick = function() {
+				reloadThemeProperties(element);
+			}
+		}
+	);
+}
+
+function reloadThemeProperties(element) {
+	if (element == null) {
+		return null;
+	}
+	var attr = element.attributes;	
+	var themeId = null;
+	if (attr.getNamedItem('current_theme_id') != null) {
+		themeId = attr.getNamedItem('current_theme_id').value;
+	}
+	
+	showLoadingMessage(getReloadingText());
+	ThemesEngine.reloadThemeProperties(themeId, getThemeStyleVariationsCallback);
 }

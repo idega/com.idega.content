@@ -870,3 +870,7 @@ overflow: auto !important;
 #makeStartPage {
 	left: 50%;
 }
+
+.reload_properties_for_theme:HOVER {
+	cursor: pointer;
+}
