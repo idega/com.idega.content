@@ -3,7 +3,6 @@ package com.idega.content.tree;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +18,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 import com.idega.block.web2.presentation.Accordion;
-import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.business.TemplatesLoader;
-import com.idega.core.cache.IWCacheManager2;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.data.IWTreeNode;
 import com.idega.idegaweb.IWMainApplication;
