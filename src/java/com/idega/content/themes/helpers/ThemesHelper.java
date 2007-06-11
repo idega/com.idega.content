@@ -1118,6 +1118,10 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		
+		fileName = getFileNameWithExtension(fileName);
+		if (fileName == null) {
+			return null;
+		}
 		String fullUrl = changeUploadFileName(ThemesConstants.PAGES_PATH_SLIDE + fileName);
 		String base = extractValueFromString(fullUrl, 0, fullUrl.lastIndexOf(ContentConstants.SLASH));
 		if (!base.endsWith(ContentConstants.SLASH)) {
