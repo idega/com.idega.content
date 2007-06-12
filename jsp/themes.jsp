@@ -11,9 +11,8 @@ version="1.2">
 	<jsf:view>
         <ws:page id="themeManager" javascripturls="
         				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.1.0/mootools-all-compressed.js,
-						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/for_mootools/1.1/reflection.js,
 						
-						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/transcorners/Transcorners.js,
+						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/reflection.js,
 						
 						/dwr/engine.js,
         				/dwr/interface/ThemesEngine.js,
@@ -26,13 +25,12 @@ version="1.2">
 					<script type="text/javascript">
 						registerEvent(window, "load", getLocalizedTextForThemes);
 						registerEvent(window, "load", initializeThemes);
-						registerEvent(window, "load", roundThemesSliderCorners);
 					</script>
 				</jsf:verbatim>
 				<wf:wfblock id="themeManagerBlock" title="#{localizedStrings['com.idega.content']['themes']}" >
 					<x:div id="themePreviewContainer" forceId="true" style="width: auto">
 						<jsf:verbatim>
-							<iframe id="themePreview">iframe</iframe>
+							<img id="themePreview"></img>
 						</jsf:verbatim>
 					</x:div>
 					
