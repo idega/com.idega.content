@@ -351,7 +351,7 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
 		simpleTheme = themes[i];
 		
 		time = date.getTime()
-		theme = new Theme(simpleTheme.name, simpleTheme.linkToSmallPreview + '?' + time, simpleTheme.linkToBigPreview/* + '?' + time*/, simpleTheme.id, simpleTheme.used);
+		theme = new Theme(simpleTheme.name, simpleTheme.linkToSmallPreview + '?' + time, simpleTheme.linkToBigPreview + '?' + time, simpleTheme.id, simpleTheme.used);
 		
 		var div = document.createElement('div');
 		div.setAttribute('id', theme.id + '_mainContainer');
