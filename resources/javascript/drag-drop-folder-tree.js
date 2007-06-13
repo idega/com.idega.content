@@ -826,16 +826,23 @@
 			getPrewUrl(lastID);
 			isChangingSiteMap();
 			if (!isSiteMap()){
-				var aTag = document.getElementById(id).getElementsByTagName('a')[0];
-				aTag.className = 'pageTreeNames';				
-				boldSelectedTreeElement(aTag);
-				registerPageInfoActions();
+				var aTag = document.getElementById(id);
+				if (aTag){
+					aTag = aTag.getElementsByTagName('a')[0];
+					aTag.className = 'pageTreeNames';				
+					boldSelectedTreeElement(aTag);
+					registerPageInfoActions();
+				}
 			}
 			else{
 				for (var i = 0; i < id.length; i++){
-					var aTag = document.getElementById(id[0]).getElementsByTagName('a')[0];
-					aTag.className = 'pageTreeNames';				
-					boldSelectedTreeElement(aTag);
+//					var aTag = document.getElementById(id[0]).getElementsByTagName('a')[0];
+					var aTag = document.getElementById(id[0]);
+					if(aTag){
+						aTag = getElementsByTagName('a')[0];
+						aTag.className = 'pageTreeNames';				
+						boldSelectedTreeElement(aTag);
+					}
 				}
 				registerSiteActions();				
 			}
