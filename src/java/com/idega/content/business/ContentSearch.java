@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.35 2007/05/02 15:30:28 eiki Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.36 2007/06/14 18:58:07 civilis Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2007/05/02 15:30:28 $ by $Author: eiki $ This class
+ * Last modified: $Date: 2007/06/14 18:58:07 $ by $Author: civilis $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -83,7 +83,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.35 $
+ * @version $Revision: 1.36 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -973,5 +973,8 @@ public class ContentSearch extends Object implements SearchPlugin{
 		return results;
 		
 	}
-
+	
+	public String getSearchIdentifier() {
+		return ContentUtil.getBundle().getComponentName(this.getClass());
+	}
 }
