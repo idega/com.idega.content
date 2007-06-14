@@ -283,6 +283,8 @@ var DROP_TEMPLATES_HERE = "Drop templates here";
 var NO_PAGE_EXISTS_TEXT = "No page exist";
 var LOADING_TEXT = "Loading...";
 var RELOADING_TEXT = 'Reloading...';
+var SHOW_MODULES_TEXT = 'Show Modules';
+var HIDE_MODULES_TEXT = 'Hide Modules';
 
 function getLocalizedTextForThemes() {
 	ThemesEngine.getLocalizedText(getLocalizedTextForThemesCallback);
@@ -292,7 +294,7 @@ function getLocalizedTextForThemesCallback(list) {
 	if (list == null) {
 		return;
 	}
-	if (list.length != 25) {
+	if (list.length != 27) {
 		return;
 	}
 	UPLOADING_THEME = list[0];
@@ -320,6 +322,8 @@ function getLocalizedTextForThemesCallback(list) {
 	LOADING_TEXT = list[22];
 	MAKE_THIS_PAGE_START_PAGE_TEXT = list[23];
 	RELOADING_TEXT = list[24];
+	SHOW_MODULES_TEXT = list[25];
+	HIDE_MODULES_TEXT = list[26];
 }
 
 function getUploadingThemeText() {
@@ -420,6 +424,14 @@ function getMakeThisPageStartPageText() {
 
 function getReloadingText() {
 	return RELOADING_TEXT;
+}
+
+function getShowModuleText() {
+	return SHOW_MODULES_TEXT;
+}
+
+function getHideModulesText() {
+	return HIDE_MODULES_TEXT;
 }
 // Localized text ends
 

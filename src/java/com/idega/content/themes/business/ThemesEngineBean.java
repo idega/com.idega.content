@@ -1396,6 +1396,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			localizedText.add(resourceBundle.getLocalizedString("loading", "Loading..."));										// 22
 			localizedText.add(resourceBundle.getLocalizedString("make_this_page_start_page", "Make This Page As Start Page"));	// 23
 			localizedText.add(resourceBundle.getLocalizedString("reloading", "Reloading..."));									//	24
+			localizedText.add(resourceBundle.getLocalizedString("show_modules", "Show Modules"));								//	25
+			localizedText.add(resourceBundle.getLocalizedString("hide_modules", "Hide Modules"));								//	26
 		} catch (Exception e) {
 			log.error(e);
 		}

@@ -11,6 +11,7 @@ var GET_THEMES_ID = 0;
 
 var CLICKED_CREATE = false;
 var SLIDER_SHOWED_FIRST_TIME = true;
+var MODULES_SHOWN = false;
 
 var KEYWORDS = null;
 
@@ -451,4 +452,58 @@ function registerPageInfoActions() {
 			}
 	   	}
 	);
+	
+	$$('input.showPageModulesStyleClass').each(
+		function(element) {
+			element.onclick = function() {
+				manageModulesBackground(element);
+			}
+		}
+	);
+}
+
+function manageModulesBackground(element) {
+	if (element == null) {
+		return;
+	}
+	var frameObject = window.frames['treePages'];
+	if (frameObject == null) {
+		element.disabled = true;
+		return;
+	}
+	var frameDocument = frameObject.document;
+	if (frameDocument == null) {
+		element.disabled = true;
+		return;
+	}
+	element.disabled = false;
+	
+	if (MODULES_SHOWN) {
+		hideOldLabels(frameDocument);
+	}
+	
+	var elements = getElementsByClassName(frameDocument, 'div', 'moduleContainer');
+	if (elements == null) {
+		return;
+	}
+	var module = null;
+	for (var i = 0; i < elements.length; i++) {
+		module = elements[i];
+		if (MODULES_SHOWN) {
+			module.removeAttribute('style');
+		}
+		else {
+			module.setAttribute('style', 'background-color: #FFFF99;');
+			showAllComponentsLabels(module);
+		}
+	}
+	
+	if (MODULES_SHOWN) {
+		element.value = getShowModuleText();
+		MODULES_SHOWN = false;
+	}
+	else {
+		element.value = getHideModulesText();
+		MODULES_SHOWN = true;
+	}
 }

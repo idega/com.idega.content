@@ -28,11 +28,11 @@ version="1.2">
 			<h:form id="pagesForm">
 				<jsf:verbatim>
                 	<script type="text/javascript">
-                		registerEvent(window, "load", startBuilderApplication);
-                		registerEvent(window, "load", getLocalizedTextForThemes);
-                		registerEvent(window, "load", initializePages);
-                		registerEvent(window, "load", getPathToImageFolder);
-                		registerEvent(window, "load", registerPageInfoActions);
+                		window.addEvent('load', startBuilderApplication);
+                		window.addEvent('load', getLocalizedTextForThemes);
+                		window.addEvent('load', initializePages);
+                		window.addEvent('load', getPathToImageFolder);
+                		window.addEvent('load', registerPageInfoActions);
                 	</script>
                 </jsf:verbatim>
                 
@@ -73,7 +73,7 @@ version="1.2">
 	
 					<x:div styleClass="pagePreviewContainer">
 						<jsf:verbatim>
-							<iframe id="treePages" class="pagePreviewFrame">iframe</iframe>
+							<iframe name="treePages" id="treePages" class="pagePreviewFrame">iframe</iframe>
 						</jsf:verbatim>
 					</x:div>
                 
@@ -118,6 +118,7 @@ version="1.2">
 					<x:commandButton id="newPageButton" forceId="true" styleClass="newPageButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['new_page']}"></x:commandButton>
 				</x:div>
 				<x:div styleClass="rightButtonStyle">
+					<x:commandButton id="showPageModules" forceId="true" styleClass="showPageModulesStyleClass" type="button" value="#{localizedStrings['com.idega.content']['show_modules']}"></x:commandButton>
 					<x:commandButton id="showThemesButton" forceId="true" styleClass="showThemesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['show_themes']}"></x:commandButton>
 				</x:div>
 			</h:form>
