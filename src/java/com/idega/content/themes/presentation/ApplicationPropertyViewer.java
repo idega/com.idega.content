@@ -41,7 +41,9 @@ public class ApplicationPropertyViewer extends Block {
 
 	private String applicationPropertyKey = null;
 	
-	public ApplicationPropertyViewer() {}
+	public ApplicationPropertyViewer() {
+		setUseBuilderObjectControl(false);	//	We don't need 'wrappers' in Builder for this PO
+	}
 	
 	public void main(IWContext iwc) {
 		if (applicationPropertyKey == null) {
