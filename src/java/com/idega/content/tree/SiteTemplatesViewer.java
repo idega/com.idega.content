@@ -128,7 +128,6 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		if(pageMap.get(pageType) != null)
 			return pageMap.get(pageType).getTemplateFile();
 		else {
-			System.out.println("pageType not set");
 			return "";
 		}
 	}
@@ -158,7 +157,6 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		if(pageMap.get(pageType) != null)
 			return pageMap.get(pageType).getIconFile();
 		else {
-			System.out.println("pageType not set");
 			return "";
 		}
 	}
