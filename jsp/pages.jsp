@@ -17,7 +17,7 @@ version="1.2">
         				/dwr/interface/BuilderService.js,
 						/dwr/interface/PagePreview.js,
 						
-						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.0.0/mootools-all-compressed.js,
+						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.1.0/mootools-all-compressed.js,
         				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/reflection.js,
         				
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
@@ -28,11 +28,11 @@ version="1.2">
 			<h:form id="pagesForm">
 				<jsf:verbatim>
                 	<script type="text/javascript">
-                		window.addEvent('load', startBuilderApplication);
-                		window.addEvent('load', getLocalizedTextForThemes);
-                		window.addEvent('load', initializePages);
-                		window.addEvent('load', getPathToImageFolder);
-                		window.addEvent('load', registerPageInfoActions);
+                		window.addEvent('domready', startBuilderApplication);
+                		window.addEvent('domready', getLocalizedTextForThemes);
+                		window.addEvent('domready', initializePages);
+                		window.addEvent('domready', getPathToImageFolder);
+                		window.addEvent('domready', registerPageInfoActions);
                 	</script>
                 </jsf:verbatim>
                 
@@ -108,9 +108,11 @@ version="1.2">
 				
 				<jsf:verbatim><script type="text/javascript">setIsSiteMap(false);</script></jsf:verbatim>
 				<jsf:verbatim>
-					<script type="text/javascript">	
-						appendIdOfTree('new_page_tree');
-						appendIdOfAdvancedTree('current_structure_tree');							
+					<script type="text/javascript">
+						window.addEvent('domready', function() {
+							appendIdOfTree('new_page_tree');
+							appendIdOfAdvancedTree('current_structure_tree');
+						});
 					</script>
 				</jsf:verbatim>
                 

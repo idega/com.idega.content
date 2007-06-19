@@ -23,8 +23,8 @@ version="1.2">
 			<h:form id="uploadForm" enctype="multipart/form-data" onsubmit="showLoadingMessage(getUploadingThemeText());">
 				<jsf:verbatim>
 					<script type="text/javascript">
-						registerEvent(window, "load", getLocalizedTextForThemes);
-						registerEvent(window, "load", initializeThemes);
+						window.addEvent('domready', getLocalizedTextForThemes);
+						window.addEvent('domready', initializeThemes);
 					</script>
 				</jsf:verbatim>
 				<wf:wfblock id="themeManagerBlock" title="#{localizedStrings['com.idega.content']['themes']}" >
