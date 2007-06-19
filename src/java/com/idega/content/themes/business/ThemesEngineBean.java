@@ -648,13 +648,21 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	private String[] getElements(Collection <Setting> c) {
-		String[] elements = null;
-		List <Setting> settings = new ArrayList<Setting>(c);
-		elements = new String[settings.size()];
-		for (int i = 0; i < settings.size(); i++) {
-			elements[i] = settings.get(i).getCode();
+		if (c == null) {
+			return null;
 		}
-		return elements;
+		try {
+			String[] elements = null;
+			List <Setting> settings = new ArrayList<Setting>(c);
+			elements = new String[settings.size()];
+			for (int i = 0; i < settings.size(); i++) {
+				elements[i] = settings.get(i).getCode();
+			}
+			return elements;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	private boolean saveSiteInfoValue(String language, String keyword, String value, IWMainApplicationSettings settings,
