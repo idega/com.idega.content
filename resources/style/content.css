@@ -874,3 +874,11 @@ overflow: auto !important;
 .reload_properties_for_theme:HOVER {
 	cursor: pointer;
 }
+
+.applicationPropertyStyleClass {
+}
+
+.applicationPropertyStyleClass:HOVER {
+	background-color: #ffff99;
+	cursor: pointer;
+}

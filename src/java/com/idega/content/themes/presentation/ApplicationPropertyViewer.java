@@ -36,7 +36,7 @@ public class ApplicationPropertyViewer extends Block {
 	private static final String LOGO = "logo";
 	
 	private static final String LIST_STYLE = "list-style-type: none; width: 100%";
-	private static final String USELESS_STYLE_CLASS = "empty_useless_style_class";
+	private static final String STYLE_CLASS = "applicationPropertyStyleClass";
 	private static final String FIFTEEN_SPACE = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 
 	private String applicationPropertyKey = null;
@@ -49,6 +49,7 @@ public class ApplicationPropertyViewer extends Block {
 		if (applicationPropertyKey == null) {
 			return;
 		}
+		
 		String settingKey = applicationPropertyKey;
 		String key = null;
 		if (applicationPropertyKey.indexOf(ThemesConstants.THEMES_PROPERTY_START) == -1) {
@@ -143,7 +144,7 @@ public class ApplicationPropertyViewer extends Block {
 		
 		Text text = new Text(value); // Simple text
 		addPropertyEditAction(iwc, text, key, settingKey);
-		text.setStyleClass(USELESS_STYLE_CLASS);
+		text.setStyleClass(STYLE_CLASS);
 		this.add(text);
 	}
 	
@@ -188,9 +189,11 @@ public class ApplicationPropertyViewer extends Block {
 			javaScript.append("changeSiteInfo(this.id, '").append(ContentUtil.getBundle().getLocalizedString("saving"));
 			javaScript.append("');");
 			component.attributes.put("ondblclick", javaScript.toString());
-			component.attributes.put("onmouseover", "addStyleProperty(this.id, 'background-color: #ffff99; cursor: pointer;');");
-			component.attributes.put("onmouseout", "removeStyleProperty(this.id);");
-			component.setToolTip(title + ": " + ContentUtil.getBundle().getLocalizedString("double_click_to_edit"));
+			
+			component.setStyleClass(STYLE_CLASS);
+			
+			String localizedText = ContentUtil.getBundle().getLocalizedString("double_click_to_edit", "Double click to edit");
+			component.setToolTip(new StringBuffer(title).append(": ").append(localizedText).toString());
 		}
 	}
 	
