@@ -11,6 +11,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 
 import com.idega.content.business.ContentConstants;
+import com.idega.util.CoreConstants;
 import com.idega.util.StringHandler;
 
 public class ThemesPropertiesExtractor {
@@ -421,7 +422,7 @@ public class ThemesPropertiesExtractor {
 		if (!linkToBase.endsWith(ContentConstants.SLASH)) {
 			linkToBase = new StringBuffer(linkToBase).append(ContentConstants.SLASH).toString();
 		}
-		String searchName = new StringBuffer(ContentConstants.CONTENT).append(theme.getLinkToBase()).append(fileName).toString();
+		String searchName = new StringBuffer(CoreConstants.CONTENT).append(theme.getLinkToBase()).append(fileName).toString();
 		if (helper.existFileInSlide(searchName)) {
 			return searchName;
 		}

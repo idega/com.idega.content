@@ -41,6 +41,7 @@ import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.servlet.filter.IWWelcomeFilter;
+import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.webface.WFUtil;
 
@@ -69,7 +70,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		List<String> pLists = null;
 		List<String> configs = null;
 		if (!helper.isCheckedFromSlide()) {
-			String searchScope = new StringBuffer(ContentConstants.CONTENT).append(ThemesConstants.THEMES_PATH).toString();
+			String searchScope = new StringBuffer(CoreConstants.CONTENT).append(ThemesConstants.THEMES_PATH).toString();
 			
 			String propSearchKey = new StringBuffer("*").append(ThemesConstants.THEME_PROPERTIES_FILE_END).toString();
 			Collection propertiesLists = helper.search(propSearchKey, searchScope);
@@ -113,12 +114,12 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				}
 				
 				// Small preview
-				link = new StringBuffer(ContentConstants.CONTENT).append(theme.getLinkToBase());
+				link = new StringBuffer(CoreConstants.CONTENT).append(theme.getLinkToBase());
 				link.append(helper.encode(theme.getLinkToSmallPreview(), true));
 				simpleTheme.setLinkToSmallPreview(link.toString());
 				
 				// Big preview
-				link = new StringBuffer(ContentConstants.CONTENT).append(theme.getLinkToBase());
+				link = new StringBuffer(CoreConstants.CONTENT).append(theme.getLinkToBase());
 				if (theme.getLinkToDraftPreview() == null) {
 					link.append(helper.encode(theme.getLinkToThemePreview(), true));
 				}

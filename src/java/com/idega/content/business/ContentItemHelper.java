@@ -13,6 +13,7 @@ import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.data.ICTreeNode;
 import com.idega.presentation.IWContext;
+import com.idega.util.CoreConstants;
 
 public class ContentItemHelper {
 	
@@ -147,7 +148,7 @@ public class ContentItemHelper {
 		}
 		StringBuffer appliedPath = new StringBuffer();
 		for (int i = 0; i + 1 < pathParts.length; i++) {
-			if (ContentConstants.CONTENT.indexOf(pathParts[i]) == -1) {
+			if (CoreConstants.CONTENT.indexOf(pathParts[i]) == -1) {
 				appliedPath.append(ContentConstants.SLASH).append(pathParts[i]);
 			}
 		}

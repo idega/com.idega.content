@@ -21,8 +21,6 @@ public class ContentConstants {
 	
 	public static final String ARTICLE_VIEWER_URI = "/articleviewer/";
 	
-	public static final String CONTENT = "/content";
-	
 	public static final String ARTICLE_PATH_START = BASE_ROOT_SLIDE + "/article";
 	public static final String ARTICLE_SCOPE = "article";
 

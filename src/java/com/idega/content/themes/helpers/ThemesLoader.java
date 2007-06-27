@@ -2,7 +2,7 @@ package com.idega.content.themes.helpers;
 
 import java.util.List;
 
-import com.idega.content.business.ContentConstants;
+import com.idega.util.CoreConstants;
 
 public class ThemesLoader {
 	
@@ -18,10 +18,10 @@ public class ThemesLoader {
 			return false;
 		}
 
-		if (encodedUri.startsWith(ContentConstants.CONTENT)) {
+		if (encodedUri.startsWith(CoreConstants.CONTENT)) {
 			encodedUri = getUriWithoutContent(encodedUri);
 		}
-		if (originalUri.startsWith(ContentConstants.CONTENT)) {
+		if (originalUri.startsWith(CoreConstants.CONTENT)) {
 			originalUri = getUriWithoutContent(originalUri);
 		}
 		
@@ -61,11 +61,11 @@ public class ThemesLoader {
 	}
 	
 	private String getUriWithoutContent(String uri) {
-		int index = uri.indexOf(ContentConstants.CONTENT);
+		int index = uri.indexOf(CoreConstants.CONTENT);
 		if (index == -1) {
 			return uri;
 		}
-		index += ContentConstants.CONTENT.length();
+		index += CoreConstants.CONTENT.length();
 		return helper.extractValueFromString(uri, index, uri.length());
 	}
 	

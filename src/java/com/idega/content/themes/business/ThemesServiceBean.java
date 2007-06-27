@@ -26,6 +26,7 @@ import com.idega.idegaweb.IWApplicationContextFactory;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWContentEvent;
 import com.idega.slide.business.IWSlideChangeListener;
+import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.StringHandler;
 
@@ -178,7 +179,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		theme.setIBPageID(id);
 		
-		return updatePageWebDav(theme.getIBPageID(), ContentConstants.CONTENT + theme.getLinkToSkeleton());
+		return updatePageWebDav(theme.getIBPageID(), CoreConstants.CONTENT + theme.getLinkToSkeleton());
 	}
 	
 	public boolean updatePageWebDav(int id, String uri) {

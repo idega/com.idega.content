@@ -33,6 +33,7 @@ import com.idega.slide.business.IWContentEvent;
 import com.idega.slide.business.IWSlideChangeListener;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.util.WebdavExtendedResource;
+import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.FileUtil;
 //import com.sun.jmx.snmp.Timestamp;
@@ -50,7 +51,7 @@ public class ContentItemRssProducer  extends RSSAbstractProducer implements RSSP
 	public static final String RSS_FOLDER_NAME = "rss";
 	public static final String RSS_FILE_NAME = "feed.xml";
 
-	public static final String PATH = ContentConstants.CONTENT + ContentUtil.getContentBaseFolderPath() + "/article/";//"/files/cms/article";
+	public static final String PATH = CoreConstants.CONTENT + ContentUtil.getContentBaseFolderPath() + "/article/";//"/files/cms/article";
 	private Map rssFileURIsCacheMap = new HashMap();
 	private static Log log = LogFactory.getLog(ContentItemRssProducer.class);
 	

@@ -69,6 +69,7 @@ import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
 import com.idega.repository.data.Singleton;
 import com.idega.slide.business.IWSlideService;
+import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.StringHandler;
 import com.idega.webface.WFUtil;
@@ -245,7 +246,7 @@ public class ThemesHelper implements Singleton {
 			checkedFromSlide = true;
 		}
 		
-		String searchScope = new StringBuffer(ContentConstants.CONTENT).append(ThemesConstants.THEMES_PATH).toString();
+		String searchScope = new StringBuffer(CoreConstants.CONTENT).append(ThemesConstants.THEMES_PATH).toString();
 		
 		Collection themes = search(ThemesConstants.THEME_SEARCH_KEY, searchScope);
 		if (themes == null) {
@@ -1135,7 +1136,7 @@ public class ThemesHelper implements Singleton {
 			log.error(e);
 		}
 		
-		return ContentConstants.CONTENT + base + changedFileName;
+		return CoreConstants.CONTENT + base + changedFileName;
 	}
 	
 	private boolean existInSlide(String path) {
@@ -1499,7 +1500,7 @@ public class ThemesHelper implements Singleton {
 		}
 		InputStream stream = null;
 		StringBuffer url = null;
-		if (path.startsWith(ContentConstants.CONTENT)) {
+		if (path.startsWith(CoreConstants.CONTENT)) {
 			url = new StringBuffer(getWebRootWithoutContent());
 		}
 		else {
