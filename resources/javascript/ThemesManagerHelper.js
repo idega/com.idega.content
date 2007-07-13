@@ -58,7 +58,7 @@ function getThemeStyleVariations(themeID) {
 		if (oldTheme != null) {
 			var oldClassName = 'themeName';
 			if (oldTheme.used) {
-				oldClassName = 'usedThemeName';
+				oldClassName = 'themeName usedThemeName';
 			}
 			setNewStyleForSelectedElement(oldTheme.id + '_themeNameContainer', oldClassName);
 		}
@@ -67,7 +67,7 @@ function getThemeStyleVariations(themeID) {
 	setGlobalId(themeID);
 	var newTheme = getTheme(THEME_ID);
 	if (!newTheme.used) {
-		setNewStyleForSelectedElement(newTheme.id + '_themeNameContainer', 'selectedThemeName');
+		setNewStyleForSelectedElement(newTheme.id + '_themeNameContainer', 'themeName selectedThemeName');
 	}
 	setThemeForPreview(themeID);
 	ThemesEngine.getThemeStyleVariations(themeID, getThemeStyleVariationsCallback);
@@ -369,7 +369,7 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
 		var textDiv = document.createElement('div');
 		textDiv.setAttribute('id', theme.id + '_themeNameContainer');
 		if (theme.used) {
-			textDiv.className = 'usedThemeName';
+			textDiv.className = 'themeName usedThemeName';
 		}
 		else {
 			textDiv.className = 'themeName';

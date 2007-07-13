@@ -234,7 +234,7 @@ function setStyle(isPage) {
 	}
 	showLoadingMessage(getApplyingStyleText());
 	setNewStyleToElements("usedThemeName", "themeName");
-	setNewStyleForSelectedElement(getThemeForStyle() + "_themeNameContainer", "usedThemeName");
+	setNewStyleForSelectedElement(getThemeForStyle() + "_themeNameContainer", "themeName usedThemeName");
 	ThemesEngine.setSelectedStyle(getThemeForStyle(), getPageID(), isPage, setStyleCallback);
 }
 

@@ -370,18 +370,17 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	color: #FFFFFF;
 	clear: left;
 	font-family: Trebuchet MS,Verdana,Sans-serif;
+	width: 152px;
+	height: 12px;
+	overflow: hidden;	
 }
 
 .usedThemeName {
-	text-align: center;
 	color: #FFCC00;
-	clear: left;
 }
 
 .selectedThemeName {
-	text-align: center;
 	color: #025FD0;
-	clear: left;
 }
 
 .themesTicker {
