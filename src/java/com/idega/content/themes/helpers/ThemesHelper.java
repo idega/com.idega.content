@@ -1074,15 +1074,15 @@ public class ThemesHelper implements Singleton {
 				if (articlesPaths.size() == articleViewers.size()) {
 					Element articleViewer = null;
 					String path = null;
-					List elements = null;
-					Element element = null;
-					Attribute resourcePath = null;
-					Attribute value = null;
-					Object o = null;
+					Attribute resourcePathValue = null;
 					for (int i = 0; i < articleViewers.size(); i++) {
 						articleViewer = articleViewers.get(i);
 						path = articlesPaths.get(i);
-						elements = articleViewer.getChildren();
+						resourcePathValue = getArticleViewerResourcePathValueAttribute(articleViewer);
+						if (resourcePathValue != null) {
+							resourcePathValue.setValue(path);
+						}
+						/*elements = articleViewer.getChildren();
 						if (elements != null) {
 							for (int j = 0; j < elements.size(); j++) {
 								o = elements.get(j);
@@ -1099,30 +1099,11 @@ public class ThemesHelper implements Singleton {
 									}
 								}
 							}
-						}
+						}*/
 					}
 				}
 			}
 		}
-		/*if (ThemesConstants.ARTICLE_PAGE_TYPE.contains(type) && articlePath != null && !ThemesConstants.MINUS_ONE.equals(articlePath)) {
-			Object o = null;
-			Element e = null;
-			Attribute a = null;
-			boolean changedValue = false;
-			for (Iterator it = doc.getDescendants(); (it.hasNext() && !changedValue);) {
-				o = it.next();
-				if (o instanceof Element) {
-					e = (Element) o;
-					if (PROPERTY_ATTRIBUTE_NAME.equals(e.getName())) {
-						a = e.getAttribute(ATTRIBUTE_PROPERTY);
-						if (a != null) {
-							a.setValue(articlePath);
-							changedValue = true;
-						}
-					}
-				}
-			}
-		}*/
 		addIDsToModules(doc.getRootElement(), pageID);
 		return doc;
 	}
@@ -1145,7 +1126,9 @@ public class ThemesHelper implements Singleton {
 					if (classAttribute != null) {
 						if (classAttribute.getValue() != null) {
 							if (classAttribute.getValue().endsWith(CoreConstants.ARTICLE_ITEM_VIEWER_NAME)) {
-								articleViewers.add(e);
+								if (isArticleViewerWithoutResourcePath(e)) {
+									articleViewers.add(e);
+								}
 							}
 						}
 					}
@@ -1154,6 +1137,45 @@ public class ThemesHelper implements Singleton {
 		}
 		
 		return articleViewers;
+	}
+	
+	private Attribute getArticleViewerResourcePathValueAttribute(Element articleViewer) {
+		if (articleViewer == null) {
+			return null;
+		}
+		List elements = articleViewer.getChildren();
+		if (elements == null) {
+			return null;
+		}
+		
+		Attribute resourcePath = null;
+		Element element = null;
+		Object o = null;
+		for (int j = 0; j < elements.size(); j++) {
+			o = elements.get(j);
+			if (o instanceof Element) {
+				element = (Element) o;
+				resourcePath = element.getAttribute(ATTRIBUTE_NAME);
+				if (resourcePath != null) {
+					if (ATTRIBUTE_RESOURCE_PATH_VALUE.equals(resourcePath.getValue())) {
+						return element.getAttribute(ATTRIBUTE_PROPERTY);
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	private boolean isArticleViewerWithoutResourcePath(Element articleViewer) {
+		Attribute resourcePathValue = getArticleViewerResourcePathValueAttribute(articleViewer);
+		if (resourcePathValue == null) {
+			return true;
+		}
+		String value = resourcePathValue.getValue();
+		if (value == null) {
+			return true;
+		}
+		return ContentConstants.EMPTY.equals(value) ? true : false;
 	}
 	
 	private String getPageDocument(String type, List<String> articlesPaths, String templateFile, int pageID) {
