@@ -5,6 +5,9 @@ import java.util.Map;
 
 import javax.faces.context.FacesContext;
 
+import org.apache.myfaces.renderkit.html.util.AddResource;
+import org.apache.myfaces.renderkit.html.util.AddResourceFactory;
+
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.Setting;
@@ -171,6 +174,11 @@ public class ApplicationPropertyViewer extends Block {
 			return;
 		}
 		if (ContentUtil.hasContentEditorRoles(iwc)) {
+			//	Adding script files for DWR
+			AddResource adder = AddResourceFactory.getInstance(iwc);
+			adder.addJavaScriptAtPosition(iwc, AddResource.HEADER_BEGIN, "/dwr/engine.js");
+			adder.addJavaScriptAtPosition(iwc, AddResource.HEADER_BEGIN, "/dwr/interface/ThemesEngine.js");
+			
 			String property = ThemesHelper.getInstance().extractValueFromString(key, key.indexOf(ThemesConstants.DOT) + 1,
 					key.lastIndexOf(ThemesConstants.DOT));
 			
@@ -186,7 +194,7 @@ public class ApplicationPropertyViewer extends Block {
 				component.attributes = new HashMap();
 			}
 			StringBuffer javaScript = new StringBuffer();
-			javaScript.append("changeSiteInfo(this.id, '").append(ContentUtil.getBundle().getLocalizedString("saving"));
+			javaScript.append("changeSiteInfo(this.id, '").append(ContentUtil.getBundle().getLocalizedString("saving", "Saving..."));
 			javaScript.append("');");
 			component.attributes.put("ondblclick", javaScript.toString());
 			
