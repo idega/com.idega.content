@@ -18,7 +18,7 @@ version="1.2">
 						/dwr/interface/PagePreview.js,
 						
 						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.1.0/mootools-all-compressed.js,
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/reflection.js,
+        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/for_mootools/1.2/reflection.js,
         				
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,

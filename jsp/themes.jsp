@@ -12,7 +12,9 @@ version="1.2">
         <ws:page id="themeManager" javascripturls="
         				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.1.0/mootools-all-compressed.js,
 						
-						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/reflection.js,
+						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/transcorners/Transcorners.js,
+						
+						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/for_mootools/1.2/reflection.js,
 						
 						/dwr/engine.js,
         				/dwr/interface/ThemesEngine.js,
@@ -25,6 +27,7 @@ version="1.2">
 					<script type="text/javascript">
 						window.addEvent('domready', getLocalizedTextForThemes);
 						window.addEvent('domready', initializeThemes);
+						window.addEvent('domready', roundThemesSliderCorners);
 					</script>
 				</jsf:verbatim>
 				<wf:wfblock id="themeManagerBlock" title="#{localizedStrings['com.idega.content']['themes']}" >

@@ -612,20 +612,10 @@ function restoreThemeCallback(result) {
 
 function addReflectionToThemes() {
 	if (needReflection) {
-		// Needs to stop script, because reflection is added before images are loaded
-		THEMES_REFLECTION_ID = setTimeout('addAfterSleep()', 1000);
+		for (var i = 0; i < THEMES.length; i++) {
+			Reflection.add(THEMES[i].id, { height: 18/100, opacity: 68/100 });
+		}
 	}
-	
-	/*for (var i = 0; i < THEMES.length; i++) {
-		Reflection.add(THEMES[i].id, { height: 18/100, opacity: 68/100 });
-	}*/
-}
-
-function addAfterSleep() {
-	for (var i = 0; i < THEMES.length; i++) {
-		Reflection.add(document.getElementById(THEMES[i].id), { height: 18/100, opacity: 68/100 });
-	}
-	window.clearTimeout(THEMES_REFLECTION_ID);
 }
 
 function saveAndApplyTheme() {
