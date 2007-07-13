@@ -399,9 +399,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		if (helper.getThemesService().getBuilderService().changePageUriByTitle(parentId, page, pageTitle, domain.getID())) {
-			if (ThemesConstants.ARTICLE_PAGE_TYPE.contains(page.getSubType())) {
-				setNewLinkInArticleFile(page.getId(), "com.idega.block.article.component.ArticleItemViewer", page.getDefaultPageURI());
-			}
+			setNewLinkInArticleFile(page.getId(), "com.idega.block.article.component.ArticleItemViewer", page.getDefaultPageURI());
 			return page.getDefaultPageURI();
 		}
 		return null;
@@ -859,8 +857,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (ThemesConstants.EMPTY.equals(templateFile)) {
 			return false;
 		}
-		String articlePath = helper.createArticle(pageType, pageID);
-		String uriToPage = helper.loadPageToSlide(pageType, templateFile, articlePath, pageID);
+		List<String> articlesPaths = helper.createArticle(templateFile, pageID);
+		String uriToPage = helper.loadPageToSlide(pageType, templateFile, articlesPaths, pageID);
 		if (uriToPage != null) {
 			helper.getThemesService().updatePageWebDav(pageID, uriToPage, clearCache);
 		}

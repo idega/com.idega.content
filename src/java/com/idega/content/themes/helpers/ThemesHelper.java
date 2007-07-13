@@ -105,11 +105,15 @@ public class ThemesHelper implements Singleton {
 	private String webRoot;
 	
 	private static final String RESOURCE_PATH_END = ThemesConstants.DOT + "article";
-	private static final String ATTRIBUTE_NAME = "property";
+	//private static final String PROPERTY_ATTRIBUTE_NAME = "property";
 	private static final String ATTRIBUTE_PROPERTY = "value";
 	private static final String ROOT_PAGE_ARTICLE = "root_page_article";
 	private static final String MODULE_ID_SCOPE = "module_id";
 	private static final String IDEGA_PAGES_SCOPE = "idega_pages";
+	private static final String MODULE_ELEMENT_NAME = "module";
+	private static final String ELEMENT_CLASS_ATTRIBUTE = "class";
+	private static final String ATTRIBUTE_NAME = "name";
+	private static final String ATTRIBUTE_RESOURCE_PATH_VALUE = "resourcePath";
 	
 	private Random numberGenerator = null;
 	
@@ -1063,8 +1067,44 @@ public class ThemesHelper implements Singleton {
 		return settings.getProperty(ThemesConstants.LAST_USED_THEME);
 	}
 	
-	private Document preparePageDocument(Document doc, String type, String articlePath, int pageID) {
-		if (ThemesConstants.ARTICLE_PAGE_TYPE.contains(type) && articlePath != null && !ThemesConstants.MINUS_ONE.equals(articlePath)) {
+	private Document preparePageDocument(Document doc, List<String> articlesPaths, int pageID) {
+		if (articlesPaths != null) {
+			List<Element> articleViewers = getArticleViewerElements(doc);
+			if (articleViewers != null) {
+				if (articlesPaths.size() == articleViewers.size()) {
+					Element articleViewer = null;
+					String path = null;
+					List elements = null;
+					Element element = null;
+					Attribute resourcePath = null;
+					Attribute value = null;
+					Object o = null;
+					for (int i = 0; i < articleViewers.size(); i++) {
+						articleViewer = articleViewers.get(i);
+						path = articlesPaths.get(i);
+						elements = articleViewer.getChildren();
+						if (elements != null) {
+							for (int j = 0; j < elements.size(); j++) {
+								o = elements.get(j);
+								if (o instanceof Element) {
+									element = (Element) o;
+									resourcePath = element.getAttribute(ATTRIBUTE_NAME);
+									if (resourcePath != null) {
+										if (ATTRIBUTE_RESOURCE_PATH_VALUE.equals(resourcePath.getValue())) {
+											value = element.getAttribute(ATTRIBUTE_PROPERTY);
+											if (value != null) {
+												value.setValue(path);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		/*if (ThemesConstants.ARTICLE_PAGE_TYPE.contains(type) && articlePath != null && !ThemesConstants.MINUS_ONE.equals(articlePath)) {
 			Object o = null;
 			Element e = null;
 			Attribute a = null;
@@ -1073,7 +1113,7 @@ public class ThemesHelper implements Singleton {
 				o = it.next();
 				if (o instanceof Element) {
 					e = (Element) o;
-					if (ATTRIBUTE_NAME.equals(e.getName())) {
+					if (PROPERTY_ATTRIBUTE_NAME.equals(e.getName())) {
 						a = e.getAttribute(ATTRIBUTE_PROPERTY);
 						if (a != null) {
 							a.setValue(articlePath);
@@ -1082,30 +1122,55 @@ public class ThemesHelper implements Singleton {
 					}
 				}
 			}
-		}
+		}*/
 		addIDsToModules(doc.getRootElement(), pageID);
 		return doc;
 	}
 	
-	private String getPageDocument(String type, String articlePath, String fileName, int pageID) {
-		Document doc = pages.get(type);
-		if (doc != null) {
-			doc = preparePageDocument(doc, type, articlePath, pageID);
-			return getThemeChanger().getXMLOutputter().outputString(doc);
-		}
-//		doc = getXMLDocument(getWebRootWithoutContent() + ThemesConstants.PAGES_PATH_APPL + fileName);
-		doc = getXMLDocument(getWebRootWithoutContent() + fileName);
-				
+	private List<Element> getArticleViewerElements(Document doc) {
 		if (doc == null) {
 			return null;
 		}
-		pages.put(type, doc);
-		doc = preparePageDocument(doc, type, articlePath, pageID);
+		
+		List<Element> articleViewers = new ArrayList<Element>();
+		Object o = null;
+		Element e = null;
+		Attribute classAttribute = null;
+		for (Iterator it = doc.getDescendants(); it.hasNext();) {
+			o = it.next();
+			if (o instanceof Element) {
+				e = (Element) o;
+				if (MODULE_ELEMENT_NAME.equals(e.getName())) {
+					classAttribute = e.getAttribute(ELEMENT_CLASS_ATTRIBUTE);
+					if (classAttribute != null) {
+						if (classAttribute.getValue() != null) {
+							if (classAttribute.getValue().endsWith(CoreConstants.ARTICLE_ITEM_VIEWER_NAME)) {
+								articleViewers.add(e);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return articleViewers;
+	}
+	
+	private String getPageDocument(String type, List<String> articlesPaths, String templateFile, int pageID) {
+		Document doc = pages.get(type);
+		if (doc == null) {
+			doc = getXMLDocument(new StringBuffer(getWebRootWithoutContent()).append(templateFile).toString());
+			if (doc == null) {
+				return null;
+			}
+			pages.put(type, doc);
+		}
+		doc = preparePageDocument(doc, articlesPaths, pageID);
 		return getThemeChanger().getXMLOutputter().outputString(doc);
 	}
 	
-	public String loadPageToSlide(String type, String fileName, String articlePath, int pageID) {
-		if (type == null || fileName == null) {
+	public String loadPageToSlide(String type, String templateFile, List<String> articlesPaths, int pageID) {
+		if (type == null || templateFile == null) {
 			return null;
 		}
 		
@@ -1114,16 +1179,16 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		
-		String docContent = getPageDocument(type, articlePath, fileName, pageID);
+		String docContent = getPageDocument(type, articlesPaths, templateFile, pageID);
 		if (docContent == null) {
 			return null;
 		}
 		
-		fileName = getFileNameWithExtension(fileName);
-		if (fileName == null) {
+		templateFile = getFileNameWithExtension(templateFile);
+		if (templateFile == null) {
 			return null;
 		}
-		String fullUrl = changeUploadFileName(ThemesConstants.PAGES_PATH_SLIDE + fileName);
+		String fullUrl = changeUploadFileName(ThemesConstants.PAGES_PATH_SLIDE + templateFile);
 		String base = extractValueFromString(fullUrl, 0, fullUrl.lastIndexOf(ContentConstants.SLASH));
 		if (!base.endsWith(ContentConstants.SLASH)) {
 			base += ContentConstants.SLASH;
@@ -1223,15 +1288,18 @@ public class ThemesHelper implements Singleton {
 		}
 	}
 	
-	public String createArticle(String type, int id) {
-		if (type == null) {
+	public List<String> createArticle(String templateFile, int id) {
+		if (templateFile == null) {
 			return null;
 		}
 		if (id == -1) {
 			return null;
 		}
-		if (!ThemesConstants.ARTICLE_PAGE_TYPE.contains(type)) {
-			return ThemesConstants.MINUS_ONE;
+		
+		Document doc = getXMLDocument(new StringBuffer(getWebRootWithoutContent()).append(templateFile).toString());
+		List<Element> articleViewers = getArticleViewerElements(doc);
+		if (articleViewers == null) {
+			return null;
 		}
 		
 		ICPage page = getThemesService().getICPage(id);
@@ -1259,25 +1327,32 @@ public class ThemesHelper implements Singleton {
 			uri = extractValueFromString(uri, 0, uri.lastIndexOf(ContentConstants.SLASH));
 		}
 
-		StringBuffer file = new StringBuffer(language);
-		file.append(ThemesConstants.DOT).append(ThemesConstants.XML_EXTENSION);
-		StringBuffer base = new StringBuffer(ContentConstants.ARTICLE_PATH_START);
-		base.append(uri);
-		if (uri.equals(ContentConstants.EMPTY)) {
-			if (!base.toString().endsWith(ContentConstants.SLASH)) {
-				base.append(ContentConstants.SLASH);
+		List<String> paths = new ArrayList<String>();
+		StringBuffer file = null;
+		StringBuffer base = null;
+		for (int i = 0; i < articleViewers.size(); i++) {
+			file = new StringBuffer(language);
+			file.append(ThemesConstants.DOT).append(ThemesConstants.XML_EXTENSION);
+			base = new StringBuffer(ContentConstants.ARTICLE_PATH_START);
+			base.append(uri);
+			if (uri.equals(ContentConstants.EMPTY)) {
+				if (!base.toString().endsWith(ContentConstants.SLASH)) {
+					base.append(ContentConstants.SLASH);
+				}
+				base.append(ROOT_PAGE_ARTICLE);
 			}
-			base.append(ROOT_PAGE_ARTICLE);
+			base.append(getSlideService().createUniqueFileName(ContentConstants.ARTICLE_SCOPE));
+			base.append(RESOURCE_PATH_END).append(ContentConstants.SLASH);
+			try {
+				getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base.toString(), file.toString(), article, ContentConstants.XML_MIME_TYPE, true);
+				paths.add(base.toString());
+			} catch (RemoteException e) {
+				log.error(e);
+				return null;
+			}
 		}
-		base.append(getSlideService().createUniqueFileName(ContentConstants.ARTICLE_SCOPE));
-		base.append(RESOURCE_PATH_END).append(ContentConstants.SLASH);
-		try {
-			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base.toString(), file.toString(), article, ContentConstants.XML_MIME_TYPE, true);
-			return base.toString();
-		} catch (RemoteException e) {
-			log.error(e);
-			return null;
-		}
+		
+		return paths;
 	}
 	
 	private String getArticleDocument(String language, String uri, IWContext iwc) {
@@ -1334,9 +1409,7 @@ public class ThemesHelper implements Singleton {
 		Object o = null;
 		Attribute moduleIdAttribute = null;
 		
-		String module = "module";
 		String id = "id";
-		String className = "class";
 		String pageKey = String.valueOf(pageID);
 		String moduleID = null;
 		
@@ -1354,10 +1427,10 @@ public class ThemesHelper implements Singleton {
 				moduleID = null;
 				if (o instanceof Element) {
 					e = (Element) o;
-					if (module.equals(e.getName())) {
-						icObjectId = getICObjectId(e.getAttributeValue(className), icoHome);
+					if (MODULE_ELEMENT_NAME.equals(e.getName())) {
+						icObjectId = getICObjectId(e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE), icoHome);
 						if (icObjectId == -1) {
-							log.error(new StringBuffer("Didn't get ICObject for: ").append(e.getAttributeValue(className)));
+							log.error(new StringBuffer("Didn't get ICObject for: ").append(e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE)));
 							log.info("Generating unique module id");
 							moduleID = getUniqueIdByNumberAndDate(MODULE_ID_SCOPE);
 							while (moduleIds.contains(moduleID)) {
@@ -1378,7 +1451,7 @@ public class ThemesHelper implements Singleton {
 							moduleIdAttribute.setValue(moduleID);
 						}
 						else {
-							log.error(new StringBuffer("Didn't find module id attribute for: ").append(e.getAttributeValue(className)));
+							log.error(new StringBuffer("Didn't find module id attribute for: ").append(e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE)));
 						}
 					}
 				}

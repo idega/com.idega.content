@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.idega.content.themes.business.ThemesService;
-import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
@@ -62,19 +61,13 @@ public class ContentItemHelper {
 				page = themesService.getICPage(Integer.valueOf(pageID));
 				if (page != null) {
 					if (page.isPage() && !page.getDeleted()) {
-						if (ThemesConstants.ARTICLE_PAGE_TYPE.contains(page.getSubType())) {
-							try {
-								moduleIds = builder.getModuleId(pageID, moduleClass);
-								if (moduleIds != null) {
-									for (int i = 0; i < moduleIds.size(); i++) {
-										if (builder.isPropertyValueSet(pageID, moduleIds.get(i), propertyName, propertyValue)) {
-											return ContentConstants.PAGES_START_URI + page.getDefaultPageURI();
-										}
-									}
-								}
-							} catch (Exception e) {
-								e.printStackTrace();
-								return getDefaultPageUrlByArticleResourcePath();
+						moduleIds = builder.getModuleId(pageID, moduleClass);
+						if (moduleIds == null) {
+							return getDefaultPageUrlByArticleResourcePath();
+						}
+						for (int i = 0; i < moduleIds.size(); i++) {
+							if (builder.isPropertyValueSet(pageID, moduleIds.get(i), propertyName, propertyValue)) {
+								return ContentConstants.PAGES_START_URI + page.getDefaultPageURI();
 							}
 						}
 					}

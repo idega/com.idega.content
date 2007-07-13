@@ -178,9 +178,6 @@ public class ThemesConstants {
 	
 	public static final String ADD_FOR_PROPERTY_CHANGE = "_changeProperty";
 	
-	private static final String[] _ARTICLE_PAGE_TYPE = new String[] {"text", "forum"};
-	public static final List <String> ARTICLE_PAGE_TYPE = Collections.unmodifiableList(Arrays.asList(_ARTICLE_PAGE_TYPE));
-	
 	protected static final String NEW_LINE = "\n";
 	
 	public static final String THEME_STYLE_VARIATIONS_CACHE_KEY = "theme_style_variations_block";
