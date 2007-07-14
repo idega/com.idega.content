@@ -91,7 +91,6 @@ public class ThemesHelper implements Singleton {
 	private Map <String, Theme> themes = null;
 	private Map <String, Setting> themeSettings = null;
 	private Map <String, Setting> pageSettings = null;
-	private Map <String, Document> pages = null;
 	private List<String> moduleIds = null;
 	private List <String> themeQueue = null;
 	private List <String> urisToThemes = null;
@@ -105,7 +104,6 @@ public class ThemesHelper implements Singleton {
 	private String webRoot;
 	
 	private static final String RESOURCE_PATH_END = ThemesConstants.DOT + "article";
-	//private static final String PROPERTY_ATTRIBUTE_NAME = "property";
 	private static final String ATTRIBUTE_PROPERTY = "value";
 	private static final String ROOT_PAGE_ARTICLE = "root_page_article";
 	private static final String MODULE_ID_SCOPE = "module_id";
@@ -120,7 +118,6 @@ public class ThemesHelper implements Singleton {
 	private ThemesHelper(boolean canUseSlide) {
 		themes = new HashMap <String, Theme> ();
 		pageSettings = new HashMap <String, Setting> ();
-		pages = new HashMap <String, Document> ();
 		
 		themeSettings = Collections.synchronizedMap(new TreeMap<String, Setting>());
 		
@@ -1082,24 +1079,6 @@ public class ThemesHelper implements Singleton {
 						if (resourcePathValue != null) {
 							resourcePathValue.setValue(path);
 						}
-						/*elements = articleViewer.getChildren();
-						if (elements != null) {
-							for (int j = 0; j < elements.size(); j++) {
-								o = elements.get(j);
-								if (o instanceof Element) {
-									element = (Element) o;
-									resourcePath = element.getAttribute(ATTRIBUTE_NAME);
-									if (resourcePath != null) {
-										if (ATTRIBUTE_RESOURCE_PATH_VALUE.equals(resourcePath.getValue())) {
-											value = element.getAttribute(ATTRIBUTE_PROPERTY);
-											if (value != null) {
-												value.setValue(path);
-											}
-										}
-									}
-								}
-							}
-						}*/
 					}
 				}
 			}
@@ -1179,13 +1158,9 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	private String getPageDocument(String type, List<String> articlesPaths, String templateFile, int pageID) {
-		Document doc = pages.get(type);
+		Document doc = getXMLDocument(new StringBuffer(getWebRootWithoutContent()).append(templateFile).toString());
 		if (doc == null) {
-			doc = getXMLDocument(new StringBuffer(getWebRootWithoutContent()).append(templateFile).toString());
-			if (doc == null) {
-				return null;
-			}
-			pages.put(type, doc);
+			return null;
 		}
 		doc = preparePageDocument(doc, articlesPaths, pageID);
 		return getThemeChanger().getXMLOutputter().outputString(doc);
@@ -1339,11 +1314,6 @@ public class ThemesHelper implements Singleton {
 		}
 		
 		String language = getCurrentLanguage(iwc);
-		
-		String article = getArticleDocument(language, uri, iwc);
-		if (article == null) {
-			return null;
-		}
 
 		if (uri.endsWith(ContentConstants.SLASH)) {
 			uri = extractValueFromString(uri, 0, uri.lastIndexOf(ContentConstants.SLASH));
@@ -1352,7 +1322,10 @@ public class ThemesHelper implements Singleton {
 		List<String> paths = new ArrayList<String>();
 		StringBuffer file = null;
 		StringBuffer base = null;
+		String article = null;
 		for (int i = 0; i < articleViewers.size(); i++) {
+			article = getArticleDocument(language, uri, iwc);
+			
 			file = new StringBuffer(language);
 			file.append(ThemesConstants.DOT).append(ThemesConstants.XML_EXTENSION);
 			base = new StringBuffer(ContentConstants.ARTICLE_PATH_START);
