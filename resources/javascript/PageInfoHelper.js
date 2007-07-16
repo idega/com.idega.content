@@ -413,6 +413,12 @@ function initializePages() {
 	checkIfNotEmptySiteTree("div_id_current_structure_tree");
 	registerEvent(document, "click", managePageInfoComponents);
 }
+var savTO = null;
+var dcTime = 250;
+var timeOfFirstClick = null
+var waitingForSecondClick = false;
+var ignoreClick = false;
+var currentElement = null;
 
 function registerPageInfoActions() {
 	$$('input.newPageButtonStyleClass').each(
@@ -441,15 +447,26 @@ function registerPageInfoActions() {
     
     $$('a.pageTreeNames').each(
 		function(element) {
-			element.onclick = function() { 
-				boldSelectedTreeElement(element);
-				
-				setPageID(element.parentNode.id);
-				getPrewUrl(element.parentNode.id);
-				getPageInfoValues();
-				isStartPage(element.parentNode.id);
-				return false;
-			}
+			prepareTree(element);
+			element.addEvent('click', function(){
+				if(ignoreClick){
+					//click right after double click
+					return false;
+				}
+				if(waitingForSecondClick){
+					//doubleclick
+					executeOnDblClick(element);
+					ignoreClick = true;
+					waitingForSecondClick = false;
+					return false;
+				}
+				else{
+					//first click
+					waitingForSecondClick = true;
+					currentElement = element;
+					setTimeout("clickOnTimeout(currentElement)",dcTime);	
+				}
+			});
 	   	}
 	);
 	
@@ -460,6 +477,35 @@ function registerPageInfoActions() {
 			}
 		}
 	);
+}
+
+function clickOnTimeout(currentElement){
+	ignoreClick = false;
+	if(!waitingForSecondClick || (currentElement == null))
+		return false;
+		
+	waitingForSecondClick = false;	
+	executeOnClick(currentElement);
+}
+function executeOnClick(element){
+	
+	boldSelectedTreeElement(element);				
+	setPageID(element.parentNode.id);
+	getPrewUrl(element.parentNode.id);
+	getPageInfoValues();
+	isStartPage(element.parentNode.id);
+}
+
+function executeOnDblClick(){
+	
+}
+
+function prepareTree(element){
+	boldSelectedTreeElement(element);
+	setPageID(element.parentNode.id);
+	getPrewUrl(element.parentNode.id);
+	getPageInfoValues();
+	isStartPage(element.parentNode.id);
 }
 
 function manageModulesBackground(element) {
