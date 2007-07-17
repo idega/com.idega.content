@@ -38,10 +38,12 @@ function savePageInfo() {
 }
 
 function getPageInfoElementsCallback(allKeywords) {
-	if (getPageID() == null || allKeywords == null) {
+	var pageId = getPageID();
+	if (pageId == null || allKeywords == null) {
 		closeLoadingMessage();
 		return;
 	}
+	
 	KEYWORDS = allKeywords;
 	var keywords = new Array();
 	var values = new Array();
@@ -53,20 +55,15 @@ function getPageInfoElementsCallback(allKeywords) {
 			keywords.push(allKeywords[i]);
 			values.push(element.value);
 			if (allKeywords[i] == 'pageTitle' && element.value != '') {
-				treeNode = document.getElementById(getPageID()+ 'a');
+				treeNode = document.getElementById(pageId + 'a');
 				if (treeNode != null) {
-					var children = treeNode.childNodes;
-					if (children != null) {
-						for (var j = 0; j < children.length; j++) {
-							treeNode.removeChild(children[j]);
-						}
-					}
+					removeChildren(treeNode);
 					treeNode.appendChild(document.createTextNode(element.value));
 				}
 			}
 		}
 	}
-	ThemesEngine.savePageInfo(getPageID(), keywords, values, savePageInfoCallback);
+	ThemesEngine.savePageInfo(pageId, keywords, values, savePageInfoCallback);
 }
 
 function savePageInfoCallback(result) {
