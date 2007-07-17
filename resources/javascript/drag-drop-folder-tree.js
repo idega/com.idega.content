@@ -11,6 +11,7 @@
 	var idsOfTrees = new Array();
 	var idsOfAdvancedTrees = new Array();
 	var treeObj = null;
+	if(changePageName == null) var changePageName = false;
 		
 	/* Constructor */
 	function JSDragDropTree()
@@ -1157,7 +1158,8 @@
 				
 				input.onkeypress = withEnter;
 						
-				aTag.ondblclick = initEditLabel;	
+				aTag.ondblclick = initEditLabel;
+				aTag.setAttribute('href', '#');	
 				if(!noDrag)aTag.onmousedown = JSTreeObj.initDrag;
 				if(!noChildren)aTag.onmousemove = JSTreeObj.moveDragableNodes;
 				if(sourceTree)aTag.onmousedown = JSTreeObj.copyDragableNode;
@@ -1588,6 +1590,7 @@
 	
 	function initEditLabel()
 	{		
+		changePageName = true;
 		if(saveOnDrop == false)
 			return;
 			
