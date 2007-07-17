@@ -2,7 +2,9 @@ var ajaxObjects = new Array();
 
 var RELOAD_PAGE = false;
 var REFRESH_PAGE_INFO = false;
-	
+
+if(changePageName == null) var changePageName = false;
+
 function saveMyTree(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncrease, nodesToDecrease) {
 	showLoadingMessage(getMovingText());
 	setPageID(sourceNodeId);
@@ -60,7 +62,10 @@ function setFrameUrl(url) {
 	url += "?view=builder";
 	var frame = document.getElementById("treePages");
 	if (frame != null) {
-		frame.src=url;
+		if (!changePageName){
+			frame.src=url;
+		}
+		chagePageName = false;
 	}
 }
 						
