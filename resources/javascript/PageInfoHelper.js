@@ -52,8 +52,8 @@ function getPageInfoElementsCallback(allKeywords) {
 		if (element != null) {
 			keywords.push(allKeywords[i]);
 			values.push(element.value);
-			if (allKeywords[i] == "pageTitle" && element.value != "") {
-				treeNode = document.getElementById(getPageID()+ "a");
+			if (allKeywords[i] == 'pageTitle' && element.value != '') {
+				treeNode = document.getElementById(getPageID()+ 'a');
 				if (treeNode != null) {
 					var children = treeNode.childNodes;
 					if (children != null) {
@@ -71,7 +71,7 @@ function getPageInfoElementsCallback(allKeywords) {
 
 function savePageInfoCallback(result) {
 	if (result != null) {
-		var pageUri = document.getElementById("pageUri");
+		var pageUri = document.getElementById('pageUri');
 		if (pageUri != null) {
 			pageUri.value = result;
 		}
@@ -82,14 +82,14 @@ function savePageInfoCallback(result) {
 
 function showSlider(container) {
 	resizeSlider();
-	container.style.position = "absolute";
-	container.style.bottom = "15px";
-	container.style.left = SPACE_FROM_LEFT + "px";
-	container.className = "theme_slider";
+	container.style.position = 'absolute';
+	container.style.bottom = '15px';
+	container.style.left = SPACE_FROM_LEFT + 'px';
+	container.className = 'theme_slider';
 	var showSlider = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 	showSlider.start(0, 1);
 	SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'block')", SHOW_ELEMENT_TRANSITION_DURATION);
-	GET_THEMES_ID = window.setTimeout("getThemesSlider()", SHOW_ELEMENT_TRANSITION_DURATION + 50);
+	GET_THEMES_ID = window.setTimeout('getThemesSlider()', SHOW_ELEMENT_TRANSITION_DURATION + 50);
 }
 
 function getThemesSlider() {
@@ -101,7 +101,7 @@ function getThemesSlider() {
 }
 
 function manageSlider(buttonID) {
-	var container = document.getElementById("themesSliderContainer");
+	var container = document.getElementById('themesSliderContainer');
 	if (container == null) {
 		return;
 	}
@@ -109,7 +109,7 @@ function manageSlider(buttonID) {
 	if (button == null) {
 		return;
 	}
-	if (container.style.display == "none") {
+	if (container.style.display == 'none') {
 		button.value = getHideThemesText();
 		showSlider(container);
 		changeFrameHeight(-FRAME_CHANGE);
@@ -143,7 +143,7 @@ function chooseStyle(themeID) {
 	var theme = getTheme(themeID);
 	if (theme != null) {
 		theme.applyStyle = true;
-		setTimeout("sleepAndApply('"+themeID+"')", waitForStyle);
+		applyThemeForPage(themeID);
 	}
 }
 
@@ -157,7 +157,7 @@ function recallStyle(themeID) {
 	}
 }
 
-function sleepAndApply(themeID) {
+function applyThemeForPage(themeID) {
 	if (themeID == null) {
 		return;
 	}
@@ -171,57 +171,57 @@ function sleepAndApply(themeID) {
 }
 
 function chooseOption(themeID) {
-	var leftPosition = (getAbsoluteLeft(themeID + "_container") + 3);
+	var leftPosition = (getAbsoluteLeft(themeID + '_container') + 3);
 	if (getTotalWidth() - (leftPosition + getImageWidth()) < 0) {
 		return; // There is not enough space
 	}
 	
 	setThemeForStyle(themeID);
 	
-	var div = document.getElementById("chooseStyleLayer");
+	var div = document.getElementById('chooseStyleLayer');
 	var pageSpan = null;
 	var siteSpan = null;
 	if (div == null) {
-		div = document.createElement("div");
-		div.style.display = "none";
-		div.setAttribute("id", "chooseStyleLayer");
-		div.className = "themeChooseStyle";
+		div = document.createElement('div');
+		div.style.display = 'none';
+		div.setAttribute('id', 'chooseStyleLayer');
+		div.className = 'themeChooseStyle';
 		
-		var divp = document.createElement("div");
-		divp.className = "themeChooseStyleText";
-		divp.setAttribute("title", getStyleForCurrentPage());
-		divp.setAttribute("alt", getStyleForCurrentPage());
-		pageSpan = document.createElement("span");
-		pageSpan.setAttribute("id", "pageStyle");
+		var divp = document.createElement('div');
+		divp.className = 'themeChooseStyleText';
+		divp.setAttribute('title', getStyleForCurrentPage());
+		divp.setAttribute('alt', getStyleForCurrentPage());
+		pageSpan = document.createElement('span');
+		pageSpan.setAttribute('id', 'pageStyle');
 		pageSpan.appendChild(document.createTextNode(getChooseStyleForPage()));
 		divp.appendChild(pageSpan);
 	
-		var divs = document.createElement("div");
-		divs.className = "themeChooseStyleText";
-		divs.setAttribute("title", getStyleForSite());
-		divs.setAttribute("alt", getStyleForSite());
-		siteSpan = document.createElement("span");
-		siteSpan.setAttribute("id", "siteStyle");
+		var divs = document.createElement('div');
+		divs.className = 'themeChooseStyleText';
+		divs.setAttribute('title', getStyleForSite());
+		divs.setAttribute('alt', getStyleForSite());
+		siteSpan = document.createElement('span');
+		siteSpan.setAttribute('id', 'siteStyle');
 		siteSpan.appendChild(document.createTextNode(getChooseStyleForSite()));
 		divs.appendChild(siteSpan);
 		
-		if (typeof div.attachEvent == "undefined") {
-			pageSpan.addEventListener("click", function(e){setStyle(true);}, false);
-	    	siteSpan.addEventListener("click", function(e){setStyle(false);}, false);
-	    	div.addEventListener("click", function(e){removeStyleOptions();}, false);
-		} else {
-			pageSpan.attachEvent("onclick", function(e){setStyle(true);});
-	   		siteSpan.attachEvent("onclick", function(e){setStyle(false);});
-	   		div.attachEvent("onclick", function(e){removeStyleOptions();});
-		}
+		var setStyleForPageFunction = function() {
+			setStyle(true);
+		};
+		var setStyleForSiteFunction = function() {
+			setStyle(false);
+		};
+		pageSpan.addEvent('click', setStyleForPageFunction);
+		siteSpan.addEvent('click', setStyleForSiteFunction);
+		div.addEvent('click', removeStyleOptions);
 		
 		div.appendChild(divp);
 		div.appendChild(divs);
 		document.body.appendChild(div);
 	}
-	div.style.left = leftPosition + "px";
-	div.style.top = (getAbsoluteTop(themeID + "_container") + 3) + "px";
-	div.style.display = "block";
+	div.style.left = leftPosition + 'px';
+	div.style.top = (getAbsoluteTop(themeID + '_container') + 3) + 'px';
+	div.style.display = 'block';
 }
 
 function setStyle(isPage) {
@@ -229,37 +229,40 @@ function setStyle(isPage) {
 	if (getThemeForStyle() == null) {
 		return;
 	}
-	if (isPage && getPageID() == null) {
+	
+	var pageId = getPageID();
+	
+	if (isPage && pageId == null) {
 		return;
 	}
 	showLoadingMessage(getApplyingStyleText());
-	setNewStyleToElements("usedThemeName", "themeName");
-	setNewStyleForSelectedElement(getThemeForStyle() + "_themeNameContainer", "themeName usedThemeName");
-	ThemesEngine.setSelectedStyle(getThemeForStyle(), getPageID(), isPage, setStyleCallback);
+	setNewStyleToElements('usedThemeName', 'themeName');
+	setNewStyleForSelectedElement(getThemeForStyle() + '_themeNameContainer', 'themeName usedThemeName');
+	ThemesEngine.setSelectedStyle(getThemeForStyle(), pageId, isPage, {
+		callback: function(result) {
+			setStyleCallback(result, pageId);
+		}
+	});
 }
 
-function setStyleCallback(result) {
-	if (getPageID() != null) {
-		if (getPageID() != -1) {
-			setTimeout("getPrewUrl('"+getPageID()+"')", 1000);
-		}
-	}
+function setStyleCallback(result, pageId) {
 	closeLoadingMessage();
+	getPrewUrl(pageId);
 }
 
 function resizeSlider() {
-	var rightScroller = document.getElementById("rightScrollerContainer");
-	var themesTicker = document.getElementById("themesTickerContainer");
-	var container = document.getElementById("themesSliderContainer");
+	var rightScroller = document.getElementById('rightScrollerContainer');
+	var themesTicker = document.getElementById('themesTickerContainer');
+	var container = document.getElementById('themesSliderContainer');
 	if (rightScroller == null || themesTicker == null || container == null) {
 		return;
 	}
 	var available = getTotalWidth() - 500;
 	if (available > 0) {
-		container.style.width = available + "px";
-		themesTicker.style.left = (getScrollerImageWidth() - 3) + "px";
-		rightScroller.style.left = (available - 23) + "px";
-		themesTicker.style.width = (available - 44) + "px";
+		container.style.width = available + 'px';
+		themesTicker.style.left = (getScrollerImageWidth() - 3) + 'px';
+		rightScroller.style.left = (available - 23) + 'px';
+		themesTicker.style.width = (available - 44) + 'px';
 	}
 }
 
@@ -271,13 +274,13 @@ function setButtonText(id, text) {
 }
 
 function newPage() {
-	var newPage = document.getElementById("newPageContainer");
+	var newPage = document.getElementById('newPageContainer');
 	if (CLICKED_CREATE) {
 		closeNewPage(newPage);
 	}
 	else {
 		CLICKED_CREATE = true;
-		setButtonText("newPageButton", getCloseText());
+		setButtonText('newPageButton', getCloseText());
 		var showNewPage = new Fx.Style(newPage, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 		showNewPage.start(0, 1);
 		SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+newPage.id+"', 'block')", SHOW_ELEMENT_TRANSITION_DURATION);
@@ -285,7 +288,7 @@ function newPage() {
 }
 
 function changeFrameHeight(change) {
-	var frame = document.getElementById("treePages");
+	var frame = document.getElementById('treePages');
 	if (frame == null) {
 		return;
 	}
@@ -293,7 +296,7 @@ function changeFrameHeight(change) {
 	if (current == null) {
 		return;
 	}
-	var temp = current.split("px");
+	var temp = current.split('px');
 	if (temp == null) {
 		return;
 	}
@@ -301,25 +304,25 @@ function changeFrameHeight(change) {
 	height++;
 	height--;
 	height += change;
-	frame.style.height = height + "px";
+	frame.style.height = height + 'px';
 }
 
 function resizeFrame() {
-	var frame = document.getElementById("treePages");
+	var frame = document.getElementById('treePages');
 	if (frame == null) {
 		return;
 	}
-	frame.style.left = SPACE_FROM_LEFT + "px";
+	frame.style.left = SPACE_FROM_LEFT + 'px';
 	var availableWidth = getTotalWidth() - RESERVED_WIDTH;
 	if (availableWidth > 0) {
-		frame.style.width = availableWidth + "px";
+		frame.style.width = availableWidth + 'px';
 	}
 	var availableHeight = getTotalHeight() - RESERVED_HEIGHT;
 	if (availableHeight > 0) {
-		frame.style.height = availableHeight + "px";
+		frame.style.height = availableHeight + 'px';
 	}
 	
-	resizeContainer("site_tree_container", "site_tree_container_pages", RESERVED_HEIGHT, true);
+	resizeContainer('site_tree_container', 'site_tree_container_pages', RESERVED_HEIGHT, true);
 }
 
 function getPageInfoValues() {
@@ -361,7 +364,7 @@ function isStartPage(pageID) {
 }
 
 function isStartPageCallback(isStart) {
-	var button = document.getElementById("makeStartPage");
+	var button = document.getElementById('makeStartPage');
 	if (button == null) {
 		return;
 	}
@@ -396,7 +399,7 @@ function closeNewPage(newPage) {
 		hideNewPage.start(1, 0);
 		SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+newPage.id+"', 'none')", SHOW_ELEMENT_TRANSITION_DURATION);
 	}
-	setButtonText("newPageButton", getNewPageText());
+	setButtonText('newPageButton', getNewPageText());
 }
 
 function managePageInfoComponents() {
@@ -410,8 +413,8 @@ function initializePages() {
 	resizeFrame();
 	getPageInfoValues();
 	isStartPage(getPageID());
-	checkIfNotEmptySiteTree("div_id_current_structure_tree");
-	registerEvent(document, "click", managePageInfoComponents);
+	checkIfNotEmptySiteTree('div_id_current_structure_tree');
+	document.addEvent('click', managePageInfoComponents);
 }
 var savTO = null;
 var dcTime = 250;
@@ -423,25 +426,22 @@ var currentElement = null;
 function registerPageInfoActions() {
 	$$('input.newPageButtonStyleClass').each(
 		function(element) {
-			element.onclick = function() {
-				newPage();
-			}
+			element.addEvent('click', newPage);
     	}
     );
     
     $$('input.saveButtonStyleClass').each(
     	function(element) {
-			element.onclick = function() {
-				savePageInfo();
-			}
+			element.addEvent('click', savePageInfo);
     	}
     );
     
 	$$('input.showThemesButtonStyleClass').each(
 		function(element) {
-			element.onclick = function() {
+			var manageSliderFunction = function() {
 				manageSlider(element.id);
-			}
+			};
+			element.addEvent('click', manageSliderFunction);
 	   	}
 	);
     
@@ -464,7 +464,7 @@ function registerPageInfoActions() {
 					//first click
 					waitingForSecondClick = true;
 					currentElement = element;
-					setTimeout("clickOnTimeout(currentElement)",dcTime);	
+					setTimeout('clickOnTimeout(currentElement)',dcTime);	
 				}
 			});
 	   	}
@@ -472,9 +472,10 @@ function registerPageInfoActions() {
 	
 	$$('input.showPageModulesStyleClass').each(
 		function(element) {
-			element.onclick = function() {
+			var manageModulesBackgroundFunction = function() {
 				manageModulesBackground(element);
-			}
+			};
+			element.addEvent('click', manageModulesBackgroundFunction);
 		}
 	);
 }
