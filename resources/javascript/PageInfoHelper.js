@@ -444,10 +444,7 @@ function registerPageInfoActions() {
     
     $$('a.pageTreeNames').each(
 		function(element) {
-//			prepareTree(element);
-//			element.addEvent('click', function(){
-
-			element.onclick = function(){
+			var pageTreeNodeClickFunction = function() {
 				if(ignoreClick){
 					//click right after double click
 					return false;
@@ -465,23 +462,10 @@ function registerPageInfoActions() {
 					currentElement = element;
 					setTimeout('clickOnTimeout(currentElement)',dcTime);	
 				}
-			}
+			};
+			element.addEvent('click', pageTreeNodeClickFunction);
 	   	}
 	);				
-
-/*
-			element.onclick = function() { 
-				boldSelectedTreeElement(element);
-				
-				setPageID(element.parentNode.id);
-				getPrewUrl(element.parentNode.id);
-				getPageInfoValues();
-				isStartPage(element.parentNode.id);
-				return false;
-			}
-		});
-*/		
-
 	
 	$$('input.showPageModulesStyleClass').each(
 		function(element) {
