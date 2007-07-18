@@ -832,7 +832,8 @@
 					aTag = aTag.getElementsByTagName('a')[0];
 					aTag.className = 'pageTreeNames';				
 					boldSelectedTreeElement(aTag);
-					registerPageInfoActions();
+//					registerPageInfoActions();
+					registerPageInfoActionsOnElement(aTag);
 				}
 			}
 			else{
@@ -840,7 +841,8 @@
 //					var aTag = document.getElementById(id[0]).getElementsByTagName('a')[0];
 					var aTag = document.getElementById(id[0]);
 					if(aTag){
-						aTag = getElementsByTagName('a')[0];
+//						aTag = getElementsByTagName('a')[0];
+						aTag = aTag.getElementsByTagName('a')[0];
 						aTag.className = 'pageTreeNames';				
 						boldSelectedTreeElement(aTag);
 					}
@@ -1255,7 +1257,7 @@
 				
 			input.onkeypress = withEnter;
 						
-			aTag.onclick = okToNavigate;				
+//			aTag.onclick = okToNavigate;				
 				aTag.ondblclick = initEditLabel;
 				if(!noDrag)aTag.onmousedown = JSTreeObj.initDrag;
 				if(!noChildren)aTag.onmousemove = JSTreeObj.moveDragableNodes;
