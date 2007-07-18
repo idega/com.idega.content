@@ -15,6 +15,14 @@ var MODULES_SHOWN = false;
 
 var KEYWORDS = null;
 
+//separating click from dblclick
+var savTO = null;
+var dcTime = 250;
+var timeOfFirstClick = null;
+var waitingForSecondClick = false;
+var ignoreClick = false;
+var currentElement = null;
+
 function setThemeForStyle(ID) {
 	THEME_ID = ID;
 }
@@ -413,12 +421,6 @@ function initializePages() {
 	checkIfNotEmptySiteTree('div_id_current_structure_tree');
 	document.addEvent('click', managePageInfoComponents);
 }
-var savTO = null;
-var dcTime = 250;
-var timeOfFirstClick = null
-var waitingForSecondClick = false;
-var ignoreClick = false;
-var currentElement = null;
 
 function registerPageInfoActions() {
 	$$('input.newPageButtonStyleClass').each(
@@ -477,11 +479,34 @@ function registerPageInfoActions() {
 	);
 }
 
+function registerPageInfoActionsOnElement(element){
+	var pageTreeNodeClickFunction = function() {
+		if(ignoreClick){
+			//click right after double click
+			return false;
+		}
+		if(waitingForSecondClick){
+			//doubleclick
+			executeOnDblClick(element);
+			ignoreClick = true;
+			waitingForSecondClick = false;
+			return false;
+		}
+		else{
+			//first click
+			waitingForSecondClick = true;
+			currentElement = element;
+			setTimeout('clickOnTimeout(currentElement)',dcTime);	
+		}
+	};
+	element.addEvent('click', pageTreeNodeClickFunction);
+}
+
 function clickOnTimeout(currentElement){
 	ignoreClick = false;
-	if(!waitingForSecondClick || (currentElement == null))
+	if(!waitingForSecondClick || (currentElement == null)){
 		return false;
-		
+	}
 	waitingForSecondClick = false;	
 	executeOnClick(currentElement);
 }
@@ -497,7 +522,7 @@ function executeOnClick(element){
 function executeOnDblClick(){
 	
 }
-
+/*
 function prepareTree(element){
 	boldSelectedTreeElement(element);
 	setPageID(element.parentNode.id);
@@ -505,7 +530,7 @@ function prepareTree(element){
 	getPageInfoValues();
 	isStartPage(element.parentNode.id);
 }
-
+*/
 function manageModulesBackground(element) {
 	if (element == null) {
 		return;
