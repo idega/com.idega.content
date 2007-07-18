@@ -47,6 +47,9 @@ function empty(param) {
 		REFRESH_PAGE_INFO = false;
 		getPageInfoValues();
 	}
+	var trashCan = document.getElementById('trash');
+	JSTreeObj.deleteNodes = false;
+	trashCan.style.opacity = 0.5;		
 }
 
 function setFrameUrl(url) {

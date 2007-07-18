@@ -1071,6 +1071,18 @@
 			}
 		}
 		,
+		mouseOverRecycleBin : function(){
+			var trashCan = document.getElementById('trash');
+			JSTreeObj.deleteNodes = true;
+			trashCan.style.opacity = 1;			
+		}
+		,
+		mouseOutOfRecycleBin : function(){
+			var trashCan = document.getElementById('trash');			
+			JSTreeObj.deleteNodes = false;
+			trashCan.style.opacity = 0.5;
+		}
+		,
 		initTree : function()
 		{				
 			JSTreeObj = this;
