@@ -62,9 +62,7 @@ function setFrameUrl(url) {
 	url += "?view=builder";
 	var frame = document.getElementById("treePages");
 	if (frame != null) {
-//		if (!changePageName){ 
-			frame.src=url;
-//		}
+		frame.src=url;
 	}
 	chagePageName = false;
 }
