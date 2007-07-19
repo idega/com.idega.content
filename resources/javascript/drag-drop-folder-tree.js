@@ -627,11 +627,13 @@
 				var countUp = JSTreeObj.dragDropCountLevels(JSTreeObj.dragNode_destination,'up');
 				var countDown = JSTreeObj.dragDropCountLevels(JSTreeObj.dragNode_source,'down');
 				var countLevels = countUp/1 + countDown/1 + (JSTreeObj.insertAsSub?1:0);		
-				
+/*				
+DEPTH RESTRICTION
 				if(countLevels>JSTreeObj.maximumDepth){
 					JSTreeObj.dragNode_destination = false;
 					showMessage = true; 	// Used later down in this function
 				}
+*/
 			}
 			if(JSTreeObj.dragNode_destination){
 				if(JSTreeObj.insertAsSub){
