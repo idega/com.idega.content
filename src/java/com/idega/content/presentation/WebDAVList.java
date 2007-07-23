@@ -85,9 +85,9 @@ public class WebDAVList extends IWBaseComponent {
 		//to make this object request safe, extension from myfaces
 		//ask Tryggvi
 		UISaveState beanSaveState = new UISaveState();
-		ValueBinding binding = WFUtil.createValueBinding("#{"+WEB_DAV_LIST_BEAN_ID+"}");
+		ValueBinding binding = WFUtil.createValueBinding("#{"+WEB_DAV_LIST_BEAN_ID+".dataModel}");
 		beanSaveState.setId("WebDavListBeanSaveState");
-		beanSaveState.setValueBinding("value",binding);
+		beanSaveState.setValueBinding("value", binding);
 		add(beanSaveState);
 
 		
