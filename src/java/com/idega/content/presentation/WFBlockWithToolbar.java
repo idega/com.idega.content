@@ -77,8 +77,10 @@ public class WFBlockWithToolbar extends WFBlock {
 			recycleBinImage.setToolTip(title);
 			recycleBinImage.setSrc(trashCanImage);
 			recycleBinImage.setStyleClass("recycleBin");
-			recycleBinImage.setOnMouseOver("treeObj.prepareToDelete();");
-			recycleBinImage.setOnMouseOut("treeObj.prepareToDelete();");
+//			recycleBinImage.setOnMouseOver("treeObj.prepareToDelete();");
+//			recycleBinImage.setOnMouseOut("treeObj.prepareToDelete();");
+			recycleBinImage.setOnMouseOver("treeObj.mouseOverRecycleBin();");
+			recycleBinImage.setOnMouseOut("treeObj.mouseOutOfRecycleBin();");
 			
 			head.add(collapse, 1, 1);
 			head.add(expand, 2, 1);
