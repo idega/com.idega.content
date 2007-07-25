@@ -11,11 +11,12 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.event.ActionEvent;
 
-import org.apache.myfaces.custom.fileupload.UploadedFile;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.myfaces.custom.fileupload.UploadedFile;
 import org.apache.webdav.lib.PropertyName;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.themes.helpers.ThemesConstants;
@@ -25,13 +26,14 @@ import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavRootResource;
+import com.idega.util.CoreUtil;
 import com.idega.webface.WFUtil;
 
 public class WebDAVUploadBean implements Serializable{
 
 	private static final long serialVersionUID = -1760819218959402747L;
 	private static final Log log = LogFactory.getLog(WebDAVUploadBean.class);
-	private static String DEFAULT_PATH = "/files/documents/";
+	private static String DEFAULT_PATH = "/files/";
 	private UploadedFile uploadFile;
 	private String name = "";
 	private String uploadFilePath = DEFAULT_PATH;
@@ -78,96 +80,97 @@ public class WebDAVUploadBean implements Serializable{
 	}
 
 	public String upload(ActionEvent event) throws IOException{
+		String uploadFailed = "upload_failed";
+		if (this.uploadFile == null) {
+			return uploadFailed;
+		}
 		
-		if(this.uploadFile!=null){
-			IWContext iwc = IWContext.getInstance();
-//			Map parameters = ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest()).getParameterMap();
-//			uploadFolderPath = ((String[])parameters.get("uploadForm:uploadPath"))[0];
-			
-			String tempUploadFolderPath = (String) WFUtil.invoke("WebDAVListBean","getWebDAVPath");
-			if(tempUploadFolderPath!=null && !tempUploadFolderPath.equals("")){
-				this.uploadFilePath = tempUploadFolderPath;
-			}
-			
-			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return uploadFailed;
+		}
+		
+//		Map parameters = ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest()).getParameterMap();
+//		uploadFolderPath = ((String[])parameters.get("uploadForm:uploadPath"))[0];
+		
+		String tempUploadFolderPath = (String) WFUtil.invoke("WebDAVListBean","getWebDAVPath");
+		if (tempUploadFolderPath != null && !tempUploadFolderPath.equals(ContentConstants.EMPTY)) {
+			this.uploadFilePath = tempUploadFolderPath;
+		}
+		
+		IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+		IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 	
-			WebdavRootResource rootResource = session.getWebdavRootResource();
-			String filePath = service.getWebdavServerURI()+getUploadFilePath();
-			String uploadName = this.uploadFile.getName();
+		WebdavRootResource rootResource = session.getWebdavRootResource();
+		String filePath = service.getWebdavServerURI()+getUploadFilePath();
+		String uploadName = this.uploadFile.getName();
 			
-			//FIXME THIS IS A BUG IN THE MYFACES UPLOADER I THINK
-			//The problem is that in IE 6 the filename actually contains the full file path!
-			//example I'm uploading test.txt from c:\myfolder\test.txt to the folder /files/public
-			//then the variable filePath+fileName = /files/public/C:/myfolder/test.txt
-			//workaround
-			int lastBloodySlash = uploadName.lastIndexOf("\\");
-			if(lastBloodySlash>-1){
-				uploadName = uploadName.substring(lastBloodySlash+1);
-			}
-			//workaround ends
+		//FIXME THIS IS A BUG IN THE MYFACES UPLOADER I THINK
+		//The problem is that in IE 6 the filename actually contains the full file path!
+		//example I'm uploading test.txt from c:\myfolder\test.txt to the folder /files/public
+		//then the variable filePath+fileName = /files/public/C:/myfolder/test.txt
+		//workaround
+		int lastBloodySlash = uploadName.lastIndexOf("\\");
+		if(lastBloodySlash > -1) {
+			uploadName = uploadName.substring(lastBloodySlash+1);
+		}
+		//workaround ends
 			
-			String fileName = uploadName;
-			
-			if(!"".equals(this.name)){
-				fileName = this.name;
-				int lastDot = uploadName.lastIndexOf(".");
-				if(lastDot>0){
-					//just add the suffix if it is missing
-					String suffix = uploadName.substring(lastDot);
-					if(!fileName.endsWith(suffix)){
-						fileName+=suffix;
-					}
+		String fileName = uploadName;
+		
+		if (!ContentConstants.EMPTY.equals(this.name)) {
+			fileName = this.name;
+			int lastDot = uploadName.lastIndexOf(ContentConstants.DOT);
+			if (lastDot > 0) {
+				//just add the suffix if it is missing
+				String suffix = uploadName.substring(lastDot);
+				if (!fileName.endsWith(suffix)) {
+					fileName += suffix;
 				}
 			}
-			
+		}
 		
-//			boolean createFolderSuccess = rootResource.mkcolMethod(filePath);
-//			System.out.println("Creating folder success "+createFolderSuccess);
-			
-			boolean uploadFileSuccess = false;
-			try {
-				uploadFileSuccess = rootResource.putMethod(filePath+fileName,this.uploadFile.getInputStream());
-			}
-			catch (HttpException e) {
-				e.printStackTrace();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-			log.info("Uploading file success "+uploadFileSuccess);
-			
-			
-			
-			// Always refreshing/keeping status
-			WFUtil.invoke("WebDAVListBean","refresh", event.getSource(), UIComponent.class);
+//		boolean createFolderSuccess = rootResource.mkcolMethod(filePath);
+//		System.out.println("Creating folder success "+createFolderSuccess);
 
-			if(uploadFileSuccess){
-				String contentType = this.uploadFile.getContentType();
-				this.downloadPath = filePath+fileName;
-				if(contentType!=null && MimeTypeUtil.getInstance().isImage(contentType)){
-					this.imagePath = iwc.getIWMainApplication().getURIFromURL(this.downloadPath);	
-				}
-				
-				if(this.comment!=null && !"".equals(this.comment)){
-					
-					rootResource.proppatchMethod(filePath+fileName,new PropertyName("DAV:","comment"),this.comment,true);
-					
-				}
-				uploadSuccessful = new Boolean(true);
-				uploadMessage = rootResource.getStatusMessage();
-			}
-			else{
-				uploadSuccessful = new Boolean(false);
-				uploadMessage = rootResource.getStatusMessage();
-				log.error("Error code :"+rootResource.getStatusMessage()+", message: "+rootResource.getStatusMessage());
-				return "upload_failed";
+		boolean uploadFileSuccess = false;
+		try {
+			uploadFileSuccess = rootResource.putMethod(filePath+fileName, this.uploadFile.getInputStream());
+		}
+		catch (HttpException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		log.info("Uploading file success: " + uploadFileSuccess);
+			
+		//	Always refreshing/keeping status
+		WFUtil.invoke("WebDAVListBean", "refresh", event.getSource(), UIComponent.class);
+
+		if (uploadFileSuccess) {
+			String contentType = this.uploadFile.getContentType();
+			this.downloadPath = filePath + fileName;
+			if (contentType!=null && MimeTypeUtil.getInstance().isImage(contentType)) {
+				this.imagePath = iwc.getIWMainApplication().getURIFromURL(this.downloadPath);	
 			}
 			
-			if (uploadFileSuccess && redirectOnSuccessURI != null) {
-				IWContext.getInstance().sendRedirect(redirectOnSuccessURI);
+			if (this.comment != null && !ContentConstants.EMPTY.equals(this.comment)) {
+				rootResource.proppatchMethod(filePath + fileName, new PropertyName("DAV:", "comment"), this.comment, true);
 			}
+			uploadSuccessful = Boolean.TRUE;
+			uploadMessage = rootResource.getStatusMessage();
+		}
+		else{
+			uploadSuccessful = Boolean.FALSE;
+			uploadMessage = rootResource.getStatusMessage();
+			log.error("Error code: " + rootResource.getStatusMessage() + ", message: " + uploadMessage);
+			return uploadFailed;
+		}
 		
+		if (uploadFileSuccess && redirectOnSuccessURI != null) {
+			CoreUtil.getIWContext().sendRedirect(redirectOnSuccessURI);
 		}
 		
 		return "ok";

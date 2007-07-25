@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIParameter;
 import javax.faces.component.html.HtmlCommandLink;
@@ -14,6 +15,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.WebDAVFilePermissionResource;
@@ -177,6 +179,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		uploadBlock.setTitlebar(uploadBar);
 		//uploadBlock.setToolbar(new WFToolbar());
 		WebDAVUpload upload = new WebDAVUpload();
+		upload.setUploadPath(currentFolderPath);
 //		upload.setRendered(renderWebDAVUpload);
 		upload.setId(getId()+"_upload");
 		upload.setUseVersionComment(true);
