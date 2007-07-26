@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.10 2006/11/10 01:23:41 gimmi Exp $
+ * $Id: WebDAVUpload.java,v 1.11 2007/07/26 07:45:13 valdas Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -35,10 +35,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/10 01:23:41 $ by $Author: gimmi $
+ *  Last modified: $Date: 2007/07/26 07:45:13 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class WebDAVUpload extends ContentBlock {
 
@@ -134,6 +134,7 @@ public class WebDAVUpload extends ContentBlock {
 			status.setTitle(message);
 
 			addLineToContainer(new Object[] {status}, getStyleClassWFContainerLine()+ " "+sStatus, "status");
+			bean.setWasUploadAttempted(null);
 		}
 				
 		HtmlOutputText selectFile = getText("select_a_file_to_upload", getStyleClassSelectFile());
