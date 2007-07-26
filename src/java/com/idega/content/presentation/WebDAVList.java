@@ -7,6 +7,9 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 import org.apache.myfaces.custom.savestate.UISaveState;
+
+import com.idega.content.bean.ContentPathBean;
+import com.idega.content.business.ContentConstants;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.webface.WFList;
 import com.idega.webface.WFUtil;
@@ -34,6 +37,14 @@ public class WebDAVList extends IWBaseComponent {
 	}
 	
 	protected void initializeComponent(FacesContext context) {
+		Object o = WFUtil.invoke(ContentPathBean.BEAN_ID, "getPath");
+		String pathFromContent = null;
+		if (o instanceof String) {
+			pathFromContent = o.toString();
+			if (!ContentConstants.EMPTY.equals(pathFromContent)) {
+				setStartFolder(pathFromContent);
+			}
+		}
 		
 		WebDAVListManagedBean bean = getWebDAVListManagedBean();
 		

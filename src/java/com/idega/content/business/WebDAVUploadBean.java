@@ -19,6 +19,8 @@ import org.apache.webdav.lib.PropertyName;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.content.bean.ContentPathBean;
+import com.idega.content.presentation.WebDAVList;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.core.file.util.MimeTypeUtil;
@@ -80,20 +82,20 @@ public class WebDAVUploadBean implements Serializable{
 	}
 
 	public String upload(ActionEvent event) throws IOException{
-		String uploadFailed = "upload_failed";
-		if (this.uploadFile == null) {
-			return uploadFailed;
-		}
-		
+		String uploadFailed = "file_upload_failed";
+		String uploadSucceeded = "file_uploaded_successfully";
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
+			return uploadFailed;
+		}
+		if (this.uploadFile == null) {
 			return uploadFailed;
 		}
 		
 //		Map parameters = ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest()).getParameterMap();
 //		uploadFolderPath = ((String[])parameters.get("uploadForm:uploadPath"))[0];
 		
-		String tempUploadFolderPath = (String) WFUtil.invoke("WebDAVListBean","getWebDAVPath");
+		String tempUploadFolderPath = (String) WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID,"getWebDAVPath");
 		if (tempUploadFolderPath != null && !tempUploadFolderPath.equals(ContentConstants.EMPTY)) {
 			this.uploadFilePath = tempUploadFolderPath;
 		}
@@ -145,9 +147,10 @@ public class WebDAVUploadBean implements Serializable{
 		}
 		
 		log.info("Uploading file success: " + uploadFileSuccess);
-			
+		
+		WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", uploadFilePath);	//	Setting current path to reload
 		//	Always refreshing/keeping status
-		WFUtil.invoke("WebDAVListBean", "refresh", event.getSource(), UIComponent.class);
+		WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "refresh", event.getSource(), UIComponent.class);
 
 		if (uploadFileSuccess) {
 			String contentType = this.uploadFile.getContentType();
@@ -173,7 +176,7 @@ public class WebDAVUploadBean implements Serializable{
 			CoreUtil.getIWContext().sendRedirect(redirectOnSuccessURI);
 		}
 		
-		return "ok";
+		return uploadSucceeded;
 	}
 
 	/**
@@ -237,6 +240,10 @@ public class WebDAVUploadBean implements Serializable{
 
 	public boolean wasUploadAttemped() {
 		return uploadSuccessful != null;
+	}
+	
+	public void setWasUploadAttempted(Boolean attempt) {
+		uploadSuccessful = attempt;
 	}
 	
 	public void setRedirectOnSuccessURI(String uri) {
