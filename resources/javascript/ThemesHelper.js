@@ -62,7 +62,7 @@ function changePageTitleCallback(result) {
 	if (result == null) {
 		return;
 	}
-	var pageUri = document.getElementById("pageUri");
+	var pageUri = document.getElementById('pageUri');
 	if (pageUri != null) {
 		pageUri.value = result;
 	}
@@ -79,7 +79,7 @@ function changePageTitleInPageInfo(title) {
 	if (title == null) {
 		return;
 	}
-	var element = document.getElementById("pageTitle");
+	var element = document.getElementById('pageTitle');
 	if (element == null) {
 		return;
 	}
@@ -90,7 +90,7 @@ function getTotalWidth() {
 	if (TOTAL_WIDTH != 0) {
 		return TOTAL_WIDTH;
 	}
-	if(typeof(window.innerWidth) == "number") {
+	if (typeof(window.innerWidth) == 'number') {
 		TOTAL_WIDTH = window.innerWidth; // Non-IE
 	} else if(document.documentElement && document.documentElement.clientWidth) {
 		TOTAL_WIDTH = document.documentElement.clientWidth; // IE 6+ in 'standards compliant mode'
@@ -104,7 +104,7 @@ function getTotalHeight() {
 	if (TOTAL_HEIGHT != 0) {
 		return TOTAL_HEIGHT;
 	}
-	if(typeof(window.innerHeight) == "number") {
+	if (typeof(window.innerHeight) == 'number') {
 		TOTAL_HEIGHT = window.innerHeight; // Non-IE
 	} else if(document.documentElement && document.documentElement.clientHeight) {
 		TOTAL_HEIGHT = document.documentElement.clientHeight; // IE 6+ in 'standards compliant mode'
@@ -140,10 +140,10 @@ function resizeContainer(containerID, styleClass, usedSpace, changeHeight) {
 	var realContainer = getRealContainerByStyle(containerID, styleClass);
 	if (realContainer != null) {
 		if (changeHeight) {
-			realContainer.style.height = (getTotalHeight() - usedSpace) + "px";
+			realContainer.style.height = (getTotalHeight() - usedSpace) + 'px';
 		}
 		else {
-			realContainer.style.width = (getTotalWidth() - usedSpace) + "px";
+			realContainer.style.width = (getTotalWidth() - usedSpace) + 'px';
 		} 
 	}
 }
@@ -162,7 +162,7 @@ function checkIfNotEmptySiteTree(id) {
 		}
 	}
 	// No pages created
-	var button = document.getElementById("makeStartPage");
+	var button = document.getElementById('makeStartPage');
 	if (button != null) {
 		button.disabled = true;
 		button.value = getNoPageExistsText();
@@ -209,10 +209,10 @@ function redirectFromSiteMap(uri) {
 	var allFrames = null;
 	var parentWindow = window.parent;
 	if (parentWindow != null) {
-		allFrames = parentWindow.document.getElementsByTagName("iframe");
+		allFrames = parentWindow.document.getElementsByTagName('iframe');
 	}
 	else {
-		allFrames = document.getElementsByTagName("iframe");
+		allFrames = document.getElementsByTagName('iframe');
 	}
 	
 	if (allFrames != null) {
@@ -250,38 +250,38 @@ function applyThemeForSite(themeId) {
 }
 
 function insertStyleFile() {
-	var style = document.createElement("link");
-	style.setAttribute("type","text/css");
-	style.setAttribute("href", "/idegaweb/bundles/com.idega.content.bundle/resources/style/themes_manager.css");
-	style.setAttribute("rel","stylesheet");
-	document.getElementsByTagName("head")[0].appendChild(style); 
+	var style = document.createElement('link');
+	style.setAttribute('type', 'text/css');
+	style.setAttribute('href', '/idegaweb/bundles/com.idega.content.bundle/resources/style/themes_manager.css');
+	style.setAttribute('rel', 'stylesheet');
+	document.getElementsByTagName('head')[0].appendChild(style);
 }
 
 // Localized text
-var UPLOADING_THEME = "Uploading...";
-var CHANGING_THEME = "Changing...";
-var SAVING_THEME = "Saving...";
-var GENERATING_PREVIEW = "Generating preview...";
-var RESTORING_THEME = "Restoring...";
-var HIDE_THEMES = "Hide Themes";
-var SHOW_THEMES = "Show Themes";
-var STYLE_FOR_CURRENT_PAGE = "Select style for current page";
-var STYLE_FOR_SITE = "Select style for all pages";
-var APPLYING_STYLE = "Applying style...";
-var CLOSE_TEXT = "Close";
-var START_PAGE_TEXT = "Start Page";
-var MAKE_START_PAGE_TEXT = "Make Start Page";
-var MAKE_THIS_PAGE_START_PAGE_TEXT="Make This Page As Start Page";
-var CHANGING_STRUCTURE_TEXT = "Changing structure...";
-var NEW_PAGE_TEXT = "New Page";
-var MOVING = "Moving...";
-var ARE_YOU_SURE_TEXT = "Are you sure?";
-var DELETING_TEXT = "Deleting...";
-var CHOOSE_STYLE_FOR_PAGE = "Page";
-var CHOOSE_STYLE_FOR_SITE = "Site";
-var DROP_TEMPLATES_HERE = "Drop templates here";
-var NO_PAGE_EXISTS_TEXT = "No page exist";
-var LOADING_TEXT = "Loading...";
+var UPLOADING_THEME = 'Uploading...';
+var CHANGING_THEME = 'Changing...';
+var SAVING_THEME = 'Saving...';
+var GENERATING_PREVIEW = 'Generating preview...';
+var RESTORING_THEME = 'Restoring...';
+var HIDE_THEMES = 'Hide Themes';
+var SHOW_THEMES = 'Show Themes';
+var STYLE_FOR_CURRENT_PAGE = 'Select style for current page';
+var STYLE_FOR_SITE = 'Select style for all pages';
+var APPLYING_STYLE = 'Applying style...';
+var CLOSE_TEXT = 'Close';
+var START_PAGE_TEXT = 'Start Page';
+var MAKE_START_PAGE_TEXT = 'Make Start Page';
+var MAKE_THIS_PAGE_START_PAGE_TEXT='Make This Page As Start Page';
+var CHANGING_STRUCTURE_TEXT = 'Changing structure...';
+var NEW_PAGE_TEXT = 'New Page';
+var MOVING = 'Moving...';
+var ARE_YOU_SURE_TEXT = 'Are you sure?';
+var DELETING_TEXT = 'Deleting...';
+var CHOOSE_STYLE_FOR_PAGE = 'Page';
+var CHOOSE_STYLE_FOR_SITE = 'Site';
+var DROP_TEMPLATES_HERE = 'Drop templates here';
+var NO_PAGE_EXISTS_TEXT = 'No page exist';
+var LOADING_TEXT = 'Loading...';
 var RELOADING_TEXT = 'Reloading...';
 var SHOW_MODULES_TEXT = 'Show Modules';
 var HIDE_MODULES_TEXT = 'Hide Modules';
@@ -324,6 +324,7 @@ function getLocalizedTextForThemesCallback(list) {
 	RELOADING_TEXT = list[24];
 	SHOW_MODULES_TEXT = list[25];
 	HIDE_MODULES_TEXT = list[26];
+	
 }
 
 function getUploadingThemeText() {
@@ -439,7 +440,7 @@ function setNewStyleToElements(oldClassName, newClassName) {
 	if (oldClassName == null || newClassName == null) {
 		return;
 	}
-	var elements = document.getElementsByClassName(oldClassName);
+	var elements = getElementsByClassName(document, '*', oldClassName);
 	if (elements == null) {
 		return;
 	}
@@ -470,7 +471,7 @@ function boldCurrentTreeElement() {
 	}
 	var element = null;
 	for (var i = 0; i < children.length; i++) {
-		if (children[i].tagName == "a" || children[i].tagName == "A") {
+		if (children[i].tagName == 'a' || children[i].tagName == 'A') {
 			boldSelectedTreeElement(children[i]);
 			return;
 		}
@@ -483,7 +484,7 @@ function boldSelectedTreeElement(element) {
 		return;
 	}
 	// Unbolding
-	var list = document.getElementsByClassName("pageTreeNames");
+	var list = getElementsByClassName(document, '*', 'pageTreeNames');
 	if (list != null) {
 		for (var i = 0; i < list.length; i++) {
 			list[i].style.fontWeight = 'normal';

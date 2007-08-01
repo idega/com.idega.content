@@ -5,8 +5,10 @@ import javax.faces.context.FacesContext;
 import com.idega.content.presentation.ContentBlock;
 import com.idega.content.presentation.WebDAVUpload;
 import com.idega.content.themes.bean.ThemesManagerBean;
-import com.idega.webface.WFBlock;
-import com.idega.webface.WFTitlebar;
+import com.idega.presentation.IWContext;
+import com.idega.presentation.Layer;
+import com.idega.presentation.ui.FieldSet;
+import com.idega.presentation.ui.Legend;
 
 public class ThemesManager extends ContentBlock {
 	
@@ -14,10 +16,9 @@ public class ThemesManager extends ContentBlock {
 	private static final String MIME_TYPE = "application/x-zip-compressed";
 	
 	protected void initializeComponent(FacesContext context) {
-		WFBlock uploadBlock = new WFBlock();
-		WFTitlebar uploadBar = new WFTitlebar();
-		uploadBar.addTitleText(getBundle().getLocalizedText("upload_theme"));
-		uploadBlock.setTitlebar(uploadBar);
+		IWContext iwc = IWContext.getIWContext(context);
+		Layer uploadContainer = new Layer();
+		FieldSet uploadBlock = new FieldSet(new Legend(getBundle().getResourceBundle(iwc).getLocalizedString("upload_theme", "Upload theme")));
 		WebDAVUpload upload = new WebDAVUpload();
 		String idExtension = getId() + "UploadTheme";
 		upload.setId(idExtension);
@@ -26,8 +27,9 @@ public class ThemesManager extends ContentBlock {
 		upload.setPathProviderBeanWithMethod("#{"+ThemesManagerBean.THEMES_MANAGER_BEAN_ID+".getThemesPath}");
 		upload.setUploadMethod("uploadZipFileContents");
 		uploadBlock.add(upload);
+		uploadContainer.add(uploadBlock);
 		
-		add(uploadBlock);
+		add(uploadContainer);
 	}
 	
 	private String getOnClickAction(String idExtension) {

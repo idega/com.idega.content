@@ -8,6 +8,8 @@ import javax.faces.context.FacesContext;
 import org.apache.myfaces.renderkit.html.util.AddResource;
 import org.apache.myfaces.renderkit.html.util.AddResourceFactory;
 
+import com.idega.block.web2.business.Web2Business;
+import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.Setting;
@@ -178,6 +180,13 @@ public class ApplicationPropertyViewer extends Block {
 			AddResource adder = AddResourceFactory.getInstance(iwc);
 			adder.addJavaScriptAtPosition(iwc, AddResource.HEADER_BEGIN, "/dwr/engine.js");
 			adder.addJavaScriptAtPosition(iwc, AddResource.HEADER_BEGIN, "/dwr/interface/ThemesEngine.js");
+			
+			try {
+				Web2Business web2 = (Web2Business) SpringBeanLookup.getInstance().getSpringBean(iwc, Web2Business.class);
+				adder.addJavaScriptAtPosition(iwc, AddResource.HEADER_BEGIN, web2.getBundleURIToMootoolsLib());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			
 			String property = ThemesHelper.getInstance().extractValueFromString(key, key.indexOf(ThemesConstants.DOT) + 1,
 					key.lastIndexOf(ThemesConstants.DOT));

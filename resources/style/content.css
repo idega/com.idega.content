@@ -328,34 +328,25 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	
 }
 
-.theme_container {
-	display: inline;
-	position: absolute;
-	float: right;
-	top: 22px;
-	right: 1px;
-}
-
 .theme_slider {
-	width: 70%;
+	width: 100%;
 	height: 150px;
 	background-color: #000000;
-	border: 1px solid #D7D7D7;
+	bottom: 0px;
 }
 
 .leftThemeScroller {
-	position: absolute;
+	z-index: 9999;
+	padding-top: 64px;
 	cursor: pointer;
-	bottom: 75px;
-	z-index: 100;
+	float: left;
 }
 
-.rightThemeScroller{
-	position: absolute;
+.rightThemeScroller {
+	z-index: 9999;
+	padding-top: 64px;
 	cursor: pointer;
-	left: 565px;
-	bottom: 75px;
-	z-index: 100;
+	float: right;
 }
 
 .themes_gallery {
@@ -384,11 +375,10 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 }
 
 .themesTicker {
-	position: absolute;
-	left: 29px;
-	width: 535px;
+	/*width: 535px;*/
 	height: 150px;
 	overflow: hidden;
+	float: left;
 }
 
 .themesTicker .multiImageGallery {
@@ -427,10 +417,8 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	position: absolute;
     width: 149px;
     height: 112px;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/idegaweb/bundles/com.idega.core.bundle/resources/style/images/transparent.png',sizingMethod='scale');
 	z-index: 9999;
 	clear: both;
-	
 }
 
 .themeChooseStyleText {

@@ -58,12 +58,12 @@ function getPageInfoElementsCallback(allKeywords) {
 	var element = null;
 	var treeNode = null;
 	for (var i = 0; i < allKeywords.length; i++) {
-		element = document.getElementById(allKeywords[i]);
+		element = $(allKeywords[i]);
 		if (element != null) {
 			keywords.push(allKeywords[i]);
 			values.push(element.value);
 			if (allKeywords[i] == 'pageTitle' && element.value != '') {
-				treeNode = document.getElementById(pageId + 'a');
+				treeNode = $(pageId + 'a');
 				if (treeNode != null) {
 					removeChildren(treeNode);
 					treeNode.appendChild(document.createTextNode(element.value));
@@ -76,7 +76,7 @@ function getPageInfoElementsCallback(allKeywords) {
 
 function savePageInfoCallback(result) {
 	if (result != null) {
-		var pageUri = document.getElementById('pageUri');
+		var pageUri = $('pageUri');
 		if (pageUri != null) {
 			pageUri.value = result;
 		}
@@ -106,11 +106,11 @@ function getThemesSlider() {
 }
 
 function manageSlider(buttonID) {
-	var container = document.getElementById('themesSliderContainer');
+	var container = $('themesSliderContainer');
 	if (container == null) {
 		return;
 	}
-	var button = document.getElementById(buttonID);
+	var button = $(buttonID);
 	if (button == null) {
 		return;
 	}
@@ -133,7 +133,7 @@ function setDisplayPropertyToElement(id, property) {
 	if (id == null || property == null) {
 		return;
 	}
-	var element = document.getElementById(id);
+	var element = $(id);
 	if (element == null) {
 		return;
 	}
@@ -183,32 +183,36 @@ function chooseOption(themeID) {
 	
 	setThemeForStyle(themeID);
 	
-	var div = document.getElementById('chooseStyleLayer');
+	var div = $('chooseStyleLayer');
 	var pageSpan = null;
 	var siteSpan = null;
 	if (div == null) {
-		div = document.createElement('div');
+		div = new Element('div');
 		div.style.display = 'none';
 		div.setAttribute('id', 'chooseStyleLayer');
 		div.className = 'themeChooseStyle';
 		
-		var divp = document.createElement('div');
+		var divp = new Element('div');
 		divp.className = 'themeChooseStyleText';
 		divp.setAttribute('title', getStyleForCurrentPage());
 		divp.setAttribute('alt', getStyleForCurrentPage());
-		pageSpan = document.createElement('span');
+		pageSpan = new Element('span');
 		pageSpan.setAttribute('id', 'pageStyle');
 		pageSpan.appendChild(document.createTextNode(getChooseStyleForPage()));
 		divp.appendChild(pageSpan);
 	
-		var divs = document.createElement('div');
+		var divs = new Element('div');
 		divs.className = 'themeChooseStyleText';
 		divs.setAttribute('title', getStyleForSite());
 		divs.setAttribute('alt', getStyleForSite());
-		siteSpan = document.createElement('span');
+		siteSpan = new Element('span');
 		siteSpan.setAttribute('id', 'siteStyle');
 		siteSpan.appendChild(document.createTextNode(getChooseStyleForSite()));
 		divs.appendChild(siteSpan);
+		
+		div.appendChild(divp);
+		div.appendChild(divs);
+		document.body.appendChild(div);
 		
 		var setStyleForPageFunction = function() {
 			setStyle(true);
@@ -219,10 +223,6 @@ function chooseOption(themeID) {
 		pageSpan.addEvent('click', setStyleForPageFunction);
 		siteSpan.addEvent('click', setStyleForSiteFunction);
 		div.addEvent('click', removeStyleOptions);
-		
-		div.appendChild(divp);
-		div.appendChild(divs);
-		document.body.appendChild(div);
 	}
 	div.style.left = leftPosition + 'px';
 	div.style.top = (getAbsoluteTop(themeID + '_container') + 3) + 'px';
@@ -256,30 +256,28 @@ function setStyleCallback(result, pageId) {
 }
 
 function resizeSlider() {
-	var rightScroller = document.getElementById('rightScrollerContainer');
-	var themesTicker = document.getElementById('themesTickerContainer');
-	var container = document.getElementById('themesSliderContainer');
-	if (rightScroller == null || themesTicker == null || container == null) {
+	var themesTicker = $('themesTickerContainer');
+	var container = $('themesSliderContainer');
+	if (themesTicker == null || container == null) {
 		return;
 	}
+
 	var available = getTotalWidth() - 500;
 	if (available > 0) {
 		container.style.width = available + 'px';
-		themesTicker.style.left = (getScrollerImageWidth() - 3) + 'px';
-		rightScroller.style.left = (available - 23) + 'px';
-		themesTicker.style.width = (available - 44) + 'px';
+		themesTicker.style.width = (available - 50) + 'px';
 	}
 }
 
 function setButtonText(id, text) {
-	var button = document.getElementById(id);
+	var button = $(id);
 	if (button != null) {
 		button.value = text;
 	}
 }
 
 function newPage() {
-	var newPage = document.getElementById('newPageContainer');
+	var newPage = $('newPageContainer');
 	if (CLICKED_CREATE) {
 		closeNewPage(newPage);
 	}
@@ -293,7 +291,7 @@ function newPage() {
 }
 
 function changeFrameHeight(change) {
-	var frame = document.getElementById('treePages');
+	var frame = $('treePages');
 	if (frame == null) {
 		return;
 	}
@@ -313,15 +311,19 @@ function changeFrameHeight(change) {
 }
 
 function resizeFrame() {
-	var frame = document.getElementById('treePages');
+	var frame = $('treePages');
 	if (frame == null) {
 		return;
 	}
+	
+	//	Width
 	frame.style.left = SPACE_FROM_LEFT + 'px';
 	var availableWidth = getTotalWidth() - RESERVED_WIDTH;
 	if (availableWidth > 0) {
 		frame.style.width = availableWidth + 'px';
 	}
+	
+	//	Height
 	var availableHeight = getTotalHeight() - RESERVED_HEIGHT;
 	if (availableHeight > 0) {
 		frame.style.height = availableHeight + 'px';
@@ -357,7 +359,7 @@ function showPageInfoValues(values) {
 	}
 	var element = null;
 	for (var i = 0; i < KEYWORDS.length; i++) {
-		element = document.getElementById(KEYWORDS[i]);
+		element = $(KEYWORDS[i]);
 		if (element != null) {
 			element.value = values[i];
 		}
@@ -369,7 +371,7 @@ function isStartPage(pageID) {
 }
 
 function isStartPageCallback(isStart) {
-	var button = document.getElementById('makeStartPage');
+	var button = $('makeStartPage');
 	if (button == null) {
 		return;
 	}
@@ -510,8 +512,7 @@ function clickOnTimeout(currentElement){
 	waitingForSecondClick = false;	
 	executeOnClick(currentElement);
 }
-function executeOnClick(element){
-	
+function executeOnClick(element) {
 	boldSelectedTreeElement(element);				
 	setPageID(element.parentNode.id);
 	getPrewUrl(element.parentNode.id);
@@ -520,17 +521,8 @@ function executeOnClick(element){
 }
 
 function executeOnDblClick(){
-	
 }
-/*
-function prepareTree(element){
-	boldSelectedTreeElement(element);
-	setPageID(element.parentNode.id);
-	getPrewUrl(element.parentNode.id);
-	getPageInfoValues();
-	isStartPage(element.parentNode.id);
-}
-*/
+
 function manageModulesBackground(element) {
 	if (element == null) {
 		return;
