@@ -17,6 +17,7 @@ import org.jaxen.JaxenException;
 import org.jaxen.jdom.JDOMXPath;
 import org.jdom.Attribute;
 import org.jdom.Comment;
+import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -462,14 +463,24 @@ public class ThemeChanger {
 		return c;
 	}
 	
-	private Collection <Element> getElement(String type, String text, String attribute, String attributeValue) {
+	private Collection <Element> getExpandRegion() {
 		Collection <Element> c = new ArrayList <Element> ();
-		Element e = new Element(type, namespace);
-		e.setText(text);
-		if (attribute != null) {
-			e.setAttribute(attribute, attributeValue);
-		}
-		c.add(e);
+		
+		//	Region
+		Element region = new Element("div", namespace);
+		String regionName = "idegaThemeExpandRegion";
+		region.setAttribute("id", regionName);
+		Collection<Content> regionContent = new ArrayList<Content>();
+		regionContent.addAll(getCommentsCollection(regionName));
+
+		//	Expander
+		Element expander = new Element("div", namespace);
+		expander.setText("idegaTheme");
+		expander.setAttribute("style", new StringBuffer("height:").append(THEME_HEIGHT).append("px;visibility:hidden").toString());
+		regionContent.add(expander);
+		
+		region.addContent(regionContent);
+		c.add(region);
 		return c;
 	}
 	
@@ -744,7 +755,7 @@ public class ThemeChanger {
 		
 		if (regionID != null) {
 			if (regionID.equals(REGION_TO_EXPAND)) {
-				e.addContent(getElement("div", "idega_theme", "style", new StringBuffer("height:").append(THEME_HEIGHT).append("px;visibility:hidden").toString())); // Expanding theme
+				e.addContent(getExpandRegion()); // Expanding theme
 			}
 		}
 		
