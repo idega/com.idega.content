@@ -1,7 +1,6 @@
 package com.idega.content.themes.business;
 
 import java.rmi.RemoteException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -75,17 +74,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		if (theme.getIBPageID() == -1) {
 			return true;
 		}
-		IWContext iwc = CoreUtil.getIWContext();
-		int userID = -1;
-		ICDomain domain = null;
-		if (iwc != null) {
-			userID = iwc.getCurrentUserId();
-			domain = iwc.getDomain();
-		}
-		getBuilderService();
 		
-		boolean result = false;
-		result = builder.deletePage(String.valueOf(theme.getIBPageID()), false, null, userID, domain);
+		boolean result = deletePage(String.valueOf(theme.getIBPageID()), false, true);
 		if (result) {
 			builder.clearAllCachedPages();
 		}
@@ -93,47 +83,55 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	}
 	
 	public boolean deleteIBPage(String pageID, boolean deleteChildren) {
-		return deletePage(pageID, deleteChildren);
+		return deletePage(pageID, deleteChildren, false);
 	}
 	
-	private boolean deletePage(String pageID, boolean deleteChildren) {
+	private boolean deletePage(String pageID, boolean deleteChildren, boolean canUseDefaultUser) {
 		if (pageID == null) {
 			return false;
 		}
 
 		IWContext iwc = CoreUtil.getIWContext();
 		
-		if (iwc == null) {
-			return false;
-		}
-
 		getBuilderService();
-
-		Map tree = builder.getTree(iwc);
-
-		ICDomain domain = iwc.getDomain();
-		int domainId = -1;
-		if (domain != null) {
-			domainId = domain.getID();
-		}
 		
-		if (pageID.equals(ThemesHelper.getInstance().getLastVisitedPage())) {
-			ThemesHelper.getInstance().setLastVisitedPage(null);
-		}
+		Map tree = null;
+		ICDomain domain = null;
+		int userId = 1;
 		
-		boolean result = true;
-		result =  builder.deletePage(pageID, deleteChildren, tree, iwc.getUserId(), domain);
-		
-		try {
-			if (Integer.valueOf(pageID).intValue() == domain.getStartPageID()) {
-				domain.setIBPage(null);
-				domain.store();
+		if (iwc == null && canUseDefaultUser) {
+			try {
+				userId = Integer.valueOf(getAccessController().getAdministratorUser().getId());	//	Using default user
+			} catch(Exception e) {
+				e.printStackTrace();
 			}
-		} catch (NumberFormatException e) {
-			log.error(e);
+			try {
+				tree = builder.getTree(getIWApplicationContext());
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			userId = iwc.getCurrentUserId();
+			tree = builder.getTree(iwc);
+			domain = iwc.getDomain();
+			
+			if (pageID.equals(ThemesHelper.getInstance().getLastVisitedPage())) {
+				ThemesHelper.getInstance().setLastVisitedPage(null);
+			}
 		}
 		
-		if (domainId != -1) {
+		boolean result = builder.deletePage(pageID, deleteChildren, tree, userId, domain);
+		
+		if (domain != null) {
+			try {
+				if (Integer.valueOf(pageID).intValue() == domain.getStartPageID()) {
+					domain.setIBPage(null);
+					domain.store();
+				}
+			} catch (NumberFormatException e) {
+				log.error(e);
+			}
 			builder.clearAllCachedPages();
 		}
 		
