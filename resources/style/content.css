@@ -328,14 +328,13 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	
 }
 
-.theme_slider {
+.themesSlider {
 	width: 100%;
 	height: 150px;
 	background-color: #000000;
-	bottom: 0px;
 }
 
-.leftThemeScroller {
+.themeScroller {
 	z-index: 9999;
 	padding-top: 64px;
 	cursor: pointer;
@@ -343,9 +342,6 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 }
 
 .rightThemeScroller {
-	z-index: 9999;
-	padding-top: 64px;
-	cursor: pointer;
 	float: right;
 }
 
@@ -375,7 +371,6 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 }
 
 .themesTicker {
-	/*width: 535px;*/
 	height: 150px;
 	overflow: hidden;
 	float: left;

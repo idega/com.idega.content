@@ -473,6 +473,25 @@
 		</attribute>
 	</tag>
 	<tag>
+		<name>ThemesSliderViewer</name>
+		<tag-class>com.idega.content.themes.presentation.ThemesSliderViewerTag</tag-class>
+		<attribute>
+			<name>mainId</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>mainStyleClass</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>hiddenOnLoad</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+	</tag>
+	<tag>
 		<name>siteTemplatesViewer</name>
 		<tag-class>com.idega.content.tree.SiteTemplatesViewerTag</tag-class>
       	<attribute>

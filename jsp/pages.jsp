@@ -79,19 +79,8 @@ version="1.2">
                 
                 	<x:inputHidden id="defaultThemeLabel" forceId="true" value="#{localizedStrings['com.idega.content']['theme_is_default']}"></x:inputHidden>
 					<x:inputHidden id="notDefaultThemeLabel" forceId="true" value="#{localizedStrings['com.idega.content']['theme_is_not_default']}"></x:inputHidden>
-					<x:div id="themesSliderContainer" forceId="true" styleClass="theme_slider" style="display: none">
-						<x:div id="leftScrollerContainer" forceId="true" styleClass="leftThemeScroller">	
-							<x:graphicImage url="/idegaweb/bundles/com.idega.content.bundle/resources/images/left.gif" onclick="scroll(this.id)" id="leftScroller" forceId="true" title="#{localizedStrings['com.idega.content']['scroll_left']}"></x:graphicImage>
-						</x:div>	
-						
-						<x:div id="themesTickerContainer" forceId="true" styleClass="themesTicker">
-							<x:div id="themes" forceId="true" styleClass="multiImageGallery" style="left: 0px;"></x:div>
-						</x:div>
-						
-						<x:div id="rightScrollerContainer" forceId="true" styleClass="rightThemeScroller">
-							<x:graphicImage url="/idegaweb/bundles/com.idega.content.bundle/resources/images/right.gif" onclick="scroll(this.id)" id="rightScroller" forceId="true" title="#{localizedStrings['com.idega.content']['scroll_right']}"></x:graphicImage>
-						</x:div>
-					</x:div>
+					
+					<c:ThemesSliderViewer hiddenOnLoad="true" />
                 </wf:wfblock>
                 
                 <x:div id="newPageContainer" forceId="true" styleClass="newPageContainerStyle" style="display: none; left: 8px;">

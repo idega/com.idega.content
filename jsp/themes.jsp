@@ -39,19 +39,7 @@ version="1.2">
 							
 							<x:div style="width: 100%; height: 1px;"></x:div>
 							
-							<x:div id="themesSliderContainer" forceId="true" styleClass="theme_slider">
-								<x:div id="leftScrollerContainer" forceId="true" styleClass="leftThemeScroller">	
-									<x:graphicImage url="/idegaweb/bundles/com.idega.content.bundle/resources/images/left.gif" onclick="scroll(this.id)" id="leftScroller" forceId="true" title="#{localizedStrings['com.idega.content']['scroll_left']}"></x:graphicImage>
-								</x:div>	
-								
-								<x:div id="themesTickerContainer" forceId="true" styleClass="themesTicker">
-									<x:div id="themes" forceId="true" styleClass="multiImageGallery" style="left: 0px;"></x:div>
-								</x:div>
-								
-								<x:div id="rightScrollerContainer" forceId="true" styleClass="rightThemeScroller">
-									<x:graphicImage url="/idegaweb/bundles/com.idega.content.bundle/resources/images/right.gif" onclick="scroll(this.id)" id="rightScroller" forceId="true" title="#{localizedStrings['com.idega.content']['scroll_right']}"></x:graphicImage>
-								</x:div>
-							</x:div>
+							<c:ThemesSliderViewer />
 						</x:div>
 						
 						<x:div id="themeVariationsContainer" forceId="true" styleClass="theme_container">
@@ -65,9 +53,11 @@ version="1.2">
 									<x:div id="themeSaveArea" forceId="true" styleClass="wf_webdav_upload">
 										<h:outputText value="#{localizedStrings['com.idega.content']['theme_name']}"></h:outputText>
 										<x:inputText id="theme_name" forceId="true"></x:inputText>
-										<x:commandButton id="changeVariationsButton" type="button" forceId="true" onclick="changeVariations()" title="#{localizedStrings['com.idega.content']['change_variations']}" value="#{localizedStrings['com.idega.content']['change']}"></x:commandButton>
-										<x:commandButton id="themeSaveButton" type="button" forceId="true" onclick="saveTheme()" title="#{localizedStrings['com.idega.content']['save']}" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
-										<x:commandButton id="themeRestoreButton" type="button" forceId="true" onclick="restoreTheme()" title="#{localizedStrings['com.idega.content']['restore_theme']}" value="#{localizedStrings['com.idega.content']['restore_theme']}"></x:commandButton>
+										<x:div style="padding-top: 5px;">
+											<x:commandButton id="changeVariationsButton" type="button" forceId="true" onclick="changeVariations()" title="#{localizedStrings['com.idega.content']['change_variations']}" value="#{localizedStrings['com.idega.content']['change']}"></x:commandButton>
+											<x:commandButton id="themeSaveButton" type="button" forceId="true" onclick="saveTheme()" title="#{localizedStrings['com.idega.content']['save']}" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
+											<x:commandButton id="themeRestoreButton" type="button" forceId="true" onclick="restoreTheme()" title="#{localizedStrings['com.idega.content']['restore_theme']}" value="#{localizedStrings['com.idega.content']['restore_theme']}"></x:commandButton>
+										</x:div>
 									</x:div>
 								</x:div>
 							</x:div>

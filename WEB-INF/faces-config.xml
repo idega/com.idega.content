@@ -267,6 +267,10 @@
 		<component-type>ThemesManager</component-type>
 		<component-class>com.idega.content.themes.presentation.ThemesManager</component-class>
 	</component>
+	<component>
+		<component-type>ThemesSliderViewer</component-type>
+		<component-class>com.idega.content.themes.presentation.ThemesSliderViewer</component-class>
+	</component>
 	<component> 
   		<component-type>siteTemplatesViewer</component-type> 
   		<component-class>com.idega.content.tree.SiteTemplatesViewer</component-class> 
