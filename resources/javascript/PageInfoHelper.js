@@ -90,7 +90,6 @@ function showSlider(container) {
 	container.style.position = 'absolute';
 	container.style.bottom = '15px';
 	container.style.left = SPACE_FROM_LEFT + 'px';
-	container.className = 'theme_slider';
 	var showSlider = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 	showSlider.start(0, 1);
 	SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'block')", SHOW_ELEMENT_TRANSITION_DURATION);
