@@ -43,7 +43,7 @@ public class SiteViewManager {
 	}
 	
 	public ViewNode getSiteNode(){
-		IWBundle iwb = this.iwma.getBundle(ContentConstants.CONTENT_BUNDLE);
+		IWBundle iwb = this.iwma.getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER);
 		if (this.siteRootNode == null) {
 			this.siteRootNode = initalizeSiteNode(iwb);
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: CaseListBean.java,v 1.6 2007/06/08 08:43:23 valdas Exp $
+ * $Id: CaseListBean.java,v 1.7 2007/08/07 08:33:00 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -26,10 +26,10 @@ import com.idega.webface.model.WFDataModel;
 /**
  * Bean for content item case list rows.   
  * <p>
- * Last modified: $Date: 2007/06/08 08:43:23 $ by $Author: valdas $
+ * Last modified: $Date: 2007/08/07 08:33:00 $ by $Author: valdas $
  *
  * @author Anders Lindman
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 
 public class CaseListBean implements WFListBean, Serializable {
@@ -128,7 +128,7 @@ public class CaseListBean implements WFListBean, Serializable {
 
 		for (int i = 0; i < cols; i++) {
 			UIColumn c = new UIColumn();
-			c.setHeader(WFUtil.getTextVB(ContentConstants.CONTENT_BUNDLE, this.testColumnHeaders[i]));
+			c.setHeader(WFUtil.getTextVB(ContentConstants.IW_BUNDLE_IDENTIFIER, this.testColumnHeaders[i]));
 			columns[i] = c;
 		}
 		

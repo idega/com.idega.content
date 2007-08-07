@@ -184,7 +184,7 @@ public class ThemeStyleVariations extends Block {
 	}
 	
 	public String getBundleIdentifier()	{
-		return ContentConstants.CONTENT_BUNDLE;
+		return ContentConstants.IW_BUNDLE_IDENTIFIER;
 	}
 
 }

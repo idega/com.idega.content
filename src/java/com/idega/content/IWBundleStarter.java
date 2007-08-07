@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.26 2007/06/08 08:43:24 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.27 2007/08/07 08:33:00 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -41,10 +41,10 @@ import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2007/06/08 08:43:24 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/08/07 08:33:00 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.26 $
+ * @version $Revision: 1.27 $
  */
 //public class IWBundleStarter implements IWBundleStartable, JarLoader {
 public class IWBundleStarter implements IWBundleStartable{
@@ -67,7 +67,7 @@ public class IWBundleStarter implements IWBundleStartable{
 		
 		ContentViewManager cViewManager = ContentViewManager.getInstance(starterBundle.getApplication());
 		cViewManager.initializeStandardNodes(starterBundle);
-		GlobalIncludeManager.getInstance().addBundleStyleSheet(ContentConstants.CONTENT_BUNDLE,"/style/content.css");
+		GlobalIncludeManager.getInstance().addBundleStyleSheet(ContentConstants.IW_BUNDLE_IDENTIFIER,"/style/content.css");
 		
 		
 		IWApplicationContext iwac = starterBundle.getApplication().getIWApplicationContext();
@@ -118,7 +118,7 @@ public class IWBundleStarter implements IWBundleStartable{
 		try {
 			String sBundlesDirectory = System.getProperty(DefaultIWBundle.SYSTEM_BUNDLES_RESOURCE_DIR);
 			if (sBundlesDirectory != null) {
-				String filePath = sBundlesDirectory + File.separator + ContentConstants.CONTENT_BUNDLE + File.separator + ThemesConstants.THEME_SETTINGS;
+				String filePath = sBundlesDirectory + File.separator + ContentConstants.IW_BUNDLE_IDENTIFIER + File.separator + ThemesConstants.THEME_SETTINGS;
 				stream = new FileInputStream(filePath);
 			}
 			else {

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentUtil.java,v 1.14 2007/06/08 08:43:23 valdas Exp $
+ * $Id: ContentUtil.java,v 1.15 2007/08/07 08:33:00 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -24,10 +24,10 @@ import com.idega.util.CoreConstants;
 
 /**
  * 
- * Last modified: $Date: 2007/06/08 08:43:23 $ by $Author: valdas $
+ * Last modified: $Date: 2007/08/07 08:33:00 $ by $Author: valdas $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class ContentUtil {
 	public static final String MODULE_PREFIX = "cms_";
@@ -54,7 +54,7 @@ public class ContentUtil {
 		else {
 			app = IWMainApplication.getDefaultIWMainApplication();
 		}
-		bundle = app.getBundle(ContentConstants.CONTENT_BUNDLE);
+		bundle = app.getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER);
 	}
 	
 	/**
