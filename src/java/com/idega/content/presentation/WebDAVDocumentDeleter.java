@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVDocumentDeleter.java,v 1.8 2006/11/10 01:28:30 gimmi Exp $
+ * $Id: WebDAVDocumentDeleter.java,v 1.9 2007/08/08 08:29:42 valdas Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -26,6 +26,7 @@ import javax.faces.event.ActionListener;
 
 import org.apache.commons.httpclient.HttpException;
 
+import com.idega.content.bean.ContentPathBean;
 import com.idega.presentation.IWContext;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.webface.WFContainer;
@@ -34,10 +35,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2006/11/10 01:28:30 $ by $Author: gimmi $
+ *  Last modified: $Date: 2007/08/08 08:29:42 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class WebDAVDocumentDeleter extends ContentBlock implements ActionListener {
 
@@ -197,7 +198,9 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 			try {
 				super.refreshList();
 				if (parentPath != null) {
-					WFUtil.invoke("WebDAVListBean", "setWebDAVPath", parentPath.replaceFirst(getIWSlideSession().getWebdavServerURI(), ""));
+					String currentPath = parentPath.replaceFirst(getIWSlideSession().getWebdavServerURI(), "");
+					WFUtil.invoke("WebDAVListBean", "setWebDAVPath", currentPath);
+					WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", currentPath);
 				}
 				WFUtil.invoke("WebDAVListBean","setClickedFilePath", null, String.class);
 				res.deleteMethod();

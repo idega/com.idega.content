@@ -18,12 +18,14 @@ import javax.faces.event.ActionListener;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.content.bean.ContentPathBean;
 import com.idega.content.business.WebDAVFilePermissionResource;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.idegaweb.UnavailableIWContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.IWSlideConstants;
+import com.idega.util.CoreConstants;
 import com.idega.util.ListUtil;
 import com.idega.webface.WFBlock;
 import com.idega.webface.WFTitlebar;
@@ -623,10 +625,19 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 				String path = "unknown";
 				while (iter.hasNext()) {
 					Object obj = iter.next();
-					if ((obj instanceof UIParameter) && PATH_TO_DELETE.equals(((UIParameter) obj).getName()) ) {
-						path = (String) ((UIParameter) obj).getValue();
-						WFUtil.invoke("WebDAVListBean", "setClickedFilePath", path);
-//						path = (String) WFUtil.createMethodBinding("#{WebDAVListBean.getClickedFilePath}", null).invoke(context,null);
+					if ((obj instanceof UIParameter)) {
+						if (PATH_TO_DELETE.equals(((UIParameter) obj).getName())) {
+							path = (String) ((UIParameter) obj).getValue();
+							WFUtil.invoke("WebDAVListBean", "setClickedFilePath", path);
+							String currentPath = null;
+							if (path.indexOf(CoreConstants.SLASH) != -1) {
+								currentPath = path.substring(0, path.lastIndexOf(CoreConstants.SLASH));
+							}
+							if (currentPath != null) {
+								WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", currentPath);	//	Setting current path to reload
+							}
+//							path = (String) WFUtil.createMethodBinding("#{WebDAVListBean.getClickedFilePath}", null).invoke(context,null);
+						}
 					}
 				}
 //				String path = (String) ((HtmlCommandLink)source).getAttributes().get(PATH_TO_DELETE);
