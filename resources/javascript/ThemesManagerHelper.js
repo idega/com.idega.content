@@ -350,68 +350,70 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
 	for (var i = 0; i < themes.length; i++) {
 		simpleTheme = themes[i];
 		
-		time = date.getTime();
-		theme = new Theme(simpleTheme.name, simpleTheme.linkToSmallPreview + '?' + time, simpleTheme.linkToBigPreview + '?' + time, simpleTheme.id, simpleTheme.used);
-
-		var div = new Element('div');
-		div.setAttribute('id', theme.id + '_mainContainer');
-		div.className = 'imageGallery';
-		
-		// Is used?
-		if (theme.used) {
-			div.setAttribute('title', $('defaultThemeLabel').value);
+		if (simpleTheme.linkToSmallPreview != null && simpleTheme.linkToSmallPreview != '') {
+			time = date.getTime();
+			theme = new Theme(simpleTheme.name, simpleTheme.linkToSmallPreview + '?' + time, simpleTheme.linkToBigPreview + '?' + time, simpleTheme.id, simpleTheme.used);
+			
+			var div = new Element('div');
+			div.setAttribute('id', theme.id + '_mainContainer');
+			div.className = 'imageGallery';
+			
+			// Is used?
+			if (theme.used) {
+				div.setAttribute('title', $('defaultThemeLabel').value);
+			}
+			else {
+				div.setAttribute('title', $('notDefaultThemeLabel').value);
+			}
+	
+			// Name
+			var textDiv = new Element('div');
+			textDiv.setAttribute('id', theme.id + '_themeNameContainer');
+			if (theme.used) {
+				textDiv.className = 'themeName usedThemeName';
+			}
+			else {
+				textDiv.className = 'themeName';
+			}
+			var themeNameContainer = new Element('strong');
+			themeNameContainer.appendChild(document.createTextNode(theme.name));
+			textDiv.appendChild(themeNameContainer);
+			div.appendChild(textDiv);
+			
+			var imageDiv = new Element('div');
+			imageDiv.setAttribute('id', theme.id + '_container');
+			var image = new Element('img'); 
+	   		image.setAttribute('id', theme.id); 
+	   		image.setAttribute('src', theme.linkToSmallPreview);
+	   		image.setAttribute('width', getImageWidth() + 'px');
+	   		image.setAttribute('height', getImageHeight() + 'px');
+	   		//image.setAttribute('title', theme.themeName);
+	   		
+	        image.className = 'reflect rheight18 ropacity68';
+	        imageDiv.className = 'galleryImage firstInRow';
+	        imageDiv.appendChild(image);
+	        div.appendChild(imageDiv);
+	        
+			container.appendChild(div);
+	
+			if (ENABLE_STYLE_VARIATIONS) {
+	   			image.addEvent('click', function() {
+	   				getThemeStyleVariations(this.id);
+	   			});
+	   		}
+	   		if (ENABLE_STYLE_FUNCTIONS) {
+	   			image.addEvents({
+	   				'mouseover': function() {
+		   				chooseStyle(this.id);
+		   			},
+		   			'mouseout': function() {
+		   				recallStyle(this.id);
+		   			}
+	   			});
+	   		}
+			
+			THEMES.push(theme);
 		}
-		else {
-			div.setAttribute('title', $('notDefaultThemeLabel').value);
-		}
-
-		// Name
-		var textDiv = new Element('div');
-		textDiv.setAttribute('id', theme.id + '_themeNameContainer');
-		if (theme.used) {
-			textDiv.className = 'themeName usedThemeName';
-		}
-		else {
-			textDiv.className = 'themeName';
-		}
-		var themeNameContainer = new Element('strong');
-		themeNameContainer.appendChild(document.createTextNode(theme.name));
-		textDiv.appendChild(themeNameContainer);
-		div.appendChild(textDiv);
-		
-		var imageDiv = new Element('div');
-		imageDiv.setAttribute('id', theme.id + '_container');
-		var image = new Element('img'); 
-   		image.setAttribute('id', theme.id); 
-   		image.setAttribute('src', theme.linkToSmallPreview);
-   		image.setAttribute('width', getImageWidth() + 'px');
-   		image.setAttribute('height', getImageHeight() + 'px');
-   		//image.setAttribute('title', theme.themeName);
-   		
-        image.className = 'reflect rheight18 ropacity68';
-        imageDiv.className = 'galleryImage firstInRow';
-        imageDiv.appendChild(image);
-        div.appendChild(imageDiv);
-        
-		container.appendChild(div);
-
-		if (ENABLE_STYLE_VARIATIONS) {
-   			image.addEvent('click', function() {
-   				getThemeStyleVariations(this.id);
-   			});
-   		}
-   		if (ENABLE_STYLE_FUNCTIONS) {
-   			image.addEvents({
-   				'mouseover': function() {
-	   				chooseStyle(this.id);
-	   			},
-	   			'mouseout': function() {
-	   				recallStyle(this.id);
-	   			}
-   			});
-   		}
-		
-		THEMES.push(theme);
 	}
 	container.style.width = Math.round(THEMES.length * getAllImageSpace()) + 'px';
 	
