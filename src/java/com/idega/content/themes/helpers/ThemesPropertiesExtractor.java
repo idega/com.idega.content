@@ -20,6 +20,7 @@ public class ThemesPropertiesExtractor {
 	
 	protected static final String LIMITED_SELECTION = "1";
 	protected static final String CSS_EXTENSION = ".css";
+	private static final String PNG_EXTENSION = ".png";
 	
 	private static final Log log = LogFactory.getLog(ThemesPropertiesExtractor.class);
 	
@@ -336,11 +337,19 @@ public class ThemesPropertiesExtractor {
 			return false;
 		}
 		String file = null;
+		String stylePath = null;
 		for (int i = 0; i < files.size(); i++) {
 			file = ((Element)files.get(i)).getText();
 			file = StringHandler.removeCharacters(file, ContentConstants.SPACE, ContentConstants.UNDER);
 			file = StringHandler.removeCharacters(file, ContentConstants.BRACKET_OPENING, ContentConstants.EMPTY);
 			file = StringHandler.removeCharacters(file, ContentConstants.BRACKET_CLOSING, ContentConstants.EMPTY);
+			
+			//	In Theme.plist sometimes occurs errors, e.g. css file with .png extension
+			if (file.endsWith(ThemesPropertiesExtractor.PNG_EXTENSION)) {
+				stylePath = file.substring(0, file.lastIndexOf(ContentConstants.DOT));
+				file = new StringBuffer(stylePath).append(ThemesPropertiesExtractor.CSS_EXTENSION).toString();
+			}
+			
 			member.addStyleFile(file);
 		}
 		return true;
