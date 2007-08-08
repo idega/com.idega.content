@@ -113,10 +113,12 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 					simpleTheme.setName(theme.getChangedName());
 				}
 				
-				// Small preview
-				link = new StringBuffer(CoreConstants.CONTENT).append(theme.getLinkToBase());
-				link.append(helper.encode(theme.getLinkToSmallPreview(), true));
-				simpleTheme.setLinkToSmallPreview(link.toString());
+				if (theme.getLinkToSmallPreview() != null) {
+					// Small preview
+					link = new StringBuffer(CoreConstants.CONTENT).append(theme.getLinkToBase());
+					link.append(helper.encode(theme.getLinkToSmallPreview(), true));
+					simpleTheme.setLinkToSmallPreview(link.toString());
+				}
 				
 				// Big preview
 				link = new StringBuffer(CoreConstants.CONTENT).append(theme.getLinkToBase());
