@@ -705,13 +705,22 @@ public class ThemeChanger {
 	 */
 	private String addRegions(String docContent) {
 		String fixedValue = null;
+		String regionContent = null;
 		for (int i = 0; i < ThemesConstants.REGIONS.size(); i++) {
 			fixedValue = fixValue(ThemesConstants.REGIONS.get(i));
 			if (docContent.indexOf(ThemesConstants.REGIONS.get(i)) != -1) {
-				docContent = docContent.replace(ThemesConstants.REGIONS.get(i), getRegion(fixedValue));
+				regionContent = getRegion(fixedValue);
+				if (ThemesConstants.REGIONS_NEEDED_TO_CREATE.contains(fixedValue)) {
+					regionContent = getRegionDiv(fixedValue, regionContent);
+				}
+				docContent = docContent.replace(ThemesConstants.REGIONS.get(i), regionContent);
 			}
 		}
 		return docContent;
+	}
+	
+	private String getRegionDiv(String id, String content) {
+		return new StringBuffer("<div id=\"").append(id).append("\">").append(content).append("</div>").toString();
 	}
 	
 	/**
