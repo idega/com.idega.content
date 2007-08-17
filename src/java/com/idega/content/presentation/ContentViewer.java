@@ -181,7 +181,17 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		uploadBlock.setTitlebar(uploadBar);
 		//uploadBlock.setToolbar(new WFToolbar());
 		WebDAVUpload upload = new WebDAVUpload();
-		upload.setUploadPath(currentFolderPath);
+		if (startFolder == null) {
+			upload.setUploadPath(currentFolderPath);
+		}
+		else {
+			if (startFolder.equals(CoreConstants.PATH_FILES_ROOT) && !(startFolder.equals(currentFolderPath))) {
+				upload.setUploadPath(currentFolderPath);
+			}
+			else {
+				upload.setUploadPath(startFolder);
+			}
+		}
 		upload.setShowStatusAfterUploadAttempt(true);
 //		upload.setRendered(renderWebDAVUpload);
 		upload.setId(getId()+"_upload");

@@ -40,7 +40,7 @@ public class WebDAVList extends IWBaseComponent {
 		Object o = WFUtil.invoke(ContentPathBean.BEAN_ID, "getPath");
 		String pathFromContent = null;
 		if (o instanceof String) {
-			pathFromContent = o.toString();
+			pathFromContent = (String) o;
 			if (!ContentConstants.EMPTY.equals(pathFromContent)) {
 				setStartFolder(pathFromContent);
 			}
