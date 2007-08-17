@@ -1,5 +1,5 @@
 /*
- * $Id: HTMLAreaDocumentImageChooser.java,v 1.4 2006/12/05 15:42:13 gimmi Exp $
+ * $Id: HTMLAreaDocumentImageChooser.java,v 1.5 2007/08/17 13:41:58 valdas Exp $
  * Created on 8.3.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -12,6 +12,7 @@ package com.idega.content.presentation;
 import javax.faces.component.UIComponent;
 import javax.faces.el.ValueBinding;
 import com.idega.idegaweb.IWBundle;
+import com.idega.util.CoreConstants;
 import com.idega.webface.htmlarea.HTMLAreaImageType;
 
 
@@ -25,7 +26,7 @@ public class HTMLAreaDocumentImageChooser implements HTMLAreaImageType {
 		ContentViewer list = new ContentViewer();
 		list.setShowPermissionTab(false);
 		list.setShowUploadComponent(true);
-		list.setRootPath("/files");
+		list.setRootPath(CoreConstants.PATH_FILES_ROOT);
 		if (url != null) {
 			list.setStartPath(url);
 		} else {

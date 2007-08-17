@@ -230,8 +230,8 @@ public class ContentItemRssProducer  extends RSSAbstractProducer implements RSSP
 			uri+="/";
 		}
 		
-		if(!uri.startsWith("/files")){
-			uri = "/files"+uri;
+		if(!uri.startsWith(CoreConstants.PATH_FILES_ROOT)){
+			uri = CoreConstants.PATH_FILES_ROOT+uri;
 		}
 		return uri;
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentRSSProducer.java,v 1.5 2007/03/16 15:46:38 justinas Exp $
+ * $Id: ContentRSSProducer.java,v 1.6 2007/08/17 13:41:58 valdas Exp $
  * Created on Sep 13, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -30,6 +30,7 @@ import com.idega.block.rss.data.RSSRequest;
 import com.idega.slide.business.IWContentEvent;
 import com.idega.slide.business.IWSlideChangeListener;
 import com.idega.slide.util.WebdavExtendedResource;
+import com.idega.util.CoreConstants;
 import com.idega.util.FileUtil;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
@@ -43,10 +44,10 @@ import com.sun.syndication.feed.synd.SyndFeedImpl;
  * The rss file for a folder is called "content.xml" and is stored in a hidden folder called ".rss" under the folder that was requested.
  * An IWSlideChangeListener see's to it that a cachemap containing which rssfiles are up to date is invalidated.
  * 
- *  Last modified: $Date: 2007/03/16 15:46:38 $ by $Author: justinas $
+ *  Last modified: $Date: 2007/08/17 13:41:58 $ by $Author: valdas $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class ContentRSSProducer extends RSSAbstractProducer implements RSSProducer, IWSlideChangeListener {
 
@@ -126,8 +127,8 @@ public class ContentRSSProducer extends RSSAbstractProducer implements RSSProduc
 			uri+="/";
 		}
 		
-		if(!uri.startsWith("/files")){
-			uri = "/files"+uri;
+		if(!uri.startsWith(CoreConstants.PATH_FILES_ROOT)){
+			uri = CoreConstants.PATH_FILES_ROOT+uri;
 		}
 		return uri;
 	}
