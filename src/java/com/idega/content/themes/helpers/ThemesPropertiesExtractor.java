@@ -431,7 +431,7 @@ public class ThemesPropertiesExtractor {
 		if (!linkToBase.endsWith(ContentConstants.SLASH)) {
 			linkToBase = new StringBuffer(linkToBase).append(ContentConstants.SLASH).toString();
 		}
-		String searchName = new StringBuffer(CoreConstants.CONTENT).append(theme.getLinkToBase()).append(fileName).toString();
+		String searchName = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase()).append(fileName).toString();
 		if (helper.existFileInSlide(searchName)) {
 			return searchName;
 		}

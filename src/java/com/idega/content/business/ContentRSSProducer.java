@@ -1,5 +1,5 @@
 /*
- * $Id: ContentRSSProducer.java,v 1.6 2007/08/17 13:41:58 valdas Exp $
+ * $Id: ContentRSSProducer.java,v 1.7 2007/08/20 14:40:58 valdas Exp $
  * Created on Sep 13, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -44,10 +44,10 @@ import com.sun.syndication.feed.synd.SyndFeedImpl;
  * The rss file for a folder is called "content.xml" and is stored in a hidden folder called ".rss" under the folder that was requested.
  * An IWSlideChangeListener see's to it that a cachemap containing which rssfiles are up to date is invalidated.
  * 
- *  Last modified: $Date: 2007/08/17 13:41:58 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/08/20 14:40:58 $ by $Author: valdas $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class ContentRSSProducer extends RSSAbstractProducer implements RSSProducer, IWSlideChangeListener {
 
@@ -76,7 +76,7 @@ public class ContentRSSProducer extends RSSAbstractProducer implements RSSProduc
 		
 		
 		String feedFile = uri+RSS_FOLDER_NAME+"/"+RSS_FILE_NAME;
-		String realURI = "/content"+feedFile;
+		String realURI = CoreConstants.WEBDAV_SERVLET_URI+feedFile;
 		try {
 			//This is an important check since it will also determin if the user can view the folder
 			if(this.isAFolderInSlide(uri,rssRequest)){
@@ -95,7 +95,7 @@ public class ContentRSSProducer extends RSSAbstractProducer implements RSSProduc
 						createRSSFile(rssRequest, uri);
 						rssFileURIsCacheMap.put(uri,realURI);
 						
-						this.dispatch("/content"+feedFile, rssRequest);
+						this.dispatch(CoreConstants.WEBDAV_SERVLET_URI+feedFile, rssRequest);
 					} catch (Exception e) {
 						throw new IOException(e.getMessage());
 					}

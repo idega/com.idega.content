@@ -141,7 +141,7 @@ public class ContentItemHelper {
 		}
 		StringBuffer appliedPath = new StringBuffer();
 		for (int i = 0; i + 1 < pathParts.length; i++) {
-			if (CoreConstants.CONTENT.indexOf(pathParts[i]) == -1) {
+			if (CoreConstants.WEBDAV_SERVLET_URI.indexOf(pathParts[i]) == -1) {
 				appliedPath.append(ContentConstants.SLASH).append(pathParts[i]);
 			}
 		}

@@ -247,7 +247,7 @@ public class ThemesHelper implements Singleton {
 			checkedFromSlide = true;
 		}
 		
-		String searchScope = new StringBuffer(CoreConstants.CONTENT).append(ThemesConstants.THEMES_PATH).toString();
+		String searchScope = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(ThemesConstants.THEMES_PATH).toString();
 		
 		Collection themes = search(ThemesConstants.THEME_SEARCH_KEY, searchScope);
 		if (themes == null) {
@@ -1198,7 +1198,7 @@ public class ThemesHelper implements Singleton {
 			log.error(e);
 		}
 		
-		return CoreConstants.CONTENT + base + changedFileName;
+		return CoreConstants.WEBDAV_SERVLET_URI + base + changedFileName;
 	}
 	
 	private boolean existInSlide(String path) {
@@ -1568,7 +1568,7 @@ public class ThemesHelper implements Singleton {
 		}
 		InputStream stream = null;
 		StringBuffer url = null;
-		if (path.startsWith(CoreConstants.CONTENT)) {
+		if (path.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
 			url = new StringBuffer(getWebRootWithoutContent());
 		}
 		else {

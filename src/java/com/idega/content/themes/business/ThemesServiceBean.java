@@ -177,7 +177,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		theme.setIBPageID(id);
 		
-		return updatePageWebDav(theme.getIBPageID(), CoreConstants.CONTENT + theme.getLinkToSkeleton());
+		return updatePageWebDav(theme.getIBPageID(), CoreConstants.WEBDAV_SERVLET_URI + theme.getLinkToSkeleton());
 	}
 	
 	public boolean updatePageWebDav(int id, String uri) {

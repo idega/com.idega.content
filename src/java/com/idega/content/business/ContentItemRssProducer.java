@@ -8,9 +8,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 
@@ -36,7 +36,6 @@ import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.FileUtil;
-//import com.sun.jmx.snmp.Timestamp;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -51,7 +50,7 @@ public class ContentItemRssProducer  extends RSSAbstractProducer implements RSSP
 	public static final String RSS_FOLDER_NAME = "rss";
 	public static final String RSS_FILE_NAME = "feed.xml";
 
-	public static final String PATH = CoreConstants.CONTENT + ContentUtil.getContentBaseFolderPath() + "/article/";//"/files/cms/article";
+	public static final String PATH = CoreConstants.WEBDAV_SERVLET_URI + ContentUtil.getContentBaseFolderPath() + "/article/";//"/files/cms/article";
 	private Map rssFileURIsCacheMap = new HashMap();
 	private static Log log = LogFactory.getLog(ContentItemRssProducer.class);
 	

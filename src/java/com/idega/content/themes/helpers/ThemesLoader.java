@@ -18,10 +18,10 @@ public class ThemesLoader {
 			return false;
 		}
 
-		if (encodedUri.startsWith(CoreConstants.CONTENT)) {
+		if (encodedUri.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
 			encodedUri = getUriWithoutContent(encodedUri);
 		}
-		if (originalUri.startsWith(CoreConstants.CONTENT)) {
+		if (originalUri.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
 			originalUri = getUriWithoutContent(originalUri);
 		}
 		
@@ -61,11 +61,11 @@ public class ThemesLoader {
 	}
 	
 	private String getUriWithoutContent(String uri) {
-		int index = uri.indexOf(CoreConstants.CONTENT);
+		int index = uri.indexOf(CoreConstants.WEBDAV_SERVLET_URI);
 		if (index == -1) {
 			return uri;
 		}
-		index += CoreConstants.CONTENT.length();
+		index += CoreConstants.WEBDAV_SERVLET_URI.length();
 		return helper.extractValueFromString(uri, index, uri.length());
 	}
 	

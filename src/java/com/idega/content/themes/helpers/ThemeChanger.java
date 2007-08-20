@@ -123,7 +123,7 @@ public class ThemeChanger {
 		Element root = doc.getRootElement();
 		Element head = root.getChild(HTML_HEAD, namespace);
 		
-		String path = new StringBuffer(CoreConstants.CONTENT).append(theme.getLinkToBase()).toString();
+		String path = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase()).toString();
 		
 		// Removing needles content (like "%pathto")
 		if (!proceedHeadContent(path, head)) {
@@ -198,7 +198,7 @@ public class ThemeChanger {
 		// Constructing correct path to images folder
 		StringBuffer replacement = new StringBuffer();
 		replacement.append(CSS_IMAGE_URL);
-		replacement.append(CoreConstants.CONTENT);
+		replacement.append(CoreConstants.WEBDAV_SERVLET_URI);
 		replacement.append(theme.getLinkToBase());
 		replacement.append(IMAGES);
 		
@@ -228,7 +228,7 @@ public class ThemeChanger {
 	private boolean prepareThemeDefaultStyleFiles(Theme theme) {
 		List <String> defaultStyles = ThemesConstants.DEFAULT_STYLE_FILES;
 		StringBuffer replacement = new StringBuffer();
-		replacement.append(CSS_IMAGE_URL).append(CoreConstants.CONTENT).append(theme.getLinkToBase()).append(IMAGES);
+		replacement.append(CSS_IMAGE_URL).append(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase()).append(IMAGES);
 		Replaces[] r = new Replaces[]{getReplace(HREF_REPLACE, HREF_REPLACEMENT), getReplace(IMAGE_URL_REPLACE,
 				replacement.toString()), getReplace(HTML_REPLACE, ThemesConstants.EMPTY)};	
 		for (int i = 0; i < defaultStyles.size(); i++) {
@@ -936,7 +936,7 @@ public class ThemeChanger {
 		if (root == null) {
 			return null;
 		}
-		String linkToBase = new StringBuffer(CoreConstants.CONTENT).append(theme.getLinkToBase()).toString();
+		String linkToBase = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase()).toString();
 		if (!changeThemeStyle(linkToBase, root.getChild(HTML_HEAD, namespace), oldStyle,
 				newStyle)) {
 			return null;
