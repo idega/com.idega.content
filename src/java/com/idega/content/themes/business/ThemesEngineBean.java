@@ -70,7 +70,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		List<String> pLists = null;
 		List<String> configs = null;
 		if (!helper.isCheckedFromSlide()) {
-			String searchScope = new StringBuffer(CoreConstants.CONTENT).append(ThemesConstants.THEMES_PATH).toString();
+			String searchScope = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(ThemesConstants.THEMES_PATH).toString();
 			
 			String propSearchKey = new StringBuffer("*").append(ThemesConstants.THEME_PROPERTIES_FILE_END).toString();
 			Collection propertiesLists = helper.search(propSearchKey, searchScope);
@@ -115,13 +115,13 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				
 				if (theme.getLinkToSmallPreview() != null) {
 					// Small preview
-					link = new StringBuffer(CoreConstants.CONTENT).append(theme.getLinkToBase());
+					link = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase());
 					link.append(helper.encode(theme.getLinkToSmallPreview(), true));
 					simpleTheme.setLinkToSmallPreview(link.toString());
 				}
 				
 				// Big preview
-				link = new StringBuffer(CoreConstants.CONTENT).append(theme.getLinkToBase());
+				link = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase());
 				if (theme.getLinkToDraftPreview() == null) {
 					link.append(helper.encode(theme.getLinkToThemePreview(), true));
 				}
@@ -358,30 +358,24 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return helper.getThemesService().getBuilderService().setProperty(pageID, ThemesConstants.MINUS_ONE, method, new String[]{title}, appl);
 	}
 	
-	public String changePageUri(String pageID, String pageTitle, boolean needSetPageTitle) {
-		if (pageID == null || pageTitle == null) {
+	public String changePageUri(String pageKey, String pageUri, boolean needSetPageTitle) {
+		if (pageKey == null || pageUri == null) {
 			return null;
 		}
-		if (ThemesConstants.MINUS_ONE.equals(pageID)) {
+		if (ThemesConstants.MINUS_ONE.equals(pageKey)) {
 			return null;
 		}
 		
-		ICPage page = helper.getThemesService().getICPage(pageID);
+		ICPage page = helper.getThemesService().getICPage(pageKey);
 		if (page == null) {
 			return null;
 		}
-		if (pageTitle.equals(page.getDefaultPageURI())) {
+		if (pageUri.equals(page.getDefaultPageURI())) {
 			return null;
 		}
 		
-		ICTreeNode parentNode = page.getParentNode();
-		String parentId = null;
-		if (parentNode != null) {
-			parentId = parentNode.getId();
-		}
-		
 		if (needSetPageTitle) {
-			setPageTitle(pageID, pageTitle);
+			setPageTitle(pageKey, pageUri);
 		}
 		
 		ICDomain domain = null;
@@ -400,7 +394,52 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return page.getDefaultPageURI();
 		}
 		
-		if (helper.getThemesService().getBuilderService().changePageUriByTitle(parentId, page, pageTitle, domain.getID())) {
+		ICTreeNode parentNode = page.getParentNode();
+		String parentId = null;
+		if (parentNode != null) {
+			parentId = parentNode.getId();
+		}
+		
+		if (helper.getThemesService().getBuilderService().changePageUriByTitle(parentId, page, pageUri, domain.getID())) {
+			setNewLinkInArticleFile(page.getId(), "com.idega.block.article.component.ArticleItemViewer", page.getDefaultPageURI());
+			return page.getDefaultPageURI();
+		}
+		return null;
+	}
+	
+	private String setPageUri(String pageKey, String uri) {
+		if (pageKey == null || uri == null) {
+			return null;
+		}
+		if (ThemesConstants.MINUS_ONE.equals(pageKey)) {
+			return null;
+		}
+		
+		ICPage page = helper.getThemesService().getICPage(pageKey);
+		if (page == null) {
+			return null;
+		}
+		if (uri.equals(page.getDefaultPageURI())) {
+			return null;
+		}
+		
+		ICDomain domain = null;
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return null;
+		}
+		else {
+			domain = iwc.getDomain();
+		}
+		if (domain == null) {
+			return null;
+		}
+		
+		if (domain.getStartPageID() == Integer.valueOf(page.getId())) { // Is page a root page?
+			return page.getDefaultPageURI();
+		}
+		
+		if (helper.getThemesService().getBuilderService().setPageUri(page, uri, domain.getID())) {
 			setNewLinkInArticleFile(page.getId(), "com.idega.block.article.component.ArticleItemViewer", page.getDefaultPageURI());
 			return page.getDefaultPageURI();
 		}
@@ -498,7 +537,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				else {
 					if (s.getCode().equals(PAGE_URI)) {
 						if (!changedPageTitle) {
-							changedPageUri = changePageUri(pageID, values[i], false);
+							changedPageUri = setPageUri(pageID, values[i]);
 						}
 					}
 					else {
@@ -512,7 +551,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 						if (needSetValue) {
 							helper.getThemesService().getBuilderService().setProperty(pageID, ThemesConstants.MINUS_ONE, s.getMethod(), newValues, appl);
 							if (s.getCode().equals(PAGE_TITLE)) {
-								changedPageUri = changePageUri(pageID, values[i], false);
+								changedPageUri = setPageUri(pageID, values[i]);
 								helper.getThemesService().getBuilderService().changePageName(Integer.valueOf(pageID).intValue(), values[i]);
 								changedPageTitle = true;
 							}
