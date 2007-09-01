@@ -88,7 +88,7 @@
     <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.dwr</artifactId>
-      <version>2.0</version>
+      <version>${com.idega.block.platform-com.idega.dwr-version}</version>
       <type>jar</type>
     </dependency>
   </dependencies>
