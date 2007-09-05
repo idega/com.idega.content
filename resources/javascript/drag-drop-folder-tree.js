@@ -1584,13 +1584,23 @@ DEPTH RESTRICTION
 	
 	function withEnter(e) {
 		if (window.event) {
+			if(e.keyCode == 3){
+				hideEdit();
+				return false;
+			}
+			
 			if (e.keyCode == 13) {
 				hideEdit();
+				return false;
+			}
+			else{
+//				return false;
 			}
 		}
 		else {
 			if (e.which == 13) {
 				hideEdit();
+				return false;
 			}
 		}
 	}
@@ -1607,9 +1617,9 @@ DEPTH RESTRICTION
 	function initEditLabel()
 	{		
 		changePageName = true;
-		if(saveOnDrop == false)
+		if(saveOnDrop == false){
 			return;
-			
+		}
 		if(editEl)hideEdit();
 		editCounter = 0;
 		editEl = this;	// Referenc to a Tag
@@ -1634,7 +1644,7 @@ DEPTH RESTRICTION
 	}
 	
 	function hideEdit()
-	{		
+	{
 
 		var editObj = editEl.previousSibling;	
 		
@@ -1658,6 +1668,7 @@ DEPTH RESTRICTION
 		editObj.style.display='none';
 		editEl = false;			
 		editCounter=-1;
+		return false;
 	}
 	
 	function mouseUpEvent()
