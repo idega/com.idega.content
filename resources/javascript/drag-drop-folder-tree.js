@@ -1640,7 +1640,9 @@ DEPTH RESTRICTION
 	
 	function showUpdate()
 	{
-		document.getElementById('ajaxMessage').innerHTML = ajax.response;
+		var message = document.getElementById('ajaxMessage');
+		message = replaceHtml(message, ajax.response);
+		//document.getElementById('ajaxMessage').innerHTML = ajax.response;
 	}
 	
 	function hideEdit()
@@ -1653,7 +1655,8 @@ DEPTH RESTRICTION
 		}
 		
 		if(editObj.value.length>0){
-			editEl.innerHTML = editObj.value;
+			editEl = replaceHtml(editEl, editObj.value);
+			//editEl.innerHTML = editObj.value;
 
 			var changeNameId = editObj.id.replace(/[^0-9]/g,'');
 			var newName = editObj.value;

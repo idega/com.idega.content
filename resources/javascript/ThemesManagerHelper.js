@@ -90,7 +90,8 @@ function getThemeStyleVariationsCallback(variations) {
 		return;
 	}
 	removeChildren(container);
-	container.innerHTML = variations;
+	container = replaceHtml(container, variations);
+	//container.innerHTML = variations;
 	
 	registerThemesActions();
 }
