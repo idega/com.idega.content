@@ -1,5 +1,5 @@
 /*
- * $Id: CategoriesEditor.java,v 1.1 2007/05/30 15:15:04 gediminas Exp $
+ * $Id: CategoriesEditor.java,v 1.2 2007/09/24 15:04:05 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -22,8 +22,8 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
-import com.idega.content.business.CategoryBean;
 import com.idega.content.business.WebDAVMetadataResource;
+import com.idega.content.business.categories.CategoryBean;
 import com.idega.content.data.ContentCategory;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
@@ -39,10 +39,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2007/05/30 15:15:04 $ by $Author: gediminas $
+ *  Last modified: $Date: 2007/09/24 15:04:05 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gediminas@idega.com">Gediminas Paulauskas</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class CategoriesEditor  extends IWBaseComponent implements ActionListener {
 	//Constants

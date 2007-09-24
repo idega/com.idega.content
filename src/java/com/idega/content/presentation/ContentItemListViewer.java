@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.22 2007/01/29 00:33:25 valdas Exp $
+ * $Id: ContentItemListViewer.java,v 1.23 2007/09/24 15:04:06 valdas Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -23,8 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.idega.content.bean.ContentItem;
 import com.idega.content.bean.ContentListViewerManagedBean;
-import com.idega.content.business.CategoryBean;
 import com.idega.content.business.ContentUtil;
+import com.idega.content.business.categories.CategoryBean;
 import com.idega.core.cache.CacheableUIComponent;
 import com.idega.core.cache.UIComponentCacher;
 import com.idega.presentation.IWContext;
@@ -34,10 +34,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- * Last modified: $Date: 2007/01/29 00:33:25 $ by $Author: valdas $
+ * Last modified: $Date: 2007/09/24 15:04:06 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.22 $
+ * @version $Revision: 1.23 $
  */
 public class ContentItemListViewer extends UIData implements CacheableUIComponent{
 

@@ -1,0 +1,25 @@
+.changeCategoryUsageImageStyle {
+	cursor: pointer;
+}
+
+.categoriesFontStyle {
+}
+
+.localesForCategoriesDropDownMenuStyle {
+}
+
+.changeCategoryNameLabelStyle {
+	cursor: pointer;
+}
+
+.deleteCategoryImageStyle {
+	cursor: pointer;
+}
+
+.localizedCategoryLabelStyle {
+	width: 55%;
+}
+
+.changeCategoryNameInputStyle {
+	width: 45%;
+}

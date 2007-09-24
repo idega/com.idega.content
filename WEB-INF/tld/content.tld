@@ -533,7 +533,7 @@
   
     <tag>
       <name>CategoriesEditor</name>
-      <tag-class>com.idega.content.presentation.CategoriesEditorTag</tag-class>
+      <tag-class>com.idega.content.presentation.categories.CategoriesEditorTag</tag-class>
       <attribute>
         <name>id</name>
         <required>true</required>

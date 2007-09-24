@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.13 2007/05/30 15:15:04 gediminas Exp $
+ * $Id: CategoryBean.java,v 1.1 2007/09/24 15:04:06 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -7,7 +7,7 @@
  * Use is subject to license terms.
  *
  */
-package com.idega.content.business;
+package com.idega.content.business.categories;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,7 +36,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.filter.Filter;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.data.CategoryComparator;
@@ -43,13 +44,11 @@ import com.idega.content.data.ContentCategory;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWUserContext;
-import com.idega.io.MemoryFileBuffer;
-import com.idega.io.MemoryInputStream;
-import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavRootResource;
+import com.idega.util.CoreConstants;
 import com.idega.util.StringHandler;
 
 
@@ -58,17 +57,17 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2007/05/30 15:15:04 $ by $Author: gediminas $
+ *  Last modified: $Date: 2007/09/24 15:04:06 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.1 $
  */
 public class CategoryBean {
 	private static final Log log = LogFactory.getLog(CategoryBean.class);
 	
 	private static String BEAN_KEY="ContentCategoryBean";
 	
-	private static final String CATEGORY_CONFIG_PATH = "/files/cms/";
+	private static final String CATEGORY_CONFIG_PATH = CoreConstants.CONTENT_PATH + CoreConstants.SLASH;
 	/**
 	 * @deprecated this file will no longer be used
 	 */
@@ -79,17 +78,16 @@ public class CategoryBean {
 	
 	public static final String CATEGORY_DELIMETER = ",";
 
-	public CategoryBean() {
-		this.iwma = IWMainApplication.getDefaultIWMainApplication();
-		this.categories = loadCategories();
+	private CategoryBean() {
+		this(IWMainApplication.getDefaultIWMainApplication());
 	}
 	
-	protected CategoryBean(IWMainApplication iwma){
+	private CategoryBean(IWMainApplication iwma){
 		this.iwma=iwma;
 		this.categories = loadCategories();
 		if (this.categories == null) {
 			CategoriesMigrator migrator = new CategoriesMigrator();
-			Collection oldCategories = getCategoriesFromString(getCategoriesAsString());
+			Collection<String> oldCategories = getCategoriesFromString(getCategoriesAsString());
 			migrator.migrate(oldCategories);
 		}
 	}
@@ -99,16 +97,16 @@ public class CategoryBean {
 		private final Log log = LogFactory.getLog(CategoriesMigrator.class);
 		private final String PROPERTY_NAME_CATEGORIES = new PropertyName("DAV","categories").toString();
 
-		private HashMap valuesToKeys;
+		private HashMap<String, String> valuesToKeys;
 		private IWSlideSession session;
 		private IWSlideService service;
 		
-		protected void migrate(Collection cats) {
+		protected void migrate(Collection<String> cats) {
 			log.info("Migrating " + CATEGORY_CONFIG_FILE + " to new format at " + CATEGORY_PROPERTIES_FILE);
-			categories = new TreeMap();
-			valuesToKeys = new HashMap();
+			categories = new TreeMap<String, ContentCategory>();
+			valuesToKeys = new HashMap<String, String>();
 			String lang = getCurrentLocale();
-			for (Iterator iter = cats.iterator(); iter.hasNext();) {
+			for (Iterator<String> iter = cats.iterator(); iter.hasNext();) {
 				String cat = (String) iter.next();
 				String key = CategoryBean.getCategoryKey(cat);
 				ContentCategory category = new ContentCategory(key);
@@ -136,6 +134,7 @@ public class CategoryBean {
 			}
 		}
 		
+		@SuppressWarnings("unchecked")
 		private void updateCategoriesOnFiles(String resourcePath) {
 			if (resourcePath.indexOf(ThemesConstants.THEMES_PATH) >= 0) {
 				return;
@@ -167,7 +166,7 @@ public class CategoryBean {
 					StringBuffer newCats = new StringBuffer(CATEGORY_DELIMETER);
 					while (tokenizer.hasMoreTokens()) {
 						String cat = tokenizer.nextToken();
-						String key = (String) valuesToKeys.get(cat);
+						String key = valuesToKeys.get(cat);
 						// if we renamed the category key, replace category with it, otherwise leave as is
 						if (key != null) {
 							newCats.append(key);
@@ -240,13 +239,17 @@ public class CategoryBean {
 		return this.categories.values();
 	}
 	
+	public ContentCategory getCategory(String id) {
+		return this.categories.get(id);
+	}
+	
 	/**
 	 * <p> Get a collection of categories, sorted by given locale </p>
 	 * @return collection of strings
 	 */
 	public Collection<ContentCategory> getCategories(Locale locale) {
 		CategoryComparator comparator = new CategoryComparator(locale);
-		List list = new ArrayList(this.categories.values());
+		List<ContentCategory> list = new ArrayList<ContentCategory>(this.categories.values());
 		Collections.sort(list, comparator);
 		return Collections.unmodifiableCollection(list);
 	}
@@ -329,18 +332,28 @@ public class CategoryBean {
 	 * @param category
 	 */
 	public void addCategory(String category) {
-		if (category == null || category.equals("")) {
-			return;
+		addCategory(category, getCurrentLocale());
+	}
+	
+	/**
+	 * Adds a category to the available categories
+	 * @param category
+	 * @param language
+	 * @return
+	 */
+	public boolean addCategory(String category, String language) {
+		if (category == null || CoreConstants.EMPTY.equals(category)) {
+			return false;
 		}
 		String key = getCategoryKey(category);
-		String lang = getCurrentLocale();
 		ContentCategory cat = this.categories.get(key);
 		if (cat == null) {
 			cat = new ContentCategory(key);
 		}
-		cat.addName(lang, category);
+		cat.addName(language, category);
 		this.categories.put(key, cat);
 		storeCategories();
+		return true;
 	}
 
 	protected static final char[] LEAVE_AS_IS = {'-','0','1','2','3','4','5','6','7','8','9'};
@@ -352,8 +365,9 @@ public class CategoryBean {
 	 * Loads category definitions from <code>categories.xml</code> file.
 	 * @return categories as Map<String, ContentCategory>, or <code>null</code> if loading failed.
 	 */
-	protected Map loadCategories() {
-		Map map = new TreeMap();
+	@SuppressWarnings({ "unchecked", "serial" })
+	protected Map<String, ContentCategory> loadCategories() {
+		Map<String, ContentCategory> map = new TreeMap<String, ContentCategory>();
 		
 		try {
 			String resourcePath = getSlideService().getURI(CATEGORY_PROPERTIES_FILE);
@@ -367,7 +381,7 @@ public class CategoryBean {
 			SAXBuilder builder = new SAXBuilder();
 			Document document = builder.build(in);
 			Element root = document.getRootElement();
-			Iterator cats = root.getDescendants(new Filter() {
+			Iterator<Element> cats = root.getDescendants(new Filter() {
 				public boolean matches(Object obj) {
 					if (obj instanceof Element) {
 						Element elem = (Element) obj;
@@ -379,7 +393,7 @@ public class CategoryBean {
 				}
 			});
 			while (cats.hasNext()) {
-				Element cat = (Element) cats.next();
+				Element cat = cats.next();
 				ContentCategory category = new ContentCategory(cat);
 				String key = category.getId();
 				if (key == null || key.equals("")) {
@@ -395,48 +409,43 @@ public class CategoryBean {
 			return null;
 		}
 		catch (JDOMException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		return map;
 	}
 
-	public synchronized void storeCategories() {
-		try {
-			Element root = new Element("categories");
-			Iterator keys = this.categories.keySet().iterator();
-			while (keys.hasNext()) {
-				String key = (String) keys.next();
-				ContentCategory category = this.categories.get(key);
-				Element cat = category.getAsXML();
-				root.addContent(cat);
-			}
-			Document document = new Document(root);
-			
-			MemoryFileBuffer buf = new MemoryFileBuffer();
-			MemoryOutputStream out = new MemoryOutputStream(buf);
-			XMLOutputter outputter = new XMLOutputter();
-			outputter.output(document, out);
-			out.close();
-			
-			MemoryInputStream in = new MemoryInputStream(buf);
-
-			String resourcePath = getSlideService().getURI(CATEGORY_PROPERTIES_FILE);
-			log.debug("Writing file to " + resourcePath);
-	
-			WebdavRootResource rootResource = getSlideSession().getWebdavRootResource();
-			boolean putOK = rootResource.putMethod(resourcePath, in);
-			if (!putOK) {
-				log.error("Could not store to webdav: " + rootResource.getStatusMessage());
-			}
-			
-			in.close();
-			rootResource.close();
-		} catch (IOException e) {
-			log.error("Error storing file " + CATEGORY_PROPERTIES_FILE + ": " + e.getMessage());
-		}
+	public void storeCategories() {
+		storeCategories(false);
 	}
-
+	
+	public synchronized boolean storeCategories(boolean useThread) {
+		CategoriesWriter writer = null;
+		try {
+			writer = new CategoriesWriter(this.categories, getSlideService().getURI(CATEGORY_PROPERTIES_FILE), getSlideSession());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		if (useThread) {
+			writer.run();
+		}
+		else {
+			return writer.writeCategories();
+		}
+		
+		return true;
+	}
+	
+	public boolean deleteCategory(String id) {
+		try {
+			this.categories.remove(id);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
 	
 }

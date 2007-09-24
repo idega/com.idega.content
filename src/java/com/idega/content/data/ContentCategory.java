@@ -1,5 +1,5 @@
 /**
- * $Id: ContentCategory.java,v 1.4 2007/02/20 10:57:51 gediminas Exp $
+ * $Id: ContentCategory.java,v 1.5 2007/09/24 15:04:05 valdas Exp $
  * Created in 2007 by gediminas
  *
  * Copyright (C) 2000-2007 Idega Software hf. All Rights Reserved.
@@ -33,8 +33,9 @@ public class ContentCategory {
 	}
 
 	public ContentCategory(String id) {
+		this();
 		this.id = id;
-		this.names = new HashMap();
+		this.names = new HashMap<String, String>();
 	}
 	
 	/**
@@ -64,7 +65,7 @@ public class ContentCategory {
 		return this.names;
 	}
 	
-	public void setNames(Map names) {
+	public void setNames(Map<String, String> names) {
 		this.names = names;
 	}
 	
@@ -88,6 +89,7 @@ public class ContentCategory {
 		getNames().put(lang, name);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void setFromXML(Element cat) {
 		this.id = cat.getAttributeValue("id");
 		Attribute disabledAttr = cat.getAttribute("disabled");
@@ -97,10 +99,10 @@ public class ContentCategory {
 		else {
 			this.disabled = false;
 		}
-		this.names = new HashMap();
-		List namesEl = cat.getChildren("name");
-		for (Iterator iter = namesEl.iterator(); iter.hasNext(); ) {
-			Element name = (Element) iter.next();
+		this.names = new HashMap<String, String>();
+		List<Element> namesEl = cat.getChildren("name");
+		for (Iterator<Element> iter = namesEl.iterator(); iter.hasNext(); ) {
+			Element name = iter.next();
 			String lang = name.getAttributeValue("lang", Namespace.XML_NAMESPACE);
 			String localizedName = name.getText();
 			names.put(lang, localizedName);
@@ -114,8 +116,8 @@ public class ContentCategory {
 		if (isDisabled()) {
 			cat.setAttribute("disabled", String.valueOf(isDisabled()));
 		}
-		for (Iterator iter = getNames().keySet().iterator(); iter.hasNext(); ) {
-			String lang = (String) iter.next();
+		for (Iterator<String> iter = getNames().keySet().iterator(); iter.hasNext(); ) {
+			String lang = iter.next();
 			String name = getNames().get(lang);
 			Element locName = new Element("name");
 			locName.setAttribute("lang", lang, Namespace.XML_NAMESPACE);

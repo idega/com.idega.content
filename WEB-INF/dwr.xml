@@ -19,6 +19,11 @@
     	<create creator="ibo" javascript="PagePreview" scope="application">
       		<param name="class" value="com.idega.content.tree.PagePreview" />
     	</create>
+    	
+    	<create creator="jsf" javascript="CategoriesEngine">
+	    	<param name="managedBeanName" value="content.CategoriesEngineBean" />
+	    	<param name="class" value="com.idega.content.business.categories.CategoriesEngineBean" />
+    	</create>
 	</allow>
   
 	<signatures>

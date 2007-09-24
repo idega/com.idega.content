@@ -295,7 +295,7 @@
 	</component>
     <component>
       <component-type>CategoriesEditor</component-type>
-      <component-class>com.idega.content.presentation.CategoriesEditor</component-class>
+      <component-class>com.idega.content.presentation.categories.NewCategoriesEditor</component-class>
     </component>
 	<component>
 		<component-type>WFBlockWithToolbar</component-type>
