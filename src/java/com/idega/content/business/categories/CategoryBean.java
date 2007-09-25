@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.2 2007/09/25 12:00:04 valdas Exp $
+ * $Id: CategoryBean.java,v 1.3 2007/09/25 14:22:50 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -57,10 +57,10 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2007/09/25 12:00:04 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/09/25 14:22:50 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class CategoryBean {
 	private static final Log log = LogFactory.getLog(CategoryBean.class);
@@ -446,6 +446,32 @@ public class CategoryBean {
 			return false;
 		}
 		return true;
+	}
+	
+	public String getCategoryName(String id, String language, IWContext iwc) {		
+		if (id == null) {
+			return null;
+		}
+		
+		return getCategoryName(this.categories.get(id), language, iwc);
+	}
+	
+	public String getCategoryName(ContentCategory category, String language, IWContext iwc) {
+		if (category == null || language == null || iwc == null) {
+			return null;
+		}
+		
+		String name = category.getName(language);
+		if (name != null) {
+			return name;
+		}
+		
+		//	Didn't find category's name by current locale, looking for by default locale
+		Locale defaultLocale = IWMainApplication.getIWMainApplication(iwc).getDefaultLocale();
+		if (defaultLocale == null) {
+			return null;
+		}
+		return category.getName(defaultLocale.toString());	//	Returning name by default locale or null if such doesn't exist
 	}
 	
 }
