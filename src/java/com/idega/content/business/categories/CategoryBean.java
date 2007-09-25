@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.1 2007/09/24 15:04:06 valdas Exp $
+ * $Id: CategoryBean.java,v 1.2 2007/09/25 12:00:04 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -57,10 +57,10 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2007/09/24 15:04:06 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/09/25 12:00:04 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class CategoryBean {
 	private static final Log log = LogFactory.getLog(CategoryBean.class);
@@ -205,9 +205,9 @@ public class CategoryBean {
 	public static CategoryBean getInstance(){
 		IWMainApplication iwma = IWMainApplication.getDefaultIWMainApplication();
 		CategoryBean bean = (CategoryBean) iwma.getAttribute(BEAN_KEY);
-		if(bean==null){
+		if (bean==null) {
 			bean = new CategoryBean(iwma);
-			iwma.setAttribute(BEAN_KEY,bean);
+			iwma.setAttribute(BEAN_KEY, bean);
 		}
 		return bean;
 	}
@@ -366,7 +366,7 @@ public class CategoryBean {
 	 * @return categories as Map<String, ContentCategory>, or <code>null</code> if loading failed.
 	 */
 	@SuppressWarnings({ "unchecked", "serial" })
-	protected Map<String, ContentCategory> loadCategories() {
+	private Map<String, ContentCategory> loadCategories() {
 		Map<String, ContentCategory> map = new TreeMap<String, ContentCategory>();
 		
 		try {
@@ -396,7 +396,7 @@ public class CategoryBean {
 				Element cat = cats.next();
 				ContentCategory category = new ContentCategory(cat);
 				String key = category.getId();
-				if (key == null || key.equals("")) {
+				if (key == null || CoreConstants.EMPTY.equals(key)) {
 					continue;
 				}
 				map.put(key, category);
