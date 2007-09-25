@@ -1,5 +1,5 @@
 /**
- * $Id: ContentCategory.java,v 1.5 2007/09/24 15:04:05 valdas Exp $
+ * $Id: ContentCategory.java,v 1.6 2007/09/25 12:01:10 valdas Exp $
  * Created in 2007 by gediminas
  *
  * Copyright (C) 2000-2007 Idega Software hf. All Rights Reserved.
@@ -94,7 +94,7 @@ public class ContentCategory {
 		this.id = cat.getAttributeValue("id");
 		Attribute disabledAttr = cat.getAttribute("disabled");
 		if (disabledAttr != null) {
-			this.disabled = Boolean.getBoolean(disabledAttr.getValue());
+			this.disabled = Boolean.valueOf(disabledAttr.getValue());
 		}
 		else {
 			this.disabled = false;
