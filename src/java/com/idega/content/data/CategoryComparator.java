@@ -1,5 +1,5 @@
 /**
- * $Id: CategoryComparator.java,v 1.1 2007/05/30 15:15:04 gediminas Exp $
+ * $Id: CategoryComparator.java,v 1.2 2007/09/25 12:00:48 valdas Exp $
  * Created in 2007 by gediminas
  *
  * Copyright (C) 2000-2007 Idega Software hf. All Rights Reserved.
@@ -22,6 +22,8 @@ import java.util.Locale;
  */
 public class CategoryComparator implements Comparator<ContentCategory>, Serializable {
 
+	private static final long serialVersionUID = -2229023916545708322L;
+	
 	private Collator collator;
 	private String lang;
 	
@@ -34,13 +36,26 @@ public class CategoryComparator implements Comparator<ContentCategory>, Serializ
 		lang = locale.toString();
 	}
 
-	/* (non-Javadoc)
-	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-	 */
 	public int compare(ContentCategory o1, ContentCategory o2) {
-		String n1 = o1.getName(lang);
-		String n2 = o2.getName(lang);
-		return collator.compare(n1, n2);
+		String value1 = o1.getName(lang);
+		String value2 = o2.getName(lang);
+		
+		int result = 0;
+
+		if (value1 == null && value2 == null) {
+			result = 0;
+		}
+		else if (value2 == null) {
+			result = 1;
+		}
+		else if (value1 == null) {
+			result = -1;
+		}
+		else {
+			result = collator.compare(value1, value2);
+		}
+		
+		return result;
 	}
 	
 }
