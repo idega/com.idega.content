@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadataResourceBean.java,v 1.13 2007/09/24 15:04:06 valdas Exp $
+ * $Id: WebDAVMetadataResourceBean.java,v 1.14 2007/09/25 12:02:50 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -30,10 +30,10 @@ import com.idega.slide.util.WebdavRootResource;
 /**
  * A resource bean that holds metadata info for the selected resouce
  * 
- * Last modified: $Date: 2007/09/24 15:04:06 $ by $Author: valdas $
+ * Last modified: $Date: 2007/09/25 12:02:50 $ by $Author: valdas $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class WebDAVMetadataResourceBean extends IBOSessionBean 
 implements WebDAVMetadataResource
@@ -41,7 +41,7 @@ implements WebDAVMetadataResource
 	//TODO change to use a map so that many metadata blocks can be displayed on one page.
 //	private Map map = new HashMap();
 	private Collection metadataBeans = null;	//Holding MetadataValueBean
-	private Collection selectedCategories = null;
+	private Collection<String> selectedCategories = null;
 
 //	private MetadataValueBean[] data;
 	private String currentPath = null;
@@ -64,7 +64,7 @@ implements WebDAVMetadataResource
 		this.currentPath = resourcePath;
 	}
 	
-	private void setSelectedCategories(String resourcePath, Collection categories) {
+	private void setSelectedCategories(String resourcePath, Collection<String> categories) {
 		this.selectedCategories = categories;
 		this.currentPath = resourcePath;
 	}
@@ -85,7 +85,7 @@ implements WebDAVMetadataResource
 	 * returns categories selected for the article specified by the given resourcePath
 	 * @return a collection of Strings
 	 */
-	public Collection getCategories(String resourcePath) throws RemoteException, IOException {
+	public Collection<String> getCategories(String resourcePath) throws RemoteException, IOException {
 		if(selectedCategories == null || !checkPath(resourcePath)) {
 			setSelectedCategories(resourcePath,getCategoriesFromRepository(resourcePath));
 		}
@@ -153,7 +153,7 @@ implements WebDAVMetadataResource
 	 * @throws RemoteException
 	 * @throws IOException
 	 */
-	protected Collection getCategoriesFromRepository(String resourcePath) throws RemoteException, IOException {
+	protected Collection<String> getCategoriesFromRepository(String resourcePath) throws RemoteException, IOException {
 		//selectedCategories = new ArrayList();
 	
 		IWContext iwc = IWContext.getInstance();

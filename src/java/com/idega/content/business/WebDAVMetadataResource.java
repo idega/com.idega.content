@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadataResource.java,v 1.3 2007/01/25 13:52:40 gediminas Exp $
+ * $Id: WebDAVMetadataResource.java,v 1.4 2007/09/25 12:02:50 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -17,10 +17,10 @@ import com.idega.content.data.MetadataValueBean;
 
 /**
  * 
- * Last modified: $Date: 2007/01/25 13:52:40 $ by $Author: gediminas $
+ * Last modified: $Date: 2007/09/25 12:02:50 $ by $Author: valdas $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public interface WebDAVMetadataResource extends IBOSession {
 	/**
@@ -36,7 +36,7 @@ public interface WebDAVMetadataResource extends IBOSession {
 	/**
 	 * @see com.idega.content.business.WebDAVMetadataResourceBean#getCategories
 	 */
-	public Collection getCategories(String resourcePath) throws RemoteException, IOException;
+	public Collection<String> getCategories(String resourcePath) throws RemoteException, IOException;
 
 	/**
 	 * @see com.idega.content.business.WebDAVMetadataResourceBean#getMetadata
