@@ -61,6 +61,9 @@ function initializeContentCategoriesActions() {
 				}
 				return false;
 			});
+			input.addEvent('blur', function() {
+				addNewCategory(input.getProperty('categorynameid'), input.getProperty('localesid'), input.getProperty('categorieslistid'));
+			});
 		}
 	);
 	
@@ -164,6 +167,10 @@ function initializeCategoryEditorWindowActions() {
 					return false;
 				}
 				return false;
+			});
+			input.addEvent('blur', function() {
+				renameCategory(input.getProperty('categoryid'), $(input.getProperty('newnameinputid')).value, input.getProperty('language'),
+					input.getProperty('reloadcategories'), input.getProperty('removecontainerid'));
 			});
 		}
 	);

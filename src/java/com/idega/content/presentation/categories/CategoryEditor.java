@@ -78,9 +78,8 @@ public class CategoryEditor extends Block {
 		}
 		
 		Script script = new Script();
-		container.add(script);
-		script.addScriptLine(new StringBuilder("$('").append(newNameInputId).append("').focus();").toString());
 		script.addScriptLine("initializeCategoryEditorWindowActions();");
+		container.add(script);
 	}
 	
 	@SuppressWarnings("unchecked")
