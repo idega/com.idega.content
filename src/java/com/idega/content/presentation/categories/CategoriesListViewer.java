@@ -1,14 +1,18 @@
 package com.idega.content.presentation.categories;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 import javax.faces.component.UIComponent;
 
-import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
-import com.idega.content.business.categories.CategoriesEngine;
+import com.idega.content.business.categories.CategoryBean;
 import com.idega.content.data.ContentCategory;
+import com.idega.core.localisation.business.ICLocaleBusiness;
+import com.idega.core.localisation.business.LocalesComparator;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.Block;
@@ -17,7 +21,12 @@ import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
 import com.idega.presentation.PresentationObject;
 import com.idega.presentation.Span;
+import com.idega.presentation.Table2;
+import com.idega.presentation.TableBodyRowGroup;
+import com.idega.presentation.TableHeaderRowGroup;
+import com.idega.presentation.TableRow;
 import com.idega.presentation.text.Text;
+import com.idega.util.CoreConstants;
 
 public class CategoriesListViewer extends Block {
 
@@ -33,7 +42,9 @@ public class CategoriesListViewer extends Block {
 	}
 	
 	@Override
-	public void main(IWContext iwc) {		
+	public void main(IWContext iwc) {
+		IWResourceBundle iwrb = getResourceBundle(iwc);
+		
 		Layer container = new Layer();
 		add(container);
 		
@@ -42,12 +53,27 @@ public class CategoriesListViewer extends Block {
 			return;
 		}
 		
+		Layer explanation = new Layer();
+		explanation.setStyleClass("categoriesHelpTextStyle");
+		container.add(explanation);
+		StringBuilder explText = new StringBuilder(iwrb.getLocalizedString("click", "Click")).append(CoreConstants.SPACE).append("'");
+		explText.append(iwrb.getLocalizedString("undefined", "Undefined")).append("' ");
+		explText.append(iwrb.getLocalizedString("categories_explanation", "to make that category available in that locale and to localize it"));
+		Text text = new Text(explText.toString());
+		explanation.add(text);
+		
 		addCategoriesList(iwc, container);
 	}
 	
 	private void addCategoriesList(IWContext iwc, Layer container) {
-		List<ContentCategory> categories = null;
-		categories = ((CategoriesEngine) SpringBeanLookup.getInstance().getSpringBean(iwc, CategoriesEngine.class)).getCategoriesByLocale(locale);
+		Locale currentLocale = iwc.getCurrentLocale();
+		if (currentLocale == null) {
+			return;
+		}
+		
+		IWBundle bundle = getBundle(iwc);
+		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
+		Collection<ContentCategory> categories = CategoryBean.getInstance().getCategories();
 		
 		if (categories == null) {
 			addNoCategoriesMessage(iwc, container);
@@ -57,46 +83,94 @@ public class CategoriesListViewer extends Block {
 			addNoCategoriesMessage(iwc, container);
 			return;
 		}
-
-		for (int i = 0; i < categories.size(); i++) {
-			container.add(getCategoryContainer(iwc, categories.get(i)));
+		
+		Table2 table = new Table2();
+		table.setStyleClass("categoriesTable");
+		container.add(table);
+		
+		List<Locale> locales = ICLocaleBusiness.getListOfLocalesJAVA();
+		if (locales == null) {
+			return;
+		}
+		try {
+		locales.remove(currentLocale);
+		} catch(Exception e) {}
+		Collections.sort(locales, new LocalesComparator());
+		List<Locale> sortedLocales = new ArrayList<Locale>();
+		sortedLocales.add(currentLocale);
+		for (int i = 0; i < locales.size(); i++) {
+			sortedLocales.add(locales.get(i));
+		}
+		
+		TableHeaderRowGroup header = table.createHeaderRowGroup();
+		TableRow headerRow = header.createRow();
+		headerRow.setStyleClass("categoriesTableHeader");
+		for (int i = 0; i < sortedLocales.size(); i++) {
+			headerRow.createCell().add(new Text(sortedLocales.get(i).getDisplayLanguage()));
+		}
+		headerRow.createCell().add(new Text(iwrb.getLocalizedString("status", "Status")));
+		headerRow.createCell().add(new Text(iwrb.getLocalizedString("delete", "Delete")));
+		
+		TableBodyRowGroup body = table.createBodyRowGroup();
+		TableRow bodyRow = null;
+		String name = null;
+		String undefined = iwrb.getLocalizedString("undefined", "Undefined");
+		String containerId = container.getId();
+		String tableId = table.getId();
+		String categoryId = null;
+		Locale l = null;
+		String language = null;
+		for (ContentCategory category : categories) {
+			categoryId = category.getId();
+			
+			bodyRow = body.createRow();
+			bodyRow.setStyleClass("categoryBodyRow");
+			for (int i = 0; i < sortedLocales.size(); i++) {
+				l = sortedLocales.get(i);
+				language = l.toString();
+				
+				name = category.getName(language);
+				bodyRow.createCell().add(getCategoryNameCellContent(name == null ? undefined : name, categoryId, iwrb, language));
+			}
+			bodyRow.createCell().add(getDisableCellContent(category, bundle, iwrb, null));
+			bodyRow.createCell().add(getDeleteCellContent(bundle, iwrb, categoryId, containerId, tableId, null));
 		}
 	}
 	
-	private UIComponent getCategoryContainer(IWContext iwc, ContentCategory category) {
-		IWBundle bundle = getBundle(iwc);
-		IWResourceBundle iwrb = getResourceBundle(iwc);
-		Layer container = new Layer();
-		container.setStyleClass("categoryContainer");
-		
-		Span name = new Span();
-		name.add(category.getName(locale));
-		addAttributes(name, category.getId(), "changeCategoryNameLabelStyle");
-		name.setToolTip(iwrb.getLocalizedString("change_category_name", "Click to change name"));
-		container.add(name);
-		
-		Image usage = null;
-		if (category.isDisabled()) {
-			usage = new Image(bundle.getVirtualPathWithFileNameString("images/disabled.png"), iwrb.getLocalizedString("enable_category", "Enable category"), 24, 24);
-			usage.setMarkupAttribute(isEnabledProperty, "false");
-		}
-		else {
-			usage = new Image(bundle.getVirtualPathWithFileNameString("images/enabled.png"), iwrb.getLocalizedString("disable_category", "Disable category"), 24, 24);
-			usage.setMarkupAttribute(isEnabledProperty, "true");
-		}
-		addAttributes(usage, category.getId(), "changeCategoryUsageImageStyle");
-		container.add(usage);
-		
-		Image delete = new Image(bundle.getVirtualPathWithFileNameString("images/delete.png"), iwrb.getLocalizedString("delete_category", "Delete category"), 24, 24);
-		addAttributes(delete, category.getId(), "deleteCategoryImageStyle");
-		container.add(delete);
-		
+	private UIComponent getCategoryNameCellContent(String name, String id, IWResourceBundle iwrb, String language) {
+		Text container = new Text(name);
+		addAttributes(container, id, "changeCategoryNameLabelStyle", language);
+		container.setToolTip(iwrb.getLocalizedString("change_category_name", "Click to change name"));
 		return container;
 	}
 	
-	private void addAttributes(PresentationObject po, String id, String styleClass) {
+	private UIComponent getDisableCellContent(ContentCategory category, IWBundle bundle, IWResourceBundle iwrb, String language) {
+		Image usage = null;
+		if (category.isDisabled()) {
+			usage = new Image(bundle.getVirtualPathWithFileNameString("images/disabled.png"), iwrb.getLocalizedString("enable_category", "Enable category"), 16, 16);
+			usage.setMarkupAttribute(isEnabledProperty, "false");
+		}
+		else {
+			usage = new Image(bundle.getVirtualPathWithFileNameString("images/enabled.png"), iwrb.getLocalizedString("disable_category", "Disable category"), 16, 16);
+			usage.setMarkupAttribute(isEnabledProperty, "true");
+		}
+		addAttributes(usage, category.getId(), "changeCategoryUsageImageStyle", language);
+		return usage;
+	}
+	
+	private UIComponent getDeleteCellContent(IWBundle bundle, IWResourceBundle iwrb, String id, String containerId, String tableId, String language) {
+		Image delete = new Image(bundle.getVirtualPathWithFileNameString("images/delete.png"), iwrb.getLocalizedString("delete_category", "Delete category"), 16, 16);
+		addAttributes(delete, id, "deleteCategoryImageStyle", language);
+		delete.setMarkupAttribute("categoriescontainerid", containerId);
+		delete.setMarkupAttribute("categoriestableid", tableId);
+		return delete;
+	}
+	
+	private void addAttributes(PresentationObject po, String id, String styleClass, String language) {
 		po.setMarkupAttribute("categoryid", id);
-		po.setMarkupAttribute("language", locale);
+		if (language != null) {
+			po.setMarkupAttribute("language", language);
+		}
 		po.setStyleClass(styleClass);
 	}
 	

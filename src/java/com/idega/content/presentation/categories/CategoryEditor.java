@@ -79,6 +79,7 @@ public class CategoryEditor extends Block {
 		
 		Script script = new Script();
 		script.addScriptLine("initializeCategoryEditorWindowActions();");
+		script.addScriptLine(new StringBuilder("$('").append(newNameInputId).append("').focus();").toString());
 		container.add(script);
 	}
 	
@@ -95,9 +96,11 @@ public class CategoryEditor extends Block {
 		ContentCategory category = CategoryBean.getInstance().getCategory(categoryId);
 		List<Locale> notLocalized = new ArrayList<Locale>();
 		Locale l = null;
+		String language = null;
 		for (int i = 0; i < locales.size(); i++) {
 			l = locales.get(i);
-			if (category.getName(l.toString()) == null) {
+			language = l.toString();
+			if (!locale.equals(language) && category.getName(language) == null) {
 				notLocalized.add(l);
 			}
 		}
@@ -141,7 +144,7 @@ public class CategoryEditor extends Block {
 	private void addAttributes(PresentationObject po, String newNameInputId, String styleClass, boolean needReload, String language) {
 		po.setMarkupAttribute("categoryid", categoryId);
 		po.setMarkupAttribute("newnameinputid", newNameInputId);
-		po.setMarkupAttribute("reloadcategories", needReload);
+		//po.setMarkupAttribute("reloadcategories", needReload);
 		if (language == null) {
 			language = locale;
 		}

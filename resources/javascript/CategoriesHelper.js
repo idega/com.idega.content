@@ -46,7 +46,7 @@ function initializeContentCategoriesActions() {
 	$$('input.addCategoryButtonStyle').each(
 		function(button) {
 			button.addEvent('click', function() {
-				addNewCategory(button.getProperty('categorynameid'), button.getProperty('localesid'), button.getProperty('categorieslistid'));
+				addNewCategory(button.getProperty('categorynameid'), button.getProperty('language'), button.getProperty('categorieslistid'));
 			});
 		}
 	);
@@ -56,13 +56,10 @@ function initializeContentCategoriesActions() {
 			input.addEvent('keyup', function(e) {
 				var event = new Event(e);
 				if (event.key == 'enter') {
-					addNewCategory(input.getProperty('categorynameid'), input.getProperty('localesid'), input.getProperty('categorieslistid'));
+					addNewCategory(input.getProperty('categorynameid'), input.getProperty('language'), input.getProperty('categorieslistid'));
 					return false;
 				}
 				return false;
-			});
-			input.addEvent('blur', function() {
-				addNewCategory(input.getProperty('categorynameid'), input.getProperty('localesid'), input.getProperty('categorieslistid'));
 			});
 		}
 	);
@@ -105,14 +102,13 @@ function changeCategoryName(category) {
 	return false;
 }
 
-function addNewCategory(inputId, selectId, categoriesListId) {
-	if (inputId == null || selectId == null || categoriesListId == null) {
+function addNewCategory(inputId, language, categoriesListId) {
+	if (inputId == null || language == null || categoriesListId == null) {
 		return false;
 	}
 	
 	var input = $(inputId);
-	var select = $(selectId);
-	if (input == null || select == null) {
+	if (input == null) {
 		return false;
 	}
 	
@@ -120,11 +116,6 @@ function addNewCategory(inputId, selectId, categoriesListId) {
 	if (categoryName == null || categoryName == '') {
 		alert(ENTER_CATEGORY_NAME);
 		return false;
-	}
-	
-	var language = 'en';
-	if (select.options != null && select.options.length > 0) {
-		language = select.options[select.selectedIndex].value;
 	}
 	
 	showLoadingMessage(SAVING_TEXT);
@@ -152,7 +143,7 @@ function initializeCategoryEditorWindowActions() {
 	$$('input.changeCategoryNameButtonStyle').each(
 		function(button) {
 			button.addEvent('click', function() {
-				renameCategory(button.getProperty('categoryid'), $(button.getProperty('newnameinputid')).value, button.getProperty('language'));
+				renameCategory(button.getProperty('categoryid'), $(button.getProperty('newnameinputid')).value, button.getProperty('language'), null);
 			});
 		}
 	);
@@ -163,32 +154,18 @@ function initializeCategoryEditorWindowActions() {
 				var event = new Event(e);
 				if (event.key == 'enter') {
 					renameCategory(input.getProperty('categoryid'), $(input.getProperty('newnameinputid')).value, input.getProperty('language'),
-						input.getProperty('reloadcategories'), input.getProperty('removecontainerid'));
+						input.getProperty('removecontainerid'));
 					return false;
 				}
 				return false;
-			});
-			input.addEvent('blur', function() {
-				renameCategory(input.getProperty('categoryid'), $(input.getProperty('newnameinputid')).value, input.getProperty('language'),
-					input.getProperty('reloadcategories'), input.getProperty('removecontainerid'));
 			});
 		}
 	);
 }
 
-function renameCategory(id, newName, language, needReload, removeContainerId) {
+function renameCategory(id, newName, language, removeContainerId) {
 	if (id == null || language == null) {
 		return false;
-	}
-		
-	var reload = true;
-	if (needReload == null) {
-		reload = false;
-	}
-	else {
-		if (needReload == 'false') {
-			reload = false;
-		}
 	}
 	
 	if (newName == null || newName == '') {
@@ -204,22 +181,6 @@ function renameCategory(id, newName, language, needReload, removeContainerId) {
 				return false;
 			}
 			
-			if (reload) {
-				var containers = $$('div.categoriesByLocaleContainerStyle');
-				if (containers == null) {
-					return false;
-				}
-				if (containers.length == 0) {
-					return false;
-				}
-				
-				var id = containers[0].getProperty('id');
-				if (id == null || id == '') {
-					return false;
-				}
-				reloadCategoriesByLocale(language, id);
-			}
-			
 			if (removeContainerId != null) {
 				var parentContainer = $(removeContainerId).getParent();
 				
@@ -231,7 +192,20 @@ function renameCategory(id, newName, language, needReload, removeContainerId) {
 				}
 				
 			}
-			return false;
+			
+			var containers = $$('div.categoriesByLocaleContainerStyle');
+			if (containers == null) {
+				return false;
+			}
+			if (containers.length == 0) {
+				return false;
+			}
+			
+			var id = containers[0].getProperty('id');
+			if (id == null || id == '') {
+				return false;
+			}
+			reloadCategoriesByLocale(language, id);
 		}
 	});
 }
@@ -247,11 +221,11 @@ function deleteCategory(image) {
 					return false;
 				}
 				
-				var categoriesContainer = image.getParent().getParent();
-				image.getParent().remove();
+				var categoriesContainer = $(image.getProperty('categoriescontainerid')).getParent();
+				image.getParent().getParent().remove();
 				
 				var addEmptyText = false;
-				var categories = $$('div.categoryContainer');
+				var categories = $$('tr.categoryBodyRow');
 				if (categories == null) {
 					addEmptyText = true;
 				}
@@ -259,6 +233,8 @@ function deleteCategory(image) {
 					addEmptyText = true;
 				}
 				if (addEmptyText) {
+					$(image.getProperty('categoriestableid')).remove();
+					
 					var span = new Element('span');
 					span.addClass('categoriesFontStyle');
 					span.appendText(NO_CATEGORIES_TEXT);

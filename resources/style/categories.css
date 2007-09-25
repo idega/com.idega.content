@@ -3,6 +3,7 @@
 }
 
 .categoriesFontStyle {
+	font-weight: bold;
 }
 
 .localesForCategoriesDropDownMenuStyle {
@@ -22,4 +23,26 @@
 
 .changeCategoryNameInputStyle {
 	width: 45%;
+}
+
+.newCategoryNameLabelStyle {
+	font-weight: bold;
+}
+
+.categoriesTableHeader {
+	font-weight: bold;
+	text-align: center;
+}
+
+.categoryBodyRow {
+	text-align: center;
+}
+
+.categoriesHelpTextStyle {
+	padding-top: 10px;
+	padding-bottom: 10px;
+	font-size: 10px;
+}
+
+.categoriesTable {
 }

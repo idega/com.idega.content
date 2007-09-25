@@ -255,3 +255,6 @@ missing_parameters_for_category_editor=Please, select category and language firs
 rename_category=Rename category
 no_localization_warning=This category misses localization for:
 add_localized_name=add localized name
+undefined=Undefined
+click=Click
+categories_explanation=to make that category available in that locale and to localize it

@@ -31,7 +31,9 @@
         			</script>
 				</f:verbatim>           
 				
-				<co:CategoriesEditor id="categoriesEditor" />
+				<wf:wfblock id="categoriesblock" title="#{localizedStrings['com.idega.content']['categories']}">
+					<co:CategoriesEditor id="categoriesEditor" />
+				</wf:wfblock>
 			</h:form>
 		</ws:page>
 	</f:view>
