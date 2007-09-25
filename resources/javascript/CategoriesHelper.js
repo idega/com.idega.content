@@ -1,9 +1,9 @@
 var LOADING_TEXT = 'Loading...';
 var DELETING_TEXT = 'Deleting...';
 var SAVING_TEXT = 'Saving...';
-var DISABLE_CATEGORY_TEXT = 'Do You want to disable this category?';
-var ENABLE_CATEGORY_TEXT = 'Do You want to enable this category?';
-var DELETE_CATEGORY_TEXT = 'Do You want to delete this category?';
+var DISABLE_CATEGORY_TEXT = 'Do you want to disable this category?';
+var ENABLE_CATEGORY_TEXT = 'Do you want to enable this category?';
+var DELETE_CATEGORY_TEXT = 'Do you want to delete this category?';
 var DISABLE_CATEGORY_IMAGE_TEXT = 'Disable category';
 var ENABLE_CATEGORY_IMAGE_TEXT = 'Enable category';
 var ENTER_CATEGORY_NAME = 'Please, enter name for category!';
