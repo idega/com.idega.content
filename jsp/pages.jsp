@@ -27,6 +27,13 @@ version="1.2">
 			<h:form id="pagesForm">
 				<f:verbatim>
                 	<script type="text/javascript">
+                		window.addEvent('domready', function() {
+							var errorHanlder = function() {
+								closeAllLoadingMessages();
+								window.location.href = window.location.href;
+							}
+							DWREngine.setErrorHandler(errorHanlder);
+						});
                 		window.addEvent('domready', startBuilderApplication);
                 		window.addEvent('domready', getLocalizedTextForThemes);
                 		window.addEvent('domready', initializePages);
