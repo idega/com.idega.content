@@ -58,17 +58,14 @@
     <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.core</artifactId>
-      <version>4.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.slide</artifactId>
-      <version>4.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.webface</artifactId>
-      <version>4.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>commons-vfs</groupId>
@@ -78,18 +75,14 @@
   	<dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.graphics</artifactId>
-      <version>4.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.block.rss</artifactId>
-      <version>4.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.dwr</artifactId>
-      <version>${com.idega.block.platform-com.idega.dwr-version}</version>
-      <type>jar</type>
     </dependency>
   </dependencies>
   
