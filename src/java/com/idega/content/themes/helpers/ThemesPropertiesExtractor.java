@@ -138,8 +138,8 @@ public class ThemesPropertiesExtractor {
 			theme.setLinkToProperties(linkToProperties);
 			extractProperties(theme, new StringBuffer(url).append(linkToProperties).toString());
 			if (theme.isNewTheme()) {
-				helper.getThemeChanger().prepareThemeForUsage(theme);
-				helper.getThemeChanger().prepareThemeStyleFiles(theme);
+				helper.getThemeChanger().prepareThemeStyleFiles(theme);	//	Checking and preparing CSS files
+				helper.getThemeChanger().prepareThemeForUsage(theme);	//	Preparing skeleton
 				try {
 					helper.getThemesService().createIBPage(theme);
 				} catch (RemoteException e) {
@@ -193,6 +193,7 @@ public class ThemesPropertiesExtractor {
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void extractProperties(Theme theme, String link) {
 		Document doc = helper.getXMLDocument(link);
 		if (doc == null) {
@@ -204,11 +205,11 @@ public class ThemesPropertiesExtractor {
 		extractStyles(theme, ThemesConstants.RW_STYLE_VARIATIONS, base.getChildren());
 	}
 	
-	private boolean extractStyles(Theme theme, String elementSearchKey, List elements) {
+	private boolean extractStyles(Theme theme, String elementSearchKey, List<Element> elements) {
 		if (theme == null || elementSearchKey == null || elements == null) {
 			return false;
 		}
-		List styleGroups = getStyleGroups(elementSearchKey, elements);
+		List<Element> styleGroups = getStyleGroups(elementSearchKey, elements);
 		if (styleGroups == null) {
 			return false;
 		}
@@ -217,7 +218,7 @@ public class ThemesPropertiesExtractor {
 		String styleGroupName = null;
 		String selectionLimit = null;
 		for (int i = 0; i < styleGroups.size(); i++) {
-			style = (Element) styleGroups.get(i);
+			style = styleGroups.get(i);
 			styleGroupName = getValueFromNextElement(ThemesConstants.RW_GROUP_NAME, style);
 			selectionLimit = getValueFromNextElement(ThemesConstants.RW_SELECTION_LIMIT, style);
 			extractStyleVariations(theme, styleGroupName, getStyleGroupElements(style), ThemesPropertiesExtractor.LIMITED_SELECTION.equals(selectionLimit));
@@ -232,27 +233,28 @@ public class ThemesPropertiesExtractor {
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private String getValueFromNextElement(String parentElementValue, Element baseElement) {
 		String value = ThemesConstants.EMPTY;
 		if (baseElement == null) {
 			return value;
 		}
-		List children = baseElement.getChildren();
+		List<Element> children = baseElement.getChildren();
 		int index = getNextElementIndex(parentElementValue, children);
 		if (index == -1) {
 			return value;
 		}
-		return ((Element) children.get(index)).getTextNormalize();
+		return (children.get(index)).getTextNormalize();
 	}
 	
-	private int getNextElementIndex(String parentElementValue, List parentElementChildren) {
+	private int getNextElementIndex(String parentElementValue, List<Element> parentElementChildren) {
 		if (parentElementChildren == null) {
 			return -1;
 		}
 		int i = 0;
 		boolean foundParentElement = false;
 		for (i = 0; (i < parentElementChildren.size() && !foundParentElement); i++) {
-			if (((Element) parentElementChildren.get(i)).getText().equals(parentElementValue)) {
+			if ((parentElementChildren.get(i)).getText().equals(parentElementValue)) {
 				foundParentElement = true;
 			}
 		}
@@ -262,15 +264,16 @@ public class ThemesPropertiesExtractor {
 		return -1;
 	}
 	
-	private Element getNextElement(String searchKey, List elements) {
+	private Element getNextElement(String searchKey, List<Element> elements) {
 		int index = getNextElementIndex(searchKey, elements);
 		if (index == -1) {
 			return null;
 		}
-		return (Element) elements.get(index);
+		return elements.get(index);
 	}
 	
-	private boolean extractStyleVariations(Theme theme, String styleGroupName, List styleVariations, boolean limitedSelection) {
+	@SuppressWarnings("unchecked")
+	private boolean extractStyleVariations(Theme theme, String styleGroupName, List<Element> styleVariations, boolean limitedSelection) {
 		if (styleVariations == null) {
 			return false;
 		}
@@ -279,7 +282,7 @@ public class ThemesPropertiesExtractor {
 		int styleGroupMemberIndex = 0;
 		Element styleMember = null;
 		for (int i = 0; i < styleVariations.size(); i++) {
-			styleMember = (Element) styleVariations.get(i);
+			styleMember = styleVariations.get(i);
 			
 			member = new ThemeStyleGroupMember();
 			member.setName(getValueFromNextElement(ThemesConstants.TAG_NAME, styleMember));
@@ -302,7 +305,8 @@ public class ThemesPropertiesExtractor {
 		return true;
 	}
 	
-	private List getStyleGroups(String elementSearchKey, List children) {
+	@SuppressWarnings("unchecked")
+	private List<Element> getStyleGroups(String elementSearchKey, List children) {
 		Element styleBaseElement = getNextElement(elementSearchKey, children);
 		if (styleBaseElement == null) {
 			return null;
@@ -314,7 +318,8 @@ public class ThemesPropertiesExtractor {
 		return styleGroupsBase.getChildren(ThemesConstants.TAG_DICT);
 	}
 	
-	private List getStyleGroupElements(Element style) {
+	@SuppressWarnings("unchecked")
+	private List<Element> getStyleGroupElements(Element style) {
 		if (style == null) {
 			return null;
 		}
@@ -328,18 +333,19 @@ public class ThemesPropertiesExtractor {
 		return styleElements.getChildren();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean extractStyleVariationFiles(ThemeStyleGroupMember member, Element styleFiles, String linkToBase) {
 		if (styleFiles == null || linkToBase == null) {
 			return false;
 		}
-		List files = styleFiles.getChildren();
+		List<Element> files = styleFiles.getChildren();
 		if (files == null) {
 			return false;
 		}
 		String file = null;
 		String stylePath = null;
 		for (int i = 0; i < files.size(); i++) {
-			file = ((Element)files.get(i)).getText();
+			file = (files.get(i)).getText();
 			file = StringHandler.removeCharacters(file, ContentConstants.SPACE, ContentConstants.UNDER);
 			file = StringHandler.removeCharacters(file, ContentConstants.BRACKET_OPENING, ContentConstants.EMPTY);
 			file = StringHandler.removeCharacters(file, ContentConstants.BRACKET_CLOSING, ContentConstants.EMPTY);
@@ -355,6 +361,7 @@ public class ThemesPropertiesExtractor {
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void extractConfiguration(Theme theme, String link) {
 		Document doc = helper.getXMLDocument(link);
 		if (doc == null || theme == null) {
@@ -372,12 +379,12 @@ public class ThemesPropertiesExtractor {
 		}
 		theme.setName(name.getTextNormalize());
 		
-		List styles = root.getChild(ThemesConstants.CON_STYLES).getChildren();
+		List<Element> styles = root.getChild(ThemesConstants.CON_STYLES).getChildren();
 		if (styles == null) {
 			return;
 		}
 		for (int i = 0; i < styles.size(); i++) {
-			setEnabledStyles(theme, (Element) styles.get(i));
+			setEnabledStyles(theme, styles.get(i));
 		}
 		
 		Element preview = root.getChild(ThemesConstants.CON_PREVIEW);

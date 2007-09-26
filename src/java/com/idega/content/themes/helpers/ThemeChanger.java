@@ -183,7 +183,7 @@ public class ThemeChanger {
 		
 		prepareThemeDefaultStyleFiles(theme);
 		
-		Map styles = theme.getStyleGroupsMembers();
+		Map<String, ThemeStyleGroupMember> styles = theme.getStyleGroupsMembers();
 		if (styles == null) {
 			return false;
 		}
@@ -205,14 +205,50 @@ public class ThemeChanger {
 		Replaces[] r = new Replaces[]{getReplace(CUSTOM_REPLACE, replacement.toString()), getReplace(IMAGE_URL_REPLACE,
 				replacement.toString()), getReplace(HTML_REPLACE, ThemesConstants.EMPTY)};
 		
-		for (Iterator it = styles.values().iterator(); it.hasNext(); ) {
-			member = (ThemeStyleGroupMember) it.next();
+		
+		List<String> invalidFiles = new ArrayList<String>();
+		int i = 0;
+		for (Iterator<ThemeStyleGroupMember> it = styles.values().iterator(); it.hasNext(); ) {
+			member = it.next();
 			files = member.getStyleFiles();
 			for (index = 0; index < files.size(); index++) {
-				proceedStyleFile(new StringBuffer(theme.getLinkToBase()).append(files.get(index)).toString(), r);
+				if (!proceedStyleFile( new StringBuffer(theme.getLinkToBase()).append(files.get(index)).toString(), r)) {
+					invalidFiles.add(files.get(index));	//	Invalid CSS file, disabling variation
+				}
+			}
+			i++;
+		}
+		removeVariationsFromTheme(theme, invalidFiles);
+		
+		return true;
+	}
+	
+	private void removeVariationsFromTheme(Theme theme, List<String> invalidFiles) {
+		if (theme == null || invalidFiles == null) {
+			return;
+		}
+
+		Collection<ThemeStyleGroupMember> variations = theme.getStyleGroupsMembers().values();
+		
+		List<ThemeStyleGroupMember> variationsToRemove = new ArrayList<ThemeStyleGroupMember>();
+		ThemeStyleGroupMember variation = null;
+		for (Iterator<ThemeStyleGroupMember> it = variations.iterator(); it.hasNext();) {
+			variation = it.next();
+			for (int i = 0; i < invalidFiles.size(); i++) {
+				if (variation.getStyleFiles().contains(invalidFiles.get(i))) {
+					variationsToRemove.add(variation);
+				}
 			}
 		}
-		return true;
+		
+		//	Removing disabled variations
+		for (int i = 0; i < variationsToRemove.size(); i++) {
+			try {
+				variations.remove(variationsToRemove.get(i));
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	private Replaces getReplace(String[] whatToReplace, String replacement) {
@@ -304,16 +340,17 @@ public class ThemeChanger {
 	 * @param attributeValue
 	 * @return int
 	 */
-	private int getElementIndex(List elements, String attributeType, String attributeValue) {
+	@SuppressWarnings("unchecked")
+	private int getElementIndex(List contents, String attributeType, String attributeValue) {
 		int index = 0;
-		if (elements == null) {
+		if (contents == null) {
 			return index;
 		}
 		Element e = null;
 		String value = null;
 		Object o = null;
-		for (int i = 0; i < elements.size(); i++) {
-			o = elements.get(i);
+		for (int i = 0; i < contents.size(); i++) {
+			o = contents.get(i);
 			if (o instanceof Element) {
 				e = (Element) o;
 				value = e.getAttributeValue(attributeType);
@@ -374,6 +411,7 @@ public class ThemeChanger {
 	 * @param head
 	 * @return boolean
 	 */
+	@SuppressWarnings("unchecked")
 	private boolean proceedHeadContent(String linkToBase, Element head) {
 		if (linkToBase == null || head == null) {
 			return false;
@@ -511,6 +549,7 @@ public class ThemeChanger {
 	 * @param body
 	 * @return boolean
 	 */
+	@SuppressWarnings("unchecked")
 	private boolean proceedBodyContent(String linkToBase, Element body) {
 		if (body == null) {
 			return false;
@@ -528,13 +567,18 @@ public class ThemeChanger {
 		if (nodes == null) {
 			return false;
 		}
+		
+		Object o = null;
 		for (Iterator it = nodes.iterator(); it.hasNext(); ) {
-			addRegion((Element) it.next());
+			o = it.next();
+			if (o instanceof Element) {
+				addRegion((Element) o);
+			}
 		}
 		
 		List<Text> needlessText = new ArrayList<Text>();
 		List allElements = body.getContent();
-		Object o = null;
+		o = null;
 		Element e = null;
 		for (int i = 0; i < allElements.size(); i++) {
 			o = allElements.get(i);
@@ -775,11 +819,12 @@ public class ThemeChanger {
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean hasElementChildren(Element e) {
 		if (e == null) {
 			return false;
 		}
-		List children = e.getChildren();
+		List<Element> children = e.getChildren();
 		if (children == null) {
 			return false;
 		}
@@ -972,13 +1017,14 @@ public class ThemeChanger {
 	 * @param newStyle
 	 * @return boolean
 	 */
+	@SuppressWarnings("unchecked")
 	private boolean changeThemeStyle(String linkToBase, Element head, ThemeStyleGroupMember oldStyle,
 			ThemeStyleGroupMember newStyle) {
 		if (head == null) {
 			return false;
 		}
 		
-		List styles = head.getChildren(ThemesConstants.ELEMENT_LINK, namespace);
+		List<Element> styles = head.getChildren(ThemesConstants.ELEMENT_LINK, namespace);
 		if (styles == null) {
 			return false;
 		}
@@ -997,7 +1043,7 @@ public class ThemeChanger {
 			List <String> files = null;
 			boolean foundStyle = false;
 			for (int i = 0; i < styles.size(); i++) {
-				style = (Element) styles.get(i);
+				style = styles.get(i);
 				attributeValue = style.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_HREF);
 				files = oldStyle.getStyleFiles();
 				foundStyle = false;
