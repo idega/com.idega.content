@@ -3,6 +3,8 @@ package com.idega.content.themes.presentation;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.component.UIComponent;
+
 import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.bean.ThemesManagerBean;
 import com.idega.content.themes.helpers.Theme;
@@ -108,22 +110,27 @@ public class ThemeStyleVariations extends Block {
 		Layer groupContainer = null;
 		Layer nameContainer = null;
 		ListItem groupVariations = null;
+		UIComponent groupVariation = null;
 		for (int i = 0; i < styleGroups.size(); i++) {
 			styleGroupName = styleGroups.get(i);
 			
-			groupContainer = new Layer();
-			groupContainer.setStyleClass(VARIATION_GROUP_STYLE);
-			groupVariations = new ListItem();
-			groupContainer.add(groupVariations);
+			groupVariation = getGroupVariations(theme, styleGroupName);
+			if (groupVariation != null) {
 			
-			nameContainer = new Layer();
-			nameContainer.setStyleClass(VARIATION_GROUP_NAME_STYLE);
-			nameContainer.add(new Text(styleGroupName));
-			groupVariations.add(nameContainer);
+				groupContainer = new Layer();
+				groupContainer.setStyleClass(VARIATION_GROUP_STYLE);
+				groupVariations = new ListItem();
+				groupContainer.add(groupVariations);
+				
+				nameContainer = new Layer();
+				nameContainer.setStyleClass(VARIATION_GROUP_NAME_STYLE);
+				nameContainer.add(new Text(styleGroupName));
+				groupVariations.add(nameContainer);
 			
-			groupVariations.add(getGroupVariations(theme, styleGroupName));
-			
-			styles.add(groupContainer);
+				groupVariations.add(groupVariation);
+				
+				styles.add(groupContainer);
+			}
 		}
 	}
 	
@@ -132,6 +139,13 @@ public class ThemeStyleVariations extends Block {
 		
 		ListItem variationContainer = null;
 		Map <String, ThemeStyleGroupMember> allVariations = theme.getStyleGroupsMembers();
+		if (allVariations.values() == null) {
+			return null;
+		}
+		if (allVariations.values().size() == 0) {
+			return null;
+		}
+		
 		ThemeStyleGroupMember variation = null;
 		String type = null;
 		String nameInMap = new StringBuffer(groupName).append(ThemesConstants.AT).toString();
