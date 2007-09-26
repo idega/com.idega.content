@@ -35,6 +35,7 @@ import com.idega.core.builder.data.ICPage;
 import com.idega.core.cache.IWCacheManager2;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.localisation.business.ICLocaleBusiness;
+import com.idega.core.search.business.SearchResult;
 import com.idega.data.TreeableEntity;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
@@ -73,18 +74,18 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			String searchScope = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(ThemesConstants.THEMES_PATH).toString();
 			
 			String propSearchKey = new StringBuffer("*").append(ThemesConstants.THEME_PROPERTIES_FILE_END).toString();
-			Collection propertiesLists = helper.search(propSearchKey, searchScope);
+			List<SearchResult> propertiesLists = helper.search(propSearchKey, searchScope);
 			pLists = helper.loadSearchResults(propertiesLists, null);
 			
 			String configSearchKey = new StringBuffer("*").append(ThemesConstants.IDEGA_THEME_INFO).toString();
-			Collection configurationXmls = helper.search(configSearchKey, searchScope);
+			List<SearchResult> configurationXmls = helper.search(configSearchKey, searchScope);
 			configs = helper.loadSearchResults(configurationXmls, null);
 		}
 		
 		helper.searchForThemes();
 
 		//	Checking if exist themes in system
-		Collection themesCollection = helper.getThemesCollection();
+		Collection<Theme> themesCollection = helper.getThemesCollection();
 		if (themesCollection == null) {
 			return simpleThemes;	// No themes in system
 		}
@@ -156,6 +157,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return false;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Map getVariationsCache(IWContext iwc) {
 		IWCacheManager2 cache = IWCacheManager2.getInstance(iwc.getIWMainApplication());
 		if (cache == null) {
@@ -173,6 +175,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		variationsCache.put(themeID, variations);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public boolean clearVariationFromCache(String themeID, IWContext iwc) {
 		if (themeID == null) {
 			return false;
@@ -191,6 +194,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private String getVariationsFromCache(String themeID, IWContext iwc) {
 		Map variations = getVariationsCache(iwc);
 		Object o = variations.get(themeID);
@@ -319,6 +323,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean setSiteStyle(int templateID, IWContext iwc) {
 		Map tree = helper.getThemesService().getBuilderService().getTree(iwc);
 		if (tree == null) {
@@ -475,7 +480,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		}
 		
-		List locales = ICLocaleBusiness.getListOfLocalesJAVA();
+		List<Locale> locales = ICLocaleBusiness.getListOfLocalesJAVA();
 		if (locales == null) {
 			return false;
 		}
@@ -484,15 +489,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			link.append(ContentConstants.SLASH);
 		}
 		Locale l = null;
-		Object o = null;
 		boolean result = true;
 		for (int i = 0; i < locales.size(); i++) {
-			o = locales.get(i);
-			if (o instanceof Locale) {
-				l = (Locale) o;
-				if (l.getLanguage() != null) {
-					result = helper.setNewLinkInArticleFile(iwc, link.toString(), l.getLanguage(), linkToArticle[0], pageUri);
-				}
+			l = locales.get(i);
+			if (l.getLanguage() != null) {
+				result = helper.setNewLinkInArticleFile(iwc, link.toString(), l.getLanguage(), linkToArticle[0], pageUri);
 			}
 		}
 		
@@ -1199,6 +1200,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return result;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private int getArticleViewerTemplateId(BuilderService builder, IWContext iwc) {
 		if (builder == null || iwc == null) {
 			return -1;
@@ -1344,6 +1346,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return struct; 
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean manageNewSiteTreeOrder(IWContext iwc, BuilderService builder, ICPage newRootPage, int newRoot) {
 		if (iwc == null || builder == null || newRootPage == null || newRoot == -1) {
 			return false;

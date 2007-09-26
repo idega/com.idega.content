@@ -8,7 +8,7 @@ public class ThemesEngineHomeImpl extends IBOHomeImpl implements ThemesEngineHom
 
 	private static final long serialVersionUID = 7141978995132493723L;
 
-	public Class getBeanInterfaceClass() {
+	public Class<ThemesEngine> getBeanInterfaceClass() {
 		return ThemesEngine.class;
 	}
 

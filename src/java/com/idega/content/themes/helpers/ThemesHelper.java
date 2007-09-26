@@ -249,7 +249,7 @@ public class ThemesHelper implements Singleton {
 		
 		String searchScope = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(ThemesConstants.THEMES_PATH).toString();
 		
-		Collection themes = search(ThemesConstants.THEME_SEARCH_KEY, searchScope);
+		List<SearchResult> themes = search(ThemesConstants.THEME_SEARCH_KEY, searchScope);
 		if (themes == null) {
 			log.error("ContentSearch.doSimpleDASLSearch returned results Collection, which is null: " + themes);
 			checkedFromSlide = false;
@@ -269,35 +269,44 @@ public class ThemesHelper implements Singleton {
 //		getThemesPropertiesExtractor().prepareThemes(pLists, configurations, true);
 	}
 	
-	public List<String> loadSearchResults(Collection searchResults, List<String> filter) {
+	public List<String> loadSearchResults(List<SearchResult> searchResults, List<String> filter) {
 		List <String> loadedResults = new ArrayList<String>();
 		if (searchResults == null) {
 			return loadedResults;
 		}
 		
 		String uri = null;
-		Object o = null;
-		for (Iterator it = searchResults.iterator(); it.hasNext(); ) {
-			o = it.next();
-			if (o instanceof SearchResult) {
-				uri = ((SearchResult) o).getSearchResultURI();
-				if (isCorrectFile(uri, filter)) {
-					loadedResults.add(uri);
-				}
+		for (int i = 0; i < searchResults.size(); i++) {
+			uri = searchResults.get(i).getSearchResultURI();
+			if (isCorrectFile(uri, filter)) {
+				loadedResults.add(uri);
 			}
 		}
 		return loadedResults;
 	}
 	
-	public Collection search(String searchKey, String searchScope) {
+	@SuppressWarnings("unchecked")
+	public List<SearchResult> search(String searchKey, String searchScope) {
 		if (searchKey == null || searchScope == null) {
 			return null;
 		}
 		
 		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
 		Collection results = search.doSimpleDASLSearch(searchKey, searchScope);
+		if (results == null) {
+			return null;
+		}
 		
-		return results;
+		List<SearchResult> wrapped = new ArrayList<SearchResult>();
+		Object o = null;
+		for (Iterator it = results.iterator(); it.hasNext();) {
+			o = it.next();
+			if (o instanceof SearchResult) {
+				wrapped.add((SearchResult) o); 
+			}
+		}
+		
+		return wrapped;
 	}
 	
 	protected String getFileName(String uri) {
@@ -361,19 +370,6 @@ public class ThemesHelper implements Singleton {
 			type = uri.substring(begin + 1).toLowerCase();
 		}
 		return type;
-	}
-	
-	protected List getFiles(String folderURI) {
-		if (folderURI == null) {
-			return null;
-		}
-		List files = null;
-		try {
-			files = getSlideService().getChildPathsExcludingFoldersAndHiddenFiles(folderURI);
-		} catch(RemoteException e) {
-			e.printStackTrace();
-		}
-		return files;
 	}
 	
 	public String getWebRootWithoutContent() {
@@ -649,6 +645,7 @@ public class ThemesHelper implements Singleton {
 		loadedPageSettings = true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void loadSettings(Map <String, Setting> settings, Document doc) {
 		if (doc == null) {
 			return;
@@ -657,14 +654,14 @@ public class ThemesHelper implements Singleton {
 		if (root == null) {
 			return;
 		}
-		List keys = root.getChildren();
+		List<Element> keys = root.getChildren();
 		if (keys == null) {
 			return;
 		}
 		Element key = null;
 		Setting setting = null;
 		for (int i = 0; i < keys.size(); i++) {
-			key = (Element) keys.get(i);
+			key = keys.get(i);
 			setting = new Setting();
 			
 			setting.setCode(key.getChildTextNormalize(ThemesConstants.SETTING_CODE));
@@ -1087,6 +1084,7 @@ public class ThemesHelper implements Singleton {
 		return doc;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private List<Element> getArticleViewerElements(Document doc) {
 		if (doc == null) {
 			return null;
@@ -1118,27 +1116,24 @@ public class ThemesHelper implements Singleton {
 		return articleViewers;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Attribute getArticleViewerResourcePathValueAttribute(Element articleViewer) {
 		if (articleViewer == null) {
 			return null;
 		}
-		List elements = articleViewer.getChildren();
+		List<Element> elements = articleViewer.getChildren();
 		if (elements == null) {
 			return null;
 		}
 		
 		Attribute resourcePath = null;
 		Element element = null;
-		Object o = null;
 		for (int j = 0; j < elements.size(); j++) {
-			o = elements.get(j);
-			if (o instanceof Element) {
-				element = (Element) o;
-				resourcePath = element.getAttribute(ATTRIBUTE_NAME);
-				if (resourcePath != null) {
-					if (ATTRIBUTE_RESOURCE_PATH_VALUE.equals(resourcePath.getValue())) {
-						return element.getAttribute(ATTRIBUTE_PROPERTY);
-					}
+			element = elements.get(j);
+			resourcePath = element.getAttribute(ATTRIBUTE_NAME);
+			if (resourcePath != null) {
+				if (ATTRIBUTE_RESOURCE_PATH_VALUE.equals(resourcePath.getValue())) {
+					return element.getAttribute(ATTRIBUTE_PROPERTY);
 				}
 			}
 		}
@@ -1392,6 +1387,7 @@ public class ThemesHelper implements Singleton {
 		return commentPath.toString();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean addIDsToModules(Element root, int pageID) {
 		if (root == null || pageID < 1) {
 			return false;
