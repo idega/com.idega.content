@@ -2,6 +2,7 @@ var ajaxObjects = new Array();
 
 var RELOAD_PAGE = false;
 var REFRESH_PAGE_INFO = false;
+var SHOW_EDIT_PAGES = true;
 
 if(changePageName == null) var changePageName = false;
 
@@ -53,20 +54,27 @@ function empty(param) {
 }
 
 function setFrameUrl(url) {
+	var frame = document.getElementById("treePages");
+	if (frame == null) {
+		return false;
+	}
+	
 	if (url == null) {
-		return;
+		url = "";
 	}
 	if (url == "") {
-		return;
+		frame.src = url;
+		return false;
 	}
-	if (url.charAt(url.length-1) != "/") {
-		url += "/";
+	
+	if (SHOW_EDIT_PAGES) {
+		if (url.charAt(url.length-1) != "/") {
+			url += "/";
+		}
+		url += "?view=builder";
 	}
-	url += "?view=builder";
-	var frame = document.getElementById("treePages");
-	if (frame != null) {
-		frame.src=url;
-	}
+	
+	frame.src = url;
 	chagePageName = false;
 }
 						

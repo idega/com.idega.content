@@ -478,6 +478,24 @@ function registerPageInfoActions() {
 			element.addEvent('click', manageModulesBackgroundFunction);
 		}
 	);
+	
+	$$('input.showEditPagesButtonStyleClass').each(
+		function(button) {
+			button.addEvent('click', function() {
+				SHOW_EDIT_PAGES = true;
+				getPrewUrl(getPageID());
+			});
+		}
+	);
+	
+	$$('input.showPreviewPagesButton').each(
+		function(button) {
+			button.addEvent('click', function() {
+				SHOW_EDIT_PAGES = false;
+				getPrewUrl(getPageID());
+			});
+		}
+	);
 }
 
 function registerPageInfoActionsOnElement(element){
