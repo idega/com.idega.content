@@ -1385,7 +1385,9 @@ public class ThemeChanger {
 		
 		// Setting Theme small preview
 		String url = new StringBuffer(helper.getFullWebRoot()).append(linkToBase).append(endodedLinkToPreview).toString();
-		helper.createSmallImage(child, url);
+		if (helper.createSmallImage(child, url)) {
+			return false;
+		}
 		
 		child.setPropertiesExtracted(true);
 		restoreTheme(parent);
