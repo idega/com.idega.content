@@ -124,7 +124,8 @@ version="1.2">
 					<t:commandButton id="showPageModules" forceId="true" styleClass="showPageModulesStyleClass" type="button" value="#{localizedStrings['com.idega.content']['show_modules']}"></t:commandButton>
 					<t:commandButton id="showThemesButton" forceId="true" styleClass="showThemesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['show_themes']}"></t:commandButton>
 					<t:commandButton id="showEditPagesButton" forceId="true" styleClass="showEditPagesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['edit']}"></t:commandButton>
-					<t:commandButton id="showPreviewPagesButton" forceId="true" styleClass="showPreviewPagesButton" type="button" value="#{localizedStrings['com.idega.content']['preview']}"></t:commandButton>
+					<t:commandButton id="showSourcePagesButton" forceId="true" styleClass="showSourcePagesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['source']}" disabled="true"></t:commandButton>
+					<t:commandButton id="showPreviewPagesButton" forceId="true" styleClass="showPreviewPagesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['preview']}"></t:commandButton>
 				</t:div>
 			</h:form>
 		</ws:page>
