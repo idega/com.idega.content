@@ -108,7 +108,7 @@ public class ThemeChanger {
 		}
 		
 		if (!theme.isNewTheme()) {
-			return true; // Theme allready prepared
+			return true; // Theme already prepared
 		}
 		
 		String skeleton = theme.getLinkToSkeleton();
@@ -152,12 +152,10 @@ public class ThemeChanger {
 	}
 	
 	private boolean addContentToElement(Element parent, Collection<Element> content, int index) {
-		if (parent == null || content == null) {
+		if (parent == null || content == null || index < 0) {
 			return false;
 		}
-		if (index < 0) {
-			return false;
-		}
+		
 		if (index > parent.getContentSize()) {
 			parent.addContent(content);
 		}
@@ -178,12 +176,12 @@ public class ThemeChanger {
 		}
 		
 		if (!theme.isNewTheme()) {
-			return true; // Theme allready prepared
+			return true; // Theme already prepared
 		}
 		
 		prepareThemeDefaultStyleFiles(theme);
 		
-		Map<String, ThemeStyleGroupMember> styles = theme.getStyleGroupsMembers();
+		Collection<ThemeStyleGroupMember> styles = theme.getStyleGroupsMembers().values();
 		if (styles == null) {
 			return false;
 		}
@@ -202,13 +200,13 @@ public class ThemeChanger {
 		replacement.append(theme.getLinkToBase());
 		replacement.append(IMAGES);
 		
-		Replaces[] r = new Replaces[]{getReplace(CUSTOM_REPLACE, replacement.toString()), getReplace(IMAGE_URL_REPLACE,
-				replacement.toString()), getReplace(HTML_REPLACE, ThemesConstants.EMPTY)};
+		Replaces[] r = new Replaces[]{getReplace(CUSTOM_REPLACE, replacement.toString()), getReplace(IMAGE_URL_REPLACE, replacement.toString()), 
+				getReplace(HTML_REPLACE, ThemesConstants.EMPTY)};
 		
 		
 		List<String> invalidFiles = new ArrayList<String>();
 		int i = 0;
-		for (Iterator<ThemeStyleGroupMember> it = styles.values().iterator(); it.hasNext(); ) {
+		for (Iterator<ThemeStyleGroupMember> it = styles.iterator(); it.hasNext(); ) {
 			member = it.next();
 			files = member.getStyleFiles();
 			for (index = 0; index < files.size(); index++) {
@@ -265,8 +263,8 @@ public class ThemeChanger {
 		List <String> defaultStyles = ThemesConstants.DEFAULT_STYLE_FILES;
 		StringBuffer replacement = new StringBuffer();
 		replacement.append(CSS_IMAGE_URL).append(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase()).append(IMAGES);
-		Replaces[] r = new Replaces[]{getReplace(HREF_REPLACE, HREF_REPLACEMENT), getReplace(IMAGE_URL_REPLACE,
-				replacement.toString()), getReplace(HTML_REPLACE, ThemesConstants.EMPTY)};	
+		Replaces[] r = new Replaces[]{getReplace(HREF_REPLACE, HREF_REPLACEMENT), getReplace(IMAGE_URL_REPLACE, replacement.toString()),
+				getReplace(HTML_REPLACE, ThemesConstants.EMPTY)};	
 		for (int i = 0; i < defaultStyles.size(); i++) {
 			if (!proceedStyleFile(new StringBuffer(theme.getLinkToBase()).append(defaultStyles.get(i)).toString(), r)) {
 				return false;
@@ -280,7 +278,7 @@ public class ThemeChanger {
 			return false;
 		}
 		
-		// Getting css file
+		// Getting CSS file
 		InputStream is = helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(linkToStyle).toString());
 		if (is == null) {
 			log.error(new StringBuilder("Cann't get CSS file: '").append(linkToStyle).append("' from Theme pack!"));
@@ -323,7 +321,8 @@ public class ThemeChanger {
 
 		// Uploading modified file
 		try {
-			if (helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(helper.getLinkToBase(helper.decodeUrl(linkToStyle)), helper.getFileNameWithExtension(linkToStyle), content, null, true)) {
+			if (helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(helper.getLinkToBase(helper.decodeUrl(linkToStyle)),
+					helper.getFileNameWithExtension(linkToStyle), content, null, true)) {
 				return true;
 			}
 		} catch (RemoteException e) {
@@ -338,7 +337,7 @@ public class ThemeChanger {
 	 * 
 	 * @param elements
 	 * @param attributeValue
-	 * @return int
+	 * @return index
 	 */
 	@SuppressWarnings("unchecked")
 	private int getElementIndex(List contents, String attributeType, String attributeValue) {
@@ -407,7 +406,7 @@ public class ThemeChanger {
 	}
 	
 	/**
-	 * RapidWeaver theme consists inproper data for valid XHTML document, so needs to be fixed
+	 * RapidWeaver theme consists in-proper data for valid XHTML document, so needs to be fixed
 	 * @param head
 	 * @return boolean
 	 */
@@ -490,7 +489,7 @@ public class ThemeChanger {
 	}
 	
 	/**
-	 * Creates collection of Comment objets (opening and closing comment)
+	 * Creates collection of Comment objects (opening and closing comment)
 	 * @param commentValue
 	 * @return Collection
 	 */
@@ -545,7 +544,7 @@ public class ThemeChanger {
 	}
 	
 	/**
-	 * Adding regions to div tags like this: <!-- TemplateBeginEditable name="MyUniqueRegionId1" --><!-- TemplateEndEditable -->
+	 * Adding regions to DIV tags like this: <!-- TemplateBeginEditable name="MyUniqueRegionId1" --><!-- TemplateEndEditable -->
 	 * @param body
 	 * @return boolean
 	 */
@@ -636,7 +635,8 @@ public class ThemeChanger {
 		if (settings == null) {
 			return new ArrayList<Element>();
 		}
-		String propertyValue = settings.getProperty(new StringBuffer(ThemesConstants.THEMES_PROPERTY_START).append(propertyKey).append(ThemesConstants.THEMES_PROPERTY_END).toString());
+		StringBuffer prop = new StringBuffer(ThemesConstants.THEMES_PROPERTY_START).append(propertyKey).append(ThemesConstants.THEMES_PROPERTY_END);
+		String propertyValue = settings.getProperty(prop.toString());
 		if (propertyValue == null) {
 			return new ArrayList<Element>();
 		}
@@ -782,7 +782,7 @@ public class ThemeChanger {
 	}
 	
 	/**
-	 * Adds region to div tag if div tag has proper id attribute
+	 * Adds region to DIV tag if DIV tag has proper id attribute
 	 * @param e
 	 * @return boolean
 	 */
@@ -877,7 +877,8 @@ public class ThemeChanger {
 		if (settings == null) {
 			return new ArrayList<Element>();
 		}
-		String propertyValue = settings.getProperty(new StringBuffer(ThemesConstants.THEMES_PROPERTY_START).append(propertyKey).append(ThemesConstants.THEMES_PROPERTY_END).toString());
+		StringBuffer prop = new StringBuffer(ThemesConstants.THEMES_PROPERTY_START).append(propertyKey).append(ThemesConstants.THEMES_PROPERTY_END);
+		String propertyValue = settings.getProperty(prop.toString());
 		if (propertyValue == null) {
 			return new ArrayList<Element>();
 		}
@@ -946,10 +947,7 @@ public class ThemeChanger {
 	}
 	
 	private String changeTheme(Document doc, Theme theme, String styleGroupName, String variation, String themeName, boolean radio, boolean checked) {
-		if (doc == null) {
-			return null;
-		}
-		if (theme == null || styleGroupName == null || variation == null) {
+		if (doc == null || theme == null || styleGroupName == null || variation == null) {
 			return null;
 		}
 		
@@ -960,18 +958,22 @@ public class ThemeChanger {
 		ThemeStyleGroupMember oldStyle = null;
 		ThemeStyleGroupMember newStyle = null;
 		ThemeStyleGroupMember styleChanger = null;
-		if (radio) { // Simply changing CSS files
+		if (radio) {
+			//	Simply changing CSS files
 			oldStyle = getEnabledStyleMember(theme, styleGroupName);
 			newStyle = getStyleMember(theme, styleGroupName, variation);
 			styleChanger = oldStyle;
 		}
-		else { //Need to know either add CSS or remove
+		else {
+			//	Need to know either add CSS or remove
 			limitedSelection = false;
-			if (checked) { // Need to add
+			if (checked) {
+				//	Need to add
 				newStyle = getStyleMember(theme, styleGroupName, variation);
 				styleChanger = newStyle;
 			}
-			else { //Need to remove
+			else {
+				//	Need to remove
 				oldStyle = getStyleMember(theme, styleGroupName, variation);
 				styleChanger = oldStyle;
 			}
@@ -982,8 +984,7 @@ public class ThemeChanger {
 			return null;
 		}
 		String linkToBase = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase()).toString();
-		if (!changeThemeStyle(linkToBase, root.getChild(HTML_HEAD, namespace), oldStyle,
-				newStyle)) {
+		if (!changeThemeStyle(linkToBase, root.getChild(HTML_HEAD, namespace), oldStyle, newStyle)) {
 			return null;
 		}
 		if (oldStyle != null) {
@@ -1018,8 +1019,7 @@ public class ThemeChanger {
 	 * @return boolean
 	 */
 	@SuppressWarnings("unchecked")
-	private boolean changeThemeStyle(String linkToBase, Element head, ThemeStyleGroupMember oldStyle,
-			ThemeStyleGroupMember newStyle) {
+	private boolean changeThemeStyle(String linkToBase, Element head, ThemeStyleGroupMember oldStyle, ThemeStyleGroupMember newStyle) {
 		if (head == null) {
 			return false;
 		}
@@ -1041,16 +1041,13 @@ public class ThemeChanger {
 			Element style = null;
 			String attributeValue = null;
 			List <String> files = null;
-			boolean foundStyle = false;
 			for (int i = 0; i < styles.size(); i++) {
 				style = styles.get(i);
 				attributeValue = style.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_HREF);
 				files = oldStyle.getStyleFiles();
-				foundStyle = false;
 				if (files != null) {
-					for (int j = 0; (j < files.size() && !foundStyle); j++) {
-						if (attributeValue.indexOf(files.get(j)) != -1) {
-							foundStyle = true;
+					for (int j = 0; j < files.size(); j++) {
+						if (attributeValue.endsWith(files.get(j))) {
 							uselessStyles.add(style);
 							index = getElementIndex(head.getContent(), ThemesConstants.TAG_ATTRIBUTE_HREF, attributeValue);
 						}
@@ -1070,9 +1067,10 @@ public class ThemeChanger {
 		
 		return true;
 	}
+
 	
 	/**
-	 * Creates new style element: <link href="..." ... />
+	 * Creates new style element: <link ... />
 	 * @param newStyle
 	 * @return Collection
 	 */
@@ -1198,7 +1196,9 @@ public class ThemeChanger {
 			return false;
 		}
 		
-		if (!theme.getName().equals(themeName)) {
+		String changedName = theme.getChangedName();
+		if (changedName != null && !theme.getName().equals(changedName)) {
+			log.info("Creating new theme: " + themeName);
 			return createNewTheme(theme, themeName);
 		}
 		
@@ -1333,7 +1333,9 @@ public class ThemeChanger {
 		if (!decodedLinkToBase.endsWith(ContentConstants.SLASH)) {
 			decodedLinkToBase = new StringBuffer(decodedLinkToBase).append(ContentConstants.SLASH).toString();
 		}
-		String themeName = StringHandler.removeCharacters(new StringBuilder(newName).append(ThemesConstants.THEME).toString(), ContentConstants.SPACE, ContentConstants.UNDER);
+		
+		String tempName = new StringBuilder(newName).append(ThemesConstants.THEME).toString();
+		String themeName = StringHandler.removeCharacters(tempName, ContentConstants.SPACE, ContentConstants.UNDER);
 		try {
 			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(decodedLinkToBase,	themeName, is, null, true)) {
 				return false;
@@ -1345,7 +1347,9 @@ public class ThemeChanger {
 			helper.closeInputStream(is);
 		}
 		
-		String themeID = helper.getThemesLoader().createNewTheme(new StringBuffer(decodedLinkToBase).append(themeName).toString(), new StringBuffer(linkToBase).append(helper.encode(themeName, true)).toString(), true, true);
+		//	Adding theme to system
+		String tempLink = new StringBuffer(decodedLinkToBase).append(themeName).toString();
+		String themeID = helper.getThemesLoader().createNewTheme(tempLink, new StringBuffer(linkToBase).append(helper.encode(themeName, true)).toString(), true, true);
 		if (themeID == null) {
 			return false;
 		}
@@ -1355,39 +1359,13 @@ public class ThemeChanger {
 		}
 		child.setName(newName);
 
+		//	Copying settings from parent theme
 		copyTheme(parent, child);
 		
-		// Copying Theme preview image
-		String linkToPreview = parent.getLinkToDraftPreview();
-		if (linkToPreview == null) {
-			linkToPreview = parent.getLinkToThemePreview();
-		}
-		String endodedLinkToPreview = helper.encode(linkToPreview, true);
-		linkToBase = child.getLinkToBase();
-		if (!linkToBase.endsWith(ContentConstants.SLASH)) {
-			linkToBase = new StringBuffer(linkToBase).append(ContentConstants.SLASH).toString();
-		}
-		is = helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(linkToBase).append(endodedLinkToPreview).toString());
-		if (is == null) {
-			return false;
-		}
-		String extension = helper.getFileExtension(linkToPreview);
-		String fileName = new StringBuffer(child.getName()).append(ThemesConstants.THEME_PREVIEW).append(ThemesConstants.DOT).append(extension).toString();
-		try {
-			if (helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(decodedLinkToBase, fileName, is, null, true)) {
-				child.setLinkToThemePreview(fileName);
-			}
-		} catch (RemoteException e) {
-			log.error(e);
-		} finally {
-			helper.closeInputStream(is);
-		}
-		
-		// Setting Theme small preview
-		String url = new StringBuffer(helper.getFullWebRoot()).append(linkToBase).append(endodedLinkToPreview).toString();
-		if (helper.createSmallImage(child, url)) {
-			return false;
-		}
+		//	Generating previews
+		 if (!helper.generatePreviewsForTheme(child, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY)) {
+			 return false;
+		 }
 		
 		child.setPropertiesExtracted(true);
 		restoreTheme(parent);

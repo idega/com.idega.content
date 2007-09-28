@@ -130,7 +130,7 @@ public class ThemesPropertiesExtractor {
 			searchResult = null;
 		}
 		
-		// Extraxting properties and preparing theme, style files for usage
+		// Extracting properties and preparing theme, style files for usage
 		if (foundedPropertiesFile) {
 			if (linkToProperties.indexOf(ThemesConstants.SPACE) != -1) {
 				linkToProperties = helper.urlEncode(linkToProperties);
