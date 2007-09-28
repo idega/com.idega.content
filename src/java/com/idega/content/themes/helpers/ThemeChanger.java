@@ -1262,6 +1262,9 @@ public class ThemeChanger {
 		if (theme == null) {
 			return false;
 		}
+		
+		clearThemeVariationsFromCache(theme.getId());
+		
 		List <ThemeChange> changes = theme.getChanges();
 		if (changes.size() == 0) {
 			return true;
@@ -1283,9 +1286,7 @@ public class ThemeChanger {
 		theme.setLinkToDraft(null);
 		theme.setChanges(new ArrayList<ThemeChange>());
 		
-		helper.createSmallImage(theme, false);
-		
-		clearThemeVariationsFromCache(theme.getId());
+		helper.generatePreviewsForTheme(theme, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY);
 		
 		return true;
 	}
@@ -1368,7 +1369,6 @@ public class ThemeChanger {
 		 }
 		
 		child.setPropertiesExtracted(true);
-		restoreTheme(parent);
 		
 		// Creating new template
 		try {
@@ -1378,7 +1378,11 @@ public class ThemeChanger {
 			return false;
 		}
 		
-		return helper.createThemeConfig(child);
+		helper.createThemeConfig(child);
+		
+		restoreTheme(parent);
+		
+		return true;
 	}
 	
 	/**
