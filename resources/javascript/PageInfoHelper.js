@@ -15,6 +15,8 @@ var MODULES_SHOWN = false;
 
 var KEYWORDS = null;
 
+var IB_SOURCE_VIEW_CLASS = 'com.idega.builder.presentation.IBSourceView';
+
 //separating click from dblclick
 var savTO = null;
 var dcTime = 250;
@@ -421,6 +423,18 @@ function initializePages() {
 	isStartPage(getPageID());
 	checkIfNotEmptySiteTree('div_id_current_structure_tree');
 	document.addEvent('click', managePageInfoComponents);
+	
+	ThemesEngine.isUserAdmin({
+		callback: function(isAdmin) {
+			$('showSourcePagesButton').setProperty('disabled', !isAdmin);
+		}
+	});
+	
+	BuilderService.getClassNameForSourceView({
+		callback: function(className) {
+			IB_SOURCE_VIEW_CLASS = className;
+		}
+	});
 }
 
 function registerPageInfoActions() {
@@ -482,16 +496,27 @@ function registerPageInfoActions() {
 	$$('input.showEditPagesButtonStyleClass').each(
 		function(button) {
 			button.addEvent('click', function() {
+				SHOW_SOURCE_PAGES = false;
 				SHOW_EDIT_PAGES = true;
 				getPrewUrl(getPageID());
 			});
 		}
 	);
 	
-	$$('input.showPreviewPagesButton').each(
+	$$('input.showPreviewPagesButtonStyleClass').each(
 		function(button) {
 			button.addEvent('click', function() {
+				SHOW_SOURCE_PAGES = false;
 				SHOW_EDIT_PAGES = false;
+				getPrewUrl(getPageID());
+			});
+		}
+	);
+	
+	$$('input.showSourcePagesButtonStyleClass').each(
+		function(button) {
+			button.addEvent('click', function() {
+				SHOW_SOURCE_PAGES = true;
 				getPrewUrl(getPageID());
 			});
 		}

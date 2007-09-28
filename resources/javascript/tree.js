@@ -3,6 +3,7 @@ var ajaxObjects = new Array();
 var RELOAD_PAGE = false;
 var REFRESH_PAGE_INFO = false;
 var SHOW_EDIT_PAGES = true;
+var SHOW_SOURCE_PAGES = false;
 
 if(changePageName == null) var changePageName = false;
 
@@ -54,24 +55,29 @@ function empty(param) {
 }
 
 function setFrameUrl(url) {
-	var frame = document.getElementById("treePages");
+	var frame = document.getElementById('treePages');
 	if (frame == null) {
 		return false;
 	}
 	
-	if (url == null) {
-		url = "";
+	if (SHOW_SOURCE_PAGES) {
+		frame.src = '/servlet/ObjectInstanciator?idegaweb_instance_class=' + IB_SOURCE_VIEW_CLASS;
+		return false;
 	}
-	if (url == "") {
+	
+	if (url == null) {
+		url = '';
+	}
+	if (url == '') {
 		frame.src = url;
 		return false;
 	}
 	
 	if (SHOW_EDIT_PAGES) {
-		if (url.charAt(url.length-1) != "/") {
-			url += "/";
+		if (url.charAt(url.length-1) != '/') {
+			url += '/';
 		}
-		url += "?view=builder";
+		url += '?view=builder';
 	}
 	
 	frame.src = url;
@@ -94,9 +100,9 @@ function initializeTree() {
 	setIsSiteMap(true);
 	setNeedRedirect(true);
 	setActiveLanguage();
-	resizeContainer("site_tree_container", "site_tree_container_site", 335, true);
-	resizeContainer("pagesTypesContainer", "pagesTypesContainer", 302, false);
-	resizeContainer("siteTemplatesContainer", "siteTemplatesContainer", 302, false);
-	resizeContainer("siteTemplatesContainer", "siteTemplatesContainer", 287, true);
-	checkIfNotEmptySiteTree("div_id_current_structure_tree");
+	resizeContainer('site_tree_container', 'site_tree_container_site', 335, true);
+	resizeContainer('pagesTypesContainer', 'pagesTypesContainer', 302, false);
+	resizeContainer('siteTemplatesContainer', 'siteTemplatesContainer', 302, false);
+	resizeContainer('siteTemplatesContainer', 'siteTemplatesContainer', 287, true);
+	checkIfNotEmptySiteTree('div_id_current_structure_tree');
 }
