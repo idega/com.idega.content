@@ -1507,5 +1507,14 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		return enabled;
 	}
+	
+	public boolean isUserAdmin() {
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return false;
+		}
+		
+		return iwc.isSuperAdmin();
+	}
 
 }

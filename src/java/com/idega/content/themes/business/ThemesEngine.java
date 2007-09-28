@@ -183,4 +183,6 @@ public interface ThemesEngine extends IBOService {
 	 * @see ThemesEngineBean#reloadThemeProperties
 	 */
 	public String reloadThemeProperties(String themeId);
+	
+	public boolean isUserAdmin();
 }
