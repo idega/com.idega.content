@@ -1,5 +1,5 @@
 /*
- * $Id: PageCreationManagedBean.java,v 1.14 2007/06/06 11:01:32 justinas Exp $
+ * $Id: PageCreationManagedBean.java,v 1.15 2007/09/30 12:14:46 valdas Exp $
  * Created on 2.5.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -26,7 +26,6 @@ import javax.faces.model.SelectItem;
 import org.apache.myfaces.custom.tree2.TreeNode;
 import org.apache.myfaces.custom.tree2.TreeNodeBase;
 
-import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.business.TemplatesLoader;
 import com.idega.content.themes.helpers.ThemesConstants;
@@ -36,33 +35,27 @@ import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.builder.data.ICPageHome;
-import com.idega.core.cache.IWCacheManager2;
 import com.idega.core.data.ICTreeNode;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
+import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
 import com.idega.webface.WFTreeNode;
-
-//import com.idega.builder.business;
-
 
 /**
  * 
- *  Last modified: $Date: 2007/06/06 11:01:32 $ by $Author: justinas $
+ *  Last modified: $Date: 2007/09/30 12:14:46 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class PageCreationManagedBean implements ActionListener {
 
 	private String SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED = "no_template_selected";
-	//private final String LINK_STYLE = "font-family:Arial,Helvetica,sans-serif;font-size:8pt;color:#000000;text-decoration:none;";
-	//private static String DOMAIN_TREE_KEY="ic_domain_tree_";
 	private int pageSelectorTopNode = -1;
-	
-	//private int pageSelectorTopNodes = -1;	
 	
 	private String selectedPageLocationIdentifier = null;
 	private String selectedPageLocationName = "[Select page]";
@@ -79,35 +72,8 @@ public class PageCreationManagedBean implements ActionListener {
 		super();
 	}
 	
-//	public TreeNode getPageSelectorTopNode(){
-//	public TreeNode getPageSelectorTopNodeOld(){
-//		try {
-//			IWContext iwc = IWContext.getInstance();
-//			BuilderService bservice = BuilderServiceFactory.getBuilderService(iwc);
-//			if (this.pageSelectorTopNode == -1) {
-//				this.pageSelectorTopNode = bservice.getRootPageId();
-//			}
-//			int currentUserId = -1;
-//			try {
-//				currentUserId = iwc.getCurrentUserId();
-//			} catch (NotLoggedOnException nle) {
-//			}
-//			ICTreeNode node = bservice.getPageTree(this.pageSelectorTopNode, currentUserId);
-//			return new WFTreeNode(node);
-//		}
-//		catch (UnavailableIWContext e) {
-//			e.printStackTrace();
-//		}
-//		catch (RemoteException e) {
-//			e.printStackTrace();
-//		}
-//				
-//		return new TreeNodeBase("type","description",true);
-//	}
-
-	
 	public TreeNode getPageSelectorTopNode() {
-		IWContext iwc = IWContext.getInstance();
+		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return new TreeNodeBase("type", "description", true);
 		}
@@ -163,31 +129,14 @@ public class PageCreationManagedBean implements ActionListener {
 	}
 	private String getTemplateFileByPageType(String pageType){
 		if (pageMap == null){
-			IWContext iwc = IWContext.getInstance();
+			IWContext iwc = CoreUtil.getIWContext();
 			IWMainApplication iwma = iwc.getApplicationContext().getIWMainApplication();
 			TemplatesLoader loader = new TemplatesLoader(iwma);
 			pageMap = loader.getPageMap();
 			if(pageMap.isEmpty()){
 				loader.loadTemplatesFromBundles();
 				pageMap = loader.getPageMap();
-			}
-//			IWContext iwc = IWContext.getInstance();
-//			IWMainApplication iwma = iwc.getApplicationContext().getIWMainApplication();
-//			TemplatesLoader loader = new TemplatesLoader(iwma);
-//			loader.loadTemplatesFromBundles();
-//			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
-//			pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
-			
-//			IWContext iwc = IWContext.getInstance();
-//			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwc.getApplicationContext().getIWMainApplication()).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
-//			
-//			if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
-//				pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
-//			}
-//			else {
-//				pageMap = new HashMap <String, PageTemplate> ();
-//				pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
-//			}		
+			}	
 		}
 	
 		if(pageMap.get(pageType) != null)
@@ -199,56 +148,20 @@ public class PageCreationManagedBean implements ActionListener {
 	private String getIconUriByPageType(String pageType){
 		
 		if (pageMap == null){
-			IWContext iwc = IWContext.getInstance();
+			IWContext iwc = CoreUtil.getIWContext();
 			IWMainApplication iwma = iwc.getApplicationContext().getIWMainApplication();
 			TemplatesLoader loader = new TemplatesLoader(iwma);
 			pageMap = loader.getPageMap();
 			if(pageMap.isEmpty()){
 				loader.loadTemplatesFromBundles();
 				pageMap = loader.getPageMap();
-			}
-				
-			
-			
-//			IWContext iwc = IWContext.getInstance();
-//			IWMainApplication iwma = iwc.getApplicationContext().getIWMainApplication();
-//			TemplatesLoader loader = new TemplatesLoader(iwma);
-//			loader.loadTemplatesFromBundles();
-//			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
-//			pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
-//			IWContext iwc = IWContext.getInstance();
-//			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwc.getApplicationContext().getIWMainApplication()).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
-//			Element root = pageDocument.getRootElement();		
-//			Collection siteRoot = root.getChildren();								
-//			Iterator itr = siteRoot.iterator();
-//			
-//			if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
-//				pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
-//			}
-//			else {
-//				pageMap = new HashMap <String, PageTemplate> ();
-//				pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
-//			}		
-//			while(itr.hasNext()){
-//				Element current = (Element)itr.next();
-//				PageTemplate page = new PageTemplate();
-//				pageType = current.getAttributeValue("type");
-//				page.setName(current.getAttributeValue("name"));
-//				page.setType(pageType);
-//				if (!current.getAttributeValue("iconfile").equals(""))
-//					page.setIconFile(iwma.getApplicationContextURI() + current.getAttributeValue("iconfile"));
-//				else
-//					page.setIconFile("");
-//				page.setTemplateFile(iwma.getApplicationContextURI() + current.getAttributeValue("templatefile"));
-//				pageMap.put(pageType, page);
-//			}			
+			}	
 		}
 		
 		if(pageMap.get(pageType) != null)
 			return pageMap.get(pageType).getIconFile();
 		else {
-//			System.out.println("pageType "+pageType);
-			return "";
+			return CoreConstants.EMPTY;
 		}
 	}
 	
@@ -257,7 +170,7 @@ public class PageCreationManagedBean implements ActionListener {
 	}
 	
 	public IWBundle getCoreBundle(){
-		IWContext iwc = IWContext.getInstance();
+		IWContext iwc = CoreUtil.getIWContext();
 		return iwc.getApplicationContext().getIWMainApplication().getCoreBundle();
 	}
 	
@@ -305,7 +218,7 @@ public class PageCreationManagedBean implements ActionListener {
 		String componentID = actionEvent.getComponent().getId();
 		System.out.println("Action "+componentID+" processed!!!!!");
 		
-		IWContext iwc = IWContext.getInstance();
+		IWContext iwc = CoreUtil.getIWContext();
 		UICommand command = (UICommand)actionEvent.getComponent();
 		System.out.println("UICommand.action:"+command.getAction());
 		System.out.println("UICommand.value:"+command.getValue());
@@ -339,56 +252,6 @@ public class PageCreationManagedBean implements ActionListener {
 		throw new RuntimeException("Function Disabled");
 	}
 	
-	/*
-	 * Temporarily commented out because of dependency problem on com.idega.builder
-	 * 
-	public void savePage(IWContext iwc) {
-		System.out.println("Save-Action processed!!!!!");
-		System.out.println("pageSelectorTopNode: "+this.pageSelectorTopNode);
-		System.out.println("selectedPageLocationIdentifier: "+this.selectedPageLocationIdentifier);
-		System.out.println("selectedPageLocationName: "+this.selectedPageLocationName);
-		System.out.println("pageName: "+this.pageName);
-		System.out.println("relativeLocation: "+this.relativeLocation );
-		
-
-		String stringSourceMarkup = getPageSource();
-
-		System.out.println("---------JSP Page----------");
-		System.out.println(stringSourceMarkup);
-		System.out.println("---------JSP Page Ends----------");
-
-		if(!this.SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED.equals(getTemplateIdentifier())){
-			//Create new page
-			String templateID = getTemplateIdentifier();
-			createSimpleTemplatePage(iwc, getParentPageIdentifier(), getPageName(), templateID,getBuilderLogic().PAGE_FORMAT_JSP_1_2,stringSourceMarkup);
-		}
-	}
-	
-	private String getPageSource() {
-		if(!this.SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED.equals(getTemplateIdentifier())){
-			return getBuilderLogic().getPageSource(getTemplateIdentifier());
-		} else {
-			return null;
-		}
-	}
-
-	private String createSimpleTemplatePage(IWContext iwc, String parentPageId, String name, String templateKey, String format, String sourceMarkup) {
-		int id=-1;
-		if (parentPageId != null) {
-			Map tree = PageTreeNode.getTree(iwc);
-			id = IBPageHelper.getInstance().createNewPage(parentPageId, name, IBPageHelper.PAGE, templateKey, tree, iwc,IBPageHelper.SUBTYPE_SIMPLE_TEMPLATE_PAGE,format,sourceMarkup);
-		}
-		if(id != -1){
-			return String.valueOf(id);
-		}
-		return null;
-	}
-	
-	protected BuilderLogic getBuilderLogic(){
-		return BuilderLogic.getInstance();
-	}
-	*/
-	
 	/**
 	 * @return Returns the selectedPageLocationName.
 	 */
@@ -406,7 +269,7 @@ public class PageCreationManagedBean implements ActionListener {
 		List l = new ArrayList();
 		l.add(new SelectItem(this.SELECT_ITEM_KEY_NO_TEMPLATE_SELECTED,"[Select Template]"));
 		try {
-			IWContext iwc = IWContext.getInstance();
+			IWContext iwc = CoreUtil.getIWContext();
 			
 			Collection templates = ((ICPageHome) IDOLookup.getHome(ICPage.class)).findAllSimpleTemplates();
 			for (Iterator iter = templates.iterator(); iter.hasNext();) {
