@@ -14,8 +14,7 @@
 	if(changePageName == null) var changePageName = false;
 		
 	/* Constructor */
-	function JSDragDropTree()
-	{
+	function JSDragDropTree() {
 		var thisTree = false;
 		var idOfTree;
 		
@@ -55,7 +54,6 @@
 		this.sourceTreee = true;
 		this.actionOnMouseUp = 'empty';
 		
-//		this.imageFolder = '/idegaweb/bundles/com.idega.content.bundle/resources/images/';
 		this.imageFolder = '';
 		this.iconFolder = '';
 		this.folderImage = 'default.png';
@@ -73,16 +71,16 @@
 		this.dragDropTimer = -1;
 		this.dragNode_noSiblings = false;
 		
-		if(document.all){
+		if (document.all) {
 			this.indicator_offsetX = 2;	// Offset position of small black lines indicating where nodes would be dropped.
 			this.indicator_offsetX_sub = 4;
 			this.indicator_offsetY = 2;
-		}else{
+		} else {
 			this.indicator_offsetX = 1;	// Offset position of small black lines indicating where nodes would be dropped.
 			this.indicator_offsetX_sub = 3;
 			this.indicator_offsetY = 2;			
 		}
-		if(navigator.userAgent.indexOf('Opera')>=0){
+		if (navigator.userAgent.indexOf('Opera') >= 0) {
 			this.indicator_offsetX = 2;	// Offset position of small black lines indicating where nodes would be dropped.
 			this.indicator_offsetX_sub = 3;
 			this.indicator_offsetY = -7;				
@@ -93,77 +91,59 @@
 	
 	/* JSDragDropTree class */
 	JSDragDropTree.prototype = {
-		
 		Get_Cookie : function(name) { 
-		   var start = document.cookie.indexOf(name+"="); 
+		   var start = document.cookie.indexOf(name+'='); 
 		   var len = start+name.length+1; 
 		   if ((!start) && (name != document.cookie.substring(0,name.length))) return null; 
 		   if (start == -1) return null; 
-		   var end = document.cookie.indexOf(";",len); 
+		   var end = document.cookie.indexOf(';',len); 
 		   if (end == -1) end = document.cookie.length; 
 		   return unescape(document.cookie.substring(len,end)); 
-		} 
-		,
+		},
+		
 		// This function has been slightly modified
 		Set_Cookie : function(name,value,expires,path,domain,secure) { 			
 			expires = expires * 60*60*24*1000;
 			var today = new Date();
 			var expires_date = new Date( today.getTime() + (expires) );
-		    var cookieString = name + "=" +escape(value) + 
-		       ( (expires) ? ";expires=" + expires_date.toGMTString() : "") + 
-		       ( (path) ? ";path=" + path : "") + 
-		       ( (domain) ? ";domain=" + domain : "") + 
-		       ( (secure) ? ";secure" : ""); 
+		    var cookieString = name + '=' +escape(value) + 
+		       ( (expires) ? ';expires=' + expires_date.toGMTString() : '') + 
+		       ( (path) ? ';path=' + path : '') + 
+		       ( (domain) ? ';domain=' + domain : '') + 
+		       ( (secure) ? ';secure' : ''); 
 		    document.cookie = cookieString; 
-		} 
-		,setMaximumDepth : function(maxDepth)
-		{
+		},
+		setMaximumDepth : function(maxDepth) {
 			this.maximumDepth = maxDepth;	
-		}
-		,setMessageMaximumDepthReached : function(newMessage)
-		{
+		},
+		setMessageMaximumDepthReached : function(newMessage) {
 			this.messageMaximumDepthReached = newMessage;
-		}
-		,	
-		setImageFolder : function(path)
-		{
+		},
+		setImageFolder : function(path) {
 			this.imageFolder = path;	
-		}
-		,
-		setFolderImage : function(imagePath)
-		{
+		},
+		setFolderImage : function(imagePath) {
 			this.folderImage = imagePath;			
-		}
-		,
-		setPlusImage : function(imagePath)
-		{
+		},
+		setPlusImage : function(imagePath) {
 			this.plusImage = imagePath;				
-		}
-		,
-		setMinusImage : function(imagePath)
-		{
+		},
+		setMinusImage : function(imagePath) {
 			this.minusImage = imagePath;			
-		}
-		,		
-		setTreeId : function(idOfTree)
-		{
+		},
+		setTreeId : function(idOfTree) {
 			this.idOfTree = idOfTree;		
-		}	
-		,
-		expandAll : function()
-		{
+		},
+		expandAll : function() {
 			var menuItems = document.getElementById(this.idOfTree).getElementsByTagName('LI');		
 			for(var no=0;no<menuItems.length;no++){
 				var subItems = menuItems[no].getElementsByTagName('UL');
-				if(subItems.length>0 && subItems[0].style.display!='block'){				
+				if (subItems.length>0 && subItems[0].style.display!='block') {				
 					JSTreeObj.showHideNode(false,menuItems[no].id);
-
-				}			
+				}
 			}
-		}	
-		,
-		collapseAll : function()
-		{
+		},
+		collapseAll : function() {
 			var menuItems = document.getElementById(this.idOfTree).getElementsByTagName('LI');
 			for(var no=0;no<menuItems.length;no++){
 				var subItems = menuItems[no].getElementsByTagName('UL');
@@ -171,12 +151,9 @@
 					JSTreeObj.showHideNode(false,menuItems[no].id);
 				}			
 			}		
-		}	
-		,
-		/*
-		Find top pos of a tree node
-		*/
-		getTopPos : function(obj){
+		},
+		// Find top pos of a tree node
+		getTopPos : function(obj) {
 			var top = obj.offsetTop/1;
 			while((obj = obj.offsetParent) != null){
 				if(obj.tagName!='HTML')top += obj.offsetTop;
@@ -185,12 +162,9 @@
 				top = top/1 + 13;
 			else top = top/1 + 4;		
 			return top;
-		}
-		,	
-		/*
-		Find left pos of a tree node
-		*/
-		getLeftPos : function(obj){
+		},	
+		// Find left pos of a tree node
+		getLeftPos : function(obj) {
 			var left = obj.offsetLeft/1 + 1;
 			while((obj = obj.offsetParent) != null){
 				if(obj.tagName!='HTML')left += obj.offsetLeft;
@@ -199,8 +173,7 @@
 			if(document.all)
 				left = left/1 - 2;
 			return left;
-		}	
-		,
+		},
 		showHideNode : function(e,inputId) {			
 			if(inputId){
 				if(!document.getElementById(inputId))
@@ -230,10 +203,8 @@
 
 			JSTreeObj.Set_Cookie('dhtmlgoodies_expandedNodes',initExpandedNodes,500);			
 			return false;						
-		}
-		,
-		copyDragableNode : function(e)
-		{			
+		},
+		copyDragableNode : function(e) {			
 			if(saveOnDrop == true)
 				movingNode = true;
 			else
@@ -271,28 +242,22 @@
 			JSTreeObj.timerDragCopy();
 			
 			return false;
-		}
-		,
-		timerDragCopy : function()
-		{	
+		},
+		timerDragCopy : function() {	
 			if(this.dragDropTimer>=0 && this.dragDropTimer<10) {
 				this.dragDropTimer = this.dragDropTimer + 1;
 				setTimeout('JSTreeObj.timerDragCopy()',20);
 				return;
 			}
-			if(this.dragDropTimer==10)
-			{
+			if(this.dragDropTimer==10) {
 				JSTreeObj.floatingContainer.style.display='block';
 				var tempNode = JSTreeObj.dragNode_source.cloneNode(true);
 				tempNode.id = 'floatingContainer'+ tempNode.id;
 				JSTreeObj.floatingContainer.appendChild(tempNode);
 			}
-		}
-		,		
-		
-		/* Initialize drag */ 
-		initDrag : function(e)
-		{
+		},		
+		// Initialize drag
+		initDrag : function(e) {
 			if(saveOnDrop == true)
 				movingNode = true;
 			else
@@ -331,24 +296,19 @@
 			JSTreeObj.timerDrag();
 
 			return false;
-		}
-		,
-		timerDrag : function()
-		{	
+		},
+		timerDrag : function() {	
 			if(this.dragDropTimer>=0 && this.dragDropTimer<10){
 				this.dragDropTimer = this.dragDropTimer + 1;
 				setTimeout('JSTreeObj.timerDrag()',20);
 				return;
 			}
-			if(this.dragDropTimer==10)
-			{
+			if(this.dragDropTimer==10) {
 				JSTreeObj.floatingContainer.style.display='block';
 				JSTreeObj.floatingContainer.appendChild(JSTreeObj.dragNode_source);	
 			}
-		}
-		,
-		moveDragableNodes : function(e){			
-
+		},
+		moveDragableNodes : function(e) {			
 			var divTags = document.getElementsByTagName('div');
 			var divTag = null;
 			for(var i = 0; i < divTags.length; i++){
@@ -412,10 +372,8 @@
 			}			
 			return false;
 			
-		}
-		,
-		dropDragableNodes:function()
-		{	
+		},
+		dropDragableNodes:function() {	
 			var parent;
 			if(JSTreeObj.dragDropTimer<10){				
 				JSTreeObj.dragDropTimer = -1;
@@ -434,7 +392,7 @@
 				}
 			}
 						
-			var sourceTree = document.getElementById(JSTreeObj.dragNode_source.id).getAttribute("sourceTree");
+			var sourceTree = document.getElementById(JSTreeObj.dragNode_source.id).getAttribute('sourceTree');
 						
 			if(JSTreeObj.dragNode_destination){
 				if(JSTreeObj.insertAsSub){
@@ -484,8 +442,6 @@
 				
 			}else{
 				// Putting the item back to it's original location
-				
-				
 				if(JSTreeObj.dragNode_sourceNextSib){
 					JSTreeObj.dragNode_parent.insertBefore(JSTreeObj.dragNode_source,JSTreeObj.dragNode_sourceNextSib);
 				}else{
@@ -513,9 +469,7 @@
 					parentDiv = parentDiv.parentNode;
 				}
 			}			
-//
-		}
-		,
+		},
 		deleteNodeChilds : function(nodeParent){
 			var childs = nodeParent.getElementsByTagName('li');
 			var nodeChilds = nodeParent.childNodes;
@@ -525,8 +479,7 @@
 					deletePage(childs[i].id, null);
 				}
 			}
-		}
-		,
+		},
 		drawTable : function(){
 			var treeContainer = document.getElementById('div_id_current_structure_tree');
 			var rootUl = document.createElement('ul');
@@ -545,10 +498,8 @@
 		  	tempTable.appendChild(tr); 	
 		  	rootUl.appendChild(tempTable);
 			treeContainer.appendChild(rootUl);
-		}
-		,
-		dropDragableNodesCopy:function()
-		{
+		},
+		dropDragableNodesCopy:function() {
 			var parent;
 			if(JSTreeObj.dragDropTimer<10){				
 				JSTreeObj.dragDropTimer = -1;
@@ -579,7 +530,6 @@
 				if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
 					if (document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id)){
 						var childToRemove = document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id);
-//						JSTreeObj.floatingContainer.removeChild(childToRemove);
 						JSTreeObj.floatingContainer.removeChild(JSTreeObj.floatingContainer.firstChild);
 					}
 				}
@@ -627,13 +577,6 @@
 				var countUp = JSTreeObj.dragDropCountLevels(JSTreeObj.dragNode_destination,'up');
 				var countDown = JSTreeObj.dragDropCountLevels(JSTreeObj.dragNode_source,'down');
 				var countLevels = countUp/1 + countDown/1 + (JSTreeObj.insertAsSub?1:0);		
-/*				
-DEPTH RESTRICTION
-				if(countLevels>JSTreeObj.maximumDepth){
-					JSTreeObj.dragNode_destination = false;
-					showMessage = true; 	// Used later down in this function
-				}
-*/
 			}
 			if(JSTreeObj.dragNode_destination){
 				if(JSTreeObj.insertAsSub){
@@ -686,8 +629,7 @@ DEPTH RESTRICTION
 							JSTreeObj.dragNode_destination.parentNode.appendChild(el);
 					}
 				}	
-				/* Clear parent object */
-				
+				// Clear parent object
 				var tmpObj = JSTreeObj.dragNode_parent;
 				var lis = tmpObj.getElementsByTagName('LI');
 				if(lis.length==0){
@@ -727,7 +669,7 @@ DEPTH RESTRICTION
 								JSTreeObj.previousParentId = newParent.id;		
 							}
 							if ((newParentId == JSTreeObj.previousParentId) || ((document.getElementById(JSTreeObj.previousParentId).tagName != 'LI')&&(!newParentId))){
-// same parent								
+								// Same parent								
 								if(JSTreeObj.previousPlaceInLevel > numberInLevel){
 									nodesToIncrease = JSTreeObj.getNodesBetween(JSTreeObj.dragNode_source.id, JSTreeObj.previousParentId, numberInLevel+1, JSTreeObj.previousPlaceInLevel);
 								}
@@ -746,7 +688,7 @@ DEPTH RESTRICTION
 							if (!newParentId)
 								newParentId = -1;
 							saveMyTree(newParentId, JSTreeObj.dragNode_source.id, numberInLevel, nodesToIncrease, nodesToDecrease);
-							var newPageUri = "undefined";
+							var newPageUri = 'undefined';
 							var linkFirstChild = JSTreeObj.dragNode_source.getElementsByTagName('a')[0];
 							if (linkFirstChild != null) {
 								newPageUri = linkFirstChild.innerHTML;
@@ -770,14 +712,13 @@ DEPTH RESTRICTION
 								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, numberInLevel, followingNodes);
 							}								
 						}
-							//need name
+						// Need name
 						break;	
 					}
 					parentDiv = parentDiv.parentNode;
 				}
 			}			
-		}
-		,
+		},
 		restoreTreeStructure : function() {
 			if (JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]) {
 				if(JSTreeObj.previousPlaceInLevel > JSTreeObj.dragNode_parent.childNodes.length)
@@ -790,23 +731,21 @@ DEPTH RESTRICTION
 			JSTreeObj.dragDropTimer = -1;
 	
 			return;
-		}
-		,
+		},
 		saveRoot : function (nodeId, pagetype, templatefile, pageName, isFirst, numberInLevel, followingNodes){
 			treeStructure = new Array();
 			var nodes = JSTreeObj.getRootStructure('floatingContainer'+nodeId, numberInLevel);			
 			document.getElementById('floatingContainer'+nodeId).id = 'rootTemporary';
-			showLoadingMessage("Creating...");			
+			showLoadingMessage(CREATING_TEXT);			
 			ThemesEngine.beforeCreatePage(nodes, isFirst, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
-		}	
-		,
+		},
 		getNewRootId : function(id) {
 			if (id == null) {
 				return;
 			}			
 						
 			var root = document.getElementById('rootTemporary');
-			(document.getElementById('rootTemporary')).setAttribute("id", id[0]);	
+			(document.getElementById('rootTemporary')).setAttribute('id', id[0]);	
 			JSTreeObj.initNode(document.getElementById(id[0]));		
 			var newName = (document.getElementById(id[0]).getElementsByTagName('a')[0]).innerHTML;
 			var newChilds = root.getElementsByTagName('li');
@@ -816,7 +755,7 @@ DEPTH RESTRICTION
 			for(var i = 0; i < newChilds.length; i++){
 				newChildsElement = newChilds[i];
 				if (newChildsElement != null) {
-					(document.getElementById(newChildsElement.id)).setAttribute("id", id[i+1]);
+					(document.getElementById(newChildsElement.id)).setAttribute('id', id[i+1]);
 				}
 				newNode = document.getElementById(id[i+1]);
 				if (newNode != null) {
@@ -828,22 +767,19 @@ DEPTH RESTRICTION
 			setPageID(lastID);
 			getPrewUrl(lastID);
 			isChangingSiteMap();
-			if (!isSiteMap()){
+			if (!isSiteMap()) {
 				var aTag = document.getElementById(id);
 				if (aTag){
 					aTag = aTag.getElementsByTagName('a')[0];
 					aTag.className = 'pageTreeNames';				
 					boldSelectedTreeElement(aTag);
-//					registerPageInfoActions();
 					registerPageInfoActionsOnElement(aTag);
 				}
 			}
-			else{
-				for (var i = 0; i < id.length; i++){
-//					var aTag = document.getElementById(id[0]).getElementsByTagName('a')[0];
+			else {
+				for (var i = 0; i < id.length; i++) {
 					var aTag = document.getElementById(id[0]);
-					if(aTag){
-//						aTag = getElementsByTagName('a')[0];
+					if (aTag) {
 						aTag = aTag.getElementsByTagName('a')[0];
 						aTag.className = 'pageTreeNames';				
 						boldSelectedTreeElement(aTag);
@@ -854,12 +790,11 @@ DEPTH RESTRICTION
 			
 			closeLoadingMessage();
 			if (isNeedRelaodBuilderPage() && isSiteMap() && isNeedRedirect()) {
-				showLoadingMessage("Redirecting...");
+				showLoadingMessage(REDIRECTING_TEXT);
 				setNeedRelaodBuilderPage(false);
-				redirectAction("/workspace/builder/application", 0);
+				redirectAction('/workspace/builder/application', 0);
 			}
-		}
-		,		
+		},		
 		getRootStructure : function(rootId, numberInLevel){					
 			var root = document.getElementById(rootId);
 			var newChilds = root.getElementsByTagName('li');
@@ -897,21 +832,17 @@ DEPTH RESTRICTION
 				parentId = newChilds[i].getAttribute('id');
 			}
 			return newTreeNodes;					
-		}		
-		,
-		createDropIndicator : function()
-		{
+		},
+		createDropIndicator : function() {
 			this.dropTargetIndicator = document.createElement('DIV');
 			this.dropTargetIndicator.style.position = 'absolute';			
 			this.dropTargetIndicator.style.display='none';			
 			var img = document.createElement('IMG');
-//			img.src = this.imageFolder + 'dragDrop_ind1.gif';
 			img.src = imageFolder + 'dragDrop_ind1.gif';
 			img.id = 'dragDropIndicatorImage';
 			this.dropTargetIndicator.appendChild(img);
 			document.body.appendChild(this.dropTargetIndicator);			
-		}
-		,
+		},
 		dragDropCountLevels : function(obj,direction,stopAtObject){
 			var countLevels = 0;
 			if(direction=='up'){
@@ -925,23 +856,18 @@ DEPTH RESTRICTION
 			if(direction=='down'){ 
 				var subObjects = obj.getElementsByTagName('LI');
 				for(var no=0;no<subObjects.length;no++){
-					countLevels = Math.max(countLevels,JSTreeObj.dragDropCountLevels(subObjects[no],"up",obj));
+					countLevels = Math.max(countLevels,JSTreeObj.dragDropCountLevels(subObjects[no],'up',obj));
 				}
 				return countLevels;
 			}	
-		}		
-		,
-		cancelEvent : function()
-		{
+		},
+		cancelEvent : function() {
 			return false;	
-		}
-		,
-		cancelSelectionEvent : function()
-		{		
+		},
+		cancelSelectionEvent : function() {		
 			if(JSTreeObj.dragDropTimer<10)return true;
 			return false;	
-		}
-		,
+		},
 		getParentId : function(childNodeId) {
 			var childNode = document.getElementById(childNodeId);
 			var possibleParent = childNode.parentNode;
@@ -950,8 +876,7 @@ DEPTH RESTRICTION
 				possibleParent.id = JSTreeObj.getParentId(possibleParent.id);
 			}
 			return possibleParent.id;
-		}
-		,
+		},
 		getParentLiTag : function(child, treeId){
 				var possibleParent = child.parentNode;
 				if(possibleParent.id)
@@ -962,8 +887,7 @@ DEPTH RESTRICTION
 					possibleParent = JSTreeObj.getParentLiTag(possibleParent, treeId);
 				}	
 			return possibleParent;
-		}
-		,
+		},
 		getNewParent : function(initObj,saveString,child,newParent, treeId) {
 			var possibleParent = null;
 			if(!saveString)var saveString = '';
@@ -1019,11 +943,8 @@ DEPTH RESTRICTION
 				return newParent;							
 			}
 			return newParent;		
-		}
-		,
-		getNodeOrders : function(initObj,saveString)
-		{
-			
+		},
+		getNodeOrders : function(initObj,saveString) {
 			if(!saveString)var saveString = '';
 			if(!initObj){
 				initObj = document.getElementById(this.idOfTree);
@@ -1059,8 +980,7 @@ DEPTH RESTRICTION
 							
 			}
 			return saveString;
-		}
-		,		
+		},		
 		prepareToDelete : function(){
 			var trashCan = document.getElementById('trash');
 			if(JSTreeObj.deleteNodes == true){
@@ -1071,22 +991,18 @@ DEPTH RESTRICTION
 				JSTreeObj.deleteNodes = true;
 				trashCan.style.opacity = 1;
 			}
-		}
-		,
+		},
 		mouseOverRecycleBin : function(){
 			var trashCan = document.getElementById('trash');
 			JSTreeObj.deleteNodes = true;
 			trashCan.style.opacity = 1;			
-		}
-		,
+		},
 		mouseOutOfRecycleBin : function(){
 			var trashCan = document.getElementById('trash');			
 			JSTreeObj.deleteNodes = false;
 			trashCan.style.opacity = 0.5;
-		}
-		,
-		initTree : function()
-		{				
+		},
+		initTree : function() {				
 			JSTreeObj = this;
 			treeObj = this;
 			JSTreeObj.createDropIndicator();
@@ -1123,13 +1039,6 @@ DEPTH RESTRICTION
 				if(tmpVar)
 					iconfile = tmpVar;
 				else {
-/*					
-					var pageType = menuItems[no].getAttribute('pagetype');
-					if (pageType){
-						iconfile = iconFolder + menuItems[no].getAttribute('pagetype') +'.png';
-					}
-					else
-*/
 					iconfile = iconFolder + this.folderImage;						
 				}
 
@@ -1143,7 +1052,6 @@ DEPTH RESTRICTION
 				nodeId++;
 				var subItems = menuItems[no].getElementsByTagName('UL');
 				var img = document.createElement('IMG');
-//				img.src = this.imageFolder + this.plusImage;
 				img.src = imageFolder + this.plusImage;
 				img.onclick = JSTreeObj.showHideNode;
 				
@@ -1175,7 +1083,7 @@ DEPTH RESTRICTION
 				input.onkeypress = withEnter;
 						
 				aTag.ondblclick = initEditLabel;
-				aTag.setAttribute('href', '#');	
+				aTag.setAttribute('href', '#' + aTag.innerHTML);	
 				if(!noDrag)aTag.onmousedown = JSTreeObj.initDrag;
 				if(!noChildren)aTag.onmousemove = JSTreeObj.moveDragableNodes;
 				if(sourceTree)aTag.onmousedown = JSTreeObj.copyDragableNode;
@@ -1200,13 +1108,10 @@ DEPTH RESTRICTION
 						folderImg.src = iconfile;
 				}
 				else if(menuItems[no].className){
-//					folderImg.src = this.imageFolder + menuItems[no].className;
 					folderImg.src = imageFolder + menuItems[no].className;
-				}else{
-//					folderImg.src = this.imageFolder + this.folderImage;					
+				}else{			
 					folderImg.src = imageFolder + this.folderImage;					
 				}
-				
 				menuItems[no].insertBefore(folderImg,input);				
 			}	
 		
@@ -1224,11 +1129,8 @@ DEPTH RESTRICTION
 			else{
 				this.actionOnMouseUp = 'move';
 			}
-		}
-		,	
-		
-		initNode : function(node)
-		{		
+		},
+		initNode : function(node) {		
 			var noChildren = false;
 			var sourceTree = false;
 			var noDrag = false;
@@ -1241,13 +1143,6 @@ DEPTH RESTRICTION
 				iconfile = tmpVar;
 			else {
 				folderImg.src = imageFolder + this.iconFolder;	
-/*				
-				var pageType = node.getAttribute('pagetype');
-				if (pageType)
-					iconfile = this.iconFolder + node.getAttribute('pagetype') +'.png';
-				else
-					iconfile = this.iconFolder + this.folderImage;
-*/
 			}
 
 			var templatefile = null;		 
@@ -1271,7 +1166,6 @@ DEPTH RESTRICTION
 				
 			input.onkeypress = withEnter;
 						
-//			aTag.onclick = okToNavigate;				
 				aTag.ondblclick = initEditLabel;
 				if(!noDrag)aTag.onmousedown = JSTreeObj.initDrag;
 				if(!noChildren)aTag.onmousemove = JSTreeObj.moveDragableNodes;
@@ -1288,12 +1182,9 @@ DEPTH RESTRICTION
 				}
 				if(!noChildren)folderImg.onmousemove = JSTreeObj.moveDragableNodes;
 				
-				if(node.className){
-//					folderImg.src = this.imageFolder + node.className;
+				if(node.className) {
 					folderImg.src = imageFolder + node.className;
-				}else{
-//					folderImg.src = this.imageFolder + this.folderImage;					
-//					folderImg.src = this.imageFolder + this.iconFolder;					
+				}else{		
 					folderImg.src = imageFolder + this.iconFolder;					
 				}
 				if(iconfile)
@@ -1302,19 +1193,15 @@ DEPTH RESTRICTION
 			
 			document.documentElement.onmouseup = JSTreeObj.dropDragableNodesCopy;
 			this.actionOnMouseUp = 'move';
-		}
-		,					
+		},					
 		saveNewPage : function (newParentNodeId, pagetype, templatefile, pageName, numberInLevel, followingNodes){
 			treeStructure = new Array();
 			var nodes = JSTreeObj.getStructure('floatingContainer'+JSTreeObj.dragNode_source.id, newParentNodeId, numberInLevel);			
 			document.getElementById('floatingContainer'+JSTreeObj.dragNode_source.id).id = 'rootTemporary';				
-			showLoadingMessage("Creating...");	
+			showLoadingMessage(CREATING_TEXT);	
 			ThemesEngine.beforeCreatePage(nodes, false, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
-		}	
-		,
-
+		},
 		getStructure : function(rootId, parentId, numberInLevel){
-	
 			var newTreeNodes = new Array();
 			var root = document.getElementById(rootId);
 			var newChilds = root.getElementsByTagName('li');
@@ -1354,8 +1241,7 @@ DEPTH RESTRICTION
 				parentId = newChilds[i].getAttribute('id');
 			}
 			return newTreeNodes;			
-		}	
-		,	
+		},	
 		getNewId : function(id){
 			closeLoadingMessage();
 			if (id == null) {
@@ -1365,7 +1251,7 @@ DEPTH RESTRICTION
 			var newChilds = newParent.getElementsByTagName('li');		
 
 			for(var i = 0; i < newChilds.length; i++){
-				(document.getElementById(newChilds[i].id)).setAttribute("id", id[i]);	
+				(document.getElementById(newChilds[i].id)).setAttribute('id', id[i]);	
 				JSTreeObj.initNode(document.getElementById(id[i]));		
 				var newName = (document.getElementById(id[i]).getElementsByTagName('a')[0]).innerHTML;
 				if(movingNode){
@@ -1376,8 +1262,7 @@ DEPTH RESTRICTION
 			setPageID(lastID);
 			getPrewUrl(lastID);
 			isChangingSiteMap();
-		}
-		,
+		},
 		getNodeChilds : function(nodeParent, newParentId){
 			var childs = nodeParent.getElementsByTagName('li');
 			var nodeChilds = nodeParent.childNodes;
@@ -1388,44 +1273,36 @@ DEPTH RESTRICTION
 					JSTreeObj.getNodeChilds(nodeChilds[i], JSTreeObj.newPageId);
 				}
 			}
-		}
-		,
+		},
 		setReceved : function(rec){
-		JSTreeObj.receved = rec;	
-		}
-		,
+			JSTreeObj.receved = rec;	
+		},
 		getReceved : function(){
 			return JSTreeObj.receved;
-		}
-		,
+		},
 		prepareToSetTopPage : function(){
 			var tempTable = document.getElementById('temporaryTable');
 			tempTable.style.border='3px  solid';
 			JSTreeObj.firstTopPage = true;
-		}
-		,
+		},
 		topPageNotSet : function(){
 			var tempTable = document.getElementById('temporaryTable');
 			tempTable.style.border='1px  solid';
 			JSTreeObj.firstTopPage = false;			
-		}
-		,
+		},
 		aboveTree : function(){
 			saveOnDrop = true;
-		}
-		,
+		},
 		notAboveTree : function(){
 			saveOnDrop = false;			
 			JSTreeObj.dropTargetIndicator.style.display='none';				
-		}
-		,
+		},
 		checkIfOverTree : function(idOfTree){
 			var treeElement = document.getElementById(idOfTree);
 			treeElement.setAttribute('onmouseover','JSTreeObj.aboveTree()');
 			treeElement.setAttribute('onmouseout','JSTreeObj.notAboveTree()');			
 			
-		}
-		, 
+		}, 
 		getOrderInLevel : function(nodeId, parentNodeId){
 
 			var result = null;
@@ -1463,8 +1340,7 @@ DEPTH RESTRICTION
 				}
 			}
 			return result;
-		}
-		,
+		},
 		getFollowingNodes : function(parentNodeId, placeInLevel){
 			var result = new Array(); //ids of following nodes
 			if (parentNodeId == null){
@@ -1499,8 +1375,7 @@ DEPTH RESTRICTION
 			}
 			return result;
 				
-		}	
-		,
+		},
 		getNodesBetween : function(nodeId, parentNodeId, placeFrom, placeTo){
 			
 			var result = new Array(); //ids of nodes	
@@ -1534,8 +1409,7 @@ DEPTH RESTRICTION
 			}
 			
 			return result;					
-		}				
-		,
+		},
 		createNodeOnClick : function(){
 			
 			JSTreeObj.dragNode_source = this.parentNode;			
@@ -1584,7 +1458,7 @@ DEPTH RESTRICTION
 	
 	function withEnter(e) {
 		if (window.event) {
-			if(e.keyCode == 3){
+			if (e.keyCode == 3) {
 				hideEdit();
 				return false;
 			}
@@ -1592,9 +1466,6 @@ DEPTH RESTRICTION
 			if (e.keyCode == 13) {
 				hideEdit();
 				return false;
-			}
-			else{
-//				return false;
 			}
 		}
 		else {
@@ -1605,77 +1476,74 @@ DEPTH RESTRICTION
 		}
 	}
 
-	function okToNavigate()
-	{
-		if(editCounter<10)return true;
+	function okToNavigate() {
+		if (editCounter < 10) {
+			return true;
+		}
 		return false;		
 	}
 	
 	var editCounter = -1;
 	var editEl = false;
 	
-	function initEditLabel()
-	{		
+	function initEditLabel() {
 		changePageName = true;
 		if(saveOnDrop == false){
 			return;
 		}
-		if(editEl)hideEdit();
+		if (editEl) {
+			hideEdit();
+		}
 		editCounter = 0;
-		editEl = this;	// Referenc to a Tag
+		editEl = this;	// Reference to a Tag
 		startEditLabel();
 	}
 	
-	function startEditLabel()
-	{
-			var el = editEl.previousSibling;
-			el.value = editEl.innerHTML;
-			editEl.style.display='none';
-			el.style.display='inline';	
-			el.select();
-			el.focus();
-			return;
-
+	function startEditLabel() {
+		var el = editEl.previousSibling;
+		el.value = editEl.innerHTML;
+		editEl.style.display='none';
+		el.style.display='inline';	
+		el.select();
+		el.focus();
 	}
 	
-	function showUpdate()
-	{
+	function showUpdate() {
 		var message = document.getElementById('ajaxMessage');
 		message = replaceHtml(message, ajax.response);
-		//document.getElementById('ajaxMessage').innerHTML = ajax.response;
 	}
 	
-	function hideEdit()
-	{
-
+	function hideEdit() {
 		var editObj = editEl.previousSibling;	
-		
-		if(editObj == null) {
-			return;
+		if (editObj == null) {
+			return false;
 		}
 		
-		if(editObj.value.length>0){
+		if (editObj.value.length>0) {
 			editEl = replaceHtml(editEl, editObj.value);
-			//editEl.innerHTML = editObj.value;
 
 			var changeNameId = editObj.id.replace(/[^0-9]/g,'');
 			var newName = editObj.value;
+			editEl.setAttribute('href', '#' + newName);
 			
-			showLoadingMessage("Changing...");
+			showLoadingMessage(CHANGING_THEME);
 			BuilderService.changePageName(changeNameId, newName, empty);
 
 			changePageTitleInPageInfo(newName);
 			ThemesEngine.changePageUri(changeNameId, newName, true, changePageTitleCallback);
 		}
 		editEl.style.display='inline';
+		editEl.ondblclick = initEditLabel;
+		try {
+			registerPageInfoActionsOnElement(editEl);
+		}  catch(e) {};
 		editObj.style.display='none';
 		editEl = false;			
 		editCounter=-1;
 		return false;
 	}
 	
-	function mouseUpEvent()
-	{
+	function mouseUpEvent() {
 		editCounter=-1;		
 	}
 			
@@ -1687,7 +1555,7 @@ DEPTH RESTRICTION
 		this.templateFile = templateFile;
 	}	
 	
-	function getPathToImageFolder(){
+	function getPathToImageFolder() {
 		ThemesEngine.getPathToImageFolder(setFolderPath);	
 	}
 	
