@@ -285,6 +285,8 @@ var LOADING_TEXT = 'Loading...';
 var RELOADING_TEXT = 'Reloading...';
 var SHOW_MODULES_TEXT = 'Show Modules';
 var HIDE_MODULES_TEXT = 'Hide Modules';
+var REDIRECTING_TEXT = 'Redirecting...';
+var CREATING_TEXT = 'Creating...';
 
 function getLocalizedTextForThemes() {
 	ThemesEngine.getLocalizedText(getLocalizedTextForThemesCallback);
@@ -294,7 +296,7 @@ function getLocalizedTextForThemesCallback(list) {
 	if (list == null) {
 		return;
 	}
-	if (list.length != 27) {
+	if (list.length != 29) {
 		return;
 	}
 	UPLOADING_THEME = list[0];
@@ -324,6 +326,8 @@ function getLocalizedTextForThemesCallback(list) {
 	RELOADING_TEXT = list[24];
 	SHOW_MODULES_TEXT = list[25];
 	HIDE_MODULES_TEXT = list[26];
+	REDIRECTING_TEXT = list[27];
+	CREATING_TEXT = list[28];
 	
 }
 

@@ -1421,6 +1421,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (resourceBundle == null) {
 			return localizedText;
 		}
+		
 		try {
 			localizedText.add(resourceBundle.getLocalizedString("uploading_theme", "Uploading..."));							// 0
 			localizedText.add(resourceBundle.getLocalizedString("changing_theme", "Changing..."));								// 1
@@ -1449,6 +1450,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			localizedText.add(resourceBundle.getLocalizedString("reloading", "Reloading..."));									//	24
 			localizedText.add(resourceBundle.getLocalizedString("show_modules", "Show Modules"));								//	25
 			localizedText.add(resourceBundle.getLocalizedString("hide_modules", "Hide Modules"));								//	26
+			localizedText.add(resourceBundle.getLocalizedString("redirecting", "Redirecting..."));								//	27
+			localizedText.add(resourceBundle.getLocalizedString("creating", "Creating..."));									//	28
+			
 		} catch (Exception e) {
 			log.error(e);
 		}
