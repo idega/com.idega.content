@@ -60,11 +60,6 @@ function setFrameUrl(url) {
 		return false;
 	}
 	
-	if (SHOW_SOURCE_PAGES) {
-		frame.src = '/servlet/ObjectInstanciator?idegaweb_instance_class=' + IB_SOURCE_VIEW_CLASS;
-		return false;
-	}
-	
 	if (url == null) {
 		url = '';
 	}
@@ -73,6 +68,9 @@ function setFrameUrl(url) {
 		return false;
 	}
 	
+	if (SHOW_SOURCE_PAGES) {
+		url = '/servlet/ObjectInstanciator?idegaweb_instance_class=' + IB_SOURCE_VIEW_CLASS;
+	}
 	if (SHOW_EDIT_PAGES) {
 		if (url.charAt(url.length-1) != '/') {
 			url += '/';
@@ -80,6 +78,7 @@ function setFrameUrl(url) {
 		url += '?view=builder';
 	}
 	
+	frame.src = '';
 	frame.src = url;
 	chagePageName = false;
 }

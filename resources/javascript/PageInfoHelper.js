@@ -517,6 +517,7 @@ function registerPageInfoActions() {
 		function(button) {
 			button.addEvent('click', function() {
 				SHOW_SOURCE_PAGES = true;
+				SHOW_EDIT_PAGES = false;
 				getPrewUrl(getPageID());
 			});
 		}
