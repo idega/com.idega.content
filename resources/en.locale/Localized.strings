@@ -258,3 +258,6 @@ add_localized_name=add localized name
 undefined=Undefined
 click=Click
 categories_explanation=to make that category available in that locale and to localize it
+page_source=Source
+redirecting=Redirecting...
+creating=Creating...
