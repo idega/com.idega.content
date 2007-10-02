@@ -87,7 +87,7 @@ public class WFBlockWithToolbar extends WFBlock {
 			head.add(recycleBinImage, 3, 1);
 			
 			if (isAddStartPageButton()) {
-				GenericButton startPage = new GenericButton("makeStartPage", ContentUtil.getBundle().getLocalizedString("make_start_page", "Make Start Page"));
+				GenericButton startPage = new GenericButton("makeStartPage", ContentUtil.getBundle().getLocalizedString("make_start_page", "Start Page"));
 				startPage.setToolTip( ContentUtil.getBundle().getLocalizedString("make_this_page_start_page", "Make This Page As Start Page"));
 				startPage.setOnClick("makePageAsStartPage();");
 				startPage.setInputType("button");
