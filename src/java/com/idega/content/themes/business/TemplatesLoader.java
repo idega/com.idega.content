@@ -1,11 +1,15 @@
 package com.idega.content.themes.business;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -17,13 +21,14 @@ import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.content.tree.PageTemplate;
-import com.idega.content.tree.SiteTemplateStructure;
+import com.idega.content.tree.SiteTemplate;
 import com.idega.core.cache.IWCacheManager2;
 import com.idega.core.search.business.SearchResult;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWModuleLoader;
 import com.idega.idegaweb.JarLoader;
 import com.idega.slide.business.IWSlideService;
+import com.idega.util.CoreConstants;
 
 /**
  * A utility class to find page types and site templates from bundles and slide
@@ -32,34 +37,28 @@ import com.idega.slide.business.IWSlideService;
  */
 public class TemplatesLoader implements JarLoader {
 	
-	public static final String SLIDE_TEMPLATES_FOLDER = "files/cms/templates/";
-
-	protected static final String TEMPLATES_LOADER_APPLICATION_ATTIBUTE = "TemplatesLoader";
-
-	private IWMainApplication iwma = null;
-	
+	public static final String SLIDE_TEMPLATES_FOLDER = CoreConstants.CONTENT_PATH + "/templates/";
 	public static final String SITE_TEMPLATES_XML_FILE_NAME = "site-templates.xml";
 	public static final String PAGE_TEMPLATES_XML_FILE_NAME = "page-templates.xml";
-	
 	public static final String SITE_TEMPLATES_CACHE_KEY = "IWSiteTemplates";
 	
-
-	private ThemesHelper themesHelper;
+	private static final String TEMPLATES_LOADER_APPLICATION_ATTIBUTE = "TemplatesLoader";
 	
-	public TemplatesLoader(IWMainApplication iwma) {
+	private IWMainApplication iwma = null;
+	private ThemesHelper themesHelper = null;
+	
+	private TemplatesLoader(IWMainApplication iwma) {
 		super();
 		this.iwma = iwma;
-		themesHelper = ThemesHelper.getInstance(false);
+		this.themesHelper = ThemesHelper.getInstance(false);
 	}
 	
 	public static TemplatesLoader getInstance(IWMainApplication iwma){
 		TemplatesLoader loader = (TemplatesLoader) iwma.getAttribute(TEMPLATES_LOADER_APPLICATION_ATTIBUTE);
-		if(loader==null){
+		if (loader == null) {
 			loader = new TemplatesLoader(iwma);
 			iwma.setAttribute(TEMPLATES_LOADER_APPLICATION_ATTIBUTE, loader);
 		}
-		
-		
 		return loader;
 	}
 	
@@ -74,106 +73,117 @@ public class TemplatesLoader implements JarLoader {
 		JarEntry pageTemplatesEntry = jarFile.getJarEntry("resources/templates/"+PAGE_TEMPLATES_XML_FILE_NAME);
 		JarEntry siteTemplatesEntry = jarFile.getJarEntry("resources/templates/"+SITE_TEMPLATES_XML_FILE_NAME);
 		
-//		pageTemplatesEntry.getAttributes().g
 		if (pageTemplatesEntry != null) {
+			InputStream stream = null;
 			try {
-				InputStream stream = jarFile.getInputStream(pageTemplatesEntry);
+				stream = jarFile.getInputStream(pageTemplatesEntry);
 				Document pageDocument = themesHelper.getXMLDocument(stream);
 				addPageTypesFromDocument(pageDocument);				
 			}
 			catch (Exception e) {
 				e.printStackTrace();
+			} finally {
+				closeInputStream(stream);
 			}
 		}
+		
 		if (siteTemplatesEntry != null) {
-
+			InputStream stream = null;
 			try {
-				InputStream stream = jarFile.getInputStream(siteTemplatesEntry);
+				stream = jarFile.getInputStream(siteTemplatesEntry);
 				Document pageDocument = themesHelper.getXMLDocument(stream);
 				addSiteTemplatesFromDocument(pageDocument);
 			}
 			catch (Exception e) {
 				e.printStackTrace();
+			} finally {
+				closeInputStream(stream);
 			}
 		}		
+	}
+	
+	private void closeInputStream(InputStream is) {
+		if (is == null) {
+			return;
+		}
+		
+		try {
+			is.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
 	 * A generic way to add page types from an xml Document
 	 * @param pageDocument
 	 */
+	@SuppressWarnings("unchecked")
 	public void addPageTypesFromDocument(Document pageDocument) {
-		Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
-		
-		Map<String, PageTemplate> pageMap;
 		Element root = pageDocument.getRootElement();		
-		Collection siteRoot = root.getChildren();								
-		Iterator itr = siteRoot.iterator();
+		Collection<Element> siteRoot = root.getChildren();
+		if (siteRoot == null) {
+			return;
+		}
+		
+		String appContextUri = iwma.getApplicationContextURI();
+		String iconFile = "iconfile";
 		String pageType = null;
-		
-		pageMap = getPageMap();
-		
-//		if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
-//			pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
-//		}
-//		else {
-//			pageMap = new HashMap <String, PageTemplate> ();
-//			pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
-//		}				
-//		IWContext iwc = null;
-//		iwc.get
-//		System.out.println("context_url: "+iwma.get);
-//		iwma.getApplicationSpecialVirtualPath();
-		
-		 
-		while(itr.hasNext()){
-			Element current = (Element)itr.next();
+		Map<String, PageTemplate> pageMap = getPageMap();
+		for (Iterator<Element> it = siteRoot.iterator(); it.hasNext();) {
+			Element current = it.next();
 			PageTemplate page = new PageTemplate();
 			pageType = current.getAttributeValue("type");
 			page.setName(current.getAttributeValue("name"));
 			page.setType(pageType);
-			if (!current.getAttributeValue("iconfile").equals(""))
-				page.setIconFile(iwma.getApplicationContextURI() + current.getAttributeValue("iconfile"));
-			else
-				page.setIconFile("");
-			page.setTemplateFile(iwma.getApplicationContextURI() + current.getAttributeValue("templatefile"));
+			if (current.getAttributeValue(iconFile).equals(CoreConstants.EMPTY)) {
+				page.setIconFile(CoreConstants.EMPTY);
+			}
+			else {
+				page.setIconFile(new StringBuffer(appContextUri).append(current.getAttributeValue(iconFile)).toString());
+			}
+			page.setTemplateFile(new StringBuffer(appContextUri).append(current.getAttributeValue("templatefile")).toString());
 			pageMap.put(pageType, page);
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void addSiteTemplatesFromDocument(Document siteTemplateDocument) {
-		Map <String, SiteTemplateStructure> siteMap;
+		SortedMap <String, SiteTemplate> siteMap = null;
 		Map siteTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(SITE_TEMPLATES_CACHE_KEY);
 		
 		if (siteTemplatesFromCache.containsKey(ContentConstants.SITE_MAP_KEY)){
-			siteMap = (Map <String, SiteTemplateStructure>)siteTemplatesFromCache.get(ContentConstants.SITE_MAP_KEY);
+			siteMap = (SortedMap <String, SiteTemplate>)siteTemplatesFromCache.get(ContentConstants.SITE_MAP_KEY);
 		}
 		else {			
-			siteMap = new HashMap<String, SiteTemplateStructure>();
+			siteMap = Collections.synchronizedSortedMap(new TreeMap<String, SiteTemplate>());
 		}						
 		
 		Element root = siteTemplateDocument.getRootElement();	
 		
-		Collection siteRoot = root.getChildren();			
-		Iterator itr = siteRoot.iterator();
-		
-		while(itr.hasNext()){
-			SiteTemplateStructure siteStruct = new SiteTemplateStructure();
-			Element currentSite = (Element)itr.next();
-			String panelName = currentSite.getAttributeValue("name");			
-			Element structure = (Element)currentSite.getChildren().get(0);			
+		Collection<Element> siteRoot = root.getChildren();
+		if (siteRoot == null) {
+			return;
+		}
+		Element siteTemplate = null;
+		for(Iterator<Element> it = siteRoot.iterator(); it.hasNext();){
+			SiteTemplate siteStruct = new SiteTemplate();
+			siteTemplate = it.next();
+			String panelName = siteTemplate.getAttributeValue("name");			
+			Element structure = (Element) siteTemplate.getChildren().get(0);			
 			siteStruct = getNode(structure);
 			siteMap.put(panelName, siteStruct);		
 		}		
 		
 		siteTemplatesFromCache.put(ContentConstants.SITE_MAP_KEY, siteMap);
-	}	
-	private SiteTemplateStructure getNode(Element currElement){
+	}
+	
+	private SiteTemplate getNode(Element currElement) {
 		String pageName = null;	
 		String pageType = null;
 		String iconFile = null;
 		String templateFile = null;
-		SiteTemplateStructure currNode = new SiteTemplateStructure();
+		SiteTemplate currNode = new SiteTemplate();
 		pageType = currElement.getAttributeValue("type");
 		currNode.setType(pageType);
 		pageName = currElement.getAttributeValue("name");
@@ -188,11 +198,6 @@ public class TemplatesLoader implements JarLoader {
 		}
 		currNode.setTemplateFile(iwma.getApplicationContextURI() + currElement.getAttributeValue("templatefile"));		
 		
-		
-//		iconFile = currElement.getAttributeValue("iconfile");			
-//		templateFile = currElement.getAttributeValue("templatefile");				
-//		if (iconFile != null)
-//			currNode.setIconFile(iconFile);
 		if (templateFile != null)
 			currNode.setTemplateFile(templateFile);
 		Iterator it = (currElement.getChildren()).iterator();
@@ -205,54 +210,66 @@ public class TemplatesLoader implements JarLoader {
 	
 	public Map<String, PageTemplate> getPageTemplates() {
 		Map pageTemplates = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
-		ThemesHelper helper = ThemesHelper.getInstance(false);
-		
 		
 		if (!pageTemplates.containsKey(ContentConstants.PAGES_MAP_KEY)) {
 		    loadTemplatesFromBundles();
 		}
 		
-		//load from slide
-		Collection results = helper.search(PAGE_TEMPLATES_XML_FILE_NAME, SLIDE_TEMPLATES_FOLDER);
-		for (Iterator iter = results.iterator(); iter.hasNext();) {
-			SearchResult element = (SearchResult) iter.next();
-			//don't read hidden files!
-			if(!element.getSearchResultName().startsWith("._")){
-				String uri = element.getSearchResultURI();
-				//TODO fetch in authenticated manner httpclient? getmethod, or by slide api
-				String serverURL = iwma.getIWApplicationContext().getDomain().getURL();
-				String url = serverURL+uri.substring(1);//get rid of the starting /
-				addPageTypesFromDocument(helper.getXMLDocument(url));
+		//	Load from slide
+		Collection<SearchResult> results = themesHelper.search(PAGE_TEMPLATES_XML_FILE_NAME, SLIDE_TEMPLATES_FOLDER);
+		if (results == null) {
+			return (Map <String, PageTemplate>)pageTemplates.get(ContentConstants.PAGES_MAP_KEY);
+		}
+		
+		String serverURL = iwma.getIWApplicationContext().getDomain().getURL();
+		Document xml = null;
+		for (Iterator<SearchResult> iter = results.iterator(); iter.hasNext();) {
+			xml = getTemplateDocument(iter.next(), serverURL);
+			if (xml != null) {
+				addPageTypesFromDocument(xml);
 			}
 		}
 		
 		return (Map <String, PageTemplate>)pageTemplates.get(ContentConstants.PAGES_MAP_KEY);
 	}
 	
-	public Map<String, SiteTemplateStructure> getSiteTemplates() {
-		ThemesHelper helper = ThemesHelper.getInstance(false);
+	public SortedMap<String, SiteTemplate> getSiteTemplates() {
 		Map siteTemplates = IWCacheManager2.getInstance(iwma).getCache(TemplatesLoader.SITE_TEMPLATES_CACHE_KEY);
 
 		if (!siteTemplates.containsKey(ContentConstants.SITE_MAP_KEY)) {
 		    loadTemplatesFromBundles();
 		}
 		
-
-//		load from slide
-		Collection results = helper.search(SITE_TEMPLATES_XML_FILE_NAME, SLIDE_TEMPLATES_FOLDER);
-		for (Iterator iter = results.iterator(); iter.hasNext();) {
-			SearchResult element = (SearchResult) iter.next();
-			//don't read hidden files!
-			if(!element.getSearchResultName().startsWith("._")){
-				String uri = element.getSearchResultURI();
-				//TODO fetch in authenticated manner httpclient? getmethod, or by slide api
-				String serverURL = iwma.getIWApplicationContext().getDomain().getURL();
-				String url = serverURL+uri.substring(1);//get rid of the starting /
-				addSiteTemplatesFromDocument(helper.getXMLDocument(url));
+		//	Load from slide
+		Collection<SearchResult> results = themesHelper.search(SITE_TEMPLATES_XML_FILE_NAME, SLIDE_TEMPLATES_FOLDER);
+		if (results == null) {
+			return (SortedMap <String, SiteTemplate>)siteTemplates.get(ContentConstants.SITE_MAP_KEY);
+		}
+		
+		String serverURL = iwma.getIWApplicationContext().getDomain().getURL();
+		Document xml = null;
+		for (Iterator<SearchResult> it = results.iterator(); it.hasNext();) {
+			xml = getTemplateDocument(it.next(), serverURL);
+			if (xml != null) {
+				addSiteTemplatesFromDocument(xml);
 			}
 		}
 		
-		return (Map <String, SiteTemplateStructure>)siteTemplates.get(ContentConstants.SITE_MAP_KEY);
+		return (SortedMap <String, SiteTemplate>)siteTemplates.get(ContentConstants.SITE_MAP_KEY);
+	}
+	
+	private Document getTemplateDocument(SearchResult result, String serverName) {
+		if (result == null || serverName == null) {
+			return null;
+		}
+		
+		if (result.getSearchResultName().startsWith("._")) {
+			return null;
+		}
+		
+		String uri = result.getSearchResultURI();
+		//	TODO fetch in authenticated manner httpclient? getmethod, or by slide api
+		return themesHelper.getXMLDocument(new StringBuffer(serverName).append(uri.substring(1)).toString());
 	}
 	
 	protected IWSlideService getIWSlideService() throws IBOLookupException{

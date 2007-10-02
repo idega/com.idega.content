@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.27 2007/08/07 08:33:00 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.28 2007/10/02 05:04:00 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -41,10 +41,10 @@ import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2007/08/07 08:33:00 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/10/02 05:04:00 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.28 $
  */
 //public class IWBundleStarter implements IWBundleStartable, JarLoader {
 public class IWBundleStarter implements IWBundleStartable{
@@ -128,8 +128,17 @@ public class IWBundleStarter implements IWBundleStartable{
 			e.printStackTrace();
 			return;
 		}
-		ThemesHelper.getInstance(false).loadThemeSettings(stream);
-		Map <String, Setting> settings = ThemesHelper.getInstance(false).getThemeSettings();
+		
+		ThemesHelper helper = ThemesHelper.getInstance(false);
+		try {
+			helper.loadThemeSettings(stream);
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeInputStream(stream);
+		}
+		
+		Map <String, Setting> settings = helper.getThemeSettings();
 		if (settings == null) {
 			return;
 		}
@@ -139,6 +148,18 @@ public class IWBundleStarter implements IWBundleStartable{
 			if (applicationSettings.getProperty(key) == null) { // Not overriding existing values
 				applicationSettings.setProperty(key, setting.getDefaultValue());
 			}
+		}
+	}
+	
+	private void closeInputStream(InputStream is) {
+		if (is == null) {
+			return;
+		}
+		
+		try {
+			is.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	

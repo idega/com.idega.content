@@ -546,8 +546,18 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		
-		return getXMLDocument(getInputStream(url));
+		InputStream stream = getInputStream(url);
+		try {
+			return getXMLDocument(stream);
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeInputStream(stream);
+		}
+		
+		return null;
 	}
+	
 	
 	public Document getXMLDocument(InputStream stream) {
 		if (stream == null) {
@@ -581,9 +591,8 @@ public class ThemesHelper implements Singleton {
 			log.info("IOException trying to build a JDOM Document");
 			log.error(e);
 			return null;
-		} finally {
-			closeInputStream(stream);
 		}
+		
 		try {
 			r.close();
 		} catch (IOException e) {
@@ -630,7 +639,6 @@ public class ThemesHelper implements Singleton {
 	
 	public void loadThemeSettings(InputStream stream) {
 		if (loadedThemeSettings) {
-			closeInputStream(stream);
 			return;
 		}
 		loadSettings(themeSettings, getXMLDocument(stream));
@@ -641,7 +649,7 @@ public class ThemesHelper implements Singleton {
 		if (loadedPageSettings) {
 			return;
 		}
-		loadSettings(pageSettings, getXMLDocument(getInputStream(url)));
+		loadSettings(pageSettings, getXMLDocument(url));
 		loadedPageSettings = true;
 	}
 	

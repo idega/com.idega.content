@@ -1,5 +1,5 @@
 /*
- * $Id: PageCreationManagedBean.java,v 1.15 2007/09/30 12:14:46 valdas Exp $
+ * $Id: PageCreationManagedBean.java,v 1.16 2007/10/02 05:04:00 valdas Exp $
  * Created on 2.5.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -47,10 +47,10 @@ import com.idega.webface.WFTreeNode;
 
 /**
  * 
- *  Last modified: $Date: 2007/09/30 12:14:46 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/10/02 05:04:00 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
 public class PageCreationManagedBean implements ActionListener {
 
@@ -131,7 +131,7 @@ public class PageCreationManagedBean implements ActionListener {
 		if (pageMap == null){
 			IWContext iwc = CoreUtil.getIWContext();
 			IWMainApplication iwma = iwc.getApplicationContext().getIWMainApplication();
-			TemplatesLoader loader = new TemplatesLoader(iwma);
+			TemplatesLoader loader = TemplatesLoader.getInstance(iwma);
 			pageMap = loader.getPageMap();
 			if(pageMap.isEmpty()){
 				loader.loadTemplatesFromBundles();
@@ -150,7 +150,7 @@ public class PageCreationManagedBean implements ActionListener {
 		if (pageMap == null){
 			IWContext iwc = CoreUtil.getIWContext();
 			IWMainApplication iwma = iwc.getApplicationContext().getIWMainApplication();
-			TemplatesLoader loader = new TemplatesLoader(iwma);
+			TemplatesLoader loader = TemplatesLoader.getInstance(iwma);
 			pageMap = loader.getPageMap();
 			if(pageMap.isEmpty()){
 				loader.loadTemplatesFromBundles();
