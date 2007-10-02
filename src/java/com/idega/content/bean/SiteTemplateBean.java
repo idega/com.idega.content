@@ -3,7 +3,9 @@ package com.idega.content.bean;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
@@ -16,6 +18,7 @@ import org.jdom.input.SAXBuilder;
 import com.idega.content.themes.business.TemplatesLoader;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.content.tree.PageTemplate;
+import com.idega.content.tree.TemplateComparator;
 import com.idega.core.data.IWTreeNode;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.webface.WFTreeNode;
@@ -32,17 +35,16 @@ public class SiteTemplateBean {
 	public SiteTemplateBean() {
 		super();
 		FacesContext ctx = FacesContext.getCurrentInstance();
-		IWMainApplication iwma = IWMainApplication.getIWMainApplication(ctx);		
-		
-		
+		IWMainApplication iwma = IWMainApplication.getIWMainApplication(ctx);
 		pageMap = TemplatesLoader.getInstance(iwma).getPageTemplates();
 	}
 		
-	public WFTreeNode getPage(WFTreeNode currNode){
-
-		Iterator itr = pageMap.values().iterator();		
-		while(itr.hasNext()){
-			PageTemplate current = (PageTemplate)itr.next();
+	public WFTreeNode getPage(WFTreeNode currNode) {
+		List<PageTemplate> pageTemplates = new ArrayList<PageTemplate>(pageMap.values());
+		Collections.sort(pageTemplates, new TemplateComparator());
+		
+		for (int i = 0; i < pageTemplates.size(); i++) {
+			PageTemplate current = pageTemplates.get(i);
 			WFTreeNode newNode = new WFTreeNode(new IWTreeNode(current.getName()));
 			newNode.setIconURI(current.getIconFile());
 			newNode.setPageType(current.getType());

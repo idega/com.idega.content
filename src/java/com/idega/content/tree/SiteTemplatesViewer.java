@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.component.html.HtmlOutputText;
@@ -26,6 +27,8 @@ import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Script;
 import com.idega.presentation.text.Text;
+import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
 import com.idega.webface.IWTree;
 import com.idega.webface.WFTreeNode;
 import com.idega.webface.WFUtil;
@@ -33,34 +36,32 @@ import com.idega.webface.WFUtil;
 public class SiteTemplatesViewer extends IWBaseComponent {
 	
 	private Map <String, PageTemplate> pageMap = null;
-	private Map <String, SiteTemplateStructure> siteMap = null;
+	private SortedMap <String, SiteTemplate> siteMap = null;
 	
 	public SiteTemplatesViewer() {
 		super();
-		// TODO Auto-generated constructor stub
 		FacesContext ctx = FacesContext.getCurrentInstance();
 		IWMainApplication iwma = IWMainApplication.getIWMainApplication(ctx);
-		pageMap = (Map <String, PageTemplate>)TemplatesLoader.getInstance(iwma).getPageTemplates();		
-		siteMap = (Map <String, SiteTemplateStructure>)TemplatesLoader.getInstance(iwma).getSiteTemplates();		
+		pageMap = TemplatesLoader.getInstance(iwma).getPageTemplates();		
+		siteMap = TemplatesLoader.getInstance(iwma).getSiteTemplates();		
 	}
 	
 	protected void initializeComponent(FacesContext context) {
-		Iterator itrKeySet = null;
+		Iterator<String> itrKeySet = null;
 		if (siteMap.keySet() != null)
 			itrKeySet = siteMap.keySet().iterator();
 		String mapKey = null;
 		Accordion acc = new Accordion("site_templates");
-//		acc.setIncludeJavascript(false);
 		
-		getChildren().add(acc);
+		add(acc);
 
 		int panelID = 0;
 		Script script = new Script();
 		
-		while(itrKeySet.hasNext()){
+		for(Iterator<String> it = itrKeySet; it.hasNext();) {
 			panelID++;
-			mapKey = itrKeySet.next().toString();
-			SiteTemplateStructure currentSite = siteMap.get(mapKey);
+			mapKey = it.next();
+			SiteTemplate currentSite = siteMap.get(mapKey);
 			String panelName = mapKey;
 			WFTreeNode rootNode = new WFTreeNode(new IWTreeNode(panelName));
 			
@@ -84,12 +85,10 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		    tree.getAttributes().put("sourceTree", "true");
 
 		    acc.addPanel("panel"+panelID, new Text(panelName), tree); 
-		    script.addScriptLine("appendIdOfTree(\'tree\'+"+panelID+");");
-			
+		    script.addScriptLine(new StringBuffer("window.addEvent('domready', function() {appendIdOfTree('tree").append(panelID).append("');});").toString());	
 		}
 		
-		this.getChildren().add(script);		
-				
+		add(script);		
 	}	
 	
 	private WFTreeNode settingIconURIsAndTemplateFiles(WFTreeNode node){
@@ -103,62 +102,36 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		
 		return node;
 	}
-	private String getTemplateFileByPageType(String pageType){
-		if (pageMap == null){
-			IWContext iwc = IWContext.getInstance();
+	
+	private void preparePageMap() {
+		if (pageMap == null) {
+			IWContext iwc = CoreUtil.getIWContext();
 			IWMainApplication iwma = iwc.getApplicationContext().getIWMainApplication();
-			TemplatesLoader loader = new TemplatesLoader(iwma);
+			TemplatesLoader loader = TemplatesLoader.getInstance(iwma);
 			pageMap = loader.getPageMap();
 			if(pageMap.isEmpty()){
 				loader.loadTemplatesFromBundles();
 				pageMap = loader.getPageMap();
-			}			
-//			IWContext iwc = IWContext.getInstance();
-//			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwc.getApplicationContext().getIWMainApplication()).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
-//			
-//			if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
-//				pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
-//			}
-//			else {
-//				pageMap = new HashMap <String, PageTemplate> ();
-//				pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
-//			}		
-		}
-	
-		if(pageMap.get(pageType) != null)
-			return pageMap.get(pageType).getTemplateFile();
-		else {
-			return "";
+			}	
 		}
 	}
+	
+	private String getTemplateFileByPageType(String pageType){
+		preparePageMap();
+	
+		if (pageMap.get(pageType) == null) {
+			return CoreConstants.EMPTY;
+		}
+		return pageMap.get(pageType).getTemplateFile();
+	}
+	
 	private String getIconUriByPageType(String pageType){
+		preparePageMap();
 		
-		if (pageMap == null){
-			IWContext iwc = IWContext.getInstance();
-			IWMainApplication iwma = iwc.getApplicationContext().getIWMainApplication();
-			TemplatesLoader loader = new TemplatesLoader(iwma);
-			pageMap = loader.getPageMap();
-			if(pageMap.isEmpty()){
-				loader.loadTemplatesFromBundles();
-				pageMap = loader.getPageMap();
-			}			
-//			IWContext iwc = IWContext.getInstance();
-//			Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwc.getApplicationContext().getIWMainApplication()).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
-//			
-//			if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
-//				pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
-//			}
-//			else {
-//				pageMap = new HashMap <String, PageTemplate> ();
-//				pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
-//			}		
+		if (pageMap.get(pageType) == null) {
+			return CoreConstants.EMPTY;
 		}
-		
-		if(pageMap.get(pageType) != null)
-			return pageMap.get(pageType).getIconFile();
-		else {
-			return "";
-		}
+		return pageMap.get(pageType).getIconFile();
 	}
 	
 	public TreeNode getTree(IWTreeNode rootNode){
@@ -166,13 +139,13 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		return new WFTreeNode(icnode);
 	}
 	
-	public WFTreeNode getPage(SiteTemplateStructure currElement, WFTreeNode currNode){
-		Iterator itr = (currElement.getChildStructure()).iterator();
+	public WFTreeNode getPage(SiteTemplate currElement, WFTreeNode currNode){
+		Iterator<SiteTemplate> itr = (currElement.getChildStructure()).iterator();
 		String pageType = null;
 		String iconFile = null;
 		String templateFile = null;
 		while(itr.hasNext()){
-			SiteTemplateStructure current = (SiteTemplateStructure)itr.next();
+			SiteTemplate current = itr.next();
 			
 			WFTreeNode newNode = new WFTreeNode(new IWTreeNode(current.getName()));
 			pageType = current.getType();
@@ -219,13 +192,13 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		return document;
 	}
 		
-	public SiteTemplateStructure getNode(Element currElement){
+	public SiteTemplate getNode(Element currElement){
 		
 		String pageName = null;	
 		String pageType = null;
 		String iconFile = null;
 		String templateFile = null;
-		SiteTemplateStructure currNode = new SiteTemplateStructure();
+		SiteTemplate currNode = new SiteTemplate();
 		pageType = currElement.getAttributeValue("type");
 		currNode.setType(pageType);
 		pageName = currElement.getAttributeValue("name");

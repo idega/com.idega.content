@@ -16,7 +16,7 @@
         			/dwr/interface/ThemesEngine.js,
 					/dwr/interface/BuilderService.js,
 					/dwr/interface/PagePreview.js,
-					/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/behaviour-mootools.js,	
+					/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.11/mootools-all-compressed.js,
 
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js,
@@ -25,11 +25,11 @@
 			<h:form id="createpageform">
 				<f:verbatim>
                 	<script type="text/javascript">
-                		getGlobalPageId();           	
-                		registerEvent(window, "load", getLocalizedTextForThemes);
-                		registerEvent(window, "load", initialiazeSiteManager);
-                		registerEvent(window, "load", getPathToImageFolder);
- 	              		registerEvent(window, "load", registerSiteActions);                		
+                		window.addEvent('domready', getGlobalPageId);
+                		window.addEvent('domready', getLocalizedTextForThemes);
+                		window.addEvent('domready', initialiazeSiteManager);
+                		window.addEvent('domready', getPathToImageFolder);
+ 	              		window.addEvent('domready', registerSiteActions);                		
                 	</script>
                 </f:verbatim>
 			
@@ -91,8 +91,10 @@
 
 					<f:verbatim>
 						<script type="text/javascript">	
-							appendIdOfTree('page_chooser22');
-							appendIdOfAdvancedTree('current_structure_tree');							
+							window.addEvent('domready', function() {
+								appendIdOfTree('page_chooser22');
+								appendIdOfAdvancedTree('current_structure_tree');
+							});
 						</script>
 					</f:verbatim>		
 				</wf:wfblock>
