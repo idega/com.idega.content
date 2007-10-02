@@ -1,10 +1,9 @@
 var THEME_ID = null;
 
 var SCROLLER_IMAGE_WIDTH = 23;
-var SPACE_FROM_LEFT = 290;
 var FRAME_CHANGE = 153;
-var RESERVED_HEIGHT = 90;
-var RESERVED_WIDTH = 500;
+var RESERVED_HEIGHT = 82;
+var RESERVED_WIDTH = 455;
 var SHOW_ELEMENT_TRANSITION_DURATION = 500;
 var SET_DISPLAY_PROPERTY_ID = 0;
 var GET_THEMES_ID = 0;
@@ -90,8 +89,8 @@ function savePageInfoCallback(result) {
 function showSlider(container) {
 	resizeSlider();
 	container.style.position = 'absolute';
-	container.style.bottom = '15px';
-	container.style.left = SPACE_FROM_LEFT + 'px';
+	container.style.bottom = '28px';
+	container.style.left = RESERVED_WIDTH + 'px';
 	var showSlider = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 	showSlider.start(0, 1);
 	SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'block')", SHOW_ELEMENT_TRANSITION_DURATION);
@@ -318,7 +317,6 @@ function resizeFrame() {
 	}
 	
 	//	Width
-	frame.style.left = SPACE_FROM_LEFT + 'px';
 	var availableWidth = getTotalWidth() - RESERVED_WIDTH;
 	if (availableWidth > 0) {
 		frame.style.width = availableWidth + 'px';

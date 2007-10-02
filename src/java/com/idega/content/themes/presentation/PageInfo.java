@@ -11,13 +11,12 @@ import com.idega.content.presentation.ContentBlock;
 import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.presentation.Layer;
 import com.idega.presentation.Table2;
 import com.idega.presentation.TableCell2;
 import com.idega.presentation.TableRow;
 import com.idega.presentation.TableRowGroup;
 import com.idega.presentation.ui.GenericButton;
-import com.idega.webface.WFBlock;
-import com.idega.webface.WFTitlebar;
 
 public class PageInfo extends ContentBlock {
 	
@@ -25,19 +24,12 @@ public class PageInfo extends ContentBlock {
 
 	@Override
 	protected void initializeComponent(FacesContext context) {		
-		WFBlock pageInfo = new WFBlock();
+		Layer pageInfo = new Layer();
 		if (styleClass != null) {
 			pageInfo.setStyleClass(getStyleClass());
 		}
 		
-		pageInfo.setTitle(getBundle().getLocalizedString("page_info"));
-		
-		WFTitlebar bar = new WFTitlebar();
-		bar.addTitleText(getBundle().getLocalizedText("page_info"));
-		pageInfo.setTitlebar(bar);
-		
-		ThemesHelper.getInstance().loadPageSettings(ThemesHelper.getInstance().getWebRootWithoutContent() +
-				ThemesConstants.PAGE_SETTINGS);
+		ThemesHelper.getInstance().loadPageSettings(ThemesHelper.getInstance().getWebRootWithoutContent() + ThemesConstants.PAGE_SETTINGS);
 		Iterator <Setting> pageSettings = ThemesHelper.getInstance().getPageSettings().values().iterator();
 		Setting s = null;
 		HtmlOutputText label = null;
@@ -66,11 +58,14 @@ public class PageInfo extends ContentBlock {
 
 		pageInfo.add(table);
 		
+		Layer buttonContainer = new Layer();
+		buttonContainer.setStyleAttribute("float", "right");
 		GenericButton save = new GenericButton("saveButton", ContentUtil.getBundle().getLocalizedString("save"));
 		save.setInputType("button");
 		save.setId("saveButton");
 		save.setStyleClass("saveButtonStyleClass");
-		pageInfo.add(save);
+		buttonContainer.add(save);
+		pageInfo.add(buttonContainer);
 		
 		add(pageInfo);
 	}

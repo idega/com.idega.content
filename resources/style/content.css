@@ -427,7 +427,7 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 
 .pageInfoStyle {
 	position: absolute;
-	width: 275px;
+	width: 250px;
 	height: 150px;
 	bottom: 15px;
 	border: 1px solid #D7D7D7;
@@ -435,12 +435,9 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 }
 
 .pageInfoStyle_accordion {
-	position: relative;
-	top : 0px;
-	z-index: 1;
-	width: 260px;
+	background-color: #E8E8E8;
+	width: auto;
 	height: 200px;
-	bottom: 15px;
 	border: 1px solid #D7D7D7;
 }
 
@@ -482,14 +479,11 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 }
 
 .rightButtonStyle {
-	position: absolute;
-	right: 0px;
-	bottom: 0px;
+	float: right;
 }
 
-.pagePreviewFrame {
-	position: absolute;
-	border: 1px solid #D7D7D7;
+.leftButtonStyle {
+	float: left;
 }
 
 .accordionTabTitleBar {
@@ -570,9 +564,8 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	border: 1px solid #D7D7D7;
 }
 
-.site_tree_container_pages {
-	position: absolute;
-	width: 275px;
+.site_tree_container {
+	width: 250px;
 	border: 1px solid #D7D7D7;
 }
 
@@ -598,11 +591,10 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 }
 
 .recycleBin {
-/*	margin-left: 7px; */
-/*	margin-top: 7px; */
-	
 	border: 2px outset #D7D7D7;	
-	opacity: 0.5; 
+	opacity: 0.5;
+	height: 16px;
+	width: 16px;
 }
 
 .siteTree {
@@ -701,7 +693,12 @@ width: auto !important;
 
 #site_tree_container .wf_titlebar{
 	display: none !important;
-background: #fff;
+	background: #fff;
+}
+
+#site_tree_container .wf_viewmenucontainer {
+	display: none !important;
+	background: #fff;
 }
 
 #pageInfoContainer .wf_titlebar{
@@ -718,9 +715,9 @@ height: auto !important;
 }
 
 #site_tree_container .wf_blockmainarea{
-margin-top: 35px !important;
-padding: 0 !important;
-top: 0pt !important;
+	padding: 0 !important;
+	top: 0pt !important;
+	width: 100%;
 }
 
 #pageInfoContainer .wf_blockmainarea{
@@ -810,23 +807,25 @@ overflow: auto !important;
 }
 
 .pagePreviewContainer {
+	float: left;
 	overflow: auto;
+	padding-left: 2px;
 }
 
 .accordionInPages {
-	position : absolute;
-	width : 262px;
+	width : 250px;
+	float: left;
 }
 
 #site_tree_container .site_tree_container_site_accordion {
+	background-color: #E8E8E8;
 	right: 0px;
-	width: 275px;
-	height: 400px !important;
+	width: 234px;
+	height: 278px !important;
 }
 
 #site_tree_container .wf_menuheader{
 	background :#E8E8E8;
-	height: 35px;
 }
 #siteInfoToggle .wf_menuheader{
 	background :#E8E8E8;
@@ -838,19 +837,18 @@ overflow: auto !important;
 	margin-bottom: 5px ;
 }
 #current_structure_tree{
-	height: 400px;
+	height: 278px;
 	width: auto;
 }
 #site_tree_container{
-	height: 400px !important;
-	width: 275px;
+	height: 278px !important;
+	width: 234px;
 }
 #sitemap{
 	overflow-y:auto !important;	
 }
 
 #makeStartPage {
-	left: 50%;
 }
 
 .reload_properties_for_theme:HOVER {
@@ -863,4 +861,8 @@ overflow: auto !important;
 .applicationPropertyStyleClass:HOVER {
 	background-color: #ffff99;
 	cursor: pointer;
+}
+
+.mainPagesContentStyle {
+	padding-top: 5px;
 }

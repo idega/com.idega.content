@@ -42,7 +42,7 @@ version="1.2">
                 	</script>
                 </f:verbatim>
                 
-                <wf:wfblock maximizedVertically="true" id="pagesBlock" title="#{localizedStrings['com.idega.content']['pages']}">
+                <t:div styleClass="mainPagesContentStyle">
                 	<t:div id="leftSide" forceId="true" styleClass="accordionInPages">
 						<web2:accordion accordionId="myAccordion" includeJavascript="true">
 							<f:facet name="PANELS">
@@ -64,7 +64,7 @@ version="1.2">
 											</c:block_with_toolbar>
 										</t:div>
 									</t:div>
-																					
+											
 									<t:div id="pageInfo" forceId="true" styleClass="acTogglemyAccordion">
 										<h:outputText value="#{localizedStrings['com.idega.content']['page_info']}"/>
 									</t:div>
@@ -79,7 +79,7 @@ version="1.2">
 	
 					<t:div styleClass="pagePreviewContainer">
 						<f:verbatim>
-							<iframe name="treePages" id="treePages" class="pagePreviewFrame">iframe</iframe>
+							<iframe name="treePages" id="treePages">iframe</iframe>
 						</f:verbatim>
 					</t:div>
                 
@@ -87,7 +87,7 @@ version="1.2">
 					<t:inputHidden id="notDefaultThemeLabel" forceId="true" value="#{localizedStrings['com.idega.content']['theme_is_not_default']}"></t:inputHidden>
 					
 					<c:ThemesSliderViewer hiddenOnLoad="true" />
-                </wf:wfblock>
+				</t:div>
                 
                 <t:div id="newPageContainer" forceId="true" styleClass="newPageContainerStyle" style="display: none; left: 8px;">
 					<wf:iwtree value="#{siteTemplateBean.pageTree}" id="new_page_tree" var="node" varNodeToggler="t" clientSideToggle="true"	sourceTree="true"	showRootNode="false">
@@ -118,14 +118,16 @@ version="1.2">
 				</f:verbatim>
                 
                 <t:div styleClass="pageInfoButtonsContainer">
-					<t:commandButton id="newPageButton" forceId="true" styleClass="newPageButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['new_page']}"></t:commandButton>
-				</t:div>
-				<t:div styleClass="rightButtonStyle">
-					<t:commandButton id="showPageModules" forceId="true" styleClass="showPageModulesStyleClass" type="button" value="#{localizedStrings['com.idega.content']['show_modules']}"></t:commandButton>
-					<t:commandButton id="showThemesButton" forceId="true" styleClass="showThemesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['show_themes']}"></t:commandButton>
-					<t:commandButton id="showEditPagesButton" forceId="true" styleClass="showEditPagesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['edit']}"></t:commandButton>
-					<t:commandButton id="showSourcePagesButton" forceId="true" styleClass="showSourcePagesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['page_source']}" disabled="true"></t:commandButton>
-					<t:commandButton id="showPreviewPagesButton" forceId="true" styleClass="showPreviewPagesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['preview']}"></t:commandButton>
+                	<t:div styleClass="leftButtonStyle">
+                		<t:commandButton id="newPageButton" forceId="true" styleClass="newPageButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['new_page']}"></t:commandButton>
+                	</t:div>
+					<t:div styleClass="rightButtonStyle">
+						<t:commandButton id="showPageModules" forceId="true" styleClass="showPageModulesStyleClass" type="button" value="#{localizedStrings['com.idega.content']['show_modules']}"></t:commandButton>
+						<t:commandButton id="showThemesButton" forceId="true" styleClass="showThemesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['show_themes']}"></t:commandButton>
+						<t:commandButton id="showEditPagesButton" forceId="true" styleClass="showEditPagesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['edit']}"></t:commandButton>
+						<t:commandButton id="showSourcePagesButton" forceId="true" styleClass="showSourcePagesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['page_source']}" disabled="true"></t:commandButton>
+						<t:commandButton id="showPreviewPagesButton" forceId="true" styleClass="showPreviewPagesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['preview']}"></t:commandButton>
+					</t:div>
 				</t:div>
 			</h:form>
 		</ws:page>
