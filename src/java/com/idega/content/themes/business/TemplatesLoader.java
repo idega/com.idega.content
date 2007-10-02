@@ -278,7 +278,7 @@ public class TemplatesLoader implements JarLoader {
 	
 	public Map<String, PageTemplate> getPageMap(){
 		Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
-		Map pageMap = null;
+		Map<String, PageTemplate> pageMap = null;
 		if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
 			pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
 		}
