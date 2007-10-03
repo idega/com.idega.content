@@ -395,7 +395,7 @@ function setAsStartPageCallback(result) {
 	if (result != null) {
 		changePageTitleCallback(result);
 	}
-	window.location.href=window.location.href;
+	reloadPage();
 }
 
 function closeNewPage(newPage) {
