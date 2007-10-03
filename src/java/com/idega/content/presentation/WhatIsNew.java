@@ -1,5 +1,5 @@
 /*
- * $Id: WhatIsNew.java,v 1.7 2007/05/02 15:30:28 eiki Exp $
+ * $Id: WhatIsNew.java,v 1.8 2007/10/03 22:59:42 eiki Exp $
  * Created on Jun 21, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -36,16 +36,16 @@ import com.idega.slide.business.IWSlideSession;
  * It extends SearchResults block and forces it to only use a DASL search (ContentSearch) with specific settings<br>
  * and the query is by default set to "*" and the path to "files" but that can be changed.
  * 
- *  Last modified: $Date: 2007/05/02 15:30:28 $ by $Author: eiki $
+ *  Last modified: $Date: 2007/10/03 22:59:42 $ by $Author: eiki $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class WhatIsNew extends SearchResults {
 
 	public static final String STYLE_CLASS_WHATISNEW = "whatisnew";
 	public static final String WHAT_IS_NEW_CACHE_KEY = "iw_whatisnew";
-	protected String startingPointURI = "files";
+	protected String startingPointURI = "files/public";
 	protected String orderByProperty = "getlastmodified";
 	protected boolean useDescendingOrder = true;
 	protected int numberOfResultItemsToDisplay = -1;
