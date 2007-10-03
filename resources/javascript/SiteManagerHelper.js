@@ -142,12 +142,12 @@ function initialiazeSiteManager() {
 }
 
 function registerSiteActions() {
-    $$('a.pageTreeNames').each(function(element){
-		element.onclick = function() { 
+    $$('a.pageTreeNames').each(function(element) {
+		element.addEvent('click', function() {
 			boldSelectedTreeElement(element);				
 			setPageID(element.parentNode.id);
 			return false;
-		}
+		});
     });
 	boldCurrentTreeElement();
 }

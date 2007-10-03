@@ -25,8 +25,7 @@ version="1.2">
 					<script type="text/javascript">
 						window.addEvent('domready', function() {
 							var errorHanlder = function() {
-								closeAllLoadingMessages();
-								window.location.href = window.location.href;
+								reloadPage();
 							}
 							DWREngine.setErrorHandler(errorHanlder);
 						});

@@ -522,26 +522,26 @@ function registerPageInfoActions() {
 	);
 }
 
-function registerPageInfoActionsOnElement(element){
+function registerPageInfoActionsOnElement(element) {
 	var pageTreeNodeClickFunction = function() {
-		if(ignoreClick){
+		if (ignoreClick) {
 			//click right after double click
 			return false;
 		}
-		if(waitingForSecondClick){
+		if (waitingForSecondClick) {
 			//doubleclick
 			executeOnDblClick(element);
 			ignoreClick = true;
 			waitingForSecondClick = false;
 			return false;
 		}
-		else{
+		else {
 			//first click
 			waitingForSecondClick = true;
 			currentElement = element;
-			setTimeout('clickOnTimeout(currentElement)',dcTime);	
+			setTimeout('clickOnTimeout(currentElement)', dcTime);
 		}
-	};
+	}
 	element.addEvent('click', pageTreeNodeClickFunction);
 }
 

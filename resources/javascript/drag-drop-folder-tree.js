@@ -492,7 +492,7 @@
 			tempTable.style.margin='5px';
 			var tr=document.createElement('tr');
 		  	var td=document.createElement('td');
-		  	var tdText=document.createTextNode('Drop templates here'); 
+		  	var tdText=document.createTextNode(getDropTemplatesHereText()); 
 		  	td.appendChild(tdText);  					// - put the text node in the table cell
 		  	tr.appendChild(td); 						// - put the cell into the row
 		  	tempTable.appendChild(tr); 	
@@ -640,8 +640,8 @@
 				}								
 			}else{			
 				// Putting the item back to it's original location
-					JSTreeObj.restoreTreeStructure();
-					return;
+				JSTreeObj.restoreTreeStructure();
+				return;
 			}
 			JSTreeObj.dropTargetIndicator.style.display='none';		
 			JSTreeObj.dragDropTimer = -1;	
@@ -707,7 +707,6 @@
 								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, false, numberInLevel, followingNodes);
 							}
 							else {
-
 								JSTreeObj.saveNewPage(newParentId, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
 								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, numberInLevel, followingNodes);
 							}								
@@ -740,55 +739,65 @@
 			ThemesEngine.beforeCreatePage(nodes, isFirst, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
 		},
 		getNewRootId : function(id) {
-			if (id == null) {
+			closeAllLoadingMessages();
+
+			if (id == null || id.length == 0) {
 				return;
-			}			
+			}
 						
-			var root = document.getElementById('rootTemporary');
-			(document.getElementById('rootTemporary')).setAttribute('id', id[0]);	
-			JSTreeObj.initNode(document.getElementById(id[0]));		
-			var newName = (document.getElementById(id[0]).getElementsByTagName('a')[0]).innerHTML;
+			var root = $('rootTemporary');
+			if (root == null) {
+				return;
+			}
+			root.setAttribute('id', id[0]);
+			
+			var createdNode = $(id[0]);
+			if (createdNode == null) {
+				return;
+			}
+			
+			JSTreeObj.initNode(createdNode);
+			
+			var newName = (createdNode.getElementsByTagName('a')[0]).innerHTML;
 			var newChilds = root.getElementsByTagName('li');
 			var newChildsElement = null;
 			var newNode = null;
 			var newName = null;
-			for(var i = 0; i < newChilds.length; i++){
+			for (var i = 0; i < newChilds.length; i++) {
 				newChildsElement = newChilds[i];
 				if (newChildsElement != null) {
-					(document.getElementById(newChildsElement.id)).setAttribute('id', id[i+1]);
+					$(newChildsElement.id).setAttribute('id', id[i+1]);
 				}
-				newNode = document.getElementById(id[i+1]);
+				newNode = $(id[i+1]);
 				if (newNode != null) {
 					JSTreeObj.initNode(newNode);
 					newName = (newNode.getElementsByTagName('a')[0]).innerHTML;
 				}
 			}
+			
 			var lastID = id[id.length - 1];
 			setPageID(lastID);
 			getPrewUrl(lastID);
 			isChangingSiteMap();
 			if (!isSiteMap()) {
-				var aTag = document.getElementById(id);
-				if (aTag){
+				var aTag = $(lastID);
+				if (aTag) {
 					aTag = aTag.getElementsByTagName('a')[0];
-					aTag.className = 'pageTreeNames';				
+					aTag.className = 'pageTreeNames';
 					boldSelectedTreeElement(aTag);
-					registerPageInfoActionsOnElement(aTag);
+					registerPageInfoActionsOnElement($(aTag));
 				}
 			}
 			else {
-				for (var i = 0; i < id.length; i++) {
-					var aTag = document.getElementById(id[0]);
-					if (aTag) {
-						aTag = aTag.getElementsByTagName('a')[0];
-						aTag.className = 'pageTreeNames';				
-						boldSelectedTreeElement(aTag);
-					}
+				var aTag = $(id[0]);
+				if (aTag) {
+					aTag = aTag.getElementsByTagName('a')[0];
+					aTag.className = 'pageTreeNames';				
+					boldSelectedTreeElement(aTag);
 				}
 				registerSiteActions();				
 			}
 			
-			closeLoadingMessage();
 			if (isNeedRelaodBuilderPage() && isSiteMap() && isNeedRedirect()) {
 				showLoadingMessage(REDIRECTING_TEXT);
 				setNeedRelaodBuilderPage(false);
@@ -1074,13 +1083,10 @@
 				input.style.width = '40%';
 				input.style.display='none';
 				
-				menuItems[no].insertBefore(input,aTag);
+				menuItems[no].insertBefore(input, aTag);
 	
 				input.id = menuItems[no].id + 'input';
-	
-				input.onblur = hideEdit;
-				
-				input.onkeypress = withEnter;
+				addEventsToSiteTreeInput($(input.id));
 						
 				aTag.ondblclick = initEditLabel;
 				aTag.setAttribute('href', '#' + aTag.innerHTML);	
@@ -1137,61 +1143,72 @@
 	
 			var iconfile = null;		 
 			var tmpVar = node.getAttribute('iconfile');
-			if(!tmpVar)				
+			if (!tmpVar) {
 				tmpVar = node.iconfile;
-			if(tmpVar)
+			}
+			if (tmpVar) {
 				iconfile = tmpVar;
+			}
 			else {
 				folderImg.src = imageFolder + this.iconFolder;	
 			}
 
 			var templatefile = null;		 
 			var tmpVar = node.getAttribute('templatefile');
-			if(!tmpVar)				
+			if (!tmpVar) {
 				tmpVar = node.templatefile;
-			if(tmpVar)
+			}
+			if (tmpVar) {
 				templatefile = tmpVar;
+			}
+			
 			nodeId++;
 			var subItems = node.getElementsByTagName('UL');
-
 			var aTag = node.getElementsByTagName('A')[0];
 
 			var input = node.getElementsByTagName('INPUT')[0];
 			input.style.width = '40%';
 			input.style.display='none';
-				
-			input.onblur = hideEdit;
-			
 			input.id = node.id + 'input';
-				
-			input.onkeypress = withEnter;
+			addEventsToSiteTreeInput($(input.id));
 						
-				aTag.ondblclick = initEditLabel;
-				if(!noDrag)aTag.onmousedown = JSTreeObj.initDrag;
-				if(!noChildren)aTag.onmousemove = JSTreeObj.moveDragableNodes;
-				if(sourceTree)aTag.onmousedown = JSTreeObj.copyDragableNode;
+			aTag.ondblclick = initEditLabel;
+			if (!noDrag) {
+				aTag.onmousedown = JSTreeObj.initDrag;
+			}
+			if (!noChildren) {
+				aTag.onmousemove = JSTreeObj.moveDragableNodes;
+			}
+			if (sourceTree) {
+				aTag.onmousedown = JSTreeObj.copyDragableNode;
+			}
 								
-				var images = node.getElementsByTagName('img');				
-				var folderImg = images[1];
-				
-				if(!noDrag){
-					if(sourceTree)
-						folderImg.onmousedown = JSTreeObj.copyDragableNode;
-					else
-						folderImg.onmousedown = JSTreeObj.initDrag;
+			var images = node.getElementsByTagName('img');				
+			var folderImg = images[1];
+			if (!noDrag) {
+				if (sourceTree) {
+					folderImg.onmousedown = JSTreeObj.copyDragableNode;
 				}
-				if(!noChildren)folderImg.onmousemove = JSTreeObj.moveDragableNodes;
-				
-				if(node.className) {
-					folderImg.src = imageFolder + node.className;
-				}else{		
-					folderImg.src = imageFolder + this.iconFolder;					
+				else {
+					folderImg.onmousedown = JSTreeObj.initDrag;
 				}
-				if(iconfile)
-					folderImg.src = iconfile;
+			}
+			if (!noChildren) {
+				folderImg.onmousemove = JSTreeObj.moveDragableNodes;
+			}	
+			if (node.className) {
+				folderImg.src = imageFolder + node.className;
+			}
+			else {		
+				folderImg.src = imageFolder + this.iconFolder;					
+			}
+			if (iconfile) {
+				folderImg.src = iconfile;
+			}
+				
 			document.documentElement.onmousemove = JSTreeObj.moveDragableNodes;
-			
 			document.documentElement.onmouseup = JSTreeObj.dropDragableNodesCopy;
+			
 			this.actionOnMouseUp = 'move';
 		},					
 		saveNewPage : function (newParentNodeId, pagetype, templatefile, pageName, numberInLevel, followingNodes){
@@ -1298,11 +1315,14 @@
 			JSTreeObj.dropTargetIndicator.style.display='none';				
 		},
 		checkIfOverTree : function(idOfTree){
-			var treeElement = document.getElementById(idOfTree);
-			treeElement.setAttribute('onmouseover','JSTreeObj.aboveTree()');
-			treeElement.setAttribute('onmouseout','JSTreeObj.notAboveTree()');			
-			
-		}, 
+			var treeElement = $(idOfTree);
+			treeElement.addEvent('mouseover', function() {
+				JSTreeObj.aboveTree();
+			});
+			treeElement.addEvent('mouseout', function() {
+				JSTreeObj.notAboveTree();
+			});
+		},
 		getOrderInLevel : function(nodeId, parentNodeId){
 
 			var result = null;
@@ -1456,24 +1476,25 @@
 		}
 	}
 	
+	function addEventsToSiteTreeInput(input) {
+		input.addEvent('blur', hideEdit);
+		input.addEvent('keypress', function(e) {
+			e = new Event(e);
+			withEnter(e);
+		});
+	}
+
 	function withEnter(e) {
-		if (window.event) {
-			if (e.keyCode == 3) {
-				hideEdit();
-				return false;
-			}
-			
-			if (e.keyCode == 13) {
-				hideEdit();
-				return false;
-			}
+		if (e.key == 'enter') {
+			hideEdit();
+			return false;
 		}
-		else {
-			if (e.which == 13) {
-				hideEdit();
-				return false;
-			}
+
+		if (e.code == 3) {
+			hideEdit();
+			return false;
 		}
+		return false;
 	}
 
 	function okToNavigate() {
@@ -1518,7 +1539,7 @@
 		if (editObj == null) {
 			return false;
 		}
-		
+
 		if (editObj.value.length>0) {
 			editEl = replaceHtml(editEl, editObj.value);
 
@@ -1533,10 +1554,8 @@
 			ThemesEngine.changePageUri(changeNameId, newName, true, changePageTitleCallback);
 		}
 		editEl.style.display='inline';
-		editEl.ondblclick = initEditLabel;
-		try {
-			registerPageInfoActionsOnElement(editEl);
-		}  catch(e) {};
+		$(editEl).addEvent('dblclick', initEditLabel);
+		registerPageInfoActionsOnElement($(editEl));
 		editObj.style.display='none';
 		editEl = false;			
 		editCounter=-1;
