@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.37 2007/07/02 16:16:06 civilis Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.38 2007/10/03 21:51:21 eiki Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2007/07/02 16:16:06 $ by $Author: civilis $ This class
+ * Last modified: $Date: 2007/10/03 21:51:21 $ by $Author: eiki $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -83,7 +83,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.37 $
+ * @version $Revision: 1.38 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -671,6 +671,11 @@ public class ContentSearch extends Object implements SearchPlugin{
 			fileURI = entity.getHref();
 
 			if (!fileURI.equalsIgnoreCase(servletMapping)) {
+				fileName = URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/") + 1));
+				//don't return "hidden files" that start with a "."
+				if(fileName.startsWith(".")){
+					continue;
+				}
 				Enumeration props = entity.getProperties();
 				Map properties = new HashMap();
 //				System.out.println(fileURI + " properties:");
@@ -683,7 +688,6 @@ public class ContentSearch extends Object implements SearchPlugin{
 				}
 				
 				// PARSE PROPERTIES AND CONVERT SOME
-				fileName = URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/") + 1));
 				if(isSetToHideFileExtensions()){
 					int dotIndex = fileName.lastIndexOf(".");
 					if(dotIndex>-1){
