@@ -25,6 +25,11 @@
 				<f:verbatim>
         			<script type="text/javascript">
         				window.addEvent('domready', function() {
+        					var errorHanlder = function() {
+								reloadPage();
+							}
+							DWREngine.setErrorHandler(errorHanlder);
+        				
         					getInfoForCategories();
         					initializeContentCategoriesActions();
         				});
