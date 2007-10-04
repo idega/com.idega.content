@@ -254,7 +254,7 @@ function resizeSlider() {
 		return;
 	}
 
-	var available = getTotalWidth() - 500;
+	var available = getTotalWidth() - RESERVED_WIDTH;
 	if (available > 0) {
 		container.style.width = available + 'px';
 		themesTicker.style.width = (available - 50) + 'px';

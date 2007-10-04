@@ -94,14 +94,3 @@ function getId(){
 function changeName() {
 	document.getElementById('page_tree_div').id = url;
 }
-
-function initializeTree() {
-	setIsSiteMap(true);
-	setNeedRedirect(true);
-	setActiveLanguage();
-	resizeContainer('site_tree_container', 'site_tree_container_site', 335, true);
-	resizeContainer('pagesTypesContainer', 'pagesTypesContainer', 302, false);
-	resizeContainer('siteTemplatesContainer', 'siteTemplatesContainer', 302, false);
-	resizeContainer('siteTemplatesContainer', 'siteTemplatesContainer', 287, true);
-	checkIfNotEmptySiteTree('div_id_current_structure_tree');
-}
