@@ -868,3 +868,7 @@ overflow: auto !important;
 .acStretchmyAccordion {
 	background-color: #E8E8E8;
 }
+
+.siteTreeNodeNameEditInputStyle {
+	width: auto;
+}

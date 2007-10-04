@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <jsp:root xmlns:jsp="http://java.sun.com/JSP/Page"
 	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:wf="http://xmlns.idega.com/com.idega.webface"
 	xmlns:ws="http://xmlns.idega.com/com.idega.workspace"
 	xmlns:c="http://xmlns.idega.com/com.idega.content"
@@ -11,7 +10,7 @@
 
 	<jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" />
 
-	<f:view>
+	<jsf:view>
 		<ws:page id="createpage" javascripturls="/dwr/engine.js,
         			/dwr/interface/ThemesEngine.js,
 					/dwr/interface/BuilderService.js,
@@ -23,7 +22,7 @@
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
         			/idegaweb/bundles/com.idega.content.bundle/resources/javascript/SiteManagerHelper.js">        			
 			<h:form id="createpageform">
-				<f:verbatim>
+				<jsf:verbatim>
                 	<script type="text/javascript">
                 		window.addEvent('domready', getGlobalPageId);
                 		window.addEvent('domready', getLocalizedTextForThemes);
@@ -31,12 +30,12 @@
                 		window.addEvent('domready', getPathToImageFolder);
  	              		window.addEvent('domready', registerSiteActions);                		
                 	</script>
-                </f:verbatim>
+                </jsf:verbatim>
 			
 				<wf:wfblock maximizedVertically="true" id="siteMapBlock" title="#{localizedStrings['com.idega.content']['site_map']}">
                 	<x:div id="leftSide" forceId="true" styleClass="accordionInPages">
 						<web2:accordion accordionId="myAccordion" includeJavascript="true">
-							<f:facet name="PANELS">
+							<jsf:facet name="PANELS">
 								<x:div id="structureAccordion" forceId="true">
 									<x:div id="siteMapInformation" forceId="true" styleClass="acTogglemyAccordion">
 										<h:outputText value="#{localizedStrings['com.idega.content']['current_site_structure']}"/>
@@ -65,20 +64,20 @@
 										</x:div>
 									</x:div>
 								</x:div>
-							</f:facet>
+							</jsf:facet>
 						</web2:accordion>     
 					</x:div>     
 
 					<x:div id="pagesTypesContainer" forceId="true">
 						<wf:wfblock id="dhtmlgoodies_tree2" title="#{localizedStrings['com.idega.content']['page_types']}" styleClass="pagesTypesContainer">
 							<wf:iwtree value="#{siteTemplateBean.pageTree}" id="page_chooser22"	var="node" varNodeToggler="t" clientSideToggle="true"	sourceTree="true"	showRootNode="false">
-								<f:facet name="IWTreeNode">
+								<jsf:facet name="IWTreeNode">
 									<h:panelGroup>
 										<h:outputLink>
 											<h:outputText value="#{node.description}"/>									
 										</h:outputLink>
 									</h:panelGroup>
-								</f:facet>
+								</jsf:facet>
 							</wf:iwtree>
 						</wf:wfblock>
 					</x:div>
@@ -89,16 +88,16 @@
 						</wf:wfblock>
 					</x:div>
 
-					<f:verbatim>
+					<jsf:verbatim>
 						<script type="text/javascript">	
 							window.addEvent('domready', function() {
 								appendIdOfTree('page_chooser22');
 								appendIdOfAdvancedTree('current_structure_tree');
 							});
 						</script>
-					</f:verbatim>		
+					</jsf:verbatim>		
 				</wf:wfblock>
 			</h:form>
 		</ws:page>
-	</f:view>
+	</jsf:view>
 </jsp:root>

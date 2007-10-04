@@ -785,7 +785,7 @@
 					aTag = aTag.getElementsByTagName('a')[0];
 					aTag.className = 'pageTreeNames';
 					boldSelectedTreeElement(aTag);
-					registerPageInfoActionsOnElement($(aTag));
+					registerActionsOnSiteTreeElement($(aTag));
 				}
 			}
 			else {
@@ -1011,7 +1011,7 @@
 			JSTreeObj.deleteNodes = false;
 			trashCan.style.opacity = 0.5;
 		},
-		initTree : function() {				
+		initTree : function() {
 			JSTreeObj = this;
 			treeObj = this;
 			JSTreeObj.createDropIndicator();
@@ -1073,23 +1073,21 @@
 						
 				var aTag = menuItems[no].getElementsByTagName('A')[0];
 				if(aTag.id)
-					numericId = aTag.id.replace(/[^0-9]/g,'');
+					numericId = aTag.id.replace(/[^0-9]/g, '');
 				else
 					numericId = (no+1);			
 	
 				aTag.id = menuItems[no].id + 'a';
 	
 				var input = document.createElement('INPUT');
-				input.style.width = '40%';
 				input.style.display='none';
 				
 				menuItems[no].insertBefore(input, aTag);
 	
 				input.id = menuItems[no].id + 'input';
 				addEventsToSiteTreeInput($(input.id));
-						
-				aTag.ondblclick = initEditLabel;
-				aTag.setAttribute('href', '#' + aTag.innerHTML);	
+				
+				aTag.setAttribute('href', 'javascript:void(0)');	
 				if(!noDrag)aTag.onmousedown = JSTreeObj.initDrag;
 				if(!noChildren)aTag.onmousemove = JSTreeObj.moveDragableNodes;
 				if(sourceTree)aTag.onmousedown = JSTreeObj.copyDragableNode;
@@ -1167,12 +1165,10 @@
 			var aTag = node.getElementsByTagName('A')[0];
 
 			var input = node.getElementsByTagName('INPUT')[0];
-			input.style.width = '40%';
 			input.style.display='none';
 			input.id = node.id + 'input';
 			addEventsToSiteTreeInput($(input.id));
-						
-			aTag.ondblclick = initEditLabel;
+			
 			if (!noDrag) {
 				aTag.onmousedown = JSTreeObj.initDrag;
 			}
@@ -1430,8 +1426,7 @@
 			
 			return result;					
 		},
-		createNodeOnClick : function(){
-			
+		createNodeOnClick : function() {
 			JSTreeObj.dragNode_source = this.parentNode;			
 			JSTreeObj.floatingContainer.style.display='block';
 			var tempNode = JSTreeObj.dragNode_source.cloneNode(true);
@@ -1440,39 +1435,36 @@
 			
 			var activePageId = getPageID();
 			JSTreeObj.dragNode_destination = document.getElementById(activePageId);
-			
-					var uls = JSTreeObj.dragNode_destination.getElementsByTagName('UL');
-					if(uls.length>0){
-						ul = uls[0];
-						ul.style.display='block';
-						var lis = ul.getElementsByTagName('LI');						
-						
-						var li = JSTreeObj.dragNode_source.getElementsByTagName('LI')[0];
-						
-						if(lis.length>0){	// Sub elements exists - drop dragable node before the first one
-							ul.insertBefore(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id),lis[0]);	
-						}else {	// No sub exists - use the appendChild method - This line should not be executed unless there's something wrong in the HTML, i.e empty <ul>
-							ul.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
-						}
-					}else{
-						var ul = document.createElement('UL');
-						ul.style.display='block';
-						JSTreeObj.dragNode_destination.appendChild(ul);
-						var childElement = document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id);
-						ul.appendChild(childElement);											
-					}
-					var img = JSTreeObj.dragNode_destination.getElementsByTagName('IMG')[0];	
 
-					img.style.visibility='visible';
-					img.src = img.src.replace(JSTreeObj.plusImage,JSTreeObj.minusImage);			
+			var uls = JSTreeObj.dragNode_destination.getElementsByTagName('UL');
+			if (uls.length>0) {
+				ul = uls[0];
+				ul.style.display='block';
+				var lis = ul.getElementsByTagName('LI');
+				var li = JSTreeObj.dragNode_source.getElementsByTagName('LI')[0];
+						
+				if (lis.length>0) {	// Sub elements exists - drop dragable node before the first one
+					ul.insertBefore(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id),lis[0]);	
+				}
+				else {	// No sub exists - use the appendChild method - This line should not be executed unless there's something wrong in the HTML, i.e empty <ul>
+					ul.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
+				}
+			}
+			else {
+				var ul = document.createElement('UL');
+				ul.style.display='block';
+				JSTreeObj.dragNode_destination.appendChild(ul);
+				var childElement = document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id);
+				ul.appendChild(childElement);											
+			}
+			var img = JSTreeObj.dragNode_destination.getElementsByTagName('IMG')[0];
+			img.style.visibility='visible';
+			img.src = img.src.replace(JSTreeObj.plusImage,JSTreeObj.minusImage);			
 			
-			
-			
-
 			var followingNodes = treeObj.getFollowingNodes(activePageId, 3);
 			JSTreeObj.saveNewPage(activePageId, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
 								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, 1, followingNodes);
-		return false;
+			return false;
 		}
 	}
 	
@@ -1506,8 +1498,9 @@
 	
 	var editCounter = -1;
 	var editEl = false;
+	var oldSitePageName = null;
 	
-	function initEditLabel() {
+	function initEditLabel(element) {
 		changePageName = true;
 		if(saveOnDrop == false){
 			return;
@@ -1516,15 +1509,17 @@
 			hideEdit();
 		}
 		editCounter = 0;
-		editEl = this;	// Reference to a Tag
+		editEl = element;
 		startEditLabel();
 	}
 	
 	function startEditLabel() {
 		var el = editEl.previousSibling;
 		el.value = editEl.innerHTML;
-		editEl.style.display='none';
-		el.style.display='inline';	
+		oldSitePageName = el.value;
+		editEl.style.display = 'none';
+		el.style.display = 'inline';
+		el.className = 'siteTreeNodeNameEditInputStyle';
 		el.select();
 		el.focus();
 	}
@@ -1540,25 +1535,27 @@
 			return false;
 		}
 
-		if (editObj.value.length>0) {
-			editEl = replaceHtml(editEl, editObj.value);
+		var newSitePageName = editObj.value;
+		if (newSitePageName != null && newSitePageName.length > 0 && newSitePageName != oldSitePageName) {
+			editEl = replaceHtml(editEl, newSitePageName);
 
-			var changeNameId = editObj.id.replace(/[^0-9]/g,'');
-			var newName = editObj.value;
-			editEl.setAttribute('href', '#' + newName);
+			var changeNameId = editObj.id.replace(/[^0-9]/g, '');
 			
 			showLoadingMessage(CHANGING_THEME);
-			BuilderService.changePageName(changeNameId, newName, empty);
+			BuilderService.changePageName(changeNameId, newSitePageName, empty);
 
-			changePageTitleInPageInfo(newName);
-			ThemesEngine.changePageUri(changeNameId, newName, true, changePageTitleCallback);
+			changePageTitleInPageInfo(newSitePageName);
+			ThemesEngine.changePageUri(changeNameId, newSitePageName, true, changePageTitleCallback);
 		}
+		
+		oldSitePageName = null;
 		editEl.style.display='inline';
-		$(editEl).addEvent('dblclick', initEditLabel);
-		registerPageInfoActionsOnElement($(editEl));
+		if (!IE) {
+			registerActionsOnSiteTreeElement($(editEl));
+		}
 		editObj.style.display='none';
 		editEl = false;			
-		editCounter=-1;
+		editCounter = -1;
 		return false;
 	}
 	
