@@ -704,6 +704,10 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	protected boolean closeInputStream(InputStream is) {
+		if (is == null) {
+			return true;
+		}
+		
 		try {
 			is.close();
 		} catch (IOException e) {
