@@ -44,8 +44,7 @@ public class WFBlockWithToolbar extends WFBlock {
 				vb = WFUtil.createValueBinding(expandAllValue);
 				expandAllValue = (String)(vb.getValue(FacesContext.getCurrentInstance()));
 			}
-			Link expand = new Link(expandAllValue);
-			expand.setNoURL();
+			Link expand = new Link(expandAllValue, "javascript:void(0)");
 			expand.setOnClick("if (treeObj != null) {treeObj.expandAll()}");
 			
 			if(WFUtil.isValueBinding(collapseAllValue)){
@@ -59,9 +58,7 @@ public class WFBlockWithToolbar extends WFBlock {
 			}
 			
 			
-			Link collapse = new Link(collapseAllValue);
-			
-			collapse.setNoURL();
+			Link collapse = new Link(collapseAllValue, "javascript:void(0)");
 			collapse.setOnClick("if (treeObj != null) {treeObj.collapseAll()}");		
 
 			Image recycleBinImage = new Image();
