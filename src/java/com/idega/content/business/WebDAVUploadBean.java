@@ -28,6 +28,7 @@ import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavRootResource;
+import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.webface.WFUtil;
 
@@ -309,7 +310,7 @@ public class WebDAVUploadBean implements Serializable{
 		String resultInfo = null;
 		boolean result;
 		
-		uploadFilePath = ThemesHelper.getInstance(false).changeFileUploadPath(getUploadFilePath() + uploadFile.getName().substring(0, uploadFile.getName().lastIndexOf(".")));
+		uploadFilePath = ThemesHelper.getInstance(false).changeFileUploadPath(getUploadFilePath() + getUploadFileName()/*uploadFile.getName().substring(0, uploadFile.getName().lastIndexOf("."))*/);
 		String path = getUploadFilePath();
 		List<String> filesToClean = new ArrayList<String>();
 		if (uploadingTheme) {
@@ -332,6 +333,31 @@ public class WebDAVUploadBean implements Serializable{
 		
 		log.info(resultInfo);
 		return result;
+	}
+	
+	private String getUploadFileName() {
+		if (uploadFile == null) {
+			return null;
+		}
+		
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return null;
+		}
+		
+		String name = uploadFile.getName();
+		if (iwc.isMacOS()) {
+			return name;
+		}
+		
+		if (name.indexOf(CoreConstants.BACK_SLASH) != -1) {
+			int nameLength = name.length();
+			int lastIndexOfBackSlash = name.lastIndexOf(CoreConstants.BACK_SLASH);
+			if (nameLength > lastIndexOfBackSlash) {
+				name = name.substring(lastIndexOfBackSlash + 1);
+			}
+		}
+		return name;
 	}
 
 }
