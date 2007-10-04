@@ -70,6 +70,9 @@ public class CategoryEditor extends Block {
 		
 		GenericButton save = new GenericButton(iwrb.getLocalizedString("save", "Save"));
 		addAttributes(save, newNameInputId, "changeCategoryNameButtonStyle", true, null);
+		if (iwc.isIE()) {
+			//	TODO add action
+		}
 		container.add(save);
 		
 		UIComponent notLocalized = getNotLocalizedCategories(iwc);
@@ -77,10 +80,12 @@ public class CategoryEditor extends Block {
 			container.add(notLocalized);
 		}
 		
-		Script script = new Script();
-		script.addScriptLine("initializeCategoryEditorWindowActions();");
-		script.addScriptLine(new StringBuilder("$('").append(newNameInputId).append("').focus();").toString());
-		container.add(script);
+		if (!iwc.isIE()) {
+			Script script = new Script();
+			script.addScriptLine("initializeCategoryEditorWindowActions();");
+			script.addScriptLine(new StringBuilder("$('").append(newNameInputId).append("').focus();").toString());
+			container.add(script);
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
