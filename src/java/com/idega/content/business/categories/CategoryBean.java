@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.3 2007/09/25 14:22:50 valdas Exp $
+ * $Id: CategoryBean.java,v 1.4 2007/10/04 12:14:44 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -49,6 +49,7 @@ import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavRootResource;
 import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
 import com.idega.util.StringHandler;
 
 
@@ -57,10 +58,10 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2007/09/25 14:22:50 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/10/04 12:14:44 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class CategoryBean {
 	private static final Log log = LogFactory.getLog(CategoryBean.class);
@@ -426,6 +427,16 @@ public class CategoryBean {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			return false;
+		}
+		
+		if (useThread) {
+			IWContext iwc = CoreUtil.getIWContext();
+			if (iwc == null) {
+				useThread = false;
+			}
+			else {
+				useThread = !iwc.isIE();
+			}
 		}
 		
 		if (useThread) {
