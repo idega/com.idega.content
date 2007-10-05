@@ -12,7 +12,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.slide.event.ContentEvent;
 
 import com.idega.business.IBOServiceBean;
+import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
+import com.idega.content.business.ContentItemChecker;
 import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
@@ -75,7 +77,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			return true;
 		}
 		
-		boolean result = deletePage(String.valueOf(theme.getIBPageID()), false, true);
+		boolean result = deletePage(String.valueOf(theme.getIBPageID()), false, true, false);
 		if (result) {
 			builder.clearAllCachedPages();
 		}
@@ -83,11 +85,11 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	}
 	
 	public boolean deleteIBPage(String pageID, boolean deleteChildren) {
-		return deletePage(pageID, deleteChildren, false);
+		return deletePage(pageID, deleteChildren, false, true);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private boolean deletePage(String pageID, boolean deleteChildren, boolean canUseDefaultUser) {
+	private boolean deletePage(String pageID, boolean deleteChildren, boolean canUseDefaultUser, boolean clearCache) {
 		if (pageID == null) {
 			return false;
 		}
@@ -122,6 +124,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			}
 		}
 		
+		deleteArticlesInThisPage(pageID);
 		boolean result = builder.deletePage(pageID, deleteChildren, tree, userId, domain);
 		
 		if (domain != null) {
@@ -133,10 +136,53 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			} catch (NumberFormatException e) {
 				log.error(e);
 			}
-			builder.clearAllCachedPages();
+			
+			if (clearCache) {
+				builder.clearAllCachedPages();
+			}
 		}
 		
 		return result;
+	}
+	
+	private boolean deleteArticlesInThisPage(String pageKey) {
+		if (pageKey == null) {
+			return false;
+		}
+		
+		BuilderService builder = getBuilderService();
+		if (builder == null) {
+			return false;
+		}
+		
+		Class<?> articleClass = CoreConstants.getArticleItemViewerClass();
+		if (articleClass == null) {
+			return false;
+		}
+		
+		List<String> ids = builder.getModuleId(pageKey, articleClass.getName());
+		if (ids == null) {
+			return true;
+		}
+		
+		List<String> paths = new ArrayList<String>();
+		String path = null;
+		for (int i = 0; i < ids.size(); i++) {
+			path = builder.getProperty(pageKey, ids.get(i), CoreConstants.ARTICLE_RESOURCE_PATH_PROPERTY_NAME);
+			if (path != null) {
+				paths.add(path);
+			}
+		}
+		
+		if (paths.size() == 0) {
+			return true;
+		}
+		
+		ContentItemChecker checker = (ContentItemChecker) SpringBeanLookup.getInstance().getSpringBean(getIWApplicationContext(), ContentItemChecker.class);
+		if (checker == null) {
+			return false;
+		}
+		return checker.deleteDummyArticles(paths);
 	}
 	
 	public boolean createIBPage(Theme theme) {
