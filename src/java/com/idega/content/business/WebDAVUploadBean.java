@@ -346,10 +346,6 @@ public class WebDAVUploadBean implements Serializable{
 		}
 		
 		String name = uploadFile.getName();
-		if (iwc.isMacOS()) {
-			return name;
-		}
-		
 		if (name.indexOf(CoreConstants.BACK_SLASH) != -1) {
 			int nameLength = name.length();
 			int lastIndexOfBackSlash = name.lastIndexOf(CoreConstants.BACK_SLASH);
@@ -357,6 +353,11 @@ public class WebDAVUploadBean implements Serializable{
 				name = name.substring(lastIndexOfBackSlash + 1);
 			}
 		}
+		
+		if (name.indexOf(ContentConstants.DOT) != -1) {
+			name = name.substring(0, name.lastIndexOf(ContentConstants.DOT));
+		}
+		
 		return name;
 	}
 
