@@ -64,6 +64,7 @@ import com.idega.data.IDOLookup;
 import com.idega.graphics.business.Generator;
 import com.idega.graphics.business.GraphicsConstants;
 import com.idega.graphics.business.ImageGenerator;
+import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
@@ -199,17 +200,18 @@ public class ThemesHelper implements Singleton {
 		return getSlideService(null);
 	}
 	
-	public IWSlideService getSlideService(IWContext iwc) {
+	public IWSlideService getSlideService(IWApplicationContext iwac) {
 		if (service == null) {
 			synchronized (ThemesHelper.class) {
-				if (iwc == null) {
-					iwc = CoreUtil.getIWContext();
-				}
 				if (service == null) {
 					try {
-						service = (IWSlideService) IBOLookup.getServiceInstance(iwc, IWSlideService.class);
-					} catch (IBOLookupException e) {
+						if (iwac == null) {
+							iwac = CoreUtil.getIWContext();
+						}
+						service = (IWSlideService) IBOLookup.getServiceInstance(iwac, IWSlideService.class);
+					} catch (Exception e) {
 						log.error(e);
+						return null;
 					}
 				}
 			}
@@ -1114,7 +1116,7 @@ public class ThemesHelper implements Singleton {
 					classAttribute = e.getAttribute(ELEMENT_CLASS_ATTRIBUTE);
 					if (classAttribute != null) {
 						if (classAttribute.getValue() != null) {
-							if (classAttribute.getValue().endsWith(CoreConstants.ARTICLE_ITEM_VIEWER_NAME)) {
+							if (classAttribute.getValue().equals(CoreConstants.getArticleItemViewerClass().getName())) {
 								if (isArticleViewerWithoutResourcePath(e)) {
 									articleViewers.add(e);
 								}
