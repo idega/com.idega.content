@@ -21,7 +21,7 @@
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js,
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
         			/idegaweb/bundles/com.idega.content.bundle/resources/javascript/SiteManagerHelper.js">        			
-			<h:form id="createpageform">
+			<h:form id="createpageform" onsubmit="return false;">
 				<jsf:verbatim>
                 	<script type="text/javascript">
                 		window.addEvent('domready', getGlobalPageId);

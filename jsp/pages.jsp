@@ -24,7 +24,7 @@ version="1.2">
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/PageInfoHelper.js,
 						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js">
-			<h:form id="pagesForm">
+			<h:form id="pagesForm" onsubmit="return false;">
 				<f:verbatim>
                 	<script type="text/javascript">
                 		window.addEvent('domready', function() {
