@@ -715,7 +715,7 @@ height: auto !important;
 
 #site_tree_container .wf_blockmainarea{
 	padding: 0 !important;
-	top: 0pt !important;
+	top: 25px !important;
 	width: 100%;
 }
 
@@ -733,8 +733,8 @@ margin-bottom: 0;
 font-size: 9px !important;
 }
 
-#site_tree_container .wf_menuheader{
-}
+/*#site_tree_container .wf_menuheader{
+}*/
 
 #pageInfoContainer .wf_menuheader{
 	border-bottom: 1px solid #d7d7d7;
