@@ -1502,12 +1502,13 @@
 	
 	function initEditLabel(element) {
 		changePageName = true;
-		if(saveOnDrop == false){
+		if (saveOnDrop == false) {
 			return;
 		}
 		if (editEl) {
 			hideEdit();
 		}
+		
 		editCounter = 0;
 		editEl = element;
 		startEditLabel();
@@ -1546,13 +1547,14 @@
 
 			changePageTitleInPageInfo(newSitePageName);
 			ThemesEngine.changePageUri(changeNameId, newSitePageName, true, changePageTitleCallback);
+		
+			if (!IE) {
+				registerActionsOnSiteTreeElement($(editEl));
+			}
 		}
 		
 		oldSitePageName = null;
 		editEl.style.display='inline';
-		if (!IE) {
-			registerActionsOnSiteTreeElement($(editEl));
-		}
 		editObj.style.display='none';
 		editEl = false;			
 		editCounter = -1;

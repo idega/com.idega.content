@@ -519,61 +519,122 @@ function registerActionsForSiteTree() {
 }
 
 function registerActionsOnSiteTreeElement(element) {
-	element.addEvent('dblclick', function(e) {
-		handleSiteTreeNodeClick(new Event(e), element);
+	element.addEvent('dblclick', function() {
+		executeOnDblClick(element);
+		markAsExecutingDoubleClick(element.id);
+		return false;
 	});
-	element.addEvent('click', function(e) {
-		handleSiteTreeNodeClick(new Event(e), element);
+	element.addEvent('click', function() {
+		handleSiteTreeNodeClick(element);
+		return false;
 	});
 }
 
-var DOUBLE_CLICKE_TIME = 250;		// Doubleclick time
-var DOUBLE_CLICK_DELAY = 100;		// No clicks after doubleclick
-var DOUBLE_CLICK_OCCURED_AT = 0;	// Time of doubleclick
-var CLICK_OCCURED_AT = 0;			// Save time of click event.
-var TIME_OUT_ID_FOR_CLICKS = null;	// Handle of click setTimeOut
-function handleSiteTreeNodeClick(e, element) {
-	var eventType = e.type;
-	switch (eventType) {
-		case 'click':
-			// If we've just had a doubleclick then ignore it
-			if (hadSiteTreeNodeDoubleClick()) {
-				return false;
-			}
-			
-			// Otherwise set timer to act.  It may be preempted by a doubleclick.
-			var d = new Date();
-			CLICK_OCCURED_AT = d.getTime();
-			TIME_OUT_ID_FOR_CLICKS = setTimeout("executeOnClick('"+element.id+"')", DOUBLE_CLICKE_TIME);
-			break;
-		case 'dblclick':
-			executeOnDblClick(element);
-			break;
-     default:
-   }
+var DOUBLE_CLICKE_TIME = 250;		//	Waiting time for other clicks on the same element
+var CLICKS_ON_ELEMENT = new Array();
+
+function ClickOnSiteTreeElement(id, count) {
+	this.id = id;
+	this.count = count;
+	this.timeOutId = null;
+	this.executingAction = false;
 }
 
-function hadSiteTreeNodeDoubleClick() {
-	var d = new Date();
-	var now = d.getTime();
-	if ((now - DOUBLE_CLICK_OCCURED_AT) < DOUBLE_CLICK_DELAY) {
-		return true;
+function markAsExecutingDoubleClick(id) {
+	var click = getClicksNumberOnElement(id);
+	click.count = 2;
+	click.executingAction = true;
+}
+
+function getClicksNumberOnElement(id) {
+	var click = null;
+	for (var i = 0; i < CLICKS_ON_ELEMENT.length; i++) {
+		click = CLICKS_ON_ELEMENT[i];
+		if (click.id == id) {
+			return click;
+		}
 	}
+	click = new ClickOnSiteTreeElement(id, 0);
+	CLICKS_ON_ELEMENT.push(click);
+	return click;
+}
+
+function resetOtherClicksForSiteTree(id) {
+	var click = null;
+	for (var i = 0; i < CLICKS_ON_ELEMENT.length; i++) {
+		click = CLICKS_ON_ELEMENT[i];
+		if (click.id != id) {
+			click.executingAction = false;
+			if (click.timeOutId != null) {
+				window.clearTimeout(click.timeOutId);
+				click.timeOutId = null;
+			}
+			click.count = 0;
+		}
+	}
+}
+
+function clearAllClicksForSiteTree() {
+	var click = null;
+	for (var i = 0; i < CLICKS_ON_ELEMENT.length; i++) {
+		click = CLICKS_ON_ELEMENT[i];
+		click.executingAction = false;
+		if (click.timeOutId != null) {
+			window.clearTimeout(click.timeOutId);
+			click.timeOutId = null;
+		}
+		click.count = 0;
+	}
+}
+
+function handleSiteTreeNodeClick(element) {
+	var id = element.id;
+	
+	resetOtherClicksForSiteTree(id);
+	
+	var click = getClicksNumberOnElement(id);
+	click.count++;
+	if (click.timeOutId == null) {
+		var action = function() {
+			executeSiteTreeActionAfterTimeOut(id);
+		}
+		click.timeOutId = window.setTimeout(action, DOUBLE_CLICKE_TIME);
+	}
+}
+
+function executeSiteTreeActionAfterTimeOut(id) {
+	var click = getClicksNumberOnElement(id);	
+	if (click == null) {
+		executeOnClick(id);
+	}
+	
+	var count = click.count;
+	var executingAction = click.executingAction;
+	
+	clearAllClicksForSiteTree();
+	
+	if (executingAction) {
+		return false;
+	}
+	
+	if (count <= 1) {
+		executeOnClick(id)
+	}
+	else {
+		executeOnDblClick($(id));
+	}
+	
 	return false;
 }
 
 function executeOnClick(id) {
-	if (CLICK_OCCURED_AT - DOUBLE_CLICK_OCCURED_AT <= 0) {
-		return false;
-	}
-	
 	var element = $(id);
 	if (element == null) {
 		return false;
 	}
 	
 	var newPageId = element.parentNode.id;
-	boldSelectedTreeElement(element);				
+	boldSelectedTreeElement(element);
 	setPageID(newPageId);
 	if (!IS_SITE_MAP) {
 		getPrewUrl(newPageId);
@@ -583,12 +644,5 @@ function executeOnClick(id) {
 }
 
 function executeOnDblClick(element) {
-	var d = new Date();
-	DOUBLE_CLICK_OCCURED_AT = d.getTime();
-	if (TIME_OUT_ID_FOR_CLICKS != null) {
-		clearTimeout(TIME_OUT_ID_FOR_CLICKS);	// Clear pending Click  
-		TIME_OUT_ID_FOR_CLICKS = null;
-	}
-	
 	initEditLabel(element);
 }
