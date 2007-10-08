@@ -1237,7 +1237,19 @@ public class ThemeChanger {
 			return false;
 		}
 		
-		return helper.createThemeConfig(theme);
+		boolean createdConfig = helper.createThemeConfig(theme);
+		if (!createdConfig) {
+			return false;
+		}
+		
+		try {
+			helper.getThemesService().getBuilderService().clearAllCaches();
+		} catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
 	}
 	
 	public boolean setSelectedStyles(Theme theme, List<ThemeChange> enabledStyles) {
