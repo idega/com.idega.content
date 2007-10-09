@@ -32,22 +32,30 @@ function getInfoForCategories() {
 function initializeContentCategoriesActions() {
 	$$('select.localesForCategoriesDropDownMenuStyle').each(
 		function(select) {
+			select.removeEvents('change');
+			
 			select.addEvent('change', function() {
 				reloadCategoriesByLocale(select.value, select.getProperty('containerid'));
+				return false;
 			});
 		}
 	);
 	
 	$$('input.addCategoryButtonStyle').each(
 		function(button) {
+			button.removeEvents('click');
+			
 			button.addEvent('click', function() {
 				addNewCategory(button.getProperty('categorynameid'), button.getProperty('language'), button.getProperty('categorieslistid'));
+				return false;
 			});
 		}
 	);
 
 	$$('input.nameForNewCategoryInputStyle').each(
 		function(input) {
+			input.removeEvents('keyup');
+			
 			input.addEvent('keyup', function(e) {
 				var event = new Event(e);
 				if (event.key == 'enter') {
@@ -65,24 +73,33 @@ function initializeContentCategoriesActions() {
 function initializeCategoryManagementActions() {
 	$$('img.changeCategoryUsageImageStyle').each(
 		function(image) {
+			image.removeEvents('click');
+			
 			image.addEvent('click', function() {
 				changeCategoryStatus(image);
+				return false;
 			});
 		}
 	);
 	
 	$$('img.deleteCategoryImageStyle').each(
 		function(image) {
+			image.removeEvents('click');
+			
 			image.addEvent('click', function() {
 				deleteCategory(image);
+				return false;
 			});
 		}
 	);
 	
 	$$('span.changeCategoryNameLabelStyle').each(
 		function(category) {
+			category.removeEvents('click');
+			
 			category.addEvent('click', function() {
 				changeCategoryName(category);
+				return false;
 			});
 		}
 	);
@@ -135,6 +152,11 @@ function needSaveCategory(newValue, oldValue) {
 		return false;
 	}
 	
+	newValue = newValue.trim();
+	if (newValue == null || newValue == '') {
+		return false;
+	}
+	
 	return newValue != oldValue;
 }
 
@@ -151,6 +173,13 @@ function addNewCategory(inputId, language, categoriesListId) {
 	var categoryName = input.value;
 	if (categoryName == null || categoryName == '') {
 		alert(ENTER_CATEGORY_NAME);
+		return false;
+	}
+	categoryName = categoryName.trim();
+	if (categoryName == null || categoryName == '') {
+		input.value = '';
+		alert(ENTER_CATEGORY_NAME);
+		input.focus();
 		return false;
 	}
 	
@@ -180,6 +209,12 @@ function renameCategory(id, newName, language, removeContainerId) {
 		return false;
 	}
 	
+	if (newName == null || newName == '') {
+		alert(ENTER_CATEGORY_NAME);
+		return false;
+	}
+	
+	newName = newName.trim();
 	if (newName == null || newName == '') {
 		alert(ENTER_CATEGORY_NAME);
 		return false;
