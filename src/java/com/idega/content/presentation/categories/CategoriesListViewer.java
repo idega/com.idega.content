@@ -23,6 +23,7 @@ import com.idega.presentation.PresentationObject;
 import com.idega.presentation.Span;
 import com.idega.presentation.Table2;
 import com.idega.presentation.TableBodyRowGroup;
+import com.idega.presentation.TableCell2;
 import com.idega.presentation.TableHeaderRowGroup;
 import com.idega.presentation.TableRow;
 import com.idega.presentation.text.Text;
@@ -93,8 +94,9 @@ public class CategoriesListViewer extends Block {
 			return;
 		}
 		try {
-		locales.remove(currentLocale);
+			locales.remove(currentLocale);
 		} catch(Exception e) {}
+		
 		Collections.sort(locales, new LocalesComparator());
 		List<Locale> sortedLocales = new ArrayList<Locale>();
 		sortedLocales.add(currentLocale);
@@ -120,6 +122,7 @@ public class CategoriesListViewer extends Block {
 		String categoryId = null;
 		Locale l = null;
 		String language = null;
+		TableCell2 cell = null;
 		for (ContentCategory category : categories) {
 			categoryId = category.getId();
 			
@@ -130,7 +133,9 @@ public class CategoriesListViewer extends Block {
 				language = l.toString();
 				
 				name = category.getName(language);
-				bodyRow.createCell().add(getCategoryNameCellContent(name == null ? undefined : name, categoryId, iwrb, language));
+				cell = bodyRow.createCell();
+				cell.setStyleClass("categoriesTableCellStyle");
+				cell.add(getCategoryNameCellContent(name == null ? undefined : name, categoryId, iwrb, language));
 			}
 			bodyRow.createCell().add(getDisableCellContent(category, bundle, iwrb, null));
 			bodyRow.createCell().add(getDeleteCellContent(bundle, iwrb, categoryId, containerId, tableId, null));

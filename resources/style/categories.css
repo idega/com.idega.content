@@ -9,6 +9,10 @@
 .localesForCategoriesDropDownMenuStyle {
 }
 
+.categoriesTableCellStyle {
+	width: 105px;
+}
+
 .changeCategoryNameLabelStyle {
 	cursor: pointer;
 }
@@ -22,7 +26,8 @@
 }
 
 .changeCategoryNameInputStyle {
-	width: 45%;
+	margin: 0px;
+	width: 100px;
 }
 
 .newCategoryNameLabelStyle {

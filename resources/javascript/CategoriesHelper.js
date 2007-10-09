@@ -8,9 +8,6 @@ var DISABLE_CATEGORY_IMAGE_TEXT = 'Disable category';
 var ENABLE_CATEGORY_IMAGE_TEXT = 'Enable category';
 var ENTER_CATEGORY_NAME = 'Please, enter name for category!';
 var NO_CATEGORIES_TEXT = 'There are no categories.';
-var EDIT_CATEGORY_WINDOW_TITLE = 'Edit category';
-
-var EDIT_CATEGORY_WINDOW_CLASS = 'com.idega.content.presentation.categories.CategoryEditor';
 
 function getInfoForCategories() {
 	CategoriesEngine.getInfo({callback: function(info) {	
@@ -28,8 +25,6 @@ function getInfoForCategories() {
 		ENTER_CATEGORY_NAME = info[7];
 		SAVING_TEXT = info[8];
 		NO_CATEGORIES_TEXT = info[9];
-		EDIT_CATEGORY_WINDOW_TITLE = info[10];
-		EDIT_CATEGORY_WINDOW_CLASS = info[11];
 		
 	}});
 }
@@ -84,7 +79,6 @@ function initializeCategoryManagementActions() {
 		}
 	);
 	
-	var categories = $$('span.changeCategoryNameLabelStyle');
 	$$('span.changeCategoryNameLabelStyle').each(
 		function(category) {
 			category.addEvent('click', function() {
@@ -95,11 +89,53 @@ function initializeCategoryManagementActions() {
 }
 
 function changeCategoryName(category) {
-	var link = '/servlet/ObjectInstanciator?idegaweb_instance_class=' + EDIT_CATEGORY_WINDOW_CLASS + '&categoryId=' + category.getProperty('categoryid') +
-				'&categoryLocale=' + category.getProperty('language');
-	MOOdalBox.init({resizeDuration: 50, evalScripts: true, animateCaption: false});
-	var result = MOOdalBox.open(link, EDIT_CATEGORY_WINDOW_TITLE, '350 200');
-	return false;
+	var container = category.getParent();
+	var id = category.getProperty('categoryid');
+	var language = category.getProperty('language');
+	if (container == null || id == null || language == null) {
+		return false;
+	}
+	
+	var oldValue = category.getText();
+	var categoryClone = category.clone();
+	removeChildren(container);
+	
+	var newNameInput = new Element('input');
+	newNameInput.addClass('changeCategoryNameInputStyle');
+	newNameInput.injectInside(container);
+	newNameInput.value = oldValue;
+	newNameInput.focus();
+	newNameInput.select();
+	
+	newNameInput.addEvent('blur', function() {
+		if (!needSaveCategory(newNameInput.value, oldValue)) {
+			removeChildren(container);
+			categoryClone.injectInside(container);
+			initializeContentCategoriesActions();
+			
+			return false;
+		}
+		
+		renameCategory(id, newNameInput.value, language, null);
+		return false;
+	});
+	
+	newNameInput.addEvent('keyup', function(e) {
+		var event = new Event(e);
+		if (event.key == 'enter' && needSaveCategory(newNameInput.value, oldValue)) {
+			renameCategory(id, newNameInput.value, language, null);
+			return false;
+		}
+		return false;
+	});
+}
+
+function needSaveCategory(newValue, oldValue) {
+	if (newValue == null || newValue == '') {
+		return false;
+	}
+	
+	return newValue != oldValue;
 }
 
 function addNewCategory(inputId, language, categoriesListId) {
@@ -137,30 +173,6 @@ function addNewCategory(inputId, language, categoriesListId) {
  			initializeCategoryManagementActions();
 		}
 	});
-}
-
-function initializeCategoryEditorWindowActions() {
-	$$('input.changeCategoryNameButtonStyle').each(
-		function(button) {
-			button.addEvent('click', function() {
-				renameCategory(button.getProperty('categoryid'), $(button.getProperty('newnameinputid')).value, button.getProperty('language'), null);
-			});
-		}
-	);
-	
-	$$('input.changeCategoryNameInputStyle').each(
-		function(input) {
-			input.addEvent('keyup', function(e) {
-				var event = new Event(e);
-				if (event.key == 'enter') {
-					renameCategory(input.getProperty('categoryid'), $(input.getProperty('newnameinputid')).value, input.getProperty('language'),
-						input.getProperty('removecontainerid'));
-					return false;
-				}
-				return false;
-			});
-		}
-	);
 }
 
 function renameCategory(id, newName, language, removeContainerId) {

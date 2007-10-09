@@ -10,7 +10,6 @@ import org.jdom.Document;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.data.ContentCategory;
 import com.idega.content.presentation.categories.CategoriesListViewer;
-import com.idega.content.presentation.categories.CategoryEditor;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.idegaweb.IWBundle;
@@ -50,8 +49,6 @@ public class CategoriesEngineBean implements CategoriesEngine {
 		info.add(iwrb.getLocalizedString("enter_name_for_category", "Please, enter name for category!"));		//	7
 		info.add(iwrb.getLocalizedString("saving", "Saving..."));												//	8
 		info.add(iwrb.getLocalizedString("no_categories_found", "There are no categories."));					//	9
-		info.add(iwrb.getLocalizedString("edit_category", "Edit category"));									//	10
-		info.add(CategoryEditor.class.getName());																//	11
 		
 		return info;
 	}
