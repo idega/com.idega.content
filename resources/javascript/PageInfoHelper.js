@@ -319,8 +319,6 @@ function resizeFrame() {
 	if (availableHeight > 0) {
 		frame.style.height = availableHeight + 'px';
 	}
-	
-	resizeContainer('site_tree_container', 'site_tree_container_pages', RESERVED_HEIGHT, true);
 }
 
 function getPageInfoValues() {

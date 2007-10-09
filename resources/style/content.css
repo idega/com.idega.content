@@ -714,9 +714,9 @@ height: auto !important;
 }
 
 #site_tree_container .wf_blockmainarea{
-	padding: 0 !important;
-	top: 25px !important;
+	padding: 0px !important;
 	width: 100%;
+	position: relative;
 }
 
 #pageInfoContainer .wf_blockmainarea{
@@ -819,7 +819,6 @@ overflow: auto !important;
 	background-color: #E8E8E8;
 	right: 0px;
 	width: 234px;
-	height: 278px !important;
 }
 
 #site_tree_container .wf_menuheader{
@@ -832,14 +831,15 @@ overflow: auto !important;
 
 #div_id_current_structure_tree{
 	position : relative;
-	margin-bottom: 5px ;
+	margin-bottom: 5px;
+	padding-bottom: 20px;
+	overflow: auto;
+	height: 278px;
 }
 #current_structure_tree{
-	height: 278px;
 	width: auto;
 }
 #site_tree_container{
-	height: 278px !important;
 	width: 234px;
 }
 #sitemap{
