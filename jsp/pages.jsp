@@ -52,7 +52,7 @@ version="1.2">
 									
 									<t:div id="sitemap" forceId="true" styleClass="acStretchmyAccordion">
 	 									<t:div id="site_tree_container" forceId="true">
-	 										<c:block_with_toolbar id="page_tree_div" styleClass="site_tree_container_site_accordion" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png" addStartPageButton="true">
+	 										<c:block_with_toolbar id="page_tree_div" addStartPageButton="true" styleClass="site_tree_container_site_accordion" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png">
 												<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 													<f:facet name="PageTreeNode">
 														<h:outputLink styleClass="pageTreeNames">
