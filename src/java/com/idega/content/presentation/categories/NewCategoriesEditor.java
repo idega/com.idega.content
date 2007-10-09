@@ -28,7 +28,7 @@ public class NewCategoriesEditor extends Block {
 		add(container);
 		
 		if (!ContentUtil.hasContentEditorRoles(iwc)) {
-			container.add(new Text(iwrb.getLocalizedString("insufficient_rights", "Sorry, You do not have enough rights to view this page.")));
+			container.add(new Text(iwrb.getLocalizedString("insufficient_rights", "Sorry, you do not have enough rights to view this page.")));
 			return;
 		}
 		

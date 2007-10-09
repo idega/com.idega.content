@@ -40,9 +40,9 @@ public class CategoriesEngineBean implements CategoriesEngine {
 		
 		List<String> info = new ArrayList<String>();
 		info.add(iwrb.getLocalizedString("loading", "Loading..."));												//	0
-		info.add(iwrb.getLocalizedString("disable_category_message", "Do You want to disable this category?"));	//	1
-		info.add(iwrb.getLocalizedString("enable_category_message", "Do You want to enable this category?"));	//	2
-		info.add(iwrb.getLocalizedString("delete_category_message", "Do You want to delete this category?"));	//	3
+		info.add(iwrb.getLocalizedString("disable_category_message", "Do you want to disable this category?"));	//	1
+		info.add(iwrb.getLocalizedString("enable_category_message", "Do you want to enable this category?"));	//	2
+		info.add(iwrb.getLocalizedString("delete_category_message", "Do you want to delete this category?"));	//	3
 		info.add(iwrb.getLocalizedString("disable_category", "Disable category"));								//	4
 		info.add(iwrb.getLocalizedString("enable_category", "Enable category"));								//	5
 		info.add(iwrb.getLocalizedString("deleting", "Deleting..."));											//	6
