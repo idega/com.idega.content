@@ -216,7 +216,11 @@ public class TemplatesLoader implements JarLoader {
 		}
 		
 		//	Load from slide
-		Collection<SearchResult> results = themesHelper.search(PAGE_TEMPLATES_XML_FILE_NAME, SLIDE_TEMPLATES_FOLDER);
+
+		String templatesFolder = getSlideTemplatesFolderURI();
+	
+		Collection<SearchResult> results = themesHelper.search(PAGE_TEMPLATES_XML_FILE_NAME, templatesFolder);
+		
 		if (results == null) {
 			return (Map <String, PageTemplate>)pageTemplates.get(ContentConstants.PAGES_MAP_KEY);
 		}
@@ -240,8 +244,10 @@ public class TemplatesLoader implements JarLoader {
 		    loadTemplatesFromBundles();
 		}
 		
-		//	Load from slide
-		Collection<SearchResult> results = themesHelper.search(SITE_TEMPLATES_XML_FILE_NAME, SLIDE_TEMPLATES_FOLDER);
+		//	Load from slide	
+		String templatesFolder = getSlideTemplatesFolderURI();
+	
+		Collection<SearchResult> results = themesHelper.search(SITE_TEMPLATES_XML_FILE_NAME, templatesFolder);
 		if (results == null) {
 			return (SortedMap <String, SiteTemplate>)siteTemplates.get(ContentConstants.SITE_MAP_KEY);
 		}
@@ -256,6 +262,16 @@ public class TemplatesLoader implements JarLoader {
 		}
 		
 		return (SortedMap <String, SiteTemplate>)siteTemplates.get(ContentConstants.SITE_MAP_KEY);
+	}
+
+	protected String getSlideTemplatesFolderURI() {
+		String templatesFolder = SLIDE_TEMPLATES_FOLDER;
+		try {
+			templatesFolder = getIWSlideService().getWebdavServerURI()+SLIDE_TEMPLATES_FOLDER;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return templatesFolder;
 	}
 	
 	private Document getTemplateDocument(SearchResult result, String serverName) {
@@ -272,8 +288,13 @@ public class TemplatesLoader implements JarLoader {
 		return themesHelper.getXMLDocument(new StringBuffer(serverName).append(uri.substring(1)).toString());
 	}
 	
-	protected IWSlideService getIWSlideService() throws IBOLookupException{
-		return (IWSlideService) IBOLookup.getServiceInstance(iwma.getIWApplicationContext(), IWSlideService.class);
+	protected IWSlideService getIWSlideService(){
+		try {
+			return (IWSlideService) IBOLookup.getServiceInstance(iwma.getIWApplicationContext(), IWSlideService.class);
+		} catch (IBOLookupException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public Map<String, PageTemplate> getPageMap(){
