@@ -14,7 +14,6 @@ version="1.2">
 						/dwr/engine.js,
         				/dwr/interface/ThemesEngine.js,
         				/dwr/interface/BuilderService.js,
-						/dwr/interface/PagePreview.js,
 						
 						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.11/mootools-all-compressed.js,
         				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/for_mootools/1.2/reflection.js,

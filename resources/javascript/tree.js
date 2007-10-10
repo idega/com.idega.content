@@ -54,37 +54,37 @@ function empty(param) {
 	trashCan.style.opacity = 0.5;		
 }
 
-function setFrameUrl(url) {
+function setFrameUrl(uri) {
 	var frame = document.getElementById('treePages');
 	if (frame == null) {
 		return false;
 	}
 	
-	if (url == null) {
-		url = '';
+	if (uri == null) {
+		uri = '';
 	}
-	if (url == '') {
-		frame.src = url;
+	if (uri == '') {
+		frame.src = uri;
 		return false;
 	}
 	
 	if (SHOW_SOURCE_PAGES) {
-		url = '/servlet/ObjectInstanciator?idegaweb_instance_class=' + IB_SOURCE_VIEW_CLASS;
+		uri = '/servlet/ObjectInstanciator?idegaweb_instance_class=' + IB_SOURCE_VIEW_CLASS;
 	}
 	if (SHOW_EDIT_PAGES) {
-		if (url.charAt(url.length-1) != '/') {
-			url += '/';
+		if (uri.charAt(uri.length-1) != '/') {
+			uri += '/';
 		}
-		url += '?view=builder';
+		uri += '?view=builder';
 	}
 	
 	frame.src = '';
-	frame.src = url;
+	frame.src = uri;
 	chagePageName = false;
 }
 						
 function getPrewUrl(nodeID) {
-	PagePreview.getPreviewUrl(nodeID, setFrameUrl);
+	ThemesEngine.getPageUri(nodeID, setFrameUrl);
 }
 						
 function getId(){

@@ -15,10 +15,6 @@
     	<create creator="ibo" javascript="NodeID" scope="application">
       		<param name="class" value="com.idega.content.tree.NodeID" />
     	</create>
-    
-    	<create creator="ibo" javascript="PagePreview" scope="application">
-      		<param name="class" value="com.idega.content.tree.PagePreview" />
-    	</create>
     	
     	<create creator="jsf" javascript="CategoriesEngine">
 	    	<param name="managedBeanName" value="content.CategoriesEngineBean" />

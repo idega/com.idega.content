@@ -185,4 +185,6 @@ public interface ThemesEngine extends IBOService {
 	public String reloadThemeProperties(String themeId);
 	
 	public boolean isUserAdmin();
+	
+	public String getPageUri(String pageKey);
 }

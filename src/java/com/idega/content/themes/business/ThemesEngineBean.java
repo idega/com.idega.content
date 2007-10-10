@@ -1521,4 +1521,37 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return iwc.isSuperAdmin();
 	}
 
+	public String getPageUri(String pageKey) {
+		if (pageKey == null) {
+			return null;
+		}
+		
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return null;
+		}
+		
+		String uri = null;
+		BuilderService builderService = null;
+		try {
+			builderService = BuilderServiceFactory.getBuilderService(iwc);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			return null;
+		}
+		if (builderService == null) {
+			return null;
+		}
+		
+		try {
+			uri = builderService.getPageURI(pageKey);
+			builderService.setCurrentPageId(iwc, pageKey);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		return uri;
+	}
+
 }

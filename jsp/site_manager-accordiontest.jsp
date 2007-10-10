@@ -14,7 +14,6 @@
 		<ws:page id="createpage" javascripturls="/dwr/engine.js,
         			/dwr/interface/ThemesEngine.js,
 					/dwr/interface/BuilderService.js,
-					/dwr/interface/PagePreview.js,
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js,
 					/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
