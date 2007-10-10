@@ -11,15 +11,13 @@
     
     <f:view>
     	<ws:page id="categories1"	javascripturls="/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.11/mootools-all-compressed.js,
-    												/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/moodalbox/1.2.1/js/moodalbox.js,
     												
     												/dwr/interface/CategoriesEngine.js,
     												/dwr/engine.js,
     												
     												/idegaweb/bundles/com.idega.content.bundle/resources/javascript/CategoriesHelper.js"
     								
-    								stylesheeturls="/idegaweb/bundles/com.idega.content.bundle/resources/style/categories.css,
-    												/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/moodalbox/1.2.1/css/moodalbox.css">
+    								stylesheeturls="/idegaweb/bundles/com.idega.content.bundle/resources/style/categories.css">
     												
 			<h:form id="categoriesForm" enctype="multipart/form-data" onsubmit="return false">
 				<f:verbatim>
