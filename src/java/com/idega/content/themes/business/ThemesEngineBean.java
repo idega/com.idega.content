@@ -406,7 +406,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		if (helper.getThemesService().getBuilderService().changePageUriByTitle(parentId, page, pageUri, domain.getID())) {
-			setNewLinkInArticleFile(page.getId(), "com.idega.block.article.component.ArticleItemViewer", page.getDefaultPageURI());
+			setNewLinkInArticleFile(page.getId(), CoreConstants.getArticleItemViewerClass().getName(), page.getDefaultPageURI());
 			return page.getDefaultPageURI();
 		}
 		return null;
@@ -445,7 +445,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		if (helper.getThemesService().getBuilderService().setPageUri(page, uri, domain.getID())) {
-			setNewLinkInArticleFile(page.getId(), "com.idega.block.article.component.ArticleItemViewer", page.getDefaultPageURI());
+			setNewLinkInArticleFile(page.getId(), CoreConstants.getArticleItemViewerClass().getName(), page.getDefaultPageURI());
 			return page.getDefaultPageURI();
 		}
 		return null;
