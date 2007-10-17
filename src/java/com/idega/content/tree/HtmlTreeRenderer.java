@@ -23,6 +23,8 @@ import org.apache.myfaces.shared_tomahawk.renderkit.html.HTML;
 import org.apache.myfaces.shared_tomahawk.renderkit.html.HtmlRendererUtils;
 import org.apache.myfaces.shared_tomahawk.renderkit.RendererUtils;
 
+import com.idega.util.CoreConstants;
+
 //import org.apache.myfaces.custom.tree2.*;
 
 import javax.faces.component.NamingContainer;
@@ -47,7 +49,7 @@ import java.util.HashMap;
  * @author Sean Schofield
  * @author Chris Barlow
  * @author Hans Bergsten (Some code taken from an example in his O'Reilly JavaServer Faces book. Copied with permission)
- * @version $Revision: 1.4 $ $Date: 2006/12/04 09:38:33 $
+ * @version $Revision: 1.5 $ $Date: 2007/10/17 15:09:42 $
  */
 public class HtmlTreeRenderer extends Renderer
 {
@@ -55,7 +57,6 @@ public class HtmlTreeRenderer extends Renderer
     protected static final String ROOT_NODE_ID = "0";
 
     private static final String NAV_COMMAND = "org.apache.myfaces.tree.NAV_COMMAND";
-    private static final String ENCODING = "UTF-8";
     private static final String ATTRIB_DELIM = ";";
     private static final String ATTRIB_KEYVAL = "=";
     private static final String NODE_STATE_EXPANDED = "x";
@@ -679,7 +680,7 @@ public class HtmlTreeRenderer extends Renderer
         Map attribMap = new HashMap();
         try
         {
-            String cookieValue = URLDecoder.decode(cookie.getValue(),ENCODING);
+            String cookieValue = URLDecoder.decode(cookie.getValue(), CoreConstants.ENCODING_UTF8);
             String[] attribArray = cookieValue.split(ATTRIB_DELIM);
             for (int j = 0; j < attribArray.length; j++)
             {

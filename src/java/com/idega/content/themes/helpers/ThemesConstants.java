@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
+import com.idega.util.CoreConstants;
 
 public class ThemesConstants {
 	
@@ -31,7 +32,6 @@ public class ThemesConstants {
 	
 	protected static final String PLUS = "+";
 	protected static final String SPACE_ENCODED = "%20";
-	protected static final String ENCODING = "UTF-8";
 	protected static final String SINGLE_QUOTE = "\"";
 	
 	protected static final String THEME_PREVIEW = "_theme_preview";
@@ -178,7 +178,7 @@ public class ThemesConstants {
 	
 	public static final String DEFAULT_DOMAIN_NAME = "Default Site";
 	
-	protected static final String DOCUMENT_HEADER = "<?xml version='1.0' encoding='UTF-8'?>";
+	protected static final String DOCUMENT_HEADER = "<?xml version='1.0' encoding='"+CoreConstants.ENCODING_UTF8+"'?>";
 	
 	public static final String ADD_FOR_PROPERTY_CHANGE = "_changeProperty";
 	

@@ -569,7 +569,7 @@ public class ThemesHelper implements Singleton {
 
 		Reader r = null;
 		try {
-			r = new InputStreamReader(stream, ThemesConstants.ENCODING);
+			r = new InputStreamReader(stream, CoreConstants.ENCODING_UTF8);
 		} catch (UnsupportedEncodingException e) {
 			log.error(e);
 			return null;
@@ -745,7 +745,7 @@ public class ThemesHelper implements Singleton {
 		}
 		if (fullyEncode) {
 			try {
-				value = URLEncoder.encode(value, ThemesConstants.ENCODING);
+				value = URLEncoder.encode(value, CoreConstants.ENCODING_UTF8);
 			} catch (UnsupportedEncodingException e) {
 				log.error(e);
 				return value;
@@ -766,7 +766,7 @@ public class ThemesHelper implements Singleton {
 			}
 			else {
 				try {
-					encoded.append(URLEncoder.encode(fileParts[i], ThemesConstants.ENCODING));
+					encoded.append(URLEncoder.encode(fileParts[i], CoreConstants.ENCODING_UTF8));
 				} catch (UnsupportedEncodingException e) {
 					log.error(e);
 					return url;
@@ -788,7 +788,7 @@ public class ThemesHelper implements Singleton {
 		}
 		if (fullyDecode) {
 			try {
-				value = URLDecoder.decode(value, ThemesConstants.ENCODING);
+				value = URLDecoder.decode(value, CoreConstants.ENCODING_UTF8);
 			} catch (UnsupportedEncodingException e) {
 				log.error(e);
 				return value;
@@ -805,7 +805,7 @@ public class ThemesHelper implements Singleton {
 		for (int i = 0; i < fileParts.length; i++) {
 			if (!fileParts[i].equals(ThemesConstants.EMPTY)) {
 				try {
-					encoded.append(URLDecoder.decode(fileParts[i], ThemesConstants.ENCODING));
+					encoded.append(URLDecoder.decode(fileParts[i], CoreConstants.ENCODING_UTF8));
 				} catch (UnsupportedEncodingException e) {
 					log.error(e);
 					return url;
