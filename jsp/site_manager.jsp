@@ -23,6 +23,13 @@
 			<h:form id="createpageform" onsubmit="return false;">
 				<jsf:verbatim>
                 	<script type="text/javascript">
+                		window.addEvent('domready', function() {
+							var errorHanlder = function() {
+								reloadPage();
+							}
+							DWREngine.setErrorHandler(errorHanlder);
+						});
+                		window.addEvent('domready', startBuilderApplication);
                 		window.addEvent('domready', getGlobalPageId);
                 		window.addEvent('domready', getLocalizedTextForThemes);
                 		window.addEvent('domready', initialiazeSiteManager);
