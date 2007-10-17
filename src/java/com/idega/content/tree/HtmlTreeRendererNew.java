@@ -24,26 +24,9 @@ import org.apache.myfaces.shared_tomahawk.renderkit.html.HtmlRendererUtils;
  * @author Chris Barlow
  * @author Hans Bergsten (Some code taken from an example in his O'Reilly
  *         JavaServer Faces book. Copied with permission)
- * @version $Revision: 1.5 $ $Date: 2006/11/28 18:37:21 $
+ * @version $Revision: 1.6 $ $Date: 2007/10/17 15:05:13 $
  */
 public class HtmlTreeRendererNew extends HtmlTreeRenderer {
-
-	/*private static final String NAV_COMMAND = "org.apache.myfaces.tree.NAV_COMMAND";
-	private static final String ENCODING = "UTF-8";
-	private static final String ATTRIB_DELIM = ";";
-	private static final String ATTRIB_KEYVAL = "=";
-	private static final String NODE_STATE_EXPANDED = "x";
-	private static final String NODE_STATE_CLOSED = "c";
-	private static final String SEPARATOR =
-	String.valueOf(NamingContainer.SEPARATOR_CHAR);
-	private static final String IMAGE_PREFIX = "t2";
-	private static final String TOGGLE_ID = "t2g";
-
-	private static final int NOTHING = 0;
-	private static final int CHILDREN = 1;
-	private static final int EXPANDED = 2;
-	private static final int LINES = 4;
-	private static final int LAST = 8;*/
 
 	private static int node = 0;
 
