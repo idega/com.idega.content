@@ -95,19 +95,9 @@ public interface ThemesEngine extends IBOService {
 	public boolean saveSiteInfo(String language, String[] keywords, String[] values);
 
 	/**
-	 * @see com.idega.content.themes.business.ThemesEngineBean#beforeCreatePage
-	 */
-	public List<String> beforeCreatePage(List<TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, List<String> followingNodes) throws RemoteException;
-
-	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#createPage
 	 */
-	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) throws RemoteException;
-
-	/**
-	 * @see com.idega.content.themes.business.ThemesEngineBean#createPage
-	 */
-	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup, String treeOrder) throws RemoteException;
+	public List<String> createPage(List<TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, List<String> followingNodes) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#deletePage

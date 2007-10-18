@@ -796,7 +796,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	public List <String> beforeCreatePage(List <TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, List<String> followingNodes){
+	public List <String> createPage(List <TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, List<String> followingNodes){
 
 		List <String> newIds = new ArrayList<String>();
 		
@@ -878,8 +878,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		//	Setting template id for new page(s)
 		String lastUsedTemplate = helper.getLastUsedTheme();
-		for (int i = 0; i < createdPages.size(); i++) {
-			setLastUsedTemplate(createdPages.get(i), lastUsedTemplate);
+		if (lastUsedTemplate != null && !CoreConstants.EMPTY.equals(lastUsedTemplate)) {
+			for (int i = 0; i < createdPages.size(); i++) {
+				setLastUsedTemplate(createdPages.get(i), lastUsedTemplate);
+			}
 		}
 
 		//	Creating new tree order
@@ -888,7 +890,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return newIds;
 	}
 	
-	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) {
+	private int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) {
 		return createPage(parentId, name, type, templateId, pageUri, subType, domainId, format, sourceMarkup, null);
 	}
 	
@@ -918,7 +920,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		helper.getThemesService().getBuilderService().setTemplateId(pageKey, templateKey);
 	}
 	
-	public int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup, String treeOrder) {
+	private int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup, String treeOrder) {
 		int id = -1;
 		if (pageUri != null) {
 			if (pageUri.equals(ThemesConstants.EMPTY)) {

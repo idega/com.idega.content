@@ -739,7 +739,7 @@
 			var nodes = JSTreeObj.getRootStructure('floatingContainer'+nodeId, numberInLevel);			
 			document.getElementById('floatingContainer'+nodeId).id = 'rootTemporary';
 			showLoadingMessage(CREATING_TEXT);			
-			ThemesEngine.beforeCreatePage(nodes, isFirst, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
+			ThemesEngine.createPage(nodes, isFirst, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
 		},
 		getNewRootId : function(id) {
 			closeAllLoadingMessages();
@@ -1215,7 +1215,7 @@
 			var nodes = JSTreeObj.getStructure('floatingContainer'+JSTreeObj.dragNode_source.id, newParentNodeId, numberInLevel);			
 			document.getElementById('floatingContainer'+JSTreeObj.dragNode_source.id).id = 'rootTemporary';				
 			showLoadingMessage(CREATING_TEXT);	
-			ThemesEngine.beforeCreatePage(nodes, false, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
+			ThemesEngine.createPage(nodes, false, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
 		},
 		getStructure : function(rootId, parentId, numberInLevel){
 			var newTreeNodes = new Array();
