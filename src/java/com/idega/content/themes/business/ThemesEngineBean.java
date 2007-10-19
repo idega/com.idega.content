@@ -903,10 +903,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		List<String> articlesPaths = helper.createArticle(templateFile, pageID);
 		String uriToPage = helper.loadPageToSlide(pageType, templateFile, articlesPaths, pageID);
-		if (uriToPage != null) {
-			helper.getThemesService().updatePageWebDav(pageID, uriToPage, clearCache);
+		if (uriToPage == null) {
+			return false;
 		}
-		return true;
+		
+		return helper.getThemesService().updatePageWebDav(pageID, uriToPage, clearCache);
 	}
 	
 	private void setLastUsedTemplate(String pageKey) {

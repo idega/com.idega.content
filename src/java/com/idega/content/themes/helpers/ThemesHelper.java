@@ -1094,7 +1094,11 @@ public class ThemesHelper implements Singleton {
 				}
 			}
 		}
-		addIDsToModules(doc.getRootElement(), pageID);
+		
+		if (!addIDsToModules(doc.getRootElement(), pageID)) {
+			return null;
+		}
+		
 		return doc;
 	}
 	
@@ -1206,6 +1210,7 @@ public class ThemesHelper implements Singleton {
 			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, changedFileName, docContent, ContentConstants.XML_MIME_TYPE, true);
 		} catch (RemoteException e) {
 			log.error(e);
+			return null;
 		}
 		
 		return CoreConstants.WEBDAV_SERVLET_URI + base + changedFileName;
@@ -1404,7 +1409,7 @@ public class ThemesHelper implements Singleton {
 	
 	@SuppressWarnings("unchecked")
 	private boolean addIDsToModules(Element root, int pageID) {
-		if (root == null || pageID < 1) {
+		if (root == null || pageID < 0) {
 			return false;
 		}
 		Iterator allElements = root.getDescendants();
@@ -1431,6 +1436,7 @@ public class ThemesHelper implements Singleton {
 			for (Iterator it = allElements; it.hasNext(); ) {
 				o = it.next();
 				moduleID = null;
+				icObjectId = -1;
 				if (o instanceof Element) {
 					e = (Element) o;
 					if (MODULE_ELEMENT_NAME.equals(e.getName())) {
@@ -1464,6 +1470,7 @@ public class ThemesHelper implements Singleton {
 			}
 		} catch (Exception ex) {
 			log.error(ex);
+			return false;
 		}
 		return true;
 	}
