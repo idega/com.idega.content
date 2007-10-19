@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.37 2007/10/05 08:38:57 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.38 2007/10/19 12:06:52 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -44,10 +44,10 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2007/10/05 08:38:57 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/10/19 12:06:52 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.37 $
+ * @version $Revision: 1.38 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -614,7 +614,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 * @param source
 	 * @param comment
 	 * @param moduleClass
-	 * @return String of SyndFeed xml if entry was successsfully added to feed, otherwise - null
+	 * @return String of SyndFeed xml if entry was successfully added to feed, otherwise - null
 	 */
 	public String getFeedEntryAsXML(IWContext iwc, String feedTitle, String feedDescription, String title, String description,
 			String body, String author, List<String> categories, String source, String comment, String moduleClass,
