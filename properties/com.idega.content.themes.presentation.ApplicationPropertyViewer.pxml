@@ -68,6 +68,8 @@
               </map>
             </value>
             <type>map</type>
+            <simple>true</simple>
+            <reload>false</reload>
           </key>
         </map>
       </value>
