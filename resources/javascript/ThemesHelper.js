@@ -190,10 +190,14 @@ function drawTableForEmptySite(id) {
 	emptyTextContainer.setProperty('id', EMPTY_SITE_TREE_TEXT_CONTAINER_ID);
 	emptyTextContainer.addClass('emptySiteTreeContainerStyleClass');
 	emptyTextContainer.addEvent('mouseenter', function() {
-		treeObj.prepareToSetTopPage();
+		try {
+			treeObj.prepareToSetTopPage();
+		} catch(e) {}
 	});	
 	emptyTextContainer.addEvent('mouseleave', function() {
-		treeObj.topPageNotSet();
+		try {
+			treeObj.topPageNotSet();
+		} catch(e) {}
 	});
 	emptyTextContainer.injectInside(container);
 	
