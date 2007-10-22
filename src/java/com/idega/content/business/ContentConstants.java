@@ -24,7 +24,6 @@ public class ContentConstants {
 	public static final String ARTICLE_PATH_START = BASE_ROOT_SLIDE + "/article";
 	public static final String ARTICLE_SCOPE = "article";
 
-	//public static final String CONTENT_ITEM_COMMENTS_URI = RSSBusinessBean.RSS_FOLDER_URI + "comments";
 	public static final String COMMENT_SCOPE = "comment";
 	public static final String COMMENT_PREFIX = DOT + COMMENT_SCOPE;
 	
