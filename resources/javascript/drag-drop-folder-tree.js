@@ -135,11 +135,21 @@
 			this.idOfTree = idOfTree;		
 		},
 		expandAll : function() {
-			var menuItems = document.getElementById(this.idOfTree).getElementsByTagName('LI');		
-			for(var no=0;no<menuItems.length;no++){
+			var siteTree = document.getElementById(this.idOfTree);
+			if (!siteTree) {
+				return false;
+			}
+			
+			var menuItems = siteTree.getElementsByTagName('LI');
+			if (!menuItems) {
+				return false;
+			}
+			for (var no = 0; no < menuItems.length; no++) {
 				var subItems = menuItems[no].getElementsByTagName('UL');
-				if (subItems.length>0 && subItems[0].style.display!='block') {				
-					JSTreeObj.showHideNode(false,menuItems[no].id);
+				if (subItems) {
+					if (subItems.length > 0 && subItems[0].style.display != 'block') {				
+						JSTreeObj.showHideNode(false, menuItems[no].id);
+					}
 				}
 			}
 		},
@@ -483,24 +493,8 @@
 				}
 			}
 		},
-		drawTable : function(){
-			var treeContainer = document.getElementById('div_id_current_structure_tree');
-			var rootUl = document.createElement('ul');
-			rootUl.setAttribute('id','rootUl');
-			var tempTable = document.createElement('table');
-			tempTable.setAttribute('id','temporaryTable');
-			tempTable.setAttribute('onmouseover','treeObj.prepareToSetTopPage();');	
-			tempTable.setAttribute('onmouseout','treeObj.topPageNotSet();');	
-			tempTable.style.border='1px  solid';
-			tempTable.style.margin='5px';
-			var tr=document.createElement('tr');
-		  	var td=document.createElement('td');
-		  	var tdText=document.createTextNode(getDropTemplatesHereText()); 
-		  	td.appendChild(tdText);  					// - put the text node in the table cell
-		  	tr.appendChild(td); 						// - put the cell into the row
-		  	tempTable.appendChild(tr); 	
-		  	rootUl.appendChild(tempTable);
-			treeContainer.appendChild(rootUl);
+		drawTable : function() {
+			drawTableForEmptySite('div_id_current_structure_tree');
 		},
 		dropDragableNodesCopy:function() {
 			var parent;
@@ -512,10 +506,10 @@
 				var rootUl = document.getElementById('rootUl');
 				if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
 					rootUl.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
-					var temporaryTable = document.getElementById('temporaryTable');
-					if (temporaryTable != null) {
-						setNeedRelaodBuilderPage(true);
-						rootUl.removeChild(temporaryTable);
+					var emptyTextContainer = $(EMPTY_SITE_TREE_TEXT_CONTAINER_ID);
+					if (emptyTextContainer != null) {
+						setNeedReloadBuilderPage(true);
+						emptyTextContainer.remove();
 					}
 					JSTreeObj.saveRoot(JSTreeObj.dragNode_source.id, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
 								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, true, '1', null);
@@ -803,7 +797,7 @@
 			
 			if (isNeedRelaodBuilderPage() && isSiteMap() && isNeedRedirect()) {
 				showLoadingMessage(REDIRECTING_TEXT);
-				setNeedRelaodBuilderPage(false);
+				setNeedReloadBuilderPage(false);
 				redirectAction('/workspace/builder/application', 0);
 			}
 		},		
@@ -1017,14 +1011,28 @@
 		initTree : function() {
 			JSTreeObj = this;
 			treeObj = this;
+			if (!this) {
+				return false;
+			}
+			
 			JSTreeObj.createDropIndicator();
 			document.documentElement.onselectstart = JSTreeObj.cancelSelectionEvent;
 			document.documentElement.ondragstart = JSTreeObj.cancelEvent;
 			var nodeId = 0;
+			
+			if (!this.idOfTree) {
+				return false;
+			}
 			var dhtmlgoodies_tree = document.getElementById(this.idOfTree);
+			if (!dhtmlgoodies_tree) {
+				return false;
+			}
+			
 			var menuItems = dhtmlgoodies_tree.getElementsByTagName('LI');	// Get an array of all menu items
-			var item = menuItems[0];
-			for(var no=0;no<menuItems.length;no++){
+			if (!menuItems) {
+				return false;
+			}
+			for (var no = 0; no < menuItems.length; no++) {
 				// No children var set ?
 				
 				var noChildren = false;
@@ -1073,28 +1081,30 @@
 					subItems[0].id = 'tree_ul_' + treeUlCounter;
 					treeUlCounter++;
 				}
-						
-				var aTag = menuItems[no].getElementsByTagName('A')[0];
-				if(aTag.id)
-					numericId = aTag.id.replace(/[^0-9]/g, '');
-				else
-					numericId = (no+1);			
-	
-				aTag.id = menuItems[no].id + 'a';
-	
+				
 				var input = document.createElement('INPUT');
 				input.style.display='none';
 				
-				menuItems[no].insertBefore(input, aTag);
-	
-				input.id = menuItems[no].id + 'input';
-				addEventsToSiteTreeInput($(input.id));
-				
-				aTag.setAttribute('href', 'javascript:void(0)');	
-				if(!noDrag)aTag.onmousedown = JSTreeObj.initDrag;
-				if(!noChildren)aTag.onmousemove = JSTreeObj.moveDragableNodes;
-				if(sourceTree)aTag.onmousedown = JSTreeObj.copyDragableNode;
-				if(sourceTree)aTag.onclick = JSTreeObj.createNodeOnClick;
+				var aTag = menuItems[no].getElementsByTagName('A')[0];
+				if (aTag) {
+					if(aTag.id)
+						numericId = aTag.id.replace(/[^0-9]/g, '');
+					else
+						numericId = (no+1);			
+		
+					aTag.id = menuItems[no].id + 'a';
+		
+					menuItems[no].insertBefore(input, aTag);
+		
+					input.id = menuItems[no].id + 'input';
+					addEventsToSiteTreeInput($(input.id));
+					
+					aTag.setAttribute('href', 'javascript:void(0)');	
+					if(!noDrag)aTag.onmousedown = JSTreeObj.initDrag;
+					if(!noChildren)aTag.onmousemove = JSTreeObj.moveDragableNodes;
+					if(sourceTree)aTag.onmousedown = JSTreeObj.copyDragableNode;
+					if(sourceTree)aTag.onclick = JSTreeObj.createNodeOnClick;
+				}
 								
 				menuItems[no].insertBefore(img,input);
 
@@ -1123,17 +1133,17 @@
 			}	
 		
 			initExpandedNodes = this.Get_Cookie('dhtmlgoodies_expandedNodes');
-			if(initExpandedNodes){
+			if (initExpandedNodes) {
 				var nodes = initExpandedNodes.split(',');
-			}			
-			document.documentElement.onmousemove = JSTreeObj.moveDragableNodes;	
+			}
 			
+			document.documentElement.onmousemove = JSTreeObj.moveDragableNodes;	
 			document.documentElement.onmouseup = JSTreeObj.dropDragableNodesCopy;
 			
-			if(sourceTree){			
+			if (sourceTree) {
 				this.actionOnMouseUp = 'copy';
 			}
-			else{
+			else {
 				this.actionOnMouseUp = 'move';
 			}
 		},
@@ -1296,14 +1306,12 @@
 		getReceved : function(){
 			return JSTreeObj.receved;
 		},
-		prepareToSetTopPage : function(){
-			var tempTable = document.getElementById('temporaryTable');
-			tempTable.style.border='3px  solid';
+		prepareToSetTopPage : function() {
+			var container = $(EMPTY_SITE_TREE_TEXT_CONTAINER_ID);
+			highlightElement(container, 1000, '#E8E8E8');
 			JSTreeObj.firstTopPage = true;
 		},
-		topPageNotSet : function(){
-			var tempTable = document.getElementById('temporaryTable');
-			tempTable.style.border='1px  solid';
+		topPageNotSet : function() {
 			JSTreeObj.firstTopPage = false;			
 		},
 		aboveTree : function(){
@@ -1322,15 +1330,14 @@
 				JSTreeObj.notAboveTree();
 			});
 		},
-		getOrderInLevel : function(nodeId, parentNodeId){
-
+		getOrderInLevel : function(nodeId, parentNodeId) {
 			var result = null;
 
-			if (parentNodeId == null){
+			if (parentNodeId == null) {
 				var parentNode = document.getElementById(this.idOfTree);
 				var ulTag = parentNode.childNodes[0].childNodes[0];
 			}
-			else{
+			else {
 				var parentNode = document.getElementById(parentNodeId);
 				var childrenOfParent = parentNode.childNodes;
 				var spanTag = childrenOfParent[childrenOfParent.length-1];
@@ -1360,7 +1367,7 @@
 			}
 			return result;
 		},
-		getFollowingNodes : function(parentNodeId, placeInLevel){
+		getFollowingNodes : function(parentNodeId, placeInLevel) {
 			var result = new Array(); //ids of following nodes
 			if (parentNodeId == null){
 				var parentNode = document.getElementById(this.idOfTree);
@@ -1395,15 +1402,14 @@
 			return result;
 				
 		},
-		getNodesBetween : function(nodeId, parentNodeId, placeFrom, placeTo){
-			
+		getNodesBetween : function(nodeId, parentNodeId, placeFrom, placeTo) {
 			var result = new Array(); //ids of nodes	
 
-			if (parentNodeId == null){
+			if (parentNodeId == null) {
 				var parentNode = document.getElementById(this.idOfTree);
 				var ulTag = parentNode.childNodes[0].childNodes[0];
 			}
-			else{
+			else {
 				var parentNode = document.getElementById(parentNodeId);
 				var childrenOfParent = parentNode.childNodes;
 				var spanTag = childrenOfParent[childrenOfParent.length-1];
@@ -1588,7 +1594,7 @@
 
 	function initializeTrees(){
 		var treeObj = null;
-		for(var i = 0; i < idsOfTrees.length; i++){
+		for (var i = 0; i < idsOfTrees.length; i++) {
 			var treeObj2 = new JSDragDropTree();
 			treeObj2.setTreeId(idsOfTrees[i]);
 			treeObj2.initTree();			
