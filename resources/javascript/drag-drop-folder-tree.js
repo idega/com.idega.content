@@ -498,13 +498,13 @@
 		},
 		dropDragableNodesCopy:function() {
 			var parent;
-			if(JSTreeObj.dragDropTimer<10){				
+			if (JSTreeObj.dragDropTimer < 10) {				
 				JSTreeObj.dragDropTimer = -1;
 				return;
 			} 			
-			if(JSTreeObj.firstTopPage == true){
+			if(JSTreeObj.firstTopPage == true) {
 				var rootUl = document.getElementById('rootUl');
-				if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
+				if (JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]) {
 					rootUl.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
 					var emptyTextContainer = $(EMPTY_SITE_TREE_TEXT_CONTAINER_ID);
 					if (emptyTextContainer != null) {
@@ -1444,6 +1444,19 @@
 			
 			var activePageId = getPageID();
 			JSTreeObj.dragNode_destination = document.getElementById(activePageId);
+			if (!JSTreeObj.dragNode_destination) {
+				JSTreeObj.dragNode_destination = $('div_id_current_structure_tree');
+				if (JSTreeObj.dragNode_destination) {	//	Will create root page
+					JSTreeObj.firstTopPage = true;
+					JSTreeObj.deleteNodes = false;
+					JSTreeObj.dragDropTimer = 11;
+					JSTreeObj.dropDragableNodesCopy();
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
 
 			var uls = JSTreeObj.dragNode_destination.getElementsByTagName('UL');
 			if (uls.length>0) {
