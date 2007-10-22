@@ -490,7 +490,9 @@
 			
 			JSTreeObj.dropTargetIndicator.style.display='none';		
 			JSTreeObj.dragDropTimer = -1;	
-			if(showMessage && JSTreeObj.messageMaximumDepthReached)alert(JSTreeObj.messageMaximumDepthReached);
+			if (showMessage && JSTreeObj.messageMaximumDepthReached) {
+				alert(JSTreeObj.messageMaximumDepthReached);
+			}
 			var parentDiv = JSTreeObj.dragNode_destination;
 
 			while(true){
@@ -589,69 +591,32 @@
 				var countLevels = countUp/1 + countDown/1 + (JSTreeObj.insertAsSub?1:0);		
 			}
 			if (JSTreeObj.dragNode_destination) {
-				if(JSTreeObj.insertAsSub) {
-					var uls = JSTreeObj.dragNode_destination.getElementsByTagName('UL');
-					if (uls.length > 0) {
-						ul = uls[0];
-						ul.style.display='block';
-						var lis = ul.getElementsByTagName('LI');						
-						
-						var li = JSTreeObj.dragNode_source.getElementsByTagName('LI')[0];
-						
-						if(lis.length>0) {
-							//	Sub elements exists - drop dragable node before the first one
-							ul.insertBefore(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id),lis[0]);	
+				if (JSTreeObj.insertAsSub) {
+					JSTreeObj.insertNewSiteTreeNodes();
+					
+					var img = JSTreeObj.dragNode_destination.getElementsByTagName('IMG')[0];
+					img.style.visibility='visible';
+					img.src = img.src.replace(JSTreeObj.plusImage,JSTreeObj.minusImage);
+				}
+				else {
+					var nodeToInsert = $(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]);
+					if (nodeToInsert) {
+						if (JSTreeObj.dragNode_destination.nextSibling) {
+							nodeToInsert.injectBefore($(JSTreeObj.dragNode_destination.nextSibling));
 						}
 						else {
-							//	No sub exists - use the appendChild method - This line should not be executed unless there's something wrong in the HTML, i.e empty <ul>
-							ul.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
+							nodeToInsert.injectInside($(JSTreeObj.dragNode_destination).getParent());
 						}
-					} else {
-						var ul = document.createElement('UL');
-						ul.style.display='block';
-						JSTreeObj.dragNode_destination.appendChild(ul);
-						var childElement = document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id);
-						ul.appendChild(childElement);											
 					}
-					var img = JSTreeObj.dragNode_destination.getElementsByTagName('IMG')[0];	
-
-					img.style.visibility='visible';
-					img.src = img.src.replace(JSTreeObj.plusImage,JSTreeObj.minusImage);					
-					
 				}
-				else {	
-					if (JSTreeObj.dragNode_destination.nextSibling) {
-						var remId;
-
-						if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
-							remId = JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id;
-						}
-
-						if (document.getElementById(remId)){
-							var el = document.getElementById(remId);
-						}						
-						var nextSib = JSTreeObj.dragNode_destination.nextSibling;
-						nextSib.parentNode.insertBefore(el,nextSib);						
-					}
-					else {
-						var remId;
-						if (JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]) {
-							remId = JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id;
-						}
-						if (document.getElementById(remId)) {
-							var el = document.getElementById(remId);
-							JSTreeObj.dragNode_destination.parentNode.appendChild(el);
-						}
-					}
-				}	
 				// Clear parent object
-				var tmpObj = JSTreeObj.dragNode_parent;
+				var tmpObj = $(JSTreeObj.dragNode_parent);
 				var lis = tmpObj.getElementsByTagName('LI');
-				if (lis.length==0) {
+				if (lis.length == 0) {
 					var tmpSpan = tmpObj.parentNode;
 					var img = tmpSpan.parentNode.getElementsByTagName('IMG')[0];
 					img.style.visibility='hidden';	// Hide [+],[-] icon
-					tmpObj.parentNode.removeChild(tmpObj);											
+					tmpObj.remove();										
 				}								
 			}
 			else {			
@@ -671,9 +636,9 @@
 				return;
 			}
 			while (true) {
-				if (parentDiv.getElementsByTagName('DIV')){
-					if (parentDiv.getElementsByTagName('DIV')[0]){
-						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id){
+				if (parentDiv.getElementsByTagName('DIV')) {
+					if (parentDiv.getElementsByTagName('DIV')[0]) {
+						if (globalDivId == parentDiv.getElementsByTagName('DIV')[0].id) {
 							var newParentId = treeObj.getNewParent(null,null,JSTreeObj.dragNode_source.id, null);
 							
 							var numberInLevel = treeObj.getOrderInLevel(JSTreeObj.dragNode_source.id, newParentId);					
@@ -937,7 +902,7 @@
 				}	
 			return possibleParent;
 		},
-		getNewParent : function(initObj,saveString,child,newParent, treeId) {
+		getNewParent : function(initObj, saveString, child, newParent, treeId) {
 			var possibleParent = null;
 			if(!saveString)var saveString = '';
 			if(!initObj){
@@ -1377,8 +1342,6 @@
 			});
 		},
 		getOrderInLevel : function(nodeId, parentNodeId) {
-			var result = null;
-
 			if (parentNodeId == null) {
 				var parentNode = document.getElementById(this.idOfTree);
 				var ulTag = parentNode.childNodes[0].childNodes[0];
@@ -1395,23 +1358,19 @@
 				}
 			}
 			var childrenOfUlTag = ulTag.childNodes;
-			var number = null;
+			var number = 0;
 			if (ulTag.getElementsByTagName('li').length == 0){
 				return 1;
 			}
 			else {
 				for (var i = 0; i < childrenOfUlTag.length; i++){
-					if (number != null){
-						result.push(childrenOfUlTag[i].id);
-					}
 					if (childrenOfUlTag[i].id == nodeId){
 						number = i + 1;
 						return number;
-						result.push(number.toString());
 					}
 				}
 			}
-			return result;
+			return 0;
 		},
 		getFollowingNodes : function(parentNodeId, placeInLevel) {
 			var result = new Array(); //ids of following nodes
@@ -1505,27 +1464,8 @@
 				}
 			}
 
-			var uls = JSTreeObj.dragNode_destination.getElementsByTagName('UL');
-			if (uls.length>0) {
-				ul = uls[0];
-				ul.style.display='block';
-				var lis = ul.getElementsByTagName('LI');
-				var li = JSTreeObj.dragNode_source.getElementsByTagName('LI')[0];
-						
-				if (lis.length>0) {	// Sub elements exists - drop dragable node before the first one
-					ul.insertBefore(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id),lis[0]);	
-				}
-				else {	// No sub exists - use the appendChild method - This line should not be executed unless there's something wrong in the HTML, i.e empty <ul>
-					ul.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
-				}
-			}
-			else {
-				var ul = document.createElement('UL');
-				ul.style.display='block';
-				JSTreeObj.dragNode_destination.appendChild(ul);
-				var childElement = document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id);
-				ul.appendChild(childElement);											
-			}
+			JSTreeObj.insertNewSiteTreeNodes();
+			
 			var img = JSTreeObj.dragNode_destination.getElementsByTagName('IMG')[0];
 			img.style.visibility='visible';
 			img.src = img.src.replace(JSTreeObj.plusImage,JSTreeObj.minusImage);			
@@ -1534,6 +1474,31 @@
 			JSTreeObj.saveNewPage(activePageId, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
 								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, 1, followingNodes);
 			return false;
+		},
+		insertNewSiteTreeNodes: function() {
+			var li = $(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]);
+			var uls = JSTreeObj.dragNode_destination.getElementsByTagName('UL');
+			if (uls.length > 0) {
+				ul = $(uls[0]);
+				ul.style.display='block';
+				
+				var lis = ul.getElementsByTagName('LI');
+				if (lis.length > 0) {
+					//	Sub elements exists - drop dragable node before the first one
+					li.injectBefore($(lis[0]));
+				}
+				else {
+					//	No sub exists - use the appendChild method - This line should not be executed unless there's something wrong in the HTML, i.e empty <ul>
+					li.injectInside(ul);
+				}
+			}
+			else {
+				var ul = new Element('ul');
+				ul.style.display='block';
+				ul.injectInside($(JSTreeObj.dragNode_destination));
+				var childElement = $(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]);
+				childElement.injectInside(ul);
+			}
 		}
 	}
 	
