@@ -11,7 +11,18 @@ function saveMyTree(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncreas
 	showLoadingMessage(getMovingText());
 	setPageID(sourceNodeId);
 	REFRESH_PAGE_INFO = !isSiteMap();
-	ThemesEngine.movePage(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncrease, nodesToDecrease, empty);
+	ThemesEngine.movePage(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncrease, nodesToDecrease, {
+		callback: function(result) {
+			closeAllLoadingMessages();
+			if (result) {
+				if (REFRESH_PAGE_INFO) {
+				REFRESH_PAGE_INFO = false;
+					getPageInfoValues();
+				}
+				boldCurrentTreeElement();
+			}
+		}
+	});
 }
 
 function getNewId(id){

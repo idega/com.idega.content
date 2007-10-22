@@ -32,6 +32,9 @@
 		var dragNode_noSiblings; 
 		var deleteNodes;
 		
+		var previousSiteTreeNode = null;
+		var nextSiteTreeNode = null;
+		
 		var dragNode_destination;
 		var floatingContainer;
 		var dragDropTimer;
@@ -282,10 +285,10 @@
 			var subs = JSTreeObj.floatingContainer.getElementsByTagName('LI');
 
 			if (subs.length>0) {
-				if(JSTreeObj.dragNode_sourceNextSib){
-					JSTreeObj.dragNode_parent.insertBefore(JSTreeObj.dragNode_source,JSTreeObj.dragNode_sourceNextSib);
+				if(JSTreeObj.dragNode_sourceNextSib) {
+					JSTreeObj.dragNode_parent.insertBefore(JSTreeObj.dragNode_source, JSTreeObj.dragNode_sourceNextSib);
 				}
-				else{
+				else {
 					JSTreeObj.dragNode_parent.appendChild(JSTreeObj.dragNode_source);
 				}					
 			}
@@ -305,7 +308,13 @@
 			}
 			JSTreeObj.dragNode_sourceNextSib = false;
 			
-			if(JSTreeObj.dragNode_source.nextSibling)JSTreeObj.dragNode_sourceNextSib = JSTreeObj.dragNode_source.nextSibling;
+			if (JSTreeObj.dragNode_source.nextSibling) {
+				JSTreeObj.dragNode_sourceNextSib = JSTreeObj.dragNode_source.nextSibling;
+			}
+			
+			previousSiteTreeNode = $(JSTreeObj.dragNode_source).getPrevious();
+			nextSiteTreeNode = $(JSTreeObj.dragNode_source).getNext();
+			
 			JSTreeObj.dragNode_destination = false;
 			JSTreeObj.dragDropTimer = 0;
 			JSTreeObj.timerDrag();
@@ -569,17 +578,7 @@
 			}				
 
 			if (saveOnDrop != true) {
-				if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]) {
-					if (movingNode == true) {
-						JSTreeObj.dragNode_parent.appendChild(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]);
-					}
-					else if (document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id)){
-						JSTreeObj.floatingContainer.removeChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));
-					}
-					removeChildren(JSTreeObj.floatingContainer);
-					JSTreeObj.dropTargetIndicator.style.display='none';		
-					JSTreeObj.dragDropTimer = -1;	
-				}
+				JSTreeObj.restoreTreeStructure();
 				return;
 			}
 			
@@ -592,7 +591,7 @@
 			if (JSTreeObj.dragNode_destination) {
 				if(JSTreeObj.insertAsSub) {
 					var uls = JSTreeObj.dragNode_destination.getElementsByTagName('UL');
-					if (uls.length>0) {
+					if (uls.length > 0) {
 						ul = uls[0];
 						ul.style.display='block';
 						var lis = ul.getElementsByTagName('LI');						
@@ -660,15 +659,18 @@
 				JSTreeObj.restoreTreeStructure();
 				return;
 			}
+			
 			JSTreeObj.dropTargetIndicator.style.display='none';		
 			JSTreeObj.dragDropTimer = -1;	
-			if(showMessage && JSTreeObj.messageMaximumDepthReached)alert(JSTreeObj.messageMaximumDepthReached);
+			if (showMessage && JSTreeObj.messageMaximumDepthReached) {
+				alert(JSTreeObj.messageMaximumDepthReached);
+			}
 			
 			var parentDiv = JSTreeObj.dragNode_destination;
 			if (parentDiv == null) {
 				return;
 			}
-			while(true){
+			while (true) {
 				if (parentDiv.getElementsByTagName('DIV')){
 					if (parentDiv.getElementsByTagName('DIV')[0]){
 						if(globalDivId == parentDiv.getElementsByTagName('DIV')[0].id){
@@ -702,8 +704,9 @@
 								nodesToIncrease = JSTreeObj.getFollowingNodes(tempParentId, numberInLevel+1);
 							}																
 																
-							if (!newParentId)
+							if (!newParentId) {
 								newParentId = -1;
+							}
 							saveMyTree(newParentId, JSTreeObj.dragNode_source.id, numberInLevel, nodesToIncrease, nodesToDecrease);
 							var newPageUri = 'undefined';
 							var linkFirstChild = JSTreeObj.dragNode_source.getElementsByTagName('a')[0];
@@ -736,17 +739,33 @@
 			}			
 		},
 		restoreTreeStructure : function() {
-			if (movingNode) {
-				if (JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]) {
-					if (JSTreeObj.previousPlaceInLevel > JSTreeObj.dragNode_parent.childNodes.length) {
+			if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]) {
+				if (movingNode == true) {
+					var nodeToRestore = null;
+					try {
+						nodeToRestore = $(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]);
+						
+						if (previousSiteTreeNode) {
+							nodeToRestore.injectAfter(previousSiteTreeNode);
+						}
+						else if (nextSiteTreeNode) {
+							nodeToRestore.injectBefore(nextSiteTreeNode);
+						}
+						else {
+							nodeToRestore.injectInside($(JSTreeObj.dragNode_parent));
+						}
+						
+						previousSiteTreeNode = null;
+						nextSiteTreeNode = null;
+					} catch(e) {
 						JSTreeObj.dragNode_parent.appendChild(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]);
 					}
-					else {
-						JSTreeObj.dragNode_parent.insertBefore(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0], JSTreeObj.dragNode_parent.childNodes[JSTreeObj.previousPlaceInLevel-1]);
-					}
+				}
+				else if (document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id)) {
+					JSTreeObj.floatingContainer.removeChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));
 				}
 			}
-			removeChildren(this.floatingContainer);
+			removeChildren(JSTreeObj.floatingContainer);
 			JSTreeObj.dropTargetIndicator.style.display='none';
 			JSTreeObj.dragDropTimer = -1;
 	
