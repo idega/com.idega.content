@@ -151,8 +151,6 @@ public class ThemesConstants {
 	
 	public static final String THEMES = "/themes/";
 	
-	public static final String INCORRECT_PARENT_ID = "-1";
-	
 	public static final String THEMES_PROPERTY_START = "theme.";
 	public static final String THEMES_PROPERTY_END = ".def";
 	

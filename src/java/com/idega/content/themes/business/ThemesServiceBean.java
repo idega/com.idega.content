@@ -40,7 +40,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 
 	public void onSlideChange(IWContentEvent idegaWebContentEvent) {
 		String uri = idegaWebContentEvent.getContentEvent().getUri();
-		if (uri.indexOf(ThemesConstants.THEMES_PATH) == -1) { // If not proccesing theme
+		if (uri.indexOf(ThemesConstants.THEMES_PATH) == -1) {	// If not processing theme
 			return;
 		}
 		if (ContentEvent.REMOVE.equals(idegaWebContentEvent.getMethod())) {
@@ -210,7 +210,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		
 		//	Creating IBPage (template) for theme
 		String parentId = builder.getTopLevelTemplateId(builder.getTopLevelTemplates(iwc));
-		if (parentId == null || ThemesConstants.INCORRECT_PARENT_ID.equals(parentId)) {
+		if (parentId == null || ThemesConstants.MINUS_ONE.equals(parentId)) {
 			//	No Top Level Template
 			int topTemplate = ThemesHelper.getInstance().getThemesEngine().createRootTemplate(domain, builder, domainID, builder.getIBXMLFormat());
 			ThemesHelper.getInstance().getThemesEngine().initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);

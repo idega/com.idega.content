@@ -11,9 +11,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.idega.business.IBOServiceBean;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
@@ -49,7 +46,6 @@ import com.idega.webface.WFUtil;
 public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 
 	private static final long serialVersionUID = 5875353284352953688L;
-	private static final Log log = LogFactory.getLog(ThemesEngineBean.class);
 	
 	private static final String PAGE_URI = "pageUri";
 	private static final String PAGE_TITLE = "pageTitle";
@@ -308,7 +304,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	private boolean setStyle(String pageID, int templateID, boolean ignoreTemplate) {
 		ICPage page = null;
-		if (templateID <= 0) {
+		if (templateID < 0) {
 			return false;
 		}
 		page = helper.getThemesService().getICPage(pageID);
@@ -931,7 +927,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		try {
 			id = helper.getThemesService().createIBPage(parentId, name, type, templateId, pageUri, subType, domainId, format, sourceMarkup, treeOrder);
 		} catch (RemoteException e) {
-			log.error(e);
+			e.printStackTrace();
 			return -1;
 		}
 		return id;
@@ -949,7 +945,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			decreaseNodesNumbersInLevel(followingNodes, -1, null);			
 			helper.getThemesService().deleteIBPage(pageId, deleteChildren);
 		} catch (RemoteException e) {
-			log.error(e);
+			e.printStackTrace();
 			return false;
 		}
 		return true;
@@ -1031,19 +1027,22 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return PATH_TO_IMAGE_FOLDER;
 	}
 	
-	public boolean isStartPage(String pageID) {
-		if (pageID == null) {
-			pageID = helper.getLastVisitedPage();
+	public boolean isStartPage(String pageKey) {
+		if (pageKey == null) {
+			pageKey = helper.getLastVisitedPage();
+		}
+		if (pageKey == null) {
+			return true;	//	Returning true to disable a button
 		}
 		int id = -1;
 		try {
-			id = Integer.valueOf(pageID).intValue();
+			id = Integer.valueOf(pageKey);
 		} catch (NumberFormatException e) {
-			log.error(e);
-			return true; // Returning true to disable a button
+			e.printStackTrace();
+			return true;	//	Returning true to disable a button
 		}
-		if (id <= 0) {
-			return true; // Returning true to disable a button
+		if (id < 0) {
+			return true;	//	Returning true to disable a button
 		}
 		if (id == getRootPageId()) {
 			return true;
@@ -1059,10 +1058,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		try {
 			newRoot = Integer.valueOf(pageID).intValue();
 		} catch (NumberFormatException e) {
-			log.error(e);
+			e.printStackTrace();
 			return null;
 		}
-		if (newRoot <= 0) {
+		if (newRoot < 0) {
 			return null;
 		}
 		
@@ -1119,7 +1118,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			try {
 				parentPage.removeChild(newRootPage);	//	Removing new root as child from his old parent node
 			} catch (SQLException e) {
-				log.error(e);
+				e.printStackTrace();
 			}
 		}
 		
@@ -1133,7 +1132,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		try {
 			id = helper.getThemesService().getBuilderService().getRootPageId();
 		} catch (Exception e) {
-			log.error(e);
+			e.printStackTrace();
 			return -1;
 		}
 		return id;
@@ -1227,7 +1226,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 					try {
 						id = Integer.valueOf(treeNode.getId());
 					} catch (NumberFormatException e) {
-						log.error(e);
+						e.printStackTrace();
 						return -1;
 					}
 					page = helper.getThemesService().getICPage(id);
@@ -1250,7 +1249,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		cachedDomain.setIBPage(domain.getStartPage());
 		cachedDomain.setStartTemplate(domain.getStartTemplate());
-		if(cachedDomain instanceof CachedDomain){
+		if (cachedDomain instanceof CachedDomain) {
 			CachedDomain ccachedDomain = (CachedDomain)cachedDomain;
 			ccachedDomain.setStartTemplateID(domain.getStartTemplateID());
 			ccachedDomain.setStartPage(domain.getStartPage());
@@ -1419,7 +1418,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		try {
 			resourceBundle = ContentUtil.getBundle().getResourceBundle(CoreUtil.getIWContext());
 		} catch (Exception e) {
-			log.error(e);
+			e.printStackTrace();
 		}
 		if (resourceBundle == null) {
 			return localizedText;
@@ -1457,7 +1456,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			localizedText.add(resourceBundle.getLocalizedString("creating", "Creating..."));									//	28
 			
 		} catch (Exception e) {
-			log.error(e);
+			e.printStackTrace();
 		}
 		return localizedText;
 	}
@@ -1525,7 +1524,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 
 	public String getPageUri(String pageKey) {
-		if (pageKey == null) {
+		if (pageKey == null || ThemesConstants.MINUS_ONE.equals(pageKey)) {
 			return null;
 		}
 		
