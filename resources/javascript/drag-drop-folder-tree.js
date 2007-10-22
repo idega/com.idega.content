@@ -51,7 +51,7 @@
 		this.parentid = -1;
 		this.newPageId = -1;
 		this.deleteNodes = false;
-		this.sourceTreee = true;
+		this.sourceTreee = false;
 		this.actionOnMouseUp = 'empty';
 		
 		this.imageFolder = '';
@@ -215,10 +215,12 @@
 			return false;						
 		},
 		copyDragableNode : function(e) {			
-			if(saveOnDrop == true)
+			if (saveOnDrop == true) {
 				movingNode = true;
-			else
+			}
+			else {
 				movingNode = false;
+			}
 			var sourceTree = false;			
 			var liTag = document.getElementsByTagName('LI')[0];
 			
@@ -254,12 +256,13 @@
 			return false;
 		},
 		timerDragCopy : function() {	
-			if(this.dragDropTimer>=0 && this.dragDropTimer<10) {
+			if (this.dragDropTimer >= 0 && this.dragDropTimer < 10) {
 				this.dragDropTimer = this.dragDropTimer + 1;
-				setTimeout('JSTreeObj.timerDragCopy()',20);
+				setTimeout('JSTreeObj.timerDragCopy()', 20);
 				return;
 			}
-			if(this.dragDropTimer==10) {
+			if (this.dragDropTimer == 10) {
+				removeChildren(JSTreeObj.floatingContainer);
 				JSTreeObj.floatingContainer.style.display='block';
 				var tempNode = JSTreeObj.dragNode_source.cloneNode(true);
 				tempNode.id = 'floatingContainer'+ tempNode.id;
@@ -268,15 +271,17 @@
 		},		
 		// Initialize drag
 		initDrag : function(e) {
-			if(saveOnDrop == true)
+			if (saveOnDrop == true) {
 				movingNode = true;
-			else
+			}
+			else {
 				movingNode = false;
-			var liTag = document.getElementsByTagName('LI')[0];
+			}
 			
+			var liTag = document.getElementsByTagName('LI')[0];
 			var subs = JSTreeObj.floatingContainer.getElementsByTagName('LI');
 
-			if(subs.length>0){
+			if (subs.length>0) {
 				if(JSTreeObj.dragNode_sourceNextSib){
 					JSTreeObj.dragNode_parent.insertBefore(JSTreeObj.dragNode_source,JSTreeObj.dragNode_sourceNextSib);
 				}
@@ -308,12 +313,13 @@
 			return false;
 		},
 		timerDrag : function() {	
-			if(this.dragDropTimer>=0 && this.dragDropTimer<10){
+			if (this.dragDropTimer >= 0 && this.dragDropTimer < 10) {
 				this.dragDropTimer = this.dragDropTimer + 1;
-				setTimeout('JSTreeObj.timerDrag()',20);
+				setTimeout('JSTreeObj.timerDrag()', 20);
 				return;
 			}
-			if(this.dragDropTimer==10) {
+			if (this.dragDropTimer == 10) {
+				removeChildren(JSTreeObj.floatingContainer);
 				JSTreeObj.floatingContainer.style.display='block';
 				JSTreeObj.floatingContainer.appendChild(JSTreeObj.dragNode_source);	
 			}
@@ -353,10 +359,13 @@
 
 			var tmpVar = thisObj.getAttribute('sourceTree');
 			
-			if(!tmpVar)
+			if(!tmpVar) {
 				tmpVar = thisObj.sourceTree;
-			if(tmpVar=='true')
-				JSTreeObj.dragNode_sourceTree=true;
+			}
+			if (tmpVar == 'true') {
+				JSTreeObj.dragNode_sourceTree = true;
+				JSTreeObj.sourceTreee = true;
+			}
 				
 			if(thisObj && thisObj.id) {
 				JSTreeObj.dragNode_destination = thisObj;
@@ -386,7 +395,7 @@
 			return false;
 			
 		},
-		dropDragableNodes:function() {	
+		dropDragableNodes:function() {
 			var parent;
 			if(JSTreeObj.dragDropTimer<10){				
 				JSTreeObj.dragDropTimer = -1;
@@ -407,10 +416,10 @@
 						
 			var sourceTree = document.getElementById(JSTreeObj.dragNode_source.id).getAttribute('sourceTree');
 						
-			if(JSTreeObj.dragNode_destination){
-				if(JSTreeObj.insertAsSub){
+			if (JSTreeObj.dragNode_destination) {
+				if (JSTreeObj.insertAsSub) {
 					var uls = JSTreeObj.dragNode_destination.getElementsByTagName('UL');
-					if(uls.length>0){
+					if (uls.length > 0) {
 						ul = uls[0];
 						ul.style.display='block';
 						
@@ -418,12 +427,16 @@
 						
 						var li = JSTreeObj.dragNode_source.getElementsByTagName('LI')[0];
 						
-						if(lis.length>0){	// Sub elements exists - drop dragable node before the first one
+						if (lis.length > 0) {
+							//	Sub elements exists - drop dragable node before the first one
 							ul.insertBefore(JSTreeObj.dragNode_source,lis[0]);	
-						}else {	// No sub exists - use the appendChild method - This line should not be executed unless there's something wrong in the HTML, i.e empty <ul>
+						}
+						else {
+							//	No sub exists - use the appendChild method - This line should not be executed unless there's something wrong in the HTML, i.e empty <ul>
 							ul.appendChild(JSTreeObj.dragNode_source);	
 						}
-					}else{
+					}
+					else {
 						var ul = document.createElement('UL');
 						ul.style.display='block';
 						JSTreeObj.dragNode_destination.appendChild(ul);
@@ -434,11 +447,13 @@
 					img.style.visibility='visible';
 					img.src = img.src.replace(JSTreeObj.plusImage,JSTreeObj.minusImage);					
 					
-				}else{
-					if(JSTreeObj.dragNode_destination.nextSibling){
+				}
+				else {
+					if (JSTreeObj.dragNode_destination.nextSibling) {
 						var nextSib = JSTreeObj.dragNode_destination.nextSibling;
-						nextSib.parentNode.insertBefore(JSTreeObj.dragNode_source,nextSib);						
-					}else{
+						nextSib.parentNode.insertBefore(JSTreeObj.dragNode_source, nextSib);
+					}
+					else {
 						JSTreeObj.dragNode_destination.parentNode.appendChild(JSTreeObj.dragNode_source);
 					}
 
@@ -453,7 +468,8 @@
 					img.style.visibility='hidden';	// Hide [+],[-] icon
 				}
 				
-			}else{
+			}
+			else{
 				// Putting the item back to it's original location
 				if(JSTreeObj.dragNode_sourceNextSib){
 					JSTreeObj.dragNode_parent.insertBefore(JSTreeObj.dragNode_source,JSTreeObj.dragNode_sourceNextSib);
@@ -501,8 +517,8 @@
 			if (JSTreeObj.dragDropTimer < 10) {				
 				JSTreeObj.dragDropTimer = -1;
 				return;
-			} 			
-			if(JSTreeObj.firstTopPage == true) {
+			}
+			if (JSTreeObj.firstTopPage == true) {
 				var rootUl = document.getElementById('rootUl');
 				if (JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]) {
 					rootUl.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
@@ -521,15 +537,10 @@
 				return;
 			}
 			
-			if(JSTreeObj.deleteNodes == true){
+			if (JSTreeObj.deleteNodes == true) {
 				var followingNodes = JSTreeObj.getFollowingNodes(JSTreeObj.previousParentId, JSTreeObj.previousPlaceInLevel);
 				deletePage(JSTreeObj.dragNode_source.id, followingNodes);
-				if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
-					if (document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id)){
-						var childToRemove = document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id);
-						JSTreeObj.floatingContainer.removeChild(JSTreeObj.floatingContainer.firstChild);
-					}
-				}
+				removeChildren(JSTreeObj.floatingContainer);
 				var tmpObj = JSTreeObj.dragNode_parent;
 				var lis = tmpObj.getElementsByTagName('LI');
 				
@@ -557,40 +568,46 @@
 				return;
 			}				
 
-			if(saveOnDrop != true){
-				if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
-					if(movingNode == true)
+			if (saveOnDrop != true) {
+				if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]) {
+					if (movingNode == true) {
 						JSTreeObj.dragNode_parent.appendChild(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]);
+					}
 					else if (document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id)){
 						JSTreeObj.floatingContainer.removeChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));
 					}
+					removeChildren(JSTreeObj.floatingContainer);
 					JSTreeObj.dropTargetIndicator.style.display='none';		
 					JSTreeObj.dragDropTimer = -1;	
 				}
 				return;
 			}
+			
 			var showMessage = false;
-			if(JSTreeObj.dragNode_destination){	// Check depth
+			if (JSTreeObj.dragNode_destination) {	// Check depth
 				var countUp = JSTreeObj.dragDropCountLevels(JSTreeObj.dragNode_destination,'up');
 				var countDown = JSTreeObj.dragDropCountLevels(JSTreeObj.dragNode_source,'down');
 				var countLevels = countUp/1 + countDown/1 + (JSTreeObj.insertAsSub?1:0);		
 			}
-			if(JSTreeObj.dragNode_destination){
-				if(JSTreeObj.insertAsSub){
+			if (JSTreeObj.dragNode_destination) {
+				if(JSTreeObj.insertAsSub) {
 					var uls = JSTreeObj.dragNode_destination.getElementsByTagName('UL');
-					if(uls.length>0){
+					if (uls.length>0) {
 						ul = uls[0];
 						ul.style.display='block';
 						var lis = ul.getElementsByTagName('LI');						
 						
 						var li = JSTreeObj.dragNode_source.getElementsByTagName('LI')[0];
 						
-						if(lis.length>0){	// Sub elements exists - drop dragable node before the first one
+						if(lis.length>0) {
+							//	Sub elements exists - drop dragable node before the first one
 							ul.insertBefore(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id),lis[0]);	
-						}else {	// No sub exists - use the appendChild method - This line should not be executed unless there's something wrong in the HTML, i.e empty <ul>
+						}
+						else {
+							//	No sub exists - use the appendChild method - This line should not be executed unless there's something wrong in the HTML, i.e empty <ul>
 							ul.appendChild(document.getElementById(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id));	
 						}
-					}else{
+					} else {
 						var ul = document.createElement('UL');
 						ul.style.display='block';
 						JSTreeObj.dragNode_destination.appendChild(ul);
@@ -602,8 +619,9 @@
 					img.style.visibility='visible';
 					img.src = img.src.replace(JSTreeObj.plusImage,JSTreeObj.minusImage);					
 					
-				}else{	
-					if(JSTreeObj.dragNode_destination.nextSibling){
+				}
+				else {	
+					if (JSTreeObj.dragNode_destination.nextSibling) {
 						var remId;
 
 						if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
@@ -615,28 +633,30 @@
 						}						
 						var nextSib = JSTreeObj.dragNode_destination.nextSibling;
 						nextSib.parentNode.insertBefore(el,nextSib);						
-					}else{
+					}
+					else {
 						var remId;
-						if(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]){
+						if (JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]) {
 							remId = JSTreeObj.floatingContainer.getElementsByTagName('LI')[0].id;
 						}
-						if (document.getElementById(remId)){
+						if (document.getElementById(remId)) {
 							var el = document.getElementById(remId);
-						}
 							JSTreeObj.dragNode_destination.parentNode.appendChild(el);
+						}
 					}
 				}	
 				// Clear parent object
 				var tmpObj = JSTreeObj.dragNode_parent;
 				var lis = tmpObj.getElementsByTagName('LI');
-				if(lis.length==0){
+				if (lis.length==0) {
 					var tmpSpan = tmpObj.parentNode;
 					var img = tmpSpan.parentNode.getElementsByTagName('IMG')[0];
 					img.style.visibility='hidden';	// Hide [+],[-] icon
 					tmpObj.parentNode.removeChild(tmpObj);											
 				}								
-			}else{			
-				// Putting the item back to it's original location
+			}
+			else {			
+				//	Putting the item back to it's original location
 				JSTreeObj.restoreTreeStructure();
 				return;
 			}
@@ -716,13 +736,17 @@
 			}			
 		},
 		restoreTreeStructure : function() {
-			if (JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]) {
-				if(JSTreeObj.previousPlaceInLevel > JSTreeObj.dragNode_parent.childNodes.length)
-					JSTreeObj.dragNode_parent.appendChild(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]);
-				else{
-					JSTreeObj.dragNode_parent.insertBefore(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0], JSTreeObj.dragNode_parent.childNodes[JSTreeObj.previousPlaceInLevel-1]);
+			if (movingNode) {
+				if (JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]) {
+					if (JSTreeObj.previousPlaceInLevel > JSTreeObj.dragNode_parent.childNodes.length) {
+						JSTreeObj.dragNode_parent.appendChild(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]);
+					}
+					else {
+						JSTreeObj.dragNode_parent.insertBefore(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0], JSTreeObj.dragNode_parent.childNodes[JSTreeObj.previousPlaceInLevel-1]);
+					}
 				}
 			}
+			removeChildren(this.floatingContainer);
 			JSTreeObj.dropTargetIndicator.style.display='none';
 			JSTreeObj.dragDropTimer = -1;
 	
@@ -1042,10 +1066,13 @@
 
 				var sourceTree = false;
 				var tmpVar = menuItems[no].getAttribute('sourceTree');
-				if(!tmpVar)
+				if (!tmpVar) {
 					tmpVar = menuItems[no].sourceTree;
-				if(tmpVar=='true')
-					sourceTree=true;
+				}
+				if (tmpVar == 'true') {
+					sourceTree = true;
+					JSTreeObj.sourceTreee = true;
+				}
 				// No drag var set ?
 				var noDrag = false;
 				var tmpVar = menuItems[no].getAttribute('noDrag');
@@ -1436,6 +1463,7 @@
 			return result;					
 		},
 		createNodeOnClick : function() {
+			removeChildren(JSTreeObj.floatingContainer);
 			JSTreeObj.dragNode_source = this.parentNode;			
 			JSTreeObj.floatingContainer.style.display='block';
 			var tempNode = JSTreeObj.dragNode_source.cloneNode(true);
