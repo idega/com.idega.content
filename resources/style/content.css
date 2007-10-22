@@ -872,3 +872,15 @@ overflow: auto !important;
 .siteTreeNodeNameEditInputStyle {
 	width: auto;
 }
+
+.emptySiteTreeContainerStyleClass {
+	height: 99%;
+	width: 99%;
+	border: 1px solid;
+}
+
+.emptySiteTreeTextContainerStyleClass {
+	text-align: center;
+	font-size: 24pt;
+	padding-top: 45%;
+}

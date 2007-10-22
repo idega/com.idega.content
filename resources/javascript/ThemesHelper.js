@@ -7,6 +7,8 @@ var IS_SITE_MAP = false;
 var NEED_RELOAD_BUILDER_PAGE = false;
 var NEED_REDIRECT = false;
 
+var EMPTY_SITE_TREE_TEXT_CONTAINER_ID = 'emptySiteTreeTextContainer';
+
 function setNeedRedirect(redirect) {
 	NEED_REDIRECT = redirect;
 }
@@ -150,43 +152,58 @@ function resizeContainer(containerID, styleClass, usedSpace, changeHeight) {
 
 function checkIfNotEmptySiteTree(id) {
 	if (id == null) {
-		return;
+		return false;
 	}
 	var treeContainer = document.getElementById(id);
 	if (treeContainer == null) {
-		return;
+		return false;
 	}
 	if (treeContainer.childNodes != null) {
 		if (treeContainer.childNodes.length != 0) {
-			return;
+			return false;
 		}
 	}
-	// No pages created
+	
+	//	No pages created
 	var button = document.getElementById('makeStartPage');
 	if (button != null) {
 		button.disabled = true;
 		button.value = getNoPageExistsText();
 	}
 	
-	var rootUl = document.createElement('ul');
-	rootUl.setAttribute('id','rootUl');
-	var tempTable = document.createElement('table');
-	tempTable.setAttribute('id','temporaryTable');
-	tempTable.setAttribute('onmouseover','treeObj.prepareToSetTopPage();');	
-	tempTable.setAttribute('onmouseout','treeObj.topPageNotSet();');	
-	tempTable.style.border='1px  solid';
-	tempTable.style.margin='5px';
-	var tr=document.createElement('tr');
-  	var td=document.createElement('td');
-  	var tdText=document.createTextNode(getDropTemplatesHereText()); 
-  	td.appendChild(tdText);
-  	tr.appendChild(td);
-  	tempTable.appendChild(tr); 	
-  	rootUl.appendChild(tempTable);
-	treeContainer.appendChild(rootUl);
+	drawTableForEmptySite(id);
 }
 
-function setNeedRelaodBuilderPage(needReload) {
+function drawTableForEmptySite(id) {
+	var container = $(id);
+	if (container == null) {
+		return false;
+	}
+	
+	container.empty();
+	
+	var rootUl = new Element('ul');
+	rootUl.setProperty('id', 'rootUl');
+	rootUl.injectInside(container);
+	
+	var emptyTextContainer = new Element('div');
+	emptyTextContainer.setProperty('id', EMPTY_SITE_TREE_TEXT_CONTAINER_ID);
+	emptyTextContainer.addClass('emptySiteTreeContainerStyleClass');
+	emptyTextContainer.addEvent('mouseenter', function() {
+		treeObj.prepareToSetTopPage();
+	});	
+	emptyTextContainer.addEvent('mouseleave', function() {
+		treeObj.topPageNotSet();
+	});
+	emptyTextContainer.injectInside(container);
+	
+	var textContainer = new Element('div');
+	textContainer.appendText(getDropTemplatesHereText());
+	textContainer.addClass('emptySiteTreeTextContainerStyleClass');
+	textContainer.injectInside(emptyTextContainer);
+}
+
+function setNeedReloadBuilderPage(needReload) {
 	NEED_RELOAD_BUILDER_PAGE = needReload;
 }
 
