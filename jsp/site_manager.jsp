@@ -38,7 +38,7 @@
                 	</script>
                 </jsf:verbatim>
 			
-				<wf:wfblock maximizedVertically="true" id="siteMapBlock" title="#{localizedStrings['com.idega.content']['site_map']}">
+				<x:div styleClass="mainPagesContentStyle">
                 	<x:div id="leftSide" forceId="true" styleClass="accordionInPages">
 						<web2:accordion accordionId="myAccordion" includeJavascript="true">
 							<jsf:facet name="PANELS">
@@ -65,17 +65,16 @@
 										<h:outputText value="#{localizedStrings['com.idega.content']['site_info']}"/>
 									</x:div>
 									<x:div id="siteInfoToggle" forceId="true" styleClass="acStretchmyAccordion">
-										<x:div id="siteInfoContainer" forceId="true">
-											<c:SiteInfo id="siteInfo" styleClass="siteInfoStyle_accordion"></c:SiteInfo>
-										</x:div>
+										<c:SiteInfo id="siteInfo" styleClass="siteInfoStyle_accordion"></c:SiteInfo>
 									</x:div>
 								</x:div>
 							</jsf:facet>
 						</web2:accordion>     
 					</x:div>     
 
-					<x:div id="pagesTypesContainer" forceId="true">
-						<wf:wfblock id="dhtmlgoodies_tree2" title="#{localizedStrings['com.idega.content']['page_types']}" styleClass="pagesTypesContainer">
+					<x:div id="rightSideInSiteManagerContainer" forceId="true" styleClass="rightSideInSiteManagerStyle">
+						<x:div id="pagesTypesContainer" forceId="true" styleClass="siteTemplatesContainerStyle" style="max-height: 300px;">
+							<x:outputLabel styleClass="siteTemplatesLabelStyle" value="#{localizedStrings['com.idega.content']['page_types']}" />
 							<wf:iwtree value="#{siteTemplateBean.pageTree}" id="page_chooser22"	var="node" varNodeToggler="t" clientSideToggle="true"	sourceTree="true"	showRootNode="false">
 								<jsf:facet name="IWTreeNode">
 									<h:panelGroup>
@@ -85,13 +84,14 @@
 									</h:panelGroup>
 								</jsf:facet>
 							</wf:iwtree>
-						</wf:wfblock>
-					</x:div>
-					
-					<x:div id="siteTemplatesContainer" forceId="true">
-						<wf:wfblock id="siteTemplatesBlock" title="#{localizedStrings['com.idega.content']['site_templates']}" styleClass="siteTemplatesContainer">
+						</x:div>
+						
+						<x:div style="padding: 2px;" />
+						
+						<x:div id="siteTemplatesContainer" forceId="true" styleClass="siteTemplatesContainerStyle">
+							<x:outputLabel styleClass="siteTemplatesLabelStyle" value="#{localizedStrings['com.idega.content']['site_templates']}" />
 							<c:siteTemplatesViewer id="siteTemplates"/>
-						</wf:wfblock>
+						</x:div>
 					</x:div>
 
 					<jsf:verbatim>
@@ -102,7 +102,7 @@
 							});
 						</script>
 					</jsf:verbatim>		
-				</wf:wfblock>
+				</x:div>
 			</h:form>
 		</ws:page>
 	</jsf:view>

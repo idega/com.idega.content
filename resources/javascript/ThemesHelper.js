@@ -201,10 +201,17 @@ function drawTableForEmptySite(id) {
 	});
 	emptyTextContainer.injectInside(container);
 	
+	var stretcher = new Element('div');
+	stretcher.setStyle('height', '40%');
+	var clone = stretcher.clone();
+	stretcher.injectInside(emptyTextContainer);
+	
 	var textContainer = new Element('div');
 	textContainer.appendText(getDropTemplatesHereText());
 	textContainer.addClass('emptySiteTreeTextContainerStyleClass');
 	textContainer.injectInside(emptyTextContainer);
+	
+	clone.injectInside(emptyTextContainer);
 }
 
 function setNeedReloadBuilderPage(needReload) {
@@ -488,17 +495,17 @@ function setNewStyleForSelectedElement(id, newClassName) {
 function boldCurrentTreeElement() {
 	var liElement = document.getElementById(getPageID());
 	if (liElement == null) {
-		return;
+		return false;
 	}
 	var children = liElement.childNodes;
 	if (children == null) {
-		return;
+		return false;
 	}
 	var element = null;
 	for (var i = 0; i < children.length; i++) {
 		if (children[i].tagName == 'a' || children[i].tagName == 'A') {
 			boldSelectedTreeElement(children[i]);
-			return;
+			return false;
 		}
 	}
 	return false;

@@ -260,9 +260,6 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 .current_structure ul {
 	list-style-type:none;
 	padding-left: 15px;
-/*	padding: 0;
-	margin: 0;
-*/
 }
 
 .current_structure li {
@@ -459,19 +456,17 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 }
 
 .siteInfoStyle_accordion {
-	position: relative;
-	z-index: 1;
-	width: 260px;
-	height: 280px;
 	border: 1px solid #D7D7D7;
 	overflow: auto;
 }
 
+.rightSideInSiteManagerStyle {
+	float: left;
+	padding-left: 5px;
+}
+
 .currentStructureStyle {
 	position: absolute;
-/*	width: 35%;
-	width: 275px;
-*/
 	width: 275px;
 	height: 275px;
 	right: 0px;
@@ -522,12 +517,8 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 }
 
 .pagesTypesContainer {
-	position: absolute;
 	border: 1px solid #D7D7D7;
 	height: 130px;
-	left: 300px !important;
-	
-/*	float: flo;*/
 }
 
 .pagesTypesContainer ul{
@@ -537,12 +528,9 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 
 
 .siteTemplatesContainer {
-	position: absolute;
 	bottom: 0px;
 	right: 0px;
-	left:300px !important;
 	border: 1px solid #D7D7D7;
-	float:right;
 }
 
 .siteTemplatesContainer ul{
@@ -560,7 +548,6 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 .site_tree_container_site_accordion {
 	position: relative;
 	right: 0px;
-	width: 275px;
 }
 
 .site_tree_container {
@@ -610,17 +597,21 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 #pagesTypesContainer{
 }
 
+div.siteTemplatesContainerStyle {
+	border-width: 1px;
+	border-color: #D7D7D7;
+	border-style: solid;
+	background-color:#E8E8E8;
+	overflow: auto;
+}
 
-div.pagesTypesContainer{
-height: auto;
-border-bottom-width: 0px;
-left: 8px;
-/*right: 281px;*/
-right: 0px;
-top: 4px !important;
-width: auto !important;
-bottom: 330px;
-overflow: auto;
+div.siteTemplatesContainerStyle ul {
+	list-style: none;
+}
+
+.siteTemplatesLabelStyle {
+	font-weight: bold;
+	margin: 4px;
 }
 
 div#siteTemplatesContainer div.siteTemplatesContainer .wf_blockmainarea #site_templates .accordionTabContentBox{
@@ -818,7 +809,6 @@ overflow: auto !important;
 #site_tree_container .site_tree_container_site_accordion {
 	background-color: #E8E8E8;
 	right: 0px;
-	width: 234px;
 }
 
 #site_tree_container .wf_menuheader{
@@ -830,17 +820,15 @@ overflow: auto !important;
 }
 
 #div_id_current_structure_tree{
-	position : relative;
+	position: relative;
 	margin-bottom: 5px;
 	padding-bottom: 20px;
 	overflow: auto;
-	height: 278px;
 }
 #current_structure_tree{
 	width: auto;
 }
 #site_tree_container{
-	width: 234px;
 }
 #sitemap{
 	overflow-y:auto !important;	
@@ -882,5 +870,4 @@ overflow: auto !important;
 .emptySiteTreeTextContainerStyleClass {
 	text-align: center;
 	font-size: 24pt;
-	padding-top: 45%;
 }

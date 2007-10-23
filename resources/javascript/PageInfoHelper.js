@@ -412,6 +412,14 @@ function initializePages() {
 	checkIfNotEmptySiteTree('div_id_current_structure_tree');
 	document.addEvent('click', managePageInfoComponents);
 	
+	var siteTreeContainer = $('div_id_current_structure_tree');
+	if (siteTreeContainer) {
+		var height = getTotalHeight() - (RESERVED_HEIGHT + 93);
+		if (height > 0) {
+			siteTreeContainer.setStyle('height', height + 'px');
+		}
+	}
+	
 	ThemesEngine.isUserAdmin({
 		callback: function(isAdmin) {
 			$('showSourcePagesButton').setProperty('disabled', !isAdmin);

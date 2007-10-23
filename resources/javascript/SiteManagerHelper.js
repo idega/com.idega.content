@@ -3,7 +3,7 @@ var LANGUAGE = null;
 var KEYWORDS = null;
 
 function setActiveLanguage() {
-	setLanguageForSiteInfo(document.getElementById("siteInfoLocale"));
+	setLanguageForSiteInfo(document.getElementById('siteInfoLocale'));
 }
 
 function setLanguageForSiteInfo(select) {
@@ -109,8 +109,8 @@ function proceedSaving(keywords) {
 		element = document.getElementById(KEYWORDS[i]);
 		if (element != null) {
 			values.push(element.value);
-			if (KEYWORDS[i] == "mainDomainName") {
-				var siteName = getElementByClassName("div", "ws_appinfo");
+			if (KEYWORDS[i] == 'mainDomainName') {
+				var siteName = getElementByClassName('div', 'ws_appinfo');
 				if (siteName != null) {
 					var newName = document.createTextNode(element.value);
 					if (siteName.firstChild == null) {
@@ -134,7 +134,31 @@ function initialiazeSiteManager() {
 	setIsSiteMap(true);
 	setNeedRedirect(false);
 	setActiveLanguage();
-	checkIfNotEmptySiteTree("div_id_current_structure_tree");
+	
+	var containerId = 'div_id_current_structure_tree';
+	var siteTreeContainer = $('div_id_current_structure_tree');
+	if (siteTreeContainer) {
+		var height = getTotalHeight() - 145;
+		if (height > 0) {
+			siteTreeContainer.setStyle('height', height + 'px');
+		}
+	}
+	
+	checkIfNotEmptySiteTree(containerId);
+
+	var width = getTotalWidth() - 462;
+	if (width > 0) {
+		var pagesTemplatesContainer = $('pagesTypesContainer');
+		if (pagesTemplatesContainer) {
+			pagesTemplatesContainer.setStyle('width', width + 'px');
+		}
+		
+		var siteTemplatesContainer = $('siteTemplatesContainer');
+		if (siteTemplatesContainer) {
+			siteTemplatesContainer.setStyle('width', width + 'px');
+		}
+	}
+
 }
 
 function registerSiteActions() {
