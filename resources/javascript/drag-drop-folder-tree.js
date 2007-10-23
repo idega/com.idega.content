@@ -593,7 +593,6 @@
 			if (JSTreeObj.dragNode_destination) {
 				if (JSTreeObj.insertAsSub) {
 					JSTreeObj.insertNewSiteTreeNodes();
-					
 					var img = JSTreeObj.dragNode_destination.getElementsByTagName('IMG')[0];
 					img.style.visibility='visible';
 					img.src = img.src.replace(JSTreeObj.plusImage,JSTreeObj.minusImage);
@@ -601,11 +600,18 @@
 				else {
 					var nodeToInsert = $(JSTreeObj.floatingContainer.getElementsByTagName('LI')[0]);
 					if (nodeToInsert) {
-						if (JSTreeObj.dragNode_destination.nextSibling) {
-							nodeToInsert.injectBefore($(JSTreeObj.dragNode_destination.nextSibling));
+						var nextDestinationSibling = $(JSTreeObj.dragNode_destination.nextSibling);
+						if (nextDestinationSibling) {
+							nodeToInsert.injectBefore(nextDestinationSibling);
 						}
 						else {
-							nodeToInsert.injectInside($(JSTreeObj.dragNode_destination).getParent());
+							var previousDestinationSibling = $(JSTreeObj.dragNode_destination);
+							if (previousDestinationSibling) {
+								nodeToInsert.injectAfter(previousDestinationSibling);
+							}
+							else {
+								nodeToInsert.injectInside($(JSTreeObj.dragNode_destination).getParent());
+							}
 						}
 					}
 				}
@@ -762,21 +768,22 @@
 			}
 			
 			JSTreeObj.initNode(createdNode);
+			var childsLink = $(createdNode.getElementsByTagName('a')[0]);
+			if (childsLink) {
+				childsLink.addClass('pageTreeNames');
+			}
 			
-			var newName = (createdNode.getElementsByTagName('a')[0]).innerHTML;
 			var newChilds = root.getElementsByTagName('li');
 			var newChildsElement = null;
-			var newNode = null;
-			var newName = null;
 			for (var i = 0; i < newChilds.length; i++) {
-				newChildsElement = newChilds[i];
+				newChildsElement = $(newChilds[i]);
 				if (newChildsElement != null) {
-					$(newChildsElement.id).setAttribute('id', id[i+1]);
-				}
-				newNode = $(id[i+1]);
-				if (newNode != null) {
-					JSTreeObj.initNode(newNode);
-					newName = (newNode.getElementsByTagName('a')[0]).innerHTML;
+					newChildsElement.setProperty('id', id[i+1]);
+					JSTreeObj.initNode(newChildsElement);
+					childsLink = $(newChildsElement.getElementsByTagName('a')[0]);
+					if (childsLink) {
+						childsLink.addClass('pageTreeNames');
+					}
 				}
 			}
 			
@@ -794,12 +801,6 @@
 				}
 			}
 			else {
-				var aTag = $(id[0]);
-				if (aTag) {
-					aTag = aTag.getElementsByTagName('a')[0];
-					aTag.className = 'pageTreeNames';				
-					boldSelectedTreeElement(aTag);
-				}
 				registerSiteActions();				
 			}
 			
@@ -1158,16 +1159,28 @@
 				this.actionOnMouseUp = 'move';
 			}
 		},
-		initNode : function(node) {		
+		initNode : function(node) {
+			if (node == null) {
+				return false;
+			}
+			node = $(node);
+			if (node.getTag() != 'li') {
+				return false;
+			}
+			
 			var noChildren = false;
 			var sourceTree = false;
 			var noDrag = false;
-	
-			var iconfile = null;		 
-			var tmpVar = node.getAttribute('iconfile');
+			var iconfile = null;
+			
+			var images = node.getElementsByTagName('img');
+			var folderImg = images[1];
+			
+			var tmpVar = node.getProperty('iconfile');
 			if (!tmpVar) {
 				tmpVar = node.iconfile;
 			}
+			
 			if (tmpVar) {
 				iconfile = tmpVar;
 			}
@@ -1176,7 +1189,7 @@
 			}
 
 			var templatefile = null;		 
-			var tmpVar = node.getAttribute('templatefile');
+			var tmpVar = node.getProperty('templatefile');
 			if (!tmpVar) {
 				tmpVar = node.templatefile;
 			}
@@ -1201,10 +1214,8 @@
 			}
 			if (sourceTree) {
 				aTag.onmousedown = JSTreeObj.copyDragableNode;
-			}
-								
-			var images = node.getElementsByTagName('img');				
-			var folderImg = images[1];
+			}	
+			
 			if (!noDrag) {
 				if (sourceTree) {
 					folderImg.onmousedown = JSTreeObj.copyDragableNode;
@@ -1213,6 +1224,7 @@
 					folderImg.onmousedown = JSTreeObj.initDrag;
 				}
 			}
+			
 			if (!noChildren) {
 				folderImg.onmousemove = JSTreeObj.moveDragableNodes;
 			}	
