@@ -336,38 +336,43 @@
 		moveDragableNodes : function(e) {			
 			var divTags = document.getElementsByTagName('div');
 			var divTag = null;
-			for(var i = 0; i < divTags.length; i++){
-				if(divTags[i].getAttribute('class') == 'current_structure')
+			for (var i = 0; i < divTags.length; i++) {
+				if (divTags[i].getAttribute('class') == 'current_structure') {
 					divTag = divTags[i];
+				}
 			}
-			
 			try {
 				if (JSTreeObj) {
 					if (JSTreeObj.dragDropTimer < 10) {
 						return;
 					}
 				}
-			} catch(e) {}
+			} catch(ex) {}
 			
-			if(document.all)e = event;
+			e = new Event(e);
 
-			dragDrop_x = e.clientX/1 - 55 + document.body.scrollLeft;
-			dragDrop_y = e.clientY/1 + 0 + document.documentElement.scrollTop;	
+			dragDrop_x = e.client.x - 55;
+			dragDrop_y = e.client.y
 
 			JSTreeObj.floatingContainer.style.left = dragDrop_x + 'px';
 			JSTreeObj.floatingContainer.style.top = dragDrop_y + 'px';
 			JSTreeObj.floatingContainer.style.opacity = 0.5;
 
-			var thisObj = this;
-			if(thisObj.tagName=='A' || thisObj.tagName=='IMG')
+			var thisObj = $(this);
+			var isOverLink = thisObj.getTag() == 'a';
+			if (thisObj.tagName =='A' || thisObj.tagName=='IMG') {
 				thisObj = thisObj.parentNode;
+			}
 			JSTreeObj.dragNode_noSiblings = false;
 			var tmpVar = thisObj.getAttribute('noSiblings');
-			if(!tmpVar)tmpVar = thisObj.noSiblings;
-			if(tmpVar=='true')JSTreeObj.dragNode_noSiblings=true;
+			if (!tmpVar) {
+				tmpVar = thisObj.noSiblings;
+			}
+			if (tmpVar == 'true') {
+				JSTreeObj.dragNode_noSiblings = true;
+			}
 
 			var tmpVar = thisObj.getAttribute('sourceTree');
-			
 			if(!tmpVar) {
 				tmpVar = thisObj.sourceTree;
 			}
@@ -376,30 +381,49 @@
 				JSTreeObj.sourceTreee = true;
 			}
 				
-			if(thisObj && thisObj.id) {
+			if (thisObj && thisObj.id) {
 				JSTreeObj.dragNode_destination = thisObj;
 				var img = thisObj.getElementsByTagName('IMG')[1];
-				var tmpObj= JSTreeObj.dropTargetIndicator;
-				tmpObj.style.display='block';
+				var tmpObj = JSTreeObj.dropTargetIndicator;
+				tmpObj.style.display = 'block';
 				
 				var eventSourceObj = this;
-				if(JSTreeObj.dragNode_noSiblings && eventSourceObj.tagName=='IMG')
+				if (JSTreeObj.dragNode_noSiblings && eventSourceObj.tagName=='IMG') {
 					eventSourceObj = eventSourceObj.nextSibling;
+				}
 				
 				var tmpImg = tmpObj.getElementsByTagName('IMG')[0];
-				if(this.tagName=='A' || JSTreeObj.dragNode_noSiblings) {
+				if (this.tagName=='A' || JSTreeObj.dragNode_noSiblings) {
 					tmpImg.src = tmpImg.src.replace('ind1','ind2');	
 					JSTreeObj.insertAsSub = true;
 					tmpObj.style.left = (JSTreeObj.getLeftPos(eventSourceObj) + JSTreeObj.indicator_offsetX_sub) + 'px';
-				}else{
+				} 
+				else {
 					tmpImg.src = tmpImg.src.replace('ind2','ind1');
 					JSTreeObj.insertAsSub = false;
 					tmpObj.style.left = (JSTreeObj.getLeftPos(eventSourceObj) + JSTreeObj.indicator_offsetX) + 'px';
 				}
-				if(!thisObj || !thisObj.id){
+				if (!thisObj || !thisObj.id) {
 					tmpImg.style.visibility = 'hidden';
 				}
-				tmpObj.style.top = (JSTreeObj.getTopPos(thisObj) + JSTreeObj.indicator_offsetY + 15) + 'px';
+				
+				var indicatorTopValue = 0;
+				var target = e.target;
+				try {
+					var overflownContainers = new Array();
+					overflownContainers.push($('div_id_current_structure_tree'));
+					indicatorTopValue = target.getTop(overflownContainers);
+					if (isOverLink) {
+						indicatorTopValue += 13;
+					}
+					else {
+						indicatorTopValue += 16;
+					}
+				} catch (ex) {
+					indicatorTopValue = JSTreeObj.getTopPos(thisObj) + JSTreeObj.indicator_offsetY + 15;
+				}
+				
+				tmpObj.style.top = indicatorTopValue + 'px';
 			}			
 			return false;
 			
