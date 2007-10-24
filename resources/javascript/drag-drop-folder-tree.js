@@ -1378,6 +1378,9 @@
 		},
 		checkIfOverTree : function(idOfTree){
 			var treeElement = $(idOfTree);
+			if (!treeElement) {
+				return false;
+			}
 			treeElement.addEvent('mouseover', function() {
 				JSTreeObj.aboveTree();
 			});
@@ -1621,7 +1624,7 @@
 			var changeNameId = editObj.id.replace(/[^0-9]/g, '');
 			
 			showLoadingMessage(CHANGING_THEME);
-			BuilderService.changePageName(changeNameId, newSitePageName, empty);
+			ThemesEngine.changePageName(changeNameId, newSitePageName, empty);
 
 			changePageTitleInPageInfo(newSitePageName);
 			ThemesEngine.changePageUri(changeNameId, newSitePageName, true, changePageTitleCallback);
