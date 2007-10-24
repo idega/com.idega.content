@@ -507,6 +507,10 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	border: 1px solid #D7D7D7;
 }
 
+#div_id_new_page_tree ul {
+	list-style-type: none;
+}
+
 .pageInfoButtonsContainer {
 	position: absolute;
 	bottom: 0px;
