@@ -174,7 +174,18 @@ public interface ThemesEngine extends IBOService {
 	 */
 	public String reloadThemeProperties(String themeId);
 	
+	/**
+	 * @see ThemesEngineBean#isUserAdmin
+	 */
 	public boolean isUserAdmin();
 	
+	/**
+	 * @see ThemesEngineBean#getPageUri
+	 */
 	public String getPageUri(String pageKey);
+	
+	/**
+	 * @see ThemesEngineBean#changePageName
+	 */
+	public boolean changePageName(int id, String newName);
 }
