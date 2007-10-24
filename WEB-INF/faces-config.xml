@@ -271,6 +271,10 @@
 		<component-type>ThemesSliderViewer</component-type>
 		<component-class>com.idega.content.themes.presentation.ThemesSliderViewer</component-class>
 	</component>
+	<component>
+		<component-type>SiteTreeViewer</component-type>
+		<component-class>com.idega.content.themes.presentation.SiteTreeViewer</component-class>
+	</component>
 	<component> 
   		<component-type>siteTemplatesViewer</component-type> 
   		<component-class>com.idega.content.tree.SiteTemplatesViewer</component-class> 
