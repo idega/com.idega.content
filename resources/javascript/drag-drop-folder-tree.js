@@ -382,27 +382,37 @@
 			}
 				
 			if (thisObj && thisObj.id) {
+				var overflownContainers = new Array();
+				overflownContainers.push($('div_id_current_structure_tree'));
+				
 				JSTreeObj.dragNode_destination = thisObj;
 				var img = thisObj.getElementsByTagName('IMG')[1];
 				var tmpObj = JSTreeObj.dropTargetIndicator;
 				tmpObj.style.display = 'block';
 				
 				var eventSourceObj = this;
-				if (JSTreeObj.dragNode_noSiblings && eventSourceObj.tagName=='IMG') {
+				if (JSTreeObj.dragNode_noSiblings && eventSourceObj.tagName == 'IMG') {
 					eventSourceObj = eventSourceObj.nextSibling;
 				}
 				
+				eventSourceObj = $(eventSourceObj);
+				var indicatorLeftValue = 0;
 				var tmpImg = tmpObj.getElementsByTagName('IMG')[0];
 				if (this.tagName=='A' || JSTreeObj.dragNode_noSiblings) {
 					tmpImg.src = tmpImg.src.replace('ind1','ind2');	
 					JSTreeObj.insertAsSub = true;
-					tmpObj.style.left = (JSTreeObj.getLeftPos(eventSourceObj) + JSTreeObj.indicator_offsetX_sub) + 'px';
 				} 
 				else {
 					tmpImg.src = tmpImg.src.replace('ind2','ind1');
 					JSTreeObj.insertAsSub = false;
-					tmpObj.style.left = (JSTreeObj.getLeftPos(eventSourceObj) + JSTreeObj.indicator_offsetX) + 'px';
 				}
+				try {
+					indicatorLeftValue = eventSourceObj.getLeft(overflownContainers);
+				} catch(ex) {
+					indicatorLeftValue = (JSTreeObj.getLeftPos(eventSourceObj) + JSTreeObj.indicator_offsetX);
+				}
+				tmpObj.style.left = indicatorLeftValue + 'px';
+				
 				if (!thisObj || !thisObj.id) {
 					tmpImg.style.visibility = 'hidden';
 				}
@@ -410,8 +420,6 @@
 				var indicatorTopValue = 0;
 				var target = e.target;
 				try {
-					var overflownContainers = new Array();
-					overflownContainers.push($('div_id_current_structure_tree'));
 					indicatorTopValue = target.getTop(overflownContainers);
 					if (isOverLink) {
 						indicatorTopValue += 13;
