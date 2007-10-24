@@ -794,6 +794,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		for (int i = 0; i < keywords.length; i++) {
 			saveSiteInfoValue(language, keywords[i], values[i], settings, domain, cachedDomain);
 		}
+		
+		updateSiteTree(null);
+		
 		return true;
 	}
 	
@@ -957,20 +960,15 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		}
 		
-		boolean result = true;
 		try {
-			result = decreaseNodesNumbersInLevel(followingNodes, -1, null);	
-			if (result) {
-				result = helper.getThemesService().deleteIBPage(pageId, deleteChildren);
-			}
+			decreaseNodesNumbersInLevel(followingNodes, -1, null);	
+			helper.getThemesService().deleteIBPage(pageId, deleteChildren);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			return false;
 		}
 		
-		if (result) {
-			updateSiteTree(null);
-		}
+		updateSiteTree(null);
 		
 		return true;
 	}

@@ -698,21 +698,46 @@ function setReverseAjaxInThemes() {
 	}
 }
 
-function updateSiteTree(updatedTree) {
+var LOADING_LAYER_ABOVE_TREE = null;
+var CURRENT_SITE_STRUCTURE_TREE_ID = 'current_structure_tree';
+function updateSiteTree(updatedTree) {	
 	if (updatedTree == null) {
 		return false;
 	}
-	var container = $('current_structure_tree').getParent();
+
+	var container = $(CURRENT_SITE_STRUCTURE_TREE_ID).getParent();
 	if (container == null) {
 		return false;
 	}
 	
-	container.empty();
+	LOADING_LAYER_ABOVE_TREE = $(setLoadingLayerForElement(CURRENT_SITE_STRUCTURE_TREE_ID, false, container.getSize(), container.getPosition()));
+
+	container.empty();	
 	insertNodesToContainer(updatedTree, container);
 	
-	initializeTrees();
-	registerActionsForSiteTree();
-	boldCurrentTreeElement();
+	var treeObj = new JSDragDropTree();
+	treeObj.setTreeId(CURRENT_SITE_STRUCTURE_TREE_ID);
+	treeObj.initTree();
+	treeObj.checkIfOverTree(CURRENT_SITE_STRUCTURE_TREE_ID);	
+	treeObj.getNodeOrders();
+	treeObj.expandAll();
 	
-	getPrewUrl(getPageID());
+	if (isSiteMap()) {
+		registerSiteActions();
+	}
+	else {
+		registerActionsForSiteTree();
+		boldCurrentTreeElement();
+	
+		getPrewUrl(getPageID());
+	}
+	
+	if (LOADING_LAYER_ABOVE_TREE) {
+		window.setTimeout(showLayerAndResumeUpdatingTree, 500);
+	}
+}
+
+function showLayerAndResumeUpdatingTree() {
+	LOADING_LAYER_ABOVE_TREE.remove();
+	LOADING_LAYER_ABOVE_TREE = null;
 }

@@ -34,7 +34,8 @@
                 		window.addEvent('domready', getLocalizedTextForThemes);
                 		window.addEvent('domready', initialiazeSiteManager);
                 		window.addEvent('domready', getPathToImageFolder);
- 	              		window.addEvent('domready', registerSiteActions);                		
+ 	              		window.addEvent('domready', registerSiteActions);
+ 	              		window.addEvent('domready', enableReverseAjaxInThemes);
                 	</script>
                 </jsf:verbatim>
 			
