@@ -1,6 +1,5 @@
-var LANGUAGE = null;
-
-var KEYWORDS = null;
+var SITE_INFO_LANGUAGE = null;
+var SITE_INFO_KEYWORDS = null;
 
 function setActiveLanguage() {
 	setLanguageForSiteInfo(document.getElementById('siteInfoLocale'));
@@ -8,50 +7,50 @@ function setActiveLanguage() {
 
 function setLanguageForSiteInfo(select) {
 	if (select == null) {
-		return;
+		return false;
 	}
 	if (select.options == null) {
-		return;
+		return false;
 	}
 	var selected = select.options[select.selectedIndex];
 	if (selected == null) {
-		return;
+		return false;
 	}
 	if (selected.value == null) {
-		return;
+		return false;
 	}
 	
-	LANGUAGE = selected.value;
+	SITE_INFO_LANGUAGE = selected.value;
 }
 
 function getValues(object) {
 	setLanguageForSiteInfo(object);
-	if (KEYWORDS == null) {
+	if (SITE_INFO_KEYWORDS == null) {
 		ThemesEngine.getSiteInfoElements(getSiteInfoElementsCallback);
 	}
 	else {
-		getSiteInfoElementsCallback(KEYWORDS);
+		getSiteInfoElementsCallback(SITE_INFO_KEYWORDS);
 	}
 }
 
 function getSiteInfoElementsCallback(keywords) {
-	KEYWORDS = keywords;
-	if (LANGUAGE != null && KEYWORDS != null) {
-		ThemesEngine.getSiteInfoValues(KEYWORDS, LANGUAGE, getSiteInfoValuesCallback);
+	SITE_INFO_KEYWORDS = keywords;
+	if (SITE_INFO_LANGUAGE != null && SITE_INFO_KEYWORDS != null) {
+		ThemesEngine.getSiteInfoValues(SITE_INFO_KEYWORDS, SITE_INFO_LANGUAGE, getSiteInfoValuesCallback);
 	}
 }
 
 function getSiteInfoValuesCallback(values) {
-	if (KEYWORDS == null || values == null) {
-		return;
+	if (SITE_INFO_KEYWORDS == null || values == null) {
+		return false;
 	}
-	if (KEYWORDS.length != values.length) {
-		return;
+	if (SITE_INFO_KEYWORDS.length != values.length) {
+		return false;
 	}
 	
 	var element = null;
-	for (var i = 0; i < KEYWORDS.length; i++) {
-		element = document.getElementById(KEYWORDS[i]);
+	for (var i = 0; i < SITE_INFO_KEYWORDS.length; i++) {
+		element = document.getElementById(SITE_INFO_KEYWORDS[i]);
 		if (element != null) {
 			element.value = values[i];
 		}
@@ -60,11 +59,11 @@ function getSiteInfoValuesCallback(values) {
 
 function saveSiteInfo() {
 	showLoadingMessage(getThemeSavingText());
-	if (KEYWORDS == null) {
+	if (SITE_INFO_KEYWORDS == null) {
 		ThemesEngine.getSiteInfoElements(proceedSaving);
 	}
 	else {
-		proceedSaving(KEYWORDS);
+		proceedSaving(SITE_INFO_KEYWORDS);
 	}
 }
 
@@ -91,25 +90,25 @@ function getElementByClassName(elementName, style) {
 
 function proceedSaving(keywords) {
 	if (keywords == null) {
-		closeLoadingMessage();
-		return;
+		closeAllLoadingMessages();
+		return false;
 	}
-	if (LANGUAGE == null) {
+	if (SITE_INFO_LANGUAGE == null) {
 		setActiveLanguage();
-		if (LANGUAGE == null) {
-			closeLoadingMessage();
-			return;
+		if (SITE_INFO_LANGUAGE == null) {
+			closeAllLoadingMessages();
+			return false;
 		}
 	}
 	
-	KEYWORDS = keywords;
+	SITE_INFO_KEYWORDS = keywords;
 	var values = new Array();
 	var element = null;
-	for (var i = 0; i < KEYWORDS.length; i++) {
-		element = document.getElementById(KEYWORDS[i]);
+	for (var i = 0; i < SITE_INFO_KEYWORDS.length; i++) {
+		element = document.getElementById(SITE_INFO_KEYWORDS[i]);
 		if (element != null) {
 			values.push(element.value);
-			if (KEYWORDS[i] == 'mainDomainName') {
+			if (SITE_INFO_KEYWORDS[i] == 'mainDomainName') {
 				var siteName = getElementByClassName('div', 'ws_appinfo');
 				if (siteName != null) {
 					var newName = document.createTextNode(element.value);
@@ -123,11 +122,14 @@ function proceedSaving(keywords) {
 			}
 		}
 	}
-	ThemesEngine.saveSiteInfo(LANGUAGE, KEYWORDS, values, saveSiteInfoCallback);
+	ThemesEngine.saveSiteInfo(SITE_INFO_LANGUAGE, SITE_INFO_KEYWORDS, values, saveSiteInfoCallback);
 }
 
 function saveSiteInfoCallback(result) {
-	closeLoadingMessage();
+	/*if (result) {
+		getPrewUrl(getPageID());
+	}*/
+	closeAllLoadingMessages();
 }
 
 function initialiazeSiteManager() {
@@ -158,7 +160,6 @@ function initialiazeSiteManager() {
 			siteTemplatesContainer.setStyle('width', width + 'px');
 		}
 	}
-
 }
 
 function registerSiteActions() {
