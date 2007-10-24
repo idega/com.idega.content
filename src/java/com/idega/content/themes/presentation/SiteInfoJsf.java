@@ -40,7 +40,7 @@ public class SiteInfoJsf extends SiteInfo {
 		
 		GenericButton save = new GenericButton(ContentUtil.getBundle().getLocalizedString("save"));
 		save.setStyleClass("button");
-		save.setId("saveButton");
+		save.setId("saveSiteInfoButton");
 		save.setOnClick("saveSiteInfo()");
 		siteInfo.add(save);
 		
