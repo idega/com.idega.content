@@ -22,7 +22,8 @@ version="1.2">
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/PageInfoHelper.js,
-						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js">
+						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js,
+						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/SiteManagerHelper.js">
 			<h:form id="pagesForm" onsubmit="return false;">
 				<f:verbatim>
                 	<script type="text/javascript">
@@ -37,6 +38,10 @@ version="1.2">
                 		window.addEvent('domready', initializePages);
                 		window.addEvent('domready', getPathToImageFolder);
                 		window.addEvent('domready', registerPageInfoActions);
+                		/*window.addEvent('domready', initialiazeSiteManager);
+                		window.addEvent('domready', getPathToImageFolder);
+ 	              		window.addEvent('domready', registerSiteActions);*/
+ 	              		window.addEvent('domready', enableReverseAjaxInThemes);
                 	</script>
                 </f:verbatim>
                 
@@ -48,7 +53,6 @@ version="1.2">
 									<t:div id="siteMapInformation" forceId="true" styleClass="acTogglemyAccordion">
 										<h:outputText value="#{localizedStrings['com.idega.content']['current_site_structure']}"/>
 									</t:div>
-									
 									<t:div id="sitemap" forceId="true" styleClass="acStretchmyAccordion">
 	 									<t:div id="site_tree_container" forceId="true">
 	 										<c:block_with_toolbar id="page_tree_div" addStartPageButton="true" styleClass="site_tree_container_site_accordion" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png">
@@ -60,16 +64,24 @@ version="1.2">
 													</f:facet>
 												</wf:iwtree>
 											</c:block_with_toolbar>
-										</t:div>
+										</t:div>			
 									</t:div>
 											
 									<t:div id="pageInfo" forceId="true" styleClass="acTogglemyAccordion">
 										<h:outputText value="#{localizedStrings['com.idega.content']['page_info']}"/>
 									</t:div>
-									
 									<t:div id="pageInfoToggle" forceId="true" styleClass="acStretchmyAccordion">
 										<c:PageInfo id="customizePage" styleClass="pageInfoStyle_accordion"></c:PageInfo>
 									</t:div>
+									
+									<!--
+									<t:div id="siteinformation" forceId="true" styleClass="acTogglemyAccordion">
+										<h:outputText value="#{localizedStrings['com.idega.content']['site_info']}"/>
+									</t:div>
+									<t:div id="siteInfoToggle" forceId="true" styleClass="acStretchmyAccordion">
+										<c:SiteInfo id="siteInfo" styleClass="siteInfoStyle_accordion"></c:SiteInfo>
+									</t:div>
+									-->
 								</t:div>
 							</f:facet>
 						</web2:accordion>     

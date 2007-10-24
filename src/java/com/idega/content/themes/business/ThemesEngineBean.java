@@ -557,6 +557,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				}
 			}
 		}
+		
+		if (changedPageUri != null) {
+			updateSiteTree(iwc);
+		}
+		
 		return changedPageUri;
 	}
 	
@@ -792,8 +797,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	public List <String> createPage(List <TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, List<String> followingNodes){
-
+	public List <String> createPage(List <TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, List<String> followingNodes) {	
 		List <String> newIds = new ArrayList<String>();
 		
 		struct.get(0).setTreeOrder(numberInLevel);
@@ -883,7 +887,18 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		//	Creating new tree order
 		increaseNodesNumbersInLevel(followingNodes, -1, null);
 		
+		updateSiteTree(null);
+		
 		return newIds;
+	}
+	
+	private void updateSiteTree(IWContext iwc) {
+		if (iwc == null) {
+			iwc = CoreUtil.getIWContext();
+		}
+		
+		Thread siteTreeUpdater = new Thread(new SiteTreeUpdater(iwc));
+		siteTreeUpdater.run();
 	}
 	
 	private int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) {
@@ -941,13 +956,22 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (pageId == null) {
 			return false;
 		}
+		
+		boolean result = true;
 		try {
-			decreaseNodesNumbersInLevel(followingNodes, -1, null);			
-			helper.getThemesService().deleteIBPage(pageId, deleteChildren);
+			result = decreaseNodesNumbersInLevel(followingNodes, -1, null);	
+			if (result) {
+				result = helper.getThemesService().deleteIBPage(pageId, deleteChildren);
+			}
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			return false;
 		}
+		
+		if (result) {
+			updateSiteTree(null);
+		}
+		
 		return true;
 	}
 	
@@ -1016,10 +1040,15 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		if (newParentId < 0) {
 			result = service.movePageToTopLevel(nodeId, iwc);
-			return result;
+		}
+		else {	
+			result = service.movePage(newParentId, nodeId, iwc.getDomain());
 		}
 		
-		result = service.movePage(newParentId, nodeId, iwc.getDomain());
+		if (result) {
+			updateSiteTree(iwc);
+		}
+		
 		return result;
 	}
 	
@@ -1554,6 +1583,34 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 
 		return uri;
+	}
+	
+	public boolean changePageName(int id, String newName) {
+		if (id < 0 || newName == null) {
+			return false;
+		}
+		
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return false;
+		}
+		
+		BuilderService builder = null;
+		try {
+			builder = BuilderServiceFactory.getBuilderService(iwc);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		if (builder == null) {
+			return false;
+		}
+		
+		if (builder.changePageName(id, newName)) {
+			updateSiteTree(iwc);
+			return true;
+		}
+		
+		return false;
 	}
 
 }

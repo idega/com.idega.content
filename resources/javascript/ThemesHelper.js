@@ -674,3 +674,45 @@ function executeOnClick(id) {
 function executeOnDblClick(element) {
 	initEditLabel(element);
 }
+
+var SET_REVERSE_AJAX_IN_THEMES = false;
+var ENABLE_REVERSE_AJAX_TIME_OUT_ID_IN_THEMES = 0;
+function enableReverseAjaxInThemes() {
+	if (!SET_REVERSE_AJAX_IN_THEMES) {
+		if (isSafariBrowser()) {
+			ENABLE_REVERSE_AJAX_TIME_OUT_ID_IN_THEMES = window.setTimeout(setReverseAjaxInThemes, 2000);
+		}
+		else {
+			setReverseAjaxInThemes();
+		}
+	}
+}
+
+function setReverseAjaxInThemes() {
+	if (!SET_REVERSE_AJAX_IN_THEMES) {
+		SET_REVERSE_AJAX_IN_THEMES = true;
+		DWREngine.setActiveReverseAjax(true);
+	}
+	if (ENABLE_REVERSE_AJAX_TIME_OUT_ID_IN_THEMES != 0) {
+		window.clearTimeout(ENABLE_REVERSE_AJAX_TIME_OUT_ID_IN_THEMES);
+	}
+}
+
+function updateSiteTree(updatedTree) {
+	if (updatedTree == null) {
+		return false;
+	}
+	var container = $('current_structure_tree').getParent();
+	if (container == null) {
+		return false;
+	}
+	
+	container.empty();
+	insertNodesToContainer(updatedTree, container);
+	
+	initializeTrees();
+	registerActionsForSiteTree();
+	boldCurrentTreeElement();
+	
+	getPrewUrl(getPageID());
+}
