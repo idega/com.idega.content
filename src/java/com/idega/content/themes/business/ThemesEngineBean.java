@@ -1077,36 +1077,36 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return false;
 	}
 	
-	public String setAsStartPage(String pageID) {
-		if (pageID == null) {
-			return null;
+	public boolean setAsStartPage(String pageKey) {
+		if (pageKey == null) {
+			return false;
 		}
 		int newRoot = -1;
 		try {
-			newRoot = Integer.valueOf(pageID).intValue();
+			newRoot = Integer.valueOf(pageKey).intValue();
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
-			return null;
+			return false;
 		}
 		if (newRoot < 0) {
-			return null;
+			return false;
 		}
 		
 		int currentRoot = getRootPageId();
 		if (currentRoot == newRoot) {
-			return null;
+			return false;
 		}
 		
 		BuilderService builder = helper.getThemesService().getBuilderService();
 		
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
-			return null;
+			return false;
 		}
 		
 		ICPage newRootPage = helper.getThemesService().getICPage(newRoot);
 		if (newRootPage == null) {
-			return null;
+			return false;
 		}
 		
 		//	Setting new tree order
@@ -1132,7 +1132,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		//	Changing old root page's properties
 		ICPage rootPage = helper.getThemesService().getICPage(currentRoot);
 		if (rootPage == null) {
-			return null;
+			return false;
 		}
 		//	Changing page uri from "/" to some other
 		changePageUri(rootPage.getPageKey(), rootPage.getName().toLowerCase(), false);
@@ -1151,7 +1151,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		builder.clearAllCaches();
 		
-		return newRootPage.getDefaultPageURI();
+		updateSiteTree(iwc);
+		
+		return true;
 	}
 	
 	private int getRootPageId() {
@@ -1573,8 +1575,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		try {
-			uri = builderService.getPageURI(pageKey);
-			builderService.setCurrentPageId(iwc, pageKey);
+			uri = builderService.getPageURI(iwc, pageKey, true);
+			if (uri != null) {
+				builderService.setCurrentPageId(iwc, String.valueOf(pageKey));
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
