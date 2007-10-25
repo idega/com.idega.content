@@ -383,7 +383,7 @@
 				
 			if (thisObj && thisObj.id) {
 				var overflownContainers = new Array();
-				overflownContainers.push($('div_id_current_structure_tree'));
+				overflownContainers.push($(ALL_CURRENT_SITE_STRUCTURE_TREE_ID));
 				
 				JSTreeObj.dragNode_destination = thisObj;
 				var img = thisObj.getElementsByTagName('IMG')[1];
@@ -553,7 +553,7 @@
 			}
 		},
 		drawTable : function() {
-			drawTableForEmptySite('div_id_current_structure_tree');
+			drawTableForEmptySite(ALL_CURRENT_SITE_STRUCTURE_TREE_ID);
 		},
 		dropDragableNodesCopy:function() {
 			var parent;
@@ -587,7 +587,7 @@
 				var tmpObj = JSTreeObj.dragNode_parent;
 				var lis = tmpObj.getElementsByTagName('LI');
 				
-				temp = document.getElementById('div_id_current_structure_tree');
+				temp = document.getElementById(ALL_CURRENT_SITE_STRUCTURE_TREE_ID);
 
 				if (temp.childNodes.length == 0)
 					JSTreeObj.drawTable();
@@ -1498,7 +1498,7 @@
 			var activePageId = getPageID();
 			JSTreeObj.dragNode_destination = document.getElementById(activePageId);
 			if (!JSTreeObj.dragNode_destination) {
-				JSTreeObj.dragNode_destination = $('div_id_current_structure_tree');
+				JSTreeObj.dragNode_destination = $(ALL_CURRENT_SITE_STRUCTURE_TREE_ID);
 				if (JSTreeObj.dragNode_destination) {	//	Will create root page
 					JSTreeObj.firstTopPage = true;
 					JSTreeObj.deleteNodes = false;
