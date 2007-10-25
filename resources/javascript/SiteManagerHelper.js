@@ -137,16 +137,9 @@ function initialiazeSiteManager() {
 	setNeedRedirect(false);
 	setActiveLanguage();
 	
-	var containerId = 'div_id_current_structure_tree';
-	var siteTreeContainer = $('div_id_current_structure_tree');
-	if (siteTreeContainer) {
-		var height = getTotalHeight() - 145;
-		if (height > 0) {
-			siteTreeContainer.setStyle('height', height + 'px');
-		}
-	}
+	resizeTreeContainerInThemes(RESERVED_HEIGHT_FOR_SITE);
 	
-	checkIfNotEmptySiteTree(containerId);
+	checkIfNotEmptySiteTree(ALL_CURRENT_SITE_STRUCTURE_TREE_ID);
 
 	var width = getTotalWidth() - 462;
 	if (width > 0) {

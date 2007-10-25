@@ -2,7 +2,6 @@ var THEME_ID = null;
 
 var SCROLLER_IMAGE_WIDTH = 23;
 var FRAME_CHANGE = 153;
-var RESERVED_HEIGHT = 82;
 var RESERVED_WIDTH = 455;
 var SHOW_ELEMENT_TRANSITION_DURATION = 500;
 var SET_DISPLAY_PROPERTY_ID = 0;
@@ -372,8 +371,6 @@ function isStartPageCallback(isStart) {
 		button.value = getMakeStartPageText();
 		button.title = getMakeThisPageStartPageText();
 	}
-	
-	boldCurrentTreeElement();
 }
 
 function makePageAsStartPage() {
@@ -382,10 +379,7 @@ function makePageAsStartPage() {
 }
 
 function setAsStartPageCallback(result) {
-	if (result != null) {
-		changePageTitleCallback(result);
-	}
-	reloadPage();
+	closeLoadingMessages();
 }
 
 function closeNewPage(newPage) {
@@ -409,16 +403,10 @@ function initializePages() {
 	resizeFrame();
 	getPageInfoValues();
 	isStartPage(getPageID());
-	checkIfNotEmptySiteTree('div_id_current_structure_tree');
+	checkIfNotEmptySiteTree(ALL_CURRENT_SITE_STRUCTURE_TREE_ID);
 	document.addEvent('click', managePageInfoComponents);
 	
-	var siteTreeContainer = $('div_id_current_structure_tree');
-	if (siteTreeContainer) {
-		var height = getTotalHeight() - (RESERVED_HEIGHT + 93);
-		if (height > 0) {
-			siteTreeContainer.setStyle('height', height + 'px');
-		}
-	}
+	resizeTreeContainerInThemes(RESERVED_HEIGHT_FOR_PAGES);
 	
 	ThemesEngine.isUserAdmin({
 		callback: function(isAdmin) {
