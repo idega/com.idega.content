@@ -7,8 +7,7 @@ import com.idega.content.presentation.WebDAVUpload;
 import com.idega.content.themes.bean.ThemesManagerBean;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
-import com.idega.presentation.ui.FieldSet;
-import com.idega.presentation.ui.Legend;
+import com.idega.presentation.text.Heading1;
 
 public class ThemesManager extends ContentBlock {
 	
@@ -18,7 +17,8 @@ public class ThemesManager extends ContentBlock {
 	protected void initializeComponent(FacesContext context) {
 		IWContext iwc = IWContext.getIWContext(context);
 		Layer uploadContainer = new Layer();
-		FieldSet uploadBlock = new FieldSet(new Legend(getBundle().getResourceBundle(iwc).getLocalizedString("upload_theme", "Upload theme")));
+		uploadContainer.setStyleClass("uploadForm");
+		Heading1 heading = new Heading1(getBundle().getResourceBundle(iwc).getLocalizedString("upload_theme", "Upload theme"));
 		WebDAVUpload upload = new WebDAVUpload();
 		String idExtension = getId() + "UploadTheme";
 		upload.setId(idExtension);
@@ -26,8 +26,8 @@ public class ThemesManager extends ContentBlock {
 		upload.setAccept(MIME_TYPE);
 		upload.setPathProviderBeanWithMethod("#{"+ThemesManagerBean.THEMES_MANAGER_BEAN_ID+".getThemesPath}");
 		upload.setUploadMethod("uploadZipFileContents");
-		uploadBlock.add(upload);
-		uploadContainer.add(uploadBlock);
+		uploadContainer.add(heading);
+		uploadContainer.add(upload);
 		
 		add(uploadContainer);
 	}

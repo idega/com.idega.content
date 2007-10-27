@@ -6,9 +6,143 @@
 	overflow: auto;
 }
 
+#themePreviewContainer {
+	height: auto !important;	
+}
+
 .themePreviewContainerStyle {
-	width: 100%;
+	width: auto !important;
+	position: absolute;
+	top: 8px;
+	left: 8px;
+	right: 268px;
+	overflow: hidden;
+	
+	height: expression(
+	(
+	document.body.clientHeight) ?
+	document.body.clientHeight - 167 + 'px'
+	:
+	document.documentElement.clientHeight - 167 + 'px'
+	);
+}
+
+html>body .themePreviewContainerStyle {
+	bottom: 159px;
+	height: auto;
+}
+
+#mainThemesContainer {
+	position: absolute;
+	top: 55px;
+	left: 202px;
+	right: 5px;
+	width: auto;
+	border: 1px #cdcdcd solid;	
+
+	height: expression(
+	(
+	document.body.clientHeight) ?
+	document.body.clientHeight - 60 + 'px'
+	:
+	document.documentElement.clientHeight - 60 + 'px'
+	);
+}
+
+html>body #mainThemesContainer {
+	bottom: 5px;
+	height: auto;
+}
+
+#themeVariationsContainer {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	width: 252px;
+	border: 1px #cdcdcd solid;
+
+	height: expression(
+	(
+	document.body.clientHeight) ?
+	document.body.clientHeight - 76 + 'px'
+	:
+	document.documentElement.clientHeight - 76 + 'px'
+	);
+}
+
+html>body #themeVariationsContainer {
+	bottom: 8px;
+	height: auto !important;
+}
+
+#themeUsability {
+	margin: 8px;
+	padding: 8px;
+	background-color: #ffff44;
+	font-weight: bold;
+	font-size: 12px;	
+}
+
+span.variationHeading {
+	display: block;
+	margin: 0 !important;
+	border-bottom: 1px #cdcdcd solid;
+	font-size: 12px;
+	line-height: 20px;
+	padding: 0 8px;
+	background-color: #a1a1a1;
+	color: #fff;
+}
+
+#themeSaveArea {
+	bottom: 89px;
+	height: 88px;
+	position: absolute;
+	left: 0;
+	right: 0;
+	padding: 0;
+	margin: 0 !important;
+}
+
+#themeVariationsContainer div.uploadForm {
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 88px;
+	position: absolute;
+}
+
+#themeVariationsContainer div.uploadForm h1 {
+	margin: 0;
+	border-bottom: 1px #cdcdcd solid;
+	font-size: 12px;
+	line-height: 20px;
+	padding: 0 8px;
+	background-color: #a1a1a1;
+	color: #fff;
+}
+
+#themeStyleVariationsBlock {
+	position: absolute;
+	top: 21px;
+	bottom: 177px;
+	height: auto;
+	left: 0;
+	right: 0;
 	overflow: auto;
+}
+
+img#themePreview {
+height: 100%;
+width: 100%;
+}
+
+div#mainThemesContentContainer {
+height: auto !important;	
+}
+
+div#themePreviewAndSliderContainer {
+width: auto !important;	
 }
 
 .themePreviewAndSliderContainerStyle {
@@ -30,8 +164,7 @@
 }
 
 div.themeVariationGroup {
-	width: 175px !important;
-	overflow: hidden;
+
 }
 
 .theme_container ul {

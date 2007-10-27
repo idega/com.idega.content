@@ -34,7 +34,10 @@ version="1.2">
 						window.addEvent('domready', roundThemesSliderCorners);
 					</script>
 				</jsf:verbatim>
+				<!--  
 				<wf:wfblock id="themeManagerBlock" title="#{localizedStrings['com.idega.content']['themes']}" >
+				-->
+				<x:div id="mainThemesContainer" forceId="true">
 					<x:div id="mainThemesContentContainer" forceId="true" styleClass="themesContentContainerStyleClass">
 						<x:div id="themePreviewAndSliderContainer" forceId="true" styleClass="themePreviewAndSliderContainerStyle">
 							<x:div id="themePreviewContainer" forceId="true" styleClass="themePreviewContainerStyle">
@@ -49,28 +52,29 @@ version="1.2">
 						</x:div>
 						
 						<x:div id="themeVariationsContainer" forceId="true" styleClass="theme_container">
+							<h:outputText styleClass="variationHeading" value="Theme settings"></h:outputText>
 							<x:div id="themeStyleVariationsBlock" forceId="true">
+								<x:div id="themeUsability" forceId="true" styleClass="themeUsabilityStyle"></x:div>
 								<x:inputHidden id="defaultThemeLabel" forceId="true" value="#{localizedStrings['com.idega.content']['theme_is_default']}"></x:inputHidden>
 								<x:inputHidden id="notDefaultThemeLabel" forceId="true" value="#{localizedStrings['com.idega.content']['theme_is_not_default']}"></x:inputHidden>
 								<x:div id="themeStyleVariations" forceId="true"></x:div>
-								<x:div id="themeUsability" forceId="true" styleClass="themeUsabilityStyle"></x:div>
-								
-								<x:div>
-									<x:div id="themeSaveArea" forceId="true" styleClass="wf_webdav_upload">
-										<h:outputText value="#{localizedStrings['com.idega.content']['theme_name']}"></h:outputText>
-										<x:inputText id="theme_name" forceId="true"></x:inputText>
-										<x:div style="padding-top: 5px;">
-											<x:commandButton id="changeVariationsButton" type="button" forceId="true" onclick="changeVariations()" title="#{localizedStrings['com.idega.content']['change_variations']}" value="#{localizedStrings['com.idega.content']['change']}"></x:commandButton>
-											<x:commandButton id="themeSaveButton" type="button" forceId="true" onclick="saveTheme()" title="#{localizedStrings['com.idega.content']['save']}" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
-											<x:commandButton id="themeRestoreButton" type="button" forceId="true" onclick="restoreTheme()" title="#{localizedStrings['com.idega.content']['restore_theme']}" value="#{localizedStrings['com.idega.content']['restore_theme']}"></x:commandButton>
-										</x:div>
+							</x:div>
+							<x:div id="themeSaveArea" forceId="true">
+								<h:outputText styleClass="variationHeading" value="Theme save"></h:outputText>
+								<x:div styleClass="wf_webdav_upload">
+									<h:outputText value="#{localizedStrings['com.idega.content']['theme_name']}"></h:outputText>
+									<x:inputText id="theme_name" forceId="true"></x:inputText>
+									<x:div style="padding-top: 5px;">
+										<x:commandButton id="changeVariationsButton" type="button" forceId="true" onclick="changeVariations()" title="#{localizedStrings['com.idega.content']['change_variations']}" value="#{localizedStrings['com.idega.content']['change']}"></x:commandButton>
+										<x:commandButton id="themeSaveButton" type="button" forceId="true" onclick="saveTheme()" title="#{localizedStrings['com.idega.content']['save']}" value="#{localizedStrings['com.idega.content']['save']}"></x:commandButton>
+										<x:commandButton id="themeRestoreButton" type="button" forceId="true" onclick="restoreTheme()" title="#{localizedStrings['com.idega.content']['restore_theme']}" value="#{localizedStrings['com.idega.content']['restore_theme']}"></x:commandButton>
 									</x:div>
 								</x:div>
 							</x:div>
 							<c:ThemesManager id="uploadBlock"></c:ThemesManager>
 						</x:div>
 					</x:div>
-               	</wf:wfblock>
+               	</x:div>
 			</h:form>
         </ws:page>
 	</jsf:view>

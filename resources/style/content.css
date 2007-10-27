@@ -325,8 +325,21 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	
 }
 
+.themesTicker {
+	overflow: hidden;
+	width: auto !important;
+	position: absolute;
+	left: 24px;
+	right: 24px;	
+}
+
 .themesSlider {
-	width: 100%;
+	position: absolute;
+	left: 8px;
+	right: 268px;
+	width: auto;
+	bottom: 8px;
+	overflow: hidden;
 	height: 150px;
 	background-color: #000000;
 }
@@ -375,11 +388,13 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 
 .themesTicker .multiImageGallery {
 	position: relative;
+	overflow: hidden;
 }
 
 .themesTicker .multiImageGallery .imageGallery {
 	cursor: pointer;
 	float: left;
+	overflow: hidden;
 }
 
 .imageGallery {
@@ -786,11 +801,11 @@ overflow: auto !important;
 }
 
 .themeVariationGroup li {
-	list-style-type: none;
+	list-style: none;
 }
 
 .allThemeVariations ul {
-	list-style-type: none;
+	list-style: none;
 }
 
 .themeUsabilityStyle {
