@@ -144,6 +144,7 @@ public class ThemesPropertiesExtractor {
 					helper.getThemesService().createIBPage(theme);
 				} catch (RemoteException e) {
 					e.printStackTrace();
+					theme.setLoading(false);
 				}
 			}
 		}
