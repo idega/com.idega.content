@@ -338,10 +338,16 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	left: 8px;
 	right: 268px;
 	width: auto;
-	bottom: 8px;
 	overflow: hidden;
 	height: 150px;
 	background-color: #000000;
+	
+	top: expression(document.body.clientHeight ? document.body.clientHeight - 218 + 'px' : document.documentElement.clientHeight - 218 + 'px');
+}
+
+html>body .themesSlider {
+	top: auto;
+	bottom: 8px;
 }
 
 .themeScroller {

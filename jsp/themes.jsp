@@ -36,8 +36,6 @@ version="1.2">
 				</jsf:verbatim>
 
 				<t:div id="mainThemesContainer" forceId="true">
-					<t:div id="mainThemesContentContainer" forceId="true" styleClass="themesContentContainerStyleClass">
-						<t:div id="themePreviewAndSliderContainer" forceId="true" styleClass="themePreviewAndSliderContainerStyle">
 							<t:div id="themePreviewContainer" forceId="true" styleClass="themePreviewContainerStyle">
 								<jsf:verbatim>
 									<img id="themePreview" />
@@ -47,7 +45,6 @@ version="1.2">
 							<t:div style="width: 100%; height: 1px;"></t:div>
 							
 							<c:ThemesSliderViewer />
-						</t:div>
 						
 						<t:div id="themeVariationsContainer" forceId="true" styleClass="theme_container">
 							<h:outputText styleClass="variationHeading" value="#{localizedStrings['com.idega.content']['theme_variations']}"></h:outputText>
@@ -62,7 +59,7 @@ version="1.2">
 								<t:div styleClass="wf_webdav_upload">
 									<h:outputText value="#{localizedStrings['com.idega.content']['theme_name']}"></h:outputText>
 									<t:inputText id="theme_name" forceId="true"></t:inputText>
-									<t:div style="padding-top: 5px;">
+									<t:div>
 										<t:commandButton id="changeVariationsButton" type="button" forceId="true" onclick="changeVariations()" title="#{localizedStrings['com.idega.content']['change_variations']}" value="#{localizedStrings['com.idega.content']['change']}"></t:commandButton>
 										<t:commandButton id="themeSaveButton" type="button" forceId="true" onclick="saveTheme()" title="#{localizedStrings['com.idega.content']['save']}" value="#{localizedStrings['com.idega.content']['save']}"></t:commandButton>
 										<t:commandButton id="themeRestoreButton" type="button" forceId="true" onclick="restoreTheme()" title="#{localizedStrings['com.idega.content']['restore_theme']}" value="#{localizedStrings['com.idega.content']['restore_theme']}"></t:commandButton>
@@ -71,7 +68,6 @@ version="1.2">
 							</t:div>
 							<c:ThemesManager id="uploadBlock"></c:ThemesManager>
 						</t:div>
-					</t:div>
                	</t:div>
 			</h:form>
         </ws:page>

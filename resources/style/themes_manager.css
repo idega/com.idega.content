@@ -1,58 +1,66 @@
 .theme_container {
 	width: 250px;
-	border: 1px solid #d7d7d7;
+	border: 1px solid #f00;
 	border-width: 1px 0 0 1px;
 	float: right;
 	overflow: auto;
 }
 
 #themePreviewContainer {
-	height: auto !important;	
-}
-
-.themePreviewContainerStyle {
-	width: auto !important;
 	position: absolute;
 	top: 8px;
 	left: 8px;
 	right: 268px;
 	overflow: hidden;
+	width: auto;
+	border: 1px #cdcdcd solid;	
 	
-	height: expression(
-	(
-	document.body.clientHeight) ?
-	document.body.clientHeight - 167 + 'px'
-	:
-	document.documentElement.clientHeight - 167 + 'px'
-	);
+	height: expression(document.body.clientHeight ? document.body.clientHeight - 232 + 'px' : document.documentElement.clientHeight - 232 + 'px');
 }
 
-html>body .themePreviewContainerStyle {
-	bottom: 159px;
+html>body #themePreviewContainer {
+	bottom: 165px;
 	height: auto;
+}
+
+.themePreviewContainerStyle {
+	position: relative;
 }
 
 #mainThemesContainer {
 	position: absolute;
 	top: 55px;
-	left: 202px;
-	right: 5px;
-	width: auto;
-	border: 1px #cdcdcd solid;	
+	left: 202px !important;
+	right: 5px !important;
+	border: 1px #cdcdcd solid;
+	margin: 0 !important;
 
-	height: expression(
-	(
-	document.body.clientHeight) ?
-	document.body.clientHeight - 60 + 'px'
-	:
-	document.documentElement.clientHeight - 60 + 'px'
-	);
+	height: expression(document.body.clientHeight ? document.body.clientHeight - 60 + 'px' : document.documentElement.clientHeight - 60 + 'px');
+	width: expression(document.body.clientWidth ? document.body.clientWidth - 207 + 'px' : document.documentElement.clientWidth - 207 + 'px');
 }
 
 html>body #mainThemesContainer {
 	bottom: 5px;
 	height: auto;
+	width: auto !important;
 }
+
+/*#mainThemesContentContainer {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	border: 1px #0f0 solid;
+	
+	height: expression(document.body.clientHeight ? document.body.clientHeight - 60 + 'px' : document.documentElement.clientHeight - 60 + 'px');
+	width: expression(document.body.clientWidth ? document.body.clientWidth - 207 + 'px' : document.documentElement.clientWidth - 207 + 'px');
+}
+
+html>body #mainThemesContentContainer {
+	bottom: 0;
+	height: auto;
+	width: auto;
+}*/
 
 #themeVariationsContainer {
 	position: absolute;
@@ -61,13 +69,7 @@ html>body #mainThemesContainer {
 	width: 252px;
 	border: 1px #cdcdcd solid;
 
-	height: expression(
-	(
-	document.body.clientHeight) ?
-	document.body.clientHeight - 76 + 'px'
-	:
-	document.documentElement.clientHeight - 76 + 'px'
-	);
+	height: expression(document.body.clientHeight ? document.body.clientHeight - 76 + 'px' : document.documentElement.clientHeight - 76 + 'px');
 }
 
 html>body #themeVariationsContainer {
@@ -80,7 +82,8 @@ html>body #themeVariationsContainer {
 	padding: 8px;
 	background-color: #ffff44;
 	font-weight: bold;
-	font-size: 12px;	
+	font-size: 12px;
+	display: block;
 }
 
 span.variationHeading {
@@ -99,17 +102,25 @@ span.variationHeading {
 	height: 88px;
 	position: absolute;
 	left: 0;
-	right: 0;
 	padding: 0;
 	margin: 0 !important;
+	width: 250px;
+}
+
+html>body #themeSaveArea {
+	width: 252px;	
 }
 
 #themeVariationsContainer div.uploadForm {
 	bottom: 0;
 	left: 0;
-	right: 0;
+	width: 250px;
 	height: 88px;
 	position: absolute;
+}
+
+html>body #themeVariationsContainer div.uploadForm {
+	width: 252px;	
 }
 
 #themeVariationsContainer div.uploadForm h1 {
@@ -133,38 +144,20 @@ span.variationHeading {
 }
 
 img#themePreview {
-height: 100%;
-width: 100%;
+	height: auto;
+	width: 100%;
 }
 
 div#mainThemesContentContainer {
-height: auto !important;	
-}
-
-div#themePreviewAndSliderContainer {
-width: auto !important;	
-}
-
-.themePreviewAndSliderContainerStyle {
-	overflow: auto;
-	float: left;
+	height: auto !important;	
 }
 
 .themesSliderContainer {
 	width: 100%;
 }
 
-.themesContentContainerStyleClass {
-	overflow: auto;
-	height: 70%;
-}
-
 .themePreviewBigImageStyle {
 	width: 50em;
-}
-
-div.themeVariationGroup {
-
 }
 
 .theme_container ul {
