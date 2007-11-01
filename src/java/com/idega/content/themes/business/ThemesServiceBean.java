@@ -7,8 +7,6 @@ import java.util.Map;
 
 import javax.ejb.FinderException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.slide.event.ContentEvent;
 
 import com.idega.business.IBOServiceBean;
@@ -34,7 +32,6 @@ import com.idega.util.StringHandler;
 public class ThemesServiceBean extends IBOServiceBean implements ThemesService, IWSlideChangeListener{
 
 	private static final long serialVersionUID = -1765120426660957585L;
-	private static final Log log = LogFactory.getLog(ThemesServiceBean.class);
 	
 	private volatile BuilderService builder = null;
 
@@ -45,7 +42,10 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		if (ContentEvent.REMOVE.equals(idegaWebContentEvent.getMethod())) {
 			if (ThemesHelper.getInstance(false).isCorrectFile(uri, ThemesConstants.THEME_SKELETONS_FILTER)) {
-				List <Theme> themes = new ArrayList<Theme>(ThemesHelper.getInstance(false).getThemesCollection());
+				List<Theme> themes = ThemesHelper.getInstance(false).getAvailableThemes();
+				if (themes == null) {
+					return;
+				}
 				boolean foundTheme = false;
 				Theme theme = null;
 				for (int i = 0; (i < themes.size() && !foundTheme); i++) {
@@ -63,8 +63,12 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			}
 		}
 		else {
-			if (ThemesHelper.getInstance().isCorrectFile(uri, ThemesConstants.THEME_SKELETONS_FILTER) && isNewTheme(uri) && !ThemesHelper.getInstance().isCreatedManually(uri)) {
-				ThemesHelper.getInstance().getThemesLoader().loadTheme(uri, ThemesHelper.getInstance().urlEncode(uri), true, false);
+			if (!ThemesHelper.getInstance().isCreatedManually(uri) && ThemesHelper.getInstance().isCorrectFile(uri, ThemesConstants.THEME_SKELETONS_FILTER) && isNewTheme(uri)) {
+				try {
+					ThemesHelper.getInstance().getThemesLoader().loadTheme(uri, ThemesHelper.getInstance().urlEncode(uri), true, false);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -134,7 +138,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 					domain.store();
 				}
 			} catch (NumberFormatException e) {
-				log.error(e);
+				e.printStackTrace();
 			}
 			
 			if (clearCache) {
@@ -300,7 +304,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 					try {
 						builder = BuilderServiceFactory.getBuilderService(getIWApplicationContext());
 					} catch (RemoteException e) {
-						log.error(e);
+						e.printStackTrace();
 					}
 				}
 			}
@@ -316,7 +320,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		try {
 			id = Integer.valueOf(pageKey);
 		} catch (NumberFormatException e) {
-			log.error(e);
+			e.printStackTrace();
 			return null;
 		}
 		return getICPage(id);
@@ -327,10 +331,10 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		try {
 			page = getICPageHome().findByPrimaryKey(id);
 		} catch (RemoteException e) {
-			log.error(e);
+			e.printStackTrace();
 			return null;
 		} catch (FinderException e) {
-			log.error(e);
+			e.printStackTrace();
 			return null;
 		}
 		return page;
