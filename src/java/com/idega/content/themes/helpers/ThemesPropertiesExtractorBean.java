@@ -142,7 +142,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		
 		// Extracting properties and preparing theme, style files for usage
 		if (foundedPropertiesFile) {
-			if (linkToProperties.indexOf(ThemesConstants.SPACE) != -1) {
+			if (linkToProperties.indexOf(CoreConstants.SPACE) != -1) {
 				linkToProperties = helper.urlEncode(linkToProperties);
 			}
 			theme.setLinkToProperties(linkToProperties);
@@ -191,7 +191,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 			
 		if (checkConfigFile && linkToConfig != null) {
 			// Extracting configuration
-			if (linkToConfig.indexOf(ThemesConstants.SPACE) != -1) {
+			if (linkToConfig.indexOf(CoreConstants.SPACE) != -1) {
 				linkToConfig = helper.urlEncode(linkToConfig);
 			}
 			if (!extractConfiguration(theme, new StringBuffer(url).append(linkToConfig).toString())) {

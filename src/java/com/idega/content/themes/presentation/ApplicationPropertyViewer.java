@@ -27,6 +27,7 @@ import com.idega.presentation.text.Link;
 import com.idega.presentation.text.ListItem;
 import com.idega.presentation.text.Lists;
 import com.idega.presentation.text.Text;
+import com.idega.util.CoreConstants;
 
 /**
  * This class diplays the current value of an application property, localized if available.
@@ -64,7 +65,7 @@ public class ApplicationPropertyViewer extends Block {
 		String value = null;
 		String language = ThemesHelper.getInstance().getCurrentLanguage(iwc);
 		
-		key = new StringBuffer(applicationPropertyKey).append(ThemesConstants.DOT).append(language).toString();
+		key = new StringBuffer(applicationPropertyKey).append(CoreConstants.DOT).append(language).toString();
 		value = iwc.getApplicationSettings().getProperty(key);
 		if (value == null) { // Didn't find localized value, getting default value
 			key = new StringBuffer(applicationPropertyKey).append(ThemesConstants.THEMES_PROPERTY_END).toString();
@@ -188,8 +189,8 @@ public class ApplicationPropertyViewer extends Block {
 				e.printStackTrace();
 			}
 			
-			String property = ThemesHelper.getInstance().extractValueFromString(key, key.indexOf(ThemesConstants.DOT) + 1,
-					key.lastIndexOf(ThemesConstants.DOT));
+			String property = ThemesHelper.getInstance().extractValueFromString(key, key.indexOf(CoreConstants.DOT) + 1,
+					key.lastIndexOf(CoreConstants.DOT));
 			
 			Map<String, Setting> settings = ThemesHelper.getInstance().getThemeSettings();
 			Setting s = settings.get(settingKey);
@@ -223,6 +224,6 @@ public class ApplicationPropertyViewer extends Block {
 	}
 	
 	private String getCheckKey(String keyWord) {
-		return new StringBuffer(ThemesConstants.THEMES_PROPERTY_START).append(keyWord).append(ThemesConstants.DOT).toString();
+		return new StringBuffer(ThemesConstants.THEMES_PROPERTY_START).append(keyWord).append(CoreConstants.DOT).toString();
 	}
 }

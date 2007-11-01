@@ -103,7 +103,7 @@ public class ThemesHelper implements Singleton {
 	private String fullWebRoot; // For cache
 	private String webRoot;
 	
-	private static final String RESOURCE_PATH_END = ThemesConstants.DOT + "article";
+	private static final String RESOURCE_PATH_END = CoreConstants.DOT + "article";
 	private static final String ATTRIBUTE_PROPERTY = "value";
 	private static final String ROOT_PAGE_ARTICLE = "root_page_article";
 	private static final String MODULE_ID_SCOPE = "module_id";
@@ -309,7 +309,7 @@ public class ThemesHelper implements Singleton {
 		}
 		String name = null;
 		int begin = uri.lastIndexOf(ContentConstants.SLASH);
-		int end = uri.lastIndexOf(ThemesConstants.DOT);
+		int end = uri.lastIndexOf(CoreConstants.DOT);
 		if (begin == -1) {
 			name = extractValueFromString(uri, 0, end);
 		}
@@ -359,7 +359,7 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		String type = null;
-		int begin = uri.lastIndexOf(ThemesConstants.DOT);
+		int begin = uri.lastIndexOf(CoreConstants.DOT);
 		if (begin != -1) {
 			type = uri.substring(begin + 1).toLowerCase();
 		}
@@ -424,7 +424,7 @@ public class ThemesHelper implements Singleton {
 			return false;
 		}
 		
-		int index = fileName.lastIndexOf(ThemesConstants.DOT);
+		int index = fileName.lastIndexOf(CoreConstants.DOT);
 		if (index == -1) {
 			return false;
 		}
@@ -464,7 +464,7 @@ public class ThemesHelper implements Singleton {
 		if (fileName == null) {
 			return true; // Not a system file, but invalid also
 		}
-		if (getFileNameWithExtension(fileName).startsWith(ThemesConstants.DOT)) {
+		if (getFileNameWithExtension(fileName).startsWith(CoreConstants.DOT)) {
 			return true;
 		}
 		return false;
@@ -865,7 +865,7 @@ public class ThemesHelper implements Singleton {
 		}
 		extension = extension.toLowerCase();
 		String mimeType = new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString();
-		String newName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).append(ThemesConstants.DOT).append(extension).toString();
+		String newName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).append(CoreConstants.DOT).append(extension).toString();
 		boolean isJpg = extension.equals(GraphicsConstants.JPG_FILE_NAME_EXTENSION);
 		
 		Generator imageGenerator = getImageGenerator(null);
@@ -1305,13 +1305,13 @@ public class ThemesHelper implements Singleton {
 		
 		String fileRoot = getFixedSlideFileName(fileName);
 		String fileType = ThemesConstants.EMPTY;
-		if (fileName.indexOf(ThemesConstants.DOT) != -1) {
-			fileRoot = extractValueFromString(fileName, 0, fileName.lastIndexOf(ThemesConstants.DOT));
+		if (fileName.indexOf(CoreConstants.DOT) != -1) {
+			fileRoot = extractValueFromString(fileName, 0, fileName.lastIndexOf(CoreConstants.DOT));
 			fileType = getFileExtension(fileName);
 		}
 		
 		StringBuffer path = new StringBuffer(fileRoot).append(ContentConstants.UNDER);
-		path.append(getUniqueIdByNumberAndDate(IDEGA_PAGES_SCOPE)).append(ThemesConstants.DOT).append(fileType);
+		path.append(getUniqueIdByNumberAndDate(IDEGA_PAGES_SCOPE)).append(CoreConstants.DOT).append(fileType);
 		
 		return path.toString();
 	}
@@ -1400,7 +1400,7 @@ public class ThemesHelper implements Singleton {
 			article = getArticleDocument(language, uri, iwc);
 			
 			file = new StringBuffer(language);
-			file.append(ThemesConstants.DOT).append(ThemesConstants.XML_EXTENSION);
+			file.append(CoreConstants.DOT).append(ThemesConstants.XML_EXTENSION);
 			base = new StringBuffer(ContentConstants.ARTICLE_PATH_START);
 			base.append(uri);
 			if (uri.equals(ContentConstants.EMPTY)) {
@@ -1427,8 +1427,8 @@ public class ThemesHelper implements Singleton {
 		String article = getArticle();
 		StringBuffer summary = new StringBuffer();
 		if (article.length() >= 200) {
-			summary.append(article.substring(0, 200)).append(ThemesConstants.DOT).append(ThemesConstants.DOT);
-			summary.append(ThemesConstants.DOT);
+			summary.append(article.substring(0, 200)).append(CoreConstants.DOT).append(CoreConstants.DOT);
+			summary.append(CoreConstants.DOT);
 		}
 		else {
 			summary = new StringBuffer(article);
@@ -1461,7 +1461,7 @@ public class ThemesHelper implements Singleton {
 		}
 		commentPath.append(getSlideService().createUniqueFileName(ContentConstants.COMMENT_SCOPE));
 		commentPath.append(ContentConstants.COMMENT_PREFIX).append(ContentConstants.SLASH).append(ContentConstants.COMMENT_SCOPE);
-		commentPath.append(ThemesConstants.DOT).append(ThemesConstants.XML_EXTENSION);
+		commentPath.append(CoreConstants.DOT).append(ThemesConstants.XML_EXTENSION);
 		return commentPath.toString();
 	}
 	
@@ -1603,7 +1603,7 @@ public class ThemesHelper implements Singleton {
 			return false;
 		}
 		
-		StringBuffer fileName = new StringBuffer(language).append(ThemesConstants.DOT).append(ThemesConstants.XML_EXTENSION);
+		StringBuffer fileName = new StringBuffer(language).append(CoreConstants.DOT).append(ThemesConstants.XML_EXTENSION);
 		StringBuffer articleLink = new StringBuffer(link).append(fileName.toString());
 		Document d = getXMLDocument(articleLink.toString());
 		if (d == null) {
@@ -1768,8 +1768,8 @@ public class ThemesHelper implements Singleton {
 		
 		String extension = imageGenerator.getFileExtension();
 		String mimeType = new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString();
-		bigPreviewName = new StringBuffer(bigPreviewName).append(ThemesConstants.DOT).append(extension).toString();
-		smallPreviewName = new StringBuffer(smallPreviewName).append(ThemesConstants.DOT).append(extension).toString();
+		bigPreviewName = new StringBuffer(bigPreviewName).append(CoreConstants.DOT).append(extension).toString();
+		smallPreviewName = new StringBuffer(smallPreviewName).append(CoreConstants.DOT).append(extension).toString();
 		
 		BufferedImage image = null;
 		InputStream stream = null;

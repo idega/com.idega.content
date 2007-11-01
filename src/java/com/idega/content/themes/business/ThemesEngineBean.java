@@ -685,7 +685,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (keyword == null || language == null || settings == null) {
 			return ThemesConstants.EMPTY;
 		}
-		keyword = ThemesConstants.THEMES_PROPERTY_START + keyword + ThemesConstants.DOT + language;
+		keyword = ThemesConstants.THEMES_PROPERTY_START + keyword + CoreConstants.DOT + language;
 		if (keyword.indexOf(ThemesConstants.SYSTEM_SETTINGS) == -1) {
 			return settings.getProperty(keyword);
 		}
@@ -790,8 +790,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (language == null) {
 			return false;
 		}
-		language = ThemesConstants.DOT + language;
-		keyword = helper.extractValueFromString(keyword, 0, keyword.lastIndexOf(ThemesConstants.UNDER));
+		language = CoreConstants.DOT + language;
+		keyword = helper.extractValueFromString(keyword, 0, keyword.lastIndexOf(CoreConstants.UNDER));
 		
 		IWMainApplication appl = ContentUtil.getBundle().getApplication();
 		ICDomain cachedDomain = null;
@@ -811,7 +811,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		IWMainApplication application = ContentUtil.getBundle().getApplication();
 		IWMainApplicationSettings settings  = application.getSettings();
-		language = ThemesConstants.DOT + language;
+		language = CoreConstants.DOT + language;
 		ICDomain domain = null;
 		ICDomain cachedDomain = application.getIWApplicationContext().getDomain();
 		for (int i = 0; i < keywords.length; i++) {

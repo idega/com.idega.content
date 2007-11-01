@@ -22,6 +22,7 @@ import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextInput;
+import com.idega.util.CoreConstants;
 
 public class SiteInfo extends Block {
 	
@@ -83,7 +84,7 @@ public class SiteInfo extends Block {
 			
 			cell = row.createCell();
 			if (TYPE_TEXT.equals(setting.getType())) {
-				regionValue = new TextInput(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.DOT +
+				regionValue = new TextInput(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + CoreConstants.DOT +
 						REGION_VALUE);
 				if (addKeyPressAction) {
 					regionValue.setOnKeyPress(keyPressAction);
@@ -141,7 +142,7 @@ public class SiteInfo extends Block {
 		for (int i = 0; i < l.size(); i++) {
 			setting = l.get(i);
 			keywords[i] = setting.getCode();
-			values[i] = iwc.getParameter(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.DOT +
+			values[i] = iwc.getParameter(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + CoreConstants.DOT +
 					REGION_VALUE);
 		}
 		ThemesHelper.getInstance().getThemesEngine().saveSiteInfo(locale, keywords, values);

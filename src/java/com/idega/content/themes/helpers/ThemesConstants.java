@@ -11,10 +11,6 @@ import com.idega.util.CoreConstants;
 public class ThemesConstants {
 	
 	public static final String IDEGA_THEME = "idega_theme";
-
-	public static final String DOT = ".";
-	public static final String UNDER = "_";
-	public static final String SPACE = " ";
 	
 	public static final String NAVIGATION = "navcontainer";
 	public static final String TOOLBAR = "toolbar";
@@ -41,9 +37,11 @@ public class ThemesConstants {
 	protected static final String THEME_SEARCH_KEY = "*.htm*";
 	public static final String THEME_PROPERTIES_FILE_END = ".plist";
 	protected static final String THEME_PROPERTIES_FILE = "Theme" + THEME_PROPERTIES_FILE_END;
-	public static final String IDEGA_THEME_INFO = UNDER + IDEGA_THEME + DOT + XML_EXTENSION;
+	public static final String IDEGA_THEME_INFO = CoreConstants.UNDER + IDEGA_THEME + CoreConstants.DOT + XML_EXTENSION;
 	
 	public static final String ARTICLE_TITLE = "Article";
+	
+	protected static final String USELESS_PATHTO_ELEMENT = "%pathto(";
 	
 	private static final String[] _REGIONS_NEEDED_TO_CREATE = new String[] {TOOLBAR, PLUGIN_SIDEBAR};
 	protected static final List <String> REGIONS_NEEDED_TO_CREATE = Collections.unmodifiableList(Arrays.asList(_REGIONS_NEEDED_TO_CREATE));
@@ -63,7 +61,7 @@ public class ThemesConstants {
 	private static final String[] _THEME_PROPERTIES_FILES = new String[] {THEME_PROPERTIES_FILE, IDEGA_THEME_INFO, "theme" + THEME_PROPERTIES_FILE_END};
 	protected static final List <String> THEME_PROPERTIES_FILES = Collections.unmodifiableList(Arrays.asList(_THEME_PROPERTIES_FILES));
 	
-	private static final String[] _USELESS_CONTENT = new String[] {"%pathto(", ")%", "%", " xml:space=\"preserve\""};
+	private static final String[] _USELESS_CONTENT = new String[] {USELESS_PATHTO_ELEMENT, ")%", "%", " xml:space=\"preserve\""};
 	protected static final List <String> USELESS_CONTENT = Collections.unmodifiableList(Arrays.asList(_USELESS_CONTENT));
 	
 	private static final String[] _REGIONS = new String[] {"%logo%", "%content%", "%toolbar%", "%sidebar_title%", "%sidebar%",
@@ -93,6 +91,8 @@ public class ThemesConstants {
 	public static final String SITE_SLOGAN = "site_slogan";
 	
 	protected static final String DIV_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":div";
+	protected static final String OBJECT_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":object";
+	protected static final String PARAM_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":param";
 	
 	// Strings used extracting theme properties
 	protected static final String TAG_DICT = "dict";
