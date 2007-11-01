@@ -13,7 +13,7 @@
 	<classpathentry kind="var" path="MAVEN_REPO/commons-logging/jars/commons-logging-1.0.4.jar" />
 	<classpathentry kind="var" path="MAVEN_REPO/rome/jars/rome-0.9.jar" />
 	<classpathentry kind="var" path="MAVEN_REPO/rome/jars/rome-fetcher-0.7.jar" />
-	<classpathentry kind="var" path="MAVEN_REPO/rome/jars/rome-modules-0.2j1.4.2.jar" />
+	<classpathentry kind="var" path="MAVEN_REPO/rome/jars/rome-modules-0.2.1j1.4.2.jar" />
 	<classpathentry kind="var" path="MAVEN_REPO/jdom/jars/jdom-1.0.jar" />
 	<classpathentry kind="var" path="MAVEN_REPO/servletapi/jars/servletapi-2.4.jar" />
 	<classpathentry kind="var" path="MAVEN_REPO/myfaces/jars/myfaces-jsf-api-1.1.3.jar" />
