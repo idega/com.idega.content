@@ -112,7 +112,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		String skeleton = theme.getLinkToSkeleton();
-		if (skeleton.indexOf(ThemesConstants.SPACE) != -1) {
+		if (skeleton.indexOf(CoreConstants.SPACE) != -1) {
 			skeleton = helper.urlEncode(skeleton);
 		}
 		
@@ -569,43 +569,66 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 		
-		List nodes = null;
-		JDOMXPath xp = null;
-		try {
-			xp = new JDOMXPath(ThemesConstants.DIV_TAG_INSTRUCTION);
-			xp.addNamespace(ThemesConstants.NAMESPACE_ID, ThemesConstants.NAMESPACE);
-			nodes = xp.selectNodes(body);
-		} catch (JaxenException e) {
-			e.printStackTrace();
-		}
-		if (nodes == null) {
+		Object o = null;
+		Element e = null;
+		
+		//	DIVs
+		List divs = getNodesByXpath(body, ThemesConstants.DIV_TAG_INSTRUCTION);
+		if (divs == null) {
 			return false;
 		}
-		
-		Object o = null;
-		for (Iterator it = nodes.iterator(); it.hasNext(); ) {
+		for (Iterator it = divs.iterator(); it.hasNext(); ) {
 			o = it.next();
 			if (o instanceof Element) {
 				addRegion((Element) o);
 			}
 		}
 		
-		List<Text> needlessText = new ArrayList<Text>();
-		List allElements = body.getContent();
+		//	OBJECTs
 		o = null;
-		Element e = null;
-		for (int i = 0; i < allElements.size(); i++) {
-			o = allElements.get(i);
+		List objects = getNodesByXpath(body, ThemesConstants.OBJECT_TAG_INSTRUCTION);
+		if (objects != null) {
+			for (int i = 0; i < objects.size(); i++) {
+				o = objects.get(i);
+				if (o instanceof Element) {
+					fixTag((Element) o, "data", linkToBase);
+				}
+			}
+			
+		}
+		
+		//	PARAMs
+		o = null;
+		List params = getNodesByXpath(body, ThemesConstants.PARAM_TAG_INSTRUCTION);
+		if (params != null) {
+			for (int i = 0; i < params.size(); i++) {
+				o = params.get(i);
+				if (o instanceof Element) {
+					fixTag((Element) o, "value", linkToBase);
+				}
+			}
+		}
+		
+		List<Text> needlessText = new ArrayList<Text>();
+		List content = body.getContent();
+		if (content == null) {
+			return true;
+		}
+		
+		o = null;
+		e = null;
+		for (int i = 0; i < content.size(); i++) {
+			o = content.get(i);
 			if (o instanceof Text) {	// Finding Text elements - they are needless
 				needlessText.add((Text) o);
 			}
 			else {
-				if (o instanceof Element) {	// Fixing <link> and/or <script> attributes values
+				if (o instanceof Element) {
 					e = (Element) o;
-					if (ELEMENT_LINK_NAME.equals(e.getName())) {
+					if (ELEMENT_LINK_NAME.equals(e.getName())) {	//	Fixing <link>
 						fixDocumentElement(e, linkToBase);
 					}
-					if (ELEMENT_SCRIPT_NAME.equals(e.getName())) {	// <script> tags needs advanced handling
+					if (ELEMENT_SCRIPT_NAME.equals(e.getName())) {	//	<script> tags needs advanced handling
 						fixDocumentElement(e, linkToBase);
 						if (!hasElementChildren(e)) {
 							e.addContent(getComment(IDEGA_COMMENT));
@@ -619,6 +642,84 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		return true;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List getNodesByXpath(Element container, String expression) {
+		if (container == null || expression == null) {
+			return null;
+		}
+		
+		JDOMXPath xp = null;
+		try {
+			xp = new JDOMXPath(expression);
+			xp.addNamespace(ThemesConstants.NAMESPACE_ID, ThemesConstants.NAMESPACE);
+			return xp.selectNodes(container);
+		} catch (JaxenException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	private boolean fixTag(Element e, String attributeName, String linkToBase) {
+		if (e == null || attributeName == null || linkToBase == null) {
+			return false;
+		}
+		
+		Attribute a = e.getAttribute(attributeName, namespace);
+		if (a == null) {
+			a = e.getAttribute(attributeName);
+		}
+		if (a == null) {
+			return false;
+		}
+		
+		String dataValue = a.getValue();
+		if (dataValue == null) {
+			return true;	//	Nothing to be fixed
+		}
+				
+		dataValue = getFixedAttributeValue(dataValue, linkToBase);
+		a.setValue(dataValue);
+		
+		return true;
+	}
+	
+	private String getFixedAttributeValue(String value, String linkToBase) {
+		if (value == null) {
+			return null;
+		}
+		
+		boolean madeChanges = false;
+		
+		while (value.indexOf(ThemesConstants.USELESS_PATHTO_ELEMENT) != -1) {
+			value = value.replace(ThemesConstants.USELESS_PATHTO_ELEMENT, CoreConstants.EMPTY);
+			
+			madeChanges = true;
+		}
+		
+		int index = value.indexOf(")");
+		if (index != -1) {
+			value = value.substring(0, index);
+			
+			madeChanges = true;
+		}
+		
+		index = value.indexOf("?");
+		if (index != -1) {
+			value = value.substring(0, index);
+			
+			madeChanges = true;
+		}
+		
+		if (madeChanges) {
+			if (!value.startsWith(linkToBase)) {
+				value = new StringBuffer(linkToBase).append(value).toString();
+			}
+		}
+		
+		return value;
 	}
 	
 	private String getBasicReplace(String begin, String defaultValue, String end) {
@@ -703,7 +804,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		for (int i = 0; i < ThemesConstants.DUMMY_ARTICLES.size(); i++) {
 			content.append(CONTENT_PARAGRAPH_TITLE).append(ThemesConstants.ARTICLE_TITLE);
 			if (ThemesConstants.DUMMY_ARTICLES.size() > 1) {
-				content.append(ThemesConstants.SPACE).append(i + 1);
+				content.append(CoreConstants.SPACE).append(i + 1);
 			}
 			content.append(CONTENT_PARAGRAPH_DATE);
 			content.append(d);
@@ -711,7 +812,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			content.append(IMAGE_START).append(ThemesConstants.SINGLE_QUOTE);
 			content.append(ThemesConstants.BASE_THEME_IMAGES);
 			content.append(ThemesConstants.THEME_IMAGES.get(helper.getRandomNumber(ThemesConstants.THEME_IMAGES.size())));
-			content.append(ThemesConstants.SINGLE_QUOTE).append(ThemesConstants.SPACE).append(IMAGE_POSITION);
+			content.append(ThemesConstants.SINGLE_QUOTE).append(CoreConstants.SPACE).append(IMAGE_POSITION);
 			content.append(ThemesConstants.IMAGE_POSITIONS.get(helper.getRandomNumber(ThemesConstants.IMAGE_POSITIONS.size())));
 			content.append(ThemesConstants.SINGLE_QUOTE).append(IMAGE_END);
 			content.append(ThemesConstants.DUMMY_ARTICLES.get(i)).append(CONTENT_PARAGRAPH_END);
@@ -1591,7 +1692,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			linkToDoc = theme.getLinkToSkeleton();
 		}
 		
-		if (linkToDoc.indexOf(ThemesConstants.SPACE) != -1) {
+		if (linkToDoc.indexOf(CoreConstants.SPACE) != -1) {
 			linkToDoc = helper.urlEncode(linkToDoc);
 		}
 		return helper.getXMLDocument(new StringBuffer(helper.getFullWebRoot()).append(linkToDoc).toString());
