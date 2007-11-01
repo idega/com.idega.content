@@ -56,9 +56,12 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 				}
 				if (foundTheme && !theme.isLocked()) {
 					ThemesHelper.getInstance(false).removeLastUsedTheme(String.valueOf(theme.getIBPageID()));
-					deleteIBPage(theme);
+					int pageId = theme.getIBPageID();
+					
 					String themeID = theme.getId();
 					ThemesHelper.getInstance(false).removeTheme(uri, themeID);
+					
+					deleteIBPage(pageId);
 				}
 			}
 		}
@@ -73,19 +76,12 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 	}
 	
-	private boolean deleteIBPage(Theme theme) {
-		if (theme == null) {
+	private boolean deleteIBPage(int pageId) {
+		if (pageId < 0) {
 			return false;
 		}
-		if (theme.getIBPageID() == -1) {
-			return true;
-		}
 		
-		boolean result = deletePage(String.valueOf(theme.getIBPageID()), false, true, false);
-		if (result) {
-			builder.clearAllCachedPages();
-		}
-		return result;
+		return deletePage(String.valueOf(pageId), false, true, false);
 	}
 	
 	public boolean deleteIBPage(String pageID, boolean deleteChildren) {
