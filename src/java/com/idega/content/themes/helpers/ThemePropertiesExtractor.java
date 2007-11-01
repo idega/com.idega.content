@@ -18,7 +18,11 @@ public class ThemePropertiesExtractor extends Thread implements Runnable {
 	}
 
 	public void run() {
-		extractor.prepareTheme(theme, pLists, configs);
+		try {
+			extractor.prepareTheme(true, theme, pLists, configs);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 }

@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,6 +36,7 @@ import org.apache.commons.httpclient.HttpURL;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.htmlcleaner.HtmlCleaner;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -81,21 +83,18 @@ public class ThemesHelper implements Singleton {
 	
 	private volatile static ThemesHelper helper = null;
 	private volatile Generator generator = null;
-	private volatile ThemeChanger changer = null;
-	private volatile ThemesPropertiesExtractor extractor = null;
-	private volatile ThemesLoader loader = null;
 	private volatile IWSlideService service = null;
 	private volatile ThemesService themesService = null;
 	private volatile ThemesEngine themesEngine = null;
 	private volatile ContentItemFeedBean feedBean = null;
 	
-	private Map <String, Theme> themes = null;
-	private Map <String, Setting> themeSettings = null;
-	private Map <String, Setting> pageSettings = null;
+	private Map<String, Theme> themes = null;
+	private Map<String, Setting> themeSettings = null;
+	private Map<String, Setting> pageSettings = null;
 	private List<String> moduleIds = null;
-	private List <String> themeQueue = null;
-	private List <String> urisToThemes = null;
-	private List <String> loadedThemes = null;
+	private List<String> themeQueue = null;
+	private List<String> urisToThemes = null;
+	private List<String> loadedThemes = null;
 	
 	private boolean checkedFromSlide = false;
 	private boolean loadedThemeSettings = false;
@@ -175,25 +174,21 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public ThemeChanger getThemeChanger() {
-		if (changer == null) {
-			synchronized (ThemesHelper.class) {
-				if (changer == null) {
-					changer = new ThemeChanger();
-				}
-			}
+		Object o = WFUtil.getBeanInstance("themeChanger");
+		if (o instanceof ThemeChanger) {
+			return (ThemeChanger) o;
 		}
-		return changer;
+		
+		return null;
 	}
 	
 	public ThemesPropertiesExtractor getThemesPropertiesExtractor() {
-		if (extractor == null) {
-			synchronized (ThemesHelper.class) {
-				if (extractor == null) {
-					extractor = new ThemesPropertiesExtractor();
-				}
-			}
+		Object o = WFUtil.getBeanInstance("themesPropertiesExtractor");
+		if (o instanceof ThemesPropertiesExtractor) {
+			return (ThemesPropertiesExtractor) o;
 		}
-		return extractor;
+		
+		return null;
 	}
 	
 	protected IWSlideService getSlideService() {
@@ -210,7 +205,7 @@ public class ThemesHelper implements Singleton {
 						}
 						service = (IWSlideService) IBOLookup.getServiceInstance(iwac, IWSlideService.class);
 					} catch (Exception e) {
-						log.error(e);
+						e.printStackTrace();
 						return null;
 					}
 				}
@@ -220,14 +215,7 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public ThemesLoader getThemesLoader() {
-		if (loader == null) {
-			synchronized (ThemesHelper.class) {
-				if (loader == null) {
-					loader = new ThemesLoader(this);
-				}
-			}
-		}
-		return loader;
+		return new ThemesLoader(helper);
 	}
 	
 	private ContentItemFeedBean getFeedBean() {
@@ -253,7 +241,7 @@ public class ThemesHelper implements Singleton {
 		
 		List<SearchResult> themes = search(ThemesConstants.THEME_SEARCH_KEY, searchScope);
 		if (themes == null) {
-			log.error("ContentSearch.doSimpleDASLSearch returned results Collection, which is null: " + themes);
+			log.info("ContentSearch.doSimpleDASLSearch returned results Collection, which is null: " + themes);
 			checkedFromSlide = false;
 			return;
 		}
@@ -267,7 +255,11 @@ public class ThemesHelper implements Singleton {
 //		Collection configurationXmls = search(configSearchKey, searchScope);
 //		List<String> configurations = loadSearchResults(configurationXmls, null);
 	
-		getThemesLoader().loadThemes(themesSkeletons, false, true);
+		try {
+			getThemesLoader().loadThemes(themesSkeletons, false, true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 //		getThemesPropertiesExtractor().prepareThemes(pLists, configurations, true);
 	}
 	
@@ -386,7 +378,7 @@ public class ThemesHelper implements Singleton {
 		try {
 			webDAVServerURI = getSlideService().getWebdavServerURI();
 		} catch (RemoteException e) {
-			log.error(e);
+			e.printStackTrace();
 		}
 		int contentIndex = fullWebRoot.indexOf(webDAVServerURI);
 		webRoot = extractValueFromString(fullWebRoot, 0, contentIndex);
@@ -401,13 +393,13 @@ public class ThemesHelper implements Singleton {
 		try {
 			root = getSlideService().getWebdavServerURL();
 		} catch (RemoteException e) {
-			log.error(e);
+			e.printStackTrace();
 			return null;
 		}
 		try {
 			fullWebRoot = root.getURI();
 		} catch (URIException e) {
-			log.error(e);
+			e.printStackTrace();
 			return null;
 		}
 		return fullWebRoot;
@@ -489,13 +481,33 @@ public class ThemesHelper implements Singleton {
 		themes.put(theme.getId(), theme);
 	}
 	
-	public Collection <Theme> getThemesCollection() {
+	public List<Theme> getAvailableThemes() {
+		Iterator<Theme> it = themes.values().iterator();
+		if (it == null) {
+			return null;
+		}
+		
+		List<Theme> availableThemes = new ArrayList<Theme>();
+		Theme theme = null;
+		for (Iterator<Theme> i = it; i.hasNext();) {
+			theme = i.next();
+			
+			if (!theme.isLoading() && !theme.isLocked() && theme.isPropertiesExtracted()) {
+				availableThemes.add(theme);
+			}
+		}
+		
+		return availableThemes;
+	}
+	
+	public Collection<Theme> getAllThemes() {
 		return themes.values();
 	}
 	
 	public List<Theme> getSortedThemes() {
 		List<Theme> sorted = new ArrayList<Theme>();
-		List<Theme> notSorted = new ArrayList<Theme>(getThemesCollection());
+		List<Theme> notSorted = getAvailableThemes();
+		
 		if (notSorted == null) {
 			return sorted;
 		}
@@ -518,7 +530,7 @@ public class ThemesHelper implements Singleton {
 				}
 			}
 		} catch(Exception e) {
-			log.error(e);
+			e.printStackTrace();
 		}
 		if (sortedMap == null) {
 			return new ArrayList<Theme>();
@@ -544,11 +556,35 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public Document getXMLDocument(String url) {
+		return getXMLDocument(url, false);
+	}
+	
+	public Document getXMLDocument(String url, boolean cleanWithHtmlCleaner) {
 		if (url == null) {
 			return null;
 		}
 		
 		InputStream stream = getInputStream(url);
+		
+		if (stream != null && cleanWithHtmlCleaner) {
+			HtmlCleaner cleaner = new HtmlCleaner(stream);
+			cleaner.setOmitDoctypeDeclaration(false);
+			String content = null;
+			try {
+				cleaner.clean();
+				content = cleaner.getPrettyXmlAsString();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			} finally {
+				closeInputStream(stream);
+			}
+			if (content == null) {
+				return null;
+			}
+			stream = new ByteArrayInputStream(content.getBytes());
+		}
+		
 		try {
 			return getXMLDocument(stream);
 		} catch(Exception e) {
@@ -571,7 +607,7 @@ public class ThemesHelper implements Singleton {
 		try {
 			r = new InputStreamReader(stream, CoreConstants.ENCODING_UTF8);
 		} catch (UnsupportedEncodingException e) {
-			log.error(e);
+			e.printStackTrace();
 			return null;
 		}
 		
@@ -587,18 +623,18 @@ public class ThemesHelper implements Singleton {
 			document = builder.build(r);
 		} catch (JDOMException e) {
 			log.info("JDOM exception");
-			log.error(e);
+			e.printStackTrace();
 			return null;
 		} catch (IOException e) {
 			log.info("IOException trying to build a JDOM Document");
-			log.error(e);
+			e.printStackTrace();
 			return null;
 		}
 		
 		try {
 			r.close();
 		} catch (IOException e) {
-			log.error(e);
+			e.printStackTrace();
 		}
 		return document;
 	}
@@ -695,7 +731,7 @@ public class ThemesHelper implements Singleton {
         } catch (Exception e) {
         	if (printError) {
         		log.info("Error getting: " + link);
-        		log.error(e);
+        		e.printStackTrace();
         	}
         }
         return is;
@@ -713,7 +749,7 @@ public class ThemesHelper implements Singleton {
 		try {
 			is.close();
 		} catch (IOException e) {
-			log.error(e);
+			e.printStackTrace();
 			return false;
 		}
 		return true;
@@ -723,7 +759,7 @@ public class ThemesHelper implements Singleton {
 		try {
 			os.close();
 		} catch (IOException e) {
-			log.error(e);
+			e.printStackTrace();
 			return false;
 		}
 		return true;
@@ -734,7 +770,7 @@ public class ThemesHelper implements Singleton {
 		try {
 			url = new URL(link);
 		} catch (MalformedURLException e) {
-			log.error(e);
+			e.printStackTrace();
 		}
 		return url;
 	}
@@ -747,7 +783,7 @@ public class ThemesHelper implements Singleton {
 			try {
 				value = URLEncoder.encode(value, CoreConstants.ENCODING_UTF8);
 			} catch (UnsupportedEncodingException e) {
-				log.error(e);
+				e.printStackTrace();
 				return value;
 			}
 		}
@@ -768,7 +804,7 @@ public class ThemesHelper implements Singleton {
 				try {
 					encoded.append(URLEncoder.encode(fileParts[i], CoreConstants.ENCODING_UTF8));
 				} catch (UnsupportedEncodingException e) {
-					log.error(e);
+					e.printStackTrace();
 					return url;
 				}
 				if (i + 1 < fileParts.length) {
@@ -790,7 +826,7 @@ public class ThemesHelper implements Singleton {
 			try {
 				value = URLDecoder.decode(value, CoreConstants.ENCODING_UTF8);
 			} catch (UnsupportedEncodingException e) {
-				log.error(e);
+				e.printStackTrace();
 				return value;
 			}
 		}
@@ -807,7 +843,7 @@ public class ThemesHelper implements Singleton {
 				try {
 					encoded.append(URLDecoder.decode(fileParts[i], CoreConstants.ENCODING_UTF8));
 				} catch (UnsupportedEncodingException e) {
-					log.error(e);
+					e.printStackTrace();
 					return url;
 				}
 				if (i + 1 < fileParts.length) {
@@ -849,7 +885,7 @@ public class ThemesHelper implements Singleton {
 		try {
 			uploadedSuccessfully = getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), newName, stream, mimeType, true);
 		} catch (RemoteException e) {
-			log.error(e);
+			e.printStackTrace();
 			return false;
 		} finally {
 			closeInputStream(stream);
@@ -882,7 +918,7 @@ public class ThemesHelper implements Singleton {
 				try {
 					themesService = (ThemesService) IBOLookup.getServiceInstance(CoreUtil.getIWContext(), ThemesService.class);
 				} catch (IBOLookupException e) {
-					log.error(e);
+					e.printStackTrace();
 				}
 			}
 		}
@@ -901,7 +937,19 @@ public class ThemesHelper implements Singleton {
 		Element styles = new Element(ThemesConstants.CON_STYLES);
 		Collection <Element> stylesElements = new ArrayList<Element>();
 		
-		List <ThemeStyleGroupMember> enabled = getThemeChanger().getEnabledStyles(theme);
+		ThemeChanger changer = getThemeChanger();
+		if (changer == null) {
+			return false;
+		}
+		
+		List <ThemeStyleGroupMember> enabled = null;
+		try {
+			enabled = changer.getEnabledStyles(theme);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
 		ThemeStyleGroupMember member = null;
 		
 		Element style = null;
@@ -941,7 +989,12 @@ public class ThemesHelper implements Singleton {
 		
 		root.setContent(rootElements);
 		doc.setRootElement(root);
-		return getThemeChanger().uploadDocument(doc, theme.getLinkToBaseAsItIs(), StringHandler.removeCharacters(theme.getName(), ContentConstants.SPACE, ContentConstants.UNDER) + ThemesConstants.IDEGA_THEME_INFO, theme, false);
+		try {
+			return changer.uploadDocument(doc, theme.getLinkToBaseAsItIs(), StringHandler.removeCharacters(theme.getName(), ContentConstants.SPACE, ContentConstants.UNDER) + ThemesConstants.IDEGA_THEME_INFO, theme, false);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 	
 	public String[] getPageValues(Setting s, String value) {
@@ -972,7 +1025,7 @@ public class ThemesHelper implements Singleton {
 		try {
 			stream.close();
 		} catch (IOException e) {
-			log.error(e);
+			e.printStackTrace();
 			return false;
 		}
 		return true;
@@ -985,7 +1038,7 @@ public class ThemesHelper implements Singleton {
 		try {
 			buffer.close();
 		} catch (IOException e) {
-			log.error(e);
+			e.printStackTrace();
 			return false;
 		}
 		return true;
@@ -998,10 +1051,10 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public synchronized void removeThemeFromQueue(String linkToBase) {
-		List <Theme> themes = new ArrayList<Theme>(getThemesCollection());
+		Collection<Theme> themes = getAllThemes();
 		Theme theme = null;
-		for (int i = 0; i < themes.size(); i++) {
-			theme = themes.get(i);
+		for (Iterator<Theme> it = themes.iterator(); it.hasNext();) {
+			theme = it.next();
 			if (theme.getLinkToBaseAsItIs().startsWith(linkToBase)) {
 				theme.setLoading(false);
 			}
@@ -1015,7 +1068,7 @@ public class ThemesHelper implements Singleton {
 				try {
 					themesEngine = (ThemesEngine) IBOLookup.getServiceInstance(CoreUtil.getIWContext(), ThemesEngine.class);
 				} catch (IBOLookupException e) {
-					log.error(e);
+					e.printStackTrace();
 				}
 			}
 		}
@@ -1039,7 +1092,7 @@ public class ThemesHelper implements Singleton {
 		if (lastUsedTheme != null) {
 			return lastUsedTheme;
 		}
-		List <Theme> themes = new ArrayList<Theme>(getThemesCollection());
+		List<Theme> themes = getAvailableThemes();
 		if (themes == null) {
 			return null;
 		}
@@ -1063,7 +1116,7 @@ public class ThemesHelper implements Singleton {
 		try {
 			settings.setProperty(ThemesConstants.LAST_USED_THEME, String.valueOf(id));
 		} catch (NumberFormatException e) {
-			log.error(e);
+			e.printStackTrace();
 		}
 	}
 	
@@ -1176,7 +1229,12 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		doc = preparePageDocument(doc, articlesPaths, pageID);
-		return getThemeChanger().getXMLOutputter().outputString(doc);
+		try {
+			return getThemeChanger().getXMLOutputter().outputString(doc);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public String loadPageToSlide(String type, String templateFile, List<String> articlesPaths, int pageID) {
@@ -1209,7 +1267,7 @@ public class ThemesHelper implements Singleton {
 		try {
 			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, changedFileName, docContent, ContentConstants.XML_MIME_TYPE, true);
 		} catch (RemoteException e) {
-			log.error(e);
+			e.printStackTrace();
 			return null;
 		}
 		
@@ -1220,11 +1278,11 @@ public class ThemesHelper implements Singleton {
 		try {
 			return getSlideService().getExistence(path);
 		} catch (HttpException e) {
-			log.error(e);
+			e.printStackTrace();
 		} catch (RemoteException e) {
-			log.error(e);
+			e.printStackTrace();
 		} catch (IOException e) {
-			log.error(e);
+			e.printStackTrace();
 		}
 		return false;
 	}
@@ -1280,7 +1338,7 @@ public class ThemesHelper implements Singleton {
 		try {
 			number = numberGenerator.nextInt(maxValue);
 		} catch (IllegalArgumentException e) {
-			log.error(e);
+			e.printStackTrace();
 			return 0;
 		}
 		return number;
@@ -1357,7 +1415,7 @@ public class ThemesHelper implements Singleton {
 				getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base.toString(), file.toString(), article, ContentConstants.XML_MIME_TYPE, true);
 				paths.add(base.toString());
 			} catch (RemoteException e) {
-				log.error(e);
+				e.printStackTrace();
 				return null;
 			}
 		}
@@ -1442,7 +1500,7 @@ public class ThemesHelper implements Singleton {
 					if (MODULE_ELEMENT_NAME.equals(e.getName())) {
 						icObjectId = getICObjectId(e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE), icoHome);
 						if (icObjectId == -1) {
-							log.error(new StringBuffer("Didn't get ICObject for: ").append(e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE)));
+							log.info(new StringBuffer("Didn't get ICObject for: ").append(e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE)));
 							log.info("Generating unique module id");
 							moduleID = getUniqueIdByNumberAndDate(MODULE_ID_SCOPE);
 							while (moduleIds.contains(moduleID)) {
@@ -1463,13 +1521,13 @@ public class ThemesHelper implements Singleton {
 							moduleIdAttribute.setValue(moduleID);
 						}
 						else {
-							log.error(new StringBuffer("Didn't find module id attribute for: ").append(e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE)));
+							log.info(new StringBuffer("Didn't find module id attribute for: ").append(e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE)));
 						}
 					}
 				}
 			}
 		} catch (Exception ex) {
-			log.error(ex);
+			ex.printStackTrace();
 			return false;
 		}
 		return true;
@@ -1484,14 +1542,14 @@ public class ThemesHelper implements Singleton {
 		try {
 			object = icoHome.findByClassName(className);
 		} catch (FinderException e) {
-			log.error(e);
+			e.printStackTrace();
 			return -1;
 		}
 		String key = object.getPrimaryKey().toString();
 		try {
 			return Integer.valueOf(key);
 		} catch (NumberFormatException e) {
-			log.error(e);
+			e.printStackTrace();
 			return -1;
 		}
 	}
@@ -1533,7 +1591,7 @@ public class ThemesHelper implements Singleton {
 					server.append(cachedDomain.getServerProtocol()).append("://").append(cachedDomain.getServerName());
 				}
 			} catch (Exception e) {
-				log.error(e);
+				e.printStackTrace();
 				return getWebRootWithoutContent();
 			}
 		}
@@ -1573,8 +1631,8 @@ public class ThemesHelper implements Singleton {
 		}
 		try {
 			getSlideService(iwc).uploadFileAndCreateFoldersFromStringAsRoot(baseDirectory, fileName.toString(), getThemeChanger().getXMLOutputter().outputString(d), ContentConstants.XML_MIME_TYPE, true);
-		} catch (RemoteException e) {
-			log.error(e);
+		} catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 		return true;
@@ -1614,7 +1672,7 @@ public class ThemesHelper implements Singleton {
 		try {
 			return ContentUtil.getBundle().getLocalizedString(key);
 		} catch (Exception e) {
-			log.error(e);
+			e.printStackTrace();
 			return key;
 		}
 	}
@@ -1736,7 +1794,7 @@ public class ThemesHelper implements Singleton {
 					}
 				}
 			} catch (RemoteException e) {
-				log.error(e);
+				e.printStackTrace();
 			} finally {
 				closeInputStream(stream);
 			}

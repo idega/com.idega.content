@@ -19,7 +19,7 @@ import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.SimplifiedTheme;
 import com.idega.content.themes.helpers.Theme;
 import com.idega.content.themes.helpers.ThemeChange;
-import com.idega.content.themes.helpers.ThemeStyleGroupMember;
+import com.idega.content.themes.helpers.ThemeChanger;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.content.themes.helpers.TreeNodeStructure;
@@ -81,17 +81,22 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		helper.searchForThemes();
 
 		//	Checking if exist themes in system
-		Collection<Theme> themesCollection = helper.getThemesCollection();
+		Collection<Theme> themesCollection = helper.getAllThemes();
 		if (themesCollection == null) {
-			return simpleThemes;	// No themes in system
+			return null;	// No themes in system
 		}
 		int themesCount = themesCollection.size();
 		if (themesCount == 0) {
-			return simpleThemes;	// No themes in system
+			return null;	// No themes in system
 		}
 		
-		//	Preparing themes
-		helper.getThemesPropertiesExtractor().prepareThemes(pLists, configs, false);
+		//	Exists some themes, preparing for usage
+		try {
+			helper.getThemesPropertiesExtractor().prepareThemes(pLists, configs, false);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 		
 		List <Theme> themes = helper.getSortedThemes();
 		Theme theme = null;
@@ -238,14 +243,26 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	 * 
 	 */
 	public String changeTheme(String themeID, String styleGroupName, String styleMember, String themeName, boolean isRadio, boolean isChecked) {
-		return helper.getThemeChanger().changeTheme(themeID, styleGroupName, styleMember, themeName, isRadio, isChecked);
+		try {
+			return helper.getThemeChanger().changeTheme(themeID, styleGroupName, styleMember, themeName, isRadio, isChecked);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 	/**
 	 * 
 	 */
 	public boolean saveTheme(String themeID, String themeName) {
-		return helper.getThemeChanger().saveTheme(themeID, themeName);
+		try {
+			return helper.getThemeChanger().saveTheme(themeID, themeName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -629,7 +646,13 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	 * 
 	 */
 	public boolean restoreTheme(String themeID) {
-		return helper.getThemeChanger().restoreTheme(themeID);
+		try {
+			return helper.getThemeChanger().restoreTheme(themeID);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return false;
 	}
 	
 	public String[] getSiteInfoElements() {
@@ -1288,7 +1311,13 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes, String themeName) {
-		return helper.getThemeChanger().applyMultipleChangesToTheme(themeID, changes, themeName);
+		try {
+			return helper.getThemeChanger().applyMultipleChangesToTheme(themeID, changes, themeName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 
 	private boolean decreaseNodesNumbersInLevel(List<String> nodes, int numberInLevel, BuilderService service) {
@@ -1504,43 +1533,21 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	public String reloadThemeProperties(String themeId) {
-		if (themeId == null) {
-			return null;
-		}
-		Theme theme = helper.getTheme(themeId);
-		if (theme == null) {
+		ThemeChanger changer = helper.getThemeChanger();
+		if (changer == null) {
 			return null;
 		}
 		
-		List<ThemeChange> enabledStyles = getEnabledStyles(theme);				//	Getting current state
-		helper.clearVariationFromCache(themeId);								//	Clearing cache
-		theme.reloadProperties();												//	Clearing properties
-		helper.getThemesPropertiesExtractor().prepareTheme(theme, null, null);	//	Extracting new properties (also setting default state)
-		helper.getThemeChanger().setSelectedStyles(theme, enabledStyles);		//	Restoring current state
-		
-		return getThemeStyleVariations(themeId);
-	}
-	
-	private List<ThemeChange> getEnabledStyles(Theme theme) {
-		List<ThemeChange> enabled = new ArrayList<ThemeChange>();
-		
-		if (theme == null) {
-			return enabled;
+		try {
+			if (changer.reloadThemeProperties(themeId, true)) {
+				return getThemeStyleVariations(themeId);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		}
 		
-		ThemeChange change = null;
-		ThemeStyleGroupMember member = null;
-		for (Iterator<ThemeStyleGroupMember> it = theme.getStyleGroupsMembers().values().iterator(); it.hasNext(); ) {
-			member = it.next();
-			change = new ThemeChange();
-			change.setStyleGroupName(member.getGroupName());
-			change.setVariation(member.getName());
-			change.setEnabled(member.isEnabled());
-			change.setLimitedSelection(member.isLimitedSelection());
-			enabled.add(change);
-		}
-		
-		return enabled;
+		return null;
 	}
 	
 	public boolean isUserAdmin() {

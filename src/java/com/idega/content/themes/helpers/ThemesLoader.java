@@ -13,6 +13,10 @@ public class ThemesLoader {
 		this.helper = helper;
 	}
 	
+	public ThemesLoader() {
+		this(ThemesHelper.getInstance(false));
+	}
+	
 	public boolean loadTheme(String originalUri, String encodedUri, boolean newTheme, boolean manuallyCreated) {
 		if (encodedUri == null || originalUri == null) {
 			return false;
@@ -50,14 +54,22 @@ public class ThemesLoader {
 		}
 	}
 	
-	private void addThemeInfo() {
+	private boolean addThemeInfo() {
 		if (theme == null) {
-			return;
+			return false;
 		}
-		if (!helper.getThemesCollection().contains(theme)) {
+		List<Theme> themes = helper.getAvailableThemes();
+		if (themes == null) {
+			return false;
+		}
+		
+		if (!themes.contains(theme)) {
 			helper.addTheme(theme);
 		}
+		
 		theme = null;
+	
+		return true;
 	}
 	
 	private String getUriWithoutContent(String uri) {
@@ -84,9 +96,11 @@ public class ThemesLoader {
 			theme.setLoading(false);
 		}
 		
-		addThemeInfo();
+		if (addThemeInfo()) {
+			return themeID;
+		}
 		
-		return themeID;
+		return null;
 	}
 	
 	private String getThemeId() {

@@ -4,5 +4,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 	
 	<bean id="content.CategoriesEngineBean" class="com.idega.content.business.categories.CategoriesEngineBean" scope="session" />
+	<bean id="themeChanger" class="com.idega.content.themes.helpers.ThemeChangerBean" scope="session"></bean>
+	<bean id="themesPropertiesExtractor" class="com.idega.content.themes.helpers.ThemesPropertiesExtractorBean" scope="session"></bean>
 
 </beans>
