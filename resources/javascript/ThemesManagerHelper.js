@@ -531,7 +531,7 @@ function setIfUsedTheme(used) {
 	}
 	element.appendChild(document.createTextNode(text));
 	
-	highlightElement(element, 1500, '#F2F2F2');
+	highlightElement(element, 500, '#FFFF44');
 }
 
 function Theme(name, linkToSmallPreview, linkToBigPreview, id, used) {
