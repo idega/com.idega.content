@@ -1742,7 +1742,7 @@ public class ThemesHelper implements Singleton {
 	 * @param quality
 	 * @return true - success, false - failure
 	 */
-	protected boolean generatePreviewsForTheme(Theme theme, boolean useDraft, boolean isJpg, float quality) {
+	protected boolean generatePreviewsForTheme(Theme theme, boolean useDraft, boolean isJpg, float quality, boolean generateOnlyBigPreview) {
 		String url = getFullWebRoot();
 		String bigPreviewName = null;
 		String smallPreviewName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).toString();
@@ -1757,7 +1757,9 @@ public class ThemesHelper implements Singleton {
 		
 		List<Dimension> dimensions = new ArrayList<Dimension>(2);
 		dimensions.add(new Dimension(ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT));
-		dimensions.add(new Dimension(ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT));
+		if (!generateOnlyBigPreview) {
+			dimensions.add(new Dimension(ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT));
+		}
 	
 		Generator imageGenerator = getImageGenerator(null);
 		
@@ -1795,6 +1797,7 @@ public class ThemesHelper implements Singleton {
 				}
 			} catch (RemoteException e) {
 				e.printStackTrace();
+				return false;
 			} finally {
 				closeInputStream(stream);
 			}

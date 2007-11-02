@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -137,11 +138,15 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		// Adding enabled styles
-		if (addDefaultEnabledStyles(theme, head, path, doc, null)) {
-			return true;
+		if (!addDefaultEnabledStyles(theme, head, path, doc, null)) {
+			return false;
 		}
 		
-		return false;
+		return uploadTheme(doc, theme);
+	}
+	
+	private boolean uploadTheme(Document doc, Theme theme) {
+		return uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.getFileNameWithExtension(theme.getLinkToSkeleton()), theme,	true);
 	}
 	
 	private boolean addDefaultEnabledStyles(Theme theme, Element head, String basePath, Document doc, List<ThemeStyleGroupMember> members) {
@@ -152,6 +157,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		if (members == null) {
 			members = getEnabledStyles(theme);
 		}
+		
 		//	Finding where to insert element
 		int index = getElementIndex(head.getContent(), ThemesConstants.TAG_ATTRIBUTE_TYPE, TAG_ATTRIBUTE_VALUE_CSS);
 		for (int i = 0; i < members.size(); i++) {
@@ -159,11 +165,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			index++;
 		}
 		
-		if (uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.getFileNameWithExtension(theme.getLinkToSkeleton()), theme,	true)) {
-			return true;
-		}
-		
-		return false;
+		return true;
 	}
 	
 	private boolean addContentToElement(Element parent, Collection<Element> content, int index) {
@@ -225,7 +227,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			member = it.next();
 			files = member.getStyleFiles();
 			for (index = 0; index < files.size(); index++) {
-				if (!proceedStyleFile( new StringBuffer(theme.getLinkToBase()).append(files.get(index)).toString(), r)) {
+				if (!proceedStyleFile(new StringBuffer(theme.getLinkToBase()).append(files.get(index)).toString(), r)) {
 					invalidFiles.add(files.get(index));	//	Invalid CSS file, disabling variation
 				}
 			}
@@ -436,8 +438,8 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		Object o = null;
-		List <Text> textElements = new ArrayList <Text> ();
-		List <Element> elementsNeedsRegions = new ArrayList <Element> ();
+		List<Text> textElements = new ArrayList<Text>();
+		List<Element> elementsNeedsRegions = new ArrayList<Element>();
 		Element e = null;
 		for (int i = 0; i < headElements.size(); i++) {
 			o = headElements.get(i);
@@ -499,7 +501,10 @@ public class ThemeChangerBean implements ThemeChanger {
 			a = e.getAttribute(ThemesConstants.TAG_ATTRIBUTE_SRC);
 		}
 		if (a != null) {
-			a.setValue(new StringBuffer(linkToBase).append(fixValue(a.getValue())).toString()); // Fixing attribute's value
+			String fixedValue = fixValue(a.getValue());
+			if (!fixedValue.startsWith(linkToBase)) {
+				a.setValue(new StringBuffer(linkToBase).append(fixedValue).toString()); // Fixing attribute's value
+			}
 		}
 	}
 	
@@ -1040,13 +1045,13 @@ public class ThemeChangerBean implements ThemeChanger {
 			return null;
 		}
 		
-		if (finishThemeChange(theme, doc)) {
+		if (finishThemeChange(theme, doc, true)) {
 			return themeID;
 		}
 		return null;
 	}
 	
-	private boolean finishThemeChange(Theme theme, Document doc) {
+	private boolean finishThemeChange(Theme theme, Document doc, boolean generateOnlyBigPreview) {
 		String draft = new StringBuffer(helper.getFileName(theme.getLinkToSkeleton())).append(ThemesConstants.DRAFT).toString();
 		if (!uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.decode(draft, true), theme, true)) {
 			return false;
@@ -1054,7 +1059,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		theme.setLinkToDraft(new StringBuffer(theme.getLinkToBase()).append(draft).toString());
 
-		if (!helper.generatePreviewsForTheme(theme, true, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY)) {
+		if (!helper.generatePreviewsForTheme(theme, true, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY, generateOnlyBigPreview)) {
 			theme.setLinkToDraft(null);
 			return false;
 		}
@@ -1346,6 +1351,8 @@ public class ThemeChangerBean implements ThemeChanger {
 		theme.setLinkToThemePreview(theme.getLinkToDraftPreview());
 		theme.setLinkToDraftPreview(null);
 		
+		helper.createSmallImage(theme, false);
+		
 		try {
 			helper.getThemesService().createIBPage(theme);
 		} catch (RemoteException e) {
@@ -1419,7 +1426,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			}
 		}
 		
-		if (helper.generatePreviewsForTheme(theme, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY)) {
+		if (helper.generatePreviewsForTheme(theme, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY, false)) {
 			theme.setChangedName(null);
 			theme.setLinkToDraftPreview(null);
 			theme.setLinkToDraft(null);
@@ -1461,9 +1468,10 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		List<Element> children = header.getChildren();
 		List<ThemeStyleGroupMember> styleMembers = new ArrayList<ThemeStyleGroupMember>();
+		List<Element> stylesToRemove = new ArrayList<Element>();
+		Map<String, Integer> stylesIndexes = new HashMap<String, Integer>();
 		if (children != null) {
 			Element child = null;
-			List<Element> stylesToRemove = new ArrayList<Element>();
 			for (int j = 0; j < children.size(); j++) {
 				child = children.get(j);	
 				if (ELEMENT_LINK_NAME.equals(child.getName())) {
@@ -1476,6 +1484,7 @@ public class ThemeChangerBean implements ThemeChanger {
 								ThemeStyleGroupMember member = getExistingDefaultStyle(styleHref, styles);
 								if (member == null) {
 									stylesToRemove.add(child);	//	Style is needless: it's not declared as default in properties list
+									stylesIndexes.put(getStyleGroupNameByHref(theme, styleHref), getElementIndex(header.getContent(), ThemesConstants.TAG_ATTRIBUTE_HREF, child.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_HREF)));
 								}
 								else {
 									styleMembers.add(member);
@@ -1486,10 +1495,6 @@ public class ThemeChangerBean implements ThemeChanger {
 				
 				}
 			}
-			
-			for (Iterator<Element> it = stylesToRemove.iterator(); it.hasNext(); ) {
-				it.next().detach();
-			}
 		}
 		
 		ThemeStyleGroupMember member = null;
@@ -1497,15 +1502,41 @@ public class ThemeChangerBean implements ThemeChanger {
 			member = styleMembers.get(i);
 			
 			if (styles.contains(member)) {
-				styles.remove(member);
+				styles.remove(member);	//	Default style already in theme, removing it from list
 			}
 		}
 		
-		if (addDefaultEnabledStyles(theme, header, new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase()).toString(), doc, styles)) {
-			return true;
+		String linkToBase = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase()).toString();
+		for (int i = 0; i < styles.size(); i++) {
+			member = styles.get(i);
+			if (!addContentToElement(header, getNewStyleElement(linkToBase, member), stylesIndexes.get(member.getGroupName()))) {
+				return false;
+			}
 		}
 		
-		return false;
+		for (Iterator<Element> it = stylesToRemove.iterator(); it.hasNext(); ) {
+			it.next().detach();
+		}
+		
+		return uploadTheme(doc, theme);
+	}
+	
+	private String getStyleGroupNameByHref(Theme theme, String href) {
+		if (theme == null || href == null) {
+			return null;
+		}
+		
+		Collection<ThemeStyleGroupMember> members = theme.getStyleGroupsMembers().values();
+		if (members == null) {
+			return null;
+		}
+		
+		ThemeStyleGroupMember member = getExistingDefaultStyle(href, new ArrayList<ThemeStyleGroupMember>(members));
+		if (member == null) {
+			return null;
+		}
+		
+		return member.getGroupName();
 	}
 	
 	/**
@@ -1627,7 +1658,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		copyTheme(parent, child);
 		
 		//	Generating previews
-		 if (!helper.generatePreviewsForTheme(child, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY)) {
+		 if (!helper.generatePreviewsForTheme(child, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY, false)) {
 			 return false;
 		 }
 		
@@ -1723,9 +1754,10 @@ public class ThemeChangerBean implements ThemeChanger {
 			return null;
 		}
 		
-		if (finishThemeChange(theme, doc)) {
+		if (finishThemeChange(theme, doc, true)) {
 			return themeID;
 		}
+		
 		return null;
 	}
 	

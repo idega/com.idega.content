@@ -203,7 +203,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		//	Checking previews
 		if (theme.getLinkToThemePreview() == null || theme.getLinkToSmallPreview() == null) {
 			//	And creating if don't exist
-			if (!helper.generatePreviewsForTheme(theme, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY)) {
+			if (!helper.generatePreviewsForTheme(theme, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY, false)) {
 				markThemeAsNotPrepared(theme);
 				return false;
 			}
