@@ -645,7 +645,25 @@ function restoreTheme() {
 
 function restoreThemeCallback(result) {
 	closeLoadingMessage();
-	getThemes(THEME_ID, true, false);
+	ThemesEngine.getTheme(THEME_ID, getRestoredThemeCallback);
+}
+
+function getRestoredThemeCallback(simpleTheme) {
+	if (simpleTheme == null) {
+		return false;
+	}
+	
+	replaceTheme(simpleTheme);
+	
+	var theme = getTheme(simpleTheme.id);
+	if (theme == null) {
+		return false;
+	}
+	
+	var smallPreview = $(theme.id);
+	smallPreview.setProperty('src', theme.linkToSmallPreview);
+	
+	getThemeStyleVariations(theme.id);
 }
 
 function addReflectionToThemes() {
