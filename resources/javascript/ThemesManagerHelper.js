@@ -117,8 +117,18 @@ function changeThemeCallback(themeID) {
 	else {
 		setGlobalId(themeID);
 		$('themeSaveButton').disabled = false;
-		getThemes(themeID, true, false);
+		
+		ThemesEngine.getTheme(themeID, getSingleThemeCallback);
 	}
+}
+
+function getSingleThemeCallback(theme) {
+	if (theme == null) {
+		return false;
+	}
+	replaceTheme(theme);
+	
+	setPreview(theme.linkToBigPreview + '?' + new Date().getTime());
 }
 
 function saveTheme() {
@@ -340,7 +350,7 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
 		return;
 	}
 	
-	removeChildren(container);
+	container.empty();
 	
 	THEMES = new Array();
 	var simpleTheme = null;
@@ -560,6 +570,22 @@ function getTheme(themeID) {
 		}
 	}
 	return null;
+}
+
+function replaceTheme(simpleTheme) {
+	if (simpleTheme == null) {
+		return false;
+	}
+	
+	var time = new Date().getTime();
+	var theme = new Theme(simpleTheme.name, simpleTheme.linkToSmallPreview + '?' + time, simpleTheme.linkToBigPreview + '?' + time, simpleTheme.id, simpleTheme.used);
+	
+	var oldTheme = getTheme(theme.id);
+	if (oldTheme != null) {
+		removeElementFromArray(THEMES, oldTheme);
+	}
+	
+	THEMES.push(theme);
 }
 
 function setThemeForPreview(themeID) {
