@@ -15,9 +15,14 @@ import java.rmi.RemoteException;
 
 public interface ThemesEngine extends IBOService {
 	/**
-	 * @see com.idega.content.themes.business.ThemesEngineBean#getThemesPreviewsInfo
+	 * @see com.idega.content.themes.business.ThemesEngineBean#getThemes
 	 */
 	public List<SimplifiedTheme> getThemes();
+	
+	/**
+	 * @see com.idega.content.themes.business.ThemesEngineBean#getTheme
+	 */
+	public SimplifiedTheme getTheme(String themeId);
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getThemeStyleVariations

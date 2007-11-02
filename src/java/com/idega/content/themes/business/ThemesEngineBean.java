@@ -99,49 +99,71 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		List <Theme> themes = helper.getSortedThemes();
-		Theme theme = null;
 		SimplifiedTheme simpleTheme = null;
-		StringBuffer link = null;
 		for (int i = 0; i < themes.size(); i++) {
-			theme = themes.get(i);
-			if (theme.isPropertiesExtracted()) {
-				simpleTheme = new SimplifiedTheme();
-				
-				// Name
-				if (theme.getChangedName() == null) {
-					simpleTheme.setName(theme.getName());
-				}
-				else {
-					simpleTheme.setName(theme.getChangedName());
-				}
-				
-				if (theme.getLinkToSmallPreview() != null) {
-					// Small preview
-					link = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase());
-					link.append(helper.encode(theme.getLinkToSmallPreview(), true));
-					simpleTheme.setLinkToSmallPreview(link.toString());
-				}
-				
-				// Big preview
-				link = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase());
-				if (theme.getLinkToDraftPreview() == null) {
-					link.append(helper.encode(theme.getLinkToThemePreview(), true));
-				}
-				else {
-					link.append(helper.encode(theme.getLinkToDraftPreview(), true));
-				}
-				simpleTheme.setLinkToBigPreview(link.toString());
-				
-				// Id
-				simpleTheme.setId(theme.getId());
-				
-				// Is used?
-				simpleTheme.setUsed(isUsedTheme(theme.getIBPageID()));
-				
+			simpleTheme = getSimpleTheme(themes.get(i));
+			
+			if (simpleTheme != null) {
 				simpleThemes.add(simpleTheme);
 			}
 		}
 		return simpleThemes;
+	}
+	
+	public SimplifiedTheme getTheme(String themeId) {
+		if (themeId == null) {
+			return null;
+		}
+		
+		Theme theme = helper.getTheme(themeId);
+		if (theme == null) {
+			return null;
+		}
+		
+		return getSimpleTheme(theme);
+	}
+	
+	private SimplifiedTheme getSimpleTheme(Theme theme) {
+		if (theme.isPropertiesExtracted()) {
+			StringBuffer link = null;
+			
+			SimplifiedTheme simpleTheme = new SimplifiedTheme();
+			
+			// Name
+			if (theme.getChangedName() == null) {
+				simpleTheme.setName(theme.getName());
+			}
+			else {
+				simpleTheme.setName(theme.getChangedName());
+			}
+			
+			if (theme.getLinkToSmallPreview() != null) {
+				// Small preview
+				link = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase());
+				link.append(helper.encode(theme.getLinkToSmallPreview(), true));
+				simpleTheme.setLinkToSmallPreview(link.toString());
+			}
+			
+			// Big preview
+			link = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase());
+			if (theme.getLinkToDraftPreview() == null) {
+				link.append(helper.encode(theme.getLinkToThemePreview(), true));
+			}
+			else {
+				link.append(helper.encode(theme.getLinkToDraftPreview(), true));
+			}
+			simpleTheme.setLinkToBigPreview(link.toString());
+			
+			// Id
+			simpleTheme.setId(theme.getId());
+			
+			// Is used?
+			simpleTheme.setUsed(isUsedTheme(theme.getIBPageID()));
+			
+			return simpleTheme;
+		}
+		
+		return null;
 	}
 	
 	private boolean isUsedTheme(int templateID) {
