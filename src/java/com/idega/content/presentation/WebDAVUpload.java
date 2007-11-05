@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.11 2007/07/26 07:45:13 valdas Exp $
+ * $Id: WebDAVUpload.java,v 1.12 2007/11/05 16:23:27 valdas Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -35,14 +35,14 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2007/07/26 07:45:13 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/11/05 16:23:27 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class WebDAVUpload extends ContentBlock {
 
-	protected static final String BEAN_ID = "WebDAVUploadBean";
+	public static final String BEAN_ID = "WebDAVUploadBean";
 	
 	protected static final String DEFAULT_OUTPUT_TEXT_STYLE = "wf_inputtext";
 	
