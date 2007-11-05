@@ -20,7 +20,7 @@ version="1.2">
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/PageInfoHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js">
-			<h:form id="uploadForm" enctype="multipart/form-data" onsubmit="showLoadingMessage(getUploadingThemeText());">
+			<h:form id="uploadForm" enctype="multipart/form-data">
 				<jsf:verbatim>
 					<script type="text/javascript">
 						window.addEvent('domready', function() {
@@ -66,7 +66,10 @@ version="1.2">
 									</t:div>
 								</t:div>
 							</t:div>
-							<c:ThemesManager id="uploadBlock"></c:ThemesManager>
+							<t:div styleClass="uploadForm">
+								<h:outputText styleClass="variationHeading" value="#{localizedStrings['com.idega.content']['upload_theme']}"></h:outputText>
+								<c:FileUploadViewer themePack="true" actionAfterUpload="getThemes(THEME_ID, true, true);" allowMultipleFiles="true" extractContent="true" zipFile="true"></c:FileUploadViewer>
+							</t:div>
 						</t:div>
                	</t:div>
 			</h:form>

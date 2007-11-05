@@ -1,0 +1,121 @@
+package com.idega.content.upload.presentation;
+
+import javax.faces.component.UIComponent;
+import javax.faces.webapp.UIComponentTag;
+
+import com.idega.util.CoreConstants;
+
+public class FileUploadViewerTag extends UIComponentTag {
+	
+	private String actionAfterUpload = null;
+	private String uploadPath = CoreConstants.CONTENT_PATH;
+	
+	private boolean zipFile = false;
+	private boolean extractContent = false;
+	private boolean themePack = false;
+	private boolean showProgressBar = true;
+	private boolean showLoadingMessage = true;
+	private boolean allowMultipleFiles = false;
+
+	@Override
+	public String getComponentType() {
+		return FileUploadViewer.class.getSimpleName();
+	}
+
+	@Override
+	public String getRendererType() {
+		return null;
+	}
+	
+	protected void setProperties(UIComponent component) {
+		if (component instanceof FileUploadViewer) {
+			FileUploadViewer uploadViewer = (FileUploadViewer) component;
+			super.setProperties(uploadViewer);
+			
+			uploadViewer.setActionAfterUpload(actionAfterUpload);
+			uploadViewer.setUploadPath(uploadPath);
+			uploadViewer.setZipFile(zipFile);
+			uploadViewer.setExtractContent(extractContent);
+			uploadViewer.setThemePack(themePack);
+			uploadViewer.setShowProgressBar(showProgressBar);
+			uploadViewer.setShowLoadingMessage(showLoadingMessage);
+			uploadViewer.setAllowMultipleFiles(allowMultipleFiles);
+		}
+	}
+
+	public void release() {
+		this.actionAfterUpload = null;
+		this.uploadPath = CoreConstants.CONTENT_PATH;
+		
+		this.zipFile = false;
+		this.extractContent = false;
+		this.themePack = false;
+		this.showProgressBar = true;
+		this.showLoadingMessage = true;
+		this.allowMultipleFiles = false;
+	}
+	
+	public String getActionAfterUpload() {
+		return actionAfterUpload;
+	}
+
+	public void setActionAfterUpload(String actionAfterUpload) {
+		this.actionAfterUpload = actionAfterUpload;
+	}
+
+	public String getUploadPath() {
+		return uploadPath;
+	}
+
+	public void setUploadPath(String uploadPath) {
+		this.uploadPath = uploadPath;
+	}
+
+	public boolean isZipFile() {
+		return zipFile;
+	}
+
+	public void setZipFile(boolean zipFile) {
+		this.zipFile = zipFile;
+	}
+
+	public boolean isExtractContent() {
+		return extractContent;
+	}
+
+	public void setExtractContent(boolean extractContent) {
+		this.extractContent = extractContent;
+	}
+
+	public boolean isThemePack() {
+		return themePack;
+	}
+
+	public void setThemePack(boolean themePack) {
+		this.themePack = themePack;
+	}
+
+	public boolean isShowProgressBar() {
+		return showProgressBar;
+	}
+
+	public void setShowProgressBar(boolean showProgressBar) {
+		this.showProgressBar = showProgressBar;
+	}
+
+	public boolean isShowLoadingMessage() {
+		return showLoadingMessage;
+	}
+
+	public void setShowLoadingMessage(boolean showLoadingMessage) {
+		this.showLoadingMessage = showLoadingMessage;
+	}
+
+	public boolean isAllowMultipleFiles() {
+		return allowMultipleFiles;
+	}
+
+	public void setAllowMultipleFiles(boolean allowMultipleFiles) {
+		this.allowMultipleFiles = allowMultipleFiles;
+	}
+}

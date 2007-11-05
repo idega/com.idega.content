@@ -305,6 +305,56 @@
 		<component-type>WFBlockWithToolbar</component-type>
 		<component-class>com.idega.content.presentation.WFBlockWithToolbar</component-class>
 	</component>
+	<component>
+		<component-type>FileUploadViewer</component-type>
+		<component-class>com.idega.content.upload.presentation.FileUploadViewer</component-class>
+		<property>
+			<display-name>JavaScript action after upload is finished</display-name>
+			<property-name>actionAfterUpload</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Upload path in Slide</display-name>
+			<property-name>uploadPath</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Is it zip file?</display-name>
+			<property-name>zipFile</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Extract content of archived file?</display-name>
+			<property-name>extractContent</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Uploading theme pack?</display-name>
+			<property-name>themePack</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Show progress bar?</display-name>
+			<property-name>showProgressBar</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Show loading message?</display-name>
+			<property-name>showLoadingMessage</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Allow multiple files to be uploaded?</display-name>
+			<property-name>allowMultipleFiles</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<component-extension>
+			<idegaweb-info>
+				<builder-visible>true</builder-visible>
+				<object-type>jsf.uicomponent</object-type>
+			</idegaweb-info>
+		</component-extension>
+	</component>
 	
     <managed-bean>
         <managed-bean-name>WebDAVBean</managed-bean-name>

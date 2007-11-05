@@ -20,6 +20,11 @@
 	    	<param name="managedBeanName" value="content.CategoriesEngineBean" />
 	    	<param name="class" value="com.idega.content.business.categories.CategoriesEngineBean" />
     	</create>
+    	
+    	<create creator="jsf" javascript="FileUploader">
+    		<param name="managedBeanName" value="fileUploader"></param>
+    		<param name="class" value="com.idega.content.upload.business.FileUploaderBean"/>
+		</create>
 	</allow>
   
 	<signatures>

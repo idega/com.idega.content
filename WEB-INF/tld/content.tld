@@ -554,6 +554,66 @@
         	<rtexprvalue>false</rtexprvalue>
       	</attribute>
 	</tag>
+	<tag>
+		<name>FileUploadViewer</name>
+		<tag-class>com.idega.content.upload.presentation.FileUploadViewerTag</tag-class>
+		<attribute>
+			<name>actionAfterUpload</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+			<type>java.lang.String</type>
+			<description>JavaScript action after upload is finished</description>
+		</attribute>
+		<attribute>
+			<name>uploadPath</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+			<type>java.lang.String</type>
+			<description>Upload path in Slide</description>	
+		</attribute>
+		<attribute>
+			<name>zipFile</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+			<type>boolean</type>
+			<description>Is it zip file?</description>
+		</attribute>
+		<attribute>
+			<name>extractContent</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+			<type>boolean</type>
+			<description>Extract content of archived file?</description>
+		</attribute>
+		<attribute>
+			<name>themePack</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+			<type>boolean</type>
+			<description>Uploading theme pack?</description>
+		</attribute>
+		<attribute>
+			<name>showProgressBar</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+			<type>boolean</type>
+			<description>Show progress bar?</description>
+		</attribute>
+		<attribute>
+			<name>showLoadingMessage</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+			<type>boolean</type>
+			<description>Show loading message?</description>
+		</attribute>
+		<attribute>
+			<name>allowMultipleFiles</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+			<type>boolean</type>
+			<description>Allow multiple files to be uploaded?</description>
+		</attribute>
+	</tag>
 	
 	<tag>
 		<name>PageInfo</name>

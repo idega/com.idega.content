@@ -33,4 +33,10 @@ public class ContentConstants {
 	public static final String PAGES_MAP_KEY = "pageMap";
 	
 	public static final String PAGE_TYPES_CACHE_KEY = "IWPageTypes";
+	
+	public static final String UPLOAD_FIELD_NAME = "web2FileUploadField";
+	public static final String UPLOADER_PATH = "web2FileUploaderPathValue";
+	public static final String UPLOADER_UPLOAD_ZIP_FILE = "web2FileUploaderUploadZipFileValue";
+	public static final String UPLOADER_UPLOAD_THEME_PACK = "web2FileUploaderUploadThemePackValue";
+	public static final String UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE = "web2FileUploaderExtractArchivedFileValue";
 }
