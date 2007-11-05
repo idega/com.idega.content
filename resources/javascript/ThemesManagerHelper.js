@@ -33,25 +33,6 @@ function getImageHeight() {
 	return imageHeight;
 }
 
-function isCorrectFileType(id, fileType, noFileMsg, invalidFileTypeMsg) {
-	var input = $(id);
-	if (input) {
-		if (input.value == '') {
-			alert(noFileMsg);
-			return false;
-		}
-		var nameParts = input.value.split('.');
-		if (nameParts) {
-			var lastPart = nameParts[nameParts.length - 1];
-			if (lastPart.toLowerCase() != fileType) {
-				alert(invalidFileTypeMsg);
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
 function getThemeStyleVariations(themeID) {
 	if (THEME_ID != null) {
 		var oldTheme = getTheme(THEME_ID);
