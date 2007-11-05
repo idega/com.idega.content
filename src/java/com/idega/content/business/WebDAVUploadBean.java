@@ -2,6 +2,7 @@ package com.idega.content.business;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -259,7 +260,7 @@ public class WebDAVUploadBean implements Serializable{
 	 */
 	public boolean uploadZipFileContents(ActionEvent event) throws IOException {
 		if (canUploadZipFile()) {
-			return doUploading(isBeingUploadedTheme(event));
+			return uploadZipFile(isBeingUploadedTheme(event));
 		}		
 		log.info("Unable to upload zip file's contents");
 		return false;
@@ -297,7 +298,7 @@ public class WebDAVUploadBean implements Serializable{
 		return result;
 	}
 	
-	private boolean doUploading (boolean uploadingTheme) throws IOException {
+	private boolean uploadZipFile(boolean uploadingTheme) throws IOException {
 		IWSlideService service = null;
 		try {
 			service = (IWSlideService) IBOLookup.getServiceInstance(IWContext.getInstance(), IWSlideService.class);
@@ -307,18 +308,28 @@ public class WebDAVUploadBean implements Serializable{
 			return false;
 		}
 		
+		return uploadZipFile(uploadingTheme, new BufferedInputStream(uploadFile.getInputStream()), service);
+	}
+	
+	public boolean uploadZipFile(boolean uploadingTheme, InputStream stream, IWSlideService slide) throws IOException {
 		String resultInfo = null;
 		boolean result;
 		
-		uploadFilePath = ThemesHelper.getInstance(false).changeFileUploadPath(getUploadFilePath() + getUploadFileName()/*uploadFile.getName().substring(0, uploadFile.getName().lastIndexOf("."))*/);
+		if (uploadingTheme) {
+			String uploadFileName = getUploadFileName();
+			if (!uploadFileName.equals(CoreConstants.EMPTY)) {
+				uploadFilePath = ThemesHelper.getInstance(false).changeFileUploadPath(getUploadFilePath() + uploadFileName);
+			}
+		}
 		String path = getUploadFilePath();
+		
 		List<String> filesToClean = new ArrayList<String>();
 		if (uploadingTheme) {
 			ThemesHelper.getInstance(false).addThemeToQueue(path);
 			filesToClean = ThemesConstants.THEME_SKELETONS_FILTER;
 		}
 		
-		if (service.uploadZipFileContents(new ZipInputStream(new BufferedInputStream(uploadFile.getInputStream())), path, filesToClean)) {
+		if (slide.uploadZipFileContents(new ZipInputStream(stream), path, filesToClean)) {
 			resultInfo = "Success uploading zip file's contents";
 			result = true;
 		}
@@ -337,15 +348,19 @@ public class WebDAVUploadBean implements Serializable{
 	
 	private String getUploadFileName() {
 		if (uploadFile == null) {
-			return null;
+			return CoreConstants.EMPTY;
 		}
 		
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
-			return null;
+			return CoreConstants.EMPTY;
 		}
 		
 		String name = uploadFile.getName();
+		if (name == null) {
+			return CoreConstants.EMPTY;
+		}
+		
 		if (name.indexOf(CoreConstants.BACK_SLASH) != -1) {
 			int nameLength = name.length();
 			int lastIndexOfBackSlash = name.lastIndexOf(CoreConstants.BACK_SLASH);
