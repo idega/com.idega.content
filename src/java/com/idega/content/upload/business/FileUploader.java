@@ -31,7 +31,7 @@ public interface FileUploader {
 	/**
 	 * @see com.idega.content.upload.business.FileUploaderBean#getFileInput
 	 */
-	public Layer getFileInput(IWContext iwc);
+	public Layer getFileInput(IWContext iwc, boolean addRemoveImage);
 	
 	/**
 	 * @see com.idega.content.upload.business.FileUploaderBean#getRenderedFileInput

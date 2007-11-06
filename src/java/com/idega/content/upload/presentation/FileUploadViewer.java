@@ -115,7 +115,7 @@ public class FileUploadViewer extends Block {
 		Layer fileInputs = new Layer();
 		String id = fileInputs.getId();
 		fileInputs.setStyleClass("fileUploadInputsContainerStyle");
-		fileInputs.add(uploader.getFileInput(iwc));
+		fileInputs.add(uploader.getFileInput(iwc, allowMultipleFiles));
 		mainContainer.add(fileInputs);
 		
 		Layer buttonsContainer = new Layer();

@@ -45,7 +45,7 @@ public class FileUploaderBean implements FileUploader {
 		getSlideService(iwc);
 	}
 	
-	public Layer getFileInput(IWContext iwc) {
+	public Layer getFileInput(IWContext iwc, boolean addRemoveImage) {
 		if (iwc == null) {
 			return null;
 		}
@@ -63,10 +63,12 @@ public class FileUploaderBean implements FileUploader {
 		input.setName(ContentConstants.UPLOAD_FIELD_NAME);
 		fileInputContainer.add(input);
 		
-		Image remove = new Image(bundle.getVirtualPathWithFileNameString("images/delete.png"), name, 18, 18);
-		remove.setStyleClass("removeFileUploadInputImageStyle");
-		remove.setOnClick(new StringBuffer("removeFileInput('").append(fileInputContainer.getId()).append("', '").append(message).append("');").toString());
-		fileInputContainer.add(remove);
+		if (addRemoveImage) {
+			Image remove = new Image(bundle.getVirtualPathWithFileNameString("images/delete.png"), name, 18, 18);
+			remove.setStyleClass("removeFileUploadInputImageStyle");
+			remove.setOnClick(new StringBuffer("removeFileInput('").append(fileInputContainer.getId()).append("', '").append(message).append("');").toString());
+			fileInputContainer.add(remove);
+		}
 		
 		return fileInputContainer;
 	}
@@ -82,7 +84,7 @@ public class FileUploaderBean implements FileUploader {
 			return null;
 		}
 		
-		return builder.getRenderedComponent(iwc, getFileInput(iwc), false);
+		return builder.getRenderedComponent(iwc, getFileInput(iwc, true), false);
 	}
 
 	public boolean uploadFile(List<UploadFile> files, String uploadPath, boolean isIE) {
