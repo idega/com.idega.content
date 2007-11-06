@@ -33,6 +33,7 @@ version="1.2">
 							}
 							DWREngine.setErrorHandler(errorHanlder);
 						});
+						window.addEvent('domready', enableReverseAjaxInThemes);
                 		window.addEvent('domready', startBuilderApplication);
                 		window.addEvent('domready', getLocalizedTextForThemes);
                 		window.addEvent('domready', initializePages);
@@ -41,7 +42,7 @@ version="1.2">
                 		/*window.addEvent('domready', initialiazeSiteManager);
                 		window.addEvent('domready', getPathToImageFolder);
  	              		window.addEvent('domready', registerSiteActions);*/
- 	              		window.addEvent('domready', enableReverseAjaxInThemes);
+ 	              		window.addEvent('resize', controlLucidAppWindow);
                 	</script>
                 </f:verbatim>
                 
@@ -129,14 +130,14 @@ version="1.2">
                 
                 <t:div styleClass="pageInfoButtonsContainer">
                 	<t:div styleClass="leftButtonStyle">
-                		<t:commandButton id="newPageButton" forceId="true" styleClass="newPageButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['new_page']}"></t:commandButton>
+                		<t:commandLink id="newPageButton" forceId="true" styleClass="newPageButtonStyleClass" value="#{localizedStrings['com.idega.content']['new_page']}"></t:commandLink>
                 	</t:div>
 					<t:div styleClass="rightButtonStyle">
-						<t:commandButton id="showPageModules" forceId="true" styleClass="showPageModulesStyleClass" type="button" value="#{localizedStrings['com.idega.content']['show_modules']}"></t:commandButton>
-						<t:commandButton id="showThemesButton" forceId="true" styleClass="showThemesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['show_themes']}"></t:commandButton>
-						<t:commandButton id="showEditPagesButton" forceId="true" styleClass="showEditPagesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['edit']}"></t:commandButton>
-						<t:commandButton id="showSourcePagesButton" forceId="true" styleClass="showSourcePagesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['page_source']}" disabled="true"></t:commandButton>
-						<t:commandButton id="showPreviewPagesButton" forceId="true" styleClass="showPreviewPagesButtonStyleClass" type="button" value="#{localizedStrings['com.idega.content']['preview']}"></t:commandButton>
+						<t:commandLink id="showPageModules" forceId="true" styleClass="showPageModulesStyleClass" value="#{localizedStrings['com.idega.content']['show_modules']}"></t:commandLink>
+						<t:commandLink id="showThemesButton" forceId="true" styleClass="showThemesButtonStyleClass" value="#{localizedStrings['com.idega.content']['show_themes']}"></t:commandLink>
+						<t:commandLink id="showEditPagesButton" forceId="true" styleClass="showEditPagesButtonStyleClass" value="#{localizedStrings['com.idega.content']['edit']}"></t:commandLink>
+						<t:commandLink id="showSourcePagesButton" forceId="true" styleClass="showSourcePagesButtonStyleClass" value="#{localizedStrings['com.idega.content']['page_source']}"></t:commandLink>
+						<t:commandLink id="showPreviewPagesButton" forceId="true" styleClass="showPreviewPagesButtonStyleClass" value="#{localizedStrings['com.idega.content']['preview']}"></t:commandLink>
 					</t:div>
 				</t:div>
 			</h:form>

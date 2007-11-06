@@ -1,7 +1,5 @@
 var PAGE_ID = null;
 
-var TOTAL_WIDTH = 0;
-var TOTAL_HEIGHT = 0;
 var RESERVED_HEIGHT = 82;
 var RESERVED_HEIGHT_FOR_PAGES = RESERVED_HEIGHT + 93;
 var RESERVED_HEIGHT_FOR_SITE = RESERVED_HEIGHT + 63;
@@ -94,31 +92,11 @@ function changePageTitleInPageInfo(title) {
 }
 
 function getTotalWidth() {
-	if (TOTAL_WIDTH != 0) {
-		return TOTAL_WIDTH;
-	}
-	if (typeof(window.innerWidth) == 'number') {
-		TOTAL_WIDTH = window.innerWidth; // Non-IE
-	} else if(document.documentElement && document.documentElement.clientWidth) {
-		TOTAL_WIDTH = document.documentElement.clientWidth; // IE 6+ in 'standards compliant mode'
-	} else if(document.body && document.body.clientWidth) {
-		TOTAL_WIDTH = document.body.clientWidth; // IE 4 compatible
-	}
-	return TOTAL_WIDTH;
+	return window.getWidth();
 }
 
 function getTotalHeight() {
-	if (TOTAL_HEIGHT != 0) {
-		return TOTAL_HEIGHT;
-	}
-	if (typeof(window.innerHeight) == 'number') {
-		TOTAL_HEIGHT = window.innerHeight; // Non-IE
-	} else if(document.documentElement && document.documentElement.clientHeight) {
-		TOTAL_HEIGHT = document.documentElement.clientHeight; // IE 6+ in 'standards compliant mode'
-	} else if(document.body && document.body.clientHeight) {
-		TOTAL_HEIGHT = document.body.clientHeight; // IE 4 compatible
-	}
-	return TOTAL_HEIGHT;
+	return window.getHeight();
 }
 
 function getRealContainerByStyle(containerID, styleClass) {
@@ -782,9 +760,28 @@ function showLayerAndResumeUpdatingTree() {
 function resizeTreeContainerInThemes(reservedHeight) {
 	var siteTreeContainer = $(ALL_CURRENT_SITE_STRUCTURE_TREE_ID);
 	if (siteTreeContainer) {
-		var height = getTotalHeight() - reservedHeight;
+		var totalHeight = getTotalHeight();
+		var height = totalHeight - reservedHeight;
 		if (height > 0) {
 			siteTreeContainer.setStyle('height', height + 'px');
 		}
+		var heightForAccordion = totalHeight - reservedHeight + 57;
+		if (heightForAccordion > 0) {
+			$('sitemap').setStyle('height', heightForAccordion + 'px');
+		}
+	}
+	
+	if (!isSiteMap()) {
+		resizeFrame();
+		resizeSlider();
+	}
+}
+
+function controlLucidAppWindow() {
+	if (isSiteMap()) {
+		resizeTreeContainerInThemes(RESERVED_HEIGHT_FOR_SITE);
+	}
+	else {
+		resizeTreeContainerInThemes(RESERVED_HEIGHT_FOR_PAGES);
 	}
 }

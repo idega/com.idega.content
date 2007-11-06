@@ -10,6 +10,7 @@ var GET_THEMES_ID = 0;
 var CLICKED_CREATE = false;
 var SLIDER_SHOWED_FIRST_TIME = true;
 var MODULES_SHOWN = false;
+var IS_USER_ADMIN = false;
 
 var KEYWORDS = null;
 
@@ -263,7 +264,7 @@ function resizeSlider() {
 function setButtonText(id, text) {
 	var button = $(id);
 	if (button != null) {
-		button.value = text;
+		button.setText(text);
 	}
 }
 
@@ -410,7 +411,7 @@ function initializePages() {
 	
 	ThemesEngine.isUserAdmin({
 		callback: function(isAdmin) {
-			$('showSourcePagesButton').setProperty('disabled', !isAdmin);
+			IS_USER_ADMIN = isAdmin;
 		}
 	});
 	
@@ -422,8 +423,10 @@ function initializePages() {
 }
 
 function registerPageInfoActions() {
-	$$('input.newPageButtonStyleClass').each(
+	$$('a.newPageButtonStyleClass').each(
 		function(element) {
+			setHrefToVoidFunction(element);
+			
 			element.addEvent('click', newPage);
     	}
     );
@@ -434,8 +437,10 @@ function registerPageInfoActions() {
     	}
     );
     
-	$$('input.showThemesButtonStyleClass').each(
+	$$('a.showThemesButtonStyleClass').each(
 		function(element) {
+			setHrefToVoidFunction(element);
+			
 			var manageSliderFunction = function() {
 				manageSlider(element.id);
 			};
@@ -443,8 +448,10 @@ function registerPageInfoActions() {
 	   	}
 	);
 	
-	$$('input.showPageModulesStyleClass').each(
+	$$('a.showPageModulesStyleClass').each(
 		function(element) {
+			setHrefToVoidFunction(element);
+			
 			var manageModulesBackgroundFunction = function() {
 				manageModulesBackground(element);
 			};
@@ -452,8 +459,10 @@ function registerPageInfoActions() {
 		}
 	);
 	
-	$$('input.showEditPagesButtonStyleClass').each(
+	$$('a.showEditPagesButtonStyleClass').each(
 		function(button) {
+			setHrefToVoidFunction(button);
+			
 			button.addEvent('click', function() {
 				SHOW_SOURCE_PAGES = false;
 				SHOW_EDIT_PAGES = true;
@@ -462,8 +471,10 @@ function registerPageInfoActions() {
 		}
 	);
 	
-	$$('input.showPreviewPagesButtonStyleClass').each(
+	$$('a.showPreviewPagesButtonStyleClass').each(
 		function(button) {
+			setHrefToVoidFunction(button);
+			
 			button.addEvent('click', function() {
 				SHOW_SOURCE_PAGES = false;
 				SHOW_EDIT_PAGES = false;
@@ -472,18 +483,26 @@ function registerPageInfoActions() {
 		}
 	);
 	
-	$$('input.showSourcePagesButtonStyleClass').each(
+	$$('a.showSourcePagesButtonStyleClass').each(
 		function(button) {
+			setHrefToVoidFunction(button);
+			
 			button.addEvent('click', function() {
-				SHOW_SOURCE_PAGES = true;
-				SHOW_EDIT_PAGES = false;
-				getPrewUrl(getPageID());
+				if (IS_USER_ADMIN) {
+					SHOW_SOURCE_PAGES = true;
+					SHOW_EDIT_PAGES = false;
+					getPrewUrl(getPageID());
+				}
 			});
 		}
 	);
 	
 	registerActionsForSiteTree();
 	boldCurrentTreeElement();
+}
+
+function setHrefToVoidFunction(element) {
+	element.setProperty('href', 'javascript:void(0)');
 }
 
 function manageModulesBackground(element) {

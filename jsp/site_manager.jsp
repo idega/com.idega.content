@@ -36,6 +36,7 @@
                 		window.addEvent('domready', getPathToImageFolder);
  	              		window.addEvent('domready', registerSiteActions);
  	              		window.addEvent('domready', enableReverseAjaxInThemes);
+ 	              		window.addEvent('resize', controlLucidAppWindow);
                 	</script>
                 </jsf:verbatim>
 			
