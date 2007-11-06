@@ -9,6 +9,7 @@ public class FileUploadViewerTag extends UIComponentTag {
 	
 	private String actionAfterUpload = null;
 	private String uploadPath = CoreConstants.CONTENT_PATH;
+	private String formId = null;
 	
 	private boolean zipFile = false;
 	private boolean extractContent = false;
@@ -34,6 +35,7 @@ public class FileUploadViewerTag extends UIComponentTag {
 			
 			uploadViewer.setActionAfterUpload(actionAfterUpload);
 			uploadViewer.setUploadPath(uploadPath);
+			uploadViewer.setFormId(formId);
 			uploadViewer.setZipFile(zipFile);
 			uploadViewer.setExtractContent(extractContent);
 			uploadViewer.setThemePack(themePack);
@@ -118,4 +120,13 @@ public class FileUploadViewerTag extends UIComponentTag {
 	public void setAllowMultipleFiles(boolean allowMultipleFiles) {
 		this.allowMultipleFiles = allowMultipleFiles;
 	}
+
+	public String getFormId() {
+		return formId;
+	}
+
+	public void setFormId(String formId) {
+		this.formId = formId;
+	}
+	
 }

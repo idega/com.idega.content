@@ -15,11 +15,12 @@ import com.idega.content.business.WebDAVUploadBean;
 import com.idega.content.upload.bean.UploadFile;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
+import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
 import com.idega.presentation.ui.FileInput;
-import com.idega.presentation.ui.GenericButton;
 import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
@@ -49,7 +50,8 @@ public class FileUploaderBean implements FileUploader {
 			return null;
 		}
 		
-		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
+		IWBundle bundle = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER);
+		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
 		String name = iwrb.getLocalizedString("remove", "Remove");
 		String message = iwrb.getLocalizedString("are_you_sure", "Are you sure?");
 		
@@ -61,7 +63,8 @@ public class FileUploaderBean implements FileUploader {
 		input.setName(ContentConstants.UPLOAD_FIELD_NAME);
 		fileInputContainer.add(input);
 		
-		GenericButton remove = new GenericButton(name);
+		Image remove = new Image(bundle.getVirtualPathWithFileNameString("images/delete.png"), name, 18, 18);
+		remove.setStyleClass("removeFileUploadInputImageStyle");
 		remove.setOnClick(new StringBuffer("removeFileInput('").append(fileInputContainer.getId()).append("', '").append(message).append("');").toString());
 		fileInputContainer.add(remove);
 		
@@ -82,19 +85,19 @@ public class FileUploaderBean implements FileUploader {
 		return builder.getRenderedComponent(iwc, getFileInput(iwc), false);
 	}
 
-	public boolean uploadFile(List<UploadFile> files, String uploadPath) {
-		return doUploading(files, uploadPath, false, false, false);
+	public boolean uploadFile(List<UploadFile> files, String uploadPath, boolean isIE) {
+		return doUploading(files, uploadPath, false, false, false, isIE);
 	}
 	
-	public boolean uploadThemePack(List<UploadFile> files, String uploadPath) {
-		return doUploading(files, uploadPath, true, true, true);
+	public boolean uploadThemePack(List<UploadFile> files, String uploadPath, boolean isIE) {
+		return doUploading(files, uploadPath, true, true, true, isIE);
 	}
 	
-	public boolean uploadZipFile(List<UploadFile> files, String uploadPath, Boolean extractContent) {
-		return doUploading(files, uploadPath, true, false, extractContent);
+	public boolean uploadZipFile(List<UploadFile> files, String uploadPath, boolean extractContent, boolean isIE) {
+		return doUploading(files, uploadPath, true, false, extractContent, isIE);
 	}
 	
-	private boolean doUploading(List<UploadFile> files, String path, boolean zipFile, boolean themePack, boolean extractContent) {
+	private boolean doUploading(List<UploadFile> files, String path, boolean zipFile, boolean themePack, boolean extractContent, boolean isIE) {
 		if (files == null || path == null) {
 			return false;
 		}
@@ -105,12 +108,12 @@ public class FileUploaderBean implements FileUploader {
 		
 		boolean result = true;
 		for (int i = 0; (i < files.size() && result); i++) {
-			result = uploadFile(files.get(i), path, zipFile, themePack, extractContent);
+			result = uploadFile(files.get(i), path, zipFile, themePack, extractContent, isIE);
 		}
 		return result;
 	}
 	
-	private boolean uploadFile(UploadFile file, String path, boolean zipFile, boolean themePack, boolean extractContent) {
+	private boolean uploadFile(UploadFile file, String path, boolean zipFile, boolean themePack, boolean extractContent, boolean isIE) {
 		if (file == null || path == null) {
 			return false;
 		}
@@ -125,15 +128,19 @@ public class FileUploaderBean implements FileUploader {
 		}
 		
 		String name = file.getName();
-		if (name.indexOf(CoreConstants.BACK_SLASH) != -1) {
+		if (name.indexOf(CoreConstants.BACK_SLASH) != -1 && isIE) {
 			name = name.substring(name.lastIndexOf(CoreConstants.BACK_SLASH) + 1);
 		}
 		
 		try {
 			if (zipFile && extractContent) {
+				if (name.indexOf(CoreConstants.DOT) != -1) {
+					name = name.substring(0, name.lastIndexOf(CoreConstants.DOT));
+				}
+				
 				WebDAVUploadBean uploadBean = new WebDAVUploadBean();
 				uploadBean.setUploadFilePath(path);
-				uploadBean.uploadZipFile(themePack, stream, slide);
+				uploadBean.uploadZipFile(themePack, name, stream, slide);
 			}
 			else {
 				return slide.uploadFileAndCreateFoldersFromStringAsRoot(path, name, stream, file.getType(), true);

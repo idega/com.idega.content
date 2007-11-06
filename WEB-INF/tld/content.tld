@@ -613,6 +613,13 @@
 			<type>boolean</type>
 			<description>Allow multiple files to be uploaded?</description>
 		</attribute>
+		<attribute>
+			<name>formId</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+			<type>java.lang.String</type>
+			<description>Form ID</description>
+		</attribute>
 	</tag>
 	
 	<tag>

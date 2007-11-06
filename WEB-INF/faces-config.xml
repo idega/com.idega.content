@@ -348,6 +348,11 @@
 			<property-name>allowMultipleFiles</property-name>
 			<property-class>boolean</property-class>
 		</property>
+		<property>
+			<display-name>Form ID</display-name>
+			<property-name>formId</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
 		<component-extension>
 			<idegaweb-info>
 				<builder-visible>true</builder-visible>

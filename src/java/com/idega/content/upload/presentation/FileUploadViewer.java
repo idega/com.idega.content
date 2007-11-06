@@ -2,14 +2,17 @@ package com.idega.content.upload.presentation;
 
 import javax.faces.context.FacesContext;
 
+import com.idega.block.web2.business.Web2Business;
 import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
+import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.content.upload.business.FileUploader;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.PresentationObjectContainer;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
@@ -19,6 +22,7 @@ public class FileUploadViewer extends Block {
 	
 	private String actionAfterUpload = null;
 	private String uploadPath = CoreConstants.CONTENT_PATH;
+	private String formId = null;
 	
 	private boolean zipFile = false;
 	private boolean extractContent = false;
@@ -69,6 +73,12 @@ public class FileUploadViewer extends Block {
 			return;
 		}
 		
+		if (themePack) {
+			ThemesHelper.getInstance(false).getSlideService(iwc);
+			zipFile = true;
+			extractContent = true;
+		}
+		
 		IWBundle bundle = getBundle(iwc);
 		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
 		
@@ -76,31 +86,37 @@ public class FileUploadViewer extends Block {
 		add(container);
 
 		StringBuffer script = new StringBuffer(getJavaScriptSourceLine(bundle.getVirtualPathWithFileNameString("javascript/FileUploadHelper.js")));
-		script.append(getJavaScriptSourceLine("http://yui.yahooapis.com/2.3.0/build/utilities/utilities.js"));
+		Web2Business web2 = (Web2Business) SpringBeanLookup.getInstance().getSpringBean(iwc, Web2Business.class);
+		script.append(getJavaScriptSourceLine(web2.getBundleURIToYUIScript()));
 		script.append(getJavaScriptSourceLine("/dwr/engine.js"));
 		script.append(getJavaScriptSourceLine("/dwr/interface/FileUploader.js"));
 		container.add(script.toString());
 		
-		Form form = new Form();
-		form.setMultiPart();
-		form.setAction("/servlet/ContentFileUploadServlet");
-		form.setMethod("post");
-		container.add(form);
+		PresentationObjectContainer mainContainer = container;
+		if (formId == null) {
+			Form form = new Form();
+			form.setMultiPart();
+			form.setAction("/servlet/ContentFileUploadServlet");
+			form.setMethod("post");
+			container.add(form);
+			mainContainer = form;
+			formId = form.getId();
+		}
 		
 		HiddenInput path = new HiddenInput(ContentConstants.UPLOADER_PATH, uploadPath);
-		form.add(path);
+		mainContainer.add(path);
 		HiddenInput zipFileValue = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_ZIP_FILE, String.valueOf(zipFile));
-		form.add(zipFileValue);
+		mainContainer.add(zipFileValue);
 		HiddenInput themePackValue = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_THEME_PACK, String.valueOf(themePack));
-		form.add(themePackValue);
+		mainContainer.add(themePackValue);
 		HiddenInput extractContentValue = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE, String.valueOf(extractContent));
-		form.add(extractContentValue);
+		mainContainer.add(extractContentValue);
 		
 		Layer fileInputs = new Layer();
 		String id = fileInputs.getId();
 		fileInputs.setStyleClass("fileUploadInputsContainerStyle");
 		fileInputs.add(uploader.getFileInput(iwc));
-		form.add(fileInputs);
+		mainContainer.add(fileInputs);
 		
 		Layer buttonsContainer = new Layer();
 		if (allowMultipleFiles) {
@@ -113,13 +129,13 @@ public class FileUploadViewer extends Block {
 		
 		String inavlidTypeMessage = iwrb.getLocalizedString("incorrect_file_type", "Unsupported file type! Only zip files allowed");
 		GenericButton upload = new GenericButton(iwrb.getLocalizedString("upload", "Upload"));
-		upload.setOnClick(getAction(id, iwrb.getLocalizedString("uploading", "Uploading..."), inavlidTypeMessage, form.getId()));
+		upload.setOnClick(getAction(id, iwrb.getLocalizedString("uploading", "Uploading..."), inavlidTypeMessage));
 		buttonsContainer.add(upload);
 		
-		form.add(buttonsContainer);
+		mainContainer.add(buttonsContainer);
 	}
 	
-	private String getAction(String id, String loadingMessage, String invalidTypeMessage, String formId) {
+	private String getAction(String id, String loadingMessage, String invalidTypeMessage) {
 		StringBuffer action = new StringBuffer("uploadFiles('").append(id).append("', '").append(loadingMessage).append("', ").append(showProgressBar).append(", ");
 		action.append(showLoadingMessage).append(", ").append(zipFile).append(", '").append(invalidTypeMessage).append("', '").append(formId).append("', ");
 		
@@ -218,6 +234,14 @@ public class FileUploadViewer extends Block {
 
 	public void setAllowMultipleFiles(boolean allowMultipleFiles) {
 		this.allowMultipleFiles = allowMultipleFiles;
+	}
+
+	public String getFormId() {
+		return formId;
+	}
+
+	public void setFormId(String formId) {
+		this.formId = formId;
 	}
 
 }

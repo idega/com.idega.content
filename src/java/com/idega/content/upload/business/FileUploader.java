@@ -16,17 +16,17 @@ public interface FileUploader {
 	/**
 	 * @see com.idega.content.upload.business.FileUploaderBean#uploadFile
 	 */
-	public boolean uploadFile(List<UploadFile> files, String uploadPath);
+	public boolean uploadFile(List<UploadFile> files, String uploadPath, boolean isIE);
 	
 	/**
 	 * @see com.idega.content.upload.business.FileUploaderBean#uploadThemePack
 	 */
-	public boolean uploadThemePack(List<UploadFile> files, String uploadPath);
+	public boolean uploadThemePack(List<UploadFile> files, String uploadPath, boolean isIE);
 	
 	/**
 	 * @see com.idega.content.upload.business.FileUploaderBean#uploadZipFile
 	 */
-	public boolean uploadZipFile(List<UploadFile> files, String uploadPath, Boolean extractContent);
+	public boolean uploadZipFile(List<UploadFile> files, String uploadPath, boolean extractContent, boolean isIE);
 	
 	/**
 	 * @see com.idega.content.upload.business.FileUploaderBean#getFileInput

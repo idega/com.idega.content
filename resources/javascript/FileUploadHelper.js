@@ -5,13 +5,25 @@ function uploadFiles(id, message, showProgressBar, showMessage, zipFile, invalid
 		return false;
 	}
 	
+	var form = null;
+	if (formId != null) {
+		form = document.getElementById(formId);
+	}
+	if (form == null) {
+		form = findElementInPage(document.getElementById(id), 'FORM');
+	}
+	if (form == null) {
+		return false;
+	}
+	if (!form.id) {
+		var tempFormId = new Date().getTime() + '_uploadForm';
+		form.setAttribute('id', tempFormId);
+		formId = tempFormId;
+	}
+	form.setAttribute('enctype', 'multipart/form-data');
+	
 	if (showMessage) {
 		showLoadingMessage(message);
-	}
-	
-	var form = document.getElementById(formId);
-	if (form == null) {
-		formId = 'uploadForm';
 	}
 	
 	YAHOO.util.Connect.setForm(formId, true);
@@ -27,6 +39,33 @@ function uploadFiles(id, message, showProgressBar, showMessage, zipFile, invalid
 		}
 	};
 	YAHOO.util.Connect.asyncRequest('POST', '/servlet/ContentFileUploadServlet', uploadHandler);
+}
+
+function findElementInPage(container, tagName) {
+	if (container == null || tagName == null) {
+		return null;
+	}
+	
+	if (container.tagName) {
+		if (container.tagName == tagName) {
+			return container;
+		}
+	}
+	
+	var children = container.childNodes;
+	if (children != null) {
+		var element = null;
+		for (var i = 0; i < children.length; i++) {
+			element = children[i];
+			if (element.tagName) {
+				if (element.tagName == tagName) {
+					return element;
+				}
+			}
+		}
+	}
+	
+	return findElementInPage(container.parentNode, tagName);
 }
 
 function executeUserDefinedActionsAfterUploadFinished(actionAfterUpload) {

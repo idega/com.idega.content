@@ -19,6 +19,7 @@ import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.upload.bean.UploadFile;
 import com.idega.content.upload.business.FileUploader;
+import com.idega.util.CoreUtil;
 
 public class ContentFileUploadServlet extends HttpServlet {
 
@@ -77,19 +78,20 @@ public class ContentFileUploadServlet extends HttpServlet {
         }
         
         if (files.size() > 0) {
+        	boolean isIE = CoreUtil.isIE(request);
         	FileUploader uploader = (FileUploader) SpringBeanLookup.getInstance().getSpringBean(request.getSession(), FileUploader.class);
         	
         	if (zipFile || themePack) {
         		if (themePack) {
         			uploadPath = ThemesConstants.THEMES_PATH;
-        			uploader.uploadThemePack(files, uploadPath);
+        			uploader.uploadThemePack(files, uploadPath, isIE);
         		}
         		else {
-        			uploader.uploadZipFile(files, uploadPath, extractContent);
+        			uploader.uploadZipFile(files, uploadPath, extractContent, isIE);
         		}
         	}
         	else {
-        		uploader.uploadFile(files, uploadPath);
+        		uploader.uploadFile(files, uploadPath, isIE);
         	}
         }
 	}

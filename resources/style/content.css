@@ -896,3 +896,7 @@ overflow: auto !important;
 	text-align: center;
 	font-size: 24pt;
 }
+
+.removeFileUploadInputImageStyle {
+	cursor: pointer;
+}
