@@ -308,15 +308,18 @@ public class WebDAVUploadBean implements Serializable{
 			return false;
 		}
 		
-		return uploadZipFile(uploadingTheme, new BufferedInputStream(uploadFile.getInputStream()), service);
+		return uploadZipFile(uploadingTheme, null, new BufferedInputStream(uploadFile.getInputStream()), service);
 	}
 	
-	public boolean uploadZipFile(boolean uploadingTheme, InputStream stream, IWSlideService slide) throws IOException {
+	public boolean uploadZipFile(boolean uploadingTheme, String fileName, InputStream stream, IWSlideService slide) throws IOException {
 		String resultInfo = null;
 		boolean result;
 		
 		if (uploadingTheme) {
-			String uploadFileName = getUploadFileName();
+			String uploadFileName = fileName;
+			if (uploadFileName == null) {
+				uploadFileName = getUploadFileName();
+			}
 			if (!uploadFileName.equals(CoreConstants.EMPTY)) {
 				uploadFilePath = ThemesHelper.getInstance(false).changeFileUploadPath(getUploadFilePath() + uploadFileName);
 			}
