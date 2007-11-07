@@ -115,7 +115,7 @@ public class FileUploadViewer extends Block {
 		Layer fileInputs = new Layer();
 		String id = fileInputs.getId();
 		fileInputs.setStyleClass("fileUploadInputsContainerStyle");
-		fileInputs.add(uploader.getFileInput(iwc, allowMultipleFiles));
+		fileInputs.add(uploader.getFileInput(iwc, false));	//	Not adding remove image - at least on file input should remain
 		mainContainer.add(fileInputs);
 		
 		Layer buttonsContainer = new Layer();
