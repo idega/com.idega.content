@@ -126,14 +126,14 @@ function proceedSaving(keywords) {
 }
 
 function saveSiteInfoCallback(result) {
-	/*if (result) {
+	if (result) {
 		getPrewUrl(getPageID());
-	}*/
+	}
 	closeAllLoadingMessages();
 }
 
 function initialiazeSiteManager() {
-	setIsSiteMap(true);
+	/*setIsSiteMap(true);
 	setNeedRedirect(false);
 	setActiveLanguage();
 	
@@ -152,7 +152,7 @@ function initialiazeSiteManager() {
 		if (siteTemplatesContainer) {
 			siteTemplatesContainer.setStyle('width', width + 'px');
 		}
-	}
+	}*/
 }
 
 function registerSiteActions() {

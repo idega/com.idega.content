@@ -39,54 +39,44 @@ version="1.2">
                 		window.addEvent('domready', initializePages);
                 		window.addEvent('domready', getPathToImageFolder);
                 		window.addEvent('domready', registerPageInfoActions);
-                		/*window.addEvent('domready', initialiazeSiteManager);
+                		window.addEvent('domready', initialiazeSiteManager);
                 		window.addEvent('domready', getPathToImageFolder);
- 	              		window.addEvent('domready', registerSiteActions);*/
+ 	              		window.addEvent('domready', registerSiteActions);
+ 	              		window.addEvent('domready', createAccordionForLucid);
+ 	              		window.addEvent('domready', createAccordionForTemplates);
  	              		window.addEvent('resize', controlLucidAppWindow);
                 	</script>
                 </f:verbatim>
                 
                 <t:div styleClass="mainPagesContentStyle">
                 	<t:div id="leftSide" forceId="true" styleClass="accordionInPages">
-						<web2:accordion accordionId="myAccordion" includeJavascript="true">
-							<f:facet name="PANELS">
-								<t:div id="accordion" forceId="true">
-									<t:div id="siteMapInformation" forceId="true" styleClass="acTogglemyAccordion">
-										<h:outputText value="#{localizedStrings['com.idega.content']['current_site_structure']}"/>
-									</t:div>
-									<t:div id="sitemap" forceId="true" styleClass="acStretchmyAccordion">
-	 									<t:div id="site_tree_container" forceId="true">
-	 										<c:block_with_toolbar id="page_tree_div" addStartPageButton="true" styleClass="site_tree_container_site_accordion" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png">
-												<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
-													<f:facet name="PageTreeNode">
-														<h:outputLink styleClass="pageTreeNames">
-															<h:outputText value="#{node.description}"/>
-														</h:outputLink>
-													</f:facet>
-												</wf:iwtree>
-											</c:block_with_toolbar>
-										</t:div>			
-									</t:div>
-											
-									<t:div id="pageInfo" forceId="true" styleClass="acTogglemyAccordion">
-										<h:outputText value="#{localizedStrings['com.idega.content']['page_info']}"/>
-									</t:div>
-									<t:div id="pageInfoToggle" forceId="true" styleClass="acStretchmyAccordion">
-										<c:PageInfo id="customizePage" styleClass="pageInfoStyle_accordion"></c:PageInfo>
-									</t:div>
-									
-									<!--
-									<t:div id="siteinformation" forceId="true" styleClass="acTogglemyAccordion">
-										<h:outputText value="#{localizedStrings['com.idega.content']['site_info']}"/>
-									</t:div>
-									<t:div id="siteInfoToggle" forceId="true" styleClass="acStretchmyAccordion">
-										<c:SiteInfo id="siteInfo" styleClass="siteInfoStyle_accordion"></c:SiteInfo>
-									</t:div>
-									-->
-								</t:div>
-							</f:facet>
-						</web2:accordion>     
-					</t:div>           
+						<t:div id="accordion" forceId="true">
+							<h:outputText styleClass="toggler atStart" value="#{localizedStrings['com.idega.content']['current_site_structure']}"/>
+							<t:div id="sitemap" forceId="true" styleClass="element atStart">
+		 						<t:div id="site_tree_container" forceId="true">
+		 							<c:block_with_toolbar id="page_tree_div" addStartPageButton="true" styleClass="site_tree_container_site_accordion" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png">
+										<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
+											<f:facet name="PageTreeNode">
+												<h:outputLink styleClass="pageTreeNames">
+													<h:outputText value="#{node.description}"/>
+												</h:outputLink>
+											</f:facet>
+										</wf:iwtree>
+									</c:block_with_toolbar>
+								</t:div>			
+							</t:div>
+							
+							<h:outputText styleClass="toggler atStart" value="#{localizedStrings['com.idega.content']['page_info']}"/>
+							<t:div id="pageInfoToggle" forceId="true" styleClass="element atStart">
+								<c:PageInfo id="customizePage" styleClass="pageInfoStyle_accordion"></c:PageInfo>
+							</t:div>
+					
+							<h:outputText styleClass="toggler atStart" value="#{localizedStrings['com.idega.content']['site_info']}"/>
+							<t:div id="siteInfoToggle" forceId="true" styleClass="element atStart">
+								<c:SiteInfo id="siteInfo" styleClass="siteInfoStyle_accordion"></c:SiteInfo>
+							</t:div>
+						</t:div>
+					</t:div>
 	
 					<t:div styleClass="pagePreviewContainer">
 						<f:verbatim>
@@ -99,17 +89,27 @@ version="1.2">
 					
 					<c:ThemesSliderViewer hiddenOnLoad="true" />
 				</t:div>
-                
-                <t:div id="newPageContainer" forceId="true" styleClass="newPageContainerStyle" style="display: none; left: 8px;">
-					<wf:iwtree value="#{siteTemplateBean.pageTree}" id="new_page_tree" var="node" varNodeToggler="t" clientSideToggle="true"	sourceTree="true"	showRootNode="false">
-						<f:facet name="IWTreeNode">						
-							<h:panelGroup>
-								<h:outputLink>
-									<h:outputText value="#{node.description}" />									
-								</h:outputLink>
-							</h:panelGroup>
-						</f:facet>
-					</wf:iwtree>
+				
+				<t:div id="newPageContainer" forceId="true" styleClass="newPageContainerStyle" style="display: none; left: 8px;">
+					<t:div id="templatesAccordion" forceId="true" styleClass="templatesAccordionStyle">
+						<t:outputText value="#{localizedStrings['com.idega.content']['page_types']}" styleClass="toggler templateTitleStyle"> </t:outputText>
+						<t:div id="pageTemplatesStretcher" forceId="true" styleClass="element templatesContainer">
+							<wf:iwtree value="#{siteTemplateBean.pageTree}" id="new_page_tree"	var="node" varNodeToggler="t" clientSideToggle="true"	sourceTree="true"	showRootNode="false">
+								<f:facet name="IWTreeNode">
+									<h:panelGroup>
+										<h:outputLink>
+											<h:outputText value="#{node.description}"/>									
+										</h:outputLink>
+									</h:panelGroup>
+								</f:facet>
+							</wf:iwtree>
+						</t:div>
+						
+						<t:outputText value="#{localizedStrings['com.idega.content']['site_templates']}" styleClass="toggler templateTitleStyle"></t:outputText>
+						<t:div id="siteTemplatesStretcher" forceId="true" styleClass="element templatesContainer">
+							<c:siteTemplatesViewer id="siteTemplates"/>
+						</t:div>
+					</t:div>
 				</t:div>
 				
 				<f:verbatim>

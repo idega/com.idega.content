@@ -785,3 +785,29 @@ function controlLucidAppWindow() {
 		resizeTreeContainerInThemes(RESERVED_HEIGHT_FOR_PAGES);
 	}
 }
+
+function createAccordionForLucid() {
+	var accordion = new Accordion('span.atStart', 'div.atStart', {
+		opacity: false,
+		onActive: function(toggler, element){
+			toggler.setStyle('font-weight', 'bold');
+		},
+ 
+		onBackground: function(toggler, element){
+			toggler.setStyle('font-weight', 'normal');
+		}
+	}, $('accordion'));
+}
+
+function createAccordionForTemplates() {
+	var accordion = new Accordion('span.templateTitleStyle', 'div.templatesContainer', {
+		opacity: false,
+		onActive: function(toggler, element){
+			toggler.setStyle('font-weight', 'bold');
+		},
+ 
+		onBackground: function(toggler, element){
+			toggler.setStyle('font-weight', 'normal');
+		}
+	}, $('templatesAccordion'));
+}

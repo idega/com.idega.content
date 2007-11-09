@@ -311,13 +311,13 @@ function resizeFrame() {
 	//	Width
 	var availableWidth = getTotalWidth() - RESERVED_WIDTH;
 	if (availableWidth > 0) {
-		frame.style.width = availableWidth + 'px';
+		frame.setStyle('width', availableWidth + 'px');
 	}
 	
 	//	Height
 	var availableHeight = getTotalHeight() - RESERVED_HEIGHT;
 	if (availableHeight > 0) {
-		frame.style.height = availableHeight + 'px';
+		frame.setStyle('height', availableHeight + 'px');
 	}
 }
 
