@@ -79,6 +79,7 @@ public class SiteViewManager {
 		DefaultViewNode siteManagerNode = new DefaultViewNode("site_manager", siteNode);
 		siteManagerNode.setJspUri(bundle.getJSPURI("site_manager.jsp"));
 		siteManagerNode.setName("#{localizedStrings['com.idega.content']['site_manager']}");
+		siteManagerNode.setVisibleInMenus(false);
 
 		DefaultViewNode treeNode = new DefaultViewNode("tree", siteNode);
 		treeNode.setJspUri(bundle.getJSPURI("tree.jsp"));
