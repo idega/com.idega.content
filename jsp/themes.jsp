@@ -5,8 +5,7 @@
         xmlns:wf="http://xmlns.idega.com/com.idega.webface"
         xmlns:ws="http://xmlns.idega.com/com.idega.workspace"
         xmlns:c="http://xmlns.idega.com/com.idega.content"
-        xmlns:t="http://myfaces.apache.org/tomahawk"
-version="1.2">
+        xmlns:t="http://myfaces.apache.org/tomahawk" version="1.2">
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 	<jsf:view>
         <ws:page id="themeManager" javascripturls="
@@ -36,15 +35,13 @@ version="1.2">
 				</jsf:verbatim>
 
 				<t:div id="mainThemesContainer" forceId="true">
-							<t:div id="themePreviewContainer" forceId="true" styleClass="themePreviewContainerStyle">
-								<jsf:verbatim>
-									<img id="themePreview" />
-								</jsf:verbatim>
-							</t:div>
-							
-							<t:div style="width: 100%; height: 1px;"></t:div>
-							
-							<c:ThemesSliderViewer />
+						<t:div id="themePreviewContainer" forceId="true" styleClass="themePreviewContainerStyle">
+							<jsf:verbatim>
+								<img id="themePreview" />
+							</jsf:verbatim>
+						</t:div>
+						
+						<c:ThemesSliderViewer />
 						
 						<t:div id="themeVariationsContainer" forceId="true" styleClass="theme_container">
 							<h:outputText styleClass="variationHeading" value="#{localizedStrings['com.idega.content']['theme_variations']}"></h:outputText>
@@ -57,7 +54,7 @@ version="1.2">
 							<t:div id="themeSaveArea" forceId="true">
 								<h:outputText styleClass="variationHeading" value="#{localizedStrings['com.idega.content']['save_theme']}"></h:outputText>
 								<t:div styleClass="wf_webdav_upload">
-									<h:outputText value="#{localizedStrings['com.idega.content']['theme_name']}"></h:outputText>
+									<h:outputText styleClass="inputLabel" value="#{localizedStrings['com.idega.content']['theme_name']}"></h:outputText>
 									<t:inputText id="theme_name" forceId="true"></t:inputText>
 									<t:div>
 										<t:commandButton id="changeVariationsButton" type="button" forceId="true" onclick="changeVariations()" title="#{localizedStrings['com.idega.content']['change_variations']}" value="#{localizedStrings['com.idega.content']['change']}"></t:commandButton>

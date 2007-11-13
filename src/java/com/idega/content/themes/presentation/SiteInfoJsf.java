@@ -3,7 +3,7 @@ package com.idega.content.themes.presentation;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.presentation.IWContext;
-import com.idega.presentation.Table2;
+import com.idega.presentation.Layer;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.webface.WFBlock;
@@ -17,6 +17,7 @@ public class SiteInfoJsf extends SiteInfo {
 		super();
 	}
 	
+	@Override
 	public void main(IWContext iwc) throws Exception {
 		WFBlock siteInfo = new WFBlock();
 		if (styleClass != null) {
@@ -30,29 +31,35 @@ public class SiteInfoJsf extends SiteInfo {
 		DropdownMenu locales = getLocales(iwc, false, "getValues(this)");
 		locales.setId("siteInfoLocale");
 		
-		Table2 table = new Table2();
-		table.setCellpadding(0);
-		createTableBody(table.createBodyRowGroup(), iwc, false, true);
-		siteInfo.add(table);
+		createContents(siteInfo, iwc, false, true);
 		
-		siteInfo.add(getText(ContentUtil.getBundle().getLocalizedString("locale") + ": ", false));
-		siteInfo.add(locales);
+		Layer formItem = new Layer();
+		formItem.setStyleClass("webfaceFormItem");
+		formItem.add(getLabel(ContentUtil.getBundle().getLocalizedString("locale"), locales));
+		formItem.add(locales);
+		siteInfo.getChildren().add(formItem);
 		
+		Layer buttonLayer = new Layer();
+		buttonLayer.setStyleClass("webfaceButtonLayer");
+		siteInfo.getChildren().add(buttonLayer);
+
 		GenericButton save = new GenericButton(ContentUtil.getBundle().getLocalizedString("save"));
 		save.setStyleClass("button");
 		save.setId("saveSiteInfoButton");
 		save.setOnClick("saveSiteInfo()");
-		siteInfo.add(save);
+		buttonLayer.add(save);
 		
 		add(siteInfo);
 		
 		doBusiness(iwc, ThemesHelper.getInstance().getThemeSettings().values());
 	}
 
+	@Override
 	public String getStyleClass() {
 		return styleClass;
 	}
 
+	@Override
 	public void setStyleClass(String styleClass) {
 		this.styleClass = styleClass;
 	}

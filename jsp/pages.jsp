@@ -51,7 +51,9 @@ version="1.2">
                 <t:div styleClass="mainPagesContentStyle">
                 	<t:div id="leftSide" forceId="true" styleClass="accordionInPages">
 						<t:div id="accordion" forceId="true">
-							<h:outputText styleClass="toggler atStart" value="#{localizedStrings['com.idega.content']['current_site_structure']}"/>
+							<t:htmlTag styleClass="toggler atStart firstToggler" value="span">
+								<h:outputText styleClass="title" value="#{localizedStrings['com.idega.content']['current_site_structure']}"/>
+							</t:htmlTag>
 							<t:div id="sitemap" forceId="true" styleClass="element atStart">
 		 						<t:div id="site_tree_container" forceId="true">
 		 							<c:block_with_toolbar id="page_tree_div" addStartPageButton="true" styleClass="site_tree_container_site_accordion" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png">
@@ -66,12 +68,16 @@ version="1.2">
 								</t:div>			
 							</t:div>
 							
-							<h:outputText styleClass="toggler atStart" value="#{localizedStrings['com.idega.content']['page_info']}"/>
+							<t:htmlTag styleClass="toggler atStart" value="span">
+								<h:outputText styleClass="title" value="#{localizedStrings['com.idega.content']['page_info']}"/>
+							</t:htmlTag>
 							<t:div id="pageInfoToggle" forceId="true" styleClass="element atStart">
 								<c:PageInfo id="customizePage" styleClass="pageInfoStyle_accordion"></c:PageInfo>
 							</t:div>
 					
-							<h:outputText styleClass="toggler atStart" value="#{localizedStrings['com.idega.content']['site_info']}"/>
+							<t:htmlTag styleClass="toggler atStart" value="span">
+								<h:outputText styleClass="title" value="#{localizedStrings['com.idega.content']['site_info']}"/>
+							</t:htmlTag>
 							<t:div id="siteInfoToggle" forceId="true" styleClass="element atStart">
 								<c:SiteInfo id="siteInfo" styleClass="siteInfoStyle_accordion"></c:SiteInfo>
 							</t:div>

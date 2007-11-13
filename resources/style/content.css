@@ -329,29 +329,31 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	overflow: hidden;
 	width: auto !important;
 	position: absolute;
-	left: 24px;
-	right: 24px;	
+	left: 28px;
+	right: 32px;	
 }
 
 .themesSlider {
+	border: 1px #cdcdcd solid;
 	position: absolute;
-	left: 8px;
-	right: 268px;
+	left: 5px;
+	right: 262px;
 	width: auto;
 	overflow: hidden;
 	height: 150px;
-	background-color: #000000;
+	background: url(images/sub_navigation_background.gif) left bottom repeat-x #fff;
 	
 	top: expression(document.body.clientHeight ? document.body.clientHeight - 218 + 'px' : document.documentElement.clientHeight - 218 + 'px');
 }
 
 html>body .themesSlider {
 	top: auto;
-	bottom: 8px;
+	bottom: 5px;
 }
 
 .themeScroller {
 	z-index: 9999;
+	padding: 0 4px;
 	padding-top: 64px;
 	cursor: pointer;
 	float: left;
@@ -365,25 +367,23 @@ html>body .themesSlider {
 	
 }
 
-.theme_image {
-}
-
 .themeName {
 	text-align: center;
-	color: #FFFFFF;
+	color: #a1a1a1;
 	clear: left;
-	font-family: Trebuchet MS,Verdana,Sans-serif;
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
 	width: 152px;
 	height: 12px;
-	overflow: hidden;	
+	overflow: hidden;
+	font-size: 10px;
 }
 
 .usedThemeName {
-	color: #FFCC00;
+	color: #1f1f1f;
 }
 
 .selectedThemeName {
-	color: #025FD0;
+	color: #1f1f1f;
 }
 
 .themesTicker {
@@ -453,10 +453,57 @@ html>body .themesSlider {
 }
 
 .pageInfoStyle_accordion {
-	background-color: #E8E8E8;
 	width: auto;
-	height: 200px;
-	border: 1px solid #D7D7D7;
+	border-bottom: 1px #cacaca solid;
+	overflow: hidden;
+	padding: 0;
+}
+
+.webfaceFormSection, .siteInfoStyle_accordion .wf_blockmainarea {
+	margin: 0 !important;
+	padding: 6px !important;
+}
+
+.webfaceFormItem {
+	margin: 0 !important;
+	padding: 0 !important;
+	overflow: hidden;
+	margin-bottom: 6px !important;
+}
+
+.webfaceFormItem label {
+	display: block;
+	float: left;
+	width: 120px;
+	line-height: 19px;	
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #1f1f1f;	
+}
+
+.webfaceFormItem input {
+	float: left;
+	width: 120px;
+	margin: 0 !important;
+	padding: 2px 4px;
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #1f1f1f;	
+}
+
+.webfaceButtonLayer {
+	margin: 0 !important;
+	text-align: right;
+	padding: 0 12px 12px 0 !important;	
+}
+
+.webfaceButtonLayer input {
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif !important;
+	margin: 0 !important;
+	font-size: 12px !important;
+	text-transform: capitalize !important;
+	padding: 3px 5px;
+	
 }
 
 .buttonsContainerStyle {
@@ -477,7 +524,6 @@ html>body .themesSlider {
 }
 
 .siteInfoStyle_accordion {
-	border: 1px solid #D7D7D7;
 	overflow: auto;
 }
 
@@ -620,14 +666,23 @@ html>body .themesSlider {
 /* Various site manager styles */
 
 #pagesTypesContainer{
+	border: 1px #cacaca solid;
+	bottom: 5px;
+	top: auto;
+	background-color: #fff;
 }
 
 div.siteTemplatesContainerStyle {
 	border-width: 1px;
 	border-color: #D7D7D7;
 	border-style: solid;
-	background-color:#E8E8E8;
+	background-color: #fff;
 	overflow: auto;
+	position: absolute;
+	top: 5px;
+	left: 280px;
+	right: 5px;
+	width: auto !important;
 }
 
 div.siteTemplatesContainerStyle ul {
@@ -635,8 +690,14 @@ div.siteTemplatesContainerStyle ul {
 }
 
 .siteTemplatesLabelStyle {
+	border-bottom: 1px #bdbdbd solid;
+	background: url(images/accordion_title.gif) top left repeat-x #d1d1d1;
+	line-height: 16px;
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+	color: #3d3d3d;
+	padding: 0 6px;
 	font-weight: bold;
-	margin: 4px;
+	display: block;
 }
 
 div#siteTemplatesContainer div.siteTemplatesContainer .wf_blockmainarea #site_templates .accordionTabContentBox{
@@ -784,6 +845,10 @@ margin: 0 !important;
 	background: #fff;
 }
 
+#siteInfoToggle .wf_blockmainarea {
+	background: #fff;	
+}
+
 /* Various site manager styles end */
 
 /*IE7 workspace quickfix*/
@@ -829,6 +894,7 @@ overflow: auto !important;
 .accordionInPages {
 	width : 250px;
 	float: left;
+	background-color: #fff;
 }
 
 #site_tree_container .site_tree_container_site_accordion {
@@ -899,4 +965,171 @@ overflow: auto !important;
 
 .removeFileUploadInputImageStyle {
 	cursor: pointer;
+}
+
+.mainPagesContentStyle {
+	position: absolute;
+	top: 0;
+	right: 0;
+	left: 0;
+	width: auto;
+	bottom: 57px;
+	overflow: hidden;
+}
+
+body.site_manager .mainPagesContentStyle {
+bottom: 0;
+}
+
+.accordionInPages {
+	position: absolute;
+	margin: 0;
+	top: 5px;
+	left: 5px;
+	bottom: 5px;
+	height: auto;
+	width: 268px;
+	overflow: hidden;
+	border: 1px #cacaca solid;
+}
+
+.pagePreviewContainer {
+	border: 1px #cacaca solid;
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	top: 5px;
+	right: 5px;
+	bottom: 5px;
+	left: 280px;
+	overflow: hidden;
+}
+
+.pagePreviewContainer iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: 100% !important;
+	height: 100% !important;
+}
+
+.pageInfoButtonsContainer {
+	border-top: 1px #959494 solid;
+	position: absolute;
+	bottom: 0;
+	height: 55px;
+	right: 0;
+	left: 0;
+	width: auto;
+	background: url(images/bottom_tiler.gif) top left repeat-x #c7c6c6;
+}
+
+.rightButtonStyle {
+	padding-right: 12px;
+}
+
+.pageInfoButtonsContainer a {
+	display: block;
+	float: left;
+	padding-top: 30px;
+	margin-top: 7px;
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #131313;
+	margin-left: 25px;
+	margin-right: 13px;
+	width: 24px;
+}
+
+html>body .pageInfoButtonsContainer a {
+	min-width: 24px;
+	width: auto;	
+}
+
+a#newPageButton {
+	background: url(images/new_24.gif) top center no-repeat;
+}
+
+a#showPageModules {
+	background: url(images/sinfo_24.gif) top center no-repeat;
+}
+
+a#showThemesButton {
+	background: url(images/lgicn_24.gif) top center no-repeat;
+}
+
+a#showEditPagesButton {
+	background: url(images/edit_24.gif) top center no-repeat;
+}
+
+a#showSourcePagesButton {
+	background: url(images/script_24.gif) top center no-repeat;
+}
+
+a#showPreviewPagesButton {
+	background: url(images/opnbr_24.gif) top center no-repeat;
+}
+
+#accordion {
+	background-color: #fff;
+}
+
+#accordion .toggler {
+	border-bottom: 1px #bdbdbd solid;
+	background: url(images/accordion_title.gif) top left repeat-x #d1d1d1;
+	line-height: 18px;
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+	color: #3d3d3d;
+	padding: 0 6px;
+	font-weight: bold;
+	display: block;
+}
+
+#accordion .toggler .title {
+	line-height: 18px;
+	padding-left: 16px;
+	display: block;
+	background: url(images/arrow_right.gif) left 4px no-repeat;
+}
+
+#accordion .selectedToggler, #accordion .firstToggler {
+	border-top: 0;
+}
+
+#accordion .selectedToggler .title {
+	background: url(images/arrow_down.gif) left 4px no-repeat;
+}
+
+#site_tree_container .wf_menuheader {
+	background-color: #fff;
+}
+
+#div_id_current_structure_tree {
+	background-color: #fff;
+}
+
+ul#page_tree_div {
+	margin: 0;
+	padding: 0;
+}
+
+ul#page_tree_div li {
+	line-height: 22px;
+}
+
+ul#page_tree_div li img {
+	vertical-align: middle;
+}
+
+ul#page_tree_div li a {
+	margin-left: 5px;
+	line-height: 22px;
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+	color: #3d3d3d
+}
+
+ul#page_tree_div li ul {
+	padding-left: 18px;
 }

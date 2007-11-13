@@ -1,6 +1,5 @@
 .theme_container {
 	width: 250px;
-	border: 1px solid #f00;
 	border-width: 1px 0 0 1px;
 	float: right;
 	overflow: auto;
@@ -8,9 +7,9 @@
 
 #themePreviewContainer {
 	position: absolute;
-	top: 8px;
-	left: 8px;
-	right: 268px;
+	top: 5px;
+	left: 5px;
+	right: 262px;
 	overflow: hidden;
 	width: auto;
 	border: 1px #cdcdcd solid;	
@@ -19,7 +18,7 @@
 }
 
 html>body #themePreviewContainer {
-	bottom: 165px;
+	bottom: 162px;
 	height: auto;
 }
 
@@ -29,18 +28,18 @@ html>body #themePreviewContainer {
 
 #mainThemesContainer {
 	position: absolute;
-	top: 55px;
-	left: 202px !important;
-	right: 5px !important;
-	border: 1px #cdcdcd solid;
+	top: 0px;
+	left: 0px !important;
+	right: 0px !important;
+	border: 0px !important;
 	margin: 0 !important;
 
-	height: expression(document.body.clientHeight ? document.body.clientHeight - 60 + 'px' : document.documentElement.clientHeight - 60 + 'px');
-	width: expression(document.body.clientWidth ? document.body.clientWidth - 207 + 'px' : document.documentElement.clientWidth - 207 + 'px');
+	height: expression(document.body.clientHeight ? document.body.clientHeight - 80 + 'px' : document.documentElement.clientHeight - 60 + 'px');
+	width: expression(document.body.clientWidth ? document.body.clientWidth - 203 + 'px' : document.documentElement.clientWidth - 203 + 'px');
 }
 
 html>body #mainThemesContainer {
-	bottom: 5px;
+	bottom: 0px;
 	height: auto;
 	width: auto !important;
 }
@@ -52,8 +51,8 @@ html>body #mainThemesContainer {
 	right: 0;
 	border: 1px #0f0 solid;
 	
-	height: expression(document.body.clientHeight ? document.body.clientHeight - 60 + 'px' : document.documentElement.clientHeight - 60 + 'px');
-	width: expression(document.body.clientWidth ? document.body.clientWidth - 207 + 'px' : document.documentElement.clientWidth - 207 + 'px');
+	height: expression(document.body.clientHeight ? document.body.clientHeight - 80 + 'px' : document.documentElement.clientHeight - 80 + 'px');
+	width: expression(document.body.clientWidth ? document.body.clientWidth - 203 + 'px' : document.documentElement.clientWidth - 203 + 'px');
 }
 
 html>body #mainThemesContentContainer {
@@ -64,16 +63,15 @@ html>body #mainThemesContentContainer {
 
 #themeVariationsContainer {
 	position: absolute;
-	top: 8px;
-	right: 8px;
+	top: 5px;
+	right: 5px;
 	width: 252px;
-	border: 1px #cdcdcd solid;
 
-	height: expression(document.body.clientHeight ? document.body.clientHeight - 76 + 'px' : document.documentElement.clientHeight - 76 + 'px');
+	height: expression(document.body.clientHeight ? document.body.clientHeight - 96 + 'px' : document.documentElement.clientHeight - 96 + 'px');
 }
 
 html>body #themeVariationsContainer {
-	bottom: 8px;
+	bottom: 5px;
 	height: auto !important;
 }
 
@@ -82,6 +80,7 @@ html>body #themeVariationsContainer {
 	padding: 8px;
 	background-color: #ffff44;
 	font-weight: bold;
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
 	font-size: 12px;
 	display: block;
 }
@@ -90,37 +89,70 @@ span.variationHeading {
 	display: block;
 	margin: 0 !important;
 	border-bottom: 1px #cdcdcd solid;
-	font-size: 12px;
+	font-size: 11px;
 	line-height: 20px;
 	padding: 0 8px;
-	background-color: #a1a1a1;
-	color: #fff;
+	background: url(images/sub_navigation_background.gif) left bottom repeat-x #c6cbc8;
+	color: #1f1f1f;
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
 }
 
 #themeSaveArea {
-	bottom: 89px;
+	bottom: 106px;
 	height: 88px;
+	border: 1px #cdcdcd solid;
 	position: absolute;
 	left: 0;
 	padding: 0;
 	margin: 0 !important;
 	width: 250px;
+	background-color: #fff;
 }
 
-html>body #themeSaveArea {
-	width: 252px;	
+#themeSaveArea .wf_webdav_upload {
+	padding: 5px;
+}
+
+#themeSaveArea .wf_webdav_upload .inputLabel {
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+	color: #1f1f1f;
+	margin-right: 8px;
+	float: left;
+	line-height: 18px;
+}
+
+#themeSaveArea .wf_webdav_upload input {
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+	color: #1f1f1f;
+	margin-right: 8px;
+	margin-bottom: 6px;
+	float: left !important;
+	width: 130px;
+	font-weight: normal;
+	padding: 2px 3px;
+}
+
+#themeSaveArea .wf_webdav_upload div {
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+	color: #1f1f1f;
+	font-weight: normal;
+}
+
+#themeSaveArea .wf_webdav_upload div input {
+	float: none;
+	width: auto;
+	margin-right: 4px;
+	margin-left: 0;
 }
 
 #themeVariationsContainer div.uploadForm {
+	background-color: #fff;
 	bottom: 0;
 	left: 0;
 	width: 250px;
-	height: 88px;
+	height: 100px;
 	position: absolute;
-}
-
-html>body #themeVariationsContainer div.uploadForm {
-	width: 252px;	
+	border: 1px #cdcdcd solid;
 }
 
 #themeVariationsContainer div.uploadForm h1 {
@@ -134,9 +166,11 @@ html>body #themeVariationsContainer div.uploadForm {
 }
 
 #themeStyleVariationsBlock {
+	background-color: #fff;
 	position: absolute;
-	top: 21px;
-	bottom: 177px;
+	top: 20px;
+	bottom: 200px;
+	border: 1px #cdcdcd solid;
 	height: auto;
 	left: 0;
 	right: 0;
@@ -162,9 +196,49 @@ div#mainThemesContentContainer {
 
 .theme_container ul {
 	margin: 0;
+	padding: 0;
+}
+
+.theme_container ul li ul {
 	padding: 5px;
 }
 
+.themeVariationGroupName {
+	color: #fff;
+	line-height: 18px;
+	padding: 0 5px;
+	background: url(images/sub_navigation_background.gif) left bottom repeat-x #c6cbc8;
+	color: #1f1f1f;
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-weight: normal;
+}
+
 .themeVariationGroup li input{
-	margin-bottom: -2px;
+	vertical-align: middle;
+}
+
+.themeVariationGroup li {
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+}
+
+.reload_properties_for_theme {
+	position: absolute;
+	top: 40px;
+	right: 0px;
+}
+
+.fileUploadInputsContainerStyle {
+	padding: 5px;
+}
+
+input.fileUploadInputStyle {
+	width: auto !important;
+	clear: both;
+}
+
+.fileUploadInputsContainerStyle img {
+	display: block;
 }

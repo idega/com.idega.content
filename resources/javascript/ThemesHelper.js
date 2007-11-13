@@ -1,8 +1,8 @@
 var PAGE_ID = null;
 
 var RESERVED_HEIGHT = 82;
-var RESERVED_HEIGHT_FOR_PAGES = RESERVED_HEIGHT + 93;
-var RESERVED_HEIGHT_FOR_SITE = RESERVED_HEIGHT + 63;
+var RESERVED_HEIGHT_FOR_PAGES = RESERVED_HEIGHT + 179;
+var RESERVED_HEIGHT_FOR_SITE = RESERVED_HEIGHT + 94;
 
 var IS_SITE_MAP = false;
 var NEED_RELOAD_BUILDER_PAGE = false;
@@ -789,12 +789,13 @@ function controlLucidAppWindow() {
 function createAccordionForLucid() {
 	var accordion = new Accordion('span.atStart', 'div.atStart', {
 		opacity: false,
+		display: 0,
 		onActive: function(toggler, element){
-			toggler.setStyle('font-weight', 'bold');
+			toggler.addClass('selectedToggler');
 		},
  
 		onBackground: function(toggler, element){
-			toggler.setStyle('font-weight', 'normal');
+			toggler.removeClass('selectedToggler');
 		}
 	}, $('accordion'));
 }
@@ -803,11 +804,11 @@ function createAccordionForTemplates() {
 	var accordion = new Accordion('span.templateTitleStyle', 'div.templatesContainer', {
 		opacity: false,
 		onActive: function(toggler, element){
-			toggler.setStyle('font-weight', 'bold');
+			toggler.addClass('selectedToggler');
 		},
  
 		onBackground: function(toggler, element){
-			toggler.setStyle('font-weight', 'normal');
+			toggler.removeClass('selectedToggler');
 		}
 	}, $('templatesAccordion'));
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentRSSProducer.java,v 1.8 2007/10/17 15:09:42 valdas Exp $
+ * $Id: ContentRSSProducer.java,v 1.9 2007/11/13 09:31:48 laddi Exp $
  * Created on Sep 13, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -21,7 +21,6 @@ import java.util.Map;
 import javax.servlet.ServletException;
 
 import org.apache.commons.httpclient.HttpException;
-import org.apache.slide.event.ContentEvent;
 import org.apache.webdav.lib.WebdavResources;
 
 import com.idega.block.rss.business.RSSAbstractProducer;
@@ -44,10 +43,10 @@ import com.sun.syndication.feed.synd.SyndFeedImpl;
  * The rss file for a folder is called "content.xml" and is stored in a hidden folder called ".rss" under the folder that was requested.
  * An IWSlideChangeListener see's to it that a cachemap containing which rssfiles are up to date is invalidated.
  * 
- *  Last modified: $Date: 2007/10/17 15:09:42 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/11/13 09:31:48 $ by $Author: laddi $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class ContentRSSProducer extends RSSAbstractProducer implements RSSProducer, IWSlideChangeListener {
 
@@ -63,6 +62,7 @@ public class ContentRSSProducer extends RSSAbstractProducer implements RSSProduc
 	/**
 	 * @see com.idega.block.rss.business.RSSProducer
 	 */
+	@Override
 	public void handleRSSRequest(RSSRequest rssRequest) throws IOException {
 		//Take the request uri and get the extrauri part of it
 		//the extra part refers to a folder and should end with a "/", add it if missing

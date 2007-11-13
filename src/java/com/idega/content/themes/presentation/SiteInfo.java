@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.faces.component.UIComponent;
+
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.business.ThemesEngine;
 import com.idega.content.themes.helpers.Setting;
@@ -13,13 +15,11 @@ import com.idega.core.builder.data.ICDomain;
 import com.idega.core.localisation.presentation.LocalePresentationUtil;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
-import com.idega.presentation.Table2;
-import com.idega.presentation.TableCell2;
-import com.idega.presentation.TableRow;
-import com.idega.presentation.TableRowGroup;
-import com.idega.presentation.text.Text;
+import com.idega.presentation.Layer;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
+import com.idega.presentation.ui.InterfaceObject;
+import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextInput;
 import com.idega.util.CoreConstants;
@@ -40,6 +40,7 @@ public class SiteInfo extends Block {
 		super();
 	}
 	
+	@Override
 	public void main(IWContext iwc) throws Exception {
 		addForm(iwc);
 	}
@@ -59,13 +60,8 @@ public class SiteInfo extends Block {
 		return locales;
 	}
 	
-	protected void createTableBody(TableRowGroup group, IWContext iwc, boolean boldText, boolean addKeyPressAction) {
-		TableRow row = null;
-		TableCell2 cell = null;
-		
+	protected void createContents(UIComponent layer, IWContext iwc, boolean boldText, boolean addKeyPressAction) {
 		Setting setting = null;
-		String value = null;
-		TextInput regionValue = null;
 		List <Setting> settings = new ArrayList <Setting> (ThemesHelper.getInstance().getThemeSettings().values());
 		if (settings == null) {
 			return;
@@ -73,26 +69,26 @@ public class SiteInfo extends Block {
 		if (locale == null) {
 			return;
 		}
+
 		ThemesEngine engine = ThemesHelper.getInstance().getThemesEngine();
 		ICDomain domain = iwc.getIWMainApplication().getIWApplicationContext().getDomain();
 		String keyPressAction = "return saveSiteInfoWithEnter(event)";
 		for (int i = 0; i < settings.size(); i++) {
 			setting = settings.get(i);
-			row = group.createRow();
-			cell = row.createCell();
-			cell.add(getText(setting.getLabel(), boldText));
 			
-			cell = row.createCell();
+			Layer formItem = new Layer();
+			formItem.setStyleClass("webfaceFormItem");
 			if (TYPE_TEXT.equals(setting.getType())) {
-				regionValue = new TextInput(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + CoreConstants.DOT +
-						REGION_VALUE);
+				TextInput regionValue = new TextInput(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + CoreConstants.DOT + REGION_VALUE);
 				if (addKeyPressAction) {
 					regionValue.setOnKeyPress(keyPressAction);
 				}
 				regionValue.setId(setting.getCode());
-				value = engine.getSiteInfoValue(setting.getCode(), locale, iwc.getApplicationSettings(), domain);
-				regionValue.setValue(value);
-				cell.add(regionValue);
+				regionValue.setValue(engine.getSiteInfoValue(setting.getCode(), locale, iwc.getApplicationSettings(), domain));
+				
+				formItem.add(getLabel(setting.getLabel(), regionValue));
+				formItem.add(regionValue);
+				layer.getChildren().add(formItem);
 			}
 		}
 	}
@@ -101,29 +97,32 @@ public class SiteInfo extends Block {
 		Form form = new Form();
 		form.maintainParameter(ACTION_PARAMETER);
 		form.maintainParameter(PARAMETER_CLASS_NAME);
+		form.setID("siteInfoForm");
 		
-		Table2 table = new Table2();
-		table.setCellpadding(0);
-		form.add(table);
-		
-		TableRowGroup group = table.createHeaderRowGroup();
-		TableRow row = group.createRow();
-		form.add(getText(ContentUtil.getBundle().getLocalizedString("locale") + ": ", true));
-		form.add(getLocales(iwc, true, null));
-
-		TableCell2 cell = row.createHeaderCell();
-		cell.add(new Text(ContentUtil.getBundle().getLocalizedString("region")));
-
-		cell = row.createHeaderCell();
-		cell.add(new Text(ContentUtil.getBundle().getLocalizedString("value")));
+		Layer layer = new Layer();
+		layer.setStyleClass("webfaceFormSection");
+		form.add(layer);
 		
 		doBusiness(iwc, ThemesHelper.getInstance().getThemeSettings().values());
-		createTableBody(table.createBodyRowGroup(), iwc, true, false);
+		createContents(layer, iwc, true, false);
 		
+		DropdownMenu locales = getLocales(iwc, true, null);
+		
+		Layer formItem = new Layer();
+		formItem.setStyleClass("webfaceFormItem");
+		formItem.add(getLabel(ContentUtil.getBundle().getLocalizedString("locale"), locales));
+		formItem.add(locales);
+		layer.add(formItem);
+		
+		Layer buttonLayer = new Layer();
+		buttonLayer.setStyleClass("webfaceButtonLayer");
+		form.add(buttonLayer);
+
 		SubmitButton save = new SubmitButton(ContentUtil.getBundle().getLocalizedString("save"), SAVE_PARAMETER, SAVE_ACTION);
 		save.setStyleClass("button");
 		save.setID(SAVE_ACTION);
-		form.add(save);		
+		buttonLayer.add(save);
+		
 		add(form);
 	}
 	
@@ -148,11 +147,9 @@ public class SiteInfo extends Block {
 		ThemesHelper.getInstance().getThemesEngine().saveSiteInfo(locale, keywords, values);
 	}
 	
-	protected Text getText(String text, boolean bold) {
-		Text T = new Text(text);
-		T.setBold(bold);
-		T.setFontFace(Text.FONT_FACE_VERDANA);
-		return T;
+	protected Label getLabel(String text, InterfaceObject component) {
+		Label label = new Label(text, component);
+		return label;
 	}
 	
 }

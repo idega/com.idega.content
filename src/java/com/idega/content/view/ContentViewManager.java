@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.36 2007/08/07 08:33:00 valdas Exp $
+ * $Id: ContentViewManager.java,v 1.37 2007/11/13 09:31:48 laddi Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -29,15 +29,16 @@ import com.idega.repository.data.Singleton;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2007/08/07 08:33:00 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/11/13 09:31:48 $ by $Author: laddi $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.36 $
+ * @version $Revision: 1.37 $
  */
 public class ContentViewManager implements Singleton  {
 
 	private static final String IW_CONTENT_VIEW_MANAGER_KEY = "iw_contentviewmanager";
 	private static final String CONTENT_ID="content";
+	private static final String DOCUMENTS_ID="documents";
 	private ViewNode contentRootNode = null;
 	private IWMainApplication iwma = null;
 	
@@ -95,10 +96,10 @@ public class ContentViewManager implements Singleton  {
 		
 		/* Page nodes begin */
 
-		DefaultViewNode siteNode = new DefaultViewNode("pages", contentNode);
+		/*DefaultViewNode siteNode = new DefaultViewNode("pages", contentNode);
 		siteNode.setJspUri(bundle.getJSPURI("pages.jsp"));
 		siteNode.setKeyboardShortcut(new KeyboardShortcut("p"));
-		siteNode.setName("#{localizedStrings['com.idega.content']['pages']}");
+		siteNode.setName("#{localizedStrings['com.idega.content']['pages']}");*/
 		
 //		DefaultViewNode siteNode = new DefaultViewNode("site", contentNode);
 //		siteNode.setJspUri(bundle.getJSPURI("pages.jsp"));
@@ -158,7 +159,18 @@ public class ContentViewManager implements Singleton  {
 //		templatesTemplateNode.setVisibleInMenus(false);
 		/* Page nodes end */
 		
-		
+		/*Collection<String> roles = new ArrayList<String>();
+		roles.add(StandardRoles.ROLE_KEY_EDITOR);
+		roles.add(StandardRoles.ROLE_KEY_AUTHOR);
+
+		ViewNode root = getViewManager().getWorkspaceRoot();
+		DefaultViewNode documentsNode = new ApplicationViewNode(DOCUMENTS_ID,root);
+		//documentsNode.setJspUri(bundle.getJSPURI("documents.jsp"));
+		documentsNode.setAuthorizedRoles(roles);
+		documentsNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
+		documentsNode.setKeyboardShortcut(new KeyboardShortcut("d"));
+		documentsNode.setName("#{localizedStrings['com.idega.content']['documents']}");*/
+
 		DefaultViewNode documentsNode = new DefaultViewNode("documents",contentNode);
 		//documentsNode.setJspUri(bundle.getJSPURI("documents.jsp"));
 		documentsNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
