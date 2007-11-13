@@ -98,7 +98,9 @@ version="1.2">
 				
 				<t:div id="newPageContainer" forceId="true" styleClass="newPageContainerStyle" style="display: none; left: 8px;">
 					<t:div id="templatesAccordion" forceId="true" styleClass="templatesAccordionStyle">
-						<t:outputText value="#{localizedStrings['com.idega.content']['page_types']}" styleClass="toggler templateTitleStyle"> </t:outputText>
+						<t:htmlTag styleClass="toggler templateTitleStyle" value="span">
+							<t:outputText value="#{localizedStrings['com.idega.content']['page_types']}" styleClass="title"> </t:outputText>
+						</t:htmlTag>
 						<t:div id="pageTemplatesStretcher" forceId="true" styleClass="element templatesContainer">
 							<wf:iwtree value="#{siteTemplateBean.pageTree}" id="new_page_tree"	var="node" varNodeToggler="t" clientSideToggle="true"	sourceTree="true"	showRootNode="false">
 								<f:facet name="IWTreeNode">
@@ -111,7 +113,9 @@ version="1.2">
 							</wf:iwtree>
 						</t:div>
 						
-						<t:outputText value="#{localizedStrings['com.idega.content']['site_templates']}" styleClass="toggler templateTitleStyle"></t:outputText>
+						<t:htmlTag styleClass="toggler templateTitleStyle" value="span">
+							<t:outputText value="#{localizedStrings['com.idega.content']['site_templates']}" styleClass="title"></t:outputText>
+						</t:htmlTag>
 						<t:div id="siteTemplatesStretcher" forceId="true" styleClass="element templatesContainer">
 							<c:siteTemplatesViewer id="siteTemplates"/>
 						</t:div>

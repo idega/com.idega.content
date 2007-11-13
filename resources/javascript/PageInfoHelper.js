@@ -2,7 +2,7 @@ var THEME_ID = null;
 
 var SCROLLER_IMAGE_WIDTH = 23;
 var FRAME_CHANGE = 153;
-var RESERVED_WIDTH = 281;
+var RESERVED_WIDTH = 280;
 var SHOW_ELEMENT_TRANSITION_DURATION = 500;
 var SET_DISPLAY_PROPERTY_ID = 0;
 var GET_THEMES_ID = 0;
@@ -83,8 +83,9 @@ function showSlider(container) {
 	
 	container = $(container);
 	container.setStyle('position', 'absolute');
-	container.setStyle('bottom', '6px');
+	container.setStyle('bottom', '5px');
 	container.setStyle('left', RESERVED_WIDTH + 'px');
+	container.setStyle('right', '5px');
 	
 	var showSlider = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 	showSlider.start(0, 1);
