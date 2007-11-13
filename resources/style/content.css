@@ -1021,27 +1021,27 @@ html>body .pageInfoButtonsContainer a {
 	width: auto;
 }
 
-a#newPageButton {
+.pageInfoButtonsContainer a#newPageButton {
 	background: url(images/new_24.gif) top center no-repeat;
 }
 
-a#showPageModules {
+.pageInfoButtonsContainer a#showPageModules {
 	background: url(images/sinfo_24.gif) top center no-repeat;
 }
 
-a#showThemesButton {
+.pageInfoButtonsContainer a#showThemesButton {
 	background: url(images/lgicn_24.gif) top center no-repeat;
 }
 
-a#showEditPagesButton {
+.pageInfoButtonsContainer a#showEditPagesButton {
 	background: url(images/edit_24.gif) top center no-repeat;
 }
 
-a#showSourcePagesButton {
+.pageInfoButtonsContainer a#showSourcePagesButton {
 	background: url(images/script_24.gif) top center no-repeat;
 }
 
-a#showPreviewPagesButton {
+.pageInfoButtonsContainer a#showPreviewPagesButton {
 	background: url(images/opnbr_24.gif) top center no-repeat;
 }
 
