@@ -1103,6 +1103,7 @@ ul#page_tree_div {
 }
 
 ul#page_tree_div li {
+	list-style: none;
 	line-height: 22px;
 }
 
