@@ -25,6 +25,7 @@ import com.idega.core.data.IWTreeNode;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.Layer;
 import com.idega.presentation.Script;
 import com.idega.presentation.text.Text;
 import com.idega.util.CoreConstants;
@@ -48,12 +49,16 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 	
 	protected void initializeComponent(FacesContext context) {
 		Iterator<String> itrKeySet = null;
-		if (siteMap.keySet() != null)
+		if (siteMap.keySet() != null) {
 			itrKeySet = siteMap.keySet().iterator();
+		}
 		String mapKey = null;
-		Accordion acc = new Accordion("site_templates");
 		
-		add(acc);
+		Layer container = new Layer();
+		add(container);
+		
+		Accordion accordion = new Accordion("site_templates");
+		container.add(accordion);
 
 		int panelID = 0;
 		Script script = new Script();
@@ -84,7 +89,7 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		    tree.getFacets().put("IWTreeNode",linki);
 		    tree.getAttributes().put("sourceTree", "true");
 
-		    acc.addPanel("panel"+panelID, new Text(panelName), tree); 
+		    accordion.addPanel("panel"+panelID, new Text(panelName), tree); 
 		    script.addScriptLine(new StringBuffer("window.addEvent('domready', function() {appendIdOfTree('tree").append(panelID).append("');});").toString());	
 		}
 		
