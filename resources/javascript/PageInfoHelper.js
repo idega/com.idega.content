@@ -87,7 +87,7 @@ function showSlider(container) {
 	container.setStyle('left', RESERVED_WIDTH + 'px');
 	container.setStyle('right', '5px');
 	
-	var showSlider = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
+	var showSlider = new Fx.Style(container, 'opacity', {duration: 1000});
 	showSlider.start(0, 1);
 	SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'block')", SHOW_ELEMENT_TRANSITION_DURATION);
 	GET_THEMES_ID = window.setTimeout('getThemesSlider()', SHOW_ELEMENT_TRANSITION_DURATION + 50);
@@ -112,8 +112,8 @@ function manageSlider(buttonID) {
 	}
 	if (container.style.display == 'none') {
 		button.setText(getHideThemesText());
-		showSlider(container);
 		changeFrameHeight(-FRAME_CHANGE);
+		showSlider(container);
 	}
 	else {
 		removeStyleOptions();
@@ -258,7 +258,7 @@ function resizeSlider() {
 		return;
 	}
 
-	var available = getTotalWidth() - RESERVED_WIDTH;
+	var available = getTotalWidth() - RESERVED_WIDTH - 6;
 	if (available > 0) {
 		container.setStyle('width', available + 'px');
 		themesTicker.setStyle('width', (available - 50) + 'px');
@@ -305,7 +305,11 @@ function changeFrameHeight(change) {
 	height++;
 	height--;
 	height += change;
-	container.setStyle('height', height + 'px');
+	
+	var changeSize = new Fx.Style(container, 'height', {duration: SHOW_ELEMENT_TRANSITION_DURATION}, {wait:true});
+	changeSize.start(current, height);
+	
+	//container.setStyle('height', height + 'px');
 }
 
 function resizeFrame() {
@@ -315,13 +319,13 @@ function resizeFrame() {
 	}
 	
 	//	Width
-	var availableWidth = getTotalWidth() - RESERVED_WIDTH;
+	var availableWidth = getTotalWidth() - RESERVED_WIDTH - 6; 
 	if (availableWidth > 0) {
 		container.setStyle('width', availableWidth + 'px');
 	}
 	
 	//	Height
-	var availableHeight = getTotalHeight() - 149;
+	var availableHeight = getTotalHeight() - 148;
 	if (availableHeight > 0) {
 		container.setStyle('height', availableHeight + 'px');
 	}

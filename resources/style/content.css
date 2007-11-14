@@ -942,9 +942,9 @@ html * .scrollTable {
 
 .mainPagesContentStyle {
 	position: absolute;
-	top: 0;
-	right: 0;
-	left: 0;
+	top: 0px;
+	right: 0px;
+	left: 0px;
 	width: auto;
 	bottom: 57px;
 	overflow: hidden;
