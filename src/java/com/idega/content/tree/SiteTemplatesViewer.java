@@ -47,6 +47,7 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		siteMap = TemplatesLoader.getInstance(iwma).getSiteTemplates();		
 	}
 	
+	@Override
 	protected void initializeComponent(FacesContext context) {
 		Iterator<String> itrKeySet = null;
 		if (siteMap.keySet() != null) {
@@ -58,6 +59,8 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		add(container);
 		
 		Accordion accordion = new Accordion("site_templates");
+		accordion.setOnActiveScriptString("toggler.addClass('selectedToggler'); element.addClass('selectedStretch');");
+		accordion.setOnBackgroundScriptString("toggler.removeClass('selectedToggler'); element.removeClass('selectedStretch');");
 		container.add(accordion);
 
 		int panelID = 0;

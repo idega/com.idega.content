@@ -555,9 +555,9 @@ html>body .themesSlider {
 
 .newPageContainerStyle {
 	position: absolute;
-	bottom: 50px;
+	bottom: 40px;
 	left: 5px !important;
-	width: 200px;
+	width: auto;
 	z-index: 5;
 	background-color: #fff;
 	border: 3px solid #a1a1a1;
@@ -565,8 +565,8 @@ html>body .themesSlider {
 
 .newPagesContainerStyle {
 	position: absolute;
-	bottom: 50px;
-	left: 5px !important;
+	bottom: 40px;
+	left: 75px !important;
 	width: auto;
 	z-index: 5;
 	background-color: #fff;
@@ -1122,8 +1122,8 @@ ul#page_tree_div li ul {
 	padding-left: 18px;
 }
 
-#templatesAccordion .toggler {
-	border-bottom: 1px #bdbdbd solid;
+#templatesAccordion .acToggle {
+	border-top: 1px #bdbdbd solid;
 	background: url(images/accordion_title.gif) top left repeat-x #d1d1d1;
 	line-height: 18px;
 	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
@@ -1133,13 +1133,40 @@ ul#page_tree_div li ul {
 	display: block;
 }
 
-#templatesAccordion .toggler .title {
+#panel1Header {
+	border-top: 0 !important;
+}
+
+#templatesAccordion .acToggle span {
 	line-height: 18px;
 	padding-left: 16px;
 	display: block;
 	background: url(images/arrow_right.gif) left 4px no-repeat;
 }
 
-#templatesAccordion .selectedToggler .title {
+#templatesAccordion .selectedStretch ul.tree_drag_drop {
+	padding: 5px;
+}
+
+#templatesAccordion .selectedToggler {
+	border-bottom: 1px #bdbdbd solid;	
+}
+
+#templatesAccordion .selectedToggler span {
 	background: url(images/arrow_down.gif) left 4px no-repeat;
+}
+
+.accordionHeading {
+	border-bottom: 1px #bdbdbd solid;
+	background: url(images/popup_top_background.gif) top left repeat-x #04262d;
+	line-height: 20px;
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+	color: #fff;
+	padding: 0 6px;
+	font-weight: bold;
+	display: block;
+}
+
+#pagesAccordion ul {
+	padding: 5px 15px 8px 0 !important;
 }
