@@ -309,7 +309,7 @@ function changeFrameHeight(change) {
 	oldHeight--;
 	var newHeight = oldHeight + change;
 	
-	var changeSize = new Fx.Style(container, 'height', {duration: SHOW_ELEMENT_TRANSITION_DURATION}, {wait:true});
+	var changeSize = new Fx.Style(container, 'height', {duration: SHOW_ELEMENT_TRANSITION_DURATION, transition: Fx.Transitions.Bounce.easeOut}, {wait:true});
 	changeSize.start(oldHeight, newHeight);
 }
 
