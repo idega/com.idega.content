@@ -793,6 +793,7 @@ function createAccordionForLucid() {
 	var accordion = new Accordion('span.atStart', 'div.atStart', {
 		opacity: false,
 		display: 0,
+		transition: Fx.Transitions.quadOut,
 		onActive: function(toggler, element){
 			toggler.addClass('selectedToggler');
 		},
