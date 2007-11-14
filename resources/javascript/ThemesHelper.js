@@ -285,6 +285,7 @@ var MAKE_START_PAGE_TEXT = 'Start Page';
 var MAKE_THIS_PAGE_START_PAGE_TEXT='Make This Page As Start Page';
 var CHANGING_STRUCTURE_TEXT = 'Changing structure...';
 var NEW_PAGE_TEXT = 'New Page';
+var NEW_PAGES_TEXT = 'New Pages';
 var MOVING = 'Moving...';
 var ARE_YOU_SURE_TEXT = 'Are you sure?';
 var DELETING_TEXT = 'Deleting...';
@@ -305,11 +306,12 @@ function getLocalizedTextForThemes() {
 
 function getLocalizedTextForThemesCallback(list) {
 	if (list == null) {
-		return;
+		return false;
 	}
-	if (list.length != 29) {
-		return;
+	if (list.length != 30) {
+		return false;
 	}
+	
 	UPLOADING_THEME = list[0];
 	CHANGING_THEME = list[1];
 	SAVING_THEME = list[2];
@@ -339,6 +341,7 @@ function getLocalizedTextForThemesCallback(list) {
 	HIDE_MODULES_TEXT = list[26];
 	REDIRECTING_TEXT = list[27];
 	CREATING_TEXT = list[28];
+	NEW_PAGES_TEXT  = list[29];
 	
 }
 
@@ -801,7 +804,7 @@ function createAccordionForLucid() {
 }
 
 function createAccordionForTemplates() {
-	var accordion = new Accordion('span.templateTitleStyle', 'div.templatesContainer', {
+	/*var accordion = new Accordion('span.templateTitleStyle', 'div.templatesContainer', {
 		opacity: false,
 		onActive: function(toggler, element){
 			toggler.addClass('selectedToggler');
@@ -810,5 +813,5 @@ function createAccordionForTemplates() {
 		onBackground: function(toggler, element){
 			toggler.removeClass('selectedToggler');
 		}
-	}, $('templatesAccordion'));
+	}, $('templatesAccordion'));*/
 }

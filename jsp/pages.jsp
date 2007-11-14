@@ -96,9 +96,9 @@ version="1.2">
 					<c:ThemesSliderViewer hiddenOnLoad="true" />
 				</t:div>
 				
-				<t:div id="newPageContainer" forceId="true" styleClass="newPageContainerStyle" style="display: none; left: 8px;">
+				<t:div id="newPageContainer" forceId="true" styleClass="newPageContainerStyle" style="display: none;">
 					<t:div id="templatesAccordion" forceId="true" styleClass="templatesAccordionStyle">
-						<t:htmlTag styleClass="toggler templateTitleStyle" value="span">
+						<t:htmlTag styleClass="toggler templateTitleStyle selectedToggler" value="span">
 							<t:outputText value="#{localizedStrings['com.idega.content']['page_types']}" styleClass="title"> </t:outputText>
 						</t:htmlTag>
 						<t:div id="pageTemplatesStretcher" forceId="true" styleClass="element templatesContainer">
@@ -112,13 +112,15 @@ version="1.2">
 								</f:facet>
 							</wf:iwtree>
 						</t:div>
-						
-						<t:htmlTag styleClass="toggler templateTitleStyle" value="span">
+					</t:div>
+				</t:div>
+				
+				<t:div id="newPagesContainer" forceId="true" styleClass="newPagesContainerStyle" style="display: none;">
+					<t:div id="templatesAccordion" forceId="true" styleClass="templatesAccordionStyle">
+						<t:htmlTag styleClass="toggler templateTitleStyle selectedToggler" value="span">
 							<t:outputText value="#{localizedStrings['com.idega.content']['site_templates']}" styleClass="title"></t:outputText>
 						</t:htmlTag>
-						<t:div id="siteTemplatesStretcher" forceId="true" styleClass="element templatesContainer">
-							<c:siteTemplatesViewer id="siteTemplates"/>
-						</t:div>
+						<c:siteTemplatesViewer id="siteTemplates"/>
 					</t:div>
 				</t:div>
 				
@@ -141,6 +143,7 @@ version="1.2">
                 <t:div styleClass="pageInfoButtonsContainer">
                 	<t:div styleClass="leftButtonStyle">
                 		<t:commandLink id="newPageButton" forceId="true" styleClass="newPageButtonStyleClass" value="#{localizedStrings['com.idega.content']['new_page']}"></t:commandLink>
+                		<t:commandLink id="newPagesButton" forceId="true" styleClass="newPagesButtonStyleClass" value="#{localizedStrings['com.idega.content']['new_pages']}"></t:commandLink>
                 	</t:div>
 					<t:div styleClass="rightButtonStyle">
 						<t:commandLink id="showPageModules" forceId="true" styleClass="showPageModulesStyleClass" value="#{localizedStrings['com.idega.content']['show_modules']}"></t:commandLink>

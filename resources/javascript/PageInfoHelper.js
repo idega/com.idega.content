@@ -7,7 +7,6 @@ var SHOW_ELEMENT_TRANSITION_DURATION = 500;
 var SET_DISPLAY_PROPERTY_ID = 0;
 var GET_THEMES_ID = 0;
 
-var CLICKED_CREATE = false;
 var SLIDER_SHOWED_FIRST_TIME = true;
 var MODULES_SHOWN = false;
 var IS_USER_ADMIN = false;
@@ -126,13 +125,14 @@ function manageSlider(buttonID) {
 
 function setDisplayPropertyToElement(id, property, frameChange) {
 	if (id == null || property == null) {
-		return;
+		return false;
 	}
 	var element = $(id);
 	if (element == null) {
-		return;
+		return false;;
 	}
-	element.style.display = property;
+	
+	element.setStyle('display', property);
 	window.clearTimeout(SET_DISPLAY_PROPERTY_ID);
 	
 	if (frameChange != null) {
@@ -275,17 +275,23 @@ function setButtonText(id, text) {
 	}
 }
 
-function newPage() {
-	var newPage = $('newPageContainer');
-	if (CLICKED_CREATE) {
-		closeNewPage(newPage);
+function newPages(containerId, buttonId, buttonText, positionFromLeft) {
+	var container = $(containerId);
+	if (container == null) {
+		return false;
+	}
+	
+	var containerOpen = buttonText != $(buttonId).getText();
+	if (containerOpen) {
+		setButtonText(buttonId, buttonText);
+		closeNewPage(container);
 	}
 	else {
-		CLICKED_CREATE = true;
-		setButtonText('newPageButton', getCloseText());
-		var showNewPage = new Fx.Style(newPage, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
+		container.setStyle('left', positionFromLeft);
+		setButtonText(buttonId, getCloseText());
+		var showNewPage = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 		showNewPage.start(0, 1);
-		SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+newPage.id+"', 'block', null)", SHOW_ELEMENT_TRANSITION_DURATION);
+		SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'block', null)", SHOW_ELEMENT_TRANSITION_DURATION);
 	}
 }
 
@@ -309,7 +315,7 @@ function changeFrameHeight(change) {
 	oldHeight--;
 	var newHeight = oldHeight + change;
 	
-	var changeSize = new Fx.Style(container, 'height', {duration: SHOW_ELEMENT_TRANSITION_DURATION, transition: Fx.Transitions.Bounce.easeOut}, {wait:true});
+	var changeSize = new Fx.Style(container, 'height', {duration: SHOW_ELEMENT_TRANSITION_DURATION}, {wait:true});
 	changeSize.start(oldHeight, newHeight);
 }
 
@@ -394,14 +400,12 @@ function setAsStartPageCallback(result) {
 	closeLoadingMessages();
 }
 
-function closeNewPage(newPage) {
-	CLICKED_CREATE = false;
-	if (newPage != null) {
-		var hideNewPage = new Fx.Style(newPage, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
+function closeNewPage(container) {
+	if (container != null) {
+		var hideNewPage = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 		hideNewPage.start(1, 0);
-		SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+newPage.id+"', 'none', null)", SHOW_ELEMENT_TRANSITION_DURATION);
+		SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'none', null)", SHOW_ELEMENT_TRANSITION_DURATION);
 	}
-	setButtonText('newPageButton', getNewPageText());
 }
 
 function managePageInfoComponents() {
@@ -438,7 +442,19 @@ function registerPageInfoActions() {
 		function(element) {
 			setHrefToVoidFunction(element);
 			
-			element.addEvent('click', newPage);
+			element.addEvent('click', function() {
+				newPages('newPageContainer', 'newPageButton', getNewPageText(), element.getLeft());
+			});
+    	}
+    );
+    
+    $$('a.newPagesButtonStyleClass').each(
+		function(element) {
+			setHrefToVoidFunction(element);
+			
+			element.addEvent('click', function() {
+				newPages('newPagesContainer', 'newPagesButton', NEW_PAGES_TEXT, element.getLeft());
+			});
     	}
     );
     

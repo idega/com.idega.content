@@ -563,6 +563,16 @@ html>body .themesSlider {
 	border: 3px solid #a1a1a1;
 }
 
+.newPagesContainerStyle {
+	position: absolute;
+	bottom: 50px;
+	left: 5px !important;
+	width: auto;
+	z-index: 5;
+	background-color: #fff;
+	border: 3px solid #a1a1a1;
+}
+
 #div_id_new_page_tree ul {
 	list-style-type: none;
 }
@@ -1023,6 +1033,10 @@ html>body .pageInfoButtonsContainer a {
 
 .pageInfoButtonsContainer a#newPageButton {
 	background: url(images/new_24.gif) top center no-repeat;
+}
+
+.pageInfoButtonsContainer a#newPagesButton {
+	background: url(images/new_multiple_24.gif) top center no-repeat;
 }
 
 .pageInfoButtonsContainer a#showPageModules {
