@@ -84,7 +84,7 @@ version="1.2">
 						</t:div>
 					</t:div>
 	
-					<t:div styleClass="pagePreviewContainer">
+					<t:div id="pagePreviewContainer" forceId="true" styleClass="pagePreviewContainer">
 						<f:verbatim>
 							<iframe name="treePages" id="treePages">iframe</iframe>
 						</f:verbatim>

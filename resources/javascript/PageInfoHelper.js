@@ -1,7 +1,7 @@
 var THEME_ID = null;
 
 var SCROLLER_IMAGE_WIDTH = 23;
-var FRAME_CHANGE = 153;
+var FRAME_CHANGE = 158;
 var RESERVED_WIDTH = 280;
 var SHOW_ELEMENT_TRANSITION_DURATION = 500;
 var SET_DISPLAY_PROPERTY_ID = 0;
@@ -258,11 +258,7 @@ function resizeSlider() {
 		return;
 	}
 
-	var scrollerWidth = 23;
-	if (IE) {
-		scrollerWidth = 27;
-	}
-	var available = (getTotalWidth() - RESERVED_WIDTH) - scrollerWidth;
+	var available = getTotalWidth() - RESERVED_WIDTH;
 	if (available > 0) {
 		container.setStyle('width', available + 'px');
 		themesTicker.setStyle('width', (available - 50) + 'px');
@@ -291,11 +287,11 @@ function newPage() {
 }
 
 function changeFrameHeight(change) {
-	var frame = $('treePages');
-	if (frame == null) {
+	var container = $('pagePreviewContainer');
+	if (container == null) {
 		return;
 	}
-	var current = frame.getStyle('height');
+	var current = container.getStyle('height');
 	if (current == null) {
 		return;
 	}
@@ -309,25 +305,25 @@ function changeFrameHeight(change) {
 	height++;
 	height--;
 	height += change;
-	frame.setStyle('height', height + 'px');
+	container.setStyle('height', height + 'px');
 }
 
 function resizeFrame() {
-	var frame = $('treePages');
-	if (frame == null) {
+	var container = $('pagePreviewContainer');
+	if (container == null) {
 		return;
 	}
 	
 	//	Width
 	var availableWidth = getTotalWidth() - RESERVED_WIDTH;
 	if (availableWidth > 0) {
-		frame.setStyle('width', availableWidth + 'px');
+		container.setStyle('width', availableWidth + 'px');
 	}
 	
 	//	Height
-	var availableHeight = getTotalHeight() - RESERVED_HEIGHT;
+	var availableHeight = getTotalHeight() - 149;
 	if (availableHeight > 0) {
-		frame.setStyle('height', availableHeight + 'px');
+		container.setStyle('height', availableHeight + 'px');
 	}
 }
 
