@@ -940,13 +940,17 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return newIds;
 	}
 	
-	private void updateSiteTree(IWContext iwc) {
+	private void updateSiteTree(IWContext iwc, boolean updateAllSessions) {
 		if (iwc == null) {
 			iwc = CoreUtil.getIWContext();
 		}
 		
-		Thread siteTreeUpdater = new Thread(new SiteTreeUpdater(iwc));
+		Thread siteTreeUpdater = new Thread(new SiteTreeUpdater(iwc, updateAllSessions));
 		siteTreeUpdater.run();
+	}
+	
+	private void updateSiteTree(IWContext iwc) {
+		updateSiteTree(iwc, false);
 	}
 	
 	private int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) {
@@ -1196,7 +1200,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		builder.clearAllCaches();
 		
-		updateSiteTree(iwc);
+		updateSiteTree(iwc, true);
 		
 		return true;
 	}

@@ -22,9 +22,11 @@ import com.idega.webface.WFUtil;
 public class SiteTreeUpdater implements Runnable {
 	
 	private IWContext iwc = null;
+	private boolean updateAllSessions = false;
 	
-	public SiteTreeUpdater(IWContext iwc) {
+	public SiteTreeUpdater(IWContext iwc, boolean updateAllSessions) {
 		this.iwc = iwc;
+		this.updateAllSessions = updateAllSessions;
 	}
 
 	public void run() {
@@ -67,8 +69,13 @@ public class SiteTreeUpdater implements Runnable {
 		ScriptSession session = null;
 		for (int i = 0; i < allPages.size(); i++) {
 			session = allPages.get(i);
-			if (ss != null && !session.equals(ss)) {
+			if (updateAllSessions) {
 				session.addScript(script);
+			}
+			else {
+				if (ss != null && !session.equals(ss)) {
+					session.addScript(script);
+				}
 			}
 		}
 	}

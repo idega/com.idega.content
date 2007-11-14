@@ -397,7 +397,7 @@ function makePageAsStartPage() {
 }
 
 function setAsStartPageCallback(result) {
-	closeLoadingMessages();
+	closeAllLoadingMessages();
 }
 
 function closeNewPage(container) {
