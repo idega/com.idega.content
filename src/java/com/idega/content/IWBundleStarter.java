@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.28 2007/10/02 05:04:00 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.29 2007/11/14 16:20:41 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -28,7 +28,6 @@ import com.idega.content.themes.helpers.Setting;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.themes.helpers.ThemesHelper;
 import com.idega.content.view.ContentViewManager;
-import com.idega.content.view.SiteViewManager;
 import com.idega.core.uri.IWActionURIManager;
 import com.idega.idegaweb.DefaultIWBundle;
 import com.idega.idegaweb.IWApplicationContext;
@@ -41,10 +40,10 @@ import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2007/10/02 05:04:00 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/11/14 16:20:41 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.29 $
  */
 //public class IWBundleStarter implements IWBundleStartable, JarLoader {
 public class IWBundleStarter implements IWBundleStartable{
@@ -88,9 +87,6 @@ public class IWBundleStarter implements IWBundleStartable{
 	    
 	    TemplatesLoader templatesLoader = TemplatesLoader.getInstance(iwmain);
 	    templatesLoader.loadTemplatesFromBundles();
-	
-	    SiteViewManager sViewManager = SiteViewManager.getInstance(iwmain);
-		sViewManager.initializeStandardNodes(starterBundle);
 		
 //	    RSSProducerRegistry.getInstance().addRSSProducer("files/cms/article", ContentItemRssProducer.getInstance(iwmain));
 //	    RSSProducerRegistry.getInstance().addRSSProducer("files/cms/article", new ContentItemRssProducer());
