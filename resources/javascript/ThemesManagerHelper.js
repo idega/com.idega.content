@@ -44,20 +44,30 @@ function getThemeStyleVariations(themeID) {
 			setNewStyleForSelectedElement(oldTheme.id + '_themeNameContainer', oldClassName);
 		}
 	}
-	showLoadingMessage(getLoadingText());
+	
+	var variationsContainer = $('themeVariationsContainer');
+	var loadingLayerOverElement = $(setLoadingLayerForElement(variationsContainer.id, false, variationsContainer.getSize(), variationsContainer.getPosition()));
+	
 	setGlobalId(themeID);
 	var newTheme = getTheme(THEME_ID);
 	if (!newTheme.used) {
 		setNewStyleForSelectedElement(newTheme.id + '_themeNameContainer', 'themeName selectedThemeName');
 	}
 	setThemeForPreview(themeID);
-	ThemesEngine.getThemeStyleVariations(themeID, getThemeStyleVariationsCallback);
+	ThemesEngine.getThemeStyleVariations(themeID, {
+		callback: function(variations) {
+			getThemeStyleVariationsCallback(variations, loadingLayerOverElement);
+		}
+	});
 }
 
-function getThemeStyleVariationsCallback(variations) {
-	closeLoadingMessage();
+function getThemeStyleVariationsCallback(variations, loadingLayerOverElement) {
+	if (loadingLayerOverElement != null) {
+		loadingLayerOverElement.remove();
+	}
+	
 	if (variations == null) {
-		return;
+		return false;
 	}
 	var theme = getTheme(THEME_ID);
 	if (theme != null) {
@@ -68,11 +78,10 @@ function getThemeStyleVariationsCallback(variations) {
 	}
 	var container = $('themeStyleVariations');
 	if (container == null) {
-		return;
+		return false;
 	}
-	removeChildren(container);
+	container.empty();
 	container = replaceHtml(container, variations);
-	//container.innerHTML = variations;
 	
 	registerThemesActions();
 }
@@ -547,7 +556,7 @@ function setPreview(url) {
 	
 	new Asset.images(images, {
 		onProgress: function(i) {
-			imageUnloader = new Fx.Style(preview, 'opacity', {duration: 500, transition: Fx.Transitions.linear, wait: true, onComplete: function() {
+			imageUnloader = new Fx.Style(preview.getParent(), 'opacity', {duration: 125, transition: Fx.Transitions.linear, wait: true, onComplete: function() {
 				changeBigThemePreviewImageWithMootools(loadedImages);
 			}});
 			
@@ -558,14 +567,13 @@ function setPreview(url) {
 				loadingLayerOverElement.remove();
 			} catch(e) {}
 			
-			imageUnloader.start(1, 0);
+			imageUnloader.start(1, 0.8);
 		}
 	});
 }
 
 function changeBigThemePreviewImageWithMootools(loadedImages) {
-	var preview = $('themePreview');
-	if (preview == null) {
+	if ($('themePreview') == null) {
 		return false;
 	}
 	
@@ -573,12 +581,14 @@ function changeBigThemePreviewImageWithMootools(loadedImages) {
 		var parentContainer = $('themePreview').getParent();
 		$('themePreview').remove();
 		
+		parentContainer.setStyle('visibility', 'hidden');
+		parentContainer.setStyle('opacity', 0.8);
 		image.setProperty('id', 'themePreview');
 		image.injectInside(parentContainer);
+		
+		var imageChanger = new Fx.Style(parentContainer, 'opacity', {duration: 125, transition: Fx.Transitions.linear, wait: false});
+		imageChanger.start(0.8, 1);
 	});
-	
-	var imageChanger = new Fx.Style(preview, 'opacity', {duration: 500, transition: Fx.Transitions.linear, wait: true});
-	imageChanger.start(0, 1);
 }
 
 function getTheme(themeID) {
@@ -869,5 +879,10 @@ function reloadThemeProperties(element) {
 	}
 	
 	showLoadingMessage(getReloadingText());
-	ThemesEngine.reloadThemeProperties(themeId, getThemeStyleVariationsCallback);
+	ThemesEngine.reloadThemeProperties(themeId, {
+		callback: function(variations) {
+			closeAllLoadingMessages();
+			getThemeStyleVariationsCallback(variations, null);
+		}
+	});
 }
