@@ -109,6 +109,7 @@ public class ThemeStyleVariations extends Block {
 		
 		Layer groupContainer = null;
 		Layer nameContainer = null;
+		Lists groupVariationsContainer = null;
 		ListItem groupVariations = null;
 		UIComponent groupVariation = null;
 		for (int i = 0; i < styleGroups.size(); i++) {
@@ -119,8 +120,10 @@ public class ThemeStyleVariations extends Block {
 			
 				groupContainer = new Layer();
 				groupContainer.setStyleClass(VARIATION_GROUP_STYLE);
+				groupVariationsContainer = new Lists();
 				groupVariations = new ListItem();
-				groupContainer.add(groupVariations);
+				groupVariationsContainer.add(groupVariations);
+				groupContainer.add(groupVariationsContainer);
 				
 				nameContainer = new Layer();
 				nameContainer.setStyleClass(VARIATION_GROUP_NAME_STYLE);
