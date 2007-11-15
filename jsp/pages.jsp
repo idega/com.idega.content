@@ -97,8 +97,8 @@ version="1.2">
 				</t:div>
 				
 				<t:div id="newPageContainer" forceId="true" styleClass="newPageContainerStyle" style="display: none;">
-					<t:div id="templatesAccordion" forceId="true" styleClass="templatesAccordionStyle">
-						<t:htmlTag styleClass="toggler templateTitleStyle selectedToggler" value="span">
+					<t:div id="pagesAccordion" forceId="true" styleClass="pagesAccordionStyle">
+						<t:htmlTag styleClass="accordionHeading" value="span">
 							<t:outputText value="#{localizedStrings['com.idega.content']['page_types']}" styleClass="title"> </t:outputText>
 						</t:htmlTag>
 						<t:div id="pageTemplatesStretcher" forceId="true" styleClass="element templatesContainer">
@@ -117,7 +117,7 @@ version="1.2">
 				
 				<t:div id="newPagesContainer" forceId="true" styleClass="newPagesContainerStyle" style="display: none;">
 					<t:div id="templatesAccordion" forceId="true" styleClass="templatesAccordionStyle">
-						<t:htmlTag styleClass="toggler templateTitleStyle selectedToggler" value="span">
+						<t:htmlTag styleClass="accordionHeading" value="span">
 							<t:outputText value="#{localizedStrings['com.idega.content']['site_templates']}" styleClass="title"></t:outputText>
 						</t:htmlTag>
 						<c:siteTemplatesViewer id="siteTemplates"/>
