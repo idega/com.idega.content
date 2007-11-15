@@ -136,7 +136,7 @@ public class ThemesHelper implements Singleton {
 		if (helper == null) {
 			synchronized (ThemesHelper.class) {
 				if (helper == null) {
-					helper = new ThemesHelper(true);
+					helper = new ThemesHelper(false);
 				}
 			}
 		}
