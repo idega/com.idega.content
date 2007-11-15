@@ -1170,3 +1170,7 @@ ul#page_tree_div li ul {
 #pagesAccordion ul {
 	padding: 5px 15px 8px 0 !important;
 }
+
+.closeNewPageOrPagesStyle {
+	cursor: pointer;
+}

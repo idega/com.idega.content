@@ -283,8 +283,7 @@ function newPages(containerId, buttonId, buttonText, positionFromLeft) {
 	
 	var containerOpen = buttonText != $(buttonId).getText();
 	if (containerOpen) {
-		setButtonText(buttonId, buttonText);
-		closeNewPage(container);
+		closeNewPage(container, buttonId, buttonText);
 	}
 	else {
 		container.setStyle('left', positionFromLeft);
@@ -400,7 +399,9 @@ function setAsStartPageCallback(result) {
 	closeAllLoadingMessages();
 }
 
-function closeNewPage(container) {
+function closeNewPage(container, buttonId, buttonText) {
+	setButtonText(buttonId, buttonText);
+	
 	if (container != null) {
 		var hideNewPage = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 		hideNewPage.start(1, 0);
@@ -519,6 +520,19 @@ function registerPageInfoActions() {
 					SHOW_SOURCE_PAGES = true;
 					SHOW_EDIT_PAGES = false;
 					getPrewUrl(getPageID());
+				}
+			});
+		}
+	);
+	
+	$$('img.closeNewPageOrPagesStyle').each(
+		function(image) {
+			image.addEvent('click', function() {
+				if (image.getProperty('id') == 'closeNewPagesContainer') {
+					closeNewPage($('newPagesContainer'), 'newPagesButton', NEW_PAGES_TEXT);
+				}
+				else {
+					closeNewPage($('newPageContainer'), 'newPageButton', getNewPageText());
 				}
 			});
 		}
