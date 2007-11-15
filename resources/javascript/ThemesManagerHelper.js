@@ -537,9 +537,48 @@ function Theme(name, linkToSmallPreview, linkToBigPreview, id, used) {
 function setPreview(url) {
 	var preview = $('themePreview');
 	if (preview == null) {
-		return;
+		return false;
 	}
-	preview.src = url;
+	
+	var imageUnloader = null;
+	var images = [url];
+	var loadedImages = [];
+	var loadingLayerOverElement = $(setLoadingLayerForElement(preview.id, false, preview.getSize(), preview.getPosition()));
+	
+	new Asset.images(images, {
+		onProgress: function(i) {
+			imageUnloader = new Fx.Style(preview, 'opacity', {duration: 500, transition: Fx.Transitions.linear, wait: true, onComplete: function() {
+				changeBigThemePreviewImageWithMootools(loadedImages);
+			}});
+			
+			loadedImages[i] = this;
+		},
+		onComplete: function() {
+			try {
+				loadingLayerOverElement.remove();
+			} catch(e) {}
+			
+			imageUnloader.start(1, 0);
+		}
+	});
+}
+
+function changeBigThemePreviewImageWithMootools(loadedImages) {
+	var preview = $('themePreview');
+	if (preview == null) {
+		return false;
+	}
+	
+	loadedImages.each(function(image, i) {
+		var parentContainer = $('themePreview').getParent();
+		$('themePreview').remove();
+		
+		image.setProperty('id', 'themePreview');
+		image.injectInside(parentContainer);
+	});
+	
+	var imageChanger = new Fx.Style(preview, 'opacity', {duration: 500, transition: Fx.Transitions.linear, wait: true});
+	imageChanger.start(0, 1);
 }
 
 function getTheme(themeID) {
