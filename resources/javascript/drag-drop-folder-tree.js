@@ -840,18 +840,8 @@
 			setPageID(lastID);
 			getPrewUrl(lastID);
 			isChangingSiteMap();
-			if (!isSiteMap()) {
-				var aTag = $(lastID);
-				if (aTag) {
-					aTag = aTag.getElementsByTagName('a')[0];
-					aTag.className = 'pageTreeNames';
-					boldSelectedTreeElement(aTag);
-					registerActionsOnSiteTreeElement($(aTag));
-				}
-			}
-			else {
-				registerSiteActions();				
-			}
+			registerActionsForSiteTree();
+			boldCurrentTreeElementWithPageId(lastID);
 			
 			if (isNeedRelaodBuilderPage() && isSiteMap() && isNeedRedirect()) {
 				showLoadingMessage(REDIRECTING_TEXT);
