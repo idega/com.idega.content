@@ -845,8 +845,14 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	public List <String> createPage(List <TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, List<String> followingNodes) {	
+	public List <String> createPage(List<TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, List<String> followingNodes) {
 		List <String> newIds = new ArrayList<String>();
+		if (struct == null || numberInLevel == null) {
+			return newIds;
+		}
+		if (struct.size() == 0) {
+			return newIds;
+		}
 		
 		struct.get(0).setTreeOrder(numberInLevel);
 		struct = getOrderInLevel(struct);

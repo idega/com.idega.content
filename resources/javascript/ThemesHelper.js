@@ -61,6 +61,9 @@ function getGlobalPageId() {
 function setGlobalPageId(ID) {
 	setPageID(ID);
 	getPrewUrl(ID);
+	
+	boldCurrentTreeElementWithPageId(ID);
+	getPageInfoValues();
 }
 
 function changePageTitleCallback(result) {

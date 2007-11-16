@@ -427,7 +427,6 @@ function initializePages() {
 	getGlobalPageId();
 
 	resizeFrame();
-	getPageInfoValues();
 	isStartPage(getPageID());
 	checkIfNotEmptySiteTree(ALL_CURRENT_SITE_STRUCTURE_TREE_ID);
 	document.addEvent('click', managePageInfoComponents);

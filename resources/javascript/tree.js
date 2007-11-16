@@ -1,7 +1,6 @@
 var ajaxObjects = new Array();
 
 var RELOAD_PAGE = false;
-var REFRESH_PAGE_INFO = false;
 var SHOW_EDIT_PAGES = true;
 var SHOW_SOURCE_PAGES = false;
 
@@ -20,10 +19,7 @@ function saveMyTree(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncreas
 		callback: function(result) {
 			closeAllLoadingMessages();
 			if (result) {
-				if (REFRESH_PAGE_INFO) {
-				REFRESH_PAGE_INFO = false;
-					getPageInfoValues();
-				}
+				getPageInfoValues();
 				boldCurrentTreeElement();
 			}
 			else {
@@ -64,10 +60,7 @@ function empty(param) {
 		RELOAD_PAGE = false;
 		getGlobalPageId();
 	}
-	if (REFRESH_PAGE_INFO) {
-		REFRESH_PAGE_INFO = false;
-		getPageInfoValues();
-	}
+	
 	var trashCan = document.getElementById('trash');
 	JSTreeObj.deleteNodes = false;
 	trashCan.style.opacity = 0.5;		
