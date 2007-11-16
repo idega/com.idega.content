@@ -195,6 +195,9 @@ function drawTableForEmptySite(id) {
 	textContainer.injectInside(emptyTextContainer);
 	
 	clone.injectInside(emptyTextContainer);
+	
+	PAGE_ID = null;
+	getPageInfoValues();	//	Reloading page info
 }
 
 function setNeedReloadBuilderPage(needReload) {

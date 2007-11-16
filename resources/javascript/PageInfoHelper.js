@@ -356,8 +356,17 @@ function getAvailableElements(allKeywords) {
 }
 
 function showPageInfoValues(values) {
-	if (values == null || KEYWORDS == null) {
-		return;
+	if (values == null) {
+		if (KEYWORDS != null) {
+			for (var i = 0; i < KEYWORDS.length; i++) {
+				element = $(KEYWORDS[i]);
+				if (element != null) {
+					element.value = '';
+				}
+			}
+		}
+		
+		return false;
 	}
 	if (KEYWORDS.length != values.length) {
 		return;
