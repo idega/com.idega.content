@@ -1376,7 +1376,7 @@
 		},
 		prepareToSetTopPage : function() {
 			var container = $(EMPTY_SITE_TREE_TEXT_CONTAINER_ID);
-			highlightElement(container, 1000, '#E8E8E8');
+			highlightElement(container, 500, '#fff');
 			JSTreeObj.firstTopPage = true;
 		},
 		topPageNotSet : function() {
