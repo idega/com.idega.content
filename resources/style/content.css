@@ -556,7 +556,6 @@ html>body .themesSlider {
 .newPageContainerStyle {
 	position: absolute;
 	bottom: 40px;
-	left: 5px !important;
 	width: auto;
 	z-index: 5;
 	background-color: #fff;
@@ -566,7 +565,6 @@ html>body .themesSlider {
 .newPagesContainerStyle {
 	position: absolute;
 	bottom: 40px;
-	left: 75px !important;
 	width: auto;
 	z-index: 5;
 	background-color: #fff;

@@ -281,16 +281,20 @@ function newPages(containerId, buttonId, buttonText, positionFromLeft) {
 		return false;
 	}
 	
-	var containerOpen = buttonText != $(buttonId).getText();
-	if (containerOpen) {
+	var containerIsOpened = false;
+	var displayValue = container.getStyle('display');
+	if (displayValue != null) {
+		containerIsOpened = displayValue == 'block';
+	}
+	if (containerIsOpened) {
 		closeNewPage(container, buttonId, buttonText);
 	}
 	else {
 		container.setStyle('left', positionFromLeft);
-		setButtonText(buttonId, getCloseText());
+		container.setStyle('visibility', 'hidden');
+		container.setStyle('display', 'block');
 		var showNewPage = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 		showNewPage.start(0, 1);
-		SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'block', null)", SHOW_ELEMENT_TRANSITION_DURATION);
 	}
 }
 
