@@ -1024,6 +1024,10 @@ body.site_manager .mainPagesContentStyle {
 	width: 24px;
 }
 
+.pageInfoButtonsContainer a:hover {
+	text-decoration: none;	
+}
+
 html>body .pageInfoButtonsContainer a {
 	min-width: 24px;
 	width: auto;
@@ -1038,11 +1042,21 @@ html>body .pageInfoButtonsContainer a {
 }
 
 .pageInfoButtonsContainer a#showPageModules {
-	background: url(images/sinfo_24.gif) top center no-repeat;
+	background: url(images/sinfo_24.png) top center no-repeat;
 }
 
 .pageInfoButtonsContainer a#showThemesButton {
-	background: url(images/lgicn_24.gif) top center no-repeat;
+	background: url(images/lgicn_24.png) top center no-repeat;
+}
+
+.pageInfoButtonsContainer a#showPageModules.disabledButtonInPages {
+	//background-image: url(images/sinfo_24_disabled.png);
+	display: none;
+}
+
+.pageInfoButtonsContainer a#showThemesButton.disabledButtonInPages {
+	//background-image: url(images/lgicn_24_disabled.png);
+	display: none;
 }
 
 .pageInfoButtonsContainer a#showEditPagesButton {
@@ -1174,7 +1188,9 @@ ul#page_tree_div li ul {
 }
 
 .activeButtonInPages {
+	font-weight: bold !important;
 }
 
 .disabledButtonInPages {
+	color: #a0a0a0 !important;
 }
