@@ -115,8 +115,20 @@ function manageSlider(buttonID) {
 		showSlider(container);
 	}
 	else {
+		hideThemesSliderInPages(container, button);
+	}
+}
+
+function hideThemesSliderInPages(container, button) {
+	if (container == null) {
+		return false;
+	}
+	
+	if ($(container).getStyle('display') != 'none') {
 		removeStyleOptions();
-		button.setText(getShowThemesText());
+		if (button != null) {
+			button.setText(getShowThemesText());
+		}
 		var hideSlider = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 		hideSlider.start(1, 0);
 		SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'none', "+FRAME_CHANGE+")", SHOW_ELEMENT_TRANSITION_DURATION);
@@ -484,7 +496,13 @@ function registerPageInfoActions() {
 			var manageSliderFunction = function() {
 				manageSlider(element.id);
 			};
-			element.addEvent('click', manageSliderFunction);
+			element.addEvent('click', function() {
+				if (SHOW_EDIT_PAGES) {
+					manageSliderFunction();
+				}
+				
+				return false;
+			});
 	   	}
 	);
 	
@@ -495,7 +513,11 @@ function registerPageInfoActions() {
 			var manageModulesBackgroundFunction = function() {
 				manageModulesBackground(element);
 			};
-			element.addEvent('click', manageModulesBackgroundFunction);
+			element.addEvent('click', function() {
+				if (SHOW_EDIT_PAGES) {
+					manageModulesBackgroundFunction();
+				}
+			});
 		}
 	);
 	
@@ -506,6 +528,14 @@ function registerPageInfoActions() {
 			button.addEvent('click', function() {
 				SHOW_SOURCE_PAGES = false;
 				SHOW_EDIT_PAGES = true;
+				
+				$('showPreviewPagesButton').removeClass('activeButtonInPages');
+				$('showSourcePagesButton').removeClass('activeButtonInPages');
+				
+				if (!button.hasClass('activeButtonInPages')) {
+					button.addClass('activeButtonInPages');
+				}
+				
 				getPrewUrl(getPageID());
 			});
 		}
@@ -518,6 +548,16 @@ function registerPageInfoActions() {
 			button.addEvent('click', function() {
 				SHOW_SOURCE_PAGES = false;
 				SHOW_EDIT_PAGES = false;
+				
+				hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
+				
+				$('showEditPagesButton').removeClass('activeButtonInPages');
+				$('showSourcePagesButton').removeClass('activeButtonInPages');
+				
+				if (!button.hasClass('activeButtonInPages')) {
+					button.addClass('activeButtonInPages');
+				}
+				
 				getPrewUrl(getPageID());
 			});
 		}
@@ -531,6 +571,16 @@ function registerPageInfoActions() {
 				if (IS_USER_ADMIN) {
 					SHOW_SOURCE_PAGES = true;
 					SHOW_EDIT_PAGES = false;
+					
+					hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
+					
+					$('showEditPagesButton').removeClass('activeButtonInPages');
+					$('showPreviewPagesButton').removeClass('activeButtonInPages');
+					
+					if (!button.hasClass('activeButtonInPages')) {
+						button.addClass('activeButtonInPages');
+					}
+					
 					getPrewUrl(getPageID());
 				}
 			});

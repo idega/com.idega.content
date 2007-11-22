@@ -1172,3 +1172,9 @@ ul#page_tree_div li ul {
 .closeNewPageOrPagesStyle {
 	cursor: pointer;
 }
+
+.activeButtonInPages {
+}
+
+.disabledButtonInPages {
+}

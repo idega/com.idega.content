@@ -1,7 +1,7 @@
 var ajaxObjects = new Array();
 
 var RELOAD_PAGE = false;
-var SHOW_EDIT_PAGES = true;
+var SHOW_EDIT_PAGES = false;
 var SHOW_SOURCE_PAGES = false;
 
 if(changePageName == null) var changePageName = false;
@@ -88,6 +88,16 @@ function setFrameUrl(uri) {
 			uri += '/';
 		}
 		uri += '?view=builder';
+	}
+	
+	if (SHOW_EDIT_PAGES) {
+		$('showPageModules').removeClass('disabledButtonInPages');
+		$('showThemesButton').removeClass('disabledButtonInPages');
+	}
+	
+	if (!SHOW_SOURCE_PAGES && !SHOW_EDIT_PAGES) {
+		$('showPageModules').addClass('disabledButtonInPages');
+		$('showThemesButton').addClass('disabledButtonInPages');
 	}
 	
 	frame.src = '';
