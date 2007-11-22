@@ -1054,11 +1054,6 @@ html>body .pageInfoButtonsContainer a {
 	display: none;
 }
 
-.pageInfoButtonsContainer a#showThemesButton.disabledButtonInPages {
-	//background-image: url(images/lgicn_24_disabled.png);
-	display: none;
-}
-
 .pageInfoButtonsContainer a#showEditPagesButton {
 	background: url(images/edit_24.gif) top center no-repeat;
 }

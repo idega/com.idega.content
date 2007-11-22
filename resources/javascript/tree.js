@@ -92,12 +92,12 @@ function setFrameUrl(uri) {
 	
 	if (SHOW_EDIT_PAGES) {
 		$('showPageModules').removeClass('disabledButtonInPages');
-		$('showThemesButton').removeClass('disabledButtonInPages');
+		//$('showThemesButton').removeClass('disabledButtonInPages');
 	}
 	
 	if (!SHOW_SOURCE_PAGES && !SHOW_EDIT_PAGES) {
 		$('showPageModules').addClass('disabledButtonInPages');
-		$('showThemesButton').addClass('disabledButtonInPages');
+		//$('showThemesButton').addClass('disabledButtonInPages');
 	}
 	
 	frame.src = '';
