@@ -151,11 +151,28 @@ version="1.2">
                 		<t:commandLink id="newPagesButton" forceId="true" styleClass="newPagesButtonStyleClass" value="#{localizedStrings['com.idega.content']['new_pages']}"></t:commandLink>
                 	</t:div>
 					<t:div styleClass="rightButtonStyle">
-						<t:commandLink id="showPageModules" forceId="true" styleClass="showPageModulesStyleClass disabledButtonInPages" value="#{localizedStrings['com.idega.content']['show_modules']}"></t:commandLink>
-						<t:commandLink id="showThemesButton" forceId="true" styleClass="showThemesButtonStyleClass" value="#{localizedStrings['com.idega.content']['show_themes']}"></t:commandLink>
-						<t:commandLink id="showEditPagesButton" forceId="true" styleClass="showEditPagesButtonStyleClass" value="#{localizedStrings['com.idega.content']['edit']}"></t:commandLink>
-						<t:commandLink id="showSourcePagesButton" forceId="true" styleClass="showSourcePagesButtonStyleClass" value="#{localizedStrings['com.idega.content']['page_source']}"></t:commandLink>
-						<t:commandLink id="showPreviewPagesButton" forceId="true" styleClass="showPreviewPagesButtonStyleClass activeButtonInPages" value="#{localizedStrings['com.idega.content']['preview']}"></t:commandLink>
+						<t:div styleClass="filters">
+							<t:commandLink id="showPageModules" forceId="true" styleClass="showPageModulesStyleClass disabledButtonInPages" value="#{localizedStrings['com.idega.content']['show_modules']}"></t:commandLink>
+							<t:commandLink id="showThemesButton" forceId="true" styleClass="showThemesButtonStyleClass" value="#{localizedStrings['com.idega.content']['show_themes']}"></t:commandLink>
+						</t:div>
+												
+						<t:div styleClass="states">
+							<t:commandLink id="showEditPagesButton" forceId="true" styleClass="showEditPagesButtonStyleClass">
+								<t:htmlTag styleClass="outerSpan" value="span">
+									<t:outputText value="#{localizedStrings['com.idega.content']['edit']}" styleClass="innerSpan"/>
+								</t:htmlTag>
+							</t:commandLink>
+							<t:commandLink id="showSourcePagesButton" forceId="true" styleClass="showSourcePagesButtonStyleClass">
+								<t:htmlTag styleClass="outerSpan" value="span">
+									<t:outputText value="#{localizedStrings['com.idega.content']['page_source']}" styleClass="innerSpan"/>
+								</t:htmlTag>
+							</t:commandLink>
+							<t:commandLink id="showPreviewPagesButton" forceId="true" styleClass="showPreviewPagesButtonStyleClass activeButtonInPages">
+								<t:htmlTag styleClass="outerSpan" value="span">
+									<t:outputText value="#{localizedStrings['com.idega.content']['preview']}" styleClass="innerSpan"/>
+								</t:htmlTag>
+							</t:commandLink>
+						</t:div>
 					</t:div>
 				</t:div>
 			</h:form>

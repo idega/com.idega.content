@@ -1033,6 +1033,10 @@ html>body .pageInfoButtonsContainer a {
 	width: auto;
 }
 
+.pageInfoButtonsContainer .filters, .pageInfoButtonsContainer .states {
+	float: left;	
+}
+
 .pageInfoButtonsContainer a#newPageButton {
 	background: url(images/new_24.gif) top center no-repeat;
 }

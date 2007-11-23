@@ -497,9 +497,7 @@ function registerPageInfoActions() {
 				manageSlider(element.id);
 			};
 			element.addEvent('click', function() {
-				if (SHOW_EDIT_PAGES) {
-					manageSliderFunction();
-				}
+				manageSliderFunction();
 				
 				return false;
 			});
