@@ -317,12 +317,23 @@ function setElementsVisibilityProperty(ids, property) {
 }
 
 function getThemes(themeID, addReflect, needScrollToDefaultTheme) {
-	showLoadingMessage(getGeneratingPreviewText());
+	var loadingLayer = null;
+	var themesContainer = $('themesSliderContainer');
+	if (themesContainer != null) {
+		loadingLayer = $(setLoadingLayerForElement(themesContainer.id, false, themesContainer.getSize(), themesContainer.getPosition()));
+	}
+	
 	setGlobalId(themeID);
 	needReflection = addReflect;
 	ThemesEngine.getThemes({
 		callback: function(themes) {
 			getThemesCallback(themes, needScrollToDefaultTheme);
+			
+			if (loadingLayer != null) {
+				try {
+					loadingLayer.remove();
+				} catch(e) {}
+			}
 		}
 	});
 }
