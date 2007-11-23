@@ -127,9 +127,6 @@ function hideThemesSliderInPages(container, button) {
 	
 	if ($(container).getStyle('display') != 'none') {
 		removeStyleOptions();
-		if (button != null) {
-			button.setText(getShowThemesText());
-		}
 		var hideSlider = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 		hideSlider.start(1, 0);
 		SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'none', "+FRAME_CHANGE+")", SHOW_ELEMENT_TRANSITION_DURATION);
