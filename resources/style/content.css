@@ -1023,6 +1023,7 @@ body.site_manager .mainPagesContentStyle {
 	margin-right: 13px;
 	width: 24px;
 	text-align: center;
+	text-shadow: #fff 2px 2px 1px;
 }
 
 .pageInfoButtonsContainer a:hover {
@@ -1059,15 +1060,15 @@ html>body .pageInfoButtonsContainer a {
 	display: none;
 }
 
-.pageInfoButtonsContainer a#showEditPagesButton {
+.pageInfoButtonsContainer a#showEditPagesButton .innerSpan {
 	background: url(images/edit_24.gif) top center no-repeat;
 }
 
-.pageInfoButtonsContainer a#showSourcePagesButton {
+.pageInfoButtonsContainer a#showSourcePagesButton .innerSpan {
 	background: url(images/script_24.gif) top center no-repeat;
 }
 
-.pageInfoButtonsContainer a#showPreviewPagesButton {
+.pageInfoButtonsContainer a#showPreviewPagesButton .innerSpan {
 	background: url(images/opnbr_24.gif) top center no-repeat;
 }
 
@@ -1187,10 +1188,6 @@ ul#page_tree_div li ul {
 	cursor: pointer;
 }
 
-.activeButtonInPages {
-	font-weight: bold !important;
-}
-
 .disabledButtonInPages {
 	color: #a0a0a0 !important;
 }
@@ -1212,6 +1209,7 @@ ul#page_tree_div li ul {
 	padding-left: 10px;
 	margin-left: 8px;
 	margin-right: 8px;
+	text-shadow: #fff 2px 2px 1px;
 }
 
 html>body .filters a {
@@ -1237,8 +1235,50 @@ html>body .filters a {
 .filters a.active {
 	background: url(images/filter_background_left.png) left no-repeat;
 	color: #fff;
+	text-shadow: #a0a0a0 2px 2px 1px;
 }
 
 .filters a.active .outerSpan {
 	background: url(images/filter_background_right.png) right no-repeat;
+}
+
+.states {
+	margin-left: 16px;	
+}
+
+.states a {
+	padding: 0;
+	margin: 0;
+	height: 55px;
+	padding-left: 2px;
+}
+
+.states a .outerSpan {
+	display: block;
+	float: left;
+	padding-right: 8px;
+	padding-left: 6px;
+	height: 55px;
+}
+
+.states a .innerSpan {
+	display: block;
+	float: left;
+	padding-top: 30px;
+	margin-top: 7px;
+	width: 30px;
+	text-align: center;
+}
+
+html>body .states a .innerSpan {
+	min-width: 30px;
+	width: auto;
+}
+
+.activeButtonInPages {
+	background: url(images/selected_button_left.png) left no-repeat;
+}
+
+.activeButtonInPages .outerSpan {
+	background: url(images/selected_button_right.png) right no-repeat;
 }
