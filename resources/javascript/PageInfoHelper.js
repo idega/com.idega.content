@@ -551,6 +551,8 @@ function registerPageInfoActions() {
 					hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
 				}
 				
+				MODULES_SHOWN = false;
+				$('showPageModules').removeClass('active');
 				$('showEditPagesButton').removeClass('activeButtonInPages');
 				$('showSourcePagesButton').removeClass('activeButtonInPages');
 				
@@ -576,6 +578,9 @@ function registerPageInfoActions() {
 						hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
 					}
 					
+					MODULES_SHOWN = false;
+					$('showPageModules').removeClass('active');
+					$('showThemesButton').removeClass('active');
 					$('showEditPagesButton').removeClass('activeButtonInPages');
 					$('showPreviewPagesButton').removeClass('activeButtonInPages');
 					
