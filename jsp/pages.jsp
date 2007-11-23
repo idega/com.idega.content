@@ -143,9 +143,9 @@ version="1.2">
 				</f:verbatim>
                 
                 <t:div styleClass="pageInfoButtonsContainer">
-                	<!-- <t:div style="float: left; width: 255px; visibility: hidden;">
+                	<t:div style="float: left; width: 255px; visibility: hidden;">
                 		<t:commandLink value="none" />
-                	</t:div> -->
+                	</t:div>
                 	<t:div styleClass="leftButtonStyle">
                 		<t:commandLink id="newPageButton" forceId="true" styleClass="newPageButtonStyleClass" value="#{localizedStrings['com.idega.content']['new_page']}"></t:commandLink>
                 		<t:commandLink id="newPagesButton" forceId="true" styleClass="newPagesButtonStyleClass" value="#{localizedStrings['com.idega.content']['new_pages']}"></t:commandLink>

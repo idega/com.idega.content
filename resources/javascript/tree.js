@@ -92,12 +92,20 @@ function setFrameUrl(uri) {
 	
 	if (SHOW_EDIT_PAGES) {
 		$('showPageModules').removeClass('disabledButtonInPages');
-		//$('showThemesButton').removeClass('disabledButtonInPages');
+		$('showThemesButton').removeClass('disabledButtonInPages');
 	}
-	
-	if (!SHOW_SOURCE_PAGES && !SHOW_EDIT_PAGES) {
-		$('showPageModules').addClass('disabledButtonInPages');
-		//$('showThemesButton').addClass('disabledButtonInPages');
+	else {
+		if (!$('showPageModules').hasClass('disabledButtonInPages')) {
+			$('showPageModules').addClass('disabledButtonInPages');
+		}
+		if (!SHOW_SOURCE_PAGES) {
+			$('showThemesButton').removeClass('disabledButtonInPages');
+		}
+		else {
+			if (!$('showThemesButton').hasClass('disabledButtonInPages')) {
+				$('showThemesButton').addClass('disabledButtonInPages');
+			}
+		}
 	}
 	
 	frame.src = '';

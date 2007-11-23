@@ -497,7 +497,9 @@ function registerPageInfoActions() {
 				manageSlider(element.id);
 			};
 			element.addEvent('click', function() {
-				manageSliderFunction();
+				if (!SHOW_SOURCE_PAGES) {
+					manageSliderFunction();
+				}
 				
 				return false;
 			});
@@ -547,7 +549,9 @@ function registerPageInfoActions() {
 				SHOW_SOURCE_PAGES = false;
 				SHOW_EDIT_PAGES = false;
 				
-				hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
+				if (SHOW_SOURCE_PAGES) {
+					hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
+				}
 				
 				$('showEditPagesButton').removeClass('activeButtonInPages');
 				$('showSourcePagesButton').removeClass('activeButtonInPages');
@@ -570,7 +574,9 @@ function registerPageInfoActions() {
 					SHOW_SOURCE_PAGES = true;
 					SHOW_EDIT_PAGES = false;
 					
-					hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
+					if (SHOW_SOURCE_PAGES) {
+						hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
+					}
 					
 					$('showEditPagesButton').removeClass('activeButtonInPages');
 					$('showPreviewPagesButton').removeClass('activeButtonInPages');
