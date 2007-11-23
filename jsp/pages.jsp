@@ -152,11 +152,24 @@ version="1.2">
                 	</t:div>
 					<t:div styleClass="rightButtonStyle">
 						<t:div styleClass="filters">
-							<t:commandLink id="showPageModules" forceId="true" styleClass="showPageModulesStyleClass disabledButtonInPages" value="#{localizedStrings['com.idega.content']['show_modules']}"></t:commandLink>
-							<t:commandLink id="showThemesButton" forceId="true" styleClass="showThemesButtonStyleClass" value="#{localizedStrings['com.idega.content']['show_themes']}"></t:commandLink>
+							<t:commandLink id="showPageModules" forceId="true" styleClass="showPageModulesStyleClass disabledButtonInPages">
+								<t:htmlTag styleClass="outerSpan" value="span">
+									<t:outputText value="#{localizedStrings['com.idega.content']['show_modules']}" styleClass="innerSpan"/>
+								</t:htmlTag>
+							</t:commandLink>
+							<t:commandLink id="showThemesButton" forceId="true" styleClass="showThemesButtonStyleClass">
+								<t:htmlTag styleClass="outerSpan" value="span">
+									<t:outputText value="#{localizedStrings['com.idega.content']['show_themes']}" styleClass="innerSpan"/>
+								</t:htmlTag>
+							</t:commandLink>
 						</t:div>
 												
 						<t:div styleClass="states">
+							<t:commandLink id="showPreviewPagesButton" forceId="true" styleClass="showPreviewPagesButtonStyleClass activeButtonInPages">
+								<t:htmlTag styleClass="outerSpan" value="span">
+									<t:outputText value="#{localizedStrings['com.idega.content']['preview']}" styleClass="innerSpan"/>
+								</t:htmlTag>
+							</t:commandLink>
 							<t:commandLink id="showEditPagesButton" forceId="true" styleClass="showEditPagesButtonStyleClass">
 								<t:htmlTag styleClass="outerSpan" value="span">
 									<t:outputText value="#{localizedStrings['com.idega.content']['edit']}" styleClass="innerSpan"/>
@@ -165,11 +178,6 @@ version="1.2">
 							<t:commandLink id="showSourcePagesButton" forceId="true" styleClass="showSourcePagesButtonStyleClass">
 								<t:htmlTag styleClass="outerSpan" value="span">
 									<t:outputText value="#{localizedStrings['com.idega.content']['page_source']}" styleClass="innerSpan"/>
-								</t:htmlTag>
-							</t:commandLink>
-							<t:commandLink id="showPreviewPagesButton" forceId="true" styleClass="showPreviewPagesButtonStyleClass activeButtonInPages">
-								<t:htmlTag styleClass="outerSpan" value="span">
-									<t:outputText value="#{localizedStrings['com.idega.content']['preview']}" styleClass="innerSpan"/>
 								</t:htmlTag>
 							</t:commandLink>
 						</t:div>

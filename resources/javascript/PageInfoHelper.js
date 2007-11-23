@@ -110,11 +110,12 @@ function manageSlider(buttonID) {
 		return;
 	}
 	if (container.style.display == 'none') {
-		button.setText(getHideThemesText());
+		button.addClass("active");
 		changeFrameHeight(-FRAME_CHANGE);
 		showSlider(container);
 	}
 	else {
+		button.removeClass("active");
 		hideThemesSliderInPages(container, button);
 	}
 }
@@ -649,11 +650,11 @@ function manageModulesBackground(element) {
 	}
 	
 	if (MODULES_SHOWN) {
-		element.value = getShowModuleText();
+		element.removeClass("active");
 		MODULES_SHOWN = false;
 	}
 	else {
-		element.value = getHideModulesText();
+		element.addClass("active");
 		MODULES_SHOWN = true;
 	}
 }

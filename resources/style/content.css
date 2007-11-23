@@ -1022,6 +1022,7 @@ body.site_manager .mainPagesContentStyle {
 	margin-left: 25px;
 	margin-right: 13px;
 	width: 24px;
+	text-align: center;
 }
 
 .pageInfoButtonsContainer a:hover {
@@ -1045,12 +1046,12 @@ html>body .pageInfoButtonsContainer a {
 	background: url(images/new_multiple_24.gif) top center no-repeat;
 }
 
-.pageInfoButtonsContainer a#showPageModules {
-	background: url(images/sinfo_24.png) top center no-repeat;
+.pageInfoButtonsContainer a#showPageModules .innerSpan {
+	background: url(images/sinfo_16.png) top center no-repeat;
 }
 
-.pageInfoButtonsContainer a#showThemesButton {
-	background: url(images/lgicn_24.png) top center no-repeat;
+.pageInfoButtonsContainer a#showThemesButton .innerSpan {
+	background: url(images/lgicn_16.png) top center no-repeat;
 }
 
 .pageInfoButtonsContainer a#showPageModules.disabledButtonInPages {
@@ -1192,4 +1193,52 @@ ul#page_tree_div li ul {
 
 .disabledButtonInPages {
 	color: #a0a0a0 !important;
+}
+
+.filters {
+	margin-top: 8px;
+	padding-right: 8px;
+	border-right: 1px #a0a0a0 dotted;
+}
+
+.filters a {
+	display: block;
+	float: left;
+	margin: 0;
+	font-size: 10px;
+	height: 40px;
+	padding-top: 0;
+	width: 16px;
+	padding-left: 10px;
+	margin-left: 8px;
+	margin-right: 8px;
+}
+
+html>body .filters a {
+	width: auto;
+	min-width: 16px;
+}
+
+.filters a .outerSpan {
+	display: block;
+	float: left;
+	height: 40px;
+	padding-right: 16px;
+	padding-left: 6px;
+}
+
+.filters a .innerSpan {
+	display: block;
+	float: left;
+	margin-top: 5px;
+	padding-top: 20px;
+}
+
+.filters a.active {
+	background: url(images/filter_background_left.png) left no-repeat;
+	color: #fff;
+}
+
+.filters a.active .outerSpan {
+	background: url(images/filter_background_right.png) right no-repeat;
 }
