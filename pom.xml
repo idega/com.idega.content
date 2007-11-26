@@ -84,6 +84,11 @@
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.dwr</artifactId>
     </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${commons-io-commons-io-version}</version>
+    </dependency>
   </dependencies>
   
 </project>

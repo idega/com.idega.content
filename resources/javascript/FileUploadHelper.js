@@ -1,4 +1,16 @@
-function uploadFiles(id, message, showProgressBar, showMessage, zipFile, invalidTypeMessage, formId, actionAfterUpload) {
+var UPLOADING_FILE_PROGRESS_BOX_TEXT = 'Uploading file';
+var UPLOADING_FILE_PLEASE_WAIT_PROGRESS_BOX_TEXT = 'completed, please wait...';
+var UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT = 'Upload was successfully finished.';
+
+function uploadFiles(id, message, showProgressBar, showMessage, zipFile, invalidTypeMessage, formId, progressBarId, localization, actionAfterUpload) {
+	if (localization != null) {
+		if (localization.length == 3) {
+			UPLOADING_FILE_PROGRESS_BOX_TEXT = localization[0];
+			UPLOADING_FILE_PLEASE_WAIT_PROGRESS_BOX_TEXT = localization[1];
+			UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT = localization[2];
+		}
+	}
+	
 	var inputs = getInputsForUpload(id);
 	var files = getFilesValuesToUpload(inputs, zipFile, invalidTypeMessage);
 	if (files.length == 0) {
@@ -26,7 +38,6 @@ function uploadFiles(id, message, showProgressBar, showMessage, zipFile, invalid
 		showLoadingMessage(message);
 	}
 	
-	YAHOO.util.Connect.setForm(formId, true);
 	var uploadHandler = {
 		upload: function(o) {
 			closeAllLoadingMessages();
@@ -38,7 +49,49 @@ function uploadFiles(id, message, showProgressBar, showMessage, zipFile, invalid
 			executeUserDefinedActionsAfterUploadFinished(actionAfterUpload);
 		}
 	};
+	
+	YAHOO.util.Connect.setForm(formId, true);
 	YAHOO.util.Connect.asyncRequest('POST', '/servlet/ContentFileUploadServlet', uploadHandler);
+	
+	if (showProgressBar) {
+		showUploadInfoInProgressBar(progressBarId);
+	}
+}
+
+function showUploadInfoInProgressBar(progressBarId) {
+	document.getElementById(progressBarId).style.visibility = 'visible';	
+	fillProgressBoxWithFileUploadInfo(progressBarId);
+}
+
+function fillProgressBoxWithFileUploadInfo(progressBarId) {
+	FileUploadListener.getFileUploadStatus({
+		callback: function(status) {
+			var textBox = document.getElementById(progressBarId + '_progressText');
+			
+			if (status == null) {
+				textBox.innerHTML = '';
+				return false;
+			}
+			
+			if (status == '1.00') {
+				textBox.innerHTML = UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT;
+				window.setTimeout("resetFileUploaderCounterAfterTimeOut('"+progressBarId+"')", 2000);
+				return false;
+			}
+			else {
+				textBox.innerHTML = UPLOADING_FILE_PROGRESS_BOX_TEXT + ': ' + status + '% ' + UPLOADING_FILE_PLEASE_WAIT_PROGRESS_BOX_TEXT;
+				window.setTimeout("fillProgressBoxWithFileUploadInfo('"+progressBarId+"')", 1000);
+			}
+		}
+	});
+}
+
+function resetFileUploaderCounterAfterTimeOut(progressBarId) {
+	FileUploadListener.resetFileUploaderCounters({
+		callback:function(result) {
+			document.getElementById(progressBarId).style.visibility = 'hidden';
+		}
+	});
 }
 
 function findElementInPage(container, tagName) {

@@ -1,5 +1,8 @@
 package com.idega.content.upload.presentation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.faces.context.FacesContext;
 
 import com.idega.block.web2.business.Web2Business;
@@ -13,6 +16,8 @@ import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.PresentationObjectContainer;
+import com.idega.presentation.Span;
+import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
@@ -28,7 +33,7 @@ public class FileUploadViewer extends Block {
 	private boolean extractContent = false;
 	private boolean themePack = false;
 	private boolean showProgressBar = true;
-	private boolean showLoadingMessage = true;
+	private boolean showLoadingMessage = false;
 	private boolean allowMultipleFiles = false;
 	
 	public void restoreState(FacesContext context, Object state) {
@@ -90,6 +95,7 @@ public class FileUploadViewer extends Block {
 		script.append(getJavaScriptSourceLine(web2.getBundleURIToYUIScript()));
 		script.append(getJavaScriptSourceLine("/dwr/engine.js"));
 		script.append(getJavaScriptSourceLine("/dwr/interface/FileUploader.js"));
+		script.append(getJavaScriptSourceLine("/dwr/interface/FileUploadListener.js"));
 		container.add(script.toString());
 		
 		PresentationObjectContainer mainContainer = container;
@@ -115,7 +121,7 @@ public class FileUploadViewer extends Block {
 		Layer fileInputs = new Layer();
 		String id = fileInputs.getId();
 		fileInputs.setStyleClass("fileUploadInputsContainerStyle");
-		fileInputs.add(uploader.getFileInput(iwc, false));	//	Not adding remove image - at least on file input should remain
+		fileInputs.add(uploader.getFileInput(iwc, false));	//	Not adding 'remove' image - at least on file input should remain
 		mainContainer.add(fileInputs);
 		
 		Layer buttonsContainer = new Layer();
@@ -127,17 +133,43 @@ public class FileUploadViewer extends Block {
 			buttonsContainer.add(addFileInput);
 		}
 		
+		Layer progressBarBox = new Layer();
+		progressBarBox.setStyleClass("fileUploaderProgressBarStyle");
+		progressBarBox.setStyleAttribute("visibility: hidden;");
+		String progressBarId = progressBarBox.getId();
+		Span progressText = new Span();
+		progressText.add(new Text("0%"));
+		progressText.setId(progressBarId + "_progressText");
+		progressBarBox.add(progressText);
+		mainContainer.add(progressBarBox);
+		
+		List<String> localization = new ArrayList<String>(3);
+		localization.add(iwrb.getLocalizedString("uploading_file", "Uploading file"));
+		localization.add(iwrb.getLocalizedString("completed_please_wait", "completed, please wait..."));
+		localization.add(iwrb.getLocalizedString("upload_was_successfully_finished", "Upload was successfully finished."));
+		
 		String inavlidTypeMessage = iwrb.getLocalizedString("incorrect_file_type", "Unsupported file type! Only zip files allowed");
 		GenericButton upload = new GenericButton(iwrb.getLocalizedString("upload", "Upload"));
-		upload.setOnClick(getAction(id, iwrb.getLocalizedString("uploading", "Uploading..."), inavlidTypeMessage));
+		upload.setOnClick(getAction(id, iwrb.getLocalizedString("uploading", "Uploading..."), inavlidTypeMessage, progressBarId, localization));
 		buttonsContainer.add(upload);
 		
 		mainContainer.add(buttonsContainer);
 	}
 	
-	private String getAction(String id, String loadingMessage, String invalidTypeMessage) {
+	private String getAction(String id, String loadingMessage, String invalidTypeMessage, String progressBarId, List<String> localization) {
 		StringBuffer action = new StringBuffer("uploadFiles('").append(id).append("', '").append(loadingMessage).append("', ").append(showProgressBar).append(", ");
-		action.append(showLoadingMessage).append(", ").append(zipFile).append(", '").append(invalidTypeMessage).append("', '").append(formId).append("', ");
+		action.append(showLoadingMessage).append(", ").append(zipFile).append(", '").append(invalidTypeMessage).append("', '").append(formId).append("', '");
+		action.append(progressBarId).append("', ");
+		
+		action.append("['");
+		for (int i = 0; i < localization.size(); i++) {
+			action.append(localization.get(i));
+			
+			if ((i + 1) < localization.size()) {
+				action.append("', '");
+			}
+		}
+		action.append("'], ");
 		
 		if (actionAfterUpload == null) {
 			action.append("null");

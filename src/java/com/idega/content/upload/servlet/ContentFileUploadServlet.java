@@ -1,6 +1,5 @@
 package com.idega.content.upload.servlet;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,44 +10,64 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUpload;
+import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.servlet.ServletRequestContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.ThemesConstants;
 import com.idega.content.upload.bean.UploadFile;
+import com.idega.content.upload.business.FileUploadProgressListener;
 import com.idega.content.upload.business.FileUploader;
 import com.idega.util.CoreUtil;
 
 public class ContentFileUploadServlet extends HttpServlet {
 
-	private static final long serialVersionUID = -6282517406996613536L;
+	private static Log log = LogFactory.getLog(ContentFileUploadServlet.class);
+	
+	private static final long serialVersionUID = -6282517406996613536L;	
+	private static final long MAX_UPLOAD_SIZE = 1024 * 1024 * 1024;
 
 	@SuppressWarnings("unchecked")
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ServletRequestContext src = new ServletRequestContext(request);
+		if (!FileUploadBase.isMultipartContent(src)) {
+			log.info("Request is not multipart content!");
+			return;
+		}
+		
 		String uploadPath = null;
 		boolean zipFile = false;
 		boolean themePack = false;
 		boolean extractContent = false;
 		
-		File location = new File(System.getProperty("java.io.tmpdir"));
-        DiskFileItemFactory itemFactory = new DiskFileItemFactory(256 * 1024, location);
-        ServletFileUpload fileUploader = new ServletFileUpload(itemFactory);
-        
-        //	TODO: implement ProgressListener - it is a base for progress bar. This needs file upload 1.2
-        /*fileUploader.setProgressListener(new ProgressListener() {
-			public void update(long bytesRead, long contentLength, int items) {
-			}
-		});*/
-
-        List<FileItem> fileItems = null;
-        try {
-			fileItems = fileUploader.parseRequest(request);
-		} catch (Exception e) {
+		FileUploadProgressListener uploadProgressListner = null;
+		try {
+			uploadProgressListner = (FileUploadProgressListener) SpringBeanLookup.getInstance().getSpringBean(request.getSession(), FileUploadProgressListener.class);
+		} catch(Exception e) {
 			e.printStackTrace();
+			return;
 		}
-        if (fileItems == null) {
+		
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		FileUploadBase fileUploadService = new FileUpload(factory);
+		fileUploadService.setSizeMax(MAX_UPLOAD_SIZE);
+		fileUploadService.setProgressListener(uploadProgressListner);
+
+		List<FileItem> fileItems = null;
+		try {
+			fileItems = fileUploadService.parseRequest(src);
+		} catch (FileUploadException e) {
+			e.printStackTrace();
+			return;
+		}
+		if (fileItems == null || fileItems.size() == 0) {
+			log.info("No files to upload!");
         	return;
         }
         

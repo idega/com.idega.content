@@ -7,5 +7,6 @@
 	<bean id="themeChanger" class="com.idega.content.themes.helpers.ThemeChangerBean" scope="session"></bean>
 	<bean id="themesPropertiesExtractor" class="com.idega.content.themes.helpers.ThemesPropertiesExtractorBean" scope="session"></bean>
 	<bean id="fileUploader" class="com.idega.content.upload.business.FileUploaderBean" scope="session"></bean>
+	<bean id="fileUploadProgressListener" class="com.idega.content.upload.business.FileUploadProgressListenerBean" scope="session"></bean>
 
 </beans>

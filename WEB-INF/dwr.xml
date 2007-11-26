@@ -25,6 +25,11 @@
     		<param name="managedBeanName" value="fileUploader"></param>
     		<param name="class" value="com.idega.content.upload.business.FileUploaderBean"/>
 		</create>
+		
+		<create creator="jsf" javascript="FileUploadListener">
+    		<param name="managedBeanName" value="fileUploadProgressListener"></param>
+    		<param name="class" value="com.idega.content.upload.business.FileUploadProgressListenerBean"/>
+		</create>
 	</allow>
   
 	<signatures>
