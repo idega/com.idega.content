@@ -69,10 +69,9 @@ function fillProgressBoxWithFileUploadInfo(progressBarId) {
 			var textBox = document.getElementById(progressBarId + '_progressText');
 			
 			if (status == null) {
-				textBox.innerHTML = '';
-				return false;
+				status = '0';
 			}
-			
+
 			if (status == '1.00') {
 				textBox.innerHTML = UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT;
 				window.setTimeout("resetFileUploaderCounterAfterTimeOut('"+progressBarId+"')", 2000);
