@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.29 2007/11/14 16:20:41 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.30 2007/11/26 15:52:49 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -40,63 +40,45 @@ import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2007/11/14 16:20:41 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/11/26 15:52:49 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.29 $
+ * @version $Revision: 1.30 $
  */
-//public class IWBundleStarter implements IWBundleStartable, JarLoader {
 public class IWBundleStarter implements IWBundleStartable{
 	
 	/**
 	 * 
 	 */
-	
 	public IWBundleStarter() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	/* (non-Javadoc)
-	 * @see com.idega.idegaweb.IWBundleStartable#start(com.idega.idegaweb.IWBundle)
-	 */
 	public void start(IWBundle starterBundle) {
 		addIWActionURIHandlers();
 		addRSSProducers(starterBundle);
 		
 		ContentViewManager cViewManager = ContentViewManager.getInstance(starterBundle.getApplication());
 		cViewManager.initializeStandardNodes(starterBundle);
-		GlobalIncludeManager.getInstance().addBundleStyleSheet(ContentConstants.IW_BUNDLE_IDENTIFIER,"/style/content.css");
+		GlobalIncludeManager.getInstance().addBundleStyleSheet(ContentConstants.IW_BUNDLE_IDENTIFIER, "/style/content.css");
 		
 		
 		IWApplicationContext iwac = starterBundle.getApplication().getIWApplicationContext();
 	    try {
 	    	IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(iwac,IWSlideService.class);
-	           
-	        ThemesService themesService = (ThemesService) IBOLookup.getServiceInstance(iwac, ThemesService.class);
-	        service.addIWSlideChangeListeners(themesService);
-	    } catch (IBOLookupException e) {
-	    	e.printStackTrace();
-	    } catch (RemoteException e) {
+	        service.addIWSlideChangeListeners((ThemesService) IBOLookup.getServiceInstance(iwac, ThemesService.class));
+	    } catch (Exception e) {
 	    	e.printStackTrace();
 	    }
 
 	    loadThemeValues(starterBundle);
-//	    loadSiteTemplateFilesFromBundles(starterBundle.getApplication());
 	    IWMainApplication iwmain = starterBundle.getApplication();
 	    
 	    TemplatesLoader templatesLoader = TemplatesLoader.getInstance(iwmain);
 	    templatesLoader.loadTemplatesFromBundles();
-		
-//	    RSSProducerRegistry.getInstance().addRSSProducer("files/cms/article", ContentItemRssProducer.getInstance(iwmain));
-//	    RSSProducerRegistry.getInstance().addRSSProducer("files/cms/article", new ContentItemRssProducer());
 	}
 
-	/* (non-Javadoc)
-	 * @see com.idega.idegaweb.IWBundleStartable#stop(com.idega.idegaweb.IWBundle)
-	 */
 	public void stop(IWBundle starterBundle) {
-		// TODO Auto-generated method stub
 	}
 	
 	/**
@@ -166,9 +148,6 @@ public class IWBundleStarter implements IWBundleStartable{
 		
 		ContentRSSProducer contentProducer = new ContentRSSProducer();
 		registry.addRSSProducer("content", contentProducer);
-		
-//	    RSSProducerRegistry.getInstance().addRSSProducer("files/cms/article", new ContentItemRssProducer());
-		
 		
 		 IWApplicationContext iwac = starterBundle.getApplication().getIWApplicationContext();
 	        try {
