@@ -1,6 +1,7 @@
 package com.idega.content.upload.business;
 
 import java.text.NumberFormat;
+import java.util.Locale;
 
 
 public class FileUploadProgressListenerBean implements FileUploadProgressListener {
@@ -20,7 +21,7 @@ public class FileUploadProgressListenerBean implements FileUploadProgressListene
 			return null;
 		}
 		
-		String status = NumberFormat.getPercentInstance().format((double) bytesTransferred / (double) fileSize);
+		String status = NumberFormat.getPercentInstance(Locale.ENGLISH).format((double) bytesTransferred / (double) fileSize);
 		System.out.println("Upload status: " + status);
 		return status.substring(0, status.length() - 1);
 	}
