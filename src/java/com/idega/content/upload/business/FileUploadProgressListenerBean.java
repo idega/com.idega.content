@@ -16,13 +16,10 @@ public class FileUploadProgressListenerBean implements FileUploadProgressListene
 	
 	public String getFileUploadStatus() {
 		if (fileSize == 0) {
-			System.out.println("Bytes transferred: " + bytesTransferred);
-			System.out.println("File size: " + fileSize);
 			return null;
 		}
 		
 		String status = NumberFormat.getPercentInstance(Locale.ENGLISH).format((double) bytesTransferred / (double) fileSize);
-		System.out.println("Upload status: " + status);
 		return status.substring(0, status.length() - 1);
 	}
 	
