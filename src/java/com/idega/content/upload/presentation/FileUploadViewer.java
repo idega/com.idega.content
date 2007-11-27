@@ -121,7 +121,7 @@ public class FileUploadViewer extends Block {
 		Layer fileInputs = new Layer();
 		String id = fileInputs.getId();
 		fileInputs.setStyleClass("fileUploadInputsContainerStyle");
-		fileInputs.add(uploader.getFileInput(iwc, false));	//	Not adding 'remove' image - at least on file input should remain
+		fileInputs.add(uploader.getFileInput(iwc, false));	//	Not adding 'remove' image - at least one file input should remain
 		mainContainer.add(fileInputs);
 		
 		Layer buttonsContainer = new Layer();
@@ -133,19 +133,22 @@ public class FileUploadViewer extends Block {
 			buttonsContainer.add(addFileInput);
 		}
 		
+		String uploadingFile = iwrb.getLocalizedString("uploading_file", "Uploading file");
+		String uploadStatus = iwrb.getLocalizedString("completed_please_wait", "completed, please wait...");
+		
 		Layer progressBarBox = new Layer();
 		progressBarBox.setStyleClass("fileUploaderProgressBarStyle");
 		progressBarBox.setStyleAttribute("visibility: hidden;");
 		String progressBarId = progressBarBox.getId();
 		Span progressText = new Span();
-		progressText.add(new Text("0%"));
+		progressText.add(new Text(new StringBuffer(uploadingFile).append(": 0% ").append(uploadStatus).toString()));
 		progressText.setId(progressBarId + "_progressText");
 		progressBarBox.add(progressText);
 		mainContainer.add(progressBarBox);
 		
 		List<String> localization = new ArrayList<String>(3);
-		localization.add(iwrb.getLocalizedString("uploading_file", "Uploading file"));
-		localization.add(iwrb.getLocalizedString("completed_please_wait", "completed, please wait..."));
+		localization.add(uploadingFile);
+		localization.add(uploadStatus);
 		localization.add(iwrb.getLocalizedString("upload_was_successfully_finished", "Upload was successfully finished."));
 		
 		String inavlidTypeMessage = iwrb.getLocalizedString("incorrect_file_type", "Unsupported file type! Only zip files allowed");
