@@ -14,7 +14,9 @@ public class FileUploadProgressListenerBean implements FileUploadProgressListene
 	}
 	
 	public String getFileUploadStatus() {
-		if (bytesTransferred == 0 || fileSize == 0) {
+		if (fileSize == 0) {
+			System.out.println("Bytes transferred: " + bytesTransferred);
+			System.out.println("File size: " + fileSize);
 			return null;
 		}
 		
