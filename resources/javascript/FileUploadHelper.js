@@ -50,12 +50,16 @@ function uploadFiles(id, message, showProgressBar, showMessage, zipFile, invalid
 		}
 	};
 	
-	YAHOO.util.Connect.setForm(formId, true);
-	YAHOO.util.Connect.asyncRequest('POST', '/servlet/ContentFileUploadServlet', uploadHandler);
-	
-	if (showProgressBar) {
-		showUploadInfoInProgressBar(progressBarId);
-	}
+	FileUploadListener.resetFileUploaderCounters({
+		callback: function(result) {
+			YAHOO.util.Connect.setForm(formId, true);
+			YAHOO.util.Connect.asyncRequest('POST', '/servlet/ContentFileUploadServlet', uploadHandler);
+			
+			if (showProgressBar) {
+				showUploadInfoInProgressBar(progressBarId);
+			}
+		}
+	});
 }
 
 function showUploadInfoInProgressBar(progressBarId) {
@@ -72,7 +76,7 @@ function fillProgressBoxWithFileUploadInfo(progressBarId) {
 				status = '0';
 			}
 
-			if (status == '1.00') {
+			if (status == '100') {
 				textBox.innerHTML = UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT;
 				window.setTimeout("resetFileUploaderCounterAfterTimeOut('"+progressBarId+"')", 2000);
 				return false;
