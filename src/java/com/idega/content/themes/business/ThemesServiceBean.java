@@ -23,6 +23,7 @@ import com.idega.core.builder.data.ICPage;
 import com.idega.core.builder.data.ICPageHome;
 import com.idega.idegaweb.IWApplicationContextFactory;
 import com.idega.presentation.IWContext;
+import com.idega.servlet.filter.IWWelcomeFilter;
 import com.idega.slide.business.IWContentEvent;
 import com.idega.slide.business.IWSlideChangeListener;
 import com.idega.util.CoreConstants;
@@ -141,6 +142,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 				builder.clearAllCachedPages();
 			}
 		}
+		
+		IWWelcomeFilter.reInitializeCachedDomainOnNextRequest();
 		
 		return result;
 	}
