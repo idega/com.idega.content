@@ -71,7 +71,7 @@ public class FileUploadViewer extends Block {
 	public void main(IWContext iwc) {
 		FileUploader uploader = null;
 		try {
-			uploader = (FileUploader) SpringBeanLookup.getInstance().getSpringBean(iwc, FileUploader.class);
+			uploader = SpringBeanLookup.getInstance().getSpringBean(iwc, FileUploader.class);
 			uploader.initializeUploader(iwc);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -91,7 +91,7 @@ public class FileUploadViewer extends Block {
 		add(container);
 
 		StringBuffer script = new StringBuffer(getJavaScriptSourceLine(bundle.getVirtualPathWithFileNameString("javascript/FileUploadHelper.js")));
-		Web2Business web2 = (Web2Business) SpringBeanLookup.getInstance().getSpringBean(iwc, Web2Business.class);
+		Web2Business web2 = SpringBeanLookup.getInstance().getSpringBean(iwc, Web2Business.class);
 		script.append(getJavaScriptSourceLine(web2.getBundleURIToYUIScript()));
 		script.append(getJavaScriptSourceLine("/dwr/engine.js"));
 		script.append(getJavaScriptSourceLine("/dwr/interface/FileUploader.js"));

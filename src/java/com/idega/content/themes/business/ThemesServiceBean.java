@@ -181,7 +181,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			return true;
 		}
 		
-		ContentItemChecker checker = (ContentItemChecker) SpringBeanLookup.getInstance().getSpringBean(getIWApplicationContext(), ContentItemChecker.class);
+		ContentItemChecker checker = SpringBeanLookup.getInstance().getSpringBean(getIWApplicationContext(), ContentItemChecker.class);
 		if (checker == null) {
 			return false;
 		}

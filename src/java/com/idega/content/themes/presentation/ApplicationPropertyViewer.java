@@ -183,7 +183,7 @@ public class ApplicationPropertyViewer extends Block {
 			adder.addJavaScriptAtPosition(iwc, AddResource.HEADER_BEGIN, "/dwr/interface/ThemesEngine.js");
 			
 			try {
-				Web2Business web2 = (Web2Business) SpringBeanLookup.getInstance().getSpringBean(iwc, Web2Business.class);
+				Web2Business web2 = SpringBeanLookup.getInstance().getSpringBean(iwc, Web2Business.class);
 				adder.addJavaScriptAtPosition(iwc, AddResource.HEADER_BEGIN, web2.getBundleURIToMootoolsLib());
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -48,7 +48,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 		
 		FileUploadProgressListener uploadProgressListner = null;
 		try {
-			uploadProgressListner = (FileUploadProgressListener) SpringBeanLookup.getInstance().getSpringBean(request.getSession(), FileUploadProgressListener.class);
+			uploadProgressListner = SpringBeanLookup.getInstance().getSpringBean(request.getSession(), FileUploadProgressListener.class);
 		} catch(Exception e) {
 			e.printStackTrace();
 			return;
@@ -98,7 +98,7 @@ public class ContentFileUploadServlet extends HttpServlet {
         
         if (files.size() > 0) {
         	boolean isIE = CoreUtil.isIE(request);
-        	FileUploader uploader = (FileUploader) SpringBeanLookup.getInstance().getSpringBean(request.getSession(), FileUploader.class);
+        	FileUploader uploader = SpringBeanLookup.getInstance().getSpringBean(request.getSession(), FileUploader.class);
         	
         	if (zipFile || themePack) {
         		if (themePack) {
