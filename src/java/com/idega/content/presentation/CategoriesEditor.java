@@ -1,5 +1,5 @@
 /*
- * $Id: CategoriesEditor.java,v 1.2 2007/09/24 15:04:05 valdas Exp $
+ * $Id: CategoriesEditor.java,v 1.3 2007/12/17 16:21:26 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -11,6 +11,7 @@ package com.idega.content.presentation;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
+
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlInputText;
@@ -20,6 +21,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.WebDAVMetadataResource;
@@ -39,10 +41,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2007/09/24 15:04:05 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/12/17 16:21:26 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gediminas@idega.com">Gediminas Paulauskas</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class CategoriesEditor  extends IWBaseComponent implements ActionListener {
 	//Constants
@@ -52,6 +54,7 @@ public class CategoriesEditor  extends IWBaseComponent implements ActionListener
 		setId(CATEGORIES_EDITOR_ID);
 	}
 	
+	@Override
 	protected void initializeComponent(FacesContext context) {
 		add(getEditContainer());
 	}
@@ -79,6 +82,7 @@ public class CategoriesEditor  extends IWBaseComponent implements ActionListener
 	 */
 	private UIComponent getEditContainer() {
 		WFContainer mainContainer = new WFContainer();
+		mainContainer.setStyleClass("categoryEditor");
 
 		mainContainer.add(getCategoriesTable());
 

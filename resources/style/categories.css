@@ -1,3 +1,30 @@
+div.categoryEditor {
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+}
+
+div.newCategoryContainer {
+	padding: 0;
+	overflow: hidden;
+	line-height: 25px;
+}
+
+span.newCategoryNameLabelStyle {
+	margin: 0 !important;
+	font-weight: bold;
+	padding-right: 25px;
+	line-height: 20px;
+}
+
+input.nameForNewCategoryInputStyle {
+	margin: 0 !important;
+	padding: 2px 4px;
+}
+
+input.addCategoryButtonStyle {
+	padding: 2px 5px;
+	margin: 0 !important;
+}
+
 .changeCategoryUsageImageStyle {
 	cursor: pointer;
 }
@@ -6,8 +33,6 @@
 	font-weight: bold;
 }
 
-.localesForCategoriesDropDownMenuStyle {
-}
 
 .categoriesTableCellStyle {
 	width: 105px;
@@ -21,17 +46,9 @@
 	cursor: pointer;
 }
 
-.localizedCategoryLabelStyle {
-	width: 55%;
-}
-
 .changeCategoryNameInputStyle {
-	margin: 0px;
+	margin: 0px !important;
 	width: 100px;
-}
-
-.newCategoryNameLabelStyle {
-	font-weight: bold;
 }
 
 .categoriesTableHeader {
@@ -49,5 +66,10 @@
 	font-size: 10px;
 }
 
-.categoriesTable {
+.categoriesTable th, .categoriesTable td {
+	padding: 2px 5px;
+}
+
+.categoriesTable .name {
+	text-align: left;
 }

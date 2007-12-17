@@ -108,7 +108,9 @@ public class CategoriesListViewer extends Block {
 		TableRow headerRow = header.createRow();
 		headerRow.setStyleClass("categoriesTableHeader");
 		for (int i = 0; i < sortedLocales.size(); i++) {
-			headerRow.createCell().add(new Text(sortedLocales.get(i).getDisplayLanguage()));
+			TableCell2 cell = headerRow.createCell();
+			cell.setStyleClass("name");
+			cell.add(new Text(sortedLocales.get(i).getDisplayLanguage()));
 		}
 		headerRow.createCell().add(new Text(iwrb.getLocalizedString("status", "Status")));
 		headerRow.createCell().add(new Text(iwrb.getLocalizedString("delete", "Delete")));
@@ -134,7 +136,7 @@ public class CategoriesListViewer extends Block {
 				
 				name = category.getName(language);
 				cell = bodyRow.createCell();
-				cell.setStyleClass("categoriesTableCellStyle");
+				cell.setStyleClass("categoriesTableCellStyle name");
 				cell.add(getCategoryNameCellContent(name == null ? undefined : name, categoryId, iwrb, language));
 			}
 			bodyRow.createCell().add(getDisableCellContent(category, bundle, iwrb, null));

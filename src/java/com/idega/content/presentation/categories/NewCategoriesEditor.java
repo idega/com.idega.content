@@ -25,6 +25,7 @@ public class NewCategoriesEditor extends Block {
 		Locale currentLocale = iwc.getCurrentLocale();
 		
 		Layer container = new Layer();
+		container.setStyleClass("categoryEditor");
 		add(container);
 		
 		if (!ContentUtil.hasContentEditorRoles(iwc)) {
@@ -33,6 +34,7 @@ public class NewCategoriesEditor extends Block {
 		}
 		
 		Layer categoriesByLocaleContainer = new Layer();
+		categoriesByLocaleContainer.setStyleClass("categoryLocaleEditor");
 		
 		container.add(addNewCategoryContainer(iwc, categoriesByLocaleContainer.getId(), currentLocale.toString()));
 		
@@ -43,6 +45,7 @@ public class NewCategoriesEditor extends Block {
 	
 	private UIComponent addNewCategoryContainer(IWContext iwc, String containerId, String language) {
 		Layer newCategory = new Layer();
+		newCategory.setStyleClass("newCategoryContainer");
 		
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		Span label = new Span();
