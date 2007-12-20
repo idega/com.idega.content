@@ -662,10 +662,6 @@ function initScript(useStyling, enableContainer, enableVariations) {
 }
 
 function hideThemesContainer() {
-	var container = $(THEMES_CONTAINER_ID);
-	if (container != null) {
-		container.style.display = 'none';
-	}
 	manageButton(SHOW_THEMES_BUTTON_ID, true);
 }
 
