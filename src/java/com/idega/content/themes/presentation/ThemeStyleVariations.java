@@ -7,10 +7,10 @@ import javax.faces.component.UIComponent;
 
 import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.bean.ThemesManagerBean;
-import com.idega.content.themes.helpers.Theme;
-import com.idega.content.themes.helpers.ThemeStyleGroupMember;
-import com.idega.content.themes.helpers.ThemesConstants;
-import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.content.themes.helpers.bean.Theme;
+import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
+import com.idega.content.themes.helpers.business.ThemesConstants;
+import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
@@ -156,27 +156,32 @@ public class ThemeStyleVariations extends Block {
 		StringBuffer action = null;
 		for (int i = 0; allVariations.get(new StringBuffer(nameInMap).append(i).toString()) != null; i++) {
 			variation = allVariations.get(new StringBuffer(nameInMap).append(i).toString());
-			if (availableStyleMember(theme.getLinkToBase(), variation)) {
-				variationContainer = new ListItem();
-				if (variation.isLimitedSelection()) {
-					input = new RadioButton();
-					type = RADIO_INPUT;
+			if (variation.isStylesheet()) {
+				if (availableStyleMember(theme.getLinkToBase(), variation)) {
+					variationContainer = new ListItem();
+					if (variation.isLimitedSelection()) {
+						input = new RadioButton();
+						type = RADIO_INPUT;
+					}
+					else {
+						input = new CheckBox();
+						type = CHECKBOX_INPUT;
+					}
+					input.setName(groupName);
+					input.setValue(variation.getName());
+					action = new StringBuffer(ON_CLICK_ACTION).append(theme.getId()).append(SEPERATOR).append(groupName).append(SEPERATOR);
+					action.append(variation.getName()).append(SEPERATOR).append(type).append(INPUT_CHECKED);
+					input.setOnClick(action.toString());
+					if (variation.isEnabled()) {
+						input.setMarkupAttribute(INPUT_CHECKED_ATTRIBUTE, true);
+					}
+					variationContainer.add(input);
+					variationContainer.add(new Text(variation.getName()));
+					variations.add(variationContainer);
 				}
-				else {
-					input = new CheckBox();
-					type = CHECKBOX_INPUT;
-				}
-				input.setName(groupName);
-				input.setValue(variation.getName());
-				action = new StringBuffer(ON_CLICK_ACTION).append(theme.getId()).append(SEPERATOR).append(groupName).append(SEPERATOR);
-				action.append(variation.getName()).append(SEPERATOR).append(type).append(INPUT_CHECKED);
-				input.setOnClick(action.toString());
-				if (variation.isEnabled()) {
-					input.setMarkupAttribute(INPUT_CHECKED_ATTRIBUTE, true);
-				}
-				variationContainer.add(input);
-				variationContainer.add(new Text(variation.getName()));
-				variations.add(variationContainer);
+			}
+			else {
+				return null;	//	TODO: handle it
 			}
 		}
 		
