@@ -6,15 +6,11 @@
 		<create creator="ibo" javascript="ThemesEngine" scope="application">
       		<param name="class" value="com.idega.content.themes.business.ThemesEngine" />
     	</create>
-    	<convert converter="bean" match="com.idega.content.themes.helpers.SimplifiedTheme" />
-    	<convert converter="bean" match="com.idega.content.themes.helpers.ThemeChange">
+    	<convert converter="bean" match="com.idega.content.themes.helpers.bean.SimplifiedTheme" />
+    	<convert converter="bean" match="com.idega.content.themes.helpers.bean.ThemeChange">
     		<param name="exclude" value="limitedSelection" />
     	</convert>
-    	<convert converter="bean" match="com.idega.content.themes.helpers.TreeNodeStructure" />
-    
-    	<create creator="ibo" javascript="NodeID" scope="application">
-      		<param name="class" value="com.idega.content.tree.NodeID" />
-    	</create>
+    	<convert converter="bean" match="com.idega.content.themes.helpers.bean.TreeNodeStructure" />
     	
     	<create creator="jsf" javascript="CategoriesEngine">
 	    	<param name="managedBeanName" value="content.CategoriesEngineBean" />
@@ -35,9 +31,9 @@
 	<signatures>
 		<![CDATA[
   			import java.util.List;
-  			import com.idega.content.themes.helpers.SimplifiedTheme;
-  			import com.idega.content.themes.helpers.ThemeChange;
-			import com.idega.content.themes.helpers.TreeNodeStructure;
+  			import com.idega.content.themes.helpers.bean.SimplifiedTheme;
+  			import com.idega.content.themes.helpers.bean.ThemeChange;
+			import com.idega.content.themes.helpers.bean.TreeNodeStructure;
 			
   			ThemesEngine.applyMultipleChangesToTheme(String, List<ThemeChange>, String);
   			ThemesEngine.createPage(List<TreeNodeStructure>, Boolean, String, List<String>);

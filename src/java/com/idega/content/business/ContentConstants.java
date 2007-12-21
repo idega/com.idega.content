@@ -1,6 +1,6 @@
 package com.idega.content.business;
 
-import com.idega.content.themes.helpers.ThemesConstants;
+import com.idega.content.themes.helpers.business.ThemesConstants;
 
 public class ContentConstants {
 	

@@ -23,7 +23,7 @@ import com.idega.block.rss.business.RSSProducer;
 import com.idega.block.rss.data.RSSRequest;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
-import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.core.search.business.SearchResult;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;

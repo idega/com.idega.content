@@ -8,7 +8,7 @@ import javax.faces.context.FacesContext;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
-import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.upload.business.FileUploader;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;

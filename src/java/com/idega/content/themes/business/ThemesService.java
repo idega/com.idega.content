@@ -5,7 +5,7 @@ import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.data.ICPage;
 import com.idega.business.IBOService;
-import com.idega.content.themes.helpers.Theme;
+import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.slide.business.IWContentEvent;
 import com.idega.slide.business.IWSlideChangeListener;
 import com.idega.core.builder.data.ICPageHome;

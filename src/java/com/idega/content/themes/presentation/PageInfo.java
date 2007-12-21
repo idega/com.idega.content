@@ -7,9 +7,9 @@ import javax.faces.context.FacesContext;
 
 import com.idega.content.business.ContentUtil;
 import com.idega.content.presentation.ContentBlock;
-import com.idega.content.themes.helpers.Setting;
-import com.idega.content.themes.helpers.ThemesConstants;
-import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.content.themes.helpers.bean.Setting;
+import com.idega.content.themes.helpers.business.ThemesConstants;
+import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.presentation.Layer;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.Label;

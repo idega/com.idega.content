@@ -1,8 +1,8 @@
 package com.idega.content.themes.business;
 
-import com.idega.content.themes.helpers.SimplifiedTheme;
-import com.idega.content.themes.helpers.ThemeChange;
-import com.idega.content.themes.helpers.TreeNodeStructure;
+import com.idega.content.themes.helpers.bean.SimplifiedTheme;
+import com.idega.content.themes.helpers.bean.ThemeChange;
+import com.idega.content.themes.helpers.bean.TreeNodeStructure;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;

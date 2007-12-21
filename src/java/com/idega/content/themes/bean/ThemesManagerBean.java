@@ -2,7 +2,7 @@ package com.idega.content.themes.bean;
 
 import java.io.Serializable;
 
-import com.idega.content.themes.helpers.ThemesConstants;
+import com.idega.content.themes.helpers.business.ThemesConstants;
 
 public class ThemesManagerBean implements Serializable {
 	

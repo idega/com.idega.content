@@ -16,7 +16,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 import com.idega.content.themes.business.TemplatesLoader;
-import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.tree.PageTemplate;
 import com.idega.content.tree.TemplateComparator;
 import com.idega.core.data.IWTreeNode;

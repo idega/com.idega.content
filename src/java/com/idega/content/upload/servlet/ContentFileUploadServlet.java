@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
-import com.idega.content.themes.helpers.ThemesConstants;
+import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.upload.bean.UploadFile;
 import com.idega.content.upload.business.FileUploadProgressListener;
 import com.idega.content.upload.business.FileUploader;

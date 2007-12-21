@@ -8,9 +8,9 @@ import javax.faces.component.UIComponent;
 
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.business.ThemesEngine;
-import com.idega.content.themes.helpers.Setting;
-import com.idega.content.themes.helpers.ThemesConstants;
-import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.content.themes.helpers.bean.Setting;
+import com.idega.content.themes.helpers.business.ThemesConstants;
+import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.localisation.presentation.LocalePresentationUtil;
 import com.idega.presentation.Block;
@@ -60,6 +60,7 @@ public class SiteInfo extends Block {
 		return locales;
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected void createContents(UIComponent layer, IWContext iwc, boolean boldText, boolean addKeyPressAction) {
 		Setting setting = null;
 		List <Setting> settings = new ArrayList <Setting> (ThemesHelper.getInstance().getThemeSettings().values());

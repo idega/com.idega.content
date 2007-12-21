@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.idega.content.themes.business.ThemesService;
-import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.core.builder.data.ICPage;

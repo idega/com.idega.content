@@ -19,7 +19,7 @@ import org.jdom.Element;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentConstants;
-import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.tree.PageTemplate;
 import com.idega.content.tree.SiteTemplate;
 import com.idega.core.cache.IWCacheManager2;

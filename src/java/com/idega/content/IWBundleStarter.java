@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.30 2007/11/26 15:52:49 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.31 2007/12/21 19:55:57 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -24,9 +24,9 @@ import com.idega.content.business.ContentIWActionURIHandler;
 import com.idega.content.business.ContentRSSProducer;
 import com.idega.content.themes.business.TemplatesLoader;
 import com.idega.content.themes.business.ThemesService;
-import com.idega.content.themes.helpers.Setting;
-import com.idega.content.themes.helpers.ThemesConstants;
-import com.idega.content.themes.helpers.ThemesHelper;
+import com.idega.content.themes.helpers.bean.Setting;
+import com.idega.content.themes.helpers.business.ThemesConstants;
+import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.view.ContentViewManager;
 import com.idega.core.uri.IWActionURIManager;
 import com.idega.idegaweb.DefaultIWBundle;
@@ -40,10 +40,10 @@ import com.idega.slide.business.IWSlideService;
 
 /**
  * 
- *  Last modified: $Date: 2007/11/26 15:52:49 $ by $Author: valdas $
+ *  Last modified: $Date: 2007/12/21 19:55:57 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.30 $
+ * @version $Revision: 1.31 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	

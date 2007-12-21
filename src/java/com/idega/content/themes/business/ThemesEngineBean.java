@@ -15,14 +15,14 @@ import com.idega.business.IBOServiceBean;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.bean.ThemesManagerBean;
-import com.idega.content.themes.helpers.Setting;
-import com.idega.content.themes.helpers.SimplifiedTheme;
-import com.idega.content.themes.helpers.Theme;
-import com.idega.content.themes.helpers.ThemeChange;
-import com.idega.content.themes.helpers.ThemeChanger;
-import com.idega.content.themes.helpers.ThemesConstants;
-import com.idega.content.themes.helpers.ThemesHelper;
-import com.idega.content.themes.helpers.TreeNodeStructure;
+import com.idega.content.themes.helpers.bean.Setting;
+import com.idega.content.themes.helpers.bean.SimplifiedTheme;
+import com.idega.content.themes.helpers.bean.Theme;
+import com.idega.content.themes.helpers.bean.ThemeChange;
+import com.idega.content.themes.helpers.bean.TreeNodeStructure;
+import com.idega.content.themes.helpers.business.ThemeChanger;
+import com.idega.content.themes.helpers.business.ThemesConstants;
+import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.themes.presentation.ThemeStyleVariations;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
@@ -847,6 +847,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	public List <String> createPage(List<TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, List<String> followingNodes) {
 		List <String> newIds = new ArrayList<String>();
+
 		if (struct == null || numberInLevel == null) {
 			return newIds;
 		}
@@ -856,8 +857,20 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		struct.get(0).setTreeOrder(numberInLevel);
 		struct = getOrderInLevel(struct);
+
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return newIds;
+		}
 		
-		BuilderService builder = helper.getThemesService().getBuilderService();
+		BuilderService builder = null;
+		try {
+			builder = BuilderServiceFactory.getBuilderService(iwc);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			return newIds;
+		}
+		
 		ICDomain domain = helper.getThemesService().getDomain();
 		
 		int pageID = -1;
