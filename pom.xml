@@ -89,6 +89,11 @@
       <artifactId>commons-io</artifactId>
       <version>${commons-io-commons-io-version}</version>
     </dependency>
+    <dependency>
+    	<groupId>bsh</groupId>
+    	<artifactId>bsh</artifactId>
+    	<version>${bsh-bsh-version}</version>
+    </dependency>
   </dependencies>
   
 </project>
