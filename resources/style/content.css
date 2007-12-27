@@ -1282,3 +1282,60 @@ html>body .states a .innerSpan {
 .activeButtonInPages .outerSpan {
 	background: url(images/selected_button_right.png) right no-repeat;
 }
+
+/* MoodalBox */
+div#mb_center, div#mb_bottom {
+	background-color: none;
+}
+
+div#mb_contents {
+	width: 650px !important;
+	height: 511px !important;
+	border: 0;
+	background-color: transparent !important;
+}
+
+div#mb_contents .mootabs_title {
+	padding-top: 8px;
+	background: #fff;
+	height: 26px;
+	border-bottom: 1px #d0d0d0 solid;
+	padding-left: 5px;
+}
+
+div#mb_contents .mootabs_title li {
+	margin-left: 3px;
+	margin-right: 0;
+	background-color: #d0d0d0;
+	height: 27px;
+	padding: 0 8px;
+	line-height: 27px;
+}
+
+div#mb_contents .mootabs_title li.active {
+	background-color: #fff;
+	border: 1px #d0d0d0 solid;
+	border-bottom: 0;
+	padding: 0 7px;
+	line-height: 25px;
+}
+
+div#mb_contents .mootabs_panel {
+	background-color: #fff !important;
+}
+
+div#mb_bottom {
+	border: 0;
+	overflow: visible;
+}
+
+a#mb_close_link {
+	float: none;
+	margin: 0;
+	position: absolute;
+	top: -522px;
+	right: -12px;
+	width: 24px;
+	height: 24px;
+	background: url(images/close_24.png) no-repeat;
+}
