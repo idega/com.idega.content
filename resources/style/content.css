@@ -1301,6 +1301,7 @@ div#mb_contents .mootabs_title {
 	height: 26px;
 	border-bottom: 1px #d0d0d0 solid;
 	padding-left: 5px;
+	text-align: left;
 }
 
 div#mb_contents .mootabs_title li {
@@ -1322,6 +1323,7 @@ div#mb_contents .mootabs_title li.active {
 
 div#mb_contents .mootabs_panel {
 	background-color: #fff !important;
+	text-align: left;
 }
 
 div#mb_bottom {
