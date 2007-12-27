@@ -1292,6 +1292,8 @@ div#mb_contents {
 	width: 650px !important;
 	height: 511px !important;
 	border: 0;
+	font-family: "Lucida Sans", "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+	color: #1f1f1f;
 	background-color: transparent !important;
 }
 
@@ -1324,6 +1326,7 @@ div#mb_contents .mootabs_title li.active {
 div#mb_contents .mootabs_panel {
 	background-color: #fff !important;
 	text-align: left;
+border-bottom: 1px #f00 solid;
 }
 
 div#mb_bottom {
@@ -1340,4 +1343,5 @@ a#mb_close_link {
 	width: 24px;
 	height: 24px;
 	background: url(images/close_24.png) no-repeat;
+	border: 0;
 }
