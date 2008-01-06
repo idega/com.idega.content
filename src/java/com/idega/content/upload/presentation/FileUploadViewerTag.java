@@ -8,7 +8,8 @@ import com.idega.util.CoreConstants;
 public class FileUploadViewerTag extends UIComponentTag {
 	
 	private String actionAfterUpload = null;
-	private String uploadPath = CoreConstants.CONTENT_PATH;
+	private String actionAfterCounterReset = null;
+	private String uploadPath = CoreConstants.PUBLIC_PATH;
 	private String formId = null;
 	
 	private boolean zipFile = false;
@@ -34,6 +35,7 @@ public class FileUploadViewerTag extends UIComponentTag {
 			super.setProperties(uploadViewer);
 			
 			uploadViewer.setActionAfterUpload(actionAfterUpload);
+			uploadViewer.setActionAfterCounterReset(actionAfterCounterReset);
 			uploadViewer.setUploadPath(uploadPath);
 			uploadViewer.setFormId(formId);
 			uploadViewer.setZipFile(zipFile);
@@ -47,7 +49,8 @@ public class FileUploadViewerTag extends UIComponentTag {
 
 	public void release() {
 		this.actionAfterUpload = null;
-		this.uploadPath = CoreConstants.CONTENT_PATH;
+		this.actionAfterCounterReset = null;
+		this.uploadPath = CoreConstants.PUBLIC_PATH;
 		
 		this.zipFile = false;
 		this.extractContent = false;
@@ -127,6 +130,14 @@ public class FileUploadViewerTag extends UIComponentTag {
 
 	public void setFormId(String formId) {
 		this.formId = formId;
+	}
+
+	public String getActionAfterCounterReset() {
+		return actionAfterCounterReset;
+	}
+
+	public void setActionAfterCounterReset(String actionAfterCounterReset) {
+		this.actionAfterCounterReset = actionAfterCounterReset;
 	}
 	
 }

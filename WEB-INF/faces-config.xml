@@ -314,6 +314,11 @@
 			<property-class>java.lang.String</property-class>
 		</property>
 		<property>
+			<display-name>JavaScript action after upload counter was reset</display-name>
+			<property-name>actionAfterCounterReset</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
 			<display-name>Upload path in Slide</display-name>
 			<property-name>uploadPath</property-name>
 			<property-class>java.lang.String</property-class>

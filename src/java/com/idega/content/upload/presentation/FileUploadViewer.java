@@ -12,6 +12,7 @@ import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.upload.business.FileUploader;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
@@ -26,7 +27,8 @@ import com.idega.util.CoreConstants;
 public class FileUploadViewer extends Block {
 	
 	private String actionAfterUpload = null;
-	private String uploadPath = CoreConstants.CONTENT_PATH;
+	private String actionAfterCounterReset = null;
+	private String uploadPath = CoreConstants.PUBLIC_PATH;
 	private String formId = null;
 	
 	private boolean zipFile = false;
@@ -174,29 +176,38 @@ public class FileUploadViewer extends Block {
 		}
 		action.append("'], ");
 		
-		if (actionAfterUpload == null) {
-			action.append("null");
-		}
-		else {
-			if (actionAfterUpload.indexOf("\"") != -1) {
-				actionAfterUpload = actionAfterUpload.replaceAll("\"", "'");
-			}
-			if (actionAfterUpload.indexOf("'") != -1) {
-				String[] actionParts = actionAfterUpload.split("'");
-				StringBuffer changedAction = new StringBuffer();
-				for (int i = 0; i < actionParts.length; i++) {
-					changedAction.append(actionParts[i]);
-					if ((i + 1) < actionParts.length) {
-						changedAction.append("\\").append("'");
-					}
-				}
-				actionAfterUpload = changedAction.toString();
-			}
-			action.append("'").append(actionAfterUpload).append("'");
-		}
+		action.append(getJavaScriptAction(actionAfterUpload));
+		action.append(", ");
+		action.append(getJavaScriptAction(actionAfterCounterReset));
+
 		action.append(");");
 		
 		return action.toString();
+	}
+	
+	private String getJavaScriptAction(String action) {
+		if (action == null) {
+			return "null";
+		}
+		
+		StringBuffer script = new StringBuffer();
+		if (action.indexOf("\"") != -1) {
+			action = action.replaceAll("\"", "'");
+		}
+		if (action.indexOf("'") != -1) {
+			String[] actionParts = action.split("'");
+			StringBuffer changedAction = new StringBuffer();
+			for (int i = 0; i < actionParts.length; i++) {
+				changedAction.append(actionParts[i]);
+				if ((i + 1) < actionParts.length) {
+					changedAction.append("\\").append("'");
+				}
+			}
+			action = changedAction.toString();
+		}
+		script.append("'").append(action).append("'");
+		
+		return script.toString();
 	}
 	
 	private String getJavaScriptSourceLine(String source) {
@@ -277,6 +288,19 @@ public class FileUploadViewer extends Block {
 
 	public void setFormId(String formId) {
 		this.formId = formId;
+	}
+
+	@Override
+	public String getBuilderName(IWUserContext iwuc) {
+		return FileUploadViewer.class.getSimpleName();
+	}
+
+	public String getActionAfterCounterReset() {
+		return actionAfterCounterReset;
+	}
+
+	public void setActionAfterCounterReset(String actionAfterCounterReset) {
+		this.actionAfterCounterReset = actionAfterCounterReset;
 	}
 
 }

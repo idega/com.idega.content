@@ -565,6 +565,13 @@
 			<description>JavaScript action after upload is finished</description>
 		</attribute>
 		<attribute>
+			<name>actionAfterCounterReset</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+			<type>java.lang.String</type>
+			<description>JavaScript action after upload counter was reset</description>
+		</attribute>
+		<attribute>
 			<name>uploadPath</name>
 			<required>false</required>
 			<rtexprvalue>false</rtexprvalue>
