@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-
 public class Theme {
 	
 	private boolean propertiesExtracted;
@@ -27,28 +25,28 @@ public class Theme {
 	private String name;
 	private String changedName;
 	
-	private List <String> styleGroupsNames;
-	private List <String> styleVariationsCacheKeys;
+	private List<String> styleGroupsNames;
+	private List<String> styleVariationsCacheKeys;
 	private List<String> colourFiles = null;
 	private List<String> originalColourFiles = null;
-	private List <ThemeChange> changes;
+	private List<ThemeChange> changes;
 
-	private Map <String, ThemeStyleGroupMember> styleGroupsMembers;
+	private Map<String, ThemeStyleGroupMember> styleGroupsMembers;
 	private Map<String, String> styleVariables = null;
 	
 	private int templateId = -1;
 
-	public Theme(String themeId) {
-		styleGroupsNames = new ArrayList<String>();
-		styleVariationsCacheKeys = new ArrayList<String>();
-		colourFiles = new ArrayList<String>();
-		originalColourFiles = new ArrayList<String>();
-		changes = new ArrayList<ThemeChange>();
+	public Theme(String id) {
+		this.styleGroupsNames = new ArrayList<String>();
+		this.styleVariationsCacheKeys = new ArrayList<String>();
+		this.colourFiles = new ArrayList<String>();
+		this.originalColourFiles = new ArrayList<String>();
+		this.changes = new ArrayList<ThemeChange>();
 		
-		styleGroupsMembers = new HashMap<String, ThemeStyleGroupMember>();
-		styleVariables = new HashMap<String, String>();
+		this.styleGroupsMembers = new HashMap<String, ThemeStyleGroupMember>();
+		this.styleVariables = new HashMap<String, String>();
 		
-		this.id = themeId;
+		this.id = id;
 	}
 	
 	public String getLinkToSkeleton() {
@@ -229,13 +227,16 @@ public class Theme {
 		styleGroupsNames.clear();
 		styleVariationsCacheKeys.clear();
 		styleGroupsMembers.clear();
+		colourFiles.clear();
+		originalColourFiles.clear();
+		styleVariables.clear();
 	}
 
 	public List<String> getColourFiles() {
 		return colourFiles;
 	}
 
-	protected void setColourFiles(List<String> colourFiles) {
+	public void setColourFiles(List<String> colourFiles) {
 		this.colourFiles = colourFiles;
 	}
 	
@@ -277,6 +278,14 @@ public class Theme {
 
 	public void setOriginalColourFiles(List<String> originalColourFiles) {
 		this.originalColourFiles = originalColourFiles;
+	}
+	
+	public boolean hasColourFiles() {
+		if (colourFiles == null || colourFiles.size() == 0) {
+			return false;
+		}
+		
+		return true;
 	}
 
 }

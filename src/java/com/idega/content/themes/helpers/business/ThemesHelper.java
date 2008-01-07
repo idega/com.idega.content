@@ -651,19 +651,19 @@ public class ThemesHelper implements Singleton {
 		return link;
 	}
 	
-	public Theme getTheme(String themeID) {
-		if (themeID == null) {
+	public Theme getTheme(String themeKey) {
+		if (themeKey == null) {
 			return null;
 		}
-		return themes.get(themeID);
+		return themes.get(themeKey);
 	}
 	
-	public void removeTheme(String uri, String themeID) {
-		if (uri == null || themeID == null) {
+	public void removeTheme(String uri, String themeKey) {
+		if (uri == null || themeKey == null) {
 			return;
 		}
 		urisToThemes.remove(uri);
-		themes.remove(themeID);
+		themes.remove(themeKey);
 	}
 
 	protected Map <String, Theme> getThemes() {
@@ -959,6 +959,9 @@ public class ThemesHelper implements Singleton {
 		Collection <Element> styleElements = null;
 		Element groupName = null;
 		Element variation = null;
+		Element color = null;
+		Element variable = null;
+		String hexColor = null;
 		for (int i = 0; i < enabled.size(); i++) {
 			member = enabled.get(i);
 			style = new Element(ThemesConstants.CON_STYLE);
@@ -971,6 +974,23 @@ public class ThemesHelper implements Singleton {
 			variation = new Element(ThemesConstants.CON_VARIATION);
 			variation.setText(member.getName());
 			styleElements.add(variation);
+			
+			if (!member.isStylesheet()) {	//	For other types then simple CSS variations
+				if (member.getColour() != null && member.getVariable() != null) {
+					//	Color settings
+					variable = new Element(ThemesConstants.CON_VARIABLE);
+					variable.setText(member.getVariable());
+					styleElements.add(variable);
+					
+					color = new Element(ThemesConstants.CON_COLOR);
+					hexColor = theme.getStyleVariableValue(member.getVariable());
+					if (hexColor == null) {
+						hexColor = member.getColour();
+					}
+					color.setText(hexColor);
+					styleElements.add(color);
+				}
+			}
 
 			style.setContent(styleElements);
 			stylesElements.add(style);
@@ -1731,7 +1751,7 @@ public class ThemesHelper implements Singleton {
 		//	Removing cache keys
 		theme.clearStyleVariationsCacheKeys();
 		
-		//	Removing rendered variations (to String) from cache
+		//	Removing rendered variations from cache
 		getThemesEngine().clearVariationFromCache(themeID, iwc);
 		
 		return true;
@@ -1809,7 +1829,7 @@ public class ThemesHelper implements Singleton {
 		return true;
 	}
 	
-	public String getThemeColourFileName(Theme theme, String customName, String file) {
+	public String getThemeColourFileName(Theme theme, String customName, String file, boolean markAsOriginalFile) {
 		if (file == null) {
 			return null;
 		}
@@ -1829,7 +1849,14 @@ public class ThemesHelper implements Singleton {
 			cssFileName = file.substring(0, file.lastIndexOf(CoreConstants.DOT));
 		}
 		
-		StringBuffer name = new StringBuffer(cssFileName).append(CoreConstants.UNDER).append(customName).append(CoreConstants.DOT).append(getFileExtension(file));
+		StringBuffer name = new StringBuffer(cssFileName);
+		if (!(name.toString().endsWith(customName))) {
+			name.append(CoreConstants.UNDER).append(customName);
+		}
+		if (markAsOriginalFile) {
+			name.append(CoreConstants.UNDER).append("original");
+		}
+		name.append(CoreConstants.DOT).append(getFileExtension(file));
 		return name.toString();
 	}
 

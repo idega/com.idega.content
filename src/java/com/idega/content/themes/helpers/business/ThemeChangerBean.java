@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -262,11 +264,11 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 		
-		List<String> colourFiles = theme.getColourFiles();
-		if (colourFiles == null || colourFiles.size() == 0) {
+		if (!theme.hasColourFiles()) {
 			return true;
 		}
 		
+		List<String> colourFiles = theme.getColourFiles();
 		IWSlideService slide = helper.getSlideService();
 		if (slide == null) {
 			return false;
@@ -282,7 +284,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		for (int i = 0; i < colourFiles.size(); i++) {
 			file = colourFiles.get(i);
 			
-			sourceLink = new StringBuffer(webRoot).append(theme.getLinkToBase()).append(helper.getThemeColourFileName(theme, null, file)).toString();
+			sourceLink = new StringBuffer(webRoot).append(theme.getLinkToBase()).append(helper.getThemeColourFileName(theme, null, file, true)).toString();
 			stream = helper.getInputStream(sourceLink);
 			if (stream == null) {
 				return false;
@@ -389,8 +391,19 @@ public class ThemeChangerBean implements ThemeChanger {
 			return value;
 		}
 		
+		originalValue = originalValue.toLowerCase();
 		originalValue = StringHandler.replace(originalValue, CoreConstants.PERCENT, CoreConstants.EMPTY);	//	Removing '%'
-		originalValue = StringHandler.replace(originalValue, variable, value);								//	Replacing variable with value
+		
+		if (originalValue.indexOf("r(") == -1 && originalValue.indexOf("g(") == -1 && originalValue.indexOf("b(") == -1) {
+			originalValue = StringHandler.replace(originalValue, variable, value);							//	Replacing variable with value
+		}
+		else {
+			originalValue = getComputedHeximalValueByRGB(originalValue, variable, value);					//	Making expression
+			if (originalValue == null) {
+				return value;
+			}
+		}
+		
 		originalValue = getCssExpressionWithDecimalNumbers(originalValue);									//	Hex numbers replaced with decimal
 		if (originalValue == null) {
 			return value;
@@ -420,6 +433,90 @@ public class ThemeChangerBean implements ThemeChanger {
 			e.printStackTrace();
 			return value;
 		}
+	}
+	
+	private String getComputedHeximalValueByRGB(String originalValue, String variable, String value) {
+		//	TODO not finished RGB stuff!
+		if (originalValue == null || variable == null || value == null) {
+			return null;
+		}
+		
+		if (value.startsWith(CoreConstants.NUMBER_SIGN)) {
+			value = value.substring(1);
+		}
+		
+		String doubleRegex = "(?i)(?:"+
+		"\\b\\d+\\.\\d*(?:e[+-]?\\d+|)[fF]?|"+// ex: 34., 3.E2
+		"\\d*\\.\\d+(?:e[+-]?\\d+|)[fF]?|"+ // ex: .2, .994e+4
+		"\\b\\d+e[+-]?\\d+[fF]?|"+ // ex: 1e-15
+		"\\b\\d+[fF]"+ // ex: 22f
+		")[fF]?";
+//		String intRegex = "\\d*";
+		
+		List<String> rgbRegexs = new ArrayList<String>();
+//		rgbRegexs.add("[r][\\p{Punct}]["+doubleRegex+"][\\p{Punct}][g][\\p{Punct}]["+doubleRegex+"][\\p{Punct}][b][\\p{Punct}]["+doubleRegex+"][\\p{Punct}]");
+//		rgbRegexs.add("[r][\\p{Punct}][\\p{Digit}*][\\p{Punct}][g][\\p{Punct}][\\p{Digit}*][\\p{Punct}][b][\\p{Punct}][\\p{Digit}*][\\p{Punct}]");
+		rgbRegexs.add(doubleRegex);
+//		rgbRegexs.add(intRegex);
+		List<String> rgbs = getValuesByPatterns(originalValue, rgbRegexs);
+		if (rgbs == null || rgbs.size() == 0) {
+			return null;
+		}
+		
+		String[] valueParts = new String[3];
+		String valuePart = null;
+		if (value.length() == 3) {
+			valuePart = value.substring(0, 1);
+			valueParts[0] = new StringBuffer(valuePart).append(valuePart).toString();	//	Red
+			
+			valuePart = value.substring(1, 2);
+			valueParts[1] = new StringBuffer(valuePart).append(valuePart).toString();	//	Green
+			
+			valuePart = value.substring(2);
+			valueParts[2] = new StringBuffer(valuePart).append(valuePart).toString();	//	Blue
+		}
+		else {
+			valueParts[0] = value.substring(0, 2);	//	Red
+			valueParts[1] = value.substring(2, 4);	//	Green
+			valueParts[2] = value.substring(4);		//	Blue
+		}
+		
+		System.out.println(rgbs);
+		return null;
+	}
+	
+	private List<String> getValuesByPatterns(String source, List<String> regexs) {
+		if (source == null || regexs == null) {
+			return null;
+		}
+		
+		List<String> destination = new ArrayList<String>();
+		Pattern p = null;
+		Matcher m = null;
+		String value = null;
+		
+		for (int i = 0; i < regexs.size(); i++) {
+			try {
+				p = Pattern.compile(regexs.get(i));
+				m = p.matcher(source);
+				while (m.find()) {
+					int start = m.start();
+					int end = m.end();
+					if (canSubstring(source, start, end)) {
+						value = source.substring(start, end);
+						try {
+							Double.valueOf(value);
+							destination.add(value);
+						} catch(Exception e){
+							e.printStackTrace();
+						}
+					}
+				}
+			} catch(Exception e) {
+			}
+		}
+		
+		return destination;
 	}
 	
 	private String getCssExpressionWithDecimalNumbers(String expression) {
@@ -524,13 +621,19 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 	
 	private boolean createCopiesForColourFiles(Theme theme, String oldName) {
+		return createCopiesForColourFiles(theme, null, oldName, true);
+	}
+	
+	private boolean createCopiesForColourFiles(Theme theme, List<String> files, String oldName, boolean setAsOriginalFiles) {
 		if (theme == null) {
 			return false;
 		}
 		
-		List<String> colourFiles = theme.getColourFiles();
-		if (colourFiles == null || colourFiles.size() == 0) {
-			return true;
+		if (files == null) {
+			files = theme.getColourFiles();
+		}
+		if (files == null || files.size() == 0) {
+			return true;	//	No color files - it's ok
 		}
 		
 		IWSlideService slide = helper.getSlideService();
@@ -544,22 +647,22 @@ public class ThemeChangerBean implements ThemeChanger {
 		String uploadName = null;
 		String file = null;
 		String webRoot = helper.getFullWebRoot();
-		for (int i = 0; i < colourFiles.size(); i++) {
-			file = colourFiles.get(i);
+		for (int i = 0; i < files.size(); i++) {
+			file = files.get(i);
 			
 			link = new StringBuffer(webRoot).append(theme.getLinkToBase());
 			if (oldName == null) {
 				link.append(file);
 			}
 			else {
-				link.append(helper.getThemeColourFileName(theme, oldName, file));
+				link.append(helper.getThemeColourFileName(theme, oldName, file, setAsOriginalFiles));
 			}
 			stream = helper.getInputStream(link.toString());
 			if (stream == null) {
 				return false;
 			}
 			
-			uploadName = helper.getThemeColourFileName(theme, null, file);
+			uploadName = helper.getThemeColourFileName(theme, null, file, setAsOriginalFiles);
 			try {
 				if (slide.uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBase(), uploadName, stream, CoreConstants.CONTENT_TYPE_TEXT_CSS, true)) {
 					newColourFiles.add(uploadName);
@@ -576,7 +679,12 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		if (newColourFiles.size() > 0) {
-			theme.setOriginalColourFiles(newColourFiles);
+			if (setAsOriginalFiles) {
+				theme.setOriginalColourFiles(newColourFiles);
+			}
+			else {
+				theme.setColourFiles(newColourFiles);
+			}
 		}
 		
 		return true;
@@ -1367,28 +1475,31 @@ public class ThemeChangerBean implements ThemeChanger {
 	
 	/**
 	 * Changes theme with new style variation, creates draft and creates new preview image
-	 * @param themeID
+	 * @param themeKey
 	 * @param styleGroupName
 	 * @param variation
 	 * @return String
 	 */
-	public String changeTheme(String themeID, String styleGroupName, String variation, String themeName, boolean radio, boolean checked) {		
-		if (themeID == null) {
+	public String changeTheme(String themeKey, String themeName, ThemeChange change) {		
+		if (themeKey == null || change == null) {
 			return null;
 		}
-		Theme theme = helper.getTheme(themeID);
+		Theme theme = helper.getTheme(themeKey);
 		if (theme == null) {
 			return null;
 		}
 		Document doc = getThemeDocument(theme.getId());
+		if (doc == null) {
+			return null;
+		}
 		
-		String changed = changeTheme(doc, theme, styleGroupName, variation, themeName, radio, checked);
+		String changed = changeTheme(doc, theme, themeName, change);
 		if (changed == null) {
 			return null;
 		}
 		
 		if (finishThemeChange(theme, doc, true)) {
-			return themeID;
+			return themeKey;
 		}
 		return null;
 	}
@@ -1411,26 +1522,41 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 	
-	private String changeTheme(Document doc, Theme theme, String styleGroupName, String variation, String themeName, boolean radio, boolean checked) {
-		if (doc == null || theme == null || styleGroupName == null || variation == null) {
+	private String changeTheme(Document doc, Theme theme, String themeName, ThemeChange change) {
+		if (doc == null || theme == null || change == null) {
 			return null;
 		}
 		
-		theme.setChangedName(themeName);
+		String styleGroupName = change.getStyleGroupName();
+		String variation = change.getVariation();
+		if (styleGroupName == null || variation == null) {
+			return null;
+		}
+		boolean checked = change.isEnabled();
 		
+		theme.setChangedName(themeName);
 		boolean limitedSelection = true;
 		
 		ThemeStyleGroupMember oldStyle = null;
 		ThemeStyleGroupMember newStyle = null;
 		ThemeStyleGroupMember styleChanger = null;
-		if (radio) {
+		boolean needUpload = true;
+		if (change.isRadio()) {
 			//	Simply changing CSS files
 			oldStyle = getEnabledStyleMember(theme, styleGroupName);
 			newStyle = getStyleMember(theme, styleGroupName, variation);
 			styleChanger = oldStyle;
-		}
-		else {
-			//	Need to know either add CSS or remove
+		} else if (change.isColor()) {
+			//	Changing color in CSS file
+			needUpload = false;
+			if (!changeThemeColourVariation(theme, change)) {
+				return null;
+			}
+		} else if (change.isPredefinedStyle()) {
+			//	Using predefined style
+			//	TODO
+		} else {
+			//	Multiple variations, need to know either add CSS or remove
 			limitedSelection = false;
 			if (checked) {
 				//	Need to add
@@ -1444,13 +1570,15 @@ public class ThemeChangerBean implements ThemeChanger {
 			}
 		}
 		
-		Element root = doc.getRootElement();
-		if (root == null) {
-			return null;
-		}
-		String linkToBase = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase()).toString();
-		if (!changeThemeStyle(linkToBase, root.getChild(HTML_HEAD, namespace), oldStyle, newStyle)) {
-			return null;
+		if (needUpload) {
+			Element root = doc.getRootElement();
+			if (root == null) {
+				return null;
+			}
+			String linkToBase = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase()).toString();
+			if (!changeThemeStyle(linkToBase, root.getChild(HTML_HEAD, namespace), oldStyle, newStyle)) {
+				return null;
+			}
 		}
 		if (oldStyle != null) {
 			oldStyle.setEnabled(false);
@@ -1459,9 +1587,54 @@ public class ThemeChangerBean implements ThemeChanger {
 			newStyle.setEnabled(true);
 		}
 		
-		addThemeChange(theme, styleChanger, limitedSelection);
+		if (styleChanger != null) {
+			addThemeChange(theme, styleChanger, limitedSelection);
+		}
 		
 		return theme.getId();
+	}
+	
+	private boolean changeThemeColourVariation(Theme theme, ThemeChange change) {
+		if (theme == null || change == null) {
+			return false;
+		}
+		
+		String variable = change.getVariable();
+		String value = change.getVariation();
+		if (variable == null || value == null) {
+			return false;
+		}
+		
+		ThemeStyleGroupMember colourVariation = getColorGroupMember(theme, change.getStyleGroupName(), variable);
+		if (colourVariation == null) {
+			return false;
+		}
+		
+		addThemeChange(theme, colourVariation, true);
+		theme.addStyleVariable(variable, value);
+		return setValuesToColourFiles(theme);
+	}
+	
+	private ThemeStyleGroupMember getColorGroupMember(Theme theme, String groupName, String variable) {
+		if (theme == null || groupName == null || variable == null) {
+			return null;
+		}
+		
+		Map.Entry<String,ThemeStyleGroupMember> entry = null;
+		ThemeStyleGroupMember member = null;
+		boolean found = false;
+		for (Iterator<Map.Entry<String,ThemeStyleGroupMember>> it = theme.getStyleGroupsMembers().entrySet().iterator(); (it.hasNext() && !found);) {
+			entry = it.next();
+			
+			member = entry.getValue();
+			if (!member.isStylesheet() && member.getVariable() != null) {
+				if (variable.equals(member.getVariable())) {
+					found = true;
+				}
+			}
+		}
+		
+		return found ? member : null;
 	}
 
 	private void addThemeChange(Theme theme, ThemeStyleGroupMember style, boolean limitedSelection) {
@@ -1471,8 +1644,12 @@ public class ThemeChangerBean implements ThemeChanger {
 		ThemeChange change = new ThemeChange();
 		change.setLimitedSelection(limitedSelection);
 		change.setEnabled(style.isEnabled());
+		change.setColor(!style.isStylesheet());
+		
 		change.setStyleGroupName(style.getGroupName());
 		change.setVariation(style.getName());
+		change.setVariable(style.getVariable());
+		
 		theme.addThemeChange(change);
 	}
 	
@@ -1498,7 +1675,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		List <Element> uselessStyles = new ArrayList <Element> ();
 		
 		if (oldStyle != null) {
-			
 			if (oldStyle.getStyleFiles() == null) {
 				return false;
 			}
@@ -1597,6 +1773,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	public List<ThemeStyleGroupMember> getEnabledStyles(Theme theme) {
 		List <ThemeStyleGroupMember> members = new ArrayList<ThemeStyleGroupMember>();
 		List <String> groupNames = theme.getStyleGroupsNames();
+		List<String> colourFiles = theme.getColourFiles();
 		ThemeStyleGroupMember member = null;
 		String styleGroupName = null;
 		Map <String, ThemeStyleGroupMember> styleMembers = theme.getStyleGroupsMembers();
@@ -1607,6 +1784,15 @@ public class ThemeChangerBean implements ThemeChanger {
 			while (member != null) {
 				if (member.isEnabled()) {
 					members.add(member);
+				}
+				else if (!member.isStylesheet()) {
+					if (colourFiles != null) {
+						//	CSS files for colors variations
+						for (int k = 0; k < colourFiles.size(); k++) {
+							member.addStyleFile(colourFiles.get(k));
+						}
+						members.add(member);
+					}
 				}
 				j++;
 				member = getMember(styleMembers, styleGroupName, j);
@@ -1646,16 +1832,16 @@ public class ThemeChangerBean implements ThemeChanger {
 	
 	/**
 	 * Saves theme
-	 * @param themeID
+	 * @param themeKey
 	 * @param themeName
 	 * @return boolean
 	 */
-	public boolean saveTheme(String themeID, String themeName) {
-		if (themeID == null || themeName == null) {
+	public boolean saveTheme(String themeKey, String themeName) {
+		if (themeKey == null || themeName == null) {
 			return false;
 		}
 		
-		Theme theme = helper.getTheme(themeID);
+		Theme theme = helper.getTheme(themeKey);
 		if (theme == null) {
 			return false;
 		}
@@ -1736,6 +1922,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 	
 	private boolean restoreTheme(Theme theme) {
+		System.out.println("Restoring: " + theme.getName());
 		if (theme == null) {
 			return false;
 		}
@@ -1753,8 +1940,14 @@ public class ThemeChangerBean implements ThemeChanger {
 					setEnabledStyles(theme, member.getGroupName(), false);
 				}
 				member.setEnabled(!change.isEnabled());
+			
+				if (change.isColor()) {
+					theme.addStyleVariable(change.getVariable(), member.getColour());	//	Setting back default color value
+				}
 			}
 		}
+		
+		setValuesToColourFiles(theme);	//	Setting back default colors
 		
 		if (!theme.getLinkToSkeleton().endsWith(ThemesConstants.THEME)) {
 			//	Original theme, will set variations from properties list
@@ -1851,8 +2044,10 @@ public class ThemeChangerBean implements ThemeChanger {
 		String linkToBase = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase()).toString();
 		for (int i = 0; i < styles.size(); i++) {
 			member = styles.get(i);
-			if (!addContentToElement(header, getNewStyleElement(linkToBase, member), stylesIndexes.get(member.getGroupName()))) {
-				return false;
+			if (member.isStylesheet()) {
+				if (!addContentToElement(header, getNewStyleElement(linkToBase, member), stylesIndexes.get(member.getGroupName()))) {
+					return false;
+				}
 			}
 		}
 		
@@ -1944,8 +2139,97 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	private boolean replaceColourFilesInDoc(Document doc, String linkToBase, List<String> oldFiles, List<String> newFiles) {
+		if (doc == null || oldFiles == null || newFiles == null) {
+			return false;
+		}
+		
+		if (oldFiles.size() != newFiles.size()) {
+			return false;
+		}
+		
+		Element html = doc.getRootElement();
+		if (html == null) {
+			return false;
+		}
+		
+		Element head = html.getChild(HTML_HEAD, namespace);
+		if (head == null) {
+			return false;
+		}
+		
+		ThemeStyleGroupMember oldStyle = null;
+		ThemeStyleGroupMember newStyle = null;
+		for (int i = 0; i < oldFiles.size(); i++) {
+			oldStyle = new ThemeStyleGroupMember();
+			oldStyle.addStyleFile(oldFiles.get(i));
+			
+			newStyle = new ThemeStyleGroupMember();
+			newStyle.addStyleFile(newFiles.get(i));
+			
+			if (!changeThemeStyle(linkToBase, head, oldStyle, newStyle)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	private boolean createThemeSkeleton(Theme parent, Theme child, String linkToTheme) {
+		if (parent == null || child == null || linkToTheme == null) {
+			return false;
+		}
+		
+		InputStream is = helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(linkToTheme).toString());
+		if (is == null) {
+			return false;
+		}
+		Document themeDoc = helper.getXMLDocument(is);
+		helper.closeInputStream(is);
+		if (themeDoc == null) {
+			return false;
+		}
+		
+		if (parent.hasColourFiles()) {
+			//	Preparing color files
+			if (!createCopiesForColourFiles(child, parent.getColourFiles(), parent.getName(), true)) {
+				return false;
+			}
+			
+			String linkToBase = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(child.getLinkToBase()).toString();
+			if (!replaceColourFilesInDoc(themeDoc, linkToBase, parent.getColourFiles(), child.getColourFiles())) {
+				return false;
+			}
+		}
+		/*String linkToBase = helper.getLinkToBase(linkToTheme);
+		if (!linkToBase.endsWith(ContentConstants.SLASH)) {
+			linkToBase = new StringBuffer(linkToBase).append(ContentConstants.SLASH).toString();
+		}
+		String decodedLinkToBase = helper.decodeUrl(linkToBase);
+		if (!decodedLinkToBase.endsWith(ContentConstants.SLASH)) {
+			decodedLinkToBase = new StringBuffer(decodedLinkToBase).append(ContentConstants.SLASH).toString();
+		}
+		
+		String tempName = new StringBuilder(name).append(ThemesConstants.THEME).toString();
+		String themeName = StringHandler.removeCharacters(tempName, ContentConstants.SPACE, ContentConstants.UNDER);
+		try {
+			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(decodedLinkToBase,	themeName, is, null, true)) {
+				return false;
+			}
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			helper.closeInputStream(is);
+		}*/
+		
+		uploadTheme(themeDoc, child);
+		
+		return true;
+	}
+	
 	private boolean createNewTheme(Theme parent, String newName) {
-		// Copying Theme skeleton
 		String linkToTheme = parent.getLinkToDraft();
 		if (linkToTheme == null) {
 			linkToTheme = parent.getLinkToSkeleton();
@@ -1953,10 +2237,11 @@ public class ThemeChangerBean implements ThemeChanger {
 		if (linkToTheme == null) {
 			return false;
 		}
-		InputStream is = helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(linkToTheme).toString());
+		
+		/*InputStream is = helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(linkToTheme).toString());
 		if (is == null) {
 			return false;
-		}
+		}*/
 		String linkToBase = helper.getLinkToBase(linkToTheme);
 		if (!linkToBase.endsWith(ContentConstants.SLASH)) {
 			linkToBase = new StringBuffer(linkToBase).append(ContentConstants.SLASH).toString();
@@ -1968,7 +2253,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		String tempName = new StringBuilder(newName).append(ThemesConstants.THEME).toString();
 		String themeName = StringHandler.removeCharacters(tempName, ContentConstants.SPACE, ContentConstants.UNDER);
-		try {
+		/*try {
 			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(decodedLinkToBase,	themeName, is, null, true)) {
 				return false;
 			}
@@ -1977,35 +2262,38 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		} finally {
 			helper.closeInputStream(is);
-		}
+		}*/
 		
 		//	Adding theme to system
 		String tempLink = new StringBuffer(decodedLinkToBase).append(themeName).toString();
-		String themeID = null;
+		String themeKey = null;
 		try {
-			themeID = helper.getThemesLoader().createNewTheme(tempLink, new StringBuffer(linkToBase).append(helper.encode(themeName, true)).toString(), true, true);
+			themeKey = helper.getThemesLoader().createNewTheme(tempLink, new StringBuffer(linkToBase).append(helper.encode(themeName, true)).toString(), true, true);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		if (themeID == null) {
 			return false;
 		}
-		Theme child = helper.getTheme(themeID);
+		if (themeKey == null) {
+			return false;
+		}
+		Theme child = helper.getTheme(themeKey);
 		if (child == null) {
 			return false;
 		}
 		child.setName(newName);
 
 		//	Copying settings from parent theme
-		copyTheme(parent, child);
+		if (!copyTheme(parent, child)) {
+			return false;
+		}
+		
+		//	Copying Theme skeleton
+		if (!createThemeSkeleton(parent, child, linkToTheme)) {
+			return false;
+		}
 		
 		//	Restoring original theme
 		restoreTheme(parent);
-		
-		//	Preparing color files
-		if (!createCopiesForColourFiles(child, parent.getName())) {
-			return false;
-		}
 		
 		//	Generating previews
 		 if (!helper.generatePreviewsForTheme(child, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY, false)) {
@@ -2034,11 +2322,12 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param parent
 	 * @param child
 	 */
-	private void copyTheme(Theme parent, Theme child) {
+	private boolean copyTheme(Theme parent, Theme child) {
 		List <String> groupNames = parent.getStyleGroupsNames();
 		ThemeStyleGroupMember member = null;
 		ThemeStyleGroupMember parentMember = null;
 		String styleGroupName = null;
+		String colourValue = null;
 		Map <String, ThemeStyleGroupMember> styleMembers = parent.getStyleGroupsMembers();
 		for (int i = 0; i < groupNames.size(); i++) {
 			styleGroupName = groupNames.get(i);
@@ -2047,11 +2336,21 @@ public class ThemeChangerBean implements ThemeChanger {
 			parentMember = getMember(styleMembers, styleGroupName, j);
 			while (parentMember != null) {
 				member = new ThemeStyleGroupMember(parentMember);
+				colourValue = parent.getStyleVariableValue(member.getVariable());
+				if (colourValue != null) {
+					member.setColour(colourValue);
+				}
 				child.addStyleGroupMember(new StringBuffer(styleGroupName).append(ThemesConstants.AT).append(j).toString(), member);
 				j++;
 				parentMember = getMember(styleMembers, styleGroupName, j);
 			}
 		}
+		
+		if (!createCopiesForColourFiles(child, parent.getColourFiles(), null, false)) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 	public XMLOutputter getXMLOutputter() {
@@ -2079,25 +2378,25 @@ public class ThemeChangerBean implements ThemeChanger {
 		return helper.getXMLDocument(new StringBuffer(helper.getFullWebRoot()).append(linkToDoc).toString());
 	}
 	
-	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes, String themeName) {
-		if (themeID == null || changes == null) {
+	public String applyMultipleChangesToTheme(String themeKey, List<ThemeChange> changes, String themeName) {
+		if (themeKey == null || changes == null) {
 			return null;
 		}
 		
-		Theme theme = helper.getTheme(themeID);
+		Theme theme = helper.getTheme(themeKey);
 		if (theme == null) {
 			return null;
 		}
-		Document doc = getThemeDocument(themeID);
+		Document doc = getThemeDocument(themeKey);
 		if (doc == null) {
 			return null;
 		}
 		
-		String changed = themeID;
+		String changed = themeKey;
 		ThemeChange change = null;
 		for (int i = 0; (i < changes.size() && changed != null); i++) {
 			change = changes.get(i);
-			changed = changeTheme(doc, theme, change.getStyleGroupName(), change.getVariation(), themeName, change.isRadio(), change.isEnabled());
+			changed = changeTheme(doc, theme, themeName, change);
 		}
 		
 		if (changed == null) {
@@ -2105,7 +2404,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		if (finishThemeChange(theme, doc, true)) {
-			return themeID;
+			return themeKey;
 		}
 		
 		return null;

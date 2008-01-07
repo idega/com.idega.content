@@ -5,17 +5,17 @@ import java.util.List;
 
 public class ThemeStyleGroupMember {
 	
-	private String name;
-	private String type;
-	private String groupName;
+	private String name = null;
+	private String type = null;
+	private String groupName = null;
 	private String colour = null;
 	private String variable = null;
 	
 	private boolean stylesheet = true;
-	private boolean enabled;
-	private boolean limitedSelection;
+	private boolean enabled = false;
+	private boolean limitedSelection = false;;
 
-	private List <String> styleFiles;
+	private List <String> styleFiles = null;
 	
 	public ThemeStyleGroupMember() {
 		styleFiles = new ArrayList <String> ();
@@ -25,11 +25,14 @@ public class ThemeStyleGroupMember {
 		this.name = parent.getName();
 		this.type = parent.getType();
 		this.groupName = parent.getGroupName();
+		this.colour = parent.getColour();
+		this.variable = parent.getVariable();
 		
+		this.stylesheet = parent.isStylesheet();
 		this.enabled = parent.isEnabled();
 		this.limitedSelection = parent.isLimitedSelection();
 		
-		this.styleFiles = new ArrayList <String> (parent.getStyleFiles());
+		this.styleFiles = new ArrayList<String>(parent.getStyleFiles());
 	}
 
 	public boolean isEnabled() {

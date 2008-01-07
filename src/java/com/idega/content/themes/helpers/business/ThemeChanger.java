@@ -14,15 +14,15 @@ import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
 @SpringBeanName("themeChanger")
 public interface ThemeChanger {
 	
-	public boolean restoreTheme(String themeID) throws Exception;
+	public boolean restoreTheme(String themeKey) throws Exception;
 
-	public boolean saveTheme(String themeID, String themeName) throws Exception;
+	public boolean saveTheme(String themeKey, String themeName) throws Exception;
 	
 	public boolean setSelectedStyles(Theme theme, List<ThemeChange> enabledStyles) throws Exception;
 	
-	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes, String themeName) throws Exception;
+	public String applyMultipleChangesToTheme(String themeKey, List<ThemeChange> changes, String themeName) throws Exception;
 	
-	public String changeTheme(String themeID, String styleGroupName, String variation, String themeName, boolean radio, boolean checked) throws Exception;
+	public String changeTheme(String themeKey, String themeName, ThemeChange change) throws Exception;
 	
 	public List <ThemeStyleGroupMember> getEnabledStyles(Theme theme) throws Exception;
 	
@@ -38,5 +38,5 @@ public interface ThemeChanger {
 	
 	public boolean uploadDocument(Document doc, String linkToBase, String fileName, Theme theme, boolean isTheme) throws Exception;
 	
-	public boolean reloadThemeProperties(String themeId, boolean checkConfig) throws Exception;
+	public boolean reloadThemeProperties(String themeKey, boolean checkConfig) throws Exception;
 }

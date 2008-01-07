@@ -93,6 +93,7 @@ public class ThemesConstants {
 	protected static final String DIV_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":div";
 	protected static final String OBJECT_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":object";
 	protected static final String PARAM_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":param";
+	protected static final String LINK_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":link";
 	
 	// Strings used extracting theme properties
 	protected static final String TAG_DICT = "dict";
@@ -137,6 +138,9 @@ public class ThemesConstants {
 	protected static final String CON_STYLE = "style";
 	protected static final String CON_GROUP = "group";
 	protected static final String CON_VARIATION = "variation";
+	protected static final String CON_VALUE = "value";
+	protected static final String CON_COLOR = "color";
+	protected static final String CON_VARIABLE = "variable";
 	protected static final String CON_PREVIEW = "preview";
 	protected static final String CON_SMALL_PREVIEW = "small-preview";
 	protected static final String CON_PAGE_ID = "page-id";

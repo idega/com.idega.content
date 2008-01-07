@@ -87,7 +87,7 @@ public class ThemesLoader {
 		
 		initTheme(newTheme);
 		
-		String themeID = theme.getId();
+		String themeKey = theme.getId();
 		
 		theme.setLinkToSkeleton(encodedUri);
 		theme.setLinkToBase(helper.getLinkToBase(encodedUri));
@@ -98,7 +98,7 @@ public class ThemesLoader {
 		}
 		
 		if (addThemeInfo()) {
-			return themeID;
+			return themeKey;
 		}
 		
 		return null;

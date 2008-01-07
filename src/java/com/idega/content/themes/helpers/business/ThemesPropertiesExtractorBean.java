@@ -417,6 +417,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 					variable = variable.replace(CoreConstants.PERCENT, CoreConstants.EMPTY);
 					
 					member.setVariable(variable);
+					member.setEnabled(true);
 					
 					theme.addStyleVariable(variable, member.getColour());
 					
@@ -545,6 +546,8 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 	private void setEnabledStyles(Theme theme, Element style) {
 		String styleGroupName = style.getChildTextNormalize(ThemesConstants.CON_GROUP);
 		String variation = style.getChildTextNormalize(ThemesConstants.CON_VARIATION);
+		String variable = style.getChildTextNormalize(ThemesConstants.CON_VARIABLE);
+		String color = style.getChildTextNormalize(ThemesConstants.CON_COLOR);
 		ThemeStyleGroupMember member = null;
 		try {
 			member = helper.getThemeChanger().getStyleMember(theme, styleGroupName, variation);
@@ -554,6 +557,13 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		
 		if (member != null) {
 			member.setEnabled(true);
+			
+			if (variable != null && color != null) {
+				member.setVariable(variable);
+				member.setColour(color);
+			
+				theme.addStyleVariable(variable, color);
+			}
 		}
 	}
 	
