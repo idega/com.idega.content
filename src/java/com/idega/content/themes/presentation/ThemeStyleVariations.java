@@ -16,6 +16,7 @@ import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
+import com.idega.presentation.Span;
 import com.idega.presentation.text.ListItem;
 import com.idega.presentation.text.Lists;
 import com.idega.presentation.text.Text;
@@ -29,17 +30,18 @@ public class ThemeStyleVariations extends Block {
 	private static final String VARIATION_GROUP_STYLE = "themeVariationGroup";
 	private static final String VARIATION_GROUP_NAME_STYLE = "themeVariationGroupName";
 	
-	private static final String ON_CLICK_ACTION = "addThemeChange('";
+	private static final String ON_CLICK_ACTION = "addThemeChangeByThemesManager('";
 	private static final String SEPERATOR = "', '";
-	private static final String INPUT_CHECKED = "', this.checked);";
 	
 	private static final String RADIO_INPUT = "radio";
 	private static final String CHECKBOX_INPUT = "checkbox";
 	private static final String INPUT_CHECKED_ATTRIBUTE = "checked";
 	
+	private static final String COLOUR_CHOOSER_ACTION = "showColorChooser(";
+	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	
-	public ThemeStyleVariations() {
+	/*public ThemeStyleVariations() {
 		setCacheable(getCacheKey());
 	}
 	
@@ -58,7 +60,7 @@ public class ThemeStyleVariations extends Block {
 			theme.addStyleVariationsCacheKey(new StringBuffer(getCacheKey()).append(cacheKey).toString());
 		}
 		return cacheKey;
-	}
+	}*/
 	
 	private String getThemeId() {
 		Object themeID = WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "getThemeId");
@@ -141,6 +143,8 @@ public class ThemeStyleVariations extends Block {
 		Lists variations = new Lists();
 		
 		ListItem variationContainer = null;
+		ListItem colorVariation = null;
+		Span colourContainer = null;
 		Map <String, ThemeStyleGroupMember> allVariations = theme.getStyleGroupsMembers();
 		if (allVariations.values() == null) {
 			return null;
@@ -170,7 +174,7 @@ public class ThemeStyleVariations extends Block {
 					input.setName(groupName);
 					input.setValue(variation.getName());
 					action = new StringBuffer(ON_CLICK_ACTION).append(theme.getId()).append(SEPERATOR).append(groupName).append(SEPERATOR);
-					action.append(variation.getName()).append(SEPERATOR).append(type).append(INPUT_CHECKED);
+					action.append(variation.getName()).append(SEPERATOR).append(type).append(SEPERATOR).append(input.getId()).append("', null);");
 					input.setOnClick(action.toString());
 					if (variation.isEnabled()) {
 						input.setMarkupAttribute(INPUT_CHECKED_ATTRIBUTE, true);
@@ -181,7 +185,27 @@ public class ThemeStyleVariations extends Block {
 				}
 			}
 			else {
-				return null;	//	TODO: handle it
+				colorVariation = new ListItem();
+				
+				colourContainer = new Span();
+				colourContainer.add("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+				colorVariation.add(colourContainer);
+				colourContainer.setStyleClass("themeVariationColourContainerStyle");
+				
+				String color = theme.getStyleVariableValue(variation.getVariable());
+				if (color == null) {
+					color = variation.getColour();
+				}
+				if (color != null) {
+					variations.add(colorVariation);
+				
+					colourContainer.setStyleAttribute("background-color", color);
+					colourContainer.setOnClick(new StringBuffer(COLOUR_CHOOSER_ACTION).append("'").append(colourContainer.getId()).append(SEPERATOR)
+							.append(variation.getVariable()).append(SEPERATOR).append(variation.getGroupName())
+							.append("');").toString());
+					
+					colorVariation.add(variation.getName());
+				}
 			}
 		}
 		

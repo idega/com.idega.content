@@ -1,4 +1,8 @@
 var THEME_ID = null;
+var THEME_COLOUR_VARIATION_VARIABLE = null;
+var THEME_COLOUR_VARIATION_GROUP_NAME = null;
+var CLICKED_THEME_COLOUR_VARIATION = null;
+
 var THEMES = new Array();
 var THEME_CHANGES = new Array();
 
@@ -20,6 +24,8 @@ var ENABLE_STYLE_VARIATIONS = true;
 
 var needReflection = false;
 var needApplyThemeForSite = false;
+
+var themeColourPicker = null;
 
 function getImageWidth() {
 	return imageWidth;
@@ -88,13 +94,14 @@ function getThemeStyleVariationsCallback(variations, loadingLayerOverElement) {
 
 function changeTheme(themeID, styleGroupName, newStyleMember, type, checked) {
 	var radio = true;
-	if (type == 'checkbox') {
+	if (type != 'radio') {
 		radio = false;
 	}
 	var themeNameObj = $('theme_name');
 	if (themeNameObj != null) {
 		showLoadingMessage(getThemeChangingText());
-		ThemesEngine.changeTheme(themeID, styleGroupName, newStyleMember, themeNameObj.value, radio, checked, changeThemeCallback);
+		var manualThemeChange = new ThemeChange(themeID, styleGroupName, newStyleMember, radio, true, null, false, false);
+		ThemesEngine.changeTheme(themeID, themeNameObj.value, manualThemeChange, changeThemeCallback);
 	}
 }
 
@@ -736,12 +743,15 @@ function changeVariations() {
 	}
 }
 
-function ThemeChange(themeId, styleGroupName, variation, radio, enabled) {
+function ThemeChange(themeId, styleGroupName, variation, radio, enabled, variable, color, predefinedStyle) {
 	this.themeId = themeId;
 	this.styleGroupName = styleGroupName;
 	this.variation = variation;
 	this.radio = radio;
 	this.enabled = enabled;
+	this.variable = variable;
+	this.color = color;
+	this.predefinedStyle = predefinedStyle;
 }
 
 function removeThemeChange(index, elementsToRemove) {
@@ -755,14 +765,23 @@ function removeThemeChange(index, elementsToRemove) {
 	return false;
 }
 
-function addThemeChange(themeId, styleGroupName, variation, variationType, enabled) {
+function addThemeChange(themeId, styleGroupName, variation, variationType, enabled, variable) {
 	if (THEME_ID != themeId) {
 		THEME_CHANGES = new Array();	// Reseting array of changes
 	}
 	var radio = true;
-	if (variationType == 'checkbox') {
+	var color = false;
+	var predefinedStyle = false;
+	if (variationType != 'radio') {
 		radio = false;
 		removeThemeChange(existThemeChange(themeId, styleGroupName, variation, radio, enabled), 1);
+		
+		if (variationType == 'colour') {
+			color = true;
+		}
+		if (variationType == 'predefinedStyle') {
+			predefinedStyle = true;
+		}
 	}
 	if (radio) {
 		removeSameGroupChanges(themeId, styleGroupName);
@@ -770,8 +789,17 @@ function addThemeChange(themeId, styleGroupName, variation, variationType, enabl
 	
 	var index = existThemeChange(themeId, styleGroupName, variation, radio, enabled);
 	if (index < 0) {
-		THEME_CHANGES.push(new ThemeChange(themeId, styleGroupName, variation, radio, enabled));
+		THEME_CHANGES.push(new ThemeChange(themeId, styleGroupName, variation, radio, enabled, variable, color, predefinedStyle));
 	}
+}
+
+function addThemeChangeByThemesManager(themeId, styleGroupName, variation, variationType, clickedElementId, variable) {
+	var enabled = true;
+	if (clickedElementId != null) {
+		enabled = $(clickedElementId).checked;
+	}
+	
+	addThemeChange(themeId, styleGroupName, variation, variationType, enabled, variable);
 }
 
 function removeSameGroupChanges(themeId, styleGroupName) {
@@ -892,4 +920,35 @@ function reloadThemeProperties(element) {
 			getThemeStyleVariationsCallback(variations, null);
 		}
 	});
+}
+
+function showColorChooser(elementId, themeColourElement, colourVariationGroupName) {
+	THEME_COLOUR_VARIATION_VARIABLE = themeColourElement;
+	THEME_COLOUR_VARIATION_GROUP_NAME = colourVariationGroupName;
+	CLICKED_THEME_COLOUR_VARIATION = elementId;
+	
+	document.removeEvents('click');
+	themeColourPicker.hide();	//	Any previous one
+	
+	var mooColor = new Color($(elementId).getStyle('background-color'));
+	themeColourPicker.manualSet(mooColor);
+	
+	themeColourPicker.show();	//	New one
+}
+
+function addThemeColorChange(mooColor) {
+	if (mooColor == null || THEME_COLOUR_VARIATION_VARIABLE == null || THEME_ID == null || THEME_COLOUR_VARIATION_GROUP_NAME == null) {
+		return false;
+	}
+	
+	addThemeChange(THEME_ID, THEME_COLOUR_VARIATION_GROUP_NAME, mooColor.hex, 'colour', true, THEME_COLOUR_VARIATION_VARIABLE);
+	if (CLICKED_THEME_COLOUR_VARIATION != null) {
+		$(CLICKED_THEME_COLOUR_VARIATION).setStyle('background-color', mooColor.hex);
+	}
+}
+
+function switchLoadingMessagesForTheme() {
+	closeAllLoadingMessages();
+	
+	showLoadingMessage(PREPARING_THEME_TEXT);
 }

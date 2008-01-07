@@ -242,3 +242,11 @@ input.fileUploadInputStyle {
 .fileUploadInputsContainerStyle img {
 	display: block;
 }
+
+span.themeVariationColourContainerStyle {
+	border: thin solid #000;
+}
+
+span.themeVariationColourContainerStyle:HOVER {
+	cursor: pointer;
+}
