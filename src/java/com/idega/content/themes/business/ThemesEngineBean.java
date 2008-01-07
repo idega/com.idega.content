@@ -240,10 +240,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return null;
 		}
 		
-		String cachedVariations = getVariationsFromCache(themeID, iwc);
+		/*String cachedVariations = getVariationsFromCache(themeID, iwc);
 		if (cachedVariations != null) {
 			return cachedVariations;
-		}
+		}*/
 		
 		BuilderService service = helper.getThemesService().getBuilderService();
 		if (service == null) {
@@ -257,16 +257,16 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 
 		WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "setThemeId", themeID, String.class);
 		String variations = service.getRenderedComponent(new ThemeStyleVariations(), iwc, false);
-		putVariationsToCache(variations, iwc, themeID);
+		//putVariationsToCache(variations, iwc, themeID);
 		return variations;
 	}
 	
 	/**
 	 * 
 	 */
-	public String changeTheme(String themeID, String styleGroupName, String styleMember, String themeName, boolean isRadio, boolean isChecked) {
+	public String changeTheme(String themeKey, String themeName, ThemeChange change) {
 		try {
-			return helper.getThemeChanger().changeTheme(themeID, styleGroupName, styleMember, themeName, isRadio, isChecked);
+			return helper.getThemeChanger().changeTheme(themeKey, themeName, change);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1558,6 +1558,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			localizedText.add(resourceBundle.getLocalizedString("redirecting", "Redirecting..."));								//	27
 			localizedText.add(resourceBundle.getLocalizedString("creating", "Creating..."));									//	28
 			localizedText.add(resourceBundle.getLocalizedString("new_pages", "New Pages"));										//	29
+			localizedText.add(resourceBundle.getLocalizedString("preparing", "Preparing..."));									//	30
 			
 		} catch (Exception e) {
 			e.printStackTrace();
