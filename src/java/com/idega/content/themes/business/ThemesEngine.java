@@ -22,32 +22,32 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getTheme
 	 */
-	public SimplifiedTheme getTheme(String themeId);
+	public SimplifiedTheme getTheme(String themeKey);
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getThemeStyleVariations
 	 */
-	public String getThemeStyleVariations(String themeID) throws RemoteException;
+	public String getThemeStyleVariations(String themeKey) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#changeTheme
 	 */
-	public String changeTheme(String themeID, String styleGroupName, String styleMember, String themeName, boolean isRadio, boolean isChecked) throws RemoteException;
+	public String changeTheme(String themeKey, String themeName, ThemeChange change) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#saveTheme
 	 */
-	public boolean saveTheme(String themeID, String themeName) throws RemoteException;
+	public boolean saveTheme(String themeKey, String themeName) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#setSelectedStyle
 	 */
-	public boolean setSelectedStyle(String themeID, String pageID, boolean applyToPage) throws RemoteException;
+	public boolean setSelectedStyle(String themeKey, String pageKey, boolean applyToPage) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#changePageUri
 	 */
-	public String changePageUri(String pageID, String pageTitle, boolean needSetPageTitle) throws RemoteException;
+	public String changePageUri(String pageKey, String pageTitle, boolean needSetPageTitle) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#setNewLinkInArticleFile
@@ -57,12 +57,12 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#savePageInfo
 	 */
-	public String savePageInfo(String pageID, String[] keywords, String[] values) throws RemoteException;
+	public String savePageInfo(String pageKey, String[] keywords, String[] values) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getPageInfoValues
 	 */
-	public String[] getPageInfoValues(String pageID, String[] keywords) throws RemoteException;
+	public String[] getPageInfoValues(String pageKey, String[] keywords) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getPageInfoElements
@@ -72,7 +72,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#restoreTheme
 	 */
-	public boolean restoreTheme(String themeID) throws RemoteException;
+	public boolean restoreTheme(String themeKey) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getSiteInfoElements
@@ -107,12 +107,12 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#deletePage
 	 */
-	public boolean deletePage(String pageId, boolean deleteChildren) throws RemoteException;
+	public boolean deletePage(String pageKey, boolean deleteChildren) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#deletePageAndDecrease
 	 */
-	public boolean deletePageAndDecrease(String pageId, boolean deleteChildren, ArrayList<String> followingNodes) throws RemoteException;
+	public boolean deletePageAndDecrease(String pageKey, boolean deleteChildren, ArrayList<String> followingNodes) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getPageId
@@ -137,7 +137,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#isStartPage
 	 */
-	public boolean isStartPage(String pageID) throws RemoteException;
+	public boolean isStartPage(String pageKey) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#setAsStartPage
@@ -157,7 +157,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#applyMultipleChangesToTheme
 	 */
-	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes, String themeName) throws RemoteException;
+	public String applyMultipleChangesToTheme(String themeKey, List<ThemeChange> changes, String themeName) throws RemoteException;
 	
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getLocalizedText
@@ -167,7 +167,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#clearVariationFromCache
 	 */
-	public boolean clearVariationFromCache(String themeID, IWContext iwc);
+	public boolean clearVariationFromCache(String themeKey, IWContext iwc);
 	
 	/**
 	 * @see ThemesEngineBean#startBuilderApplication
@@ -177,7 +177,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see ThemesEngineBean#reloadThemeProperties
 	 */
-	public String reloadThemeProperties(String themeId);
+	public String reloadThemeProperties(String themeKey);
 	
 	/**
 	 * @see ThemesEngineBean#isUserAdmin
