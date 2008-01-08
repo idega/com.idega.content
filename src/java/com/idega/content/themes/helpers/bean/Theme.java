@@ -300,5 +300,9 @@ public class Theme {
 	public List<AdvancedProperty> getExtraRegions() {
 		return extraRegions;
 	}
+	
+	public void setExtraRegions(List<AdvancedProperty> extraRegions) {
+		this.extraRegions = extraRegions;
+	}
 
 }

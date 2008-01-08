@@ -45,6 +45,7 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.xml.sax.EntityResolver;
 
+import com.idega.builder.bean.AdvancedProperty;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.bean.ContentItemFeedBean;
@@ -57,9 +58,6 @@ import com.idega.content.themes.business.ThemesService;
 import com.idega.content.themes.helpers.bean.Setting;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
-import com.idega.content.themes.presentation.ApplicationPropertyViewer;
-import com.idega.core.builder.business.BuilderService;
-import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.component.business.ICObjectBusiness;
@@ -1013,6 +1011,25 @@ public class ThemesHelper implements Singleton {
 		pageId.setText(String.valueOf(theme.getIBPageID()));
 		rootElements.add(pageId);
 		
+		List<AdvancedProperty> extraRegions = theme.getExtraRegions();
+		if (extraRegions.size() > 0) {
+			Element regions = new Element(ThemesConstants.CON_EXTRA_REGIONS);
+			AdvancedProperty extraRegion = null;
+			Element region = null;
+			Collection<Element> allRegions = new ArrayList<Element>();
+			for (int i = 0; i < extraRegions.size(); i++) {
+				extraRegion = extraRegions.get(i);
+			
+				region = new Element(ThemesConstants.CON_EXTRA_REGION);
+				region.setAttribute(ThemesConstants.CON_ATT_EXTRA_REGION_PARENT, extraRegion.getId());
+				region.setText(extraRegion.getValue());
+				allRegions.add(region);
+			}
+			
+			regions.setContent(allRegions);
+			rootElements.add(regions);
+		}
+		
 		root.setContent(rootElements);
 		doc.setRootElement(root);
 		try {
@@ -1132,6 +1149,27 @@ public class ThemesHelper implements Singleton {
 			}
 		}
 		return lastUsedTheme;
+	}
+	
+	public Theme getThemeByTemplateKey(String templateKey) {
+		if (templateKey == null) {
+			return null;
+		}
+		
+		List<Theme> themes = getAvailableThemes();
+		if (themes == null) {
+			return null;
+		}
+		
+		Theme theme = null;
+		for (int i = 0; i < themes.size(); i++) {
+			theme = themes.get(i);
+			if (templateKey.equals(String.valueOf(theme.getIBPageID()))) {
+				return theme;
+			}
+		}
+		
+		return null;
 	}
 	
 	public void setLastUsedTheme(int id) {
@@ -1862,39 +1900,4 @@ public class ThemesHelper implements Singleton {
 		name.append(CoreConstants.DOT).append(getFileExtension(file));
 		return name.toString();
 	}
-
-	/*protected boolean addAdditionalRegionToTemplate(Theme theme, String parentRegion, String childRegion) {
-		if (theme == null || parentRegion == null || childRegion == null) {
-			return false;
-		}
-		
-		int templateId = theme.getIBPageID();
-		if (templateId < 0) {
-			return false;
-		}
-		
-		BuilderService service = null;
-		try {
-			service = BuilderServiceFactory.getBuilderService(IWMainApplication.getDefaultIWApplicationContext());
-		} catch (RemoteException e) {
-			e.printStackTrace();
-			return false;
-		}
-		if (service == null) {
-			return false;
-		}
-		
-		int appViewerId = service.getICObjectId(ApplicationPropertyViewer.class.getName());
-		if (appViewerId < 0) {
-			return false;
-		}
-		
-		String templateKey = String.valueOf(templateId);
-		String moduleId = service.addNewModule(templateKey, childRegion, appViewerId, childRegion);
-		if (moduleId == null) {
-			return false;
-		}
-		
-		return service.addPropertyToModule(templateKey, moduleId, ":method:1:implied:void:setApplicationPropertyKey:java.lang.String:", parentRegion);
-	}*/
 }

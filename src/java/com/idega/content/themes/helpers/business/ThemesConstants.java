@@ -63,7 +63,7 @@ public class ThemesConstants {
 	private static final String[] _THEME_PROPERTIES_FILES = new String[] {THEME_PROPERTIES_FILE, IDEGA_THEME_INFO, "theme" + THEME_PROPERTIES_FILE_END};
 	protected static final List <String> THEME_PROPERTIES_FILES = Collections.unmodifiableList(Arrays.asList(_THEME_PROPERTIES_FILES));
 	
-	private static final String[] _USELESS_CONTENT = new String[] {")%", "%", " xml:space=\"preserve\"", "&lt;" + USELESS_DATA_ELEMENT, "]]&amp;amp;"};
+	private static final String[] _USELESS_CONTENT = new String[] {")%", "%", " xml:space=\"preserve\"", "&lt;" + USELESS_DATA_ELEMENT, "]]&amp;amp;", " xmlns=\"\""};
 	protected static final List <String> USELESS_CONTENT = Collections.unmodifiableList(Arrays.asList(_USELESS_CONTENT));
 	
 	private static final String[] _REGIONS = new String[] {"%logo%", "%content%", "%toolbar%", "%sidebar_title%", "%sidebar%",
@@ -146,6 +146,9 @@ public class ThemesConstants {
 	protected static final String CON_PREVIEW = "preview";
 	protected static final String CON_SMALL_PREVIEW = "small-preview";
 	protected static final String CON_PAGE_ID = "page-id";
+	protected static final String CON_EXTRA_REGIONS = "extra-regions";
+	protected static final String CON_EXTRA_REGION = "extra-region";
+	protected static final String CON_ATT_EXTRA_REGION_PARENT = "extra-region-parent";
 	
 	protected static final int SMALL_PREVIEW_WIDTH = 149;
 	protected static final int SMALL_PREVIEW_HEIGHT = 112;

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.idega.builder.bean.AdvancedProperty;
 import com.idega.business.IBOServiceBean;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
@@ -23,6 +24,7 @@ import com.idega.content.themes.helpers.bean.TreeNodeStructure;
 import com.idega.content.themes.helpers.business.ThemeChanger;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
+import com.idega.content.themes.presentation.ApplicationPropertyViewer;
 import com.idega.content.themes.presentation.ThemeStyleVariations;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
@@ -30,6 +32,7 @@ import com.idega.core.builder.data.CachedDomain;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.cache.IWCacheManager2;
+import com.idega.core.component.business.ICObjectBusiness;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.core.search.business.SearchResult;
@@ -240,10 +243,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return null;
 		}
 		
-		/*String cachedVariations = getVariationsFromCache(themeID, iwc);
+		String cachedVariations = getVariationsFromCache(themeID, iwc);
 		if (cachedVariations != null) {
 			return cachedVariations;
-		}*/
+		}
 		
 		BuilderService service = helper.getThemesService().getBuilderService();
 		if (service == null) {
@@ -257,7 +260,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 
 		WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "setThemeId", themeID, String.class);
 		String variations = service.getRenderedComponent(new ThemeStyleVariations(), iwc, false);
-		//putVariationsToCache(variations, iwc, themeID);
+		putVariationsToCache(variations, iwc, themeID);
 		return variations;
 	}
 	
@@ -338,22 +341,28 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				result = setStyle(articleViewerID, templateID, true);
 			}
 		}
+		
 		return result;
 	}
 	
-	private boolean setStyle(String pageID, int templateID, boolean ignoreTemplate) {
+	private boolean setStyle(String pageKey, int templateID, boolean ignoreTemplate) {
 		ICPage page = null;
 		if (templateID < 0) {
 			return false;
 		}
-		page = helper.getThemesService().getICPage(pageID);
+		page = helper.getThemesService().getICPage(pageKey);
 		if (page == null) {
 			return false;
 		}
+		
+		String templateKey = String.valueOf(templateID); 
 		if (page.isPage() || ignoreTemplate) {
-			helper.getThemesService().getBuilderService().setTemplateId(pageID, String.valueOf(templateID));
+			helper.getThemesService().getBuilderService().setTemplateId(pageKey, templateKey);
 			page.setTemplateId(templateID);
-			page.store();
+			
+			if (!checkIfNeedExtraRegions(pageKey, helper.getThemeByTemplateKey(templateKey))) {
+				page.store();
+			}
 		}
 		return true;
 	}
@@ -946,8 +955,14 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		//	Setting template id for new page(s)
 		String lastUsedTemplate = helper.getLastUsedTheme();
 		if (lastUsedTemplate != null && !CoreConstants.EMPTY.equals(lastUsedTemplate)) {
+			String createdPageKey = null;
+			Theme theme = helper.getThemeByTemplateKey(lastUsedTemplate);
 			for (int i = 0; i < createdPages.size(); i++) {
-				setLastUsedTemplate(createdPages.get(i), lastUsedTemplate);
+				createdPageKey = createdPages.get(i);
+				
+				setLastUsedTemplate(createdPageKey, lastUsedTemplate);
+			
+				addExtraRegionsToPage(createdPageKey, theme);
 			}
 		}
 
@@ -957,6 +972,90 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		updateSiteTree(null);
 		
 		return newIds;
+	}
+	
+	private boolean addExtraRegionsToPage(String pageKey, Theme theme) {
+		if (pageKey == null || theme == null) {
+			return false;
+		}
+		
+		List<AdvancedProperty> extraRegions = theme.getExtraRegions();
+		if (extraRegions == null || extraRegions.size() == 0) {
+			return true;
+		}
+		
+		BuilderService service = null;
+		try {
+			service = BuilderServiceFactory.getBuilderService(IWMainApplication.getDefaultIWApplicationContext());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			return false;
+		}
+		if (service == null) {
+			return false;
+		}
+		
+		int appViewerId = service.getICObjectId(ApplicationPropertyViewer.class.getName());
+		for (int i = 0; i < extraRegions.size(); i++) {
+			if (!addExtraRegionToPage(pageKey, extraRegions.get(i), service, appViewerId)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	private boolean addExtraRegionToPage(String pageKey, AdvancedProperty region, BuilderService service, int appViewerId) {
+		if (pageKey == null || region == null || service == null || appViewerId < 0) {
+			return false;
+		}
+		
+		String moduleId = service.addNewModule(pageKey, region.getValue(), appViewerId, region.getValue());
+		if (moduleId == null) {
+			return false;
+		}
+		if (!moduleId.startsWith(ICObjectBusiness.UUID_PREFIX)) {
+			moduleId = new StringBuffer(ICObjectBusiness.UUID_PREFIX).append(moduleId).toString();
+		}
+		
+		if (!service.addPropertyToModule(pageKey, moduleId, ":method:1:implied:void:setApplicationPropertyKey:java.lang.String:", region.getId())) {
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean checkIfNeedExtraRegions(String pageKey, Theme theme) {
+		if (pageKey == null || theme == null) {
+			return false;
+		}
+		
+		BuilderService service = null;
+		try {
+			service = BuilderServiceFactory.getBuilderService(IWMainApplication.getDefaultIWApplicationContext());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			return false;
+		}
+		if (service == null) {
+			return false;
+		}
+		
+		List<AdvancedProperty> regions = theme.getExtraRegions();
+		if (regions == null || regions.size() == 0) {
+			return false;
+		}
+		
+		int appViewerId = service.getICObjectId(ApplicationPropertyViewer.class.getName());
+		
+		AdvancedProperty region = null;
+		for (int i = 0; i < regions.size(); i++) {
+			region = regions.get(i);
+			if (!service.existsRegion(pageKey, region.getValue(), region.getId())) {
+				addExtraRegionToPage(pageKey, region, service, appViewerId);
+			}
+		}
+		
+		return false;
 	}
 	
 	private void updateSiteTree(IWContext iwc, boolean updateAllSessions) {

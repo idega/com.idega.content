@@ -85,7 +85,6 @@ public class ApplicationPropertyViewer extends Block {
 				name = FIFTEEN_SPACE;
 			}
 			Image image = new Image(value, name);
-			image.setID(siteLogo);
 			addPropertyEditAction(iwc, image, key, settingKey);
 			this.add(image);
 			return;
@@ -197,7 +196,7 @@ public class ApplicationPropertyViewer extends Block {
 				title = s.getLabel();
 			}
 			
-			String id = property + ThemesConstants.ADD_FOR_PROPERTY_CHANGE;
+			String id = new StringBuffer(property).append(ThemesConstants.ADD_FOR_PROPERTY_CHANGE).append(component.getId()).toString();
 			component.setID(id);
 			if (component.attributes == null) {
 				component.attributes = new HashMap();

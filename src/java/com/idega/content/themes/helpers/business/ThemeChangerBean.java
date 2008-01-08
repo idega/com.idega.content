@@ -30,6 +30,7 @@ import org.jdom.output.XMLOutputter;
 
 import bsh.Interpreter;
 
+import com.idega.builder.bean.AdvancedProperty;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.bean.Replaces;
 import com.idega.content.themes.helpers.bean.Theme;
@@ -1328,17 +1329,19 @@ public class ThemeChangerBean implements ThemeChanger {
 		String regionContent = null;
 		
 		String region = null;
+		String fixedRegion = null;
 		int sameRegionRepeatTime = 0;
 		for (int i = 0; i < ThemesConstants.REGIONS.size(); i++) {
 			region = ThemesConstants.REGIONS.get(i);
 			
 			fixedValue = fixValue(region, linkToBase);
+			fixedRegion = StringHandler.replace(region, CoreConstants.PERCENT, CoreConstants.EMPTY);
 			sameRegionRepeatTime = 0;
 			while (docContent.indexOf(region) != -1) {
 				if (sameRegionRepeatTime > 0) {
 					fixedValue = new StringBuffer(fixedValue).append(sameRegionRepeatTime).toString();
 					
-					theme.addExtraRegion(region, fixedValue);
+					theme.addExtraRegion(fixedRegion, fixedValue);
 				}
 				sameRegionRepeatTime++;
 				regionContent = getRegion(fixedValue);
@@ -1433,7 +1436,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		if (e == null || heading == null) {
 			return false;
 		}
-		if (detachElement(e, heading)) {
+		if (detachElement(e, heading, headingKeyword)) {
 			e.addContent(getCommentsCollection(headingKeyword));
 			addElementToRegion(e, e.getContentSize() - 1, heading, headingKeyword);	
 			return true;
@@ -1452,12 +1455,19 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 	
-	private boolean detachElement(Element parent, String elementName) {
-		if (parent == null || elementName == null) {
+	private boolean detachElement(Element parent, String elementName, String content) {
+		if (parent == null || elementName == null || content == null) {
 			return false;
 		}
 		Element useless = parent.getChild(elementName, namespace);
 		if (useless != null) {
+			String text = useless.getTextNormalize();
+			if (text == null) {
+				return false;
+			}
+			if (text.indexOf(content) == -1) {
+				return false;
+			}
 			useless.detach();
 			return true;
 		}
@@ -2358,6 +2368,8 @@ public class ThemeChangerBean implements ThemeChanger {
 		if (!createCopiesForColourFiles(child, parent.getColourFiles(), null, false)) {
 			return false;
 		}
+		
+		child.setExtraRegions(new ArrayList<AdvancedProperty>(parent.getExtraRegions()));
 		
 		return true;
 	}

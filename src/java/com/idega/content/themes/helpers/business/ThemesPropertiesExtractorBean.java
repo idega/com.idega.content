@@ -540,7 +540,29 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 			return false;
 		}
 		
+		Element extraRegions = root.getChild(ThemesConstants.CON_EXTRA_REGIONS);
+		loadExtraRegions(theme, extraRegions);
+		
 		return true;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void loadExtraRegions(Theme theme, Element regions) {
+		if (theme == null || regions == null) {
+			return;
+		}
+		
+		List<Element> allRegions = regions.getChildren(ThemesConstants.CON_EXTRA_REGION);
+		if (allRegions == null) {
+			return;
+		}
+		
+		Element region = null;
+		for (int i = 0; i < allRegions.size(); i++) {
+			region = allRegions.get(i);
+			
+			theme.addExtraRegion(region.getAttributeValue(ThemesConstants.CON_ATT_EXTRA_REGION_PARENT), region.getTextNormalize());
+		}
 	}
 	
 	private void setEnabledStyles(Theme theme, Element style) {
