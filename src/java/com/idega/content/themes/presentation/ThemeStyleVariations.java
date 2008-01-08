@@ -41,7 +41,7 @@ public class ThemeStyleVariations extends Block {
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	
-	/*public ThemeStyleVariations() {
+	public ThemeStyleVariations() {
 		setCacheable(getCacheKey());
 	}
 	
@@ -60,7 +60,7 @@ public class ThemeStyleVariations extends Block {
 			theme.addStyleVariationsCacheKey(new StringBuffer(getCacheKey()).append(cacheKey).toString());
 		}
 		return cacheKey;
-	}*/
+	}
 	
 	private String getThemeId() {
 		Object themeID = WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "getThemeId");
