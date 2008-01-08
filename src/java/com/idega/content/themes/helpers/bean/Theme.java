@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.idega.builder.bean.AdvancedProperty;
+
 public class Theme {
 	
 	private boolean propertiesExtracted;
@@ -30,6 +32,7 @@ public class Theme {
 	private List<String> colourFiles = null;
 	private List<String> originalColourFiles = null;
 	private List<ThemeChange> changes;
+	private List<AdvancedProperty> extraRegions = null;
 
 	private Map<String, ThemeStyleGroupMember> styleGroupsMembers;
 	private Map<String, String> styleVariables = null;
@@ -41,6 +44,7 @@ public class Theme {
 		this.styleVariationsCacheKeys = new ArrayList<String>();
 		this.colourFiles = new ArrayList<String>();
 		this.originalColourFiles = new ArrayList<String>();
+		this.extraRegions = new ArrayList<AdvancedProperty>();
 		this.changes = new ArrayList<ThemeChange>();
 		
 		this.styleGroupsMembers = new HashMap<String, ThemeStyleGroupMember>();
@@ -230,6 +234,7 @@ public class Theme {
 		colourFiles.clear();
 		originalColourFiles.clear();
 		styleVariables.clear();
+		extraRegions.clear();
 	}
 
 	public List<String> getColourFiles() {
@@ -286,6 +291,14 @@ public class Theme {
 		}
 		
 		return true;
+	}
+	
+	public void addExtraRegion(String parentRegion, String childRegion) {
+		this.extraRegions.add(new AdvancedProperty(parentRegion, childRegion));
+	}
+	
+	public List<AdvancedProperty> getExtraRegions() {
+		return extraRegions;
 	}
 
 }

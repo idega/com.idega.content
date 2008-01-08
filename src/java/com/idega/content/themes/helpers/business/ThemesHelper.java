@@ -57,6 +57,9 @@ import com.idega.content.themes.business.ThemesService;
 import com.idega.content.themes.helpers.bean.Setting;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
+import com.idega.content.themes.presentation.ApplicationPropertyViewer;
+import com.idega.core.builder.business.BuilderService;
+import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.component.business.ICObjectBusiness;
@@ -1860,4 +1863,38 @@ public class ThemesHelper implements Singleton {
 		return name.toString();
 	}
 
+	/*protected boolean addAdditionalRegionToTemplate(Theme theme, String parentRegion, String childRegion) {
+		if (theme == null || parentRegion == null || childRegion == null) {
+			return false;
+		}
+		
+		int templateId = theme.getIBPageID();
+		if (templateId < 0) {
+			return false;
+		}
+		
+		BuilderService service = null;
+		try {
+			service = BuilderServiceFactory.getBuilderService(IWMainApplication.getDefaultIWApplicationContext());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			return false;
+		}
+		if (service == null) {
+			return false;
+		}
+		
+		int appViewerId = service.getICObjectId(ApplicationPropertyViewer.class.getName());
+		if (appViewerId < 0) {
+			return false;
+		}
+		
+		String templateKey = String.valueOf(templateId);
+		String moduleId = service.addNewModule(templateKey, childRegion, appViewerId, childRegion);
+		if (moduleId == null) {
+			return false;
+		}
+		
+		return service.addPropertyToModule(templateKey, moduleId, ":method:1:implied:void:setApplicationPropertyKey:java.lang.String:", parentRegion);
+	}*/
 }

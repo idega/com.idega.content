@@ -30,16 +30,14 @@ import com.idega.presentation.text.Text;
 import com.idega.util.CoreConstants;
 
 /**
- * This class diplays the current value of an application property, localized if available.
+ * This class displays the current value of an application property, localized if available.
  * You have to use the method setApplicationPropertyKey to make it display anything.
- * You can also use setDefaultValue to initilize a key that has not been set.
+ * You can also use setDefaultValue to initialize a key that has not been set.
  * 
  * @author valdas
  *
  */
 public class ApplicationPropertyViewer extends Block {
-	
-	private static final String LOGO = "logo";
 	
 	private static final String LIST_STYLE = "list-style-type: none; width: 100%";
 	private static final String STYLE_CLASS = "applicationPropertyStyleClass";
@@ -80,7 +78,7 @@ public class ApplicationPropertyViewer extends Block {
 			return;
 		}
 		
-		if (key.indexOf(getCheckKey(LOGO)) != -1) {
+		if (key.indexOf(getCheckKey(ThemesConstants.LOGO)) != -1) {
 			String siteLogo = "site_logo";
 			String name = ContentUtil.getBundle().getLocalizedString(siteLogo);
 			if (value.equals(ContentConstants.EMPTY)) {
@@ -199,12 +197,13 @@ public class ApplicationPropertyViewer extends Block {
 				title = s.getLabel();
 			}
 			
-			component.setID(property + ThemesConstants.ADD_FOR_PROPERTY_CHANGE);
+			String id = property + ThemesConstants.ADD_FOR_PROPERTY_CHANGE;
+			component.setID(id);
 			if (component.attributes == null) {
 				component.attributes = new HashMap();
 			}
 			StringBuffer javaScript = new StringBuffer();
-			javaScript.append("changeSiteInfo(this.id, '").append(ContentUtil.getBundle().getLocalizedString("saving", "Saving..."));
+			javaScript.append("changeSiteInfo('").append(id).append("', '").append(ContentUtil.getBundle().getLocalizedString("saving", "Saving..."));
 			javaScript.append("');");
 			component.attributes.put("ondblclick", javaScript.toString());
 			
@@ -218,7 +217,7 @@ public class ApplicationPropertyViewer extends Block {
 	public String getBuilderName(IWUserContext iwuc) {
 		String name = ContentUtil.getBundle().getComponentName(ApplicationPropertyViewer.class);
 		if (name == null || ThemesConstants.EMPTY.equals(name)) {
-			return "ApplicationPropertyViewer";
+			return ApplicationPropertyViewer.class.getSimpleName();
 		}
 		return name;
 	}

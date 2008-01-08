@@ -16,6 +16,7 @@ public class ThemesConstants {
 	public static final String TOOLBAR = "toolbar";
 	public static final String BREADCRUMB = "breadcrumbcontainer";
 	public static final String PLUGIN_SIDEBAR = "plugin_sidebar";
+	public static final String LOGO = "logo";
 	
 	public static final String XML_EXTENSION = "xml";
 	
@@ -41,7 +42,8 @@ public class ThemesConstants {
 	
 	public static final String ARTICLE_TITLE = "Article";
 	
-	protected static final String USELESS_PATHTO_ELEMENT = "%pathto(";
+	protected static final String USELESS_PATHTO_ELEMENT = "pathto(";
+	protected static final String USELESS_DATA_ELEMENT = "![CDATA[";
 	
 	private static final String[] _REGIONS_NEEDED_TO_CREATE = new String[] {TOOLBAR, PLUGIN_SIDEBAR};
 	protected static final List <String> REGIONS_NEEDED_TO_CREATE = Collections.unmodifiableList(Arrays.asList(_REGIONS_NEEDED_TO_CREATE));
@@ -61,14 +63,14 @@ public class ThemesConstants {
 	private static final String[] _THEME_PROPERTIES_FILES = new String[] {THEME_PROPERTIES_FILE, IDEGA_THEME_INFO, "theme" + THEME_PROPERTIES_FILE_END};
 	protected static final List <String> THEME_PROPERTIES_FILES = Collections.unmodifiableList(Arrays.asList(_THEME_PROPERTIES_FILES));
 	
-	private static final String[] _USELESS_CONTENT = new String[] {USELESS_PATHTO_ELEMENT, ")%", "%", " xml:space=\"preserve\""};
+	private static final String[] _USELESS_CONTENT = new String[] {")%", "%", " xml:space=\"preserve\"", "&lt;" + USELESS_DATA_ELEMENT, "]]&amp;amp;"};
 	protected static final List <String> USELESS_CONTENT = Collections.unmodifiableList(Arrays.asList(_USELESS_CONTENT));
 	
 	private static final String[] _REGIONS = new String[] {"%logo%", "%content%", "%toolbar%", "%sidebar_title%", "%sidebar%",
 		"%plugin_sidebar%", "%breadcrumb%", "%footer%", "%site_title%", "%site_slogan%"};
 	protected static final List <String> REGIONS = Collections.unmodifiableList(Arrays.asList(_REGIONS));
 	
-	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "sidebarContainer",
+	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "sidebarContainer", "side-navcontainer",
 		BREADCRUMB, NAVIGATION};
 	protected static final List <String> BASIC_IDS_FOR_REGIONS = Collections.unmodifiableList(Arrays.asList(_BASIC_IDS_FOR_REGIONS));
 	
@@ -169,9 +171,9 @@ public class ThemesConstants {
 	public static final String THEMES_PREVIEW_PATH = THEMES_PATH + "preview/";
 	
 	public static final String AT = "@";
-	public static final String EMPTY = "";
-	public static final String SEMICOLON = ";";
-	public static final String COMMA = ",";
+	public static final String EMPTY = CoreConstants.EMPTY;
+	public static final String SEMICOLON = CoreConstants.SEMICOLON;
+	public static final String COMMA = CoreConstants.COMMA;
 	
 	public static final String THEME_SETTINGS = "resources/themes/theme.xml";
 	public static final String PAGE_SETTINGS = BASE_ROOT_APPL + "/themes/page.xml";

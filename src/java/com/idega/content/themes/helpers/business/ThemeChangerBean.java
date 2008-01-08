@@ -445,7 +445,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			value = value.substring(1);
 		}
 		
-		String doubleRegex = "(?i)(?:"+
+		/*String doubleRegex = "(?i)(?:"+
 		"\\b\\d+\\.\\d*(?:e[+-]?\\d+|)[fF]?|"+// ex: 34., 3.E2
 		"\\d*\\.\\d+(?:e[+-]?\\d+|)[fF]?|"+ // ex: .2, .994e+4
 		"\\b\\d+e[+-]?\\d+[fF]?|"+ // ex: 1e-15
@@ -481,7 +481,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			valueParts[2] = value.substring(4);		//	Blue
 		}
 		
-		System.out.println(rgbs);
+//		System.out.println(rgbs);*/
 		return null;
 	}
 	
@@ -840,7 +840,12 @@ public class ThemeChangerBean implements ThemeChanger {
 		String docContent = out.outputString(doc);
 		
 		if (isTheme) {
-			docContent = addRegions(docContent);
+			docContent = addRegions(theme, docContent, linkToBase);
+			if (docContent == null) {
+				return false;
+			}
+			docContent = StringHandler.replace(docContent, ThemesConstants.USELESS_PATHTO_ELEMENT,
+					new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(linkToBase).toString());
 			docContent = getFixedDocumentContent(docContent);
 		}
 		
@@ -906,14 +911,14 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		for (Iterator<Element> ite = elementsNeedsRegions.iterator(); ite.hasNext(); ) {
 			e = ite.next();
-			e.addContent(getCommentsCollection(fixValue(e.getTextNormalize())));
+			e.addContent(getCommentsCollection(fixValue(e.getTextNormalize(), linkToBase)));
 		}
 
 		Text t = null;
 		for (Iterator <Text> itt = textElements.iterator(); itt.hasNext(); ) {
 			t = itt.next();
 			if (needAddRegion(ThemesConstants.REGIONS, t.getTextNormalize())) {
-				head.addContent(getCommentsCollection(fixValue(t.getTextNormalize())));
+				head.addContent(getCommentsCollection(fixValue(t.getTextNormalize(), linkToBase)));
 			}
 			t.detach();
 		}
@@ -944,14 +949,14 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		Attribute a = null;
 		if (!needAddRegion(ThemesConstants.REGIONS, e.getTextNormalize())) {
-			e.setText(fixValue(e.getTextNormalize()));
+			e.setText(fixValue(e.getTextNormalize(), linkToBase));
 		}
 		a = e.getAttribute(ThemesConstants.TAG_ATTRIBUTE_HREF);
 		if (a == null) {
 			a = e.getAttribute(ThemesConstants.TAG_ATTRIBUTE_SRC);
 		}
 		if (a != null) {
-			String fixedValue = fixValue(a.getValue());
+			String fixedValue = fixValue(a.getValue(), linkToBase);
 			if (!fixedValue.startsWith(linkToBase)) {
 				a.setValue(new StringBuffer(linkToBase).append(fixedValue).toString()); // Fixing attribute's value
 			}
@@ -1148,8 +1153,8 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		boolean madeChanges = false;
 		
-		while (value.indexOf(ThemesConstants.USELESS_PATHTO_ELEMENT) != -1) {
-			value = value.replace(ThemesConstants.USELESS_PATHTO_ELEMENT, CoreConstants.EMPTY);
+		if (value.indexOf(ThemesConstants.USELESS_PATHTO_ELEMENT) != -1) {
+			value = StringHandler.replace(value, ThemesConstants.USELESS_PATHTO_ELEMENT, CoreConstants.EMPTY);
 			
 			madeChanges = true;
 		}
@@ -1314,21 +1319,33 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 	
 	/**
-	 * Creates Builder's regions in XML () document
+	 * Creates Builder's regions in HTML document
 	 * @param docContent
 	 * @return String
 	 */
-	private String addRegions(String docContent) {
+	private String addRegions(Theme theme, String docContent, String linkToBase) {
 		String fixedValue = null;
 		String regionContent = null;
+		
+		String region = null;
+		int sameRegionRepeatTime = 0;
 		for (int i = 0; i < ThemesConstants.REGIONS.size(); i++) {
-			fixedValue = fixValue(ThemesConstants.REGIONS.get(i));
-			if (docContent.indexOf(ThemesConstants.REGIONS.get(i)) != -1) {
+			region = ThemesConstants.REGIONS.get(i);
+			
+			fixedValue = fixValue(region, linkToBase);
+			sameRegionRepeatTime = 0;
+			while (docContent.indexOf(region) != -1) {
+				if (sameRegionRepeatTime > 0) {
+					fixedValue = new StringBuffer(fixedValue).append(sameRegionRepeatTime).toString();
+					
+					theme.addExtraRegion(region, fixedValue);
+				}
+				sameRegionRepeatTime++;
 				regionContent = getRegion(fixedValue);
 				if (ThemesConstants.REGIONS_NEEDED_TO_CREATE.contains(fixedValue)) {
 					regionContent = getRegionDiv(fixedValue, regionContent);
 				}
-				docContent = docContent.replace(ThemesConstants.REGIONS.get(i), regionContent);
+				docContent = docContent.replaceFirst(region, regionContent);
 			}
 		}
 		return docContent;
@@ -1343,12 +1360,19 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param value
 	 * @return String
 	 */
-	private String fixValue(String value) {
+	private String fixValue(String value, String linkToBase) {
 		for (int i = 0; i < ThemesConstants.USELESS_CONTENT.size(); i++) {
 			while (value.indexOf(ThemesConstants.USELESS_CONTENT.get(i)) != -1) {
 				value = value.replace(ThemesConstants.USELESS_CONTENT.get(i), ThemesConstants.EMPTY);
 			}
 		}
+		
+		String replace = CoreConstants.EMPTY;
+		if (value.indexOf(ThemesConstants.USELESS_DATA_ELEMENT) != -1) {
+			replace = linkToBase;
+		}
+		value = StringHandler.replace(value, ThemesConstants.USELESS_PATHTO_ELEMENT, replace);
+		
 		return value;
 	}
 	
@@ -1922,7 +1946,6 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 	
 	private boolean restoreTheme(Theme theme) {
-		System.out.println("Restoring: " + theme.getName());
 		if (theme == null) {
 			return false;
 		}
@@ -2238,10 +2261,6 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 		
-		/*InputStream is = helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(linkToTheme).toString());
-		if (is == null) {
-			return false;
-		}*/
 		String linkToBase = helper.getLinkToBase(linkToTheme);
 		if (!linkToBase.endsWith(ContentConstants.SLASH)) {
 			linkToBase = new StringBuffer(linkToBase).append(ContentConstants.SLASH).toString();
@@ -2253,16 +2272,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		String tempName = new StringBuilder(newName).append(ThemesConstants.THEME).toString();
 		String themeName = StringHandler.removeCharacters(tempName, ContentConstants.SPACE, ContentConstants.UNDER);
-		/*try {
-			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(decodedLinkToBase,	themeName, is, null, true)) {
-				return false;
-			}
-		} catch (RemoteException e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			helper.closeInputStream(is);
-		}*/
 		
 		//	Adding theme to system
 		String tempLink = new StringBuffer(decodedLinkToBase).append(themeName).toString();
