@@ -11,14 +11,14 @@
 	<key>
 		<code>site_title</code>
 		<label>Site title</label>
-		<defaultValue>idega</defaultValue>
+		<defaultValue>Idega</defaultValue>
 		<type>text</type>
 		<method>setSiteTitle</method>
 	</key>
 	<key>
 		<code>site_slogan</code>
 		<label>Site slogan</label>
-		<defaultValue>Idega Software CMS and RAD webapplication tools</defaultValue>
+		<defaultValue>Web solutions for all your needs</defaultValue>
 		<type>text</type>
 		<method>setSiteSlogan</method>
 	</key>
@@ -46,7 +46,7 @@
 	<key>
 		<code>navcontainer</code>
 		<label>Navigation</label>
-		<defaultValue>The Products,Web Community,Partner Program,Get Support,About idega</defaultValue>
+		<defaultValue>Frontpage,Products,Customers,Partners,The Company,News</defaultValue>
 		<type>text</type>
 		<method>setNavContainer</method>
 	</key>
@@ -60,7 +60,7 @@
 	<key>
 		<code>footer</code>
 		<label>Footer</label>
-		<defaultValue>idega</defaultValue>
+		<defaultValue>Idega Software</defaultValue>
 		<type>text</type>
 		<method>setFooter</method>
 	</key>
