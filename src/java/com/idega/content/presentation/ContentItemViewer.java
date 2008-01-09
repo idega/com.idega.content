@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.28 2007/03/19 08:51:06 valdas Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.29 2008/01/09 13:45:27 valdas Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -24,6 +24,7 @@ import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 import com.idega.content.bean.ContentItem;
+import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.core.cache.UIComponentCacher;
 import com.idega.core.uri.IWActionURIManager;
@@ -33,10 +34,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2007/03/19 08:51:06 $ by $Author: valdas $
+ * Last modified: $Date: 2008/01/09 13:45:27 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.29 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -340,6 +341,16 @@ public class ContentItemViewer extends WFContainer {
 	 * @return
 	 */
 	protected String getStyleClass(String fieldName) {
+		if (ContentConstants.ATTRIBUTE_HEADLINE.equals(fieldName)) {
+			return ContentConstants.ARTICLE_ITEM_HEADLINE_STYLE_CLASS;
+		}
+		if (ContentConstants.ATTRIBUTE_CREATION_DATE.equals(fieldName)) {
+			return ContentConstants.ARTICLE_ITEM_DATE_STYLE_CLASS;
+		}
+		if (ContentConstants.ATTRIBUTE_BODY.equals(fieldName)) {
+			return ContentConstants.ARTICLE_ITEM_BODY_STYLE_CLASS;
+		}
+		
 		return getDefaultStyleClassPrefix() + fieldName;
 	}
 

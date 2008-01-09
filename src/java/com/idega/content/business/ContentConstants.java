@@ -39,4 +39,12 @@ public class ContentConstants {
 	public static final String UPLOADER_UPLOAD_ZIP_FILE = "web2FileUploaderUploadZipFileValue";
 	public static final String UPLOADER_UPLOAD_THEME_PACK = "web2FileUploaderUploadThemePackValue";
 	public static final String UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE = "web2FileUploaderExtractArchivedFileValue";
+
+	public final static String ATTRIBUTE_HEADLINE = "headline";
+	public final static String ATTRIBUTE_CREATION_DATE = "creation_date";
+	public final static String ATTRIBUTE_BODY = "body";
+	
+	public static final String ARTICLE_ITEM_HEADLINE_STYLE_CLASS = "blog-entry-title";
+	public static final String ARTICLE_ITEM_DATE_STYLE_CLASS = "blog-entry-date";
+	public static final String ARTICLE_ITEM_BODY_STYLE_CLASS = "blog-entry-body";
 }
