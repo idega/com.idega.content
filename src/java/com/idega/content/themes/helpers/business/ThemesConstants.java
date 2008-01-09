@@ -12,7 +12,6 @@ public class ThemesConstants {
 	
 	public static final String IDEGA_THEME = "idega_theme";
 	
-//	public static final String NAVIGATION = "navcontainer";
 	public static final String TOOLBAR = "toolbar";
 	public static final String BREADCRUMB = "breadcrumb";
 	public static final String PLUGIN_SIDEBAR = "plugin_sidebar";
@@ -70,7 +69,7 @@ public class ThemesConstants {
 		"%footer%", "%site_title%", "%site_slogan%"};
 	protected static final List <String> REGIONS = Collections.unmodifiableList(Arrays.asList(_REGIONS));
 	
-	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "sidebarContainer", "side-navcontainer"};
+	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "sidebarContainer"};
 	protected static final List <String> BASIC_IDS_FOR_REGIONS = Collections.unmodifiableList(Arrays.asList(_BASIC_IDS_FOR_REGIONS));
 	
 	private static final String[] _DOCUMENT_PUBLIC_IDS = new String[] {"Apple Computer", "DTD XHTML 1.0 Strict"};
