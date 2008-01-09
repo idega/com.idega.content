@@ -12,9 +12,9 @@ public class ThemesConstants {
 	
 	public static final String IDEGA_THEME = "idega_theme";
 	
-	public static final String NAVIGATION = "navcontainer";
+//	public static final String NAVIGATION = "navcontainer";
 	public static final String TOOLBAR = "toolbar";
-	public static final String BREADCRUMB = "breadcrumbcontainer";
+	public static final String BREADCRUMB = "breadcrumb";
 	public static final String PLUGIN_SIDEBAR = "plugin_sidebar";
 	public static final String LOGO = "logo";
 	
@@ -45,7 +45,7 @@ public class ThemesConstants {
 	protected static final String USELESS_PATHTO_ELEMENT = "pathto(";
 	protected static final String USELESS_DATA_ELEMENT = "![CDATA[";
 	
-	private static final String[] _REGIONS_NEEDED_TO_CREATE = new String[] {TOOLBAR, PLUGIN_SIDEBAR};
+	private static final String[] _REGIONS_NEEDED_TO_CREATE = new String[] {PLUGIN_SIDEBAR};
 	protected static final List <String> REGIONS_NEEDED_TO_CREATE = Collections.unmodifiableList(Arrays.asList(_REGIONS_NEEDED_TO_CREATE));
 	
 	private static final String[] _DUMMY_ARTICLES = new String[] {"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum bibendum, ligula ut feugiat rutrum, mauris libero ultricies nulla, at hendrerit lectus dui bibendum metus. Phasellus quis nulla nec mauris sollicitudin ornare. Vivamus faucibus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Cras vulputate condimentum ipsum. Duis urna eros, commodo id, sagittis sed, sodales eu, ante. Etiam ante. Cras risus dolor, porta nec, adipiscing eu, scelerisque at, metus. Mauris nunc eros, porttitor nec, tincidunt ut, rutrum eget, massa. In facilisis nisi. Sed non lorem malesuada quam egestas bibendum. Quisque bibendum ullamcorper purus. Integer id diam vel elit adipiscing consectetuer. Phasellus vitae eros. Vivamus laoreet consectetuer tortor. In congue dignissim quam. Suspendisse nec purus vel velit ultricies bibendum."};
@@ -66,12 +66,11 @@ public class ThemesConstants {
 	private static final String[] _USELESS_CONTENT = new String[] {")%", "%", " xml:space=\"preserve\"", "&lt;" + USELESS_DATA_ELEMENT, "]]&amp;amp;", " xmlns=\"\""};
 	protected static final List <String> USELESS_CONTENT = Collections.unmodifiableList(Arrays.asList(_USELESS_CONTENT));
 	
-	private static final String[] _REGIONS = new String[] {"%logo%", "%content%", "%toolbar%", "%sidebar_title%", "%sidebar%",
-		"%plugin_sidebar%", "%breadcrumb%", "%footer%", "%site_title%", "%site_slogan%"};
+	private static final String[] _REGIONS = new String[] {"%logo%", "%content%", "%toolbar%", "%sidebar_title%", "%sidebar%", "%plugin_sidebar%", "%breadcrumb%",
+		"%footer%", "%site_title%", "%site_slogan%"};
 	protected static final List <String> REGIONS = Collections.unmodifiableList(Arrays.asList(_REGIONS));
 	
-	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "sidebarContainer", "side-navcontainer",
-		BREADCRUMB, NAVIGATION};
+	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "sidebarContainer", "side-navcontainer"};
 	protected static final List <String> BASIC_IDS_FOR_REGIONS = Collections.unmodifiableList(Arrays.asList(_BASIC_IDS_FOR_REGIONS));
 	
 	private static final String[] _DOCUMENT_PUBLIC_IDS = new String[] {"Apple Computer", "DTD XHTML 1.0 Strict"};

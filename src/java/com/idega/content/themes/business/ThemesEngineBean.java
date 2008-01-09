@@ -24,7 +24,6 @@ import com.idega.content.themes.helpers.bean.TreeNodeStructure;
 import com.idega.content.themes.helpers.business.ThemeChanger;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
-import com.idega.content.themes.presentation.ApplicationPropertyViewer;
 import com.idega.content.themes.presentation.ThemeStyleVariations;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
@@ -32,7 +31,6 @@ import com.idega.core.builder.data.CachedDomain;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.cache.IWCacheManager2;
-import com.idega.core.component.business.ICObjectBusiness;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.core.search.business.SearchResult;
@@ -597,7 +595,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 							helper.getThemesService().getBuilderService().setProperty(pageID, ThemesConstants.MINUS_ONE, s.getMethod(), newValues, appl);
 							if (s.getCode().equals(PAGE_TITLE)) {
 								changedPageUri = setPageUri(pageID, values[i]);
-								helper.getThemesService().getBuilderService().changePageName(Integer.valueOf(pageID).intValue(), values[i]);
+								helper.getThemesService().getBuilderService().changePageName(Integer.valueOf(pageID).intValue(), values[i], iwc);
 								changedPageTitle = true;
 							}
 						}
@@ -995,9 +993,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		}
 		
-		int appViewerId = service.getICObjectId(ApplicationPropertyViewer.class.getName());
 		for (int i = 0; i < extraRegions.size(); i++) {
-			if (!addExtraRegionToPage(pageKey, extraRegions.get(i), service, appViewerId)) {
+			if (!addExtraRegionToPage(pageKey, extraRegions.get(i), service)) {
 				return false;
 			}
 		}
@@ -1005,23 +1002,13 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	private boolean addExtraRegionToPage(String pageKey, AdvancedProperty region, BuilderService service, int appViewerId) {
-		if (pageKey == null || region == null || service == null || appViewerId < 0) {
+	private boolean addExtraRegionToPage(String pageKey, AdvancedProperty region, BuilderService service) {
+		if (pageKey == null || region == null || service == null) {
 			return false;
 		}
 		
-		String moduleId = service.addNewModule(pageKey, region.getValue(), appViewerId, region.getValue());
-		if (moduleId == null) {
-			return false;
-		}
-		if (!moduleId.startsWith(ICObjectBusiness.UUID_PREFIX)) {
-			moduleId = new StringBuffer(ICObjectBusiness.UUID_PREFIX).append(moduleId).toString();
-		}
-		
-		if (!service.addPropertyToModule(pageKey, moduleId, ":method:1:implied:void:setApplicationPropertyKey:java.lang.String:", region.getId())) {
-			return false;
-		}
-		return true;
+		String newRegionId = region.getValue();
+		return service.copyAllModulesFromRegionIntoRegion(pageKey, region.getId(), newRegionId, newRegionId);
 	}
 	
 	private boolean checkIfNeedExtraRegions(String pageKey, Theme theme) {
@@ -1045,13 +1032,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		}
 		
-		int appViewerId = service.getICObjectId(ApplicationPropertyViewer.class.getName());
-		
 		AdvancedProperty region = null;
 		for (int i = 0; i < regions.size(); i++) {
 			region = regions.get(i);
 			if (!service.existsRegion(pageKey, region.getValue(), region.getId())) {
-				addExtraRegionToPage(pageKey, region, service, appViewerId);
+				addExtraRegionToPage(pageKey, region, service);
 			}
 		}
 		
@@ -1760,7 +1745,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		}
 		
-		if (builder.changePageName(id, newName)) {
+		if (builder.changePageName(id, newName, iwc)) {
 			updateSiteTree(iwc);
 			return true;
 		}

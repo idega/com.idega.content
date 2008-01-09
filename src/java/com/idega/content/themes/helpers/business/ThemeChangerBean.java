@@ -4,12 +4,14 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.rmi.RemoteException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,8 +40,11 @@ import com.idega.content.themes.helpers.bean.ThemeChange;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
+import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
+import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 
@@ -48,19 +53,13 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final Log log = LogFactory.getLog(ThemeChangerBean.class);
 	
 	// These are defaults in RapidWeaver, we are using its to generate good preview
-	private static final String TOOLBAR_REPLACE_BEGIN = "<ul><li><a href=\"index.html\" rel=\"self\" id=\"current\">";
-	private static final String TOOLBAR_REPLACE_END = "</a></li></ul>";
-	
 	private static final String IMAGE_START = "<img src=";
 	private static final String IMAGE_POSITION = "style=\"margin: 2px; float: ";
 	private static final String IMAGE_END = " />";
-	private static final String CONTENT_PARAGRAPH_TITLE = "<div class=\"blog-entry\"><div class=\"blog-entry-title\">";
-	private static final String CONTENT_PARAGRAPH_DATE = "</div><div class=\"blog-entry-date\">";
-	private static final String CONTENT_PARAGRAPH_LINK = "<span class=\"blog-entry-permalink\"> | <a>Permalink</a></span></div><div class=\"blog-entry-body\">";
-	private static final String CONTENT_PARAGRAPH_START = "<p style=\"font-family: Verdana,Arial,Helvetica,sans-serif\">";
-	private static final String CONTENT_PARAGRAPH_END = "</p></div></div>";
-	private static final String CONTENT_BEGIN = "<div class=\"contentSpacer\"></div>";
-	private static final String CONTENT_END = "<div class=\"clear\"></div>\n<div class=\"clearer\"></div>";
+	private static final String CONTENT_PARAGRAPH_TITLE = "<div class=\"blog-entry\"><h1 class=\"blog-entry-title\">";
+	private static final String CONTENT_PARAGRAPH_DATE = "</h1><div class=\"blog-entry-date\">";
+	private static final String CONTENT_PARAGRAPH_LINK = "</div><div class=\"blog-entry-body\">";
+	private static final String CONTENT_PARAGRAPH_END = "</div></div><br /><br />";
 	
 	// Default keywords
 	private static final String FOOTER = "footer";
@@ -89,7 +88,8 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final String TAG_ATTRIBUTE_VALUE_CSS = CoreConstants.CONTENT_TYPE_TEXT_CSS;
 	private static final String TAG_ATTRIBUTE_VALUE_SCREEN = "screen";
 	
-	private static final String COPY_AND_SPACE = ContentConstants.EMPTY;//"&copy;&nbsp;";
+	private static final String NO_BREAK_STRING = "&nbsp;";
+	private static final String COPY_AND_SPACE = /*ContentConstants.EMPTY;*/"&copy;" + NO_BREAK_STRING;
 	
 	private static final String ELEMENT_SCRIPT_NAME = "script";
 	private static final String ELEMENT_LINK_NAME = "link";
@@ -99,6 +99,8 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final String REGION_TO_EXPAND = "contentContainer";
 	
 	private static final String IDEGA_COMMENT = "idega";
+	
+	private static final String[] TOOLBAR_NAV_MENU = new String[] {"Frontpage", "Products", "Customers", "Partners", "The Company", "News"};
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
@@ -1204,55 +1206,23 @@ public class ThemeChangerBean implements ThemeChanger {
 		return value.toString();
 	}
 	
-	private Collection <Element> getNavigatorContent(String propertyKey, boolean addID) {
-		if (propertyKey == null) {
-			return new ArrayList<Element>();
-		}
-		IWMainApplicationSettings settings  = IWMainApplication.getDefaultIWMainApplication().getSettings();
-		if (settings == null) {
-			return new ArrayList<Element>();
-		}
-		StringBuffer prop = new StringBuffer(ThemesConstants.THEMES_PROPERTY_START).append(propertyKey).append(ThemesConstants.THEMES_PROPERTY_END);
-		String propertyValue = settings.getProperty(prop.toString());
-		if (propertyValue == null) {
-			return new ArrayList<Element>();
-		}
-		if (ThemesConstants.EMPTY.equals(propertyValue)) {
-			return new ArrayList<Element>();
-		}
-		
-		Collection <Element> container = new ArrayList<Element>();
-		Collection <Element> pages = new ArrayList<Element>();
-		Collection <Element> linkToPage = null;
-		
-		String[] elements = propertyValue.split(ThemesConstants.COMMA);
-		
-		Element listContainer = new Element("ul");
-		Element listElement = null;
-		Element link = null;
-		
-		String LI = "li";
-		String A = "a";
-		String ID = "id";
-		String CURRENT = "current";
-		
-		for (int i = 0; i < elements.length; i++) {
-			listElement = new Element(LI);
-			link = new Element(A);
-			if (addID) {
-				if (i == 0) {
-					link.setAttribute(ID, CURRENT);
-				}
+	private String getBreadCrumbContent() {
+		return new StringBuffer("<a href=\"javascript:void(0)\">").append(TOOLBAR_NAV_MENU[0]).append("</a>").append(NO_BREAK_STRING).append(NO_BREAK_STRING).toString();
+	}
+	
+	private String getToolBarContent() {
+		StringBuffer navMenu = new StringBuffer("<ul>");
+		for (int i = 0; i < TOOLBAR_NAV_MENU.length; i++) {
+			navMenu.append("<li>");
+			navMenu.append("<a");
+			if (i == 0) {
+				navMenu.append(" class=\"current\" id=\"current\"");
 			}
-			link.setText(elements[i]);
-			linkToPage = new ArrayList<Element>();
-			linkToPage.add(link);
-			listElement.setContent(linkToPage);
-			pages.add(listElement);
+			navMenu.append(" href=\"javascript:void(0)\" rel=\"self\">").append(TOOLBAR_NAV_MENU[i]).append("</a>");
+			navMenu.append("</li>");
 		}
-		listContainer.setContent(pages);
-		container.add(listContainer);
-		return container;
+		navMenu.append("</ul>");
+		return navMenu.toString();
 	}
 	
 	private String getContentReplace(String defaultValue) {
@@ -1260,16 +1230,25 @@ public class ThemeChangerBean implements ThemeChanger {
 		if (defaultValue != null && !ThemesConstants.EMPTY.equals(defaultValue)) {
 			content.append(defaultValue).append(ThemesConstants.NEW_LINE);
 		}
-		Date d = new Date();
-		content.append(CONTENT_BEGIN).append(ThemesConstants.NEW_LINE);
+		Locale l = null;
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc != null) {
+			l = iwc.getCurrentLocale();
+		}
+		if (l == null) {
+			l = Locale.ENGLISH;
+		}
+		
+		IWTimestamp timestamp = new IWTimestamp(new Date());
+		content.append(ThemesConstants.NEW_LINE);
 		for (int i = 0; i < ThemesConstants.DUMMY_ARTICLES.size(); i++) {
 			content.append(CONTENT_PARAGRAPH_TITLE).append(ThemesConstants.ARTICLE_TITLE);
 			if (ThemesConstants.DUMMY_ARTICLES.size() > 1) {
 				content.append(CoreConstants.SPACE).append(i + 1);
 			}
 			content.append(CONTENT_PARAGRAPH_DATE);
-			content.append(d);
-			content.append(CONTENT_PARAGRAPH_LINK).append(CONTENT_PARAGRAPH_START);
+			content.append(timestamp.getLocaleDate(l, DateFormat.MEDIUM));
+			content.append(CONTENT_PARAGRAPH_LINK);
 			content.append(IMAGE_START).append(ThemesConstants.SINGLE_QUOTE);
 			content.append(ThemesConstants.BASE_THEME_IMAGES);
 			content.append(ThemesConstants.THEME_IMAGES.get(helper.getRandomNumber(ThemesConstants.THEME_IMAGES.size())));
@@ -1278,7 +1257,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			content.append(ThemesConstants.SINGLE_QUOTE).append(IMAGE_END);
 			content.append(ThemesConstants.DUMMY_ARTICLES.get(i)).append(CONTENT_PARAGRAPH_END);
 		}
-		content.append(CONTENT_END).append(ThemesConstants.NEW_LINE);
+		content.append(ThemesConstants.NEW_LINE);
 		return content.toString();
 	}
 	
@@ -1294,16 +1273,29 @@ public class ThemeChangerBean implements ThemeChanger {
 		IWMainApplicationSettings settings  = IWMainApplication.getDefaultIWMainApplication().getSettings();
 		StringBuffer key = new StringBuffer(ThemesConstants.THEMES_PROPERTY_START).append(value);
 		key.append(ThemesConstants.THEMES_PROPERTY_END);
+		
+		if (value.equals(ThemesConstants.TOOLBAR)) {
+			//	Outputs the menu links for the site.
+			region.append(getToolBarContent());
+			
+			region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END);
+			region.append(ThemesConstants.COMMENT_END);
+			return region.toString();
+		}
+		if (value.equals(ThemesConstants.BREADCRUMB)) {
+			//	Outputs a list of links from the home page to the current page.
+			region.append(getBreadCrumbContent());
+			
+			region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END);
+			region.append(ThemesConstants.COMMENT_END);
+			return region.toString();
+		}
+		
 		String propertyValue = settings.getProperty(key.toString());
 		if (propertyValue != null) {
-			if (value.equals(ThemesConstants.TOOLBAR)) {
-				region.append(getBasicReplace(TOOLBAR_REPLACE_BEGIN, propertyValue, TOOLBAR_REPLACE_END));
-				region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END);
-				region.append(ThemesConstants.COMMENT_END);
-				return region.toString();
-			}
 			if (value.equals(FOOTER)) {
 				region.append(COPY_AND_SPACE).append(getBasicReplace(null, propertyValue, null));
+				
 				region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END);
 				region.append(ThemesConstants.COMMENT_END);
 				return region.toString();
@@ -1393,12 +1385,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		if (needAddRegion(ThemesConstants.BASIC_IDS_FOR_REGIONS, regionID)) {
 			e.addContent(0, getCommentsCollection(regionID));
-			if (ThemesConstants.NAVIGATION.equals(regionID)) {
-				e.addContent(1, getNavigatorContent(regionID, true));
-			}
-			if (ThemesConstants.BREADCRUMB.equals(regionID)) {
-				e.addContent(1, getNavigatorContent(regionID, false));
-			}
 		}
 		
 		fixSiteRegion(e, "h1", ThemesConstants.SITE_TITLE);
