@@ -30,32 +30,11 @@
 		<method>setContent</method>
 	</key>
 	<key>
-		<code>toolbar</code>
-		<label>Toolbar</label>
-		<defaultValue></defaultValue>
-		<type>text</type>
-		<method>setToolbar</method>
-	</key>
-	<key>
 		<code>sidebar_title</code>
 		<label>Sidebar title</label>
 		<defaultValue></defaultValue>
 		<type>text</type>
 		<method>setSidebarTitle</method>
-	</key>
-	<key>
-		<code>navcontainer</code>
-		<label>Navigation</label>
-		<defaultValue>Frontpage,Products,Customers,Partners,The Company,News</defaultValue>
-		<type>text</type>
-		<method>setNavContainer</method>
-	</key>
-	<key>
-		<code>breadcrumbcontainer</code>
-		<label>Breadcrumb</label>
-		<defaultValue></defaultValue>
-		<type>text</type>
-		<method>setBreadcrumb</method>
 	</key>
 	<key>
 		<code>footer</code>
