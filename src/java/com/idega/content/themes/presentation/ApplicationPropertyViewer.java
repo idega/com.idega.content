@@ -15,7 +15,6 @@ import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.bean.Setting;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
-import com.idega.core.builder.data.ICPage;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
@@ -23,9 +22,6 @@ import com.idega.presentation.Image;
 import com.idega.presentation.PresentationObject;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Heading2;
-import com.idega.presentation.text.Link;
-import com.idega.presentation.text.ListItem;
-import com.idega.presentation.text.Lists;
 import com.idega.presentation.text.Text;
 import com.idega.util.CoreConstants;
 
@@ -39,7 +35,6 @@ import com.idega.util.CoreConstants;
  */
 public class ApplicationPropertyViewer extends Block {
 	
-	private static final String LIST_STYLE = "list-style-type: none; width: 100%";
 	private static final String STYLE_CLASS = "applicationPropertyStyleClass";
 	private static final String FIFTEEN_SPACE = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 
@@ -65,7 +60,8 @@ public class ApplicationPropertyViewer extends Block {
 		
 		key = new StringBuffer(applicationPropertyKey).append(CoreConstants.DOT).append(language).toString();
 		value = iwc.getApplicationSettings().getProperty(key);
-		if (value == null) { // Didn't find localized value, getting default value
+		if (value == null) {
+			//	Didn't find localized value, getting default value
 			key = new StringBuffer(applicationPropertyKey).append(ThemesConstants.THEMES_PROPERTY_END).toString();
 			value = iwc.getApplicationSettings().getProperty(key);
 		}
@@ -85,7 +81,7 @@ public class ApplicationPropertyViewer extends Block {
 				name = FIFTEEN_SPACE;
 			}
 			Image image = new Image(value, name);
-			addPropertyEditAction(iwc, image, key, settingKey);
+			addPropertyEditAction(iwc, image, key, settingKey, true);
 			this.add(image);
 			return;
 		}
@@ -94,59 +90,22 @@ public class ApplicationPropertyViewer extends Block {
 			value = FIFTEEN_SPACE;
 		}
 		
-		if (key.indexOf(getCheckKey(ThemesConstants.NAVIGATION)) != -1) {
-			ICPage page = ThemesHelper.getInstance().getThemesService().getICPage(iwc.getCurrentIBPageID());
-			if (page != null) {
-				if (page.getWebDavUri() != null) {
-					return;
-				}
-			}
-			String[] values = value.split(ThemesConstants.COMMA);
-			Lists list = new Lists();
-			list.setStyleAttribute(LIST_STYLE);
-			ListItem item = null;
-			for (int i = 0; i < values.length; i++) {
-				item = new ListItem();
-				item.addText(values[i].trim());
-				list.add(item);
-			}
-			addPropertyEditAction(iwc, list, key, settingKey);
-			this.add(list);
-			return;
-		}
-		
-		if (key.indexOf(getCheckKey(ThemesConstants.TOOLBAR)) != -1) {
-			Link l = new Link();
-			l.setText(value);
-			addPropertyEditAction(iwc, l, key, settingKey);
-			this.add(l);
-			return;
-		}
-		
-		if (key.indexOf(getCheckKey(ThemesConstants.BREADCRUMB)) != -1) {
-			Link l = new Link();
-			l.setText(value);
-			addPropertyEditAction(iwc, l, key, settingKey);
-			this.add(l);
-			return;
-		}
-		
 		if (key.indexOf(getCheckKey(ThemesConstants.SITE_TITLE)) != -1) {
 			Heading1 h1 = new Heading1(value);
-			addPropertyEditAction(iwc, h1, key, settingKey);
+			addPropertyEditAction(iwc, h1, key, settingKey, false);
 			this.add(h1);
 			return;
 		}
 		
 		if (key.indexOf(getCheckKey(ThemesConstants.SITE_SLOGAN)) != -1) {
 			Heading2 h2 = new Heading2(value);
-			addPropertyEditAction(iwc, h2, key, settingKey);
+			addPropertyEditAction(iwc, h2, key, settingKey, false);
 			this.add(h2);
 			return;
 		}
 		
 		Text text = new Text(value); // Simple text
-		addPropertyEditAction(iwc, text, key, settingKey);
+		addPropertyEditAction(iwc, text, key, settingKey, false);
 		text.setStyleClass(STYLE_CLASS);
 		this.add(text);
 	}
@@ -169,7 +128,7 @@ public class ApplicationPropertyViewer extends Block {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void addPropertyEditAction(IWContext iwc, PresentationObject component, String key, String settingKey) {
+	private void addPropertyEditAction(IWContext iwc, PresentationObject component, String key, String settingKey, boolean needsReload) {
 		if (iwc == null || component == null || key == null) {
 			return;
 		}
@@ -203,7 +162,7 @@ public class ApplicationPropertyViewer extends Block {
 			}
 			StringBuffer javaScript = new StringBuffer();
 			javaScript.append("changeSiteInfo('").append(id).append("', '").append(ContentUtil.getBundle().getLocalizedString("saving", "Saving..."));
-			javaScript.append("');");
+			javaScript.append("', ").append(needsReload).append(");");
 			component.attributes.put("ondblclick", javaScript.toString());
 			
 			component.setStyleClass(STYLE_CLASS);
