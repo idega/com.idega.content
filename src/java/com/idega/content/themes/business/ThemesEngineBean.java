@@ -278,9 +278,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	/**
 	 * 
 	 */
-	public boolean saveTheme(String themeID, String themeName) {
+	public boolean saveTheme(String themeKey, String themeName) {
 		try {
-			return helper.getThemeChanger().saveTheme(themeID, themeName);
+			return helper.getThemeChanger().saveTheme(themeKey, themeName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -291,16 +291,16 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	/**
 	 * 
 	 */
-	public boolean setSelectedStyle(String themeID, String pageID, boolean applyToPage) {
+	public boolean setSelectedStyle(String themeKey, String pageKey, boolean applyToPage) {
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return false;
 		}
 		
-		if (themeID == null) {
+		if (themeKey == null) {
 			return false;
 		}
-		Theme theme = helper.getTheme(themeID);
+		Theme theme = helper.getTheme(themeKey);
 		if (theme == null) {
 			return false;
 		}
@@ -310,7 +310,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		if (applyToPage) {
 			//	Apply style to selected page
-			result = setPageStyle(pageID, theme.getIBPageID(), iwc, null);
+			result = setPageStyle(pageKey, theme.getIBPageID(), iwc, null);
 		}
 		else {
 			//	Apply style to all pages

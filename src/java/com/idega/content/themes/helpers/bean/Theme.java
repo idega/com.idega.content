@@ -227,14 +227,14 @@ public class Theme {
 		styleVariationsCacheKeys.clear();
 	}
 	
-	public void reloadProperties() {
+	public void clearProperties() {
+		//	These properties can be reloaded from plist file
 		styleGroupsNames.clear();
 		styleVariationsCacheKeys.clear();
 		styleGroupsMembers.clear();
 		colourFiles.clear();
 		originalColourFiles.clear();
 		styleVariables.clear();
-		extraRegions.clear();
 	}
 
 	public List<String> getColourFiles() {
