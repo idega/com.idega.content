@@ -304,7 +304,7 @@ public class ThemeChangerBean implements ThemeChanger {
 				content = replaceColourFileContent(content, key, theme.getStyleVariableValue(key));
 			}
 			
-			content = checkIfAllVariablesReplaced(content);
+			content = checkIfAllVariablesReplaced(content, theme);
 			
 			if (content == null) {
 				return false;
@@ -323,8 +323,8 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 	
-	private String checkIfAllVariablesReplaced(String content) {
-		if (content == null) {
+	private String checkIfAllVariablesReplaced(String content, Theme theme) {
+		if (content == null || theme == null) {
 			return null;
 		}
 		
@@ -335,18 +335,36 @@ public class ThemeChangerBean implements ThemeChanger {
 		String cssExpression = null;
 		String fixedCssExpression = null;
 		String variable = null;
+		String styleValue = null;
+		ThemeStyleGroupMember colourVariation = null;
 		while (content.indexOf(CoreConstants.PERCENT) != -1) {
+			cssExpression = null;
+			fixedCssExpression = null;
+			variable = null;
+			styleValue = null;
+			colourVariation = null;
+			
 			start = getStartIndexForCssVariable(content, CoreConstants.PERCENT, CoreConstants.PERCENT);
 			end = getEndIndexForCssVariable(content, CoreConstants.PERCENT, searchTerm, true, true);
 			
 			if (!(canSubstring(content, start, end))) {
 				return content;
 			}
-			
+
 			cssExpression = content.substring(start, end);
 			variable = StringHandler.remove(cssExpression, CoreConstants.PERCENT);
-			fixedCssExpression = computeCssValue(cssExpression, variable, defaultColour);
+			styleValue = theme.getStyleVariableValue(variable);
+			if (styleValue == null) {
+				colourVariation = getColorGroupMember(theme, variable);
+				if (colourVariation != null) {
+					styleValue = colourVariation.getColour();
+				}
+			}
+			if (styleValue == null) {
+				styleValue = defaultColour;
+			}
 			
+			fixedCssExpression = computeCssValue(cssExpression, variable, styleValue);
 			content = StringHandler.replace(content, cssExpression, fixedCssExpression);
 		}
 		
@@ -1625,7 +1643,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 		
-		ThemeStyleGroupMember colourVariation = getColorGroupMember(theme, change.getStyleGroupName(), variable);
+		ThemeStyleGroupMember colourVariation = getColorGroupMember(theme, variable);
 		if (colourVariation == null) {
 			return false;
 		}
@@ -1635,8 +1653,8 @@ public class ThemeChangerBean implements ThemeChanger {
 		return setValuesToColourFiles(theme);
 	}
 	
-	private ThemeStyleGroupMember getColorGroupMember(Theme theme, String groupName, String variable) {
-		if (theme == null || groupName == null || variable == null) {
+	private ThemeStyleGroupMember getColorGroupMember(Theme theme, String variable) {
+		if (theme == null || variable == null) {
 			return null;
 		}
 		
@@ -2034,7 +2052,7 @@ public class ThemeChangerBean implements ThemeChanger {
 						Attribute styleLink = child.getAttribute(ThemesConstants.TAG_ATTRIBUTE_HREF);
 						if (styleLink != null) {
 							String styleHref = styleLink.getValue();
-							if (styleHref != null && !isDefaultStyle(styleHref)) {
+							if (styleHref != null && !isDefaultStyle(styleHref) && !isColorVariation(theme.getColourFiles(), styleHref)) {
 								ThemeStyleGroupMember member = getExistingDefaultStyle(styleHref, styles);
 								if (member == null) {
 									stylesToRemove.add(child);	//	Style is needless: it's not declared as default in properties list
@@ -2046,7 +2064,6 @@ public class ThemeChangerBean implements ThemeChanger {
 							}
 						}
 					}
-				
 				}
 			}
 		}
@@ -2075,6 +2092,20 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		return uploadTheme(doc, theme);
+	}
+	
+	private boolean isColorVariation(List<String> cssFiles, String styleHref) {
+		if (cssFiles == null || styleHref == null) {
+			return false;
+		}
+		
+		for (int i = 0; i < cssFiles.size(); i++) {
+			if (styleHref.endsWith(cssFiles.get(i))) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	private String getStyleGroupNameByHref(Theme theme, String href) {
@@ -2355,6 +2386,13 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 		
+		List<String> styleVariables = parent.getStyleVariablesKeys();
+		String variable = null;
+		for (int i = 0; i < styleVariables.size(); i++) {
+			variable = styleVariables.get(i);
+			child.addStyleVariable(variable, parent.getStyleVariableValue(variable));
+		}
+		
 		child.setExtraRegions(new ArrayList<AdvancedProperty>(parent.getExtraRegions()));
 		
 		return true;
@@ -2448,7 +2486,7 @@ public class ThemeChangerBean implements ThemeChanger {
 
 		List<ThemeChange> enabledStyles = getEnabledStylesAsThemeChanges(theme);				//	Getting current state
 		helper.clearVariationFromCache(themeId);												//	Clearing cache
-		theme.reloadProperties();																//	Clearing properties
+		theme.clearProperties();																//	Clearing properties
 		try {
 			helper.getThemesPropertiesExtractor().prepareTheme(checkConfig, theme, null, null);	//	Extracting new properties (also setting default state)
 		} catch (Exception e) {
