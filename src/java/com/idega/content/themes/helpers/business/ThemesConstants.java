@@ -151,8 +151,8 @@ public class ThemesConstants {
 	protected static final int SMALL_PREVIEW_WIDTH = 149;
 	protected static final int SMALL_PREVIEW_HEIGHT = 112;
 	
-	protected static final int PREVIEW_WIDTH = 800;
-	protected static final int PREVIEW_HEIGHT = 600;
+	protected static final int PREVIEW_WIDTH = 1024;
+	protected static final int PREVIEW_HEIGHT = 768;
 	
 	protected static final int REDUCED_PREVIEW_WIDTH = 580;
 	protected static final int REDUCED_PREVIEW_HEIGHT = 435;
