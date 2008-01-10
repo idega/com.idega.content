@@ -934,10 +934,12 @@ public class ThemesHelper implements Singleton {
 		Element root = new Element(ThemesConstants.CON_THEME);
 		Collection <Element> rootElements = new ArrayList<Element>();
 		
+		//	Name
 		Element name = new Element(ThemesConstants.CON_NAME);
 		name.setText(theme.getName());
 		rootElements.add(name);
 		
+		//	Style variations
 		Element styles = new Element(ThemesConstants.CON_STYLES);
 		Collection <Element> stylesElements = new ArrayList<Element>();
 		
@@ -999,18 +1001,22 @@ public class ThemesHelper implements Singleton {
 		styles.setContent(stylesElements);
 		rootElements.add(styles);
 		
+		//	Big preview image
 		Element preview = new Element(ThemesConstants.CON_PREVIEW);
 		preview.setText(theme.getLinkToThemePreview());
 		rootElements.add(preview);
 		
+		//	Small preview image
 		Element smallPreview = new Element(ThemesConstants.CON_SMALL_PREVIEW);
 		smallPreview.setText(theme.getLinkToSmallPreview());
 		rootElements.add(smallPreview);
 		
+		//	Page id
 		Element pageId = new Element(ThemesConstants.CON_PAGE_ID);
 		pageId.setText(String.valueOf(theme.getIBPageID()));
 		rootElements.add(pageId);
 		
+		//	Extra regions
 		List<AdvancedProperty> extraRegions = theme.getExtraRegions();
 		if (extraRegions.size() > 0) {
 			Element regions = new Element(ThemesConstants.CON_EXTRA_REGIONS);
