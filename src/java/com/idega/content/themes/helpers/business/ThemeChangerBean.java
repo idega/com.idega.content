@@ -1310,7 +1310,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		String propertyValue = settings.getProperty(key.toString());
-		if (propertyValue != null) {
+		if (propertyValue != null && !(propertyValue.equals(CoreConstants.EMPTY))) {
 			if (value.equals(FOOTER)) {
 				region.append(COPY_AND_SPACE).append(getBasicReplace(null, propertyValue, null));
 				
@@ -1318,11 +1318,21 @@ public class ThemeChangerBean implements ThemeChanger {
 				region.append(ThemesConstants.COMMENT_END);
 				return region.toString();
 			}
+			
 			if (value.equals(CONTENT)) {
 				region.append(getContentReplace(propertyValue)).append(ThemesConstants.COMMENT_BEGIN);
 				region.append(ThemesConstants.TEMPLATE_REGION_END).append(ThemesConstants.COMMENT_END);
 				return region.toString();
 			}
+			
+			if (value.equals(ThemesConstants.LOGO)) {
+				region.append("<img src=\"").append(propertyValue).append("\"></img>");
+				
+				region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END);
+				region.append(ThemesConstants.COMMENT_END);
+				return region.toString();
+			}
+			
 			region.append(propertyValue);
 		}
 		region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END).append(ThemesConstants.COMMENT_END);
