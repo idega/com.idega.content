@@ -877,9 +877,16 @@ public class ThemesHelper implements Singleton {
 		if (stream == null) {
 			return false;
 		}
-		Image image = imageGenerator.getScaledImage(stream, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT, isJpg);
-		if (image == null) {
+		Image image = null;
+		try {
+			image = imageGenerator.getScaledImage(stream, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT, isJpg);
+		} catch(Exception e) {
+			e.printStackTrace();
+			image = null;
+		} finally {
 			closeInputStream(stream);
+		}
+		if (image == null) {
 			return generatePreviewsForTheme(theme, false, isJpg, ThemesConstants.THEME_PREVIEW_QUALITY, false);
 		}
 		stream = imageGenerator.getImageInputStream(image, extension, isJpg);
