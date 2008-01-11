@@ -284,6 +284,7 @@ var HIDE_THEMES = 'Hide Themes';
 var SHOW_THEMES = 'Show Themes';
 var STYLE_FOR_CURRENT_PAGE = 'Select style for current page';
 var STYLE_FOR_SITE = 'Select style for all pages';
+var STYLE_FOR_PAGE_AND_CHILDREN = 'Select style for current page and all children';
 var APPLYING_STYLE = 'Applying style...';
 var CLOSE_TEXT = 'Close';
 var START_PAGE_TEXT = 'Start Page';
@@ -297,6 +298,7 @@ var ARE_YOU_SURE_TEXT = 'Are you sure?';
 var DELETING_TEXT = 'Deleting...';
 var CHOOSE_STYLE_FOR_PAGE = 'Page';
 var CHOOSE_STYLE_FOR_SITE = 'Site';
+var CHOOSE_STYLE_FOR_PAGE_AND_CHILDREN = 'Page*'
 var DROP_TEMPLATES_HERE = 'Drop templates here';
 var NO_PAGE_EXISTS_TEXT = 'No page exist';
 var LOADING_TEXT = 'Loading...';
@@ -315,7 +317,7 @@ function getLocalizedTextForThemesCallback(list) {
 	if (list == null) {
 		return false;
 	}
-	if (list.length != 31) {
+	if (list.length != 33) {
 		return false;
 	}
 	
@@ -350,6 +352,8 @@ function getLocalizedTextForThemesCallback(list) {
 	CREATING_TEXT = list[28];
 	NEW_PAGES_TEXT  = list[29];
 	PREPARING_THEME_TEXT = list[30];
+	STYLE_FOR_PAGE_AND_CHILDREN = list[31];
+	CHOOSE_STYLE_FOR_PAGE_AND_CHILDREN = list[32];
 	
 }
 
@@ -387,6 +391,10 @@ function getStyleForCurrentPage() {
 
 function getStyleForSite() {
 	return STYLE_FOR_SITE;
+}
+
+function getStyleForPageAndChildren() {
+	return STYLE_FOR_PAGE_AND_CHILDREN;
 }
 
 function getApplyingStyleText() {
@@ -431,6 +439,10 @@ function getChooseStyleForPage() {
 
 function getChooseStyleForSite() {
 	return CHOOSE_STYLE_FOR_SITE;
+}
+
+function getChooseStyleForPageAndChildren() {
+	return CHOOSE_STYLE_FOR_PAGE_AND_CHILDREN;
 }
 
 function getDropTemplatesHereText() {

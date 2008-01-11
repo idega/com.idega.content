@@ -202,42 +202,58 @@ function chooseOption(themeID) {
 	var div = $('chooseStyleLayer');
 	var pageSpan = null;
 	var siteSpan = null;
+	var pageAndChildrenSpan = null;
 	if (div == null) {
 		div = new Element('div');
-		div.style.display = 'none';
-		div.setAttribute('id', 'chooseStyleLayer');
-		div.className = 'themeChooseStyle';
+		div.setStyle('display', 'none');
+		div.setProperty('id', 'chooseStyleLayer');
+		div.addClass('themeChooseStyle');
 		
 		var divp = new Element('div');
-		divp.className = 'themeChooseStyleText';
-		divp.setAttribute('title', getStyleForCurrentPage());
-		divp.setAttribute('alt', getStyleForCurrentPage());
+		divp.addClass('themeChooseStyleText');
+		divp.setProperty('title', getStyleForCurrentPage());
+		divp.setProperty('alt', getStyleForCurrentPage());
 		pageSpan = new Element('span');
-		pageSpan.setAttribute('id', 'pageStyle');
+		pageSpan.setProperty('id', 'pageStyle');
 		pageSpan.appendChild(document.createTextNode(getChooseStyleForPage()));
 		divp.appendChild(pageSpan);
 	
 		var divs = new Element('div');
-		divs.className = 'themeChooseStyleText';
-		divs.setAttribute('title', getStyleForSite());
-		divs.setAttribute('alt', getStyleForSite());
+		divs.addClass('themeChooseStyleText');
+		divs.setProperty('title', getStyleForSite());
+		divs.setProperty('alt', getStyleForSite());
 		siteSpan = new Element('span');
-		siteSpan.setAttribute('id', 'siteStyle');
+		siteSpan.setProperty('id', 'siteStyle');
 		siteSpan.appendChild(document.createTextNode(getChooseStyleForSite()));
 		divs.appendChild(siteSpan);
 		
+		var divd = new Element('div');
+		divd.addClass('themeChooseStyleText');
+		divd.setProperty('title', getStyleForPageAndChildren());
+		divd.setProperty('alt', getStyleForPageAndChildren());
+		pageAndChildrenSpan = new Element('span');
+		pageAndChildrenSpan.setProperty('id', 'pageAndChildrenStyle');
+		pageAndChildrenSpan.appendChild(document.createTextNode(getChooseStyleForPageAndChildren()));
+		divd.appendChild(pageAndChildrenSpan);
+		
 		div.appendChild(divp);
+		div.appendChild(divd);
 		div.appendChild(divs);
 		document.body.appendChild(div);
 		
 		var setStyleForPageFunction = function() {
-			setStyle(true);
+			setStyle(true, 0);
 		};
+		var setStyleForPageAndChildren = function() {
+			setStyle(true, 1);
+		}
 		var setStyleForSiteFunction = function() {
-			setStyle(false);
+			setStyle(false, 2);
 		};
+		
 		pageSpan.addEvent('click', setStyleForPageFunction);
 		siteSpan.addEvent('click', setStyleForSiteFunction);
+		pageAndChildrenSpan.addEvent('click', setStyleForPageAndChildren);
 		div.addEvent('click', removeStyleOptions);
 	}
 	div.style.left = leftPosition + 'px';
@@ -245,30 +261,31 @@ function chooseOption(themeID) {
 	div.style.display = 'block';
 }
 
-function setStyle(isPage) {
+function setStyle(isPage, type) {
 	removeStyleOptions();
 	if (getThemeForStyle() == null) {
 		return;
 	}
 	
 	var pageId = getPageID();
-	
-	if (isPage && pageId == null) {
-		return;
+	if (isPage) {
+		if (pageId == null) {
+			return;
+		}
 	}
+	else {
+		pageId = null;
+	}
+	
 	showLoadingMessage(getApplyingStyleText());
 	setNewStyleToElements('usedThemeName', 'themeName');
 	setNewStyleForSelectedElement(getThemeForStyle() + '_themeNameContainer', 'themeName usedThemeName');
-	ThemesEngine.setSelectedStyle(getThemeForStyle(), pageId, isPage, {
+	ThemesEngine.setSelectedStyle(getThemeForStyle(), pageId, type, {
 		callback: function(result) {
-			setStyleCallback(result, pageId);
+			closeLoadingMessage();
+			getPrewUrl(getPageID());
 		}
 	});
-}
-
-function setStyleCallback(result, pageId) {
-	closeLoadingMessage();
-	getPrewUrl(pageId);
 }
 
 function resizeSlider() {
