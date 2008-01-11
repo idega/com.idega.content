@@ -69,7 +69,7 @@ public class ThemesConstants {
 		"%footer%", "%site_title%", "%site_slogan%"};
 	protected static final List <String> REGIONS = Collections.unmodifiableList(Arrays.asList(_REGIONS));
 	
-	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "sidebarContainer", "sidecontent"};
+	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "sidebarContainer", "sideContent"};
 	protected static final List <String> BASIC_IDS_FOR_REGIONS = Collections.unmodifiableList(Arrays.asList(_BASIC_IDS_FOR_REGIONS));
 	
 	private static final String[] _DOCUMENT_PUBLIC_IDS = new String[] {"Apple Computer", "DTD XHTML 1.0 Strict"};
