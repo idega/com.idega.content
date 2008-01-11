@@ -368,12 +368,16 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		for (Iterator<ICTreeNode> it = tree.values().iterator(); (it.hasNext() && !foundParent);) {
 			o = it.next();
 			if (o instanceof ICTreeNode) {
-				if (pageKey.equals(((ICTreeNode)o).getId())) {
+				parentPage = (ICTreeNode) o;
+				if (pageKey.equals(parentPage.getId())) {
 					foundParent = true;
 				}
 			}
 		}
 		if (!foundParent) {
+			return true;
+		}
+		if (parentPage == null) {
 			return true;
 		}
 		
