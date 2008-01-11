@@ -98,7 +98,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final String ELEMENT_SCRIPT_NAME = "script";
 	private static final String ELEMENT_LINK_NAME = "link";
 	
-	private static final int THEME_HEIGHT = 350;
+	private static final int THEME_HEIGHT = 400;
 	
 	private static final String REGION_TO_EXPAND = "contentContainer";
 	
