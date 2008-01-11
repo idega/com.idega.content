@@ -661,8 +661,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 							helper.getThemesService().getBuilderService().setProperty(pageID, ThemesConstants.MINUS_ONE, s.getMethod(), newValues, appl);
 							if (s.getCode().equals(PAGE_TITLE)) {
 								changedPageUri = setPageUri(pageID, values[i]);
-								helper.getThemesService().getBuilderService().changePageName(Integer.valueOf(pageID).intValue(), values[i], iwc);
-								changedPageTitle = true;
+								changedPageTitle = changePageName(Integer.valueOf(pageID).intValue(), values[i], iwc);
 							}
 						}
 					}
@@ -671,7 +670,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		if (changedPageUri != null) {
-			updateSiteTree(iwc);
+			updateSiteTree(iwc, changedPageTitle);
 		}
 		
 		return changedPageUri;
@@ -1794,12 +1793,21 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	public boolean changePageName(int id, String newName) {
-		if (id < 0 || newName == null) {
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
 			return false;
 		}
 		
-		IWContext iwc = CoreUtil.getIWContext();
-		if (iwc == null) {
+		if (changePageName(id, newName, iwc)) {
+			updateSiteTree(iwc);
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private boolean changePageName(int id, String newName, IWContext iwc) {
+		if (id < 0 || newName == null) {
 			return false;
 		}
 		
@@ -1814,7 +1822,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		if (builder.changePageName(id, newName, iwc)) {
-			updateSiteTree(iwc);
+			builder.clearAllCaches();
 			return true;
 		}
 		
