@@ -6,7 +6,9 @@ import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -61,6 +63,8 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final String CONTENT_PARAGRAPH_LINK = "</div><div class=\"blog-entry-body\">";
 	private static final String CONTENT_PARAGRAPH_END = "</div></div><br /><br />";
 	
+	private static final String HREF = "href";
+	
 	// Default keywords
 	private static final String FOOTER = "footer";
 	private static final String CONTENT = "content";
@@ -73,8 +77,8 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final String[] CUSTOM_REPLACE = new String[] {CUSTOM_CSS_REPLACE};
 
 	// Incorrect CSS syntax needs to be replaced
-	private static final String[] HREF_REPLACE = new String[] {"href^=", "href$="};
-	private static final String HREF_REPLACEMENT = "href~=";
+	private static final String[] HREF_REPLACE = new String[] {HREF + "^=", HREF + "$="};
+	private static final String HREF_REPLACEMENT = HREF + "~=";
 	private static final String[] IMAGE_URL_REPLACE = new String[] {"url(images"};
 	private static final String[] HTML_REPLACE = new String[] {">html"};
 	
@@ -89,7 +93,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final String TAG_ATTRIBUTE_VALUE_SCREEN = "screen";
 	
 	private static final String NO_BREAK_STRING = "&nbsp;";
-	private static final String COPY_AND_SPACE = /*ContentConstants.EMPTY;*/"&copy;" + NO_BREAK_STRING;
+	private static final String COPY_AND_SPACE = "&copy;" + NO_BREAK_STRING;
 	
 	private static final String ELEMENT_SCRIPT_NAME = "script";
 	private static final String ELEMENT_LINK_NAME = "link";
@@ -101,6 +105,12 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final String IDEGA_COMMENT = "idega";
 	
 	private static final String[] TOOLBAR_NAV_MENU = new String[] {"Frontpage", "Products", "Customers", "Partners", "The Company", "News"};
+	
+	private String[] _validLinkTagAttributes = new String[] {"charset", HREF, "hreflang", "media", "rel", "rev", "target", "type"};
+	private List<String> validLinkTagAttributes = Collections.unmodifiableList(Arrays.asList(_validLinkTagAttributes));
+	
+	private String[] _unChangedCaseAttributes = new String[] {HREF, "src"};
+	private List<String> unChangedCaseAttributes = Collections.unmodifiableList(Arrays.asList(_unChangedCaseAttributes));
 	
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
@@ -944,17 +954,24 @@ public class ThemeChangerBean implements ThemeChanger {
 			t.detach();
 		}
 	
-		// Adding fake (comment) element to <script> - to get <script ...></script> in HTML code
+		//	Adding fake (comment) element to <script> - to get <script ...></script> in HTML code
+		//	Checking <link> tags in head
 		List elements = head.getContent();
-		Object element = null;
-		Element script = null;
+		o = null;
+		Element element = null;
 		if (elements != null) {
 			for (int i = 0; i < elements.size(); i++) {
-				element = elements.get(i);
-				if (element instanceof Element) {
-					script = (Element) element;
-					if (ELEMENT_SCRIPT_NAME.equals(script.getName())) {
-						script.addContent(getComment(IDEGA_COMMENT));
+				o = elements.get(i);
+				if (o instanceof Element) {
+					element = (Element) o;
+					if (ELEMENT_SCRIPT_NAME.equals(element.getName().toLowerCase())) {
+						//	<script>
+						element.addContent(getComment(IDEGA_COMMENT));
+					}
+					
+					if (ELEMENT_LINK_NAME.equals(element.getName().toLowerCase())) {
+						//	<link>
+						checkElementAttributes(element, validLinkTagAttributes);
 					}
 				}
 			}
@@ -962,6 +979,54 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		return true;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void checkElementAttributes(Element e, List<String> validAttributes) {
+		if (e == null || validAttributes == null) {
+			return;
+		}
+		
+		List attributes = e.getAttributes();
+		if (attributes == null) {
+			return;
+		}
+		
+		List<Attribute> needless = new ArrayList<Attribute>();
+		
+		Object o = null;
+		Attribute a = null;
+		String name = null;
+		String value = null;
+		for (int i = 0; i < attributes.size(); i++) {
+			o = attributes.get(i);
+			if (o instanceof Attribute) {
+				a = (Attribute) o;
+				
+				name = a.getName();
+				value = a.getValue();
+				if (name == null || value == null) {
+					needless.add(a);
+				}
+				else {
+					name = name.toLowerCase();
+					if (!unChangedCaseAttributes.contains(name)) {
+						value = value.toLowerCase();
+					}
+					if (!validAttributes.contains(name)) {
+						needless.add(a);
+					}
+					else {
+						a.setName(name);
+						a.setValue(value);
+					}
+				}
+			}
+		}
+		
+		for (Iterator<Attribute> it = needless.iterator(); it.hasNext();) {
+			it.next().detach();
+		}
 	}
 	
 	private void fixDocumentElement(Element e, String linkToBase) {
@@ -1310,7 +1375,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		String propertyValue = settings.getProperty(key.toString());
-		if (propertyValue != null && !(propertyValue.equals(CoreConstants.EMPTY))) {
+		if (propertyValue != null) {
 			if (value.equals(FOOTER)) {
 				region.append(COPY_AND_SPACE).append(getBasicReplace(null, propertyValue, null));
 				
@@ -1325,7 +1390,7 @@ public class ThemeChangerBean implements ThemeChanger {
 				return region.toString();
 			}
 			
-			if (value.equals(ThemesConstants.LOGO)) {
+			if (value.equals(ThemesConstants.LOGO) && !(propertyValue.equals(CoreConstants.EMPTY))) {
 				region.append("<img src=\"").append(propertyValue).append("\"></img>");
 				
 				region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END);
