@@ -357,17 +357,20 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	@SuppressWarnings("unchecked")
 	private boolean setStyleForChildren(String pageKey, int templateKey, IWContext iwc, ICDomain cachedDomain) {
-		Map<Integer, ICTreeNode> tree = getTree(iwc);
+		Map tree = getTree(iwc);
 		if (tree == null) {
 			return true;
 		}
 		
 		ICTreeNode parentPage = null;
 		boolean foundParent = false;
+		Object o = null;
 		for (Iterator<ICTreeNode> it = tree.values().iterator(); (it.hasNext() && !foundParent);) {
-			parentPage = it.next();
-			if (pageKey.equals(parentPage.getId())) {
-				foundParent = true;
+			o = it.next();
+			if (o instanceof ICTreeNode) {
+				if (pageKey.equals(((ICTreeNode)o).getId())) {
+					foundParent = true;
+				}
 			}
 		}
 		if (!foundParent) {
@@ -378,7 +381,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (pageChildren == null) {
 			return true;
 		}
-		Object o = null;
+		o = null;
 		ICTreeNode childPage = null;
 		for (Iterator it = pageChildren.iterator(); it.hasNext();) {
 			o = it.next();
@@ -413,7 +416,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	private Map<Integer, ICTreeNode> getTree(IWContext iwc) {
+	@SuppressWarnings("unchecked")
+	private Map getTree(IWContext iwc) {
 		try {
 			return helper.getThemesService().getBuilderService().getTree(iwc);
 		} catch(Exception e) {
@@ -422,16 +426,21 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean setSiteStyle(int templateID, IWContext iwc, boolean setStyleForChildren) {
-		Map<Integer, ICTreeNode> tree = getTree(iwc);
+		Map tree = getTree(iwc);
 		if (tree == null) {
 			return false;
 		}
 		
 		ICDomain cachedDomain = iwc.getApplicationContext().getDomain();
 		boolean result = true;
-		for (Iterator<ICTreeNode> it = tree.values().iterator(); it.hasNext();) {
-			result = setPageStyle((it.next()).getId(), templateID, iwc, cachedDomain, false);
+		Object o = null;
+		for (Iterator it = tree.values().iterator(); it.hasNext();) {
+			o = it.next();
+			if (o instanceof ICTreeNode) {
+				result = setPageStyle(((ICTreeNode) o).getId(), templateID, iwc, cachedDomain, false);
+			}
 		}
 		return result;
 	}
