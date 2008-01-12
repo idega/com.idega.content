@@ -2034,7 +2034,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 	
-	private boolean restoreTheme(Theme theme) {
+	private boolean restoreTheme(Theme theme, boolean fullyRestore) {
 		if (theme == null) {
 			return false;
 		}
@@ -2061,15 +2061,17 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		setValuesToColourFiles(theme);	//	Setting back default colors
 		
-		if (!theme.getLinkToSkeleton().endsWith(ThemesConstants.THEME)) {
-			//	Original theme, will set variations from properties list
-			if (reloadThemeProperties(theme.getId(), false)) {
-				if (!setDefaultStylesToTheme(theme)) {
+		if (fullyRestore) {
+			if (!theme.getLinkToSkeleton().endsWith(ThemesConstants.THEME)) {
+				//	Original theme, will set variations from properties list
+				if (reloadThemeProperties(theme.getId(), false)) {
+					if (!setDefaultStylesToTheme(theme)) {
+						return false;
+					}
+				}
+				else {
 					return false;
 				}
-			}
-			else {
-				return false;
 			}
 		}
 		
@@ -2250,7 +2252,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 		
-		return restoreTheme(theme);
+		return restoreTheme(theme, true);
 	}
 	
 	private void setEnabledStyles(Theme theme, String styleGroupName, boolean enable) {
@@ -2327,27 +2329,6 @@ public class ThemeChangerBean implements ThemeChanger {
 				return false;
 			}
 		}
-		/*String linkToBase = helper.getLinkToBase(linkToTheme);
-		if (!linkToBase.endsWith(ContentConstants.SLASH)) {
-			linkToBase = new StringBuffer(linkToBase).append(ContentConstants.SLASH).toString();
-		}
-		String decodedLinkToBase = helper.decodeUrl(linkToBase);
-		if (!decodedLinkToBase.endsWith(ContentConstants.SLASH)) {
-			decodedLinkToBase = new StringBuffer(decodedLinkToBase).append(ContentConstants.SLASH).toString();
-		}
-		
-		String tempName = new StringBuilder(name).append(ThemesConstants.THEME).toString();
-		String themeName = StringHandler.removeCharacters(tempName, ContentConstants.SPACE, ContentConstants.UNDER);
-		try {
-			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(decodedLinkToBase,	themeName, is, null, true)) {
-				return false;
-			}
-		} catch (RemoteException e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			helper.closeInputStream(is);
-		}*/
 		
 		uploadTheme(themeDoc, child);
 		
@@ -2404,7 +2385,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		//	Restoring original theme
-		restoreTheme(parent);
+		restoreTheme(parent, false);
 		
 		//	Generating previews
 		 if (!helper.generatePreviewsForTheme(child, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY, false)) {
