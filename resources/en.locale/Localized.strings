@@ -272,3 +272,4 @@ upload_was_successfully_finished=Upload was successfully finished.
 preparing=Preparing...
 style_for_page_and_children=Select style for current page and all children
 choose_style_for_page_and_children=Page*
+restore_theme_to_original_state=Restore theme to it's original state

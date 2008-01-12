@@ -239,3 +239,4 @@ version_comment=and a version comment (optional)
 yes=Yes
 new_pages=New Pages
 lucid_application=Lucid
+restore_theme_to_original_state=Restore theme to it's original state
