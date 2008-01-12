@@ -49,32 +49,53 @@ function getPageInfoElementsCallback(allKeywords) {
 	var values = new Array();
 	var element = null;
 	var treeNode = null;
+	var needReload = false;
 	for (var i = 0; i < allKeywords.length; i++) {
 		element = $(allKeywords[i]);
 		if (element != null) {
 			keywords.push(allKeywords[i]);
 			values.push(element.value);
 			if (allKeywords[i] == 'pageTitle' && element.value != '') {
-				treeNode = $(pageId + 'a');
-				if (treeNode != null) {
-					removeChildren(treeNode);
-					treeNode.appendChild(document.createTextNode(element.value));
+				treeNode = $(pageId);
+				if (treeNode == null) {
+					needReload = true;
+				}
+				else {
+					var nodeLinks = treeNode.getElements('a[class=pageTreeNames]');
+					if (nodeLinks == null || nodeLinks.length == 0) {
+						needReload = true;
+					}
+					else {
+						var nodeLink = null;
+						for (var j = 0; j < nodeLinks.length; j++) {
+							nodeLink = nodeLinks[j];
+							
+							nodeLink.empty();
+							nodeLink.setText(element.value);
+						}
+					}
 				}
 			}
 		}
 	}
-	ThemesEngine.savePageInfo(pageId, keywords, values, savePageInfoCallback);
-}
-
-function savePageInfoCallback(result) {
-	if (result != null) {
-		var pageUri = $('pageUri');
-		if (pageUri != null) {
-			pageUri.value = result;
+	ThemesEngine.savePageInfo(pageId, keywords, values, {
+		callback: function(result) {
+			if (needReload) {
+				reloadPage();
+				return;
+			}
+			
+			if (result != null) {
+				var pageUri = $('pageUri');
+				if (pageUri != null) {
+					pageUri.value = result;
+				}
+			}
+			
+			closeLoadingMessage();
+			getPrewUrl(getPageID());
 		}
-	}
-	closeLoadingMessage();
-	getPrewUrl(getPageID());
+	});
 }
 
 function showSlider(container) {

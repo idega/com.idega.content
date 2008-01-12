@@ -670,7 +670,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		if (changedPageUri != null) {
-			updateSiteTree(iwc, changedPageTitle);
+			updateSiteTree(iwc);
 		}
 		
 		return changedPageUri;
