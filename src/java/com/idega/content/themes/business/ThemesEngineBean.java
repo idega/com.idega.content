@@ -611,8 +611,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	/**
 	 * 
 	 */
-	public String savePageInfo(String pageID, String[] keywords, String[] values) {
-		if (pageID == null || keywords == null || values == null) {
+	public String savePageInfo(String pageKey, String[] keywords, String[] values) {
+		if (pageKey == null || keywords == null || values == null) {
+			return null;
+		}
+		if (ThemesConstants.MINUS_ONE.equals(pageKey)) {
 			return null;
 		}
 		if (keywords.length != values.length) {
@@ -637,17 +640,20 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			needSetValue = true;
 			s = map.get(keywords[i]);
 			if (s != null) {
-				currentValues = helper.getThemesService().getBuilderService().getPropertyValues(appl, pageID, ThemesConstants.MINUS_ONE, s.getMethod(), null, true);
+				currentValues = helper.getThemesService().getBuilderService().getPropertyValues(appl, pageKey, ThemesConstants.MINUS_ONE, s.getMethod(), null, true);
 				if (ThemesConstants.EMPTY.equals(values[i]) || values[i] == null) {
 					if (currentValues != null) {
-						helper.getThemesService().getBuilderService().removeProperty(appl, pageID, ThemesConstants.MINUS_ONE, s.getMethod(), currentValues);
+						helper.getThemesService().getBuilderService().removeProperty(appl, pageKey, ThemesConstants.MINUS_ONE, s.getMethod(), currentValues);
 					}
 				}
 				else {
 					if (s.getCode().equals(PAGE_URI)) {
 						if (!changedPageTitle) {
-							changedPageUri = setPageUri(pageID, values[i]);
+							changedPageUri = setPageUri(pageKey, values[i]);
 						}
+					}
+					else if (ContentConstants.HIDE_MENU_IN_PAGE.equals(s.getCode())) {
+						setShowMenuInPage(pageKey, values[i]);
 					}
 					else {
 						newValues = helper.getPageValues(s, values[i]);
@@ -658,10 +664,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 							needSetValue = false;
 						}
 						if (needSetValue) {
-							helper.getThemesService().getBuilderService().setProperty(pageID, ThemesConstants.MINUS_ONE, s.getMethod(), newValues, appl);
+							helper.getThemesService().getBuilderService().setProperty(pageKey, ThemesConstants.MINUS_ONE, s.getMethod(), newValues, appl);
 							if (s.getCode().equals(PAGE_TITLE)) {
-								changedPageUri = setPageUri(pageID, values[i]);
-								changedPageTitle = changePageName(Integer.valueOf(pageID).intValue(), values[i], iwc);
+								changedPageUri = setPageUri(pageKey, values[i]);
+								changedPageTitle = changePageName(Integer.valueOf(pageKey).intValue(), values[i], iwc);
 							}
 						}
 					}
@@ -676,11 +682,44 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return changedPageUri;
 	}
 	
-	public String[] getPageInfoValues(String pageID, String[] keywords) {
-		if (pageID == null || keywords == null) {
+	@SuppressWarnings("unchecked")
+	public boolean setShowMenuInPage(String pageKey, String value) {
+		if (pageKey == null) {
+			return false;
+		}
+		
+		ICPage page = helper.getThemesService().getICPage(pageKey);
+		if (page == null) {
+			return false;
+		}
+		
+		boolean hideMenu = false;
+		if (value != null) {
+			hideMenu = Boolean.TRUE.toString().equals(value);
+		}
+		
+		page.setHidePageInMenu(hideMenu);
+		page.store();
+		
+		Collection children = page.getChildren();
+		if (children != null) {
+			Object o = null;
+			for (Iterator it = children.iterator(); it.hasNext();) {
+				o = it.next();
+				if (o instanceof ICTreeNode) {
+					setShowMenuInPage(((ICTreeNode) o).getId(), value);
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	public String[] getPageInfoValues(String pageKey, String[] keywords) {
+		if (pageKey == null || keywords == null) {
 			return null;
 		}
-		if (ThemesConstants.MINUS_ONE.equals(pageID)) {
+		if (ThemesConstants.MINUS_ONE.equals(pageKey)) {
 			return null;
 		}
 		IWContext iwc = CoreUtil.getIWContext();
@@ -696,11 +735,12 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		String[] values = new String[keywords.length];
 		String[] propValues = null;
 		StringBuffer value = null;
+		ICPage page = helper.getThemesService().getICPage(pageKey);
 		for (int i = 0; i < keywords.length; i++) {
 			s = map.get(keywords[i]);
 			value = new StringBuffer();
 			if (s != null) {
-				propValues = helper.getThemesService().getBuilderService().getPropertyValues(appl, pageID, ThemesConstants.MINUS_ONE, s.getMethod(), null, true);
+				propValues = helper.getThemesService().getBuilderService().getPropertyValues(appl, pageKey, ThemesConstants.MINUS_ONE, s.getMethod(), null, true);
 				if (propValues != null) {
 					for (int j = 0; j < propValues.length; j++) {
 						if (!s.getDefaultValue().equals(propValues[j])) {
@@ -713,10 +753,12 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				}
 				else {
 					if (s.getCode().equals(PAGE_URI)) {
-						ICPage page = helper.getThemesService().getICPage(pageID);
 						if (page != null) {
 							value.append(page.getDefaultPageURI());
 						}
+					}
+					if (ContentConstants.HIDE_MENU_IN_PAGE.equals(s.getCode())) {
+						value.append(page.isHidePageInMenu());
 					}
 				}
 			}

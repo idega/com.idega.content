@@ -47,4 +47,7 @@ public class ContentConstants {
 	public static final String ARTICLE_ITEM_HEADLINE_STYLE_CLASS = "blog-entry-title";
 	public static final String ARTICLE_ITEM_DATE_STYLE_CLASS = "blog-entry-date";
 	public static final String ARTICLE_ITEM_BODY_STYLE_CLASS = "blog-entry-body";
+	
+	public static final String BOOLEAN_TYPE = "boolean";
+	public static final String HIDE_MENU_IN_PAGE = "hidePageInMenu";
 }

@@ -43,4 +43,11 @@
 		<type></type>
 		<method></method>
 	</key>
+	<key>
+		<code>hidePageInMenu</code>
+		<label>Hide Page</label>
+		<defaultValue></defaultValue>
+		<type>boolean</type>
+		<method></method>
+	</key>
 </config>

@@ -27,6 +27,31 @@ function getScrollerImageWidth() {
 	return SCROLLER_IMAGE_WIDTH;
 }
 
+function setValueToHiddentPageInfoElement(input) {
+	var hiddenInputId = input.getProperty('radioButtonCode');
+	if (hiddenInputId == null) {
+		return false;
+	}
+	
+	var hiddenInput = $(hiddenInputId);
+	if (hiddenInput == null) {
+		return false;
+	}
+	
+	hiddenInput.setProperty('value', input.getProperty('value'));
+}
+
+function savePageInfoWithRadioButtonValue(id) {
+	var radio = $(id);
+	if (radio == null) {
+		return false;
+	}
+	
+	setValueToHiddentPageInfoElement(radio);
+	
+	savePageInfo();
+}
+
 function savePageInfo() {
 	showLoadingMessage(getThemeSavingText());
 	if (KEYWORDS == null) {
@@ -433,7 +458,14 @@ function showPageInfoValues(values) {
 	var element = null;
 	for (var i = 0; i < KEYWORDS.length; i++) {
 		element = $(KEYWORDS[i]);
-		if (element != null) {
+		if (element == null || element.getProperty('type') == 'hidden') {
+			element = $(KEYWORDS[i] + '_' + values[i]);
+			if (element != null && values[i] != null && values[i] != '') {
+				element.setProperty('checked', true);
+				element.checked = true;
+			}
+		}
+		else {
 			element.value = values[i];
 		}
 	}
