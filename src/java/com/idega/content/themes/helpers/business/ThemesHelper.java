@@ -1475,8 +1475,6 @@ public class ThemesHelper implements Singleton {
 		StringBuffer base = null;
 		String article = null;
 		for (int i = 0; i < articleViewers.size(); i++) {
-			article = getArticleDocument(language, uri, iwc);
-			
 			file = new StringBuffer(language);
 			file.append(CoreConstants.DOT).append(ThemesConstants.XML_EXTENSION);
 			base = new StringBuffer(ContentConstants.ARTICLE_PATH_START);
@@ -1488,7 +1486,11 @@ public class ThemesHelper implements Singleton {
 				base.append(ROOT_PAGE_ARTICLE);
 			}
 			base.append(getSlideService().createUniqueFileName(ContentConstants.ARTICLE_SCOPE));
-			base.append(RESOURCE_PATH_END).append(ContentConstants.SLASH);
+			base.append(RESOURCE_PATH_END);
+			
+			article = getArticleDocument(language, base.toString(), iwc);
+			
+			base.append(CoreConstants.SLASH);
 			try {
 				getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base.toString(), file.toString(), article, ContentConstants.XML_MIME_TYPE, true);
 				paths.add(base.toString());
@@ -1529,18 +1531,36 @@ public class ThemesHelper implements Singleton {
 			commentPath.append(ContentConstants.SLASH);
 		} 
 		else {
-			if (pageURI.equals(ContentConstants.SLASH)) {
-				pageURI += ROOT_PAGE_ARTICLE;
+			String articleEnd = new StringBuffer(CoreConstants.DOT).append(CoreConstants.ARTICLE_FILENAME_SCOPE).toString();
+			if (pageURI.indexOf(commentPath.toString()) != -1 && pageURI.endsWith(articleEnd)) {
+				String articlePath = pageURI.substring(pageURI.indexOf(commentPath.toString()) + commentPath.length(), pageURI.indexOf(articleEnd));
+				commentPath.append(articlePath);
+				return getFinishedCommentsLink(commentPath);
 			}
-			if (pageURI.endsWith(ContentConstants.SLASH)) {
-				pageURI = pageURI.substring(0, pageURI.lastIndexOf(ContentConstants.SLASH));
+			else {
+				if (pageURI.equals(ContentConstants.SLASH)) {
+					pageURI = new StringBuffer(pageURI).append(ROOT_PAGE_ARTICLE).toString();
+				}
+				if (pageURI.endsWith(ContentConstants.SLASH)) {
+					pageURI = pageURI.substring(0, pageURI.lastIndexOf(ContentConstants.SLASH));
+				}
+				commentPath.append(pageURI);
 			}
-			commentPath.append(pageURI);
 		}
 		commentPath.append(getSlideService().createUniqueFileName(ContentConstants.COMMENT_SCOPE));
-		commentPath.append(ContentConstants.COMMENT_PREFIX).append(ContentConstants.SLASH).append(ContentConstants.COMMENT_SCOPE);
-		commentPath.append(CoreConstants.DOT).append(ThemesConstants.XML_EXTENSION);
-		return commentPath.toString();
+		
+		return getFinishedCommentsLink(commentPath);
+	}
+	
+	private String getFinishedCommentsLink(StringBuffer uri) {
+		if (uri == null) {
+			return null;
+		}
+		
+		uri.append(ContentConstants.COMMENT_PREFIX).append(ContentConstants.SLASH).append(ContentConstants.COMMENT_SCOPE).append(CoreConstants.DOT);
+		uri.append(ThemesConstants.XML_EXTENSION);
+		
+		return uri.toString();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -1760,13 +1780,13 @@ public class ThemesHelper implements Singleton {
 			iwc = CoreUtil.getIWContext();
 		}
 		if (iwc == null) {
-			return Locale.ENGLISH.toString();
+			return Locale.ENGLISH.getLanguage();
 		}
 		Locale l = iwc.getCurrentLocale();
 		if (l == null) {
-			return Locale.ENGLISH.toString();
+			return Locale.ENGLISH.getLanguage();
 		}
-		return l.toString();
+		return l.getLanguage();
 	}
 	
 	protected void addLoadedTheme(String id) {
