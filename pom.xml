@@ -2,16 +2,20 @@
   <parent>
     <artifactId>com.idega.block.base</artifactId>
     <groupId>com.idega.block.platform</groupId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.0.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.idega.block.platform</groupId>
   <artifactId>com.idega.content</artifactId>
   <name>idegaWeb Content</name>
-  <version>4.0-SNAPSHOT</version>
+  <version>4.0.0-SNAPSHOT</version>
   <description>idegaWeb is the new ContentManagement System and Framework</description>
   <inceptionYear>2004</inceptionYear>
   <scm>
+    <!--
+    <connection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</connection>
+    <developerConnection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</developerConnection> 
+    -->
     <connection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</connection>
     <developerConnection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</developerConnection>
   </scm>
@@ -58,31 +62,37 @@
     <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.core</artifactId>
+      <version>4.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.slide</artifactId>
+      <version>4.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.idega.block.platform</groupId>
       <artifactId>com.idega.webface</artifactId>
+      <version>4.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.idega.block.platform</groupId>
+      <artifactId>com.idega.graphics</artifactId>
+      <version>4.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.idega.block.platform</groupId>
+      <artifactId>com.idega.block.rss</artifactId>
+      <version>4.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.idega.block.platform</groupId>
+      <artifactId>com.idega.dwr</artifactId>
+      <version>4.0.0</version>
     </dependency>
     <dependency>
       <groupId>commons-vfs</groupId>
       <artifactId>commons-vfs</artifactId>
       <version>20050307052300</version>
-    </dependency>
-  	<dependency>
-      <groupId>com.idega.block.platform</groupId>
-      <artifactId>com.idega.graphics</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.idega.block.platform</groupId>
-      <artifactId>com.idega.block.rss</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.idega.block.platform</groupId>
-      <artifactId>com.idega.dwr</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
