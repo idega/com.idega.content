@@ -50,4 +50,10 @@ public class ContentConstants {
 	
 	public static final String BOOLEAN_TYPE = "boolean";
 	public static final String HIDE_MENU_IN_PAGE = "hidePageInMenu";
+	
+	public static final String CONTENT_ITEM_ACTION_EDIT = "edit";
+	public static final String CONTENT_ITEM_ACTION_DELETE = "delete";
+	public static final String CONTENT_ITEM_ACTION_CREATE = "create";
+
+	public static final String RENDERING_COMPONENT_OF_ARTICLE_LIST = "renderingComponentOfParentArticleList";
 }
