@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.40 2008/01/17 09:32:55 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.41 2008/01/23 08:40:11 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -26,6 +26,7 @@ import org.apache.webdav.lib.util.WebdavStatus;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentItemHelper;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
@@ -44,10 +45,10 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2008/01/17 09:32:55 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/01/23 08:40:11 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.40 $
+ * @version $Revision: 1.41 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -79,8 +80,8 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	private Boolean doRender = Boolean.TRUE;
 	private boolean exists=false;
 
-	private final static String[] ACTION_EXISTS_ARRAY = new String[] {"delete","edit"};
-	private final static String[] ACTION_NOT_EXISTS_ARRAY = new String[] {"create"};
+	private final static String[] ACTION_EXISTS_ARRAY = new String[] {ContentConstants.CONTENT_ITEM_ACTION_DELETE, ContentConstants.CONTENT_ITEM_ACTION_EDIT};
+	private final static String[] ACTION_NOT_EXISTS_ARRAY = new String[] {ContentConstants.CONTENT_ITEM_ACTION_CREATE};
 	
 	private List versions;
 	
