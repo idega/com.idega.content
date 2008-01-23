@@ -12,7 +12,7 @@ import com.idega.content.themes.helpers.bean.Setting;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.core.builder.data.ICDomain;
-import com.idega.core.localisation.presentation.LocalePresentationUtil;
+import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
@@ -47,7 +47,7 @@ public class SiteInfo extends Block {
 	
 	protected DropdownMenu getLocales(IWContext iwc, boolean submit, String onChnageAction) {
 		locale = iwc.getParameter(IW_LOCALES);
-		DropdownMenu locales = LocalePresentationUtil.getAvailableLocalesDropdown(iwc.getIWMainApplication(), IW_LOCALES);
+		DropdownMenu locales = ICLocaleBusiness.getAvailableLocalesDropdownStringKeyed(iwc.getIWMainApplication(), IW_LOCALES, true);
 		locales.keepStatusOnAction();
 		locales.setToSubmit(submit);
 		if (onChnageAction != null) {
