@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.24 2008/01/23 12:11:59 valdas Exp $
+ * $Id: WebDAVCategories.java,v 1.25 2008/01/23 13:13:34 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -47,10 +47,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2008/01/23 12:11:59 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/01/23 13:13:34 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.24 $
+ * @version $Revision: 1.25 $
  */
 public class WebDAVCategories extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -73,8 +73,6 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	
 	private int localizedCategories = 0;
 	private String localeIdentity = null;
-	
-	private Table categoriesTable = null;
 
 	public WebDAVCategories() {
 		setId(DEFAULT_CATEGORIES_BLOCK_ID);
@@ -160,6 +158,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		Table categoriesTable = new Table();
 		int selectedCategoriesCount = 0;
 		ContentCategory category = null;
+		Locale locale = getLocale(iwc);
 		for (int i = 0; i < selectedCategories.size(); i++) {
 			category = selectedCategories.get(i);
 						
@@ -173,13 +172,12 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 			
 			//	Text
 			HtmlOutputText catText = new HtmlOutputText();
-			String catLabel = CategoryBean.getInstance().getCategoryName(category.getId());
+			String catLabel = category.getName(locale.toString());
 			catText.setValue(catLabel);
 			categoriesTable.add(catText,selectedCategoriesCount%COLLUMNS + 1,selectedCategoriesCount/COLLUMNS + 1);
 			selectedCategoriesCount++;
 		}
 
-		Locale locale = getLocale(iwc);
 		//	Display all the non-selected categories
 		for (int i = 0; i < notSelectedCategories.size(); i++) {
 			category = notSelectedCategories.get(i);
@@ -187,7 +185,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 			//Checkbox
 			HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
 			setCategory(smc, category.getId());
-			if (notSelectedCategories.size() == 1) {
+			if (notSelectedCategories.size() == 1 && selectedCategories.size() == 0) {
 				smc.setValue(Boolean.TRUE);
 				smc.setSelected(true);
 			}
@@ -222,8 +220,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 			
 		categoriesTable.setId(categoriesTable.getId() + "_ver");
 		categoriesTable.setStyleClass("wf_listtable");
-		
-		this.categoriesTable = categoriesTable;
+
 		return categoriesTable;
 	}
 	
@@ -288,7 +285,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	 * @return
 	 */
 	private Collection<String> getSetCategoriesList() {
-		if(this.resourcePath!=null){
+		if (this.resourcePath != null) {
 			IWContext iwuc = IWContext.getInstance();
 			try {
 				WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(iwuc, WebDAVMetadataResource.class);
@@ -299,7 +296,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 				throw new RuntimeException(e);
 			}
 		}
-		else if(this.setCategories!=null){
+		else if (this.setCategories != null) {
 			return CategoryBean.getCategoriesFromString(this.setCategories);
 		}
 		return null;
