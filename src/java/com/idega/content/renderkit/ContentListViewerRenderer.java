@@ -1,5 +1,5 @@
 /*
- * $Id: ContentListViewerRenderer.java,v 1.11 2007/03/26 10:24:06 valdas Exp $ Created on
+ * $Id: ContentListViewerRenderer.java,v 1.12 2008/01/23 12:11:59 valdas Exp $ Created on
  * 27.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -32,10 +32,10 @@ import com.idega.webface.renderkit.BaseRenderer;
 
 /**
  * 
- * Last modified: $Date: 2007/03/26 10:24:06 $ by $Author: valdas $
+ * Last modified: $Date: 2008/01/23 12:11:59 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class ContentListViewerRenderer extends BaseRenderer {
 	
@@ -74,6 +74,7 @@ public class ContentListViewerRenderer extends BaseRenderer {
 		renderCommentsScript(facesContext, uiComponent);
 		renderCommentsController(facesContext, uiComponent);
 		renderHeader(facesContext,(UIData)uiComponent);
+		renderJavaScript(facesContext, uiComponent);
 	}
 	
 	private void renderCommentsScript(FacesContext facesContext, UIComponent list) throws IOException {
@@ -336,6 +337,14 @@ public class ContentListViewerRenderer extends BaseRenderer {
 //			RendererUtils.renderChild(facesContext, facet);
 //		}
 //		writer.endElement(HTML.TD_ELEM);
+	}
+	
+	private void renderJavaScript(FacesContext ctx, UIComponent list) throws IOException {
+		Object o = list.getFacets().get(ContentItemViewer.FACET_JAVA_SCRIPT);
+		if (o instanceof UIComponent) {
+			RenderUtils.renderChild(ctx, (UIComponent) o);
+		}
+		return;
 	}
 
 	//-------------------------------------------------------------

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.14 2006/04/09 12:01:54 laddi Exp $
+ * $Id: ContentItemToolbar.java,v 1.15 2008/01/23 12:11:59 valdas Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -14,14 +14,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import javax.faces.component.UIParameter;
 import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
+
+import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.uri.IWActionURIManager;
 import com.idega.presentation.IWContext;
+import com.idega.util.CoreUtil;
+import com.idega.util.URLUtil;
 import com.idega.webface.WFToolbar;
 
 
@@ -29,10 +34,10 @@ import com.idega.webface.WFToolbar;
  *  <p>
  *  Toolbar used by new content management system to display editor buttons.
  *  </p>
- *  Last modified: $Date: 2006/04/09 12:01:54 $ by $Author: laddi $
+ *  Last modified: $Date: 2008/01/23 12:11:59 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
@@ -45,20 +50,24 @@ public class ContentItemToolbar extends WFToolbar {
 	private String actionHandlerIdentifier;
 	private IWActionURIManager manager = null;
 	
-	private Map actions;
+	private Map<String, String> actions;
 	private String[] RolesAllowded = null;
 	private Boolean rendered;
 	private String categories;
 	private String baseFolderPath;
-
+	private Boolean addMoodalBoxRel = false;
 	
 	/**
 	 * 
 	 */
 	public ContentItemToolbar() {
 		super();
-		//this.setStyleClass("content_item_toolbar");
 		this.setMenuStyleClass("content_item_toolbar");
+	}
+	
+	public ContentItemToolbar(boolean addMoodalBoxRel) {
+		this();
+		this.addMoodalBoxRel = addMoodalBoxRel;
 	}
 	
 	public IWActionURIManager getIWActionURIManager(){
@@ -68,11 +77,33 @@ public class ContentItemToolbar extends WFToolbar {
 		return this.manager;
 	}
 	
-	public HtmlOutputLink addToolbarButton(String action, String url, String menuItemId){
+	private String getUri(String url) {
+		if (url == null) {
+			return null;
+		}
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return url;
+		}
+		
+			
+		Object renderingAttribute = iwc.getSessionAttribute(ContentConstants.RENDERING_COMPONENT_OF_ARTICLE_LIST);
+		if (renderingAttribute instanceof Boolean) {
+			URLUtil urlUtil = new URLUtil(url);
+			urlUtil.addParameter(ContentConstants.RENDERING_COMPONENT_OF_ARTICLE_LIST, ((Boolean) renderingAttribute).toString());
+			
+			url = urlUtil.toString();
+		}
+		
+		return url;
+	}
+	
+	public HtmlOutputLink addToolbarButton(String action, String url, String menuItemId) {
+		url = getUri(url);
+		
 		ContentItemToolbarButton link = new ContentItemToolbarButton();
 		link.setValue(url);
 		link.setId(menuItemId);
-		//link.getChildren().add(WFUtil.getText(action)); //TMP
 		addToActionMap(action,menuItemId);
 		this.setMenuItem(menuItemId,link);
 		
@@ -81,6 +112,10 @@ public class ContentItemToolbar extends WFToolbar {
 		link.setAction(action);
 		link.setStyleClass(action);
 		link.setTitle(title);
+		
+		if (addMoodalBoxRel && (action.equals(ContentConstants.CONTENT_ITEM_ACTION_EDIT) || action.equals(ContentConstants.CONTENT_ITEM_ACTION_CREATE))) {
+			link.setRel("moodalbox");
+		}
 		
 		return link;
 	}
@@ -91,13 +126,13 @@ public class ContentItemToolbar extends WFToolbar {
 	}
 	
 	public HtmlOutputLink addToolbarButton(String action){
-		String url = getActionURL(action,getResourcePath(),getActionHandlerIdentifier());
+		String url = getActionURL(action, getResourcePath(), getActionHandlerIdentifier());
 		String menuItemId = getNextMenuItemId();
-		return addToolbarButton(action,url,menuItemId);
+		return addToolbarButton(action, url, menuItemId);
 	}
 	
 	protected String getActionURL(String action, String resourcePath,String handlerIdentifier){
-		String url = getIWActionURIManager().getActionURIPrefixWithContext(action,resourcePath,handlerIdentifier);
+		String url = getIWActionURIManager().getActionURIPrefixWithContext(action, resourcePath, handlerIdentifier);
 		return url;
 	}
 	
@@ -114,14 +149,14 @@ public class ContentItemToolbar extends WFToolbar {
 	
 	
 	public void update(){
-		Set s = getActions().keySet();
-		for (Iterator iter = s.iterator(); iter.hasNext();) {
-			String action = (String) iter.next();
+		Set<String> s = getActions().keySet();
+		for (Iterator<String> iter = s.iterator(); iter.hasNext();) {
+			String action = iter.next();
 			ContentItemToolbarButton link = (ContentItemToolbarButton)getToolbarButton(action);
 			if(link==null){
 				addToolbarButton(action);
 			} else {
-				link.setValue(getActionURL(action,getResourcePath(),getActionHandlerIdentifier()));
+				link.setValue(getUri(getActionURL(action,getResourcePath(),getActionHandlerIdentifier())));
 				
 				link.setResourcePath(getResourcePath());
 				String categories = this.getCategories();
@@ -150,9 +185,9 @@ public class ContentItemToolbar extends WFToolbar {
 		}
 	}
 	
-	public Map getActions(){
+	public Map<String, String> getActions(){
 		if(this.actions==null){
-			this.actions=new HashMap();
+			this.actions=new HashMap<String, String>();
 		}
 		return this.actions;
 	}
@@ -231,12 +266,13 @@ public class ContentItemToolbar extends WFToolbar {
 	 * @see javax.faces.component.UIComponentBase#saveState(javax.faces.context.FacesContext)
 	 */
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[5];
+		Object values[] = new Object[6];
 		values[0] = super.saveState(ctx);
 		values[1] = this.resourcePath;
 		values[2] = this.actionHandlerIdentifier;
 		values[3] = this.categories;
 		values[4] = this.baseFolderPath;
+		values[5] = this.addMoodalBoxRel;
 		return values;
 	}
 	
@@ -250,6 +286,7 @@ public class ContentItemToolbar extends WFToolbar {
 		this.actionHandlerIdentifier = (String)values[2];
 		this.categories=(String)values[3];
 		this.baseFolderPath=(String)values[4];
+		this.addMoodalBoxRel = (Boolean) values[5];
 	}
 	
 	

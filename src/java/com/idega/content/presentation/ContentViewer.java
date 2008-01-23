@@ -52,6 +52,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	public static final String ACTION_UPLOAD = "ac_upload";
 	public static final String ACTION_DELETE = "ac_delete";
 	
+	public static final String CONTENT_VIEWER_EDITOR_NEEDS_FORM = "contentViewerEditorNeedsForm";
+	
 	static final String PATH_TO_DELETE = "ac_path2del";
 	
 	private String currentAction = null;

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewerRenderer.java,v 1.5 2007/03/07 17:26:30 justinas Exp $
+ * $Id: ContentItemViewerRenderer.java,v 1.6 2008/01/23 12:11:59 valdas Exp $
  * Created on 16.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -19,10 +19,10 @@ import com.idega.webface.renderkit.ContainerRenderer;
 
 /**
  * 
- *  Last modified: $Date: 2007/03/07 17:26:30 $ by $Author: justinas $
+ *  Last modified: $Date: 2008/01/23 12:11:59 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class ContentItemViewerRenderer extends ContainerRenderer {
 	
@@ -41,7 +41,7 @@ public class ContentItemViewerRenderer extends ContainerRenderer {
 		
 		renderHeader(ctx,viewer);
 		
-		renderJavaScript(ctx, viewer);
+		renderJavaScriptForComments(ctx, viewer);
 
 		boolean renderToolbarAbove = false;
 		if(renderToolbarAbove){
@@ -60,13 +60,11 @@ public class ContentItemViewerRenderer extends ContainerRenderer {
 		
 		renderComments(ctx, viewer);
 		
-		renderFeedScript(ctx, viewer);
+		renderJavaScriptForFeed(ctx, viewer);
+		
+		renderJavaScript(ctx, viewer);
 	}
 	
-	
-	
-	
-
 	public void renderFields(FacesContext context, ContentItemViewer viewer) throws IOException {
 		String attr[] = viewer.getViewerFieldNames();
 		for (int i = 0; i < attr.length; i++) {
@@ -119,7 +117,7 @@ public class ContentItemViewerRenderer extends ContainerRenderer {
 		RenderUtils.renderChild(ctx, comments);
 	}
 	
-	public void renderJavaScript(FacesContext ctx,ContentItemViewer viewer) throws IOException {
+	public void renderJavaScriptForComments(FacesContext ctx,ContentItemViewer viewer) throws IOException {
 		UIComponent script = (UIComponent) viewer.getFacets().get(ContentItemViewer.FACET_COMMENTS_SCRIPTS);
 		if (script == null) {
 			return;
@@ -127,12 +125,20 @@ public class ContentItemViewerRenderer extends ContainerRenderer {
 		RenderUtils.renderChild(ctx, script);
 	}
 
-	public void renderFeedScript(FacesContext ctx,ContentItemViewer viewer) throws IOException {
+	public void renderJavaScriptForFeed(FacesContext ctx,ContentItemViewer viewer) throws IOException {
 		UIComponent script = (UIComponent) viewer.getFacets().get(ContentItemViewer.FACET_FEED_SCRIPT);
 		if (script == null) {
 			return;
 		}
 		RenderUtils.renderChild(ctx, script);
+	}
+	
+	private void renderJavaScript(FacesContext ctx, ContentItemViewer viewer) throws IOException {
+		Object o = viewer.getFacets().get(ContentItemViewer.FACET_JAVA_SCRIPT);
+		if (o instanceof UIComponent) {
+			RenderUtils.renderChild(ctx, (UIComponent) o);
+		}
+		return;
 	}
 	
 }

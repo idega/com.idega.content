@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.23 2007/09/24 15:04:06 valdas Exp $
+ * $Id: ContentItemListViewer.java,v 1.24 2008/01/23 12:11:59 valdas Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -34,10 +34,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- * Last modified: $Date: 2007/09/24 15:04:06 $ by $Author: valdas $
+ * Last modified: $Date: 2008/01/23 12:11:59 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.23 $
+ * @version $Revision: 1.24 $
  */
 public class ContentItemListViewer extends UIData implements CacheableUIComponent{
 
@@ -104,7 +104,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		
 		String[] actions = getToolbarActions();
 		if(actions != null && actions.length > 0){
-			ContentItemToolbar toolbar = new ContentItemToolbar();
+			ContentItemToolbar toolbar = new ContentItemToolbar(true);
 			for (int i = 0; i < actions.length; i++) {
 				toolbar.addToolbarButton(actions[i]);
 			}

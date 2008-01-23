@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.23 2007/09/25 12:02:37 valdas Exp $
+ * $Id: WebDAVCategories.java,v 1.24 2008/01/23 12:11:59 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -11,9 +11,12 @@ package com.idega.content.presentation;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
+
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlInputText;
@@ -23,18 +26,19 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.bean.ManagedContentBeans;
 import com.idega.content.business.WebDAVMetadataResource;
 import com.idega.content.business.categories.CategoryBean;
 import com.idega.content.data.ContentCategory;
+import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFResourceUtil;
-
 
 /**
  * <p>
@@ -43,37 +47,48 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2007/09/25 12:02:37 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/01/23 12:11:59 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.23 $
+ * @version $Revision: 1.24 $
  */
-public class WebDAVCategories  extends IWBaseComponent implements ManagedContentBeans, ActionListener{
+public class WebDAVCategories extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
 	private static final String DEFAULT_CATEGORIES_BLOCK_ID = "categoriesBlock";
-	/*public static final String CATEGORIES_BLOCK_ID = "categoriesBlockID";
-	private static final String ADD_BUTTON_ID = "add_button_ID";
-	private static final String SAVE_ID = "save_category_ID";
-	private static final String ADD_CATEGORY_TEXT_ID = "addCategoryID";
-	private static final String CATEGORY = "category_";		//Prefix for the id in the userinterface
-	*/
 	private static final int COLLUMNS = 3;		//Number of collumns to display the categories in
 
 	private String resourcePath;
+	private String setCategories;
+	
 	private boolean setOnParent=false;
 	private boolean displaySaveButton=true;
-	private String setCategories;
 	private boolean displayHeader=true;
+	private boolean addCategoryCreator = true;
+	private boolean needDisplayCategoriesSelection = true;
 	
-//	List categoryStatus = new ArrayList();
+	private boolean areCategoriesFetched = false;
+	
+	private List<ContentCategory> selectedCategories = null;
+	private List<ContentCategory> notSelectedCategories = null;
+	
+	private int localizedCategories = 0;
+	private String localeIdentity = null;
+	
+	private Table categoriesTable = null;
 
 	public WebDAVCategories() {
 		setId(DEFAULT_CATEGORIES_BLOCK_ID);
+		
+		selectedCategories = new ArrayList<ContentCategory>();
+		notSelectedCategories = new ArrayList<ContentCategory>();
+		
+		areCategoriesFetched = false;
 	}
 	
-	public WebDAVCategories(String path){
+	public WebDAVCategories(String path, String localeIdentity){
 		this();
 		this.resourcePath = path;
+		this.localeIdentity = localeIdentity;
 	}
 	
 	public void setResourcePath(String path){
@@ -87,9 +102,9 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	public void reset(){
 		getChildren().clear();
 		setInitialized(false);
-		IWContext iwuc = IWContext.getInstance();
+		IWContext iwc = IWContext.getInstance();
 		try {
-			WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(iwuc, WebDAVMetadataResource.class);
+			WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(iwc, WebDAVMetadataResource.class);
 			resource.clear();
 		} catch (IBOLookupException e) {
 			throw new RuntimeException(e);
@@ -111,7 +126,9 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 		}
 		mainContainer.add(getCategoriesTable(iwc));
 
-		mainContainer.add(getAddCategoryContainer());
+		if (isAddCategoryCreator()) {
+			mainContainer.add(getAddCategoryContainer());
+		}
 
 		return mainContainer;
 	}
@@ -136,75 +153,100 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	 * @return table
 	 */
 	private Table getCategoriesTable(IWContext iwc) {
-		Table categoriesTable = new Table();
-		Locale locale = iwc.getCurrentLocale();
-		int count = 0;
-			Collection<String> selectedCategories = getSetCategoriesList();
-			if (selectedCategories != null) {
-				ContentCategory category = null;
-				for (Iterator<String> selectedIter = selectedCategories.iterator(); selectedIter.hasNext();) {
-					String categoryKey = selectedIter.next();
-					category = CategoryBean.getInstance().getCategory(categoryKey);
-					if (category != null) {
-						if (category.getName(locale.toString()) != null && !category.isDisabled()) {	//	If category exists for current locale and it's not disabled
-							//	Checkbox
-							HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
-							setCategory(smc,categoryKey);
-							smc.setValue(Boolean.TRUE);
-							String id = getCategoryId()+count;
-							smc.setId(id);
-							categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
-							
-							//	Text
-							HtmlOutputText catText = new HtmlOutputText();
-							String catLabel = CategoryBean.getInstance().getCategoryName(categoryKey);
-							catText.setValue(catLabel);
-							categoriesTable.add(catText,count%COLLUMNS + 1,count/COLLUMNS + 1);
-							count++;
-						}
-					}
-				}
-			}
-
-			//	Display all the non-selected categories
-			Collection<ContentCategory> categories = CategoryBean.getInstance().getCategories(locale);
-			for (ContentCategory category : categories) {
-				String categoryKey = category.getId();
-				if (!category.isDisabled() && (selectedCategories == null || !selectedCategories.contains(categoryKey))) {
-					//Checkbox
-					HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
-					setCategory(smc,categoryKey);
-					smc.setValue(Boolean.FALSE);
-					String id = getCategoryId(count);
-					smc.setId(id);
-					categoriesTable.add(smc,count%COLLUMNS + 1,count/COLLUMNS + 1);
-					//Text
-					HtmlOutputText catText = new HtmlOutputText();
-					String catLabel = category.getName(locale.toString());
-					catText.setValue(catLabel);
-					categoriesTable.add(catText,count%COLLUMNS + 1,count/COLLUMNS + 1);
-					count++;
-				}
-			}
-			
-			categoriesTable.setColumns(Math.min(count,COLLUMNS));
-			count--;
-			categoriesTable.setRows(count/COLLUMNS + 1);
-
-			if(getDisplaySaveButton()){
-				//Add the save button
-				if(this.resourcePath!=null && this.resourcePath.length()>0) {
-					WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
-					HtmlCommandButton addCategoryButton = localizer.getButtonVB(getSaveButtonId(), "save", this);
-					categoriesTable.add(addCategoryButton,1,count/COLLUMNS + 2);
-					categoriesTable.setRows(count/COLLUMNS + 2);
-				}
-			}
-			
-			categoriesTable.setId(categoriesTable.getId() + "_ver");
-			categoriesTable.setStyleClass("wf_listtable");
+		if (!areCategoriesFetched) {
+			getSelectedAndNotSelectedCategories(iwc);
+		}
 		
+		Table categoriesTable = new Table();
+		int selectedCategoriesCount = 0;
+		ContentCategory category = null;
+		for (int i = 0; i < selectedCategories.size(); i++) {
+			category = selectedCategories.get(i);
+						
+			//	Checkbox
+			HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
+			setCategory(smc, category.getId());
+			smc.setValue(Boolean.TRUE);
+			String id = getCategoryId()+selectedCategoriesCount;
+			smc.setId(id);
+			categoriesTable.add(smc,selectedCategoriesCount%COLLUMNS + 1,selectedCategoriesCount/COLLUMNS + 1);
+			
+			//	Text
+			HtmlOutputText catText = new HtmlOutputText();
+			String catLabel = CategoryBean.getInstance().getCategoryName(category.getId());
+			catText.setValue(catLabel);
+			categoriesTable.add(catText,selectedCategoriesCount%COLLUMNS + 1,selectedCategoriesCount/COLLUMNS + 1);
+			selectedCategoriesCount++;
+		}
+
+		Locale locale = getLocale(iwc);
+		//	Display all the non-selected categories
+		for (int i = 0; i < notSelectedCategories.size(); i++) {
+			category = notSelectedCategories.get(i);
+			
+			//Checkbox
+			HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
+			setCategory(smc, category.getId());
+			if (notSelectedCategories.size() == 1) {
+				smc.setValue(Boolean.TRUE);
+				smc.setSelected(true);
+			}
+			else {
+				smc.setValue(Boolean.FALSE);
+			}
+			String id = getCategoryId(selectedCategoriesCount);
+			smc.setId(id);
+			categoriesTable.add(smc,selectedCategoriesCount%COLLUMNS + 1,selectedCategoriesCount/COLLUMNS + 1);
+	
+			//Text
+			HtmlOutputText catText = new HtmlOutputText();
+			String catLabel = category.getName(locale.toString());
+			catText.setValue(catLabel);
+			categoriesTable.add(catText,selectedCategoriesCount%COLLUMNS + 1,selectedCategoriesCount/COLLUMNS + 1);
+			selectedCategoriesCount++;
+		}
+		
+		categoriesTable.setColumns(Math.min(selectedCategoriesCount,COLLUMNS));
+		selectedCategoriesCount--;
+		categoriesTable.setRows(selectedCategoriesCount/COLLUMNS + 1);
+
+		if (getDisplaySaveButton()) {
+			//	Add the save button
+			if(this.resourcePath!=null && this.resourcePath.length()>0) {
+				WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
+				HtmlCommandButton addCategoryButton = localizer.getButtonVB(getSaveButtonId(), "save", this);
+				categoriesTable.add(addCategoryButton,1,selectedCategoriesCount/COLLUMNS + 2);
+				categoriesTable.setRows(selectedCategoriesCount/COLLUMNS + 2);
+			}
+		}
+			
+		categoriesTable.setId(categoriesTable.getId() + "_ver");
+		categoriesTable.setStyleClass("wf_listtable");
+		
+		this.categoriesTable = categoriesTable;
 		return categoriesTable;
+	}
+	
+	@Override
+	protected void updateComponent(FacesContext context) {
+		this.getChildren().clear();
+		add(getEditContainer(IWContext.getIWContext(context)));
+	}
+	
+	private Locale getLocale(IWContext iwc) {
+		Locale l = null;
+		if (localeIdentity == null) {
+			l = iwc.getCurrentLocale();
+		}
+		else {
+			l = ICLocaleBusiness.getLocaleFromLocaleString(localeIdentity);
+		}
+		
+		if (l == null) {
+			l = Locale.ENGLISH;
+		}
+		
+		return l;
 	}
 	
 	/**
@@ -451,4 +493,74 @@ public class WebDAVCategories  extends IWBaseComponent implements ManagedContent
 	public void setCategories(String setCategories) {
 		this.setCategories=setCategories;
 	}
+
+	public boolean isAddCategoryCreator() {
+		return addCategoryCreator;
+	}
+
+	public void setAddCategoryCreator(boolean addCategoryCreator) {
+		this.addCategoryCreator = addCategoryCreator;
+	}
+
+	public boolean isNeedDisplayCategoriesSelection(IWContext iwc) {
+		if (!areCategoriesFetched) {
+			getSelectedAndNotSelectedCategories(iwc);
+		}
+		
+		return needDisplayCategoriesSelection;
+	}
+	
+	public void getSelectedAndNotSelectedCategories(IWContext iwc) {
+		this.selectedCategories = new ArrayList<ContentCategory>();
+		notSelectedCategories = new ArrayList<ContentCategory>();
+		
+		Locale locale = getLocale(iwc);
+		Collection<String> selectedCategories = getSetCategoriesList();
+		if (selectedCategories != null) {
+			ContentCategory category = null;
+			for (Iterator<String> selectedIter = selectedCategories.iterator(); selectedIter.hasNext();) {
+				String categoryKey = selectedIter.next();
+				category = CategoryBean.getInstance().getCategory(categoryKey);
+				if (category != null) {
+					if (category.getName(locale.toString()) != null && !category.isDisabled()) {	//	If category exists for current locale and it's not disabled
+						this.selectedCategories.add(category);
+					}
+				}
+			}
+		}
+		
+		Collection<ContentCategory> categories = CategoryBean.getInstance().getCategories(locale);
+		if (categories == null) {
+			localizedCategories = 0;
+		}
+		else {
+			localizedCategories = categories.size();
+		}
+		for (ContentCategory category : categories) {
+			if (!category.isDisabled() && (selectedCategories == null || !selectedCategories.contains(category.getId()))) {
+				this.notSelectedCategories.add(category);
+			}
+		}
+		
+		if (categories == null || categories.size() == 0) {
+			needDisplayCategoriesSelection = false;
+		}
+		else if (this.selectedCategories.size() == 0 && notSelectedCategories.size() == 1) {
+			needDisplayCategoriesSelection = false;
+		}
+		else {
+			needDisplayCategoriesSelection = true;
+		}
+		
+		areCategoriesFetched = true;
+	}
+
+	public int getLocalizedCategories() {
+		return localizedCategories;
+	}
+
+	public void setLocaleIdentity(String localeIdentity) {
+		this.localeIdentity = localeIdentity;
+	}
+	
 }

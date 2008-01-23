@@ -1,5 +1,5 @@
 /**
- * $Id: ContentCategory.java,v 1.6 2007/09/25 12:01:10 valdas Exp $
+ * $Id: ContentCategory.java,v 1.7 2008/01/23 12:11:59 valdas Exp $
  * Created in 2007 by gediminas
  *
  * Copyright (C) 2000-2007 Idega Software hf. All Rights Reserved.
@@ -80,6 +80,16 @@ public class ContentCategory {
 			}
 			if (i > 1) {
 				name = getName(lang.substring(0, i - 1));
+			}
+		}
+		
+		if (name == null) {
+			String key = null;
+			for (Iterator<String> it = getNames().keySet().iterator(); (name == null && it.hasNext());) {
+				key = it.next();
+				if (key.startsWith(lang)) {
+					name = getName(key);
+				}
 			}
 		}
 		return name;

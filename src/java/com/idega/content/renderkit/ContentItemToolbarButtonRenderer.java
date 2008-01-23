@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbarButtonRenderer.java,v 1.3 2006/05/11 16:12:46 eiki Exp $
+ * $Id: ContentItemToolbarButtonRenderer.java,v 1.4 2008/01/23 12:11:59 valdas Exp $
  * Created on 9.3.2005
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -24,15 +24,18 @@ import org.apache.myfaces.shared_tomahawk.renderkit.html.HTML;
 import org.apache.myfaces.shared_tomahawk.renderkit.html.HtmlLinkRendererBase;
 import org.apache.myfaces.shared_tomahawk.renderkit.html.HtmlRendererUtils;
 
+import com.idega.content.business.ContentConstants;
+import com.idega.content.presentation.ContentItemToolbarButton;
+
 
 /**
  * <p>
  * Renderer for the ContentItemToolbarButton
  * </p>
- * Last modified: $Date: 2006/05/11 16:12:46 $ by $Author: eiki $
+ * Last modified: $Date: 2008/01/23 12:11:59 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class ContentItemToolbarButtonRenderer extends HtmlLinkRendererBase {
 
@@ -107,14 +110,21 @@ public class ContentItemToolbarButtonRenderer extends HtmlLinkRendererBase {
         writer.startElement(HTML.ANCHOR_ELEM, output);
         writer.writeAttribute(HTML.ID_ATTR, output.getClientId(facesContext), null);
        // writer.writeURIAttribute(HTML.HREF_ATTR, href, null);
-        writeUriAttribute(facesContext,output,writer,href);
+        boolean isPopUp = true;
+        if (output instanceof ContentItemToolbarButton) {
+        	String action = ((ContentItemToolbarButton) output).getAction();
+        	isPopUp = !(ContentConstants.CONTENT_ITEM_ACTION_EDIT.equals(action) || ContentConstants.CONTENT_ITEM_ACTION_CREATE.equals(action));
+        }
+        writeUriAttribute(facesContext, output, writer, href, isPopUp);
         HtmlRendererUtils.renderHTMLAttributes(writer, output, HTML.ANCHOR_PASSTHROUGH_ATTRIBUTES);
         writer.flush();
 	}
 	
-	protected void writeUriAttribute(FacesContext facesContext, UIOutput output,ResponseWriter writer,String href) throws IOException {
-		String javascriptUrl = "javascript:openContentEditor('"+href+"')";
-		writer.writeURIAttribute(HTML.HREF_ATTR, javascriptUrl, null);
+	protected void writeUriAttribute(FacesContext facesContext, UIOutput output, ResponseWriter writer, String href, boolean isPopUp) throws IOException {
+		if (isPopUp) {
+			href = new StringBuffer("javascript:openContentEditor('").append(href).append("');").toString();
+		}
+		writer.writeURIAttribute(HTML.HREF_ATTR, href, null);
 	}
 
     private void addChildParametersToHref(UIComponent linkComponent,

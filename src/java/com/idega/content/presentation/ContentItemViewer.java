@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.29 2008/01/09 13:45:27 valdas Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.30 2008/01/23 12:11:59 valdas Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -29,15 +29,16 @@ import com.idega.content.business.ContentUtil;
 import com.idega.core.cache.UIComponentCacher;
 import com.idega.core.uri.IWActionURIManager;
 import com.idega.presentation.IWContext;
+import com.idega.util.CoreConstants;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2008/01/09 13:45:27 $ by $Author: valdas $
+ * Last modified: $Date: 2008/01/23 12:11:59 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.29 $
+ * @version $Revision: 1.30 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -50,9 +51,12 @@ public class ContentItemViewer extends WFContainer {
 	public static final String FACET_ITEM_FOOTER = "item_footer";
 	public static final String FACET_ITEM_DETAILS_COMMAND = "item_details_command";
 	public static final String FACET_ITEM_COMMENTS = "item_comments";
-	public static final String FACET_COMMENTS_SCRIPTS = "item_comments_scripts";
-	public static final String FACET_FEED_SCRIPT = "item_feed_script";
+	public static final String FACET_COMMENTS_SCRIPTS = "item_comments_java_scripts";
+	public static final String FACET_FEED_SCRIPT = "item_feed_java_scripts";
 	public static final String DEFAULT_RENDERER_TYPE = "content_item_viewer";
+	public static final String FACET_JAVA_SCRIPT = "content_item_java_script";
+	public static final String FACET_STYLE_SHEET = "content_item_style_sheet";
+	
 	/*
 	 * The field requestedResourcePath is used to store the path that is
 	 * requested by a http request
@@ -203,7 +207,7 @@ public class ContentItemViewer extends WFContainer {
 		if (item != null) {
 			String[] actions = item.getToolbarActions();
 			if (actions != null && actions.length > 0) {
-				ContentItemToolbar toolbar = new ContentItemToolbar();
+				ContentItemToolbar toolbar = new ContentItemToolbar(this.getClass().equals(CoreConstants.getArticleItemViewerClass()));
 				toolbar.setId(this.getId()+"_toolbar");
 				toolbar.setToolbarActions(actions);
 				this.setToolbar(toolbar);
