@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.40 2007/12/10 22:24:49 eiki Exp $
+ * $Id: ContentViewManager.java,v 1.41 2008/01/24 10:11:49 valdas Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -24,21 +24,20 @@ import com.idega.core.view.ViewNode;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.repository.data.Singleton;
+import com.idega.util.CoreConstants;
 
 
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2007/12/10 22:24:49 $ by $Author: eiki $
+ *  Last modified: $Date: 2008/01/24 10:11:49 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.40 $
+ * @version $Revision: 1.41 $
  */
 public class ContentViewManager implements Singleton  {
 
 	private static final String IW_CONTENT_VIEW_MANAGER_KEY = "iw_contentviewmanager";
-	private static final String CONTENT_ID="content";
-	private static final String DOCUMENTS_ID="documents";
 	private ViewNode contentRootNode = null;
 	private IWMainApplication iwma = null;
 	
@@ -75,7 +74,7 @@ public class ContentViewManager implements Singleton  {
 	
 	public ViewNode initalizeContentNode(IWBundle contentBundle){
 		ViewNode root = getViewManager().getWorkspaceRoot();
-		DefaultViewNode contentNode = new ApplicationViewNode(CONTENT_ID,root);
+		DefaultViewNode contentNode = new ApplicationViewNode(CoreConstants.CONTENT_VIEW_MANAGER_ID, root);
 		Collection<String> roles = new ArrayList<String>();
 		roles.add(StandardRoles.ROLE_KEY_EDITOR);
 		roles.add(StandardRoles.ROLE_KEY_AUTHOR);
@@ -93,7 +92,7 @@ public class ContentViewManager implements Singleton  {
 	public void initializeStandardNodes(IWBundle bundle){
 		ViewNode contentNode = initalizeContentNode(bundle);
 
-		DefaultViewNode pagesNode = new DefaultViewNode("pages", contentNode);
+		DefaultViewNode pagesNode = new DefaultViewNode(CoreConstants.PAGES_VIEW_MANAGER_ID, contentNode);
 		pagesNode.setJspUri(bundle.getJSPURI("pages.jsp"));
 		pagesNode.setKeyboardShortcut(new KeyboardShortcut("p"));
 		pagesNode.setName("#{localizedStrings['com.idega.content']['pages']}");
