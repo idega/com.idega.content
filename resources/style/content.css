@@ -1331,6 +1331,7 @@ div#mb_contents .mootabs_panel {
 div#mb_bottom {
 	border: 0;
 	overflow: visible;
+	width: 650px !important;
 }
 
 a#mb_close_link {
