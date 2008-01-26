@@ -28,14 +28,13 @@ import java.util.Map;
 import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.logging.Logger;
 
 import javax.ejb.FinderException;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpURL;
 import org.apache.commons.httpclient.URIException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.htmlcleaner.HtmlCleaner;
 import org.jdom.Attribute;
 import org.jdom.Document;
@@ -83,7 +82,7 @@ import com.idega.webface.WFUtil;
 
 public class ThemesHelper implements Singleton {
 	
-	private static Log log = LogFactory.getLog(ThemesHelper.class);
+	private static Logger log = Logger.getLogger(ThemesHelper.class.getName());
 	
 	private volatile static ThemesHelper helper = null;
 	private volatile Generator generator = null;
@@ -245,7 +244,7 @@ public class ThemesHelper implements Singleton {
 		
 		List<SearchResult> themes = search(ThemesConstants.THEME_SEARCH_KEY, searchScope);
 		if (themes == null) {
-			log.info("ContentSearch.doSimpleDASLSearch returned results Collection, which is null: " + themes);
+			log.warning(this.getClass().getName() + ": ContentSearch.doSimpleDASLSearch returned results Collection, which is null: " + themes);
 			checkedFromSlide = false;
 			return;
 		}
@@ -603,7 +602,7 @@ public class ThemesHelper implements Singleton {
 	
 	public Document getXMLDocument(InputStream stream) {
 		if (stream == null) {
-			log.info("Stream is null");
+			log.warning(this.getClass().getName() + ": Stream is null");
 			return null;
 		}
 
@@ -626,11 +625,11 @@ public class ThemesHelper implements Singleton {
 		try {
 			document = builder.build(r);
 		} catch (JDOMException e) {
-			log.info("JDOM exception");
+			log.warning(this.getClass().getName() + ": JDOM exception");
 			e.printStackTrace();
 			return null;
 		} catch (IOException e) {
-			log.info("IOException trying to build a JDOM Document");
+			log.warning(this.getClass().getName() + ": IOException trying to build a JDOM Document");
 			e.printStackTrace();
 			return null;
 		}
@@ -734,7 +733,7 @@ public class ThemesHelper implements Singleton {
             is = url.openStream();
         } catch (Exception e) {
         	if (printError) {
-        		log.info("Error getting: " + link);
+        		log.warning(this.getClass().getName() + ": Error getting: " + link);
         		e.printStackTrace();
         	}
         }
@@ -1304,6 +1303,7 @@ public class ThemesHelper implements Singleton {
 	private String getPageDocument(String type, List<String> articlesPaths, String templateFile, int pageID) {
 		Document doc = getXMLDocument(new StringBuffer(getWebRootWithoutContent()).append(templateFile).toString());
 		if (doc == null) {
+			log.warning(this.getClass().getName() + ": Template file ("+templateFile+") wasn'tfound!");
 			return null;
 		}
 		doc = preparePageDocument(doc, articlesPaths, pageID);
@@ -1598,8 +1598,8 @@ public class ThemesHelper implements Singleton {
 					if (MODULE_ELEMENT_NAME.equals(e.getName())) {
 						icObjectId = getICObjectId(e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE), icoHome);
 						if (icObjectId == -1) {
-							log.info(new StringBuffer("Didn't get ICObject for: ").append(e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE)));
-							log.info("Generating unique module id");
+							log.warning(this.getClass().getName() +": Didn't get ICObject for: "+e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE));
+							log.warning(this.getClass().getName() + ": Generating unique module id");
 							moduleID = getUniqueIdByNumberAndDate(MODULE_ID_SCOPE);
 							while (moduleIds.contains(moduleID)) {
 								moduleID = getUniqueIdByNumberAndDate(MODULE_ID_SCOPE);
@@ -1619,7 +1619,7 @@ public class ThemesHelper implements Singleton {
 							moduleIdAttribute.setValue(moduleID);
 						}
 						else {
-							log.info(new StringBuffer("Didn't find module id attribute for: ").append(e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE)));
+							log.warning("Didn't find module id attribute for: " + e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE));
 						}
 					}
 				}
