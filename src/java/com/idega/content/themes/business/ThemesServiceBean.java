@@ -2,6 +2,8 @@ package com.idega.content.themes.business;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -90,8 +92,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	}
 	
 	@SuppressWarnings("unchecked")
-	private boolean deletePage(String pageID, boolean deleteChildren, boolean canUseDefaultUser, boolean clearCache) {
-		if (pageID == null) {
+	private boolean deletePage(String pageKey, boolean deleteChildren, boolean canUseDefaultUser, boolean clearCache) {
+		if (pageKey == null) {
 			return false;
 		}
 
@@ -120,17 +122,17 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			tree = builder.getTree(iwc);
 			domain = iwc.getDomain();
 			
-			if (pageID.equals(ThemesHelper.getInstance().getLastVisitedPage())) {
+			if (pageKey.equals(ThemesHelper.getInstance().getLastVisitedPage())) {
 				ThemesHelper.getInstance().setLastVisitedPage(null);
 			}
 		}
 		
-		deleteArticlesInThisPage(pageID);
-		boolean result = builder.deletePage(pageID, deleteChildren, tree, userId, domain);
+		deleteArticlesInPagesBeingDeleted(pageKey, deleteChildren);
+		boolean result = builder.deletePage(pageKey, deleteChildren, tree, userId, domain);
 		
 		if (domain != null) {
 			try {
-				if (Integer.valueOf(pageID).intValue() == domain.getStartPageID()) {
+				if (Integer.valueOf(pageKey).intValue() == domain.getStartPageID()) {
 					domain.setIBPage(null);
 					domain.store();
 				}
@@ -145,6 +147,30 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		
 		IWWelcomeFilter.reInitializeCachedDomainOnNextRequest();
 		
+		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private boolean deleteArticlesInPagesBeingDeleted(String parentPageKey, boolean deleteChildren) {
+		boolean result = deleteArticlesInThisPage(parentPageKey);
+		
+		if (deleteChildren) {
+			ICPage parentPage = getICPage(parentPageKey);
+			
+			if (parentPage != null) {
+				Collection children = parentPage.getChildren();
+				if (children != null) {
+					Object o = null;
+					for (Iterator it = children.iterator(); it.hasNext();) {
+						o = it.next();
+						if (o instanceof ICPage) {
+							result = deleteArticlesInPagesBeingDeleted(((ICPage) o).getId(), deleteChildren);
+						}
+					}
+				}
+			}
+		}
+	
 		return result;
 	}
 	
@@ -215,9 +241,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		String parentId = builder.getTopLevelTemplateId(builder.getTopLevelTemplates(iwc));
 		if (parentId == null || ThemesConstants.MINUS_ONE.equals(parentId)) {
 			//	No Top Level Template
-			int topTemplate = ThemesHelper.getInstance().getThemesEngine().createRootTemplate(domain, builder, domainID, builder.getIBXMLFormat());
+			parentId = ThemesHelper.getInstance().getThemesEngine().createRootTemplate(domain, builder, domainID, builder.getIBXMLFormat());
 			ThemesHelper.getInstance().getThemesEngine().initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
-			parentId = String.valueOf(topTemplate);
 		}
 		String name = StringHandler.removeCharacters(theme.getName(), ContentConstants.SPACE, ContentConstants.UNDER);
 		id = createIBPage(parentId, theme.getName(), builder.getTemplateKey(), null, ThemesConstants.THEMES + name +
