@@ -56,4 +56,6 @@ public class ContentConstants {
 	public static final String CONTENT_ITEM_ACTION_CREATE = "create";
 
 	public static final String RENDERING_COMPONENT_OF_ARTICLE_LIST = "renderingComponentOfParentArticleList";
+
+	public static final String ARTICLE_NOT_AVAILABLE_BODY = "The article you have chosen is not available in the selected language";
 }
