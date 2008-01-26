@@ -1033,7 +1033,6 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				//	Creating root page and root template
 				createRootPage(pageID, domain, builder, domainID, format);
 				createRootTemplate(domain, builder, domainID, format);
-				createArticlePreviewTemplate(domainID, builder, format);
 				initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
 				IWWelcomeFilter.unload();
 			}
@@ -1443,41 +1442,42 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return true;
 	}
 	
-	public int createRootTemplate(ICDomain domain, BuilderService builder, int domainID, String format) {
-		if (domain.getStartTemplate() != null) {
-			return domain.getStartTemplateID();
+	public String createRootTemplate(ICDomain domain, BuilderService builder, int domainID, String format) {
+		ICPage startTemplate = domain.getStartTemplate();
+		if (startTemplate != null && !startTemplate.getDeleted()) {
+			return startTemplate.getId();
 		}
 		
 		int templateId = createPage(null, "Template", builder.getTemplateKey(), null, null, null, domainID, format, null);
+		String templateKey = String.valueOf(templateId);
 		
-		builder.unlockRegion(String.valueOf(templateId), ThemesConstants.MINUS_ONE, null);
+		builder.unlockRegion(templateKey, ThemesConstants.MINUS_ONE, null);
 		
 		domain.setStartTemplate(helper.getThemesService().getICPage(templateId));
 		domain.store();
-		return templateId;
+		
+		createArticlePreviewTemplate(domainID, builder, format, templateId);
+		
+		return templateKey;
 	}
 	
-	private boolean createArticlePreviewTemplate(int domainID, BuilderService builder, String format) {
+	private boolean createArticlePreviewTemplate(int domainID, BuilderService builder, String format, int id) {
 		if (builder == null) {
 			return false;
 		}
 		IWContext iwc = CoreUtil.getIWContext();
 		
 		String articleTemplateFile = "/idegaweb/bundles/com.idega.block.article.bundle/resources/pages/article_viewer_template.xml";
-		boolean existInSlide = false;
-		int id = getArticleViewerTemplateId(builder, iwc);
-		existInSlide = helper.existFileInSlide(ThemesConstants.PAGES_PATH_SLIDE + articleTemplateFile);
-		if (existInSlide && id != -1) {
-			return true;
+		if (id < 0) {
+			id = getArticleViewerTemplateId(builder, iwc);
 		}
 		
 		if (id == -1) {
 			id = createPage(null, ARTICLE_VIEWER_NAME, builder.getTemplateKey(), null, ContentConstants.ARTICLE_VIEWER_URI, ARTICLE_VIEWER_SUBTYPE, domainID, format, null);
 		}
-		else {
-			if (existInSlide) {
-				return true;
-			}
+		
+		if (id < 0) {
+			return false;
 		}
 		
 		String pageKey = String.valueOf(id);

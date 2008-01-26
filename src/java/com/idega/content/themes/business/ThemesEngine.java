@@ -147,7 +147,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#createRootTemplate
 	 */
-	public int createRootTemplate(ICDomain domain, BuilderService builder, int domainID, String format);
+	public String createRootTemplate(ICDomain domain, BuilderService builder, int domainID, String format);
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#initializeCachedDomain
