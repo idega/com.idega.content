@@ -732,8 +732,8 @@ public class ThemesHelper implements Singleton {
         	}
             is = url.openStream();
         } catch (Exception e) {
+        	log.warning(this.getClass().getName() + ": Error getting: " + link);
         	if (printError) {
-        		log.warning(this.getClass().getName() + ": Error getting: " + link);
         		e.printStackTrace();
         	}
         }
