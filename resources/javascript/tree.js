@@ -40,22 +40,31 @@ function deletePage(pageId, followingNodes){
 		setPageID(null);
 		RELOAD_PAGE = true;
 		
-		if (followingNodes) {
-			ThemesEngine.deletePageAndDecrease(pageId, true, followingNodes, empty);
-		}
-		else {	
-			ThemesEngine.deletePageAndDecrease(pageId, true, null, empty);
-		}
+		ThemesEngine.deletePageAndDecrease(pageId, true, followingNodes, {
+			callback: function(result) {
+				if (!result) {
+					executeActionsAfterSiteTreeInLucidWasChanged(result);
+				}
+				
+				ThemesEngine.deleteArticlesFromDeletedPages(pageId, {
+					callbcak: function(deletedArticlesResult) {
+					}
+				});
+				executeActionsAfterSiteTreeInLucidWasChanged(result);
+			}
+		});
 	}
 	else {
-		if (treeObj) {
+		try {
 			treeObj.restoreTreeStructure();
+		} catch(e) {
+			reloadPage();
 		}
 	}
 }
 
-function empty(param) {
-	closeLoadingMessage();
+function executeActionsAfterSiteTreeInLucidWasChanged(param) {
+	closeAllLoadingMessages();
 	if (RELOAD_PAGE) {
 		RELOAD_PAGE = false;
 		getGlobalPageId();

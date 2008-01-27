@@ -13,7 +13,9 @@ import java.util.Map;
 
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.business.IBOServiceBean;
+import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
+import com.idega.content.business.ContentItemChecker;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.bean.ThemesManagerBean;
 import com.idega.content.themes.helpers.bean.Setting;
@@ -1220,7 +1222,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		try {
 			decreaseNodesNumbersInLevel(followingNodes, -1, null);	
-			helper.getThemesService().deleteIBPage(pageId, deleteChildren);
+			helper.getThemesService().deleteIBPage(pageId, deleteChildren, true);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			return false;
@@ -1869,6 +1871,80 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		
 		return false;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public boolean deleteArticlesFromDeletedPages(String pageKey) {
+		if (pageKey == null) {
+			return false;
+		}
+		
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return false;
+		}
+		
+		Object o = iwc.getSessionAttribute(ContentConstants.DELETED_PAGE_IN_LUCID_PROPERTIES_FOR_ARTICLE);
+		if (o instanceof List) {
+			List ids = (List) o;
+			
+			iwc.removeSessionAttribute(ContentConstants.DELETED_PAGE_IN_LUCID_PROPERTIES_FOR_ARTICLE);
+			
+			return deleteArticlesInPagesBeingDeleted(ids, helper.getThemesService().getBuilderService());
+		}
+		
+		return false;
+	}
+	
+	private boolean deleteArticlesInPagesBeingDeleted(List<String> ids, BuilderService builder) {
+		if (ids == null || builder == null) {
+			return false;
+		}
+		
+		for (int i = 0; i < ids.size(); i++) {
+			deleteArticlesInThisPage(ids.get(i), builder);
+		}
+		
+		return true;
+	}
+	
+	private boolean deleteArticlesInThisPage(String pageKey, BuilderService builder) {
+		if (pageKey == null) {
+			return false;
+		}
+
+		if (builder == null) {
+			return false;
+		}
+		
+		Class<?> articleClass = CoreConstants.getArticleItemViewerClass();
+		if (articleClass == null) {
+			return false;
+		}
+		
+		List<String> ids = builder.getModuleId(pageKey, articleClass.getName());
+		if (ids == null) {
+			return true;
+		}
+		
+		List<String> paths = new ArrayList<String>();
+		String path = null;
+		for (int i = 0; i < ids.size(); i++) {
+			path = builder.getProperty(pageKey, ids.get(i), CoreConstants.ARTICLE_RESOURCE_PATH_PROPERTY_NAME);
+			if (path != null) {
+				paths.add(path);
+			}
+		}
+		
+		if (paths.size() == 0) {
+			return true;
+		}
+		
+		ContentItemChecker checker = SpringBeanLookup.getInstance().getSpringBean(getIWApplicationContext(), ContentItemChecker.class);
+		if (checker == null) {
+			return false;
+		}
+		return checker.deleteDummyArticles(paths);
 	}
 
 }

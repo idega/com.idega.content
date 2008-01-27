@@ -193,4 +193,6 @@ public interface ThemesEngine extends IBOService {
 	 * @see ThemesEngineBean#changePageName
 	 */
 	public boolean changePageName(int id, String newName);
+	
+	public boolean deleteArticlesFromDeletedPages(String pageKey);
 }

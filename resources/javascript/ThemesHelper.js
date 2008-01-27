@@ -745,12 +745,16 @@ function updateSiteTree(updatedTree) {
 	container.empty();	
 	insertNodesToContainer(updatedTree, container);
 	
-	var treeObj = new JSDragDropTree();
-	treeObj.setTreeId(CURRENT_SITE_STRUCTURE_TREE_ID);
-	treeObj.initTree();
-	treeObj.checkIfOverTree(CURRENT_SITE_STRUCTURE_TREE_ID);
-	treeObj.getNodeOrders();
-	treeObj.expandAll();
+	try {
+		var treeObj = new JSDragDropTree();
+		treeObj.setTreeId(CURRENT_SITE_STRUCTURE_TREE_ID);
+		treeObj.initTree();
+		treeObj.checkIfOverTree(CURRENT_SITE_STRUCTURE_TREE_ID);
+		treeObj.getNodeOrders();
+		treeObj.expandAll();
+	} catch(e) {
+		reloadPage();
+	}
 	
 	if (isSiteMap()) {
 		resizeTreeContainerInThemes(RESERVED_HEIGHT_FOR_SITE);

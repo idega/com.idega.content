@@ -58,4 +58,6 @@ public class ContentConstants {
 	public static final String RENDERING_COMPONENT_OF_ARTICLE_LIST = "renderingComponentOfParentArticleList";
 
 	public static final String ARTICLE_NOT_AVAILABLE_BODY = "The article you have chosen is not available in the selected language";
+	
+	public static final String DELETED_PAGE_IN_LUCID_PROPERTIES_FOR_ARTICLE = "deletedPageInLucidPropertiesForArticle";
 }

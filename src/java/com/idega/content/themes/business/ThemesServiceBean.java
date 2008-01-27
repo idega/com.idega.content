@@ -12,9 +12,7 @@ import javax.ejb.FinderException;
 import org.apache.slide.event.ContentEvent;
 
 import com.idega.business.IBOServiceBean;
-import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
-import com.idega.content.business.ContentItemChecker;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
@@ -84,15 +82,15 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			return false;
 		}
 		
-		return deletePage(String.valueOf(pageId), false, true, false);
+		return deletePage(String.valueOf(pageId), false, true, false, false);
 	}
 	
-	public boolean deleteIBPage(String pageID, boolean deleteChildren) {
-		return deletePage(pageID, deleteChildren, false, true);
+	public boolean deleteIBPage(String pageID, boolean deleteChildren, boolean markPagesForDeletingArticles) {
+		return deletePage(pageID, deleteChildren, false, true, markPagesForDeletingArticles);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private boolean deletePage(String pageKey, boolean deleteChildren, boolean canUseDefaultUser, boolean clearCache) {
+	private boolean deletePage(String pageKey, boolean deleteChildren, boolean canUseDefaultUser, boolean clearCache, boolean markPagesForDeletingArticles) {
 		if (pageKey == null) {
 			return false;
 		}
@@ -127,7 +125,9 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			}
 		}
 		
-		deleteArticlesInPagesBeingDeleted(pageKey, deleteChildren);
+		if (markPagesForDeletingArticles) {
+			markPagesForDeletingArticles(pageKey, iwc);
+		}
 		boolean result = builder.deletePage(pageKey, deleteChildren, tree, userId, domain);
 		
 		if (domain != null) {
@@ -150,68 +150,38 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		return result;
 	}
 	
-	@SuppressWarnings("unchecked")
-	private boolean deleteArticlesInPagesBeingDeleted(String parentPageKey, boolean deleteChildren) {
-		boolean result = deleteArticlesInThisPage(parentPageKey);
+	private void markPagesForDeletingArticles(String pageKey, IWContext iwc) {
+		if (pageKey == null || iwc == null) {
+			return;
+		}
 		
-		if (deleteChildren) {
-			ICPage parentPage = getICPage(parentPageKey);
+		List<String> ids = new ArrayList<String>();
+		putAllIdsOfPageAndChildren(pageKey, ids);
+		
+		iwc.setSessionAttribute(ContentConstants.DELETED_PAGE_IN_LUCID_PROPERTIES_FOR_ARTICLE, ids);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void putAllIdsOfPageAndChildren(String pageKey, List<String> ids) {
+		ICPage page = getICPage(pageKey);
+		
+		if (page != null) {
+			String id = page.getId();
+			if (!ids.contains(id)) {
+				ids.add(id);
+			}
 			
-			if (parentPage != null) {
-				Collection children = parentPage.getChildren();
-				if (children != null) {
-					Object o = null;
-					for (Iterator it = children.iterator(); it.hasNext();) {
-						o = it.next();
-						if (o instanceof ICPage) {
-							result = deleteArticlesInPagesBeingDeleted(((ICPage) o).getId(), deleteChildren);
-						}
+			Collection children = page.getChildren();
+			if (children != null) {
+				Object o = null;
+				for (Iterator it = children.iterator(); it.hasNext();) {
+					o = it.next();
+					if (o instanceof ICPage) {
+						putAllIdsOfPageAndChildren(((ICPage) o).getId(), ids);
 					}
 				}
 			}
 		}
-	
-		return result;
-	}
-	
-	private boolean deleteArticlesInThisPage(String pageKey) {
-		if (pageKey == null) {
-			return false;
-		}
-		
-		BuilderService builder = getBuilderService();
-		if (builder == null) {
-			return false;
-		}
-		
-		Class<?> articleClass = CoreConstants.getArticleItemViewerClass();
-		if (articleClass == null) {
-			return false;
-		}
-		
-		List<String> ids = builder.getModuleId(pageKey, articleClass.getName());
-		if (ids == null) {
-			return true;
-		}
-		
-		List<String> paths = new ArrayList<String>();
-		String path = null;
-		for (int i = 0; i < ids.size(); i++) {
-			path = builder.getProperty(pageKey, ids.get(i), CoreConstants.ARTICLE_RESOURCE_PATH_PROPERTY_NAME);
-			if (path != null) {
-				paths.add(path);
-			}
-		}
-		
-		if (paths.size() == 0) {
-			return true;
-		}
-		
-		ContentItemChecker checker = SpringBeanLookup.getInstance().getSpringBean(getIWApplicationContext(), ContentItemChecker.class);
-		if (checker == null) {
-			return false;
-		}
-		return checker.deleteDummyArticles(paths);
 	}
 	
 	public boolean createIBPage(Theme theme) {
