@@ -795,7 +795,7 @@
 			if (tempFloatingContainer != null) {
 				tempFloatingContainer.setProperty('id', 'rootTemporary');
 			}
-			showLoadingMessage(CREATING_TEXT);			
+			showLoadingMessage(CREATING_TEXT);
 			ThemesEngine.createPage(nodes, isFirst, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
 		},
 		getNewRootId : function(id) {
@@ -1292,7 +1292,7 @@
 			treeStructure = new Array();
 			var nodes = JSTreeObj.getStructure('floatingContainer'+JSTreeObj.dragNode_source.id, newParentNodeId, numberInLevel);			
 			document.getElementById('floatingContainer'+JSTreeObj.dragNode_source.id).id = 'rootTemporary';				
-			showLoadingMessage(CREATING_TEXT);	
+			showLoadingMessage(CREATING_TEXT);
 			ThemesEngine.createPage(nodes, false, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
 		},
 		getStructure : function(rootId, parentId, numberInLevel){
@@ -1348,7 +1348,7 @@
 				(document.getElementById(newChilds[i].id)).setAttribute('id', id[i]);	
 				JSTreeObj.initNode(document.getElementById(id[i]));		
 				var newName = (document.getElementById(id[i]).getElementsByTagName('a')[0]).innerHTML;
-				if(movingNode){
+				if (movingNode) {
 					ThemesEngine.changePageUri(id[i], newName, false, changePageTitleCallback);
 				}
 			}
@@ -1408,11 +1408,10 @@
 				ulTag = parentNode.childNodes[0].childNodes[0];
 			}
 			else {
-				var parentNode = document.getElementById(parentNodeId);
-				var childrenOfParent = parentNode.childNodes;
-				var spanTag = childrenOfParent[childrenOfParent.length-1];
-				if (spanTag.tagName.toString() == 'SPAN'){
-					ulTag = spanTag.getElementsByTagName('ul')[0];				
+				var parentNode = $(parentNodeId);
+				var spanTag = $(parentNode.getElements('span')[0]);
+				if (spanTag.getTag() == 'span') {
+					ulTag = spanTag.getElements('ul')[0];			
 				}
 				else{
 					ulTag = spanTag;				
@@ -1423,13 +1422,13 @@
 				return 0;
 			}
 			
-			var childrenOfUlTag = ulTag.childNodes;
+			var childrenOfUlTag = $(ulTag).getChildren();
 			if (childrenOfUlTag == null) {
 				return 0;
 			}
 			
 			var number = 0;
-			if (ulTag.getElementsByTagName('li').length == 0){
+			if ($(ulTag).getElements('li').length == 0) {
 				return 1;
 			}
 			else {
@@ -1450,14 +1449,11 @@
 				var parentNode = document.getElementById(this.idOfTree);
 				ulTag = parentNode.childNodes[0].childNodes[0];
 			}
-			else{
-				var parentNode = document.getElementById(parentNodeId);
-				var childrenOfParent = parentNode.childNodes;
-				var spanTag = childrenOfParent[childrenOfParent.length-1];
-				if (spanTag.childNodes.length == 0)
-					return null;
-				if (spanTag.tagName.toString() == 'SPAN'){
-					ulTag = spanTag.getElementsByTagName('ul')[0];				
+			else {
+				var parentNode = $(parentNodeId);
+				var spanTag = $(parentNode.getElements('span')[0]);
+				if (spanTag.getTag() == 'span') {
+					ulTag = spanTag.getElements('ul')[0];			
 				}
 				else{
 					ulTag = spanTag;
@@ -1468,20 +1464,23 @@
 				return null;
 			}
 			
-			var childrenOfUlTag = ulTag.childNodes;
+			var childrenOfUlTag = $(ulTag).getChildren();
 			if (childrenOfUlTag == null) {
 				return null;
 			}
 			
 			var number = null;
 
-			if (ulTag.getElementsByTagName('li').length == 0){
+			if ($(ulTag).getElements('li').length == 0) {
 				return null;
 			}
 			else {
-				for (var i = placeInLevel-1; i < childrenOfUlTag.length; i++){
-					if(childrenOfUlTag[i].tagName == 'LI'){
-						result.push(childrenOfUlTag[i].id);
+				for (var i = placeInLevel-1; i < childrenOfUlTag.length; i++) {
+					var childOfUlTag = childrenOfUlTag[i];
+					if (childOfUlTag != null) {
+						if ($(childOfUlTag).getTag() == 'li') {
+							result.push(childOfUlTag.id);
+						}
 					}
 				}
 			}
@@ -1489,33 +1488,42 @@
 				
 		},
 		getNodesBetween : function(nodeId, parentNodeId, placeFrom, placeTo) {
-			var result = new Array(); //ids of nodes	
-
+			var ulTag = null;
+			var result = new Array();	//	Ids of nodes
+			
 			if (parentNodeId == null) {
 				var parentNode = document.getElementById(this.idOfTree);
-				var ulTag = parentNode.childNodes[0].childNodes[0];
+				ulTag = parentNode.childNodes[0].childNodes[0];
 			}
 			else {
-				var parentNode = document.getElementById(parentNodeId);
-				var childrenOfParent = parentNode.childNodes;
-				var spanTag = childrenOfParent[childrenOfParent.length-1];
-				if (spanTag.tagName.toString() == 'SPAN'){
-					var ulTag = spanTag.getElementsByTagName('ul')[0];				
+				var parentNode = $(parentNodeId);
+				var spanTag = $(parentNode.getElements('span')[0]);
+				if (spanTag.getTag() == 'span') {
+					ulTag = spanTag.getElements('ul')[0];			
 				}
-				else{
-					var ulTag = spanTag;				
+				else {
+					ulTag = spanTag;				
 				}
 			}
-			var childrenOfUlTag = ulTag.childNodes;
+			
+			if (ulTag == null) {
+				return null;
+			}
+			
+			var childrenOfUlTag = $(ulTag).getChildren();
 			var number = null;
 
-			if (ulTag.getElementsByTagName('li').length == 0){
+			if ($(ulTag).getElements('li').length == 0){
 				return null;
 			}
 			else {
-				for (var i = placeFrom-1; i < placeTo; i++){
-					if(childrenOfUlTag[i].tagName == 'LI')
-						result.push(childrenOfUlTag[i].id);
+				for (var i = placeFrom-1; i < placeTo; i++) {
+					var childOfUlTag = childrenOfUlTag[i];
+					if (childOfUlTag != null) {
+						if ($(childOfUlTag).getTag() == 'li') {
+							result.push(childOfUlTag.id);
+						}
+					}
 				}
 			}
 			
@@ -1658,7 +1666,7 @@
 			var changeNameId = editObj.id.replace(/[^0-9]/g, '');
 			
 			showLoadingMessage(CHANGING_THEME);
-			ThemesEngine.changePageName(changeNameId, newSitePageName, empty);
+			ThemesEngine.changePageName(changeNameId, newSitePageName, executeActionsAfterSiteTreeInLucidWasChanged);
 
 			changePageTitleInPageInfo(newSitePageName);
 			ThemesEngine.changePageUri(changeNameId, newSitePageName, true, changePageTitleCallback);
