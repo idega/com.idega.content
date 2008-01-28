@@ -1409,7 +1409,11 @@
 			}
 			else {
 				var parentNode = $(parentNodeId);
-				var spanTag = $(parentNode.getElements('span')[0]);
+				var childrenOfParent = parentNode.childNodes;
+				var spanTag = $(childrenOfParent[childrenOfParent.length - 1]);
+				if (spanTag == null) {
+					return 0;
+				}
 				if (spanTag.getTag() == 'span') {
 					ulTag = spanTag.getElements('ul')[0];			
 				}
@@ -1422,7 +1426,7 @@
 				return 0;
 			}
 			
-			var childrenOfUlTag = $(ulTag).getChildren();
+			var childrenOfUlTag = $(ulTag).childNodes;
 			if (childrenOfUlTag == null) {
 				return 0;
 			}
@@ -1432,8 +1436,8 @@
 				return 1;
 			}
 			else {
-				for (var i = 0; i < childrenOfUlTag.length; i++){
-					if (childrenOfUlTag[i].id == nodeId){
+				for (var i = 0; i < childrenOfUlTag.length; i++) {
+					if (childrenOfUlTag[i].id == nodeId) {
 						number = i + 1;
 						return number;
 					}
@@ -1451,7 +1455,14 @@
 			}
 			else {
 				var parentNode = $(parentNodeId);
-				var spanTag = $(parentNode.getElements('span')[0]);
+				var childrenOfParent = parentNode.childNodes;
+				var spanTag = $(childrenOfParent[childrenOfParent.length - 1]);
+				if (spanTag == null) {
+					return null;
+				}
+				if (spanTag.childNodes.length == 0) {
+					return null;
+				}
 				if (spanTag.getTag() == 'span') {
 					ulTag = spanTag.getElements('ul')[0];			
 				}
@@ -1464,7 +1475,7 @@
 				return null;
 			}
 			
-			var childrenOfUlTag = $(ulTag).getChildren();
+			var childrenOfUlTag = $(ulTag).childNodes;
 			if (childrenOfUlTag == null) {
 				return null;
 			}
@@ -1497,7 +1508,11 @@
 			}
 			else {
 				var parentNode = $(parentNodeId);
-				var spanTag = $(parentNode.getElements('span')[0]);
+				var childrenOfParent = parentNode.childNodes;
+				var spanTag = $(childrenOfParent[childrenOfParent.length - 1]);
+				if (spanTag == null) {
+					return null;
+				}
 				if (spanTag.getTag() == 'span') {
 					ulTag = spanTag.getElements('ul')[0];			
 				}
@@ -1510,7 +1525,7 @@
 				return null;
 			}
 			
-			var childrenOfUlTag = $(ulTag).getChildren();
+			var childrenOfUlTag = $(ulTag).childNodes;
 			var number = null;
 
 			if ($(ulTag).getElements('li').length == 0){
