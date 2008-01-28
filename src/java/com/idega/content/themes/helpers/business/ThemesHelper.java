@@ -398,12 +398,24 @@ public class ThemesHelper implements Singleton {
 			e.printStackTrace();
 			return null;
 		}
+		
+		String serverURL = null;
 		try {
-			fullWebRoot = root.getURI();
+			serverURL = root.getURI();
 		} catch (URIException e) {
 			e.printStackTrace();
 			return null;
 		}
+		
+		if (root.getPort() < 1000) {
+			if (serverURL.indexOf(CoreConstants.COLON) != -1) {
+				int start = serverURL.lastIndexOf(CoreConstants.COLON);
+				serverURL = serverURL.substring(0, start);
+				serverURL = new StringBuffer(serverURL).append(CoreConstants.WEBDAV_SERVLET_URI).toString();
+			}
+		}
+		fullWebRoot = serverURL;
+		
 		return fullWebRoot;
 	}
 	
@@ -1314,7 +1326,7 @@ public class ThemesHelper implements Singleton {
 		return ContentConstants.EMPTY.equals(value) ? true : false;
 	}
 	
-	private String getPageTemplate(String type, List<String> articlesPaths, String templateFile, int pageID) {
+	private String getTemplateForPage(String type, List<String> articlesPaths, String templateFile, int pageID) {
 		Document doc = getXMLDocument(new StringBuffer(getWebRootWithoutContent()).append(templateFile).toString(), false, true);
 		if (doc == null) {
 			log.warning(this.getClass().getName() + ": Template file ("+templateFile+") wasn'tfound!");
@@ -1339,7 +1351,7 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		
-		String docContent = getPageTemplate(type, articlesPaths, templateFile, pageID);
+		String docContent = getTemplateForPage(type, articlesPaths, templateFile, pageID);
 		if (docContent == null) {
 			return null;
 		}
