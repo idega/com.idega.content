@@ -1330,18 +1330,18 @@ div#mb_contents .mootabs_panel {
 
 div#mb_bottom {
 	border: 0;
-	overflow: visible;
+	overflow: visible !important;
 	width: 650px !important;
 }
 
 a#mb_close_link {
-	float: none;
-	margin: 0;
-	position: absolute;
-	top: -522px;
-	right: -12px;
-	width: 24px;
-	height: 24px;
-	background: url(images/close_24.png) no-repeat;
-	border: 0;
+	float: none !important;
+	margin: 0 !important;
+	position: absolute !important;
+	top: -522px !important;
+	right: -12px !important;
+	width: 24px !important;
+	height: 24px !important;
+	background: url(images/close_24.png) no-repeat !important;
+	border: 0 !important;
 }
