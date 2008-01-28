@@ -3,6 +3,7 @@ package com.idega.content.themes.helpers.business;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -407,13 +407,6 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		
-		if (root.getPort() < 1000) {
-			if (serverURL.indexOf(CoreConstants.COLON) != -1) {
-				int start = serverURL.lastIndexOf(CoreConstants.COLON);
-				serverURL = serverURL.substring(0, start);
-				serverURL = new StringBuffer(serverURL).append(CoreConstants.WEBDAV_SERVLET_URI).toString();
-			}
-		}
 		fullWebRoot = serverURL;
 		
 		return fullWebRoot;
@@ -750,20 +743,17 @@ public class ThemesHelper implements Singleton {
 	}
 
 	private InputStream getInputStream(String link, boolean printError) {
-		InputStream is = null;
-        try {
-        	URL url = getUrl(link);
-        	if (url == null) {
-        		return null;
-        	}
-            is = url.openStream();
-        } catch (Exception e) {
-        	if (printError) {
+		InputStream stream = null;
+		try {
+			URL url = new URL(link);
+			stream = new BufferedInputStream(url.openStream());
+		} catch(Exception e) {
+			if (printError) {
         		e.printStackTrace();
         		log.warning("Error getting: " + link);
         	}
-        }
-        return is;
+		}
+		return stream;
 	}
 	
 	protected InputStream getInputStream(String link) {
@@ -792,16 +782,6 @@ public class ThemesHelper implements Singleton {
 			return false;
 		}
 		return true;
-	}
-	
-	protected URL getUrl(String link) {
-		URL url = null;
-		try {
-			url = new URL(link);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		return url;
 	}
 	
 	public String encode(String value, boolean fullyEncode) {
