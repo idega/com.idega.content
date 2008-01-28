@@ -5,6 +5,9 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -73,6 +76,7 @@ import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
 import com.idega.repository.data.Singleton;
+import com.idega.servlet.filter.IWBundleResourceFilter;
 import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
@@ -742,17 +746,42 @@ public class ThemesHelper implements Singleton {
 		}
 	}
 
-	private InputStream getInputStream(String link, boolean printError) {
-		InputStream stream = null;
-		try {
-			URL url = new URL(link);
-			stream = new BufferedInputStream(url.openStream());
-		} catch(Exception e) {
-			if (printError) {
-        		e.printStackTrace();
-        		log.warning("Error getting: " + link);
-        	}
+	private InputStream getInputStream(String uri, boolean printError) {
+		if (uri == null) {
+			return null;
 		}
+		
+		InputStream stream = null;
+		if (uri.startsWith(IWBundleResourceFilter.BUNDLES_STANDARD_DIR)) {
+			File file = IWBundleResourceFilter.copyResourceFromJarToWebapp(IWMainApplication.getDefaultIWMainApplication(), uri);
+			if (file == null) {
+				if (printError) {
+					log.warning("Error getting file (file was not found): " + uri);
+				}
+				return null;
+			}
+			
+			try {
+				stream = new BufferedInputStream(new FileInputStream(file));
+			} catch (FileNotFoundException e) {
+				if (printError) {
+	        		e.printStackTrace();
+	        		log.warning("Error getting file: " + uri);
+	        	}
+			}
+		}
+		else {
+			try {
+				URL url = new URL(uri);
+				stream = new BufferedInputStream(url.openStream());
+			} catch(Exception e) {
+				if (printError) {
+	        		e.printStackTrace();
+	        		log.warning("Error getting URL: " + uri);
+	        	}
+			}
+		}
+		
 		return stream;
 	}
 	
@@ -1306,13 +1335,13 @@ public class ThemesHelper implements Singleton {
 		return ContentConstants.EMPTY.equals(value) ? true : false;
 	}
 	
-	private String getTemplateForPage(String type, List<String> articlesPaths, String templateFile, int pageID) {
-		Document doc = getXMLDocument(new StringBuffer(getWebRootWithoutContent()).append(templateFile).toString(), false, true);
+	private String getTemplateForPage(String type, List<String> articlesPaths, String templateFile, int pageId) {
+		Document doc = getXMLDocument(templateFile, false, true);
 		if (doc == null) {
 			log.warning(this.getClass().getName() + ": Template file ("+templateFile+") wasn'tfound!");
 			return null;
 		}
-		doc = preparePageDocument(doc, articlesPaths, pageID);
+		doc = preparePageDocument(doc, articlesPaths, pageId);
 		try {
 			return getThemeChanger().getXMLOutputter().outputString(doc);
 		} catch (Exception e) {
