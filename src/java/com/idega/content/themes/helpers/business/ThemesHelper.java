@@ -3,7 +3,6 @@ package com.idega.content.themes.helpers.business;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -762,7 +761,7 @@ public class ThemesHelper implements Singleton {
 			}
 			
 			try {
-				stream = new BufferedInputStream(new FileInputStream(file));
+				stream = new FileInputStream(file);
 			} catch (FileNotFoundException e) {
 				if (printError) {
 	        		e.printStackTrace();
@@ -773,7 +772,7 @@ public class ThemesHelper implements Singleton {
 		else {
 			try {
 				URL url = new URL(uri);
-				stream = new BufferedInputStream(url.openStream());
+				stream = url.openStream();
 			} catch(Exception e) {
 				if (printError) {
 	        		e.printStackTrace();
@@ -1336,6 +1335,9 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	private String getTemplateForPage(String type, List<String> articlesPaths, String templateFile, int pageId) {
+		if (!templateFile.startsWith(IWBundleResourceFilter.BUNDLES_STANDARD_DIR)) {
+			templateFile = new StringBuffer(getWebRootWithoutContent()).append(templateFile).toString();
+		}
 		Document doc = getXMLDocument(templateFile, false, true);
 		if (doc == null) {
 			log.warning(this.getClass().getName() + ": Template file ("+templateFile+") wasn'tfound!");
