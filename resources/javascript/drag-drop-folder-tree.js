@@ -1426,7 +1426,7 @@
 				return 0;
 			}
 			
-			var childrenOfUlTag = $(ulTag).childNodes;
+			var childrenOfUlTag = $(ulTag).getChildren();
 			if (childrenOfUlTag == null) {
 				return 0;
 			}
@@ -1475,7 +1475,7 @@
 				return null;
 			}
 			
-			var childrenOfUlTag = $(ulTag).childNodes;
+			var childrenOfUlTag = $(ulTag).getChildren();
 			if (childrenOfUlTag == null) {
 				return null;
 			}
@@ -1525,7 +1525,7 @@
 				return null;
 			}
 			
-			var childrenOfUlTag = $(ulTag).childNodes;
+			var childrenOfUlTag = $(ulTag).getChildren();
 			var number = null;
 
 			if ($(ulTag).getElements('li').length == 0){
