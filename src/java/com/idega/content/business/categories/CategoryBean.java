@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.5 2007/12/21 19:55:57 valdas Exp $
+ * $Id: CategoryBean.java,v 1.6 2008/01/28 06:20:54 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -58,10 +58,10 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2007/12/21 19:55:57 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/01/28 06:20:54 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class CategoryBean {
 	private static final Log log = LogFactory.getLog(CategoryBean.class);
@@ -370,17 +370,19 @@ public class CategoryBean {
 	private Map<String, ContentCategory> loadCategories() {
 		Map<String, ContentCategory> map = new TreeMap<String, ContentCategory>();
 		
+		InputStream stream = null;
+		WebdavRootResource rootResource = null;
 		try {
 			String resourcePath = getSlideService().getURI(CATEGORY_PROPERTIES_FILE);
-			WebdavRootResource rootResource = getSlideSession().getWebdavRootResource();
-			InputStream in = rootResource.getMethodData(resourcePath);
+			rootResource = getSlideSession().getWebdavRootResource();
 
 			if (rootResource.getStatusCode() != WebdavStatus.SC_OK) {
 				throw new FileNotFoundException("File not found " + CATEGORY_PROPERTIES_FILE);
 			}
 			
+			stream = rootResource.getMethodData(resourcePath);
 			SAXBuilder builder = new SAXBuilder();
-			Document document = builder.build(in);
+			Document document = builder.build(stream);
 			Element root = document.getRootElement();
 			Iterator<Element> cats = root.getDescendants(new Filter() {
 				public boolean matches(Object obj) {
@@ -402,15 +404,19 @@ public class CategoryBean {
 				}
 				map.put(key, category);
 			}
-			
-			in.close();
-			rootResource.close();
 		} catch (IOException e) {
 			log.warn("Error loading categories: " + e.getMessage());
 			return null;
 		}
 		catch (JDOMException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				stream.close();
+				rootResource.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		return map;

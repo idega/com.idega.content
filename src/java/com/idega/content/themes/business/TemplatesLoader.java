@@ -73,8 +73,8 @@ public class TemplatesLoader implements JarLoader {
 		JarEntry pageTemplatesEntry = jarFile.getJarEntry("resources/templates/"+PAGE_TEMPLATES_XML_FILE_NAME);
 		JarEntry siteTemplatesEntry = jarFile.getJarEntry("resources/templates/"+SITE_TEMPLATES_XML_FILE_NAME);
 		
+		InputStream stream = null;
 		if (pageTemplatesEntry != null) {
-			InputStream stream = null;
 			try {
 				stream = jarFile.getInputStream(pageTemplatesEntry);
 				Document pageDocument = themesHelper.getXMLDocument(stream);
@@ -88,7 +88,6 @@ public class TemplatesLoader implements JarLoader {
 		}
 		
 		if (siteTemplatesEntry != null) {
-			InputStream stream = null;
 			try {
 				stream = jarFile.getInputStream(siteTemplatesEntry);
 				Document pageDocument = themesHelper.getXMLDocument(stream);

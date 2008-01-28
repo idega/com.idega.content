@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -559,15 +558,15 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public Document getXMLDocument(String url) {
-		return getXMLDocument(url, false);
+		return getXMLDocument(url, false, false);
 	}
 	
-	public Document getXMLDocument(String url, boolean cleanWithHtmlCleaner) {
+	private Document getXMLDocument(String url, boolean cleanWithHtmlCleaner, boolean useLog) {
 		if (url == null) {
 			return null;
 		}
 		
-		InputStream stream = getInputStream(url);
+		InputStream stream = getInputStream(url, useLog);
 		
 		if (stream != null && cleanWithHtmlCleaner) {
 			HtmlCleaner cleaner = new HtmlCleaner(stream);
@@ -585,7 +584,11 @@ public class ThemesHelper implements Singleton {
 			if (content == null) {
 				return null;
 			}
-			stream = new ByteArrayInputStream(content.getBytes());
+			try {
+				stream = StringHandler.getStreamFromString(content);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		try {
@@ -599,46 +602,51 @@ public class ThemesHelper implements Singleton {
 		return null;
 	}
 	
+	public Document getXMLDocument(String url, boolean cleanWithHtmlCleaner) {
+		return getXMLDocument(url, cleanWithHtmlCleaner, false);
+	}
 	
-	public Document getXMLDocument(InputStream stream) {
+	
+	public Document getXMLDocument(InputStream stream) throws Exception {
 		if (stream == null) {
 			log.warning(this.getClass().getName() + ": Stream is null");
 			return null;
 		}
 
-		Reader r = null;
+		Reader reader = null;
 		try {
-			r = new InputStreamReader(stream, CoreConstants.ENCODING_UTF8);
-		} catch (UnsupportedEncodingException e) {
+			reader = new InputStreamReader(stream, CoreConstants.ENCODING_UTF8);
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 		
 		Document document = null;
-		
-		SAXBuilder builder = new SAXBuilder(false);
-		EntityResolver resolver = null;
-		//Creating our EntityResolver to avoid IOException trying to load DTD file, defined in every Theme.plist file:
-		//<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-		resolver = new ThemesEntityResolver();
-		builder.setEntityResolver(resolver);
 		try {
-			document = builder.build(r);
-		} catch (JDOMException e) {
-			log.warning(this.getClass().getName() + ": JDOM exception");
+			SAXBuilder builder = new SAXBuilder(false);
+			EntityResolver resolver = null;
+			//Creating our EntityResolver to avoid IOException trying to load DTD file, defined in every Theme.plist file:
+			//<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+			resolver = new ThemesEntityResolver();
+			builder.setEntityResolver(resolver);
+			try {
+				document = builder.build(reader);
+			} catch (JDOMException e) {
+				log.warning(this.getClass().getName() + ": JDOM exception");
+				e.printStackTrace();
+				return null;
+			} catch (IOException e) {
+				log.warning(this.getClass().getName() + ": IOException trying to build a JDOM Document");
+				e.printStackTrace();
+				return null;
+			}
+		} catch(Exception e) {
 			e.printStackTrace();
-			return null;
-		} catch (IOException e) {
-			log.warning(this.getClass().getName() + ": IOException trying to build a JDOM Document");
-			e.printStackTrace();
-			return null;
+		} finally {
+			closeInputStream(stream);
+			reader.close();
 		}
-		
-		try {
-			r.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			
 		return document;
 	}
 	
@@ -682,8 +690,14 @@ public class ThemesHelper implements Singleton {
 		if (loadedThemeSettings) {
 			return;
 		}
-		loadSettings(themeSettings, getXMLDocument(stream));
-		loadedThemeSettings = true;
+		
+		try {
+			loadSettings(themeSettings, getXMLDocument(stream));
+			loadedThemeSettings = true;
+		} catch(Exception e) {
+			e.printStackTrace();
+			loadedThemeSettings = false;
+		}
 	}
 	
 	public void loadPageSettings(String url) {
@@ -732,9 +746,9 @@ public class ThemesHelper implements Singleton {
         	}
             is = url.openStream();
         } catch (Exception e) {
-        	log.warning(this.getClass().getName() + ": Error getting: " + link);
         	if (printError) {
         		e.printStackTrace();
+        		log.warning("Error getting: " + link);
         	}
         }
         return is;
@@ -1300,8 +1314,8 @@ public class ThemesHelper implements Singleton {
 		return ContentConstants.EMPTY.equals(value) ? true : false;
 	}
 	
-	private String getPageDocument(String type, List<String> articlesPaths, String templateFile, int pageID) {
-		Document doc = getXMLDocument(new StringBuffer(getWebRootWithoutContent()).append(templateFile).toString());
+	private String getPageTemplate(String type, List<String> articlesPaths, String templateFile, int pageID) {
+		Document doc = getXMLDocument(new StringBuffer(getWebRootWithoutContent()).append(templateFile).toString(), false, true);
 		if (doc == null) {
 			log.warning(this.getClass().getName() + ": Template file ("+templateFile+") wasn'tfound!");
 			return null;
@@ -1325,7 +1339,7 @@ public class ThemesHelper implements Singleton {
 			return null;
 		}
 		
-		String docContent = getPageDocument(type, articlesPaths, templateFile, pageID);
+		String docContent = getPageTemplate(type, articlesPaths, templateFile, pageID);
 		if (docContent == null) {
 			return null;
 		}

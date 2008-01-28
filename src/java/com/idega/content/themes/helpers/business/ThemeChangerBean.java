@@ -303,8 +303,14 @@ public class ThemeChangerBean implements ThemeChanger {
 				return false;
 			}
 			
-			String content = StringHandler.getContentFromInputStream(stream);
-			helper.closeInputStream(stream);
+			String content = null;
+			try {
+				content = StringHandler.getContentFromInputStream(stream);
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				helper.closeInputStream(stream);
+			}
 			if (content == null) {
 				return false;
 			}
@@ -2312,8 +2318,14 @@ public class ThemeChangerBean implements ThemeChanger {
 		if (is == null) {
 			return false;
 		}
-		Document themeDoc = helper.getXMLDocument(is);
-		helper.closeInputStream(is);
+		Document themeDoc = null; 
+		try {
+			themeDoc = helper.getXMLDocument(is);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			helper.closeInputStream(is);
+		}
 		if (themeDoc == null) {
 			return false;
 		}

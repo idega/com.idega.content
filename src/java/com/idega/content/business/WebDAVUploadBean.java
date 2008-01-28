@@ -133,19 +133,20 @@ public class WebDAVUploadBean implements Serializable{
 				}
 			}
 		}
-		
-//		boolean createFolderSuccess = rootResource.mkcolMethod(filePath);
-//		System.out.println("Creating folder success "+createFolderSuccess);
 
 		boolean uploadFileSuccess = false;
+		InputStream stream = null;
 		try {
-			uploadFileSuccess = rootResource.putMethod(filePath+fileName, this.uploadFile.getInputStream());
+			stream = this.uploadFile.getInputStream();
+			uploadFileSuccess = rootResource.putMethod(filePath+fileName, stream);
 		}
 		catch (HttpException e) {
 			e.printStackTrace();
 		}
 		catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			closeInputStream(stream);
 		}
 		
 		log.info("Uploading file success: " + uploadFileSuccess);
@@ -313,7 +314,7 @@ public class WebDAVUploadBean implements Serializable{
 	
 	public boolean uploadZipFile(boolean uploadingTheme, String fileName, InputStream stream, IWSlideService slide) throws IOException {
 		String resultInfo = null;
-		boolean result;
+		boolean result = false;
 		
 		if (uploadingTheme) {
 			String uploadFileName = fileName;
@@ -332,13 +333,22 @@ public class WebDAVUploadBean implements Serializable{
 			filesToClean = ThemesConstants.THEME_SKELETONS_FILTER;
 		}
 		
-		if (slide.uploadZipFileContents(new ZipInputStream(stream), path, filesToClean)) {
-			resultInfo = "Success uploading zip file's contents";
-			result = true;
-		}
-		else {
-			resultInfo = "Unable to upload zip file's contents";
-			result = false;
+		ZipInputStream zipStream = null;
+		try {
+			zipStream = new ZipInputStream(stream);
+			if (slide.uploadZipFileContents(zipStream, path, filesToClean)) {
+				resultInfo = "Success uploading zip file's contents";
+				result = true;
+			}
+			else {
+				resultInfo = "Unable to upload zip file's contents";
+				result = false;
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeInputStream(stream);
+			closeInputStream(zipStream);
 		}
 		
 		if (uploadingTheme) {
@@ -347,6 +357,21 @@ public class WebDAVUploadBean implements Serializable{
 		
 		log.info(resultInfo);
 		return result;
+	}
+	
+	private boolean closeInputStream(InputStream stream) {
+		if (stream == null) {
+			return false;
+		}
+		
+		try {
+			stream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
 	}
 	
 	private String getUploadFileName() {
