@@ -3,11 +3,11 @@
   <parent>
     <artifactId>com.idega.block.platform</artifactId>
     <groupId>com.idega.block.platform</groupId>
-    <version>4.0.0</version>
+    <version>4.0.1-SNAPSHOT</version>
   </parent>
   <groupId>com.idega.block.platform</groupId>
   <artifactId>com.idega.content</artifactId>
-  <version>4.0.0</version>
+  <version>4.0.1-SNAPSHOT</version>
   <name>idegaWeb Content</name>
   <description>idegaWeb is the new ContentManagement System and Framework</description>
   <inceptionYear>2004</inceptionYear>
@@ -16,9 +16,8 @@
     <connection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</connection>
     <developerConnection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</developerConnection> 
     -->
-    <connection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</connection>
-    <developerConnection>scm:cvs:ext:${user.name}@code.idega.com:/idega/cvs:${groupId}/${artifactId}/</developerConnection>
-    <tag>com_idega_block_platform_super-4_0_0</tag>
+    <connection>scm:cvs:ext:civilis@code.idega.com:/idega/cvs:com.idega.block.platform/com.idega.content/</connection>
+    <developerConnection>scm:cvs:ext:civilis@code.idega.com:/idega/cvs:com.idega.block.platform/com.idega.content/</developerConnection>
   </scm>
 
   <developers>
