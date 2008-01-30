@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbarButtonRenderer.java,v 1.4 2008/01/23 12:11:59 valdas Exp $
+ * $Id: ContentItemToolbarButtonRenderer.java,v 1.5 2008/01/30 13:48:25 valdas Exp $
  * Created on 9.3.2005
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -32,10 +32,10 @@ import com.idega.content.presentation.ContentItemToolbarButton;
  * <p>
  * Renderer for the ContentItemToolbarButton
  * </p>
- * Last modified: $Date: 2008/01/23 12:11:59 $ by $Author: valdas $
+ * Last modified: $Date: 2008/01/30 13:48:25 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ContentItemToolbarButtonRenderer extends HtmlLinkRendererBase {
 
@@ -113,7 +113,8 @@ public class ContentItemToolbarButtonRenderer extends HtmlLinkRendererBase {
         boolean isPopUp = true;
         if (output instanceof ContentItemToolbarButton) {
         	String action = ((ContentItemToolbarButton) output).getAction();
-        	isPopUp = !(ContentConstants.CONTENT_ITEM_ACTION_EDIT.equals(action) || ContentConstants.CONTENT_ITEM_ACTION_CREATE.equals(action));
+        	isPopUp = !(ContentConstants.CONTENT_ITEM_ACTION_EDIT.equals(action) || ContentConstants.CONTENT_ITEM_ACTION_CREATE.equals(action) ||
+        			ContentConstants.CONTENT_ITEM_ACTION_DELETE.equals(action));
         }
         writeUriAttribute(facesContext, output, writer, href, isPopUp);
         HtmlRendererUtils.renderHTMLAttributes(writer, output, HTML.ANCHOR_PASSTHROUGH_ATTRIBUTES);
