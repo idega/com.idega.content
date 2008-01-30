@@ -1946,5 +1946,22 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		return checker.deleteDummyArticles(paths);
 	}
+	
+	public boolean deleteArticle(String resourcePath) {
+		if (resourcePath == null) {
+			return false;
+		}
+		
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return false;
+		}
+		
+		ContentItemChecker checker = SpringBeanLookup.getInstance().getSpringBean(getIWApplicationContext(), ContentItemChecker.class);
+		if (checker == null) {
+			return false;
+		}
+		return checker.deleteContentItem(resourcePath, iwc.getCurrentLocale());
+	}
 
 }
