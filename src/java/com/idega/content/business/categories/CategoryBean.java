@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.6 2008/01/28 06:20:54 valdas Exp $
+ * $Id: CategoryBean.java,v 1.7 2008/01/30 15:32:46 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -58,10 +58,10 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2008/01/28 06:20:54 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/01/30 15:32:46 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class CategoryBean {
 	private static final Log log = LogFactory.getLog(CategoryBean.class);
@@ -412,8 +412,12 @@ public class CategoryBean {
 			e.printStackTrace();
 		} finally {
 			try {
-				stream.close();
-				rootResource.close();
+				if (stream != null) { 
+					stream.close();
+				}
+				if (rootResource != null) {
+					rootResource.close();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
