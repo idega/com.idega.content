@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVDocumentDeleter.java,v 1.9 2007/08/08 08:29:42 valdas Exp $
+ * $Id: WebDAVDocumentDeleter.java,v 1.10 2008/02/04 12:13:13 valdas Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.faces.component.UICommand;
+import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlCommandLink;
 import javax.faces.component.html.HtmlForm;
@@ -35,10 +36,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2007/08/08 08:29:42 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/02/04 12:13:13 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class WebDAVDocumentDeleter extends ContentBlock implements ActionListener {
 
@@ -49,13 +50,13 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	private boolean embedInForm = false;
 	private String redirectOnSuccessURI = null;
 	private boolean useLinkAsSubmit = false;
-	private List WFContainerLines = null;
+	private List<UIComponent> WFContainerLines = null;
 	private HtmlForm form = null;
 	
 	protected void initializeComponent(FacesContext context) {
 		String pathToUse = IWContext.getIWContext(context).getParameter(PARAMETER_PATH);
 		Boolean deleted = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getDeleted");
-		WFContainerLines = new ArrayList();
+		WFContainerLines = new ArrayList<UIComponent>();
 		if (deleted == null) {
 			String clickedPath = null;
 			if (pathToUse != null) {
@@ -86,7 +87,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 				e.printStackTrace();
 			}
 	
-			addLineToContainer(new Object[]{WFUtil.getText(path)}, "wf_text", "resource_path");
+			addLineToContainer(new UIComponent[]{WFUtil.getText(path)}, "wf_text", "resource_path");
 			
 //			if (showResourceName) {
 //				HtmlOutputText resName = new HtmlOutputText();
@@ -97,9 +98,9 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 //			}
 			
 			if (resource.isCollection()) {
-				addLineToContainer(new Object[]{getText("are_you_sure_you_want_to_delete_folder")}, "verify", "verify_question");
+				addLineToContainer(new UIComponent[]{getText("are_you_sure_you_want_to_delete_folder")}, "verify", "verify_question");
 			} else {
-				addLineToContainer(new Object[]{getText("are_you_sure_you_want_to_delete_file")}, "verify", "verify_question");
+				addLineToContainer(new UIComponent[]{getText("are_you_sure_you_want_to_delete_file")}, "verify", "verify_question");
 			}
 			
 			UICommand button = null;
@@ -116,18 +117,18 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 			button.getAttributes().put(PARAMETER_PATH, resource.getPath());
 			button.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 
-			addLineToContainer(new Object[]{button}, "submit", "submit");
+			addLineToContainer(new UIComponent[]{button}, "submit", "submit");
 			
 		} else {
 			Boolean wasFolder = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getWasFolder");
 			if (deleted.booleanValue()) {
 				if (wasFolder.booleanValue()) {
-					addLineToContainer(new Object[]{getText("folder_deleted")}, "delete_result", "delete_result");
+					addLineToContainer(new UIComponent[]{getText("folder_deleted")}, "delete_result", "delete_result");
 				} else {
-					addLineToContainer(new Object[]{getText("file_deleted")}, "delete_result", "delete_result");
+					addLineToContainer(new UIComponent[]{getText("file_deleted")}, "delete_result", "delete_result");
 				}
 			} else {
-				addLineToContainer(new Object[]{getText("deletion_failed")}, "delete_result", "delete_result");
+				addLineToContainer(new UIComponent[]{getText("deletion_failed")}, "delete_result", "delete_result");
 			}
 			try {
 				ContentViewer viewer = (ContentViewer) getParent().getParent();
@@ -155,7 +156,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 		return form;
 	}
 
-	private void addLineToContainer(Object[] lineElements, String styleClass, String ID) {
+	private void addLineToContainer(UIComponent[] lineElements, String styleClass, String ID) {
 		if (lineElements == null) {
 			return;
 		}
@@ -163,7 +164,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 		line.setStyleClass(styleClass);
 		line.setId(ID);
 		for (int i = 0; i < lineElements.length; i++) {
-			line.getChildren().add(lineElements[i]);
+			line.add(lineElements[i]);
 		}
 		WFContainerLines.add(line);
 	}
@@ -179,7 +180,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 			}
 		} else {
 			for (int i = 0; i < WFContainerLines.size(); i++) {
-				getChildren().add(WFContainerLines.get(i));
+				add(WFContainerLines.get(i));
 			}
 		}
 	}

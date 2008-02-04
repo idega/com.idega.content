@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVUpload.java,v 1.12 2007/11/05 16:23:27 valdas Exp $
+ * $Id: WebDAVUpload.java,v 1.13 2008/02/04 12:13:13 valdas Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -14,8 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.faces.component.UICommand;
-import javax.faces.component.html.HtmlCommandLink;
+import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
+import javax.faces.component.html.HtmlCommandLink;
 import javax.faces.component.html.HtmlForm;
 import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.component.html.HtmlInputText;
@@ -35,10 +36,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- *  Last modified: $Date: 2007/11/05 16:23:27 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/02/04 12:13:13 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class WebDAVUpload extends ContentBlock {
 
@@ -98,7 +99,7 @@ public class WebDAVUpload extends ContentBlock {
 	
 	private String onClickAction;
 	
-	private List <WFContainer> WFContainerLines = null;
+	private List<WFContainer> WFContainerLines = null;
 
 	private String uploadPath;
 	
@@ -116,7 +117,7 @@ public class WebDAVUpload extends ContentBlock {
 		
 		
 		WebDAVUploadBean bean = (WebDAVUploadBean) WFUtil.getBeanInstance(BEAN_ID);
-		WFContainerLines = new ArrayList <WFContainer> ();
+		WFContainerLines = new ArrayList<WFContainer>();
 
 		if ( showStatusAfterUploadAttempt && bean.wasUploadAttemped()) {
 			String message = bean.getUploadMessage();
@@ -133,7 +134,7 @@ public class WebDAVUpload extends ContentBlock {
 			status.setId(getId()+"_status");
 			status.setTitle(message);
 
-			addLineToContainer(new Object[] {status}, getStyleClassWFContainerLine()+ " "+sStatus, "status");
+			addLineToContainer(new UIComponent[] {status}, getStyleClassWFContainerLine()+ " "+sStatus, "status");
 			bean.setWasUploadAttempted(null);
 		}
 				
@@ -236,29 +237,29 @@ public class WebDAVUpload extends ContentBlock {
 		
 		
 		
-		addLineToContainer(new Object[] {selectFile, fileUpload}, getStyleClassWFContainerLine(), "upload_file");
+		addLineToContainer(new UIComponent[] {selectFile, fileUpload}, getStyleClassWFContainerLine(), "upload_file");
 		
 		if (useFileName) {
-			addLineToContainer(new Object[] {giveName, fileName}, getStyleClassWFContainerLine()+" filename", "file_name");
+			addLineToContainer(new UIComponent[] {giveName, fileName}, getStyleClassWFContainerLine()+" filename", "file_name");
 		}
 		
 		if (useVersionComment) {
-			addLineToContainer(new Object[] {versionText, comment}, getStyleClassWFContainerLine()+" comment", "upload_comment");
+			addLineToContainer(new UIComponent[] {versionText, comment}, getStyleClassWFContainerLine()+" comment", "upload_comment");
 		}
 		
 		if (useUploadPath) {
-			addLineToContainer(new Object[] {folder, uploadPath}, getStyleClassWFContainerLine()+" uploadpath", "upload_path");
+			addLineToContainer(new UIComponent[] {folder, uploadPath}, getStyleClassWFContainerLine()+" uploadpath", "upload_path");
 		}
 		
 		if (useFileLink && useImagePreview) {
-			addLineToContainer(new Object[] {fileLink, imagePreview}, getStyleClassWFContainerLine()+ "filelink_imgprev", "file_link_image_preview");
+			addLineToContainer(new UIComponent[] {fileLink, imagePreview}, getStyleClassWFContainerLine()+ "filelink_imgprev", "file_link_image_preview");
 		}
 		else {
 			if (useFileLink) {
-				addLineToContainer(new Object[] {fileLink}, getStyleClassWFContainerLine()+" filelink", "file_link");
+				addLineToContainer(new UIComponent[] {fileLink}, getStyleClassWFContainerLine()+" filelink", "file_link");
 			}
 			if (useImagePreview) {
-				addLineToContainer(new Object[] {imagePreview}, getStyleClassWFContainerLine()+" imgprev", "image_preview");
+				addLineToContainer(new UIComponent[] {imagePreview}, getStyleClassWFContainerLine()+" imgprev", "image_preview");
 			}
 		}
 		
@@ -300,7 +301,7 @@ public class WebDAVUpload extends ContentBlock {
 		return uploadPath;
 	}
 	
-	private void addLineToContainer(Object[] lineElements, String styleClass, String ID) {
+	private void addLineToContainer(UIComponent[] lineElements, String styleClass, String ID) {
 		if (lineElements == null) {
 			return;
 		}
@@ -308,17 +309,17 @@ public class WebDAVUpload extends ContentBlock {
 		line.setStyleClass(styleClass);
 		line.setId(ID);
 		for (int i = 0; i < lineElements.length; i++) {
-			line.getChildren().add(lineElements[i]);
+			line.add(lineElements[i]);
 		}
 		WFContainerLines.add(line);
 	}
 	
-	private void addElementToLastLine(Object element) {
+	private void addElementToLastLine(UIComponent element) {
 		if (WFContainerLines == null) {
 			return;
 		}
 		WFContainer line = WFContainerLines.get(WFContainerLines.size() - 1);
-		line.getChildren().add(element);
+		line.add(element);
 	}
 	
 	private void addLines() {
@@ -330,9 +331,9 @@ public class WebDAVUpload extends ContentBlock {
 				getForm().getChildren().add(WFContainerLines.get(i));
 			}
 		} else {
-		for (int i = 0; i < WFContainerLines.size(); i++) {
-			getChildren().add(WFContainerLines.get(i));
-		}
+			for (int i = 0; i < WFContainerLines.size(); i++) {
+				add(WFContainerLines.get(i));
+			}
 		}
 	}
 
