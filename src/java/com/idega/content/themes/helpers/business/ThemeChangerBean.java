@@ -92,8 +92,13 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final String TAG_ATTRIBUTE_VALUE_CSS = CoreConstants.CONTENT_TYPE_TEXT_CSS;
 	private static final String TAG_ATTRIBUTE_VALUE_SCREEN = "screen";
 	
+	//	HTML codes
 	private static final String NO_BREAK_STRING = "&nbsp;";
 	private static final String COPY_AND_SPACE = "&copy;" + NO_BREAK_STRING;
+	private static final String LESS_CODE = "&lt;";
+	private static final String LESS_CODE_REPLACEMENT = "\n<";
+	private static final String MORE_CODE = "&gt;";
+	private static final String MORE_CODE_REPLACEMENT = ">\n";
 	
 	private static final String ELEMENT_SCRIPT_NAME = "script";
 	private static final String ELEMENT_LINK_NAME = "link";
@@ -884,6 +889,9 @@ public class ThemeChangerBean implements ThemeChanger {
 			docContent = StringHandler.replace(docContent, ThemesConstants.USELESS_PATHTO_ELEMENT,
 					new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(linkToBase).toString());
 			docContent = getFixedDocumentContent(docContent);
+			
+			docContent = StringHandler.replace(docContent, LESS_CODE, LESS_CODE_REPLACEMENT);
+			docContent = StringHandler.replace(docContent, MORE_CODE, MORE_CODE_REPLACEMENT);
 		}
 		
 		theme.setLocked(true);
