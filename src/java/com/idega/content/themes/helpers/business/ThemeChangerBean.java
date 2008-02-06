@@ -120,13 +120,52 @@ public class ThemeChangerBean implements ThemeChanger {
 	private ThemesHelper helper = ThemesHelper.getInstance();
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
 	private XMLOutputter out = null;
-	private Interpreter mathInterpreter = null; 
+	private Interpreter mathInterpreter = null;
+	
+	private String[] _themeHeadVariables = new String[] {"%header%", "%style_variations%", "%user_styles%", "%user_javascript%",
+														"%plugin_header%", "%user_header%"};
+	private List<String> themeHeadVariables = Collections.unmodifiableList(Arrays.asList(_themeHeadVariables));
+	
+	private String[] _regularExpressionsForNeedlessStuff = new String[] {" xmlns.+\"", "..<?doc.+?>"};
+	private List<String> regularExpressionsForNeedlessStuff = Collections.unmodifiableList(Arrays.asList(_regularExpressionsForNeedlessStuff));
 	
 	public ThemeChangerBean() {
 		out = new XMLOutputter();
 		out.setFormat(Format.getPrettyFormat());
 		
 		mathInterpreter = new bsh.Interpreter();
+	}
+	
+	private boolean prepareHeadContent(Theme theme, String skeleton) {
+		if (theme == null || skeleton == null) {
+			return false;
+		}
+		
+		String content = null;
+		try {
+			content = StringHandler.getContentFromInputStream(helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(skeleton).toString()));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		if (content == null) {
+			return false;
+		}
+		
+		String variable = null;
+		String value = null;
+		for (int i = 0; i < themeHeadVariables.size(); i++) {
+			variable = themeHeadVariables.get(i);
+			value = getThemeValueByVariable(variable);
+			
+			content = StringHandler.replace(content, variable, value);
+		}
+		
+		return uploadTheme(content, theme, false);
+	}
+	
+	private String getThemeValueByVariable(String variable) {
+		return CoreConstants.EMPTY;	//	TODO: make logic to get values for theme's variables
 	}
 	
 	/**
@@ -146,6 +185,10 @@ public class ThemeChangerBean implements ThemeChanger {
 		String skeleton = theme.getLinkToSkeleton();
 		if (skeleton.indexOf(CoreConstants.SPACE) != -1) {
 			skeleton = helper.urlEncode(skeleton);
+		}
+		
+		if (!prepareHeadContent(theme, skeleton)) {
+			return false;
 		}
 		
 		Document doc = helper.getXMLDocument(new StringBuffer(helper.getFullWebRoot()).append(skeleton).toString(), true);
@@ -176,8 +219,86 @@ public class ThemeChangerBean implements ThemeChanger {
 		return uploadTheme(doc, theme);
 	}
 	
+	/**
+	 * RapidWeaver theme consists in-proper data for valid XHTML document, so needs to be fixed
+	 * @param head
+	 * @return boolean
+	 */
+	@SuppressWarnings("unchecked")
+	private boolean proceedHeadContent(String linkToBase, Element head) {
+		if (linkToBase == null || head == null) {
+			return false;
+		}
+		List headElements = head.getContent();
+		
+		if (headElements == null) {
+			return false;
+		}
+		
+		Object o = null;
+		List<Text> textElements = new ArrayList<Text>();
+		List<Element> elementsNeedsRegions = new ArrayList<Element>();
+		Element e = null;
+		for (int i = 0; i < headElements.size(); i++) {
+			o = headElements.get(i);
+			if (o instanceof Element) {
+				e = (Element) o;
+				fixDocumentElement(e, linkToBase);
+			}
+			else {
+				if (o instanceof Text) {
+					textElements.add((Text) o);
+				}
+			}
+		}
+		
+		for (Iterator<Element> ite = elementsNeedsRegions.iterator(); ite.hasNext(); ) {
+			e = ite.next();
+			e.addContent(getCommentsCollection(fixValue(e.getTextNormalize(), linkToBase)));
+		}
+
+		Text t = null;
+		for (Iterator <Text> itt = textElements.iterator(); itt.hasNext(); ) {
+			t = itt.next();
+			if (needAddRegion(ThemesConstants.REGIONS, t.getTextNormalize())) {
+				head.addContent(getCommentsCollection(fixValue(t.getTextNormalize(), linkToBase)));
+			}
+			t.detach();
+		}
+	
+		//	Adding fake (comment) element to <script> - to get <script ...></script> in HTML code
+		//	Checking <link> tags in head
+		List elements = head.getContent();
+		o = null;
+		Element element = null;
+		if (elements != null) {
+			for (int i = 0; i < elements.size(); i++) {
+				o = elements.get(i);
+				if (o instanceof Element) {
+					element = (Element) o;
+					if (ELEMENT_SCRIPT_NAME.equals(element.getName().toLowerCase())) {
+						//	<script>
+						element.addContent(getComment(IDEGA_COMMENT));
+					}
+					
+					if (ELEMENT_LINK_NAME.equals(element.getName().toLowerCase())) {
+						//	<link>
+						checkElementAttributes(element, validLinkTagAttributes);
+					}
+				}
+			}
+
+		}
+		
+		return true;
+	}
+	
+	private boolean uploadTheme(String content, Theme theme, boolean addRegions) {
+		return uploadDocument(content, theme.getLinkToBaseAsItIs(), helper.getFileNameWithExtension(theme.getLinkToSkeleton()), theme,	true, addRegions);
+	}
+	
 	private boolean uploadTheme(Document doc, Theme theme) {
-		return uploadDocument(doc, theme.getLinkToBaseAsItIs(), helper.getFileNameWithExtension(theme.getLinkToSkeleton()), theme,	true);
+		return uploadTheme(out.outputString(doc), theme, true);
 	}
 	
 	private boolean addDefaultEnabledStyles(Theme theme, Element head, String basePath, Document doc, List<ThemeStyleGroupMember> members) {
@@ -871,32 +992,29 @@ public class ThemeChangerBean implements ThemeChanger {
 		return index;
 	}
 	
-	/**
-	 * Uploads document to slide
-	 * @param doc
-	 * @param linkToBase
-	 * @param fileName
-	 * @return boolean
-	 */
-	public boolean uploadDocument(Document doc, String linkToBase, String fileName, Theme theme, boolean isTheme) {
-		String docContent = out.outputString(doc);
-		
+	private boolean uploadDocument(String content, String linkToBase, String fileName, Theme theme, boolean isTheme, boolean addRegions) {
 		if (isTheme) {
-			docContent = addRegions(theme, docContent, linkToBase);
-			if (docContent == null) {
-				return false;
+			if (addRegions) {
+				content = addRegions(theme, content, linkToBase);
+				if (content == null) {
+					return false;
+				}
 			}
-			docContent = StringHandler.replace(docContent, ThemesConstants.USELESS_PATHTO_ELEMENT,
+			content = StringHandler.replace(content, ThemesConstants.USELESS_PATHTO_ELEMENT,
 					new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(linkToBase).toString());
-			docContent = getFixedDocumentContent(docContent);
 			
-			docContent = StringHandler.replace(docContent, LESS_CODE, LESS_CODE_REPLACEMENT);
-			docContent = StringHandler.replace(docContent, MORE_CODE, MORE_CODE_REPLACEMENT);
+			if (addRegions) {
+				content = getFixedDocumentContent(content);
+				content = removeNeedlessStuffWithRegularExpressions(content);
+			}
+			
+			content = StringHandler.replace(content, LESS_CODE, LESS_CODE_REPLACEMENT);
+			content = StringHandler.replace(content, MORE_CODE, MORE_CODE_REPLACEMENT);
 		}
 		
 		theme.setLocked(true);
 		try {
-			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(linkToBase, fileName, docContent, null, true)) {
+			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(linkToBase, fileName, content, null, true)) {
 				return false;
 			}
 		} catch (RemoteException e) {
@@ -908,91 +1026,61 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 	
+	private String removeNeedlessStuffWithRegularExpressions(String content) {
+		if (content == null) {
+			return null;
+		}
+		
+		String expression = null;
+		Pattern p = null;
+		Matcher m = null;
+		List<String> stuffToRemove = new ArrayList<String>();
+		for (int i = 0; i < regularExpressionsForNeedlessStuff.size(); i++) {
+			expression = regularExpressionsForNeedlessStuff.get(i);
+			
+			p = Pattern.compile(expression);
+			m = p.matcher(content);
+			while (m.find()) {
+				int start = m.start();
+				int end = m.end();
+				
+				stuffToRemove.add(content.substring(start, end));
+			}
+		}
+		
+		for (int i = 0; i < stuffToRemove.size(); i++) {
+			content = StringHandler.replace(content, stuffToRemove.get(i), CoreConstants.EMPTY);
+		}
+		
+		return content;
+	}
+	
+	/**
+	 * Uploads document to slide
+	 * @param doc
+	 * @param linkToBase
+	 * @param fileName
+	 * @return boolean
+	 */
+	public boolean uploadDocument(Document doc, String linkToBase, String fileName, Theme theme, boolean isTheme) {
+		return uploadDocument(out.outputString(doc), linkToBase, fileName, theme, isTheme, false);
+	}
+	
 	/**
 	 * Checks if document contains needless info if so, replaces with empty String
 	 * @param documentContent
 	 * @return String
 	 */
-	private String getFixedDocumentContent(String documentContent) {
+	private String getFixedDocumentContent(String content) {
+		String uselessContent = null;
 		for (int i = 0; i < ThemesConstants.USELESS_CONTENT.size(); i++) {
-			while (documentContent.indexOf(ThemesConstants.USELESS_CONTENT.get(i)) != -1) {
-				documentContent = documentContent.replace(ThemesConstants.USELESS_CONTENT.get(i), ThemesConstants.EMPTY);
+			uselessContent = ThemesConstants.USELESS_CONTENT.get(i);
+			
+			if (content.indexOf(uselessContent) != -1) {
+				content = StringHandler.replace(content, uselessContent, ThemesConstants.EMPTY);
 			}
 		}
-		return documentContent;
-	}
-	
-	/**
-	 * RapidWeaver theme consists in-proper data for valid XHTML document, so needs to be fixed
-	 * @param head
-	 * @return boolean
-	 */
-	@SuppressWarnings("unchecked")
-	private boolean proceedHeadContent(String linkToBase, Element head) {
-		if (linkToBase == null || head == null) {
-			return false;
-		}
-		List headElements = head.getContent();
-		if (headElements == null) {
-			return false;
-		}
-		
-		Object o = null;
-		List<Text> textElements = new ArrayList<Text>();
-		List<Element> elementsNeedsRegions = new ArrayList<Element>();
-		Element e = null;
-		for (int i = 0; i < headElements.size(); i++) {
-			o = headElements.get(i);
-			if (o instanceof Element) {
-				e = (Element) o;
-				fixDocumentElement(e, linkToBase);
-			}
-			else {
-				if (o instanceof Text) {
-					textElements.add((Text) o);
-				}
-			}
-		}
-		
-		for (Iterator<Element> ite = elementsNeedsRegions.iterator(); ite.hasNext(); ) {
-			e = ite.next();
-			e.addContent(getCommentsCollection(fixValue(e.getTextNormalize(), linkToBase)));
-		}
-
-		Text t = null;
-		for (Iterator <Text> itt = textElements.iterator(); itt.hasNext(); ) {
-			t = itt.next();
-			if (needAddRegion(ThemesConstants.REGIONS, t.getTextNormalize())) {
-				head.addContent(getCommentsCollection(fixValue(t.getTextNormalize(), linkToBase)));
-			}
-			t.detach();
-		}
-	
-		//	Adding fake (comment) element to <script> - to get <script ...></script> in HTML code
-		//	Checking <link> tags in head
-		List elements = head.getContent();
-		o = null;
-		Element element = null;
-		if (elements != null) {
-			for (int i = 0; i < elements.size(); i++) {
-				o = elements.get(i);
-				if (o instanceof Element) {
-					element = (Element) o;
-					if (ELEMENT_SCRIPT_NAME.equals(element.getName().toLowerCase())) {
-						//	<script>
-						element.addContent(getComment(IDEGA_COMMENT));
-					}
-					
-					if (ELEMENT_LINK_NAME.equals(element.getName().toLowerCase())) {
-						//	<link>
-						checkElementAttributes(element, validLinkTagAttributes);
-					}
-				}
-			}
-
-		}
-		
-		return true;
+		return content;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -1367,7 +1455,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		StringBuffer region = new StringBuffer(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_BEGIN);
 		region.append(value).append(ThemesConstants.TEMPLATE_REGION_MIDDLE).append(ThemesConstants.COMMENT_END);
 		
-		IWMainApplicationSettings settings  = IWMainApplication.getDefaultIWMainApplication().getSettings();
 		StringBuffer key = new StringBuffer(ThemesConstants.THEMES_PROPERTY_START).append(value);
 		key.append(ThemesConstants.THEMES_PROPERTY_END);
 		
@@ -1388,7 +1475,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return region.toString();
 		}
 		
-		String propertyValue = settings.getProperty(key.toString());
+		String propertyValue = getApplicationSettings().getProperty(key.toString());
 		if (propertyValue != null) {
 			if (value.equals(FOOTER)) {
 				region.append(COPY_AND_SPACE).append(getBasicReplace(null, propertyValue, null));
@@ -1424,33 +1511,61 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @return String
 	 */
 	private String addRegions(Theme theme, String docContent, String linkToBase) {
+		if (theme == null || docContent == null || linkToBase == null) {
+			return null;
+		}
+		
+		List<String> regions = new ArrayList<String>();
+		Pattern regionPattern = Pattern.compile("%.\\w+.%");
+		Matcher matcher = regionPattern.matcher(docContent);
+		while (matcher.find()) {
+			int start = matcher.start();
+			int end = matcher.end();
+			
+			regions.add(docContent.substring(start, end));
+		}
 		String fixedValue = null;
 		String regionContent = null;
 		
 		String region = null;
 		String fixedRegion = null;
 		int sameRegionRepeatTime = 0;
-		for (int i = 0; i < ThemesConstants.REGIONS.size(); i++) {
-			region = ThemesConstants.REGIONS.get(i);
+		for (int i = 0; i < regions.size(); i++) {
+			region = regions.get(i);
 			
 			fixedValue = fixValue(region, linkToBase);
+			fixedValue = StringHandler.replace(fixedValue, CoreConstants.PERCENT, CoreConstants.EMPTY);
 			fixedRegion = StringHandler.replace(region, CoreConstants.PERCENT, CoreConstants.EMPTY);
 			sameRegionRepeatTime = 0;
 			while (docContent.indexOf(region) != -1) {
 				if (sameRegionRepeatTime > 0) {
+					//	Adding region with number at the end
 					fixedValue = new StringBuffer(fixedValue).append(sameRegionRepeatTime).toString();
 					
 					theme.addExtraRegion(fixedRegion, fixedValue);
 				}
 				sameRegionRepeatTime++;
-				regionContent = getRegion(fixedValue);
+				
+				if (fixedRegion.equals("title")) {
+					regionContent = getApplicationSettings().getProperty(fixedRegion);
+					regionContent = regionContent == null ? CoreConstants.EMPTY : regionContent;
+				}
+				else {
+					regionContent = getRegion(fixedValue);
+				}
+				
 				if (ThemesConstants.REGIONS_NEEDED_TO_CREATE.contains(fixedValue)) {
 					regionContent = getRegionDiv(fixedValue, regionContent);
 				}
+				
 				docContent = docContent.replaceFirst(region, regionContent);
 			}
 		}
 		return docContent;
+	}
+	
+	private IWMainApplicationSettings getApplicationSettings() {
+		return IWMainApplication.getDefaultIWMainApplication().getSettings();
 	}
 	
 	private String getRegionDiv(String id, String content) {
@@ -1463,11 +1578,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @return String
 	 */
 	private String fixValue(String value, String linkToBase) {
-		for (int i = 0; i < ThemesConstants.USELESS_CONTENT.size(); i++) {
-			while (value.indexOf(ThemesConstants.USELESS_CONTENT.get(i)) != -1) {
-				value = value.replace(ThemesConstants.USELESS_CONTENT.get(i), ThemesConstants.EMPTY);
-			}
-		}
+		value = getFixedDocumentContent(value);
 		
 		String replace = CoreConstants.EMPTY;
 		if (value.indexOf(ThemesConstants.USELESS_DATA_ELEMENT) != -1) {
@@ -1571,7 +1682,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		if (propertyKey == null) {
 			return new ArrayList<Element>();
 		}
-		IWMainApplicationSettings settings  = IWMainApplication.getDefaultIWMainApplication().getSettings();
+		IWMainApplicationSettings settings = getApplicationSettings();
 		if (settings == null) {
 			return new ArrayList<Element>();
 		}

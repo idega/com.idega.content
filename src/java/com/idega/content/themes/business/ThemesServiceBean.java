@@ -42,7 +42,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			return;
 		}
 		if (ContentEvent.REMOVE.equals(idegaWebContentEvent.getMethod())) {
-			if (ThemesHelper.getInstance(false).isCorrectFile(uri, ThemesConstants.THEME_SKELETONS_FILTER)) {
+			if (ThemesHelper.getInstance(false).isCorrectThemeTemplateFile(uri, ThemesConstants.THEME_SKELETONS_FILTER)) {
 				List<Theme> themes = ThemesHelper.getInstance(false).getAvailableThemes();
 				if (themes == null) {
 					return;
@@ -67,7 +67,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			}
 		}
 		else {
-			if (!ThemesHelper.getInstance().isCreatedManually(uri) && ThemesHelper.getInstance().isCorrectFile(uri, ThemesConstants.THEME_SKELETONS_FILTER) && isNewTheme(uri)) {
+			if (!ThemesHelper.getInstance().isCreatedManually(uri) && ThemesHelper.getInstance().isCorrectThemeTemplateFile(uri, ThemesConstants.THEME_SKELETONS_FILTER) && isNewTheme(uri)) {
 				try {
 					ThemesHelper.getInstance().getThemesLoader().loadTheme(uri, ThemesHelper.getInstance().urlEncode(uri), true, false);
 				} catch (Exception e) {

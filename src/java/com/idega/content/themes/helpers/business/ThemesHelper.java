@@ -277,7 +277,7 @@ public class ThemesHelper implements Singleton {
 		String uri = null;
 		for (int i = 0; i < searchResults.size(); i++) {
 			uri = searchResults.get(i).getSearchResultURI();
-			if (isCorrectFile(uri, filter)) {
+			if (isCorrectThemeTemplateFile(uri, filter)) {
 				loadedResults.add(uri);
 			}
 		}
@@ -422,7 +422,7 @@ public class ThemesHelper implements Singleton {
 		return fileName.equals(nameTemplate);
 	}
 	
-	public boolean isCorrectFile(String fileName, List<String> filter) {
+	public boolean isCorrectThemeTemplateFile(String fileName, List<String> filter) {
 		boolean result = false;
 		if (fileName == null) {
 			return false;
@@ -442,6 +442,10 @@ public class ThemesHelper implements Singleton {
 		
 		if (filter == null) {
 			return true;
+		}
+		
+		if (fileName.indexOf("index") == -1) {
+			return false;
 		}
 		
 		for (int i = 0; (i < filter.size() && !result); i++) {
@@ -579,6 +583,7 @@ public class ThemesHelper implements Singleton {
 		if (stream != null && cleanWithHtmlCleaner) {
 			HtmlCleaner cleaner = new HtmlCleaner(stream);
 			cleaner.setOmitDoctypeDeclaration(false);
+			cleaner.setOmitComments(true);
 			String content = null;
 			try {
 				cleaner.clean();
@@ -613,7 +618,6 @@ public class ThemesHelper implements Singleton {
 	public Document getXMLDocument(String url, boolean cleanWithHtmlCleaner) {
 		return getXMLDocument(url, cleanWithHtmlCleaner, false);
 	}
-	
 	
 	public Document getXMLDocument(InputStream stream) throws Exception {
 		if (stream == null) {

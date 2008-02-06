@@ -327,16 +327,10 @@ public class WebDAVUploadBean implements Serializable{
 		}
 		String path = getUploadFilePath();
 		
-		List<String> filesToClean = new ArrayList<String>();
-		if (uploadingTheme) {
-			ThemesHelper.getInstance(false).addThemeToQueue(path);
-			filesToClean = ThemesConstants.THEME_SKELETONS_FILTER;
-		}
-		
 		ZipInputStream zipStream = null;
 		try {
 			zipStream = new ZipInputStream(stream);
-			if (slide.uploadZipFileContents(zipStream, path, filesToClean)) {
+			if (slide.uploadZipFileContents(zipStream, path, null)) {
 				resultInfo = "Success uploading zip file's contents";
 				result = true;
 			}
