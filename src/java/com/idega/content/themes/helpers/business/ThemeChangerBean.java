@@ -126,7 +126,7 @@ public class ThemeChangerBean implements ThemeChanger {
 														"%plugin_header%", "%user_header%"};
 	private List<String> themeHeadVariables = Collections.unmodifiableList(Arrays.asList(_themeHeadVariables));
 	
-	private String[] _regularExpressionsForNeedlessStuff = new String[] {" xmlns.+\"", "..<?doc.+?>"};
+	private String[] _regularExpressionsForNeedlessStuff = new String[] {/*" xmlns.+\"", */"..<?doc.+?>"};
 	private List<String> regularExpressionsForNeedlessStuff = Collections.unmodifiableList(Arrays.asList(_regularExpressionsForNeedlessStuff));
 	
 	public ThemeChangerBean() {
@@ -1310,6 +1310,25 @@ public class ThemeChangerBean implements ThemeChanger {
 		return null;
 	}
 	
+	private Attribute getElementAtribute(Element e, String name, Namespace ns) {
+		if (e == null || name == null) {
+			return null;
+		}
+		
+		Attribute a = null;
+		if (ns == null) {
+			a = e.getAttribute(name);
+		}
+		else {
+			a = e.getAttribute(name, ns);
+			if (a == null) {
+				a = e.getAttribute(name);
+			}
+		}
+		
+		return a;
+	}
+	
 	private boolean fixTag(Element e, String attributeName, String linkToBase) {
 		if (e == null || attributeName == null || linkToBase == null) {
 			return false;
@@ -1832,6 +1851,25 @@ public class ThemeChangerBean implements ThemeChanger {
 		return theme.getId();
 	}
 	
+	private Element getChildElement(Element parent, String childName, Namespace ns) {
+		if (parent == null || childName == null) {
+			return null;
+		}
+		
+		Element child = null;
+		if (ns == null) {
+			child = parent.getChild(childName);
+		}
+		else {
+			child = parent.getChild(childName, ns);
+			if (child == null) {
+				child = parent.getChild(childName);
+			}
+		}
+		
+		return child;
+	}
+	
 	private boolean changeThemeColourVariation(Theme theme, ThemeChange change) {
 		if (theme == null || change == null) {
 			return false;
@@ -1891,6 +1929,26 @@ public class ThemeChangerBean implements ThemeChanger {
 		theme.addThemeChange(change);
 	}
 	
+	@SuppressWarnings("unchecked")
+	private List<Element> getElementChildren(Element parent, String name, Namespace ns) {
+		if (parent == null || name == null) {
+			return null;
+		}
+		
+		List<Element> children = null;
+		if (ns == null) {
+			children = parent.getChildren(name);
+		}
+		else {
+			children = parent.getChildren(name, ns);
+			if (children == null || children.size() == 0) {
+				children = parent.getChildren(name);
+			}
+		}
+		
+		return children;
+	}
+	
 	/**
 	 * Changes theme's old style with new
 	 * @param head
@@ -1923,12 +1981,14 @@ public class ThemeChangerBean implements ThemeChanger {
 			for (int i = 0; i < styles.size(); i++) {
 				style = styles.get(i);
 				attributeValue = style.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_HREF);
-				files = oldStyle.getStyleFiles();
-				if (files != null) {
-					for (int j = 0; j < files.size(); j++) {
-						if (attributeValue.endsWith(files.get(j))) {
-							uselessStyles.add(style);
-							index = getElementIndex(head.getContent(), ThemesConstants.TAG_ATTRIBUTE_HREF, attributeValue);
+				if (attributeValue != null) {
+					files = oldStyle.getStyleFiles();
+					if (files != null) {
+						for (int j = 0; j < files.size(); j++) {
+							if (attributeValue.endsWith(files.get(j))) {
+								uselessStyles.add(style);
+								index = getElementIndex(head.getContent(), ThemesConstants.TAG_ATTRIBUTE_HREF, attributeValue);
+							}
 						}
 					}
 				}
@@ -2089,12 +2149,16 @@ public class ThemeChangerBean implements ThemeChanger {
 			return createNewTheme(theme, themeName);
 		}
 		
-		if (theme.getLinkToDraft() == null) {
+		String linkToTheme = theme.getLinkToDraft();
+		if (linkToTheme == null) {
+			linkToTheme = theme.getLinkToSkeleton();
+		}
+		if (linkToTheme == null) {
 			return false;
 		}
 
 		InputStream is = null;
-		is = helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(theme.getLinkToDraft()).toString());
+		is = helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(linkToTheme).toString());
 		if (is == null) {
 			return false;
 		}
@@ -2114,7 +2178,9 @@ public class ThemeChangerBean implements ThemeChanger {
 		theme.setLocked(false);
 		
 		theme.setLinkToDraft(null);
-		theme.setLinkToThemePreview(theme.getLinkToDraftPreview());
+		if (theme.getLinkToDraftPreview() != null) {
+			theme.setLinkToThemePreview(theme.getLinkToDraftPreview());
+		}
 		theme.setLinkToDraftPreview(null);
 		
 		helper.createSmallImage(theme, false);
@@ -2611,7 +2677,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 	
 	public String applyMultipleChangesToTheme(String themeKey, List<ThemeChange> changes, String themeName) {
-		if (themeKey == null || changes == null) {
+		if (themeKey == null) {
 			return null;
 		}
 		
@@ -2625,10 +2691,12 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		String changed = themeKey;
-		ThemeChange change = null;
-		for (int i = 0; (i < changes.size() && changed != null); i++) {
-			change = changes.get(i);
-			changed = changeTheme(doc, theme, themeName, change);
+		if (changes != null) {
+			ThemeChange change = null;
+			for (int i = 0; (i < changes.size() && changed != null); i++) {
+				change = changes.get(i);
+				changed = changeTheme(doc, theme, themeName, change);
+			}
 		}
 		
 		if (changed == null) {
