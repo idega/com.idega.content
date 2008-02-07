@@ -1567,7 +1567,7 @@ public class ThemeChangerBean implements ThemeChanger {
 				
 				if (fixedRegion.equals("title")) {
 					regionContent = getApplicationSettings().getProperty(fixedRegion);
-					regionContent = regionContent == null ? CoreConstants.EMPTY : regionContent;
+					regionContent = regionContent == null ? "Idega template" : regionContent;
 				}
 				else {
 					regionContent = getRegion(fixedValue);

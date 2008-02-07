@@ -444,7 +444,7 @@ public class ThemesHelper implements Singleton {
 			return true;
 		}
 		
-		if (fileName.indexOf("index") == -1) {
+		if (fileName.indexOf("index") == -1 && fileName.indexOf(ThemesConstants.IDEGA_THEME) == -1) {
 			return false;
 		}
 		
