@@ -730,12 +730,12 @@ function changeVariations() {
 	if (THEME_ID == null) {
 		return false;
 	}
-	if (THEME_CHANGES == null) {
+	/*if (THEME_CHANGES == null) {
 		return false;
 	}
 	if (THEME_CHANGES.length == 0) {
 		return false;
-	}
+	}*/
 	var themeNameObj = $('theme_name');
 	if (themeNameObj != null) {
 		showLoadingMessage(getThemeChangingText());
