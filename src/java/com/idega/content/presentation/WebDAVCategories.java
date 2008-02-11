@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.25 2008/01/23 13:13:34 valdas Exp $
+ * $Id: WebDAVCategories.java,v 1.26 2008/02/11 09:18:00 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -47,10 +47,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2008/01/23 13:13:34 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/02/11 09:18:00 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.25 $
+ * @version $Revision: 1.26 $
  */
 public class WebDAVCategories extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -65,6 +65,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	private boolean displayHeader=true;
 	private boolean addCategoryCreator = true;
 	private boolean needDisplayCategoriesSelection = true;
+	private boolean selectAllCategories = false;
 	
 	private boolean areCategoriesFetched = false;
 	
@@ -421,13 +422,14 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	 * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
 	 */
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[6];
+		Object values[] = new Object[7];
 		values[0] = super.saveState(ctx);
 		values[1] = this.resourcePath;
 		values[2] = Boolean.valueOf(this.setOnParent);
 		values[3] = Boolean.valueOf(this.displaySaveButton);
 		values[4] = this.setCategories;
 		values[5] = Boolean.valueOf(this.displayHeader);
+		values[6] = Boolean.valueOf(this.selectAllCategories);
 		return values;
 	}
 
@@ -443,6 +445,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		this.displaySaveButton = ((Boolean) values[3]).booleanValue();
 		this.setCategories=(String)values[4];
 		this.displayHeader=((Boolean)values[5]).booleanValue();
+		this.selectAllCategories = (Boolean) values[6];
 	}
 	
 	
@@ -512,6 +515,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		notSelectedCategories = new ArrayList<ContentCategory>();
 		
 		Locale locale = getLocale(iwc);
+		
 		Collection<String> selectedCategories = getSetCategoriesList();
 		if (selectedCategories != null) {
 			ContentCategory category = null;
@@ -519,7 +523,8 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 				String categoryKey = selectedIter.next();
 				category = CategoryBean.getInstance().getCategory(categoryKey);
 				if (category != null) {
-					if (category.getName(locale.toString()) != null && !category.isDisabled()) {	//	If category exists for current locale and it's not disabled
+					if (category.getName(locale.toString()) != null && !category.isDisabled()) {
+						//	If category exists for current locale and it's not disabled
 						this.selectedCategories.add(category);
 					}
 				}
@@ -532,10 +537,16 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		}
 		else {
 			localizedCategories = categories.size();
-		}
-		for (ContentCategory category : categories) {
-			if (!category.isDisabled() && (selectedCategories == null || !selectedCategories.contains(category.getId()))) {
-				this.notSelectedCategories.add(category);
+			
+			for (ContentCategory category : categories) {
+				if (!category.isDisabled() && (selectedCategories == null || !selectedCategories.contains(category.getId()))) {
+					if (selectAllCategories) {
+						this.selectedCategories.add(category);
+					}
+					else {
+						this.notSelectedCategories.add(category);
+					}
+				}
 			}
 		}
 		
@@ -558,6 +569,14 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 
 	public void setLocaleIdentity(String localeIdentity) {
 		this.localeIdentity = localeIdentity;
+	}
+
+	public boolean isSelectAllCategories() {
+		return selectAllCategories;
+	}
+
+	public void setSelectAllCategories(boolean selectAllCategories) {
+		this.selectAllCategories = selectAllCategories;
 	}
 	
 }

@@ -1,5 +1,5 @@
 /**
- * $Id: ContentCategory.java,v 1.7 2008/01/23 12:11:59 valdas Exp $
+ * $Id: ContentCategory.java,v 1.8 2008/02/11 09:18:00 valdas Exp $
  * Created in 2007 by gediminas
  *
  * Copyright (C) 2000-2007 Idega Software hf. All Rights Reserved.
@@ -92,6 +92,18 @@ public class ContentCategory {
 				}
 			}
 		}
+		
+		if (name == null) {
+			//	Didn't find name by locale, will try to get any localized name
+			Map<String, String> allNames = getNames();
+			if (allNames != null) {
+				Object[] namesKeys = allNames.keySet().toArray();
+				for (int i = 0; (i < namesKeys.length && name == null); i++) {
+					name = allNames.get(namesKeys[i]);
+				}
+			}
+		}
+		
 		return name;
 	}
 	
