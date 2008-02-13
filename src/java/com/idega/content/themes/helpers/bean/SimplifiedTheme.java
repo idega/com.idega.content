@@ -1,5 +1,7 @@
 package com.idega.content.themes.helpers.bean;
 
+import java.util.List;
+
 public class SimplifiedTheme {
 	
 	private String id = null;
@@ -7,7 +9,18 @@ public class SimplifiedTheme {
 	private String linkToSmallPreview = null;
 	private String linkToBigPreview = null;
 	
+	private List<SimplifiedTheme> children = null;
+	
 	private boolean used = false;
+	
+	public SimplifiedTheme() {}
+	
+	public SimplifiedTheme(String id, String name) {
+		this();
+		
+		this.id = id;
+		this.name = name;
+	}
 
 	public String getId() {
 		return id;
@@ -47,6 +60,14 @@ public class SimplifiedTheme {
 
 	public void setUsed(boolean used) {
 		this.used = used;
+	}
+
+	public List<SimplifiedTheme> getChildren() {
+		return children;
+	}
+
+	public void setChildren(List<SimplifiedTheme> children) {
+		this.children = children;
 	}
 
 }

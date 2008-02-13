@@ -184,7 +184,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 	}
 	
-	public boolean createIBPage(Theme theme) {
+	public boolean createIBPage(Theme theme, String parentTemplateId) {
 		if (theme == null) {
 			return false;
 		}
@@ -208,7 +208,10 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		getBuilderService();
 		
 		//	Creating IBPage (template) for theme
-		String parentId = builder.getTopLevelTemplateId(builder.getTopLevelTemplates(iwc));
+		String parentId = parentTemplateId;
+		if (parentId == null || ThemesConstants.MINUS_ONE.equals(parentId)) {
+			parentId = builder.getTopLevelTemplateId(builder.getTopLevelTemplates(iwc));
+		}
 		if (parentId == null || ThemesConstants.MINUS_ONE.equals(parentId)) {
 			//	No Top Level Template
 			parentId = ThemesHelper.getInstance().getThemesEngine().createRootTemplate(domain, builder, domainID, builder.getIBXMLFormat());
@@ -222,7 +225,12 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		theme.setIBPageID(id);
 		
-		return updatePageWebDav(theme.getIBPageID(), CoreConstants.WEBDAV_SERVLET_URI + theme.getLinkToSkeleton());
+		if (updatePageWebDav(theme.getIBPageID(), CoreConstants.WEBDAV_SERVLET_URI + theme.getLinkToSkeleton())) {
+			ThemesHelper.getInstance().getThemesEngine().updateSiteTemplatesTree(iwc, true);
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public boolean updatePageWebDav(int id, String uri) {
@@ -349,5 +357,47 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			return null;
 		}*/
 		return IWApplicationContextFactory.getCurrentIWApplicationContext().getDomain();
+	}
+	
+	public String createChildTemplateForThisTemplate(String parentTemplateKey) {
+		if (parentTemplateKey == null) {
+			return null;
+		}
+		
+		BuilderService builder = getBuilderService();
+		if (builder == null) {
+			return null;
+		}
+		
+		ICPage currentTemplate = getICPage(parentTemplateKey);
+		if (currentTemplate == null) {
+			return null;
+		}
+		ICDomain domain = getDomain();
+		if (domain == null) {
+			return null;
+		}
+		
+		String childTemplate = "Child Template";
+		String name = currentTemplate.getName();
+		if (name == null) {
+			name = childTemplate;
+		}
+		else {
+			name = new StringBuffer(name).append(CoreConstants.SPACE).append(childTemplate).toString();
+		}
+		
+		int templateId = -1;
+		try {
+			templateId = createIBPage(parentTemplateKey, name, builder.getTemplateKey(), parentTemplateKey, null, null, domain.getID(), builder.getIBXMLFormat(), null, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		if (templateId == -1) {
+			return null;
+		}
+		
+		return String.valueOf(templateId);
 	}
 }

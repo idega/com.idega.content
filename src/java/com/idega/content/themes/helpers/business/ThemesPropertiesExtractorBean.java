@@ -189,7 +189,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 					markThemeAsNotPrepared(theme);
 					return false;
 				}
-				if (!(helper.getThemesService().createIBPage(theme))) {
+				if (!(helper.getThemesService().createIBPage(theme, null))) {
 					markThemeAsNotPrepared(theme);
 					return false;
 				}

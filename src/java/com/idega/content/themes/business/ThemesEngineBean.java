@@ -163,10 +163,62 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			// Is used?
 			simpleTheme.setUsed(isUsedTheme(theme.getIBPageID()));
 			
+			addTemplatesAsChildrenToTheme(simpleTheme, theme.getIBPageID());
+			
 			return simpleTheme;
 		}
 		
 		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void addTemplatesAsChildrenToTheme(SimplifiedTheme theme, int templateId) {
+		if (theme == null) {
+			return;
+		}
+		
+		List<SimplifiedTheme> templates = new ArrayList<SimplifiedTheme>();
+		
+		addAllBuilderTypeTemplates(String.valueOf(templateId), templates, helper.getThemesService().getBuilderService());
+		
+		if (templates.size() > 0) {
+			theme.setChildren(templates);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void addAllBuilderTypeTemplates(String key, List<SimplifiedTheme> childrenTemplates, BuilderService builder) {
+		if (key == null) {
+			return;
+		}
+		
+		ICPage template = helper.getThemesService().getICPage(key);
+		if (template == null) {
+			return;
+		}
+		
+		Collection children = template.getChildren();
+		if (children == null || children.size() == 0) {
+			return;
+		}
+		
+		Object o = null;
+		ICPage childTemplate = null;
+		for (Iterator it = children.iterator(); it.hasNext();) {
+			o = it.next();
+			
+			if (o instanceof ICPage) {
+				childTemplate = (ICPage) o;
+				
+				if (builder.getTemplateKey().equals(childTemplate.getType()) && builder.getIBXMLFormat().equals(childTemplate.getFormat())) {
+					String templateId = childTemplate.getId();
+					
+					childrenTemplates.add(new SimplifiedTheme(templateId, childTemplate.getName()));
+					
+					addAllBuilderTypeTemplates(templateId, childrenTemplates, builder);
+				}
+			}
+		}
 	}
 	
 	private boolean isUsedTheme(int templateID) {
@@ -1151,12 +1203,17 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return false;
 	}
 	
+	public void updateSiteTemplatesTree(IWContext iwc, boolean sendToAllSessions) {
+		Thread templatesTreeUpater = new Thread(new SiteTemplatesTreeUpdater(iwc, sendToAllSessions));
+		templatesTreeUpater.run();
+	}
+	
 	private void updateSiteTree(IWContext iwc, boolean updateAllSessions) {
 		if (iwc == null) {
 			iwc = CoreUtil.getIWContext();
 		}
 		
-		Thread siteTreeUpdater = new Thread(new SiteTreeUpdater(iwc, updateAllSessions));
+		Thread siteTreeUpdater = new Thread(new SitePagesTreeUpdater(iwc, updateAllSessions));
 		siteTreeUpdater.run();
 	}
 	
@@ -1754,6 +1811,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			localizedText.add(resourceBundle.getLocalizedString("preparing", "Preparing..."));									//	30
 			localizedText.add(resourceBundle.getLocalizedString("style_for_page_and_children", "Select style for current page and all children"));			//	31
 			localizedText.add(resourceBundle.getLocalizedString("choose_style_for_page_and_children", "Page*"));				//	32
+			localizedText.add(resourceBundle.getLocalizedString("select_template_first", "Select template first!"));			//	33
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1962,6 +2020,17 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		}
 		return checker.deleteContentItem(resourcePath, iwc.getCurrentLocale());
+	}
+	
+	public String createChildTemplateForThisTemplate(String parentTemplateKey) {
+		String newTemplateId = helper.getThemesService().createChildTemplateForThisTemplate(parentTemplateKey);
+		if (newTemplateId == null) {
+			return null;
+		}
+		
+		updateSiteTemplatesTree(CoreUtil.getIWContext(), true);
+		
+		return newTemplateId;
 	}
 
 }

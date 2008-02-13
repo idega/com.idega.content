@@ -306,6 +306,10 @@
 		<component-class>com.idega.content.presentation.WFBlockWithToolbar</component-class>
 	</component>
 	<component>
+		<component-type>TemplatesTree</component-type>
+		<component-class>com.idega.content.themes.presentation.TemplatesTree</component-class>
+	</component>
+	<component>
 		<component-type>FileUploadViewer</component-type>
 		<component-class>com.idega.content.upload.presentation.FileUploadViewer</component-class>
 		<property>

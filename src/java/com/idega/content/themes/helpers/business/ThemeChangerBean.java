@@ -111,7 +111,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	
 	private static final String[] TOOLBAR_NAV_MENU = new String[] {"Frontpage", "Products", "Customers", "Partners", "The Company", "News"};
 	
-	private String[] _validLinkTagAttributes = new String[] {"charset", HREF, "hreflang", "media", "rel", "rev", "target", "type"};
+	private String[] _validLinkTagAttributes = new String[] {"charset", HREF, "hreflang", "media", "rel", "rev", "target", "type", "title"};
 	private List<String> validLinkTagAttributes = Collections.unmodifiableList(Arrays.asList(_validLinkTagAttributes));
 	
 	private String[] _unChangedCaseAttributes = new String[] {HREF, "src"};
@@ -2186,7 +2186,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		helper.createSmallImage(theme, false);
 		
 		try {
-			helper.getThemesService().createIBPage(theme);
+			helper.getThemesService().createIBPage(theme, null);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			return false;
@@ -2533,6 +2533,8 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 	
 	private boolean createNewTheme(Theme parent, String newName) {
+		String parentThemeTemplateId = String.valueOf(parent.getIBPageID());
+		
 		String linkToTheme = parent.getLinkToDraft();
 		if (linkToTheme == null) {
 			linkToTheme = parent.getLinkToSkeleton();
@@ -2594,7 +2596,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		// Creating new template
 		try {
-			helper.getThemesService().createIBPage(child);
+			helper.getThemesService().createIBPage(child, parentThemeTemplateId);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			return false;

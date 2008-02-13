@@ -25,7 +25,7 @@ public interface ThemesService extends IBOService, IWSlideChangeListener {
 	/**
 	 * @see com.idega.content.themes.business.ThemesServiceBean#createIBPage
 	 */
-	public boolean createIBPage(Theme theme) throws RemoteException;
+	public boolean createIBPage(Theme theme, String parentTemplateId) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesServiceBean#updatePageWebDav
@@ -71,4 +71,6 @@ public interface ThemesService extends IBOService, IWSlideChangeListener {
 	 * @see com.idega.content.themes.business.ThemesServiceBean#getICPage
 	 */
 	public ICPage getICPage(String pageKey);
+	
+	public String createChildTemplateForThisTemplate(String parentTemplateKey);
 }

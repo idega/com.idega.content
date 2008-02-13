@@ -197,4 +197,8 @@ public interface ThemesEngine extends IBOService {
 	public boolean deleteArticlesFromDeletedPages(String pageKey);
 	
 	public boolean deleteArticle(String resourcePath);
+	
+	public void updateSiteTemplatesTree(IWContext iwc, boolean sendToAllSessions);
+	
+	public String createChildTemplateForThisTemplate(String parentTemplateKey);
 }
