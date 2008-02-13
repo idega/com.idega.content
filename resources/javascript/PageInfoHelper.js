@@ -305,13 +305,16 @@ function chooseOption(themeID) {
 		document.body.appendChild(div);
 		
 		var setStyleForPageFunction = function() {
-			setTemplate(true, 0);
+			TEMPLATE_ID = null;
+			setTemplateForPageOrPages(true, 0);
 		};
 		var setStyleForPageAndChildren = function() {
-			setTemplate(true, 1);
+			TEMPLATE_ID = null;
+			setTemplateForPageOrPages(true, 1);
 		}
 		var setStyleForSiteFunction = function() {
-			setTemplate(false, 2);
+			TEMPLATE_ID = null;
+			setTemplateForPageOrPages(false, 2);
 		};
 		
 		pageSpan.addEvent('click', setStyleForPageFunction);
@@ -359,14 +362,55 @@ function getChildTemplatesForThisTheme() {
 	
 	stackContainer.empty();
 	
+	var listInStackContainer = new Element('ul');
+	listInStackContainer.addClass('templatesListInStackContainer');
+	listInStackContainer.injectInside(stackContainer);
+	
 	var allChildren = theme.children;
+	var templateId = null;
 	for (var i = 0; i < allChildren.length; i++) {
-		var childTemplateContainer = new Element('div');
+		templateId = allChildren[i].id;
+		
+		var childTemplateContainer = new Element('li');
 		childTemplateContainer.addClass('themeChildInStackContainerStyle');
 		var span = new Element('span');
 		span.appendText(allChildren[i].name);
 		span.injectInside(childTemplateContainer);
-		childTemplateContainer.injectInside(stackContainer);
+		
+		var applyStyleToPageLink = new Element('a');
+		applyStyleToPageLink.setProperty('href', 'javascript:void(0)');
+		applyStyleToPageLink.setProperty('templateid', templateId);
+		applyStyleToPageLink.appendText('Page');	//	TODO: remove
+		applyStyleToPageLink.addClass('applyPage');
+		applyStyleToPageLink.addEvent('click', function() {
+			TEMPLATE_ID = $(this).getProperty('templateid');
+			setTemplateForPageOrPages(true, 0);
+		});
+		applyStyleToPageLink.injectInside(childTemplateContainer);
+		
+		var applyStyleToPageAndChildrenLink = new Element('a');
+		applyStyleToPageAndChildrenLink.setProperty('href', 'javascript:void(0)');
+		applyStyleToPageAndChildrenLink.setProperty('templateid', templateId);
+		applyStyleToPageAndChildrenLink.appendText('Page*');	//	TODO: remove
+		applyStyleToPageAndChildrenLink.addClass('applyPageAndChildren');
+		applyStyleToPageAndChildrenLink.addEvent('click', function() {
+			TEMPLATE_ID = $(this).getProperty('templateid');
+			setTemplateForPageOrPages(true, 1);
+		});
+		applyStyleToPageAndChildrenLink.injectInside(childTemplateContainer);
+		
+		var applyStyleToSiteLink = new Element('a');
+		applyStyleToSiteLink.setProperty('href', 'javascript:void(0)');
+		applyStyleToSiteLink.setProperty('templateid', templateId);
+		applyStyleToSiteLink.appendText('Site');	//	TODO: remove
+		applyStyleToSiteLink.addClass('applySite');
+		applyStyleToSiteLink.addEvent('click', function() {
+			TEMPLATE_ID = $(this).getProperty('templateid');
+			setTemplateForPageOrPages(false, 2);
+		});
+		applyStyleToSiteLink.injectInside(childTemplateContainer);
+		
+		childTemplateContainer.injectInside(listInStackContainer);
 	}
 	
 	var initialTopPosition = stackContainer.getProperty('initialtopposition');
@@ -377,7 +421,7 @@ function getChildTemplatesForThisTheme() {
 	showStackContainer.start(0, 1);
 }
 
-function setTemplate(isPage, type) {
+function setTemplateForPageOrPages(isPage, type) {
 	removeStyleOptions(null);
 	if (getThemeForStyle() == null) {
 		return;
@@ -396,8 +440,9 @@ function setTemplate(isPage, type) {
 	showLoadingMessage(getApplyingStyleText());
 	setNewStyleToElements('usedThemeName', 'themeName');
 	setNewStyleForSelectedElement(getThemeForStyle() + '_themeNameContainer', 'themeName usedThemeName');
-	ThemesEngine.setSelectedStyle(getThemeForStyle(), pageId, type, {
+	ThemesEngine.setSelectedStyle(getThemeForStyle(), pageId, type, TEMPLATE_ID, {
 		callback: function(result) {
+			WORKING_WITH_TEMPLATE = false;
 			closeLoadingMessage();
 			getPrewUrl(getPageID());
 		}

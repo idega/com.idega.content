@@ -42,7 +42,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#setSelectedStyle
 	 */
-	public boolean setSelectedStyle(String themeKey, String pageKey, Integer type) throws RemoteException;
+	public boolean setSelectedStyle(String themeKey, String pageKey, Integer type, Integer templateId) throws RemoteException;
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#changePageUri

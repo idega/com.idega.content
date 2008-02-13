@@ -345,7 +345,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	/**
 	 * 
 	 */
-	public boolean setSelectedStyle(String themeKey, String pageKey, Integer type) {
+	public boolean setSelectedStyle(String themeKey, String pageKey, Integer type, Integer templateId) {
 		if (type == null) {
 			return false;
 		}
@@ -370,13 +370,17 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			applyToPage = false;
 		}
 		
+		if (templateId == null) {
+			templateId = theme.getIBPageID();
+		}
+		
 		if (applyToPage) {
 			//	Apply style to selected page
-			result = setPageStyle(pageKey, theme.getIBPageID(), iwc, null, type == 0 ? false : true);
+			result = setPageStyle(pageKey, templateId, iwc, null, type == 0 ? false : true);
 		}
 		else {
 			//	Apply style to all pages
-			result = setSiteStyle(theme.getIBPageID(), iwc, false);
+			result = setSiteStyle(templateId, iwc, false);
 		}
 		helper.getThemesService().getBuilderService().clearAllCachedPages();
 		return result;
