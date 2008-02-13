@@ -249,14 +249,14 @@ function chooseOption(themeID) {
 	var pageSpan = null;
 	var siteSpan = null;
 	var pageAndChildrenSpan = null;
-	var buttonLayerContainerId = 'arrowButtonContainerForSelectThemeStyleLayer';
+	//var buttonLayerContainerId = 'arrowButtonContainerForSelectThemeStyleLayer';
 	if (div == null) {
 		div = new Element('div');
 		div.setStyle('opacity', '0');
 		div.setProperty('id', 'chooseStyleLayer');
 		div.addClass('themeChooseStyle');
 		
-		var buttonContainer = new Element('div');
+		/*var buttonContainer = new Element('div');
 		buttonContainer.setProperty('id', buttonLayerContainerId);
 		buttonContainer.addClass('buttonContainer');
 		var arrowImage = new Element('img');
@@ -265,7 +265,7 @@ function chooseOption(themeID) {
 		arrowImage.injectInside(buttonContainer);
 		arrowImage.addEvent('click', function() {
 			getChildTemplatesForThisTheme();
-		});
+		});*/
 		
 		var container = new Element('div');
 		container.addClass('themesButtonContainer');
@@ -317,7 +317,7 @@ function chooseOption(themeID) {
 		right.appendChild(divd);
 		right.appendChild(divs);
 		
-		div.appendChild(buttonContainer);
+		//div.appendChild(buttonContainer);
 		div.appendChild(container);
 		document.body.appendChild(div);
 		
@@ -347,17 +347,14 @@ function chooseOption(themeID) {
 	
 	$('themeTemplateChildrenContainer').setStyles({
 		opacity: '0',
-		left: (leftPosition + 25) + 'px'
+		left: leftPosition + 'px'
 	});
 	$('themeTemplateChildrenContainer').setProperty('themeid', themeID);
 	$('themeTemplateChildrenContainer').setProperty('initialtopposition', topPosition);
 	
 	var theme = getTheme(themeID);
-	if (theme == null || theme.children == null || theme.children.length == 0) {
-		$(buttonLayerContainerId).setStyle('visibility', 'hidden');
-	}
-	else {
-		$(buttonLayerContainerId).setStyle('visibility', 'visible');
+	if (theme != null && theme.children != null && theme.children.length > 0) {
+		getChildTemplatesForThisTheme();
 	}
 	
 	div.setStyle('left', leftPosition + 'px');
@@ -366,7 +363,7 @@ function chooseOption(themeID) {
 	showSelectStyle.start(0, 1);
 }
 
-function getChildTemplatesForThisTheme() {	
+function getChildTemplatesForThisTheme() {
 	var stackContainer = $('themeTemplateChildrenContainer');
 	if (stackContainer == null) {
 		return false;
