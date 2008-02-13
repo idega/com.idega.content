@@ -43,7 +43,7 @@ version="1.2">
                 		window.addEvent('domready', getPathToImageFolder);
  	              		window.addEvent('domready', registerSiteActions);
  	              		window.addEvent('domready', createAccordionForLucid);
- 	              		window.addEvent('domready', createAccordionForTemplates);
+ 	              		window.addEvent('domready', registerActionsForTemplatesInLucid);
  	              		window.addEvent('resize', controlLucidAppWindow);
                 	</script>
                 </f:verbatim>
@@ -66,6 +66,13 @@ version="1.2">
 										</wf:iwtree>
 									</c:block_with_toolbar>
 								</t:div>			
+							</t:div>
+							
+							<t:htmlTag styleClass="toggler atStart" value="span">
+								<h:outputText styleClass="title" value="#{localizedStrings['com.idega.content']['templates']}"/>
+							</t:htmlTag>
+							<t:div id="templatesTreeToggle" forceId="true" styleClass="element atStart">
+								<c:TemplatesTree />
 							</t:div>
 							
 							<t:htmlTag styleClass="toggler atStart" value="span">

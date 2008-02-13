@@ -164,7 +164,7 @@ function setGlobalId(themeId) {
 }
 
 function setThemeName(themeName) {
-	removeStyleOptions();
+	removeStyleOptions(null);
 	var themeNameObj = $('theme_name');
 	if (themeNameObj != null) {
 		themeNameObj.value = themeName;
@@ -212,7 +212,7 @@ function getThemesTickerContainerLength() {
 }
 
 function scroll(id) {
-	removeStyleOptions();
+	removeStyleOptions(null);
 	if (id == null) {
 		return;
 	}
@@ -371,7 +371,7 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
 		
 		if (simpleTheme.linkToSmallPreview != null && simpleTheme.linkToSmallPreview != '') {
 			time = date.getTime();
-			theme = new Theme(simpleTheme.name, simpleTheme.linkToSmallPreview + '?' + time, simpleTheme.linkToBigPreview + '?' + time, simpleTheme.id, simpleTheme.used);
+			theme = new Theme(simpleTheme.name, simpleTheme.linkToSmallPreview + '?' + time, simpleTheme.linkToBigPreview + '?' + time, simpleTheme.id, simpleTheme.used, simpleTheme.children);
 			
 			var div = new Element('div');
 			div.setAttribute('id', theme.id + '_mainContainer');
@@ -422,10 +422,10 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
 	   		}
 	   		if (ENABLE_STYLE_FUNCTIONS) {
 	   			image.addEvents({
-	   				'mouseover': function() {
+	   				'mouseenter': function() {
 		   				chooseStyle(this.id);
 		   			},
-		   			'mouseout': function() {
+		   			'mouseleave': function() {
 		   				recallStyle(this.id);
 		   			}
 	   			});
@@ -552,13 +552,14 @@ function setIfUsedTheme(used) {
 	highlightElement(element, 500, '#FFFF44');
 }
 
-function Theme(name, linkToSmallPreview, linkToBigPreview, id, used) {
+function Theme(name, linkToSmallPreview, linkToBigPreview, id, used, children) {
 	this.name = name;
 	this.linkToSmallPreview = linkToSmallPreview;
 	this.linkToBigPreview = linkToBigPreview;
 	this.id = id;
 	this.applyStyle = false;
 	this.used = used;
+	this.children = children;
 }
 
 function setPreview(url) {
@@ -626,7 +627,7 @@ function replaceTheme(simpleTheme) {
 	}
 	
 	var time = new Date().getTime();
-	var theme = new Theme(simpleTheme.name, simpleTheme.linkToSmallPreview + '?' + time, simpleTheme.linkToBigPreview + '?' + time, simpleTheme.id, simpleTheme.used);
+	var theme = new Theme(simpleTheme.name, simpleTheme.linkToSmallPreview + '?' + time, simpleTheme.linkToBigPreview + '?' + time, simpleTheme.id, simpleTheme.used, simpleTheme.children);
 	
 	var oldTheme = getTheme(theme.id);
 	if (oldTheme != null) {
@@ -655,10 +656,29 @@ function getThemeIndex(themeID) {
 	return -1;
 }
 
-function removeStyleOptions() {
-	var div = $('chooseStyleLayer');
-	if (div != null) {
-		div.style.display = 'none';
+function removeStyleOptions(event) {
+	var needToHide = true;
+	
+	if (event != null) {
+		if ($(event.target).getProperty('hidestylelayer') == 'no') {
+			needToHide = false;
+		}
+	}
+	
+	if (needToHide) {
+		var div = $('chooseStyleLayer');
+		if (div != null) {
+			var currentOpacity = div.getStyle('opacity');
+			if (currentOpacity == 0 || currentOpacity == '0') {
+				return;
+			}
+			var hideSelectStyle = new Fx.Style(div, 'opacity', {duration: 250});
+			hideSelectStyle.start(1, 0);
+		}
+		
+		if ($('themeTemplateChildrenContainer')) {
+			$('themeTemplateChildrenContainer').setStyle('opacity', '0');
+		}
 	}
 }
 

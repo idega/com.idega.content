@@ -123,6 +123,12 @@ function setFrameUrl(uri) {
 }
 						
 function getPrewUrl(nodeID) {
+	if (WORKING_WITH_TEMPLATE) {
+		if (nodeID != TEMPLATE_ID) {
+			nodeID = TEMPLATE_ID;
+		}		
+	}
+	
 	ThemesEngine.getPageUri(nodeID, setFrameUrl);
 }
 						

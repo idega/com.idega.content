@@ -273,3 +273,6 @@ preparing=Preparing...
 style_for_page_and_children=Select style for current page and all children
 choose_style_for_page_and_children=Page*
 restore_theme_to_original_state=Restore theme to it's original state
+create_child_template_for_current_template=Create child template for current template
+create_child_template=Create child template
+select_template_first=Select template first!

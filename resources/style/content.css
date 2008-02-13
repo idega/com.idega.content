@@ -1345,3 +1345,25 @@ a#mb_close_link {
 	background: url(images/close_24.png) no-repeat !important;
 	border: 0 !important;
 }
+
+.templatesTreeInLucidStyle {
+	list-style: none;
+	padding: 0px;
+}
+
+.templatesTreeInLucidStyle li ul {
+	padding-left: 18px;
+}
+
+.templateNameInLucidTemplatesTreeStyle {
+	margin-left: 5px;
+}
+
+.templatesTreeContainerInLucidStyle {
+	padding-left: 5px;
+	overflow: auto;
+}
+
+.themeTemplateChildrenContainerAsStackStyle {
+	position: absolute;
+}

@@ -1,7 +1,8 @@
 var PAGE_ID = null;
+var TEMPLATE_ID = null;
 
 var RESERVED_HEIGHT = 82;
-var RESERVED_HEIGHT_FOR_PAGES = RESERVED_HEIGHT + 179;
+var RESERVED_HEIGHT_FOR_PAGES = RESERVED_HEIGHT + 197;
 var RESERVED_HEIGHT_FOR_SITE = RESERVED_HEIGHT + 94;
 
 var IS_SITE_MAP = false;
@@ -11,6 +12,8 @@ var NEED_REDIRECT = false;
 var EMPTY_SITE_TREE_TEXT_CONTAINER_ID = 'emptySiteTreeTextContainer';
 var CURRENT_SITE_STRUCTURE_TREE_ID = 'current_structure_tree';
 var ALL_CURRENT_SITE_STRUCTURE_TREE_ID = 'div_id_' + CURRENT_SITE_STRUCTURE_TREE_ID;
+
+var WORKING_WITH_TEMPLATE = false;
 
 function setNeedRedirect(redirect) {
 	NEED_REDIRECT = redirect;
@@ -308,6 +311,7 @@ var HIDE_MODULES_TEXT = 'Hide Modules';
 var REDIRECTING_TEXT = 'Redirecting...';
 var CREATING_TEXT = 'Creating...';
 var PREPARING_THEME_TEXT = 'Preparing...';
+var SELECT_TEMPLATE_FIRST_TEXT = 'Select template first!';
 
 function getLocalizedTextForThemes() {
 	ThemesEngine.getLocalizedText(getLocalizedTextForThemesCallback);
@@ -317,7 +321,7 @@ function getLocalizedTextForThemesCallback(list) {
 	if (list == null) {
 		return false;
 	}
-	if (list.length != 33) {
+	if (list.length != 34) {
 		return false;
 	}
 	
@@ -354,6 +358,7 @@ function getLocalizedTextForThemesCallback(list) {
 	PREPARING_THEME_TEXT = list[30];
 	STYLE_FOR_PAGE_AND_CHILDREN = list[31];
 	CHOOSE_STYLE_FOR_PAGE_AND_CHILDREN = list[32];
+	SELECT_TEMPLATE_FIRST_TEXT = list[33];
 	
 }
 
@@ -577,11 +582,15 @@ function registerActionsOnSiteTreeElement(element) {
 	element.removeEvents('dblclick');
 	
 	element.addEvent('dblclick', function() {
+		WORKING_WITH_TEMPLATE = false;
+		
 		executeOnDblClick(element);
 		markAsExecutingDoubleClick(element.id);
 		return false;
 	});
 	element.addEvent('click', function() {
+		WORKING_WITH_TEMPLATE = false;
+		
 		handleSiteTreeNodeClick(element);
 		return false;
 	});
@@ -796,6 +805,11 @@ function resizeTreeContainerInThemes(reservedHeight) {
 		if (heightForAccordion > 0) {
 			$('sitemap').setStyle('height', heightForAccordion + 'px');
 		}
+		
+		var templatesContainer = $('templatesTreeContainerInLucid');
+		if (templatesContainer) {
+			templatesContainer.setStyle('height', heightForAccordion + 'px');
+		}
 	}
 	
 	if (!isSiteMap()) {
@@ -826,17 +840,4 @@ function createAccordionForLucid() {
 			toggler.removeClass('selectedToggler');
 		}
 	}, $('accordion'));
-}
-
-function createAccordionForTemplates() {
-	/*var accordion = new Accordion('span.templateTitleStyle', 'div.templatesContainer', {
-		opacity: false,
-		onActive: function(toggler, element){
-			toggler.addClass('selectedToggler');
-		},
- 
-		onBackground: function(toggler, element){
-			toggler.removeClass('selectedToggler');
-		}
-	}, $('templatesAccordion'));*/
 }
