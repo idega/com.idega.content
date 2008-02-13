@@ -258,6 +258,7 @@ function chooseOption(themeID) {
 		
 		var buttonContainer = new Element('div');
 		buttonContainer.setProperty('id', buttonLayerContainerId);
+		buttonContainer.addClass('buttonContainer');
 		var arrowImage = new Element('img');
 		arrowImage.setProperty('hidestylelayer', 'no');
 		arrowImage.setProperty('src', '/idegaweb/bundles/com.idega.content.bundle/resources/images/up_arrow.png');
@@ -266,31 +267,45 @@ function chooseOption(themeID) {
 			getChildTemplatesForThisTheme();
 		});
 		
+		var container = new Element('div');
+		container.addClass('themesButtonContainer');
+		
+		var left = new Element('div');
+		left.addClass('left');
+		container.appendChild(left);
+		
+		var right = new Element('div');
+		right.addClass('right');
+		container.appendChild(right);
+		
 		var divp = new Element('div');
 		divp.addClass('themeChooseStyleText');
+		divp.addClass('applyPage');
 		divp.setProperty('title', getStyleForCurrentPage());
 		divp.setProperty('alt', getStyleForCurrentPage());
 		pageSpan = new Element('span');
 		pageSpan.setProperty('id', 'pageStyle');
-		pageSpan.appendChild(document.createTextNode(getChooseStyleForPage()));
+		//pageSpan.appendChild(document.createTextNode(getChooseStyleForPage()));
 		divp.appendChild(pageSpan);
 	
 		var divs = new Element('div');
 		divs.addClass('themeChooseStyleText');
+		divs.addClass('applySite');
 		divs.setProperty('title', getStyleForSite());
 		divs.setProperty('alt', getStyleForSite());
 		siteSpan = new Element('span');
 		siteSpan.setProperty('id', 'siteStyle');
-		siteSpan.appendChild(document.createTextNode(getChooseStyleForSite()));
+		//siteSpan.appendChild(document.createTextNode(getChooseStyleForSite()));
 		divs.appendChild(siteSpan);
 		
 		var divd = new Element('div');
 		divd.addClass('themeChooseStyleText');
+		divd.addClass('applyPageAndChildren');
 		divd.setProperty('title', getStyleForPageAndChildren());
 		divd.setProperty('alt', getStyleForPageAndChildren());
 		pageAndChildrenSpan = new Element('span');
 		pageAndChildrenSpan.setProperty('id', 'pageAndChildrenStyle');
-		pageAndChildrenSpan.appendChild(document.createTextNode(getChooseStyleForPageAndChildren()));
+		//pageAndChildrenSpan.appendChild(document.createTextNode(getChooseStyleForPageAndChildren()));
 		divd.appendChild(pageAndChildrenSpan);
 		
 		var themeChildrenTemplatesContainer = new Element('div');
@@ -298,10 +313,12 @@ function chooseOption(themeID) {
 		themeChildrenTemplatesContainer.addClass('themeTemplateChildrenContainerAsStackStyle');
 		document.body.appendChild(themeChildrenTemplatesContainer);
 		
+		right.appendChild(divp);
+		right.appendChild(divd);
+		right.appendChild(divs);
+		
 		div.appendChild(buttonContainer);
-		div.appendChild(divp);
-		div.appendChild(divd);
-		div.appendChild(divs);
+		div.appendChild(container);
 		document.body.appendChild(div);
 		
 		var setStyleForPageFunction = function() {

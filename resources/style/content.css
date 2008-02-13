@@ -418,19 +418,65 @@ html>body .themesSlider {
 
 .themeChooseStyle {
 	position: absolute;
-	width: 149px;
-	height: 112px;
+	width: 147px;
+	height: 110px;
 	z-index: 9999;
 	clear: both;
+	margin-top: 40px;
+}
+
+.themeChooseStyle .themesButtonContainer {
+	overflow: hidden;
+	position: absolute;
+	top: 58px;
+	left: 4px;
+}
+
+.themeChooseStyle .left {
+	width: 5px;
+	height: 48px;
+	float: left;
+	background: url(images/buttons-left.png) left no-repeat;
+}
+
+.themeChooseStyle .right {
+	height: 32px;
+	padding: 8px 0;
+	padding-right: 10px;
+	padding-left: 5px;
+	background: url(images/buttons-right.png) right no-repeat;
+	float: left;
 }
 
 .themeChooseStyleText {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 34pt;
+	font-size: 12px;
 	font-weight: bold;
 	text-align: center;
 	cursor: pointer;
-	height: 33%;
+	float: left;
+	margin: 0 4px;
+}
+
+.themeChooseStyleText #pageStyle {
+	display: block;
+	height: 32px;
+	width: 32px;
+	background: url(images/opnbr_32.png) no-repeat;
+}
+
+.themeChooseStyleText #pageAndChildrenStyle {
+	display: block;
+	height: 32px;
+	width: 32px;
+	background: url(images/docs_32.png) no-repeat;
+}
+
+.themeChooseStyleText #siteStyle {
+	display: block;
+	height: 32px;
+	width: 32px;
+	background: url(images/ntwrk_32.png) no-repeat;
 }
 
 .pageInfoStyle {
