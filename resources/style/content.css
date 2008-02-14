@@ -1069,7 +1069,7 @@ body.site_manager .mainPagesContentStyle {
 	margin-right: 13px;
 	width: 24px;
 	text-align: center;
-	text-shadow: #fff 2px 2px 1px;
+	text-shadow: #fff 1px 1px 1px;
 }
 
 .pageInfoButtonsContainer a:hover {
@@ -1255,7 +1255,7 @@ ul#page_tree_div li ul {
 	padding-left: 10px;
 	margin-left: 8px;
 	margin-right: 8px;
-	text-shadow: #fff 2px 2px 1px;
+	text-shadow: #fff 1px 1px 1px;
 }
 
 html>body .filters a {
@@ -1281,7 +1281,7 @@ html>body .filters a {
 .filters a.active {
 	background: url(images/filter_background_left.png) left no-repeat;
 	color: #fff;
-	text-shadow: #a0a0a0 2px 2px 1px;
+	text-shadow: #a0a0a0 1px 1px 1px;
 }
 
 .filters a.active .outerSpan {
@@ -1410,6 +1410,79 @@ a#mb_close_link {
 	overflow: auto;
 }
 
-.themeTemplateChildrenContainerAsStackStyle {
+#themeTemplateChildrenContainer {
 	position: absolute;
+	background: #fff;
+	margin-top: 42px;
+	margin-left: -30px !important;
+	width: 205px;
+	background: url(images/child-templates-bottom.png) left bottom no-repeat;
+	padding-bottom: 18px;
+}
+
+#themeTemplateChildrenContainer ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;	
+	width: 205px;
+	background: url(images/child-templates-top.png) left top no-repeat;
+	padding: 10px 8px 0 8px;
+}
+
+#themeTemplateChildrenContainer ul li {
+	font-size: 11px;
+	color: #fff;
+	text-shadow: #000 1px 1px 1px;
+	padding: 5px 0;
+	width: 189px;
+	overflow: hidden;
+	border-top: 1px #000 solid;
+	border-bottom: 1px #666 solid;
+}
+
+#themeTemplateChildrenContainer ul li.firstChild {
+	border-top: 0;
+	padding-top: 0;
+}
+
+#themeTemplateChildrenContainer ul li.lastChild {
+	border-bottom: 0;
+	padding-bottom: 0;
+}
+
+#themeTemplateChildrenContainer ul li span {
+	display: block;
+	float: left;
+	width: 130px;
+	line-height: 16px;
+}
+
+#themeTemplateChildrenContainer .container {
+	float: right;
+	width: 54px;
+	overflow: hidden;
+}
+
+#themeTemplateChildrenContainer ul li a {
+	display: block;
+	float: left;
+	width: 16px;
+	height: 16px;
+	margin: 0 1px;
+	padding: 0;
+}
+
+#themeTemplateChildrenContainer ul li a.applyPage {
+	background: url(images/opnbr_16.png) no-repeat;
+}
+
+#themeTemplateChildrenContainer ul li a.applyPageAndChildren {
+	background: url(images/docs_16.png) no-repeat;
+}
+
+#themeTemplateChildrenContainer ul li a.applySite {
+	background: url(images/ntwrk_16.png) no-repeat;
+}
+
+.themeTemplateChildrenContainerAsStackStyle {
 }

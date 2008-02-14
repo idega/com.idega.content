@@ -387,42 +387,52 @@ function getChildTemplatesForThisTheme() {
 		
 		var childTemplateContainer = new Element('li');
 		childTemplateContainer.addClass('themeChildInStackContainerStyle');
+		if (i == 0) {
+			childTemplateContainer.addClass('firstChild');
+		}
+		else if (i + 1 == allChildren.length) {
+			childTemplateContainer.addClass('lastChild');
+		}
 		var span = new Element('span');
 		span.appendText(allChildren[i].name);
 		span.injectInside(childTemplateContainer);
 		
+		var container = new Element('div');
+		container.addClass('container');
+		container.injectInside(childTemplateContainer);
+		
 		var applyStyleToPageLink = new Element('a');
 		applyStyleToPageLink.setProperty('href', 'javascript:void(0)');
 		applyStyleToPageLink.setProperty('templateid', templateId);
-		applyStyleToPageLink.appendText('Page');	//	TODO: remove
 		applyStyleToPageLink.addClass('applyPage');
+		applyStyleToPageLink.setProperty('title', getStyleForCurrentPage());
 		applyStyleToPageLink.addEvent('click', function() {
 			TEMPLATE_ID = $(this).getProperty('templateid');
 			setTemplateForPageOrPages(true, 0);
 		});
-		applyStyleToPageLink.injectInside(childTemplateContainer);
+		applyStyleToPageLink.injectInside(container);
 		
 		var applyStyleToPageAndChildrenLink = new Element('a');
 		applyStyleToPageAndChildrenLink.setProperty('href', 'javascript:void(0)');
 		applyStyleToPageAndChildrenLink.setProperty('templateid', templateId);
-		applyStyleToPageAndChildrenLink.appendText('Page*');	//	TODO: remove
 		applyStyleToPageAndChildrenLink.addClass('applyPageAndChildren');
+		applyStyleToPageAndChildrenLink.setProperty('title', getStyleForPageAndChildren());
 		applyStyleToPageAndChildrenLink.addEvent('click', function() {
 			TEMPLATE_ID = $(this).getProperty('templateid');
 			setTemplateForPageOrPages(true, 1);
 		});
-		applyStyleToPageAndChildrenLink.injectInside(childTemplateContainer);
+		applyStyleToPageAndChildrenLink.injectInside(container);
 		
 		var applyStyleToSiteLink = new Element('a');
 		applyStyleToSiteLink.setProperty('href', 'javascript:void(0)');
 		applyStyleToSiteLink.setProperty('templateid', templateId);
-		applyStyleToSiteLink.appendText('Site');	//	TODO: remove
 		applyStyleToSiteLink.addClass('applySite');
+		applyStyleToSiteLink.setProperty('title', getStyleForSite());
 		applyStyleToSiteLink.addEvent('click', function() {
 			TEMPLATE_ID = $(this).getProperty('templateid');
 			setTemplateForPageOrPages(false, 2);
 		});
-		applyStyleToSiteLink.injectInside(childTemplateContainer);
+		applyStyleToSiteLink.injectInside(container);
 		
 		childTemplateContainer.injectInside(listInStackContainer);
 	}
