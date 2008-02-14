@@ -249,23 +249,11 @@ function chooseOption(themeID) {
 	var pageSpan = null;
 	var siteSpan = null;
 	var pageAndChildrenSpan = null;
-	//var buttonLayerContainerId = 'arrowButtonContainerForSelectThemeStyleLayer';
 	if (div == null) {
 		div = new Element('div');
 		div.setStyle('opacity', '0');
 		div.setProperty('id', 'chooseStyleLayer');
 		div.addClass('themeChooseStyle');
-		
-		/*var buttonContainer = new Element('div');
-		buttonContainer.setProperty('id', buttonLayerContainerId);
-		buttonContainer.addClass('buttonContainer');
-		var arrowImage = new Element('img');
-		arrowImage.setProperty('hidestylelayer', 'no');
-		arrowImage.setProperty('src', '/idegaweb/bundles/com.idega.content.bundle/resources/images/up_arrow.png');
-		arrowImage.injectInside(buttonContainer);
-		arrowImage.addEvent('click', function() {
-			getChildTemplatesForThisTheme();
-		});*/
 		
 		var container = new Element('div');
 		container.addClass('themesButtonContainer');
@@ -285,7 +273,6 @@ function chooseOption(themeID) {
 		divp.setProperty('alt', getStyleForCurrentPage());
 		pageSpan = new Element('span');
 		pageSpan.setProperty('id', 'pageStyle');
-		//pageSpan.appendChild(document.createTextNode(getChooseStyleForPage()));
 		divp.appendChild(pageSpan);
 	
 		var divs = new Element('div');
@@ -295,7 +282,6 @@ function chooseOption(themeID) {
 		divs.setProperty('alt', getStyleForSite());
 		siteSpan = new Element('span');
 		siteSpan.setProperty('id', 'siteStyle');
-		//siteSpan.appendChild(document.createTextNode(getChooseStyleForSite()));
 		divs.appendChild(siteSpan);
 		
 		var divd = new Element('div');
@@ -305,7 +291,6 @@ function chooseOption(themeID) {
 		divd.setProperty('alt', getStyleForPageAndChildren());
 		pageAndChildrenSpan = new Element('span');
 		pageAndChildrenSpan.setProperty('id', 'pageAndChildrenStyle');
-		//pageAndChildrenSpan.appendChild(document.createTextNode(getChooseStyleForPageAndChildren()));
 		divd.appendChild(pageAndChildrenSpan);
 		
 		var themeChildrenTemplatesContainer = new Element('div');
@@ -317,7 +302,6 @@ function chooseOption(themeID) {
 		right.appendChild(divd);
 		right.appendChild(divs);
 		
-		//div.appendChild(buttonContainer);
 		div.appendChild(container);
 		document.body.appendChild(div);
 		
