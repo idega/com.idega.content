@@ -21,6 +21,7 @@ public class CssScanner {
 	private static final String COMMENT_END = "*/";
 	private static final String OPENER = "{";
 	private static final String CLOSER = "}";
+	private static final String UTF_8_DECLARATION = "@charset \"UTF-8\";";
 	
 	public CssScanner(BufferedReader readerBuffer) {
 		this.readerBuffer = readerBuffer;
@@ -54,6 +55,11 @@ public class CssScanner {
 	private String scanLine(String line) {
 		if (line == null) {
 			return ThemesConstants.EMPTY;
+		}
+		
+		if (line.indexOf(UTF_8_DECLARATION) != -1) {
+			line = StringHandler.replace(line, UTF_8_DECLARATION, CoreConstants.EMPTY);
+			return line;
 		}
 		
 		// Checking for incorrect hexidecimal values

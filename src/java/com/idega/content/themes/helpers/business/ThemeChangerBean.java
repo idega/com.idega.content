@@ -36,7 +36,6 @@ import bsh.Interpreter;
 
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.content.business.ContentConstants;
-import com.idega.content.themes.helpers.bean.Replaces;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeChange;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
@@ -68,19 +67,6 @@ public class ThemeChangerBean implements ThemeChanger {
 	// Default keywords
 	private static final String FOOTER = "footer";
 	private static final String CONTENT = "content";
-	
-	// These are defaults in RapidWeaver style files, we need to change directories to images
-	private static final String CSS_IMAGE_URL = "url(";
-	private static final String DIRECTORY = "../";
-	private static final String IMAGES = "images";
-	private static final String CUSTOM_CSS_REPLACE = CSS_IMAGE_URL + DIRECTORY + DIRECTORY + IMAGES;
-	private static final String[] CUSTOM_REPLACE = new String[] {CUSTOM_CSS_REPLACE};
-
-	// Incorrect CSS syntax needs to be replaced
-	private static final String[] HREF_REPLACE = new String[] {HREF + "^=", HREF + "$="};
-	private static final String HREF_REPLACEMENT = HREF + "~=";
-	private static final String[] IMAGE_URL_REPLACE = new String[] {"url(images"};
-	private static final String[] HTML_REPLACE = new String[] {">html"};
 	
 	private static final String HTML_HEAD = "head";
 	private static final String HTML_BODY = "body";
@@ -298,7 +284,44 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 	
 	private boolean uploadTheme(Document doc, Theme theme) {
+		checkCssFiles(doc);
+		
 		return uploadTheme(out.outputString(doc), theme, true);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private boolean checkCssFiles(Document doc) {
+		if (doc == null) {
+			return false;
+		}
+		
+		Element root = doc.getRootElement();
+		if (root == null) {
+			return false;
+		}
+			
+		List links = getNodesByXpath(root, ThemesConstants.LINK_TAG_INSTRUCTION);
+		if (links == null) {
+			return true;
+		}
+		
+		Object o = null;
+		Element link = null;
+		String cssLink = null;
+		for (int i = 0; i < links.size(); i++) {
+			o = links.get(i);
+			if (o instanceof Element) {
+				link = (Element) o;
+				
+				cssLink = link.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_HREF);
+				
+				if (cssLink != null) {
+					proceedStyleFile(getFixedDocumentContent(cssLink));
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 	private boolean addDefaultEnabledStyles(Theme theme, Element head, String basePath, Document doc, List<ThemeStyleGroupMember> members) {
@@ -370,24 +393,13 @@ public class ThemeChangerBean implements ThemeChanger {
 			index++;
 		}
 		
-		// Constructing correct path to images folder
-		StringBuffer replacement = new StringBuffer();
-		replacement.append(CSS_IMAGE_URL);
-		replacement.append(CoreConstants.WEBDAV_SERVLET_URI);
-		replacement.append(theme.getLinkToBase());
-		replacement.append(IMAGES);
-		
-		Replaces[] r = new Replaces[]{getReplace(CUSTOM_REPLACE, replacement.toString()), getReplace(IMAGE_URL_REPLACE, replacement.toString()), 
-				getReplace(HTML_REPLACE, ThemesConstants.EMPTY)};
-		
-		
 		List<String> invalidFiles = new ArrayList<String>();
 		int i = 0;
 		for (Iterator<ThemeStyleGroupMember> it = styles.iterator(); it.hasNext(); ) {
 			member = it.next();
 			files = member.getStyleFiles();
 			for (index = 0; index < files.size(); index++) {
-				if (!proceedStyleFile(new StringBuffer(theme.getLinkToBase()).append(files.get(index)).toString(), r)) {
+				if (!proceedStyleFile(new StringBuffer(theme.getLinkToBase()).append(files.get(index)).toString())) {
 					invalidFiles.add(files.get(index));	//	Invalid CSS file, disabling variation
 				}
 			}
@@ -881,35 +893,26 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 	}
 	
-	private Replaces getReplace(String[] whatToReplace, String replacement) {
-		if (whatToReplace == null || replacement == null) {
-			return null;
-		}
-		Replaces replace = new Replaces();
-		replace.setReplaces(whatToReplace);
-		replace.setReplacement(replacement);
-		return replace;
-	}
-	
 	private boolean prepareThemeDefaultStyleFiles(Theme theme) {
 		List <String> defaultStyles = ThemesConstants.DEFAULT_STYLE_FILES;
-		StringBuffer replacement = new StringBuffer();
-		replacement.append(CSS_IMAGE_URL).append(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase()).append(IMAGES);
-		Replaces[] r = new Replaces[]{getReplace(HREF_REPLACE, HREF_REPLACEMENT), getReplace(IMAGE_URL_REPLACE, replacement.toString()),
-				getReplace(HTML_REPLACE, ThemesConstants.EMPTY)};	
 		for (int i = 0; i < defaultStyles.size(); i++) {
-			proceedStyleFile(new StringBuffer(theme.getLinkToBase()).append(defaultStyles.get(i)).toString(), r);
+			proceedStyleFile(new StringBuffer(theme.getLinkToBase()).append(defaultStyles.get(i)).toString());
 		}
 		return true;
 	}
 	
-	private boolean proceedStyleFile(String linkToStyle, Replaces[] replaces) {
-		if (linkToStyle == null || replaces == null) {
+	private boolean proceedStyleFile(String linkToStyle) {
+		if (linkToStyle == null) {
 			return false;
 		}
 		
 		// Getting CSS file
-		InputStream is = helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(linkToStyle).toString());
+		String fullLink = null;
+		if (linkToStyle.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
+			linkToStyle = linkToStyle.substring(linkToStyle.indexOf(CoreConstants.WEBDAV_SERVLET_URI) + CoreConstants.WEBDAV_SERVLET_URI.length());
+		}
+		fullLink = new StringBuffer(helper.getFullWebRoot()).append(linkToStyle).toString();
+		InputStream is = helper.getInputStream(fullLink);
 		if (is == null) {
 			log.error(new StringBuilder("Cann't get CSS file: '").append(linkToStyle).append("' from Theme pack!"));
 			return false;
@@ -928,23 +931,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		boolean needToReplace = scanner.isNeedToReplace();
 		
-		// Changing content
 		String content = result.toString();
-		String[] whatToReplace = null;
-		String replacement = null;
-		for (int i = 0; i < replaces.length; i++) {
-			whatToReplace = replaces[i].getReplaces();
-			replacement = replaces[i].getReplacement();
-			if (whatToReplace != null && replacement != null) {
-				for (int j = 0; j < whatToReplace.length; j++) {
-					while (content.indexOf(whatToReplace[j]) != -1) {
-						content = content.replace(whatToReplace[j], replacement);
-						needToReplace = true;
-					}
-				}
-			}
-		}
-
 		if (!needToReplace) {
 			return true;
 		}
@@ -2320,7 +2307,7 @@ public class ThemeChangerBean implements ThemeChanger {
 						Attribute styleLink = child.getAttribute(ThemesConstants.TAG_ATTRIBUTE_HREF);
 						if (styleLink != null) {
 							String styleHref = styleLink.getValue();
-							if (styleHref != null && !isDefaultStyle(styleHref) && !isColorVariation(theme.getColourFiles(), styleHref)) {
+							if (styleHref != null && !isDefaultStyle(styleHref, theme) && !isColorVariation(theme.getColourFiles(), styleHref)) {
 								ThemeStyleGroupMember member = getExistingDefaultStyle(styleHref, styles);
 								if (member == null) {
 									stylesToRemove.add(child);	//	Style is needless: it's not declared as default in properties list
@@ -2419,7 +2406,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return null;
 	}
 	
-	private boolean isDefaultStyle(String cssHref) {
+	private boolean isDefaultStyle(String cssHref, Theme theme) {
 		if (cssHref == null) {
 			return false;
 		}
@@ -2430,7 +2417,21 @@ public class ThemeChangerBean implements ThemeChanger {
 			}
 		}
 		
-		return false;
+		//	Didn't find CSS in static list, will check if CSS is defined in any variation. If not - it's 'default' CSS
+		Collection<ThemeStyleGroupMember> allVariations = theme.getStyleGroupsMembers().values();
+		ThemeStyleGroupMember styleGroup = null;
+		for (Iterator<ThemeStyleGroupMember> it = allVariations.iterator(); it.hasNext();) {
+			styleGroup = it.next();
+			
+			List<String> files = styleGroup.getStyleFiles();
+			for (int j = 0; j < files.size(); j++) {
+				if (cssHref.endsWith(files.get(j))) {
+					return false;	//	It's defined in variations
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 	public boolean restoreTheme(String themeID) {
