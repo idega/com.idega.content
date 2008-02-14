@@ -943,4 +943,6 @@ function updateSiteTemplatesTree(tree) {
 	insertNodesToContainer(tree, container);
 	
 	registerActionsForTemplatesInLucid();
+	
+	getThemes(null, true, SLIDER_SHOWED_FIRST_TIME);
 }
