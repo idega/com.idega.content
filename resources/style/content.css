@@ -490,8 +490,6 @@ html>body .themesSlider {
 
 .pageInfoStyle_accordion {
 	width: auto;
-	border-bottom: 1px #cacaca solid;
-	overflow: hidden;
 	padding: 0;
 }
 
@@ -519,7 +517,7 @@ html>body .themesSlider {
 
 .webfaceFormItem input {
 	float: left;
-	width: 120px;
+	width: 100px;
 	margin: 0 !important;
 	padding: 2px 4px;
 	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
@@ -838,12 +836,9 @@ div.pagesTypesContainer .wf_blockmainarea {
 /*#site_tree_container .wf_menuheader{
 }*/
 #pageInfoContainer .wf_menuheader {
-	border-bottom: 1px solid #d7d7d7;
 }
 
 #siteInfoContainer .siteInfoStyle {
-	bottom: 0 !important;
-	height: 327px !important;
 }
 
 #siteInfoContainer .wf_blockmainarea input {
@@ -932,10 +927,6 @@ html * .scrollTable {
 }
 
 #div_id_current_structure_tree {
-	position: relative;
-	margin-bottom: 5px;
-	padding-bottom: 20px;
-	overflow: auto;
 }
 
 #current_structure_tree {
@@ -1018,6 +1009,16 @@ body.site_manager .mainPagesContentStyle {
 	width: 268px;
 	overflow: hidden;
 	border: 1px #cacaca solid;
+}
+
+.accordionInPages .hiddenElement {
+	height: 0 !important;
+	overflow: hidden !important;	
+}
+
+.accordionInPages .selectedElement {
+	overflow: auto !important;
+	border-bottom: 1px #cacaca solid !important;	
 }
 
 .pagePreviewContainer {

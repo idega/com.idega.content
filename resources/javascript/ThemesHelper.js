@@ -801,14 +801,10 @@ function resizeTreeContainerInThemes(reservedHeight) {
 		if (height > 0) {
 			siteTreeContainer.setStyle('height', height + 'px');
 		}
-		var heightForAccordion = totalHeight - reservedHeight + 57;
+
+		var heightForAccordion = totalHeight - 225;
 		if (heightForAccordion > 0) {
-			$('sitemap').setStyle('height', heightForAccordion + 'px');
-		}
-		
-		var templatesContainer = $('templatesTreeContainerInLucid');
-		if (templatesContainer) {
-			templatesContainer.setStyle('height', heightForAccordion + 'px');
+			$$('.selectedElement').setStyle('height', heightForAccordion + 'px');
 		}
 	}
 	
@@ -831,13 +827,26 @@ function createAccordionForLucid() {
 	var accordion = new Accordion('span.atStart', 'div.atStart', {
 		opacity: false,
 		display: 0,
+		height: false,
 		transition: Fx.Transitions.quadOut,
 		onActive: function(toggler, element){
 			toggler.addClass('selectedToggler');
+
+			element.removeClass('hiddenElement');
+			element.addClass('selectedElement');
+
+			var heightForAccordion = getTotalHeight() - 225;
+			if (heightForAccordion > 0) {
+				element.setStyle('height', heightForAccordion + 'px');
+			}
 		},
  
 		onBackground: function(toggler, element){
 			toggler.removeClass('selectedToggler');
+
+			element.removeClass('selectedElement');
+			element.addClass('hiddenElement');
+			element.setStyle('height', '0px');
 		}
 	}, $('accordion'));
 }
