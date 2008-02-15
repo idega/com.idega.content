@@ -53,6 +53,7 @@ public class TemplatesTree extends Block {
 		}
 		
 		Lists templates = new Lists();
+		templates.setStyleClass("templatesTreeInLucidStyle");
 		container.add(templates);
 		
 		addTemplatesToTree(templates, topLevelTemplates, iwc.getCurrentLocale(), iwb);
@@ -71,8 +72,6 @@ public class TemplatesTree extends Block {
 		if (templates == null || templates.size() == 0) {
 			return;
 		}
-		
-		tree.setStyleClass("templatesTreeInLucidStyle");
 		
 		Object o = null;
 		ICTreeNode template = null;

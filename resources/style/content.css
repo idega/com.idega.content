@@ -527,8 +527,9 @@ html>body .themesSlider {
 
 .webfaceButtonLayer {
 	margin: 0 !important;
-	text-align: right;
-	padding: 0 12px 12px 0 !important;
+	text-align: left;
+	padding: 0 12px 12px 6px !important;
+	overflow: hidden;
 }
 
 .webfaceButtonLayer input {
@@ -1396,10 +1397,30 @@ a#mb_close_link {
 .templatesTreeInLucidStyle {
 	list-style: none;
 	padding: 0px;
+	margin: 0;
+	margin-bottom: 12px;
+}
+
+.templatesTreeInLucidStyle li {
+	display: block;
+	clear: both;
+	overflow: hidden;
+}
+
+.templatesTreeInLucidStyle li img {
+	float: left;
+}
+
+.templatesTreeInLucidStyle li a {
+	display: block;
+	float: left;
+	margin-top: 3px;
+	margin-bottom: 5px;
 }
 
 .templatesTreeInLucidStyle li ul {
-	padding-left: 18px;
+	list-style: none;
+	padding-left: 20px;
 }
 
 .templateNameInLucidTemplatesTreeStyle {
@@ -1407,8 +1428,13 @@ a#mb_close_link {
 }
 
 .templatesTreeContainerInLucidStyle {
-	padding-left: 5px;
 	overflow: auto;
+	padding: 12px;
+}
+
+.templatesTreeContainerInLucidStyle .webfaceButtonLayer {
+	padding: 0 !important;
+	padding-bottom: 12px !important;
 }
 
 #themeTemplateChildrenContainer {
