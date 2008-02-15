@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.41 2008/01/24 10:11:49 valdas Exp $
+ * $Id: ContentViewManager.java,v 1.42 2008/02/15 09:45:53 valdas Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -30,10 +30,10 @@ import com.idega.util.CoreConstants;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2008/01/24 10:11:49 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/02/15 09:45:53 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.41 $
+ * @version $Revision: 1.42 $
  */
 public class ContentViewManager implements Singleton  {
 
@@ -100,8 +100,13 @@ public class ContentViewManager implements Singleton  {
 		DefaultViewNode themesNode = new DefaultViewNode("themes", contentNode);
 		themesNode.setJspUri(bundle.getJSPURI("themes.jsp"));
 		themesNode.setKeyboardShortcut(new KeyboardShortcut("t"));
-		themesNode.setName("#{localizedStrings['com.idega.content']['themes']}");		
+		themesNode.setName("#{localizedStrings['com.idega.content']['themes']}");
 
+		DefaultViewNode usersNode = new DefaultViewNode("users", contentNode);
+		usersNode.setJspUri(bundle.getJSPURI("users.jsp"));
+		usersNode.setKeyboardShortcut(new KeyboardShortcut("u"));
+		usersNode.setName("#{localizedStrings['com.idega.content']['users']}");
+		
 		DefaultViewNode documentsNode = new DefaultViewNode("documents",contentNode);
 		documentsNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
 		documentsNode.setKeyboardShortcut(new KeyboardShortcut("d"));
