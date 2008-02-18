@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.32 2008/02/18 11:41:42 eiki Exp $
+ * $Id: IWBundleStarter.java,v 1.33 2008/02/18 12:01:34 eiki Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -32,6 +32,7 @@ import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.view.ContentViewManager;
 import com.idega.core.accesscontrol.business.StandardRoles;
+import com.idega.core.builder.business.BuilderService;
 import com.idega.core.uri.IWActionURIManager;
 import com.idega.idegaweb.DefaultIWBundle;
 import com.idega.idegaweb.IWApplicationContext;
@@ -46,10 +47,10 @@ import com.idega.user.data.Group;
 
 /**
  * 
- *  Last modified: $Date: 2008/02/18 11:41:42 $ by $Author: eiki $
+ *  Last modified: $Date: 2008/02/18 12:01:34 $ by $Author: eiki $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.32 $
+ * @version $Revision: 1.33 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	
@@ -92,7 +93,10 @@ public class IWBundleStarter implements IWBundleStartable{
 	protected void addContentRoleGroups(IWApplicationContext iwac) {
 		try {
 			GroupBusiness groupBiz = (GroupBusiness) IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
-		
+			BuilderService builderService = (BuilderService) IBOLookup.getServiceInstance(iwac, BuilderService.class);
+			boolean clearCache = false;
+			
+			
 			Collection<Group> editorGroups =  groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_EDITOR);
 			Collection<Group> authorGroups =  groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_AUTHOR);
 			
@@ -100,11 +104,17 @@ public class IWBundleStarter implements IWBundleStartable{
 			if(editorGroups.isEmpty()){
 				Group editorGroup = groupBiz.createGroup(StandardRoles.ROLE_KEY_EDITOR, "This is the system group for content editors.", groupBiz.getGroupTypeHome().getPermissionGroupTypeString(), true);
 				iwac.getIWMainApplication().getAccessController().addRoleToGroup(StandardRoles.ROLE_KEY_AUTHOR,editorGroup, iwac);
+				clearCache = true;
 			}
 			
 			if(authorGroups.isEmpty()){
 				Group authorGroup = groupBiz.createGroup(StandardRoles.ROLE_KEY_AUTHOR, "This is the system group for content authors.", groupBiz.getGroupTypeHome().getPermissionGroupTypeString(), true);
 				iwac.getIWMainApplication().getAccessController().addRoleToGroup(StandardRoles.ROLE_KEY_AUTHOR,authorGroup, iwac);
+				clearCache = true;
+			}
+			
+			if(clearCache){
+				builderService.clearAllCaches();
 			}
 			
 		} catch (IBOLookupException e) {
