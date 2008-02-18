@@ -13,7 +13,9 @@
     	<ws:page id="simpleUserApplication">							
 			<h:form id="simpleUserApplicationForm">
 				<wf:wfblock id="simpleUserApplicationBlock" title="#{localizedStrings['com.idega.content']['users']}">
-					<bu:module id="simpleUserApplicationModule" componentClass="com.idega.user.app.SimpleUserApp" />
+					<bu:module id="simpleUserApplicationModule" componentClass="#{userApplicationEngine.getSimpleUserApplicationClassName}">
+						<bu:property name=":method:1:implied:void:setAllFieldsEditable:boolean:" value="Y" type="java.lang.String" />
+					</bu:module>
 				</wf:wfblock>
 			</h:form>
 		</ws:page>
