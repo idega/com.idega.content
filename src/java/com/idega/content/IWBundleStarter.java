@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.31 2007/12/21 19:55:57 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.32 2008/02/18 11:41:42 eiki Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -14,7 +14,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.Map;
+
+import javax.ejb.CreateException;
 
 import com.idega.block.rss.business.RSSProducerRegistry;
 import com.idega.business.IBOLookup;
@@ -28,6 +31,7 @@ import com.idega.content.themes.helpers.bean.Setting;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.view.ContentViewManager;
+import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.uri.IWActionURIManager;
 import com.idega.idegaweb.DefaultIWBundle;
 import com.idega.idegaweb.IWApplicationContext;
@@ -37,13 +41,15 @@ import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.include.GlobalIncludeManager;
 import com.idega.slide.business.IWSlideService;
+import com.idega.user.business.GroupBusiness;
+import com.idega.user.data.Group;
 
 /**
  * 
- *  Last modified: $Date: 2007/12/21 19:55:57 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/02/18 11:41:42 $ by $Author: eiki $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.31 $
+ * @version $Revision: 1.32 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	
@@ -57,6 +63,7 @@ public class IWBundleStarter implements IWBundleStartable{
 	public void start(IWBundle starterBundle) {
 		addIWActionURIHandlers();
 		addRSSProducers(starterBundle);
+		addContentRoleGroups(starterBundle.getApplication().getIWApplicationContext());
 		
 		ContentViewManager cViewManager = ContentViewManager.getInstance(starterBundle.getApplication());
 		cViewManager.initializeStandardNodes(starterBundle);
@@ -76,6 +83,39 @@ public class IWBundleStarter implements IWBundleStartable{
 	    
 	    TemplatesLoader templatesLoader = TemplatesLoader.getInstance(iwmain);
 	    templatesLoader.loadTemplatesFromBundles();
+	}
+
+	/**
+	 * Auto generate groups for the editor and author roles so we can set them in the Lucid app
+	 * @param iwac 
+	 */
+	protected void addContentRoleGroups(IWApplicationContext iwac) {
+		try {
+			GroupBusiness groupBiz = (GroupBusiness) IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
+		
+			Collection<Group> editorGroups =  groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_EDITOR);
+			Collection<Group> authorGroups =  groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_AUTHOR);
+			
+			//only generate groups if none exist
+			if(editorGroups.isEmpty()){
+				Group editorGroup = groupBiz.createGroup(StandardRoles.ROLE_KEY_EDITOR, "This is the system group for content editors.", groupBiz.getGroupTypeHome().getPermissionGroupTypeString(), true);
+				iwac.getIWMainApplication().getAccessController().addRoleToGroup(StandardRoles.ROLE_KEY_AUTHOR,editorGroup, iwac);
+			}
+			
+			if(authorGroups.isEmpty()){
+				Group authorGroup = groupBiz.createGroup(StandardRoles.ROLE_KEY_AUTHOR, "This is the system group for content authors.", groupBiz.getGroupTypeHome().getPermissionGroupTypeString(), true);
+				iwac.getIWMainApplication().getAccessController().addRoleToGroup(StandardRoles.ROLE_KEY_AUTHOR,authorGroup, iwac);
+			}
+			
+		} catch (IBOLookupException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (CreateException e) {
+			e.printStackTrace();
+		}
+		
+		
 	}
 
 	public void stop(IWBundle starterBundle) {
