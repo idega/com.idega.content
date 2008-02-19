@@ -364,7 +364,6 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		}
 		boolean result = true;
 		
-		helper.setLastUsedTheme(theme.getIBPageID());
 		boolean applyToPage = true;
 		if (pageKey == null) {
 			applyToPage = false;
@@ -373,6 +372,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (templateId == null) {
 			templateId = theme.getIBPageID();
 		}
+		helper.setLastUsedTheme(templateId);
 		
 		if (applyToPage) {
 			//	Apply style to selected page
