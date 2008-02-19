@@ -277,3 +277,4 @@ restore_theme_to_original_state=Restore theme to it's original state
 create_child_template_for_current_template=Create child template for current template
 create_child_template=Create child template
 select_template_first=Select template first!
+are_you_sure_you_want_apply_this_template=Are you sure you want to apply this template?

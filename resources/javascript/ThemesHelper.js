@@ -312,6 +312,7 @@ var REDIRECTING_TEXT = 'Redirecting...';
 var CREATING_TEXT = 'Creating...';
 var PREPARING_THEME_TEXT = 'Preparing...';
 var SELECT_TEMPLATE_FIRST_TEXT = 'Select template first!';
+var ARE_YOU_SURE_YOU_WANT_APPLY_THIS_TEMPLATE = 'Are you sure you want to apply this template?';
 
 function getLocalizedTextForThemes() {
 	ThemesEngine.getLocalizedText(getLocalizedTextForThemesCallback);
@@ -321,7 +322,7 @@ function getLocalizedTextForThemesCallback(list) {
 	if (list == null) {
 		return false;
 	}
-	if (list.length != 34) {
+	if (list.length != 35) {
 		return false;
 	}
 	
@@ -359,6 +360,7 @@ function getLocalizedTextForThemesCallback(list) {
 	STYLE_FOR_PAGE_AND_CHILDREN = list[31];
 	CHOOSE_STYLE_FOR_PAGE_AND_CHILDREN = list[32];
 	SELECT_TEMPLATE_FIRST_TEXT = list[33];
+	ARE_YOU_SURE_YOU_WANT_APPLY_THIS_TEMPLATE = list[34];
 	
 }
 

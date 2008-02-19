@@ -445,6 +445,13 @@ function setTemplateForPageOrPages(isPage, type) {
 		pageId = null;
 	}
 	
+	if (type > 0) {
+		var confirmed = window.confirm(ARE_YOU_SURE_YOU_WANT_APPLY_THIS_TEMPLATE);
+		if (!confirmed) {
+			return false;
+		}
+	}
+	
 	showLoadingMessage(getApplyingStyleText());
 	setNewStyleToElements('usedThemeName', 'themeName');
 	setNewStyleForSelectedElement(getThemeForStyle() + '_themeNameContainer', 'themeName usedThemeName');

@@ -1816,6 +1816,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			localizedText.add(resourceBundle.getLocalizedString("style_for_page_and_children", "Select style for current page and all children"));			//	31
 			localizedText.add(resourceBundle.getLocalizedString("choose_style_for_page_and_children", "Page*"));				//	32
 			localizedText.add(resourceBundle.getLocalizedString("select_template_first", "Select template first!"));			//	33
+			localizedText.add(resourceBundle.getLocalizedString("are_you_sure_you_want_apply_this_template", "Are you sure you want to apply this template?"));
 			
 		} catch (Exception e) {
 			e.printStackTrace();
