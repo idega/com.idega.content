@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.18 2008/02/21 08:57:47 laddi Exp $
+ * $Id: ContentItemToolbar.java,v 1.19 2008/02/21 10:29:48 valdas Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -36,10 +36,10 @@ import com.idega.webface.WFToolbar;
  *  <p>
  *  Toolbar used by new content management system to display editor buttons.
  *  </p>
- *  Last modified: $Date: 2008/02/21 08:57:47 $ by $Author: laddi $
+ *  Last modified: $Date: 2008/02/21 10:29:48 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.19 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
@@ -118,7 +118,7 @@ public class ContentItemToolbar extends WFToolbar {
 		link.getChildren().add(new Span(new Text(title)));
 		
 		if (addMoodalBoxRel) {
-			link.setRel("moodalbox 80% 80%");
+			link.setRel("moodalbox");
 		}
 		
 		return link;
