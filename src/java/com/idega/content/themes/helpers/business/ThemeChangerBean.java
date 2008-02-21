@@ -2173,7 +2173,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		helper.createSmallImage(theme, false);
 		
 		try {
-			helper.getThemesService().createIBPage(theme, null);
+			helper.getThemesService().createBuilderTemplate(theme, null);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			return false;
@@ -2597,7 +2597,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		// Creating new template
 		try {
-			helper.getThemesService().createIBPage(child, parentThemeTemplateId);
+			helper.getThemesService().createBuilderTemplate(child, parentThemeTemplateId);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			return false;
