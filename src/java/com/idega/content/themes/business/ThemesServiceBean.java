@@ -16,6 +16,7 @@ import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
+import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.core.builder.data.ICDomain;
@@ -184,7 +185,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 	}
 	
-	public boolean createIBPage(Theme theme, String parentTemplateId) {
+	public boolean createBuilderTemplate(Theme theme, String parentTemplateId) {
 		if (theme == null) {
 			return false;
 		}
@@ -284,7 +285,17 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			}
 		}
 		
-		return builder.createNewPage(parentId, name, type, templateId, pageUri, tree, iwc, subType, domainId, format, sourceMarkup, treeOrder);
+		int pageId = builder.createNewPage(parentId, name, type, templateId, pageUri, tree, iwc, subType, domainId, format, sourceMarkup, treeOrder);
+		
+		if (iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR)) {
+			ICPage createdPage = getICPage(pageId);
+			if (createdPage != null) {
+				createdPage.setPublished(true);
+				createdPage.store();
+			}
+		}
+		
+		return pageId;
 	}
 	
 	private boolean isNewTheme(String uri) {

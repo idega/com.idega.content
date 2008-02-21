@@ -45,7 +45,14 @@
 	</key>
 	<key>
 		<code>hidePageInMenu</code>
-		<label>Hide Page</label>
+		<label>Hidden Page</label>
+		<defaultValue></defaultValue>
+		<type>boolean</type>
+		<method></method>
+	</key>
+	<key>
+		<code>setPagePublished</code>
+		<label>Published Page</label>
 		<defaultValue></defaultValue>
 		<type>boolean</type>
 		<method></method>

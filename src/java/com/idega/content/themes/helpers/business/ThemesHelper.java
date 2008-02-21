@@ -1223,13 +1223,13 @@ public class ThemesHelper implements Singleton {
 		return null;
 	}
 	
-	public void setLastUsedTheme(int id) {
-		if (id == -1) {
+	public void setLastUsedTheme(String templateId) {
+		if (templateId == null || templateId.equals(ThemesConstants.MINUS_ONE)) {
 			return;
 		}
 		IWMainApplicationSettings settings = ContentUtil.getBundle().getApplication().getSettings();
 		try {
-			settings.setProperty(ThemesConstants.LAST_USED_THEME, String.valueOf(id));
+			settings.setProperty(ThemesConstants.LAST_USED_THEME, templateId);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		}

@@ -33,6 +33,9 @@ version="1.2">
 							}
 							DWREngine.setErrorHandler(errorHanlder);
 						});
+						window.addEvent('domready', function() {
+							ThemesEngine.isUserContentEditor(markIfUserIsContentEditor);
+						});
 						window.addEvent('domready', enableReverseAjaxInThemes);
                 		window.addEvent('domready', startBuilderApplication);
                 		window.addEvent('domready', getLocalizedTextForThemes);

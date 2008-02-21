@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.jdom.Document;
+
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.business.IBOServiceBean;
 import com.idega.business.SpringBeanLookup;
@@ -26,12 +28,15 @@ import com.idega.content.themes.helpers.bean.TreeNodeStructure;
 import com.idega.content.themes.helpers.business.ThemeChanger;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
+import com.idega.content.themes.presentation.PageInfo;
 import com.idega.content.themes.presentation.ThemeStyleVariations;
+import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.core.builder.data.CachedDomain;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
+import com.idega.core.builder.data.ICPageBMPBean;
 import com.idega.core.cache.IWCacheManager2;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.localisation.business.ICLocaleBusiness;
@@ -362,8 +367,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (theme == null) {
 			return false;
 		}
-		boolean result = true;
 		
+		boolean isContentEditor = iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR);
+		boolean result = true;
 		boolean applyToPage = true;
 		if (pageKey == null) {
 			applyToPage = false;
@@ -372,22 +378,25 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (templateId == null) {
 			templateId = theme.getIBPageID();
 		}
-		helper.setLastUsedTheme(templateId);
 		
 		if (applyToPage) {
 			//	Apply style to selected page
-			result = setPageStyle(pageKey, templateId, iwc, null, type == 0 ? false : true);
+			result = setPageStyle(pageKey, templateId, iwc, null, type == 0 ? false : true, isContentEditor);
 		}
 		else {
 			//	Apply style to all pages
-			result = setSiteStyle(templateId, iwc, false);
+			result = setSiteStyle(templateId, iwc, false, isContentEditor);
 		}
-		helper.getThemesService().getBuilderService().clearAllCachedPages();
+		
+		if (result) {
+			helper.getThemesService().getBuilderService().clearAllCachedPages();
+		}
+		
 		return result;
 	}
 	
-	private boolean setPageStyle(String pageKey, int templateKey, IWContext iwc, ICDomain cachedDomain, boolean setStyleForChildren) {
-		boolean result = setStyle(pageKey, templateKey, false);
+	private boolean setPageStyle(String pageKey, int templateKey, IWContext iwc, ICDomain cachedDomain, boolean setStyleForChildren, boolean isContentEditor) {
+		boolean result = setStyle(pageKey, templateKey, false, isContentEditor);
 		if (!result) {
 			return false;
 		}
@@ -402,19 +411,19 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			//	Setting the same style as front page has
 			String articleViewerID = iwc.getApplicationSettings().getProperty(ARTICLE_VIEWER_TEMPLATE_KEY);
 			if (articleViewerID != null) {
-				result = setStyle(articleViewerID, templateKey, true);
+				result = setStyle(articleViewerID, templateKey, true, isContentEditor);
 			}
 		}
 		
 		if (setStyleForChildren) {
-			return setStyleForChildren(pageKey, templateKey, iwc, cachedDomain);
+			return setStyleForChildren(pageKey, templateKey, iwc, cachedDomain, isContentEditor);
 		}
 		
 		return result;
 	}
 	
 	@SuppressWarnings("unchecked")
-	private boolean setStyleForChildren(String pageKey, int templateKey, IWContext iwc, ICDomain cachedDomain) {
+	private boolean setStyleForChildren(String pageKey, int templateKey, IWContext iwc, ICDomain cachedDomain, boolean isContentEditor) {
 		Map tree = getTree(iwc);
 		if (tree == null) {
 			return true;
@@ -449,16 +458,16 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			o = it.next();
 			if (o instanceof ICTreeNode) {
 				childPage = (ICTreeNode) o;
-				setPageStyle(childPage.getId(), templateKey, iwc, cachedDomain, true);
+				setPageStyle(childPage.getId(), templateKey, iwc, cachedDomain, true, isContentEditor);
 			}
 		}
 		
 		return true;
 	}
 	
-	private boolean setStyle(String pageKey, int templateID, boolean ignoreTemplate) {
+	private boolean setStyle(String pageKey, int templateId, boolean ignoreTemplate, boolean isContentEditor) {
 		ICPage page = null;
-		if (templateID < 0) {
+		if (templateId < 0) {
 			return false;
 		}
 		page = helper.getThemesService().getICPage(pageKey);
@@ -466,10 +475,18 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		}
 		
-		String templateKey = String.valueOf(templateID); 
+		if (!isContentEditor) {
+			if (page.isPage() && page.isPublished()) {
+				//	Insufficient rights
+				return false;
+			}
+		}
+		
+		String templateKey = String.valueOf(templateId); 
 		if (page.isPage() || ignoreTemplate) {
 			helper.getThemesService().getBuilderService().setTemplateId(pageKey, templateKey);
-			page.setTemplateId(templateID);
+			page.setTemplateId(templateId);
+			helper.setLastUsedTheme(templateKey);
 			
 			if (!checkIfNeedExtraRegions(pageKey, helper.getThemeByTemplateKey(templateKey))) {
 				page.store();
@@ -489,7 +506,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private boolean setSiteStyle(int templateID, IWContext iwc, boolean setStyleForChildren) {
+	private boolean setSiteStyle(int templateID, IWContext iwc, boolean setStyleForChildren, boolean isContentEditor) {
 		Map tree = getTree(iwc);
 		if (tree == null) {
 			return false;
@@ -501,7 +518,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		for (Iterator it = tree.values().iterator(); it.hasNext();) {
 			o = it.next();
 			if (o instanceof ICTreeNode) {
-				result = setPageStyle(((ICTreeNode) o).getId(), templateID, iwc, cachedDomain, false);
+				result = setPageStyle(((ICTreeNode) o).getId(), templateID, iwc, cachedDomain, false, isContentEditor);
 			}
 		}
 		return result;
@@ -711,7 +728,10 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 						}
 					}
 					else if (ContentConstants.HIDE_MENU_IN_PAGE.equals(s.getCode())) {
-						setShowMenuInPage(pageKey, values[i]);
+						setValueForPage(pageKey, values[i], ICPageBMPBean.HIDE_PAGE_IN_MENU);
+					}
+					else if (ContentConstants.PUBLISH_PAGE_IN_LUCID_CODE.equals(s.getCode())) {
+						setValueForPage(pageKey, values[i], ICPageBMPBean.PAGE_IS_PUBLISHED);
 					}
 					else {
 						newValues = helper.getPageValues(s, values[i]);
@@ -740,8 +760,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return changedPageUri;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public boolean setShowMenuInPage(String pageKey, String value) {
+	@SuppressWarnings({ "unchecked", "deprecation" })
+	public boolean setValueForPage(String pageKey, String value, String columnName) {
 		if (pageKey == null) {
 			return false;
 		}
@@ -751,12 +771,12 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		}
 		
-		boolean hideMenu = false;
+		boolean pageValue = false;
 		if (value != null) {
-			hideMenu = Boolean.TRUE.toString().equals(value);
+			pageValue = Boolean.TRUE.toString().equals(value);
 		}
 		
-		page.setHidePageInMenu(hideMenu);
+		page.setColumn(columnName, pageValue);
 		page.store();
 		
 		Collection children = page.getChildren();
@@ -765,7 +785,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			for (Iterator it = children.iterator(); it.hasNext();) {
 				o = it.next();
 				if (o instanceof ICTreeNode) {
-					setShowMenuInPage(((ICTreeNode) o).getId(), value);
+					setValueForPage(((ICTreeNode) o).getId(), value, columnName);
 				}
 			}
 		}
@@ -817,6 +837,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 					}
 					if (ContentConstants.HIDE_MENU_IN_PAGE.equals(s.getCode())) {
 						value.append(page.isHidePageInMenu());
+					}
+					if (ContentConstants.PUBLISH_PAGE_IN_LUCID_CODE.equals(s.getCode())) {
+						value.append(page.isPublished());
 					}
 				}
 			}
@@ -1829,6 +1852,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		if (iwc == null) {
 			return false;
 		}
+		
 		BuilderService builder = helper.getThemesService().getBuilderService();
 		if (builder == null) {
 			return false;
@@ -2038,4 +2062,21 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return newTemplateId;
 	}
 
+	public boolean isUserContentEditor() {
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return false;
+		}
+		
+		return iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR);
+	}
+	
+	public Document getRenderedPageInfo(String pageKey, String id, String styleClass) {
+		PageInfo pageInfo = new PageInfo();
+		pageInfo.setPageKey(pageKey);
+		pageInfo.setStyleClass(styleClass);
+		pageInfo.setId(id);
+		
+		return helper.getThemesService().getBuilderService().getRenderedComponent(CoreUtil.getIWContext(), pageInfo, false);
+	}
 }

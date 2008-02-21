@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.42 2008/01/26 10:17:38 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.43 2008/02/21 17:44:51 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -30,6 +30,7 @@ import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentItemHelper;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
+import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
@@ -45,10 +46,10 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2008/01/26 10:17:38 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/02/21 17:44:51 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.42 $
+ * @version $Revision: 1.43 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -628,7 +629,8 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		String pageUri = helper.getPageUrlByArticleResourcePath(iwc, moduleClass);
 		articleURL.append(pageUri);
 
-		if (published == null) { // Setting published date the same as creation
+		if (published == null && iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR)) { 
+			// Setting published date the same as creation
 			published = new Timestamp(System.currentTimeMillis());
 			setPublishedDate(published);
 		}

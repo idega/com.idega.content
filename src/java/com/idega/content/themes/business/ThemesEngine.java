@@ -13,6 +13,8 @@ import com.idega.business.IBOService;
 import java.util.List;
 import java.rmi.RemoteException;
 
+import org.jdom.Document;
+
 public interface ThemesEngine extends IBOService {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getThemes
@@ -201,4 +203,8 @@ public interface ThemesEngine extends IBOService {
 	public void updateSiteTemplatesTree(IWContext iwc, boolean sendToAllSessions);
 	
 	public String createChildTemplateForThisTemplate(String parentTemplateKey);
+
+	public boolean isUserContentEditor();
+	
+	public Document getRenderedPageInfo(String pageKey, String id, String styleClass);
 }

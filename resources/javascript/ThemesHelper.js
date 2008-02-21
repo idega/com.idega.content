@@ -15,6 +15,12 @@ var ALL_CURRENT_SITE_STRUCTURE_TREE_ID = 'div_id_' + CURRENT_SITE_STRUCTURE_TREE
 
 var WORKING_WITH_TEMPLATE = false;
 
+var USER_IS_CONTENT_EDITOR = false;
+
+function markIfUserIsContentEditor(userIsContentEditor) {
+	USER_IS_CONTENT_EDITOR = userIsContentEditor;
+}
+
 function setNeedRedirect(redirect) {
 	NEED_REDIRECT = redirect;
 }

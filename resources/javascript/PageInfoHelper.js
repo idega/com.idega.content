@@ -453,12 +453,23 @@ function setTemplateForPageOrPages(isPage, type) {
 	}
 	
 	showLoadingMessage(getApplyingStyleText());
-	setNewStyleToElements('usedThemeName', 'themeName');
-	setNewStyleForSelectedElement(getThemeForStyle() + '_themeNameContainer', 'themeName usedThemeName');
 	ThemesEngine.setSelectedStyle(getThemeForStyle(), pageId, type, TEMPLATE_ID, {
 		callback: function(result) {
+			closeAllLoadingMessages();
+			
+			//	Error
+			if (!result) {
+				if (!USER_IS_CONTENT_EDITOR) {
+					alert('Sorry, you have insufficient rights for this action!');
+				}
+				return false;
+			}
+			
+			//	OK
+			setNewStyleToElements('usedThemeName', 'themeName');
+			setNewStyleForSelectedElement(getThemeForStyle() + '_themeNameContainer', 'themeName usedThemeName');
+			
 			WORKING_WITH_TEMPLATE = false;
-			closeLoadingMessage();
 			getPrewUrl(getPageID());
 		}
 	});
@@ -566,7 +577,19 @@ function getAvailableElements(allKeywords) {
 		return;
 	}
 	KEYWORDS = allKeywords;
-	ThemesEngine.getPageInfoValues(getPageID(), allKeywords, showPageInfoValues);
+	
+	var pageId = getPageID();
+	ThemesEngine.getRenderedPageInfo(pageId, 'customizePage', 'pageInfoStyle_accordion', {
+		callback: function(component) {
+			var container = $('pageInfoToggle');
+			container.empty();
+			
+			insertNodesToContainer(component, container);
+			registerPageInfoActions();
+			
+			ThemesEngine.getPageInfoValues(pageId, allKeywords, showPageInfoValues);	
+		}
+	});
 }
 
 function showPageInfoValues(values) {
@@ -675,6 +698,7 @@ function registerPageInfoActions() {
 		function(element) {
 			setHrefToVoidFunction(element);
 			
+			element.removeEvents('click');
 			element.addEvent('click', function() {
 				newPages('newPageContainer', 'newPageButton', getNewPageText(), element.getLeft());
 			});
@@ -685,6 +709,7 @@ function registerPageInfoActions() {
 		function(element) {
 			setHrefToVoidFunction(element);
 			
+			element.removeEvents('click');
 			element.addEvent('click', function() {
 				newPages('newPagesContainer', 'newPagesButton', NEW_PAGES_TEXT, element.getLeft());
 			});
@@ -693,6 +718,7 @@ function registerPageInfoActions() {
     
     $$('input.saveButtonStyleClass').each(
     	function(element) {
+    		element.removeEvents('click');
 			element.addEvent('click', savePageInfo);
     	}
     );
@@ -701,6 +727,7 @@ function registerPageInfoActions() {
 		function(element) {
 			setHrefToVoidFunction(element);
 			
+			element.removeEvents('click');
 			var manageSliderFunction = function() {
 				manageSlider(element.id);
 			};
@@ -718,6 +745,7 @@ function registerPageInfoActions() {
 		function(element) {
 			setHrefToVoidFunction(element);
 			
+			element.removeEvents('click');
 			var manageModulesBackgroundFunction = function() {
 				manageModulesBackground(element);
 			};
@@ -733,6 +761,7 @@ function registerPageInfoActions() {
 		function(button) {
 			setHrefToVoidFunction(button);
 			
+			button.removeEvents('click');
 			button.addEvent('click', function() {
 				SHOW_SOURCE_PAGES = false;
 				SHOW_EDIT_PAGES = true;
@@ -753,6 +782,7 @@ function registerPageInfoActions() {
 		function(button) {
 			setHrefToVoidFunction(button);
 			
+			button.removeEvents('click');
 			button.addEvent('click', function() {
 				SHOW_SOURCE_PAGES = false;
 				SHOW_EDIT_PAGES = false;
@@ -779,6 +809,7 @@ function registerPageInfoActions() {
 		function(button) {
 			setHrefToVoidFunction(button);
 			
+			button.removeEvents('click');
 			button.addEvent('click', function() {
 				if (IS_USER_ADMIN) {
 					SHOW_SOURCE_PAGES = true;
@@ -806,6 +837,7 @@ function registerPageInfoActions() {
 	
 	$$('img.closeNewPageOrPagesStyle').each(
 		function(image) {
+			image.removeEvents('click');
 			image.addEvent('click', function() {
 				if (image.getProperty('id') == 'closeNewPagesContainer') {
 					closeNewPage($('newPagesContainer'), 'newPagesButton', NEW_PAGES_TEXT);
