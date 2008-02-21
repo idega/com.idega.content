@@ -1337,8 +1337,6 @@ div#mb_center, div#mb_bottom {
 }
 
 div#mb_contents {
-	width: 650px !important;
-	height: 511px !important;
 	border: 0;
 	font-family: "Lucida Sans", "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
 	color: #1f1f1f;
