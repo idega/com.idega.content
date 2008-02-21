@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.24 2008/01/23 12:11:59 valdas Exp $
+ * $Id: ContentItemListViewer.java,v 1.25 2008/02/21 08:57:47 laddi Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.StringTokenizer;
+
 import javax.faces.component.UIColumn;
 import javax.faces.component.UIData;
 import javax.faces.context.FacesContext;
@@ -34,10 +35,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- * Last modified: $Date: 2008/01/23 12:11:59 $ by $Author: valdas $
+ * Last modified: $Date: 2008/02/21 08:57:47 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.24 $
+ * @version $Revision: 1.25 $
  */
 public class ContentItemListViewer extends UIData implements CacheableUIComponent{
 
@@ -105,6 +106,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		String[] actions = getToolbarActions();
 		if(actions != null && actions.length > 0){
 			ContentItemToolbar toolbar = new ContentItemToolbar(true);
+			toolbar.setMenuStyleClass(toolbar.getMenuStyleClass() + " " + toolbar.getMenuStyleClass() + "_top");
 			for (int i = 0; i < actions.length; i++) {
 				toolbar.addToolbarButton(actions[i]);
 			}
@@ -134,6 +136,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	}
 	
 	
+	@Override
 	public String getFamily(){
 		return ContentUtil.FAMILY_CONTENT;
 	}
@@ -141,6 +144,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	/**
 	 * @deprecated replaced with setBaseFolderPath
 	 */
+	@Deprecated
 	public void setResourcePath(String resourcePath){
 		setBaseFolderPath(resourcePath);
 	}
@@ -180,6 +184,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		this.getChildren().add(c);
 	}
 	
+	@Override
 	public Object getValue(){
 		if(this.model==null){
 			//List items = (List)WFUtil.invoke(this.managedBeanId,"getContentItems");
@@ -199,6 +204,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		return this.model;
 	}
 	
+	@Override
 	public void encodeBegin(FacesContext context) throws IOException{
 		UIComponentCacher cacher = getCacher(context);
 		setItemCategoryFromRequest(context);
@@ -217,6 +223,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		}
 	}
 	
+	@Override
 	public void encodeChildren(FacesContext context) throws IOException{
 		UIComponentCacher cacher = getCacher(context);
 		if(cacher.existsInCache(this,context)){
@@ -227,6 +234,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		}	
 	}
 	
+	@Override
 	public void encodeEnd(FacesContext context) throws IOException{
 		UIComponentCacher cacher = getCacher(context);
 		if(cacher.existsInCache(this,context)){
@@ -314,6 +322,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	/**
 	 * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
 	 */
+	@Override
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[11];
 		values[0] = super.saveState(ctx);
@@ -333,6 +342,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	/**
 	 * @see javax.faces.component.StatHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
 	 */
+	@Override
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[])state;
 		super.restoreState(ctx, values[0]);

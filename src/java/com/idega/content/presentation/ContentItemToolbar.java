@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.17 2008/02/07 12:37:03 valdas Exp $
+ * $Id: ContentItemToolbar.java,v 1.18 2008/02/21 08:57:47 laddi Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -25,6 +25,8 @@ import com.idega.content.business.ContentUtil;
 import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.uri.IWActionURIManager;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.Span;
+import com.idega.presentation.text.Text;
 import com.idega.util.CoreUtil;
 import com.idega.util.URLUtil;
 import com.idega.webface.WFToolbar;
@@ -34,10 +36,10 @@ import com.idega.webface.WFToolbar;
  *  <p>
  *  Toolbar used by new content management system to display editor buttons.
  *  </p>
- *  Last modified: $Date: 2008/02/07 12:37:03 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/02/21 08:57:47 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
@@ -113,6 +115,8 @@ public class ContentItemToolbar extends WFToolbar {
 		link.setStyleClass(action);
 		link.setTitle(title);
 		
+		link.getChildren().add(new Span(new Text(title)));
+		
 		if (addMoodalBoxRel) {
 			link.setRel("moodalbox 80% 80%");
 		}
@@ -137,7 +141,7 @@ public class ContentItemToolbar extends WFToolbar {
 	}
 	
 	public HtmlOutputLink getToolbarButton(String action){
-		String menuItemId = (String)getActions().get(action);
+		String menuItemId = getActions().get(action);
 		return (HtmlOutputLink)getMenuItem(menuItemId);
 	}
 	
@@ -210,6 +214,7 @@ public class ContentItemToolbar extends WFToolbar {
 		this.resourcePath = resourcePath;
 	}
 	
+	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
 		update();
 		super.encodeBegin(context);
@@ -219,6 +224,7 @@ public class ContentItemToolbar extends WFToolbar {
 		return this.RolesAllowded;
 	}
 	
+	@Override
 	public boolean isRendered(){
 		if (this.rendered != null) {
 			return this.rendered.booleanValue();
@@ -244,6 +250,7 @@ public class ContentItemToolbar extends WFToolbar {
         return false; //true when testing, then probably false
 	}
 	
+	@Override
 	public void setRendered(boolean value){
 		this.rendered = Boolean.valueOf(value);
 	}
@@ -265,6 +272,7 @@ public class ContentItemToolbar extends WFToolbar {
 	/**
 	 * @see javax.faces.component.UIComponentBase#saveState(javax.faces.context.FacesContext)
 	 */
+	@Override
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[6];
 		values[0] = super.saveState(ctx);
@@ -279,6 +287,7 @@ public class ContentItemToolbar extends WFToolbar {
 	/**
 	 * @see javax.faces.component.UIComponentBase#restoreState(javax.faces.context.FacesContext, java.lang.Object)
 	 */
+	@Override
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[])state;
 		super.restoreState(ctx, values[0]);

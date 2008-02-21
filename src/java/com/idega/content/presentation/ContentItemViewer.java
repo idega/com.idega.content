@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.30 2008/01/23 12:11:59 valdas Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.31 2008/02/21 08:57:47 laddi Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
@@ -23,6 +24,7 @@ import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
+
 import com.idega.content.bean.ContentItem;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
@@ -35,10 +37,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2008/01/23 12:11:59 $ by $Author: valdas $
+ * Last modified: $Date: 2008/02/21 08:57:47 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.30 $
+ * @version $Revision: 1.31 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -79,6 +81,7 @@ public class ContentItemViewer extends WFContainer {
 		setRendererType(DEFAULT_RENDERER_TYPE);
 	}
 
+	@Override
 	public String getFamily() {
 		return ContentUtil.FAMILY_CONTENT;
 	}
@@ -190,6 +193,7 @@ public class ContentItemViewer extends WFContainer {
 		setLocalValueHasChanged(fieldName, false);
 	}
 
+	@Override
 	protected void initializeComponent(FacesContext context) {
 		String attr[] = getViewerFieldNames();
 		for (int i = 0; i < attr.length; i++) {
@@ -208,6 +212,7 @@ public class ContentItemViewer extends WFContainer {
 			String[] actions = item.getToolbarActions();
 			if (actions != null && actions.length > 0) {
 				ContentItemToolbar toolbar = new ContentItemToolbar(this.getClass().equals(CoreConstants.getArticleItemViewerClass()));
+				toolbar.setMenuStyleClass(toolbar.getMenuStyleClass() + " " + toolbar.getMenuStyleClass() + "_item");
 				toolbar.setId(this.getId()+"_toolbar");
 				toolbar.setToolbarActions(actions);
 				this.setToolbar(toolbar);
@@ -397,6 +402,7 @@ public class ContentItemViewer extends WFContainer {
 		setFieldLocalValue(fieldName, value);
 	}
 
+	@Override
 	public boolean isRendered() {
 		/*ContentItem item = getContentItem();
 		if (item != null) {
@@ -419,6 +425,7 @@ public class ContentItemViewer extends WFContainer {
 	 * 
 	 * @see javax.faces.component.UIComponent#decode(javax.faces.context.FacesContext)
 	 */
+	@Override
 	public void decode(FacesContext context) {
 		// TODO USE DECODE RATHER THAN ENCODEBEGIN! not working because->NEVER
 		// CALLED!
@@ -437,6 +444,7 @@ public class ContentItemViewer extends WFContainer {
 	 * 
 	 * @see javax.faces.component.UIComponent#encodeBegin(javax.faces.context.FacesContext)
 	 */
+	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
 		
 		UIComponentCacher cacher = getCacher(context);
@@ -470,6 +478,7 @@ public class ContentItemViewer extends WFContainer {
 		
 	}
 
+	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
 		/*UIComponentCacher cacher = getCacher(context);
 		if(cacher.existsInCache(this,context)){
@@ -481,6 +490,7 @@ public class ContentItemViewer extends WFContainer {
 		super.encodeChildren(context);
 	}
 	
+	@Override
 	public void encodeEnd(FacesContext context) throws IOException {
 		/*UIComponentCacher cacher = getCacher(context);
 		if(cacher.existsInCache(this,context)){
@@ -565,6 +575,7 @@ public class ContentItemViewer extends WFContainer {
 		updateToolbar();
 	}
 
+	@Override
 	public void processDecodes(FacesContext context) {
 		super.processDecodes(context);
 		// if(showRequestedItem){
@@ -740,6 +751,7 @@ public class ContentItemViewer extends WFContainer {
 	/**
 	 * @see javax.faces.component.UIComponentBase#saveState(javax.faces.context.FacesContext)
 	 */
+	@Override
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[10];
 		values[0] = super.saveState(ctx);
@@ -759,6 +771,7 @@ public class ContentItemViewer extends WFContainer {
 	 * @see javax.faces.component.UIComponentBase#restoreState(javax.faces.context.FacesContext,
 	 *      java.lang.Object)
 	 */
+	@Override
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[]) state;
 		super.restoreState(ctx, values[0]);
@@ -861,6 +874,7 @@ public class ContentItemViewer extends WFContainer {
 	/* (non-Javadoc)
 	 * @see com.idega.core.cache.CacheableUIComponent#getViewState(javax.faces.context.FacesContext)
 	 */
+	@Override
 	public String getViewState(FacesContext context) {
 		IWContext iwc = IWContext.getIWContext(context);
 		StringBuffer state = new StringBuffer();

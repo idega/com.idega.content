@@ -1513,3 +1513,7 @@ a#mb_close_link {
 
 .themeTemplateChildrenContainerAsStackStyle {
 }
+
+.content_item_toolbar li a span {
+	display: none;
+}
