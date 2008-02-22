@@ -95,7 +95,7 @@ public class FileUploadViewer extends Block {
 		StringBuffer script = new StringBuffer(getJavaScriptSourceLine(bundle.getVirtualPathWithFileNameString("javascript/FileUploadHelper.js")));
 		Web2Business web2 = SpringBeanLookup.getInstance().getSpringBean(iwc, Web2Business.class);
 		script.append(getJavaScriptSourceLine(web2.getBundleURIToYUIScript()));
-		script.append(getJavaScriptSourceLine("/dwr/engine.js"));
+		script.append(getJavaScriptSourceLine(CoreConstants.DWR_ENGINE_SCRIPT));
 		script.append(getJavaScriptSourceLine("/dwr/interface/FileUploader.js"));
 		script.append(getJavaScriptSourceLine("/dwr/interface/FileUploadListener.js"));
 		container.add(script.toString());

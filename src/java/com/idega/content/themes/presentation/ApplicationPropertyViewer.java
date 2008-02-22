@@ -135,7 +135,7 @@ public class ApplicationPropertyViewer extends Block {
 		if (ContentUtil.hasContentEditorRoles(iwc)) {
 			//	Adding script files for DWR
 			AddResource adder = AddResourceFactory.getInstance(iwc);
-			adder.addJavaScriptAtPosition(iwc, AddResource.HEADER_BEGIN, "/dwr/engine.js");
+			adder.addJavaScriptAtPosition(iwc, AddResource.HEADER_BEGIN, CoreConstants.DWR_ENGINE_SCRIPT);
 			adder.addJavaScriptAtPosition(iwc, AddResource.HEADER_BEGIN, "/dwr/interface/ThemesEngine.js");
 			
 			try {
