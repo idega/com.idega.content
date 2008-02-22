@@ -86,7 +86,7 @@ public class ContentItemFeedBean implements Serializable {
 	 */
 	private SyndFeed createFeedWithEntry(String feedTitle, String serverName, String feedDescription, String title, Timestamp updated,
 			Timestamp published, String description, String body, String author, String language, List<String> categories,
-			String url, String source, String comment, String linkToComments) {
+			String url, String source, String comment, String linkToComments, String creator) {
 		if (rss == null) {
 			return null;
 		}
@@ -98,7 +98,7 @@ public class ContentItemFeedBean implements Serializable {
 		
 		List<SyndEntry> entries = new ArrayList<SyndEntry>();
 		entries.add(rss.createNewEntry(title, url, updated, published, FEED_ENTRY_DESCRIPTION_TYPE, description, FEED_ENTRY_BODY_TYPE,
-				body, author, language, categories, source, comment, linkToComments));
+				body, author, language, categories, source, comment, linkToComments, creator));
 		feed.setEntries(entries);
 		
 		return feed;
@@ -125,7 +125,7 @@ public class ContentItemFeedBean implements Serializable {
 	 */
 	public String getFeedEntryAsXML(String feedTitle, String serverName, String feedDescription, String title, Timestamp updated,
 			Timestamp published, String description, String body, String author, String language, List<String> categories,
-			String url, String source, String comment, String linkToComments) {
+			String url, String source, String comment, String linkToComments, String creator) {
 		if (rss == null) {
 			return null;
 		}
@@ -134,7 +134,7 @@ public class ContentItemFeedBean implements Serializable {
 		}
 
 		SyndFeed feed = createFeedWithEntry(feedTitle, serverName, feedDescription, title, updated, published, description, body,
-				author, language, categories, url, source, comment, linkToComments);
+				author, language, categories, url, source, comment, linkToComments, creator);
 		if (feed == null) {
 			return null;
 		}

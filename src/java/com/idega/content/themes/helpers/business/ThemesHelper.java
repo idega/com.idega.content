@@ -1562,7 +1562,7 @@ public class ThemesHelper implements Singleton {
 		String user = iwc.getCurrentUser().getName();
 		return getFeedBean().getFeedEntryAsXML(ThemesConstants.ARTICLE_TITLE, server, null, ThemesConstants.ARTICLE_TITLE,
 				new Timestamp(System.currentTimeMillis()), null, summary.toString(), article, user, language, null, link.toString(),
-				null, null, linkToComments);
+				null, null, linkToComments, iwc.getCurrentUser().getId());
 	}
 	
 	public String getArticleCommentLink(IWContext iwc, String pageURI) {

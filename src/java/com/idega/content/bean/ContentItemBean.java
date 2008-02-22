@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.43 2008/02/21 17:44:51 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.44 2008/02/22 13:48:07 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -46,10 +46,10 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2008/02/21 17:44:51 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/02/22 13:48:07 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.43 $
+ * @version $Revision: 1.44 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -57,7 +57,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	private String _name = null;
 	private String _description = null;
 	private String _itemType = null;
-	private int _createdByUserId = 0;
+	private int _createdByUserId = -1;
 	private boolean autoCreateResource;
 	private boolean loaded;
 	
@@ -635,13 +635,50 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 			setPublishedDate(published);
 		}
 		
+		String creatorId = null;
+		if (getCreatedByUserId() < 0) {
+			creatorId = iwc.getCurrentUser().getId();
+			setCreatedByUserId(Integer.valueOf(creatorId));
+		}
+		else {
+			creatorId = String.valueOf(getCreatedByUserId());
+		}
+		
 		if (linkToComments == null) {
 			linkToComments = ThemesHelper.getInstance().getArticleCommentLink(iwc, pageUri);
 		}
 
+		description = getFixedDescription(description);
+		
 		ContentItemFeedBean feedBean = new ContentItemFeedBean(iwc, ContentItemFeedBean.FEED_TYPE_ATOM_1);
 		return feedBean.getFeedEntryAsXML(feedTitle, server, feedDescription, title, updated, published, description,
-				body, author, getLanguage(), categories, articleURL.toString(), source, comment, linkToComments);
+				body, author, getLanguage(), categories, articleURL.toString(), source, comment, linkToComments, creatorId);
+	}
+	
+	private String getFixedDescription(String description) {
+		boolean changeCurrentDescription = false;
+		if (description == null) {
+			changeCurrentDescription = true;
+		}
+		else {
+			String tempValue = description;
+			// Removing needless characters
+			tempValue = tempValue.replaceAll("\b", CoreConstants.EMPTY);
+			tempValue = tempValue.replaceAll("\t", CoreConstants.EMPTY);
+			tempValue = tempValue.replaceAll("\f", CoreConstants.EMPTY);
+			tempValue = tempValue.replaceAll("\r", CoreConstants.SPACE);
+			tempValue = tempValue.replaceAll("\n", CoreConstants.EMPTY);
+			for (int i = 0; i < ThemesConstants.FIRST_SENTENCES_OF_DUMMY_ARTICLES.size(); i++) {
+				if (tempValue.indexOf(ThemesConstants.FIRST_SENTENCES_OF_DUMMY_ARTICLES.get(i)) != -1) {
+					changeCurrentDescription = true;
+				}
+			}
+		}
+		if (changeCurrentDescription) {
+			description = CoreConstants.EMPTY;
+		}
+		
+		return description;
 	}
 	
 	@SuppressWarnings("finally")
