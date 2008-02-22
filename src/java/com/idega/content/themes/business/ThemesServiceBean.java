@@ -63,7 +63,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 					String themeID = theme.getId();
 					ThemesHelper.getInstance(false).removeTheme(uri, themeID);
 					
-					deleteIBPage(pageId);
+					deleteTemplate(pageId);
 				}
 			}
 		}
@@ -78,12 +78,12 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 	}
 	
-	private boolean deleteIBPage(int pageId) {
+	private boolean deleteTemplate(int pageId) {
 		if (pageId < 0) {
 			return false;
 		}
 		
-		return deletePage(String.valueOf(pageId), false, true, false, false);
+		return deletePage(String.valueOf(pageId), true, true, false, false);
 	}
 	
 	public boolean deleteIBPage(String pageID, boolean deleteChildren, boolean markPagesForDeletingArticles) {
@@ -130,6 +130,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			markPagesForDeletingArticles(pageKey, iwc);
 		}
 		boolean result = builder.deletePage(pageKey, deleteChildren, tree, userId, domain);
+		log("IBPage (id=" + pageKey + ") was deleted successfully: " + result);
 		
 		if (domain != null) {
 			try {
