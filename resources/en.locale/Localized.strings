@@ -286,3 +286,4 @@ stylesheet=Stylesheet URL
 pageUri=Page URI
 hidePageInMenu=Hidden Page
 setPagePublished=Published Page
+insufficient_rights_for_this_action=Sorry, you have insufficient rights for this action!

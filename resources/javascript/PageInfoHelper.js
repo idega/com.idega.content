@@ -460,7 +460,7 @@ function setTemplateForPageOrPages(isPage, type) {
 			//	Error
 			if (!result) {
 				if (!USER_IS_CONTENT_EDITOR) {
-					alert('Sorry, you have insufficient rights for this action!');
+					alert(INSUFFICIENT_RIGHTS_FOR_ACTION_IN_LUCID);
 				}
 				return false;
 			}
