@@ -1,5 +1,5 @@
 /*
- * $Id: ContentViewManager.java,v 1.42 2008/02/15 09:45:53 valdas Exp $
+ * $Id: ContentViewManager.java,v 1.43 2008/02/22 18:10:08 eiki Exp $
  * Created on 2.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -30,10 +30,10 @@ import com.idega.util.CoreConstants;
 /**
  *  This is the class modules should use to attatch themselves on to the Content application view structure.
  * 
- *  Last modified: $Date: 2008/02/15 09:45:53 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/02/22 18:10:08 $ by $Author: eiki $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.42 $
+ * @version $Revision: 1.43 $
  */
 public class ContentViewManager implements Singleton  {
 
@@ -90,6 +90,9 @@ public class ContentViewManager implements Singleton  {
 	
 	
 	public void initializeStandardNodes(IWBundle bundle){
+		Collection<String> editor = new ArrayList<String>();
+		editor.add(StandardRoles.ROLE_KEY_EDITOR);
+				
 		ViewNode contentNode = initalizeContentNode(bundle);
 
 		DefaultViewNode pagesNode = new DefaultViewNode(CoreConstants.PAGES_VIEW_MANAGER_ID, contentNode);
@@ -106,6 +109,8 @@ public class ContentViewManager implements Singleton  {
 		usersNode.setJspUri(bundle.getJSPURI("users.jsp"));
 		usersNode.setKeyboardShortcut(new KeyboardShortcut("u"));
 		usersNode.setName("#{localizedStrings['com.idega.content']['users']}");
+		//only editor!
+		usersNode.setAuthorizedRoles(editor);
 		
 		DefaultViewNode documentsNode = new DefaultViewNode("documents",contentNode);
 		documentsNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
@@ -116,6 +121,8 @@ public class ContentViewManager implements Singleton  {
 		categoriesNode.setJspUri(bundle.getJSPURI("categories.jsp"));	
 		categoriesNode.setKeyboardShortcut(new KeyboardShortcut("c"));
 		categoriesNode.setName("#{localizedStrings['com.idega.content']['categories']}");
+		//only editor!
+		categoriesNode.setAuthorizedRoles(editor);
 		
 		DefaultViewNode searchNode = new DefaultViewNode("search",contentNode);
 		searchNode.setJspUri(bundle.getJSPURI("search.jsp"));	
