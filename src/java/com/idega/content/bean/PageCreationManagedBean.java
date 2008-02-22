@@ -1,5 +1,5 @@
 /*
- * $Id: PageCreationManagedBean.java,v 1.18 2007/12/21 19:55:57 valdas Exp $
+ * $Id: PageCreationManagedBean.java,v 1.19 2008/02/22 08:20:52 valdas Exp $
  * Created on 2.5.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -48,10 +48,10 @@ import com.idega.webface.WFTreeNode;
 
 /**
  * 
- *  Last modified: $Date: 2007/12/21 19:55:57 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/02/22 08:20:52 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.19 $
  */
 public class PageCreationManagedBean implements ActionListener {
 
@@ -108,8 +108,17 @@ public class PageCreationManagedBean implements ActionListener {
 			return getEmptyNode();
 		}
 		
-		List <ICTreeNode> topLevelPages = new ArrayList <ICTreeNode> (builderService.getTopLevelPages(iwc));
 		WFTreeNode node = new WFTreeNode();
+		List <ICTreeNode> topLevelPages = null;
+		try {
+			topLevelPages = new ArrayList<ICTreeNode>(builderService.getTopLevelPages(iwc));
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		if (topLevelPages == null) {
+			return node;
+		}
+		
 		ICTreeNode startPage = null;
 		ICTreeNode page = null;
 		for (int i = 0; i < topLevelPages.size(); i++) {
