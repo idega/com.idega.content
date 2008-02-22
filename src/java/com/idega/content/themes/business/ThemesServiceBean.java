@@ -44,14 +44,14 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		if (ContentEvent.REMOVE.equals(idegaWebContentEvent.getMethod())) {
 			if (ThemesHelper.getInstance(false).isCorrectThemeTemplateFile(uri, ThemesConstants.THEME_SKELETONS_FILTER)) {
-				List<Theme> themes = ThemesHelper.getInstance(false).getAvailableThemes();
+				Collection<Theme> themes = ThemesHelper.getInstance(false).getAllThemes();
 				if (themes == null) {
 					return;
 				}
 				boolean foundTheme = false;
 				Theme theme = null;
-				for (int i = 0; (i < themes.size() && !foundTheme); i++) {
-					theme = themes.get(i);
+				for (Iterator<Theme> it = themes.iterator(); (it.hasNext() && !foundTheme);) {
+					theme = it.next();
 					if (uri.equals(ThemesHelper.getInstance(false).decodeUrl(theme.getLinkToSkeleton()))) {
 						foundTheme = true;
 					}
