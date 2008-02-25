@@ -40,7 +40,6 @@ version="1.2">
                 		window.addEvent('domready', startBuilderApplication);
                 		window.addEvent('domready', getLocalizedTextForThemes);
                 		window.addEvent('domready', initializePages);
-                		window.addEvent('domready', getPathToImageFolder);
                 		window.addEvent('domready', registerPageInfoActions);
                 		window.addEvent('domready', initialiazeSiteManager);
                 		window.addEvent('domready', getPathToImageFolder);
