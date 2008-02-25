@@ -151,6 +151,9 @@ public class PageInfo extends ContentBlock {
 		if (pageKey == null) {
 			pageKey = String.valueOf(iwc.getCurrentIBPageID());
 		}
+		if (pageKey == null || pageKey.equals(ThemesConstants.MINUS_ONE)) {
+			return false;
+		}
 		
 		ICPage page = ThemesHelper.getInstance(false).getThemesService().getICPage(pageKey);
 		
