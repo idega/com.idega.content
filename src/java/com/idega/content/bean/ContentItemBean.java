@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.44 2008/02/22 13:48:07 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.45 2008/02/25 13:15:06 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -46,10 +46,10 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2008/02/22 13:48:07 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/02/25 13:15:06 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.44 $
+ * @version $Revision: 1.45 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -137,7 +137,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		this._name = null;
 		this._description = null;
 		this._itemType = null;
-		this._createdByUserId = 0;
+		this._createdByUserId = -1;
 
 		this._pendingLocaleId = null;
 	
