@@ -33,10 +33,7 @@ public class PageInfo extends ContentBlock {
 	@Override
 	protected void initializeComponent(FacesContext context) {
 		IWContext iwc = IWContext.getIWContext(context);
-		if (!needAddPageInfo(iwc)) {
-			return;
-		}
-		
+
 		Layer pageInfo = new Layer();
 		if (styleClass != null) {
 			pageInfo.setStyleClass(getStyleClass());
@@ -54,56 +51,57 @@ public class PageInfo extends ContentBlock {
 		
 		IWResourceBundle iwrb = getIWResourceBundle(context, ContentConstants.IW_BUNDLE_IDENTIFIER);
 		String localizedLabel = null;
+		boolean enableInput = true;
 		for (Iterator<Setting> it = pageSettings; it.hasNext();) {
 			s = it.next();
 			
-			if (canAddSection(iwc, s.getCode())) {
-				Layer container = new Layer();
-				container.setStyleClass("webfaceFormItem");
-				
-				Label label = new Label();
-				localizedLabel = iwrb.getLocalizedString(s.getCode());
-				if (localizedLabel == null) {
-					localizedLabel = s.getLabel();
-				}
-				label.setLabel(localizedLabel);
-				container.add(label);
-				
-				if (ContentConstants.BOOLEAN_TYPE.equals(s.getType())) {
-					Layer buttons = new Layer();
-					
-					HiddenInput hiddenInput = new HiddenInput();
-					hiddenInput.setID(s.getCode());
-					buttons.add(hiddenInput);
-					
-					RadioButton yes = getRadioButton(Boolean.TRUE.toString(), s.getCode());
-					Label yesLabel = new Label(iwrb.getLocalizedString("yes", "Yes"), yes);
-					yesLabel.setStyleAttribute("width", "20px");
-					
-					RadioButton no = getRadioButton(Boolean.FALSE.toString(), s.getCode());
-					Label noLabel = new Label(iwrb.getLocalizedString("no", "No"), no);
-					noLabel.setStyleAttribute("width", "20px");
-					
-					buttons.add(yesLabel);
-					buttons.add(yes);
-					
-					buttons.add(noLabel);
-					buttons.add(no);
-					
-					label.setFor(buttons.getID());
-					container.add(buttons);
-				}
-				else {
-					TextInput input = new TextInput();
-					input.setOnKeyPress(keyPressAction);
-					input.setId(s.getCode());
-		
-					label.setFor(input.getId());
-					container.add(input);
-				}
-				
-				layer.add(container);
+			enableInput = canInputBeEnabled(iwc, s.getCode());
+			Layer container = new Layer();
+			container.setStyleClass("webfaceFormItem");
+			
+			Label label = new Label();
+			localizedLabel = iwrb.getLocalizedString(s.getCode());
+			if (localizedLabel == null) {
+				localizedLabel = s.getLabel();
 			}
+			label.setLabel(localizedLabel);
+			container.add(label);
+			
+			if (ContentConstants.BOOLEAN_TYPE.equals(s.getType())) {
+				Layer buttons = new Layer();
+				
+				HiddenInput hiddenInput = new HiddenInput();
+				hiddenInput.setID(s.getCode());
+				buttons.add(hiddenInput);
+				
+				RadioButton yes = getRadioButton(Boolean.TRUE.toString(), s.getCode(), enableInput);
+				Label yesLabel = new Label(iwrb.getLocalizedString("yes", "Yes"), yes);
+				yesLabel.setStyleAttribute("width", "20px");
+				
+				RadioButton no = getRadioButton(Boolean.FALSE.toString(), s.getCode(), enableInput);
+				Label noLabel = new Label(iwrb.getLocalizedString("no", "No"), no);
+				noLabel.setStyleAttribute("width", "20px");
+				
+				buttons.add(yesLabel);
+				buttons.add(yes);
+				
+				buttons.add(noLabel);
+				buttons.add(no);
+				
+				label.setFor(buttons.getID());
+				container.add(buttons);
+			}
+			else {
+				TextInput input = new TextInput();
+				input.setDisabled(!enableInput);
+				input.setOnKeyPress(keyPressAction);
+				input.setId(s.getCode());
+	
+				label.setFor(input.getId());
+				container.add(input);
+			}
+			
+			layer.add(container);
 		}
 
 		Layer buttonContainer = new Layer();
@@ -120,7 +118,7 @@ public class PageInfo extends ContentBlock {
 		add(pageInfo);
 	}
 	
-	private boolean needAddPageInfo(IWContext iwc) {
+	private boolean canInputBeEnabled(IWContext iwc, String code) {
 		if (iwc == null) {
 			return false;
 		}
@@ -140,21 +138,8 @@ public class PageInfo extends ContentBlock {
 			return false;
 		}
 		
-		return true;
-	}
-	
-	private boolean canAddSection(IWContext iwc, String code) {
-		if (iwc == null || code == null) {
-			return false;
-		}
-		
-		if (!needAddPageInfo(iwc)) {
-			return false;
-		}
-		
-		//	Page is not published
-		//	"Less" role than content_editor
-		if (code.equals(ContentConstants.PUBLISH_PAGE_IN_LUCID_CODE) && !hasEditorRole) {
+		//	Page is not published and user's role is "less" than content_editor
+		if (code.equals(ContentConstants.PUBLISH_PAGE_IN_LUCID_CODE)) {
 			//	Publish/unpublish can only user with content_editor role
 			return false;
 		}
@@ -172,8 +157,9 @@ public class PageInfo extends ContentBlock {
 		return page == null ? true : page.isPublished();
 	}
 	
-	private RadioButton getRadioButton(String value, String code) {
+	private RadioButton getRadioButton(String value, String code, boolean enableInput) {
 		RadioButton button = new RadioButton(code, value);
+		button.setDisabled(!enableInput);
 		button.setMarkupAttribute("radioButtonCode", code);
 		button.setStyleAttribute("width", "13px");
 		button.setId(new StringBuffer(code).append(CoreConstants.UNDER).append(value).toString());
