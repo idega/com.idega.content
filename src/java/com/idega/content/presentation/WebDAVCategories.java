@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.26 2008/02/11 09:18:00 valdas Exp $
+ * $Id: WebDAVCategories.java,v 1.27 2008/02/26 11:26:45 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -47,10 +47,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2008/02/11 09:18:00 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/02/26 11:26:45 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.26 $
+ * @version $Revision: 1.27 $
  */
 public class WebDAVCategories extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -95,7 +95,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	}
 	
 	protected void initializeComponent(FacesContext context) {
-		add(getEditContainer(IWContext.getIWContext(context)));
+		add(getEditContainer(IWContext.getIWContext(context), false));
 	}
 
 	public void reset(){
@@ -117,13 +117,13 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	 * Creates the edit container
 	 * @return editContainer
 	 */
-	private UIComponent getEditContainer(IWContext iwc) {
+	private UIComponent getEditContainer(IWContext iwc, boolean submitted) {
 		WFContainer mainContainer = new WFContainer();
 		WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
 		if(getDisplayHeader()){
 			mainContainer.add(localizer.getHeaderTextVB("categories"));
 		}
-		mainContainer.add(getCategoriesTable(iwc));
+		mainContainer.add(getCategoriesTable(iwc, submitted));
 
 		if (isAddCategoryCreator()) {
 			mainContainer.add(getAddCategoryContainer());
@@ -151,7 +151,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	 * @param resourcePath
 	 * @return table
 	 */
-	private Table getCategoriesTable(IWContext iwc) {
+	private Table getCategoriesTable(IWContext iwc, boolean submitted) {
 		if (!areCategoriesFetched) {
 			getSelectedAndNotSelectedCategories(iwc);
 		}
@@ -186,7 +186,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 			//Checkbox
 			HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
 			setCategory(smc, category.getId());
-			if (notSelectedCategories.size() == 1 && selectedCategories.size() == 0) {
+			if (notSelectedCategories.size() == 1 && selectedCategories.size() == 0 && !submitted) {
 				smc.setValue(Boolean.TRUE);
 				smc.setSelected(true);
 			}
@@ -228,7 +228,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	@Override
 	protected void updateComponent(FacesContext context) {
 		this.getChildren().clear();
-		add(getEditContainer(IWContext.getIWContext(context)));
+		add(getEditContainer(IWContext.getIWContext(context), true));
 	}
 	
 	private Locale getLocale(IWContext iwc) {
@@ -365,8 +365,8 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		}
 		
 		if(id.equalsIgnoreCase(getAddButtonId())) {
-			//Add a category to the list of selectable categories
-			//This is input for adding a category
+			//	Add a category to the list of selectable categories
+			//	This is input for adding a category
 			HtmlInputText newCategoryInput = (HtmlInputText) comp.getParent().findComponent(getAddCategoryInputId());
 
 			String newCategoryName=newCategoryInput.getValue().toString();
@@ -386,7 +386,6 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		CategoryBean categoryBean = CategoryBean.getInstance();
 		int categoriesCount = categoryBean.getCategories().size();
 		HtmlSelectBooleanCheckbox checkBox = null;
-		//int count = 0;
 		String categoryKey;
 		String checkId;
 		for (int i = 0; i < categoriesCount; i++) {
@@ -406,7 +405,8 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		if (this.resourcePath == null){
 			throw new RuntimeException("resourcePath is null");
 		}
-		//save the selection of categories to the article
+		
+		//	Save the selection of categories to the article
 		String categories = getEnabledCategories();
 			
 		IWContext iwuc = IWContext.getInstance();
@@ -553,11 +553,14 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		if (categories == null || categories.size() == 0) {
 			needDisplayCategoriesSelection = false;
 		}
-		else if (this.selectedCategories.size() == 0 && notSelectedCategories.size() == 1) {
-			needDisplayCategoriesSelection = false;
+		/*else if (this.selectedCategories.size() == 0 && notSelectedCategories.size() == 1) {
+			needDisplayCategoriesSelection = true;
 		}
 		else {
 			needDisplayCategoriesSelection = true;
+		}*/
+		else {
+			needDisplayCategoriesSelection = true;	//	Now ALWAYS showing categories to user
 		}
 		
 		areCategoriesFetched = true;
