@@ -724,7 +724,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 				else {
 					if (s.getCode().equals(PAGE_URI)) {
 						if (!changedPageTitle) {
-							changedPageUri = setPageUri(pageKey, values[i]);
+							changedPageUri = setPageUri(pageKey, values[i]);	//	Setting user's uri
 						}
 					}
 					else if (ContentConstants.HIDE_MENU_IN_PAGE.equals(s.getCode())) {
@@ -744,8 +744,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 						if (needSetValue) {
 							helper.getThemesService().getBuilderService().setProperty(pageKey, ThemesConstants.MINUS_ONE, s.getMethod(), newValues, appl);
 							if (s.getCode().equals(PAGE_TITLE)) {
-								changedPageUri = setPageUri(pageKey, values[i]);
 								changedPageTitle = changePageName(Integer.valueOf(pageKey).intValue(), values[i], iwc);
+								changedPageUri = changePageUri(pageKey, values[i], true);	//	Changing uri by new name
 							}
 						}
 					}
