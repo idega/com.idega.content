@@ -207,4 +207,6 @@ public interface ThemesEngine extends IBOService {
 	public boolean isUserContentEditor();
 	
 	public Document getRenderedPageInfo(String pageKey, String id, String styleClass);
+	
+	public String changePageUriAfterPageWasMoved(String pageKey);
 }

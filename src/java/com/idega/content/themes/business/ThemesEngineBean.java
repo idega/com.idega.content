@@ -546,6 +546,35 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return helper.getThemesService().getBuilderService().setProperty(pageID, ThemesConstants.MINUS_ONE, method, new String[]{title}, appl);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public String changePageUriAfterPageWasMoved(String pageKey) {
+		if (pageKey == null) {
+			return null;
+		}
+		if (ThemesConstants.MINUS_ONE.equals(pageKey)) {
+			return null;
+		}
+		
+		ICPage page = helper.getThemesService().getICPage(pageKey);
+		if (page == null) {
+			return null;
+		}
+		
+		String newUri = changePageUri(pageKey, page.getName(), false);
+		if (newUri == null) {
+			return null;
+		}
+		
+		Collection children = page.getChildren();
+		if (children != null) {
+			for (Iterator it = children.iterator(); it.hasNext();) {
+				return changePageUriAfterPageWasMoved(((ICPage) it.next()).getId()); 
+			}
+		}
+		
+		return newUri;
+	}
+	
 	public String changePageUri(String pageKey, String pageUri, boolean needSetPageTitle) {
 		if (pageKey == null || pageUri == null) {
 			return null;
@@ -627,8 +656,12 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return page.getDefaultPageURI();
 		}
 		
-		if (helper.getThemesService().getBuilderService().setPageUri(page, uri, domain.getID())) {
-			setNewLinkInArticleFile(page.getId(), CoreConstants.getArticleItemViewerClass().getName(), page.getDefaultPageURI());
+		BuilderService builder = helper.getThemesService().getBuilderService();
+		if (builder == null) {
+			return null;
+		}
+		if (builder.setPageUri(page, uri, domain.getID())) {
+			setNewLinkInArticleFile(page.getId(), CoreConstants.getArticleItemViewerClass().getName(), page.getDefaultPageURI());			
 			return page.getDefaultPageURI();
 		}
 		return null;
