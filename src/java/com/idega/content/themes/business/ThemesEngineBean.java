@@ -381,11 +381,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		if (applyToPage) {
 			//	Apply style to selected page
-			result = setPageStyle(pageKey, templateId, iwc, null, type == 0 ? false : true, isContentEditor);
+			result = setPageStyle(pageKey, templateId, iwc, null, type == 0 ? false : true, isContentEditor, theme);
 		}
 		else {
 			//	Apply style to all pages
-			result = setSiteStyle(templateId, iwc, false, isContentEditor);
+			result = setSiteStyle(templateId, iwc, false, isContentEditor, theme);
 		}
 		
 		if (result) {
@@ -395,8 +395,8 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return result;
 	}
 	
-	private boolean setPageStyle(String pageKey, int templateKey, IWContext iwc, ICDomain cachedDomain, boolean setStyleForChildren, boolean isContentEditor) {
-		boolean result = setStyle(pageKey, templateKey, false, isContentEditor);
+	private boolean setPageStyle(String pageKey, int templateKey, IWContext iwc, ICDomain cachedDomain, boolean setStyleForChildren, boolean isContentEditor, Theme theme) {
+		boolean result = setStyle(theme, pageKey, templateKey, false, isContentEditor);
 		if (!result) {
 			return false;
 		}
@@ -411,19 +411,19 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			//	Setting the same style as front page has
 			String articleViewerID = iwc.getApplicationSettings().getProperty(ARTICLE_VIEWER_TEMPLATE_KEY);
 			if (articleViewerID != null) {
-				result = setStyle(articleViewerID, templateKey, true, isContentEditor);
+				result = setStyle(theme, articleViewerID, templateKey, true, isContentEditor);
 			}
 		}
 		
 		if (setStyleForChildren) {
-			return setStyleForChildren(pageKey, templateKey, iwc, cachedDomain, isContentEditor);
+			return setStyleForChildren(pageKey, templateKey, iwc, cachedDomain, isContentEditor, theme);
 		}
 		
 		return result;
 	}
 	
 	@SuppressWarnings("unchecked")
-	private boolean setStyleForChildren(String pageKey, int templateKey, IWContext iwc, ICDomain cachedDomain, boolean isContentEditor) {
+	private boolean setStyleForChildren(String pageKey, int templateKey, IWContext iwc, ICDomain cachedDomain, boolean isContentEditor, Theme theme) {
 		Map tree = getTree(iwc);
 		if (tree == null) {
 			return true;
@@ -458,14 +458,14 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			o = it.next();
 			if (o instanceof ICTreeNode) {
 				childPage = (ICTreeNode) o;
-				setPageStyle(childPage.getId(), templateKey, iwc, cachedDomain, true, isContentEditor);
+				setPageStyle(childPage.getId(), templateKey, iwc, cachedDomain, true, isContentEditor, theme);
 			}
 		}
 		
 		return true;
 	}
 	
-	private boolean setStyle(String pageKey, int templateId, boolean ignoreTemplate, boolean isContentEditor) {
+	private boolean setStyle(Theme theme, String pageKey, int templateId, boolean ignoreTemplate, boolean isContentEditor) {
 		ICPage page = null;
 		if (templateId < 0) {
 			return false;
@@ -488,7 +488,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			page.setTemplateId(templateId);
 			helper.setLastUsedTheme(templateKey);
 			
-			if (!checkIfNeedExtraRegions(pageKey, helper.getThemeByTemplateKey(templateKey))) {
+			if (!checkIfNeedExtraRegions(pageKey, theme)) {
 				page.store();
 			}
 		}
@@ -506,7 +506,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private boolean setSiteStyle(int templateID, IWContext iwc, boolean setStyleForChildren, boolean isContentEditor) {
+	private boolean setSiteStyle(int templateID, IWContext iwc, boolean setStyleForChildren, boolean isContentEditor, Theme theme) {
 		Map tree = getTree(iwc);
 		if (tree == null) {
 			return false;
@@ -518,7 +518,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		for (Iterator it = tree.values().iterator(); it.hasNext();) {
 			o = it.next();
 			if (o instanceof ICTreeNode) {
-				result = setPageStyle(((ICTreeNode) o).getId(), templateID, iwc, cachedDomain, false, isContentEditor);
+				result = setPageStyle(((ICTreeNode) o).getId(), templateID, iwc, cachedDomain, false, isContentEditor, theme);
 			}
 		}
 		return result;
