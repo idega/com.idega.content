@@ -621,7 +621,6 @@ public class ThemesHelper implements Singleton {
 	
 	public Document getXMLDocument(InputStream stream) throws Exception {
 		if (stream == null) {
-			log.warning(this.getClass().getName() + ": Stream is null");
 			return null;
 		}
 
