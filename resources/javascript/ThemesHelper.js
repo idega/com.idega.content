@@ -860,3 +860,19 @@ function createAccordionForLucid() {
 		}
 	}, $('accordion'));
 }
+
+function getUpdatedSiteTreeFromServer() {
+	ThemesEngine.getUpdatedSiteTree({
+		callback: function(tree) {
+			updateSiteTree(tree);
+		}
+	});
+}
+
+function getUpdatedSiteTemplatesTreeFromServer() {
+	ThemesEngine.getUpdatedSiteTemplatesTree({
+		callback: function(templatesTree) {
+			updateSiteTemplatesTree(templatesTree);
+		}
+	});
+}

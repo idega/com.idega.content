@@ -11,9 +11,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.myfaces.custom.tree2.TreeNode;
+import org.directwebremoting.ScriptBuffer;
 import org.jdom.Document;
 
 import com.idega.builder.bean.AdvancedProperty;
+import com.idega.business.IBOLookupException;
 import com.idega.business.IBOServiceBean;
 import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
@@ -29,6 +32,8 @@ import com.idega.content.themes.helpers.business.ThemeChanger;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.themes.presentation.PageInfo;
+import com.idega.content.themes.presentation.SiteTreeViewer;
+import com.idega.content.themes.presentation.TemplatesTree;
 import com.idega.content.themes.presentation.ThemeStyleVariations;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.builder.business.BuilderService;
@@ -42,6 +47,7 @@ import com.idega.core.data.ICTreeNode;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.core.search.business.SearchResult;
 import com.idega.data.TreeableEntity;
+import com.idega.dwr.business.ScriptCaller;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWResourceBundle;
@@ -1268,17 +1274,62 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	}
 	
 	public void updateSiteTemplatesTree(IWContext iwc, boolean sendToAllSessions) {
-		Thread templatesTreeUpater = new Thread(new SiteTemplatesTreeUpdater(iwc, sendToAllSessions));
-		templatesTreeUpater.run();
+		StringBuffer uri = new StringBuffer(CoreConstants.SLASH).append(CoreConstants.WORKSPACE_VIEW_MANAGER_ID).append(CoreConstants.SLASH);
+		uri.append(CoreConstants.CONTENT_VIEW_MANAGER_ID).append(CoreConstants.SLASH).append(CoreConstants.PAGES_VIEW_MANAGER_ID).append(CoreConstants.SLASH);
+		Thread scriptCaller = new Thread(new ScriptCaller(new ScriptBuffer("getUpdatedSiteTemplatesTreeFromServer();"), uri.toString(), sendToAllSessions));
+		scriptCaller.run();
+	}
+	
+	public Document getUpdatedSiteTemplatesTree() {
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return null;
+		}
+		
+		BuilderService service = null;
+		try {
+			service = (BuilderService) getServiceInstance(BuilderService.class);
+		} catch (IBOLookupException e) {
+			e.printStackTrace();
+		}
+		if (service == null) {
+			return null;
+		}
+		
+		return service.getRenderedComponent(iwc, new TemplatesTree(), false);
+	}
+	
+	public Document getUpdatedSiteTree() {
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return null;
+		}
+		
+		SiteTreeViewer tree = new SiteTreeViewer();
+		Object o = WFUtil.getValue("pageCreationBean", "pageSelectorTopNode");
+		if (o instanceof TreeNode) {
+			tree.setRootNode((TreeNode) o);
+		}
+		else {
+			return null;
+		}
+		
+		BuilderService service = null;
+		try {
+			service = (BuilderService) getServiceInstance(BuilderService.class);
+		} catch (IBOLookupException e) {
+			e.printStackTrace();
+		}
+		if (service == null) {
+			return null;
+		}
+		
+		return service.getRenderedComponent(iwc, tree, true);
 	}
 	
 	private void updateSiteTree(IWContext iwc, boolean updateAllSessions) {
-		if (iwc == null) {
-			iwc = CoreUtil.getIWContext();
-		}
-		
-		Thread siteTreeUpdater = new Thread(new SitePagesTreeUpdater(iwc, updateAllSessions));
-		siteTreeUpdater.run();
+		Thread scriptCaller = new Thread(new ScriptCaller(new ScriptBuffer("getUpdatedSiteTreeFromServer();"), updateAllSessions));
+		scriptCaller.run();
 	}
 	
 	private void updateSiteTree(IWContext iwc) {
