@@ -38,7 +38,12 @@ function setValueToHiddentPageInfoElement(input) {
 		return false;
 	}
 	
-	hiddenInput.setProperty('value', input.getProperty('value'));
+	var inputValue = input.getProperty('value');
+	if (inputValue == null || inputValue == '') {
+		inputValue = '-1';
+	}
+	
+	hiddenInput.setProperty('value', inputValue);
 }
 
 function savePageInfoWithRadioButtonValue(id) {
@@ -79,8 +84,9 @@ function getPageInfoElementsCallback(allKeywords) {
 		element = $(allKeywords[i]);
 		if (element != null) {
 			keywords.push(allKeywords[i]);
-			values.push(element.value);
-			if (allKeywords[i] == 'pageTitle' && element.value != '') {
+			var pageInfoValue = element.getProperty('value');
+			values.push(pageInfoValue);
+			if (allKeywords[i] == 'pageTitle' && pageInfoValue != '') {
 				treeNode = $(pageId);
 				if (treeNode == null) {
 					needReload = true;
@@ -96,7 +102,7 @@ function getPageInfoElementsCallback(allKeywords) {
 							nodeLink = nodeLinks[j];
 							
 							nodeLink.empty();
-							nodeLink.setText(element.value);
+							nodeLink.setText(pageInfoValue);
 						}
 					}
 				}

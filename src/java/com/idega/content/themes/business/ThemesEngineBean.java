@@ -795,7 +795,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	public boolean setValueForPage(String pageKey, String value, String columnName) {
-		if (pageKey == null) {
+		if (pageKey == null || value == null) {
+			return false;
+		}
+		
+		if (value.equals(CoreConstants.EMPTY) || value.equalsIgnoreCase("null") || value.equals(ThemesConstants.MINUS_ONE)) {
 			return false;
 		}
 		
@@ -806,7 +810,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		
 		boolean pageValue = false;
 		if (value != null) {
-			pageValue = Boolean.TRUE.toString().equals(value);
+			pageValue = Boolean.TRUE.toString().equalsIgnoreCase(value);
 		}
 		
 		page.setColumn(columnName, pageValue);

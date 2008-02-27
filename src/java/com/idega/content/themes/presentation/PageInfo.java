@@ -70,7 +70,7 @@ public class PageInfo extends ContentBlock {
 			if (ContentConstants.BOOLEAN_TYPE.equals(s.getType())) {
 				Layer buttons = new Layer();
 				
-				HiddenInput hiddenInput = new HiddenInput();
+				HiddenInput hiddenInput = new HiddenInput(ThemesConstants.MINUS_ONE, ThemesConstants.MINUS_ONE);
 				hiddenInput.setID(s.getCode());
 				buttons.add(hiddenInput);
 				
