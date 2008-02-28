@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.45 2008/02/25 13:15:06 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.46 2008/02/28 14:30:13 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -46,10 +46,10 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2008/02/25 13:15:06 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/02/28 14:30:13 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.45 $
+ * @version $Revision: 1.46 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -87,6 +87,8 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	private List versions;
 	
 	private String webDavResourceCategories = null; // This string is parsed from WebDavResource
+	
+	private boolean setPublishedDateByDefault = false;
 	
 	/**
 	 * Default constructor.
@@ -629,10 +631,12 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		String pageUri = helper.getPageUrlByArticleResourcePath(iwc, moduleClass);
 		articleURL.append(pageUri);
 
-		if (published == null && iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR)) { 
-			// Setting published date the same as creation
-			published = new Timestamp(System.currentTimeMillis());
-			setPublishedDate(published);
+		if (isSetPublishedDateByDefault()) {
+			if (published == null && iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR)) { 
+				// Setting published date the same as creation
+				published = new Timestamp(System.currentTimeMillis());
+				setPublishedDate(published);
+			}
 		}
 		
 		String creatorId = null;
@@ -724,6 +728,14 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		}
 		
 		return isDummyArticle;
+	}
+	
+	public boolean isSetPublishedDateByDefault() {
+		return setPublishedDateByDefault;
+	}
+
+	public void setSetPublishedDateByDefault(boolean setPublishedDateByDefault) {
+		this.setPublishedDateByDefault = setPublishedDateByDefault;
 	}
 	
 }
