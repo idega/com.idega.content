@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.27 2008/02/26 11:26:45 valdas Exp $
+ * $Id: WebDAVCategories.java,v 1.28 2008/02/28 14:30:47 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -12,6 +12,7 @@ package com.idega.content.presentation;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +38,7 @@ import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
+import com.idega.util.CoreConstants;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFResourceUtil;
 
@@ -47,10 +49,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2008/02/26 11:26:45 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/02/28 14:30:47 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.28 $
  */
 public class WebDAVCategories extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -65,7 +67,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	private boolean displayHeader=true;
 	private boolean addCategoryCreator = true;
 	private boolean needDisplayCategoriesSelection = true;
-	private boolean selectAllCategories = false;
+	private boolean selectAnyCategory = false;
 	
 	private boolean areCategoriesFetched = false;
 	
@@ -186,9 +188,11 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 			//Checkbox
 			HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
 			setCategory(smc, category.getId());
-			if (notSelectedCategories.size() == 1 && selectedCategories.size() == 0 && !submitted) {
-				smc.setValue(Boolean.TRUE);
-				smc.setSelected(true);
+			if (!submitted) {
+				if (notSelectedCategories.size() == 1 && selectedCategories.size() == 0 && selectAnyCategory) {
+					smc.setValue(Boolean.TRUE);
+					smc.setSelected(true);
+				}
 			}
 			else {
 				smc.setValue(Boolean.FALSE);
@@ -429,7 +433,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		values[3] = Boolean.valueOf(this.displaySaveButton);
 		values[4] = this.setCategories;
 		values[5] = Boolean.valueOf(this.displayHeader);
-		values[6] = Boolean.valueOf(this.selectAllCategories);
+		values[6] = Boolean.valueOf(this.selectAnyCategory);
 		return values;
 	}
 
@@ -445,7 +449,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		this.displaySaveButton = ((Boolean) values[3]).booleanValue();
 		this.setCategories=(String)values[4];
 		this.displayHeader=((Boolean)values[5]).booleanValue();
-		this.selectAllCategories = (Boolean) values[6];
+		this.selectAnyCategory = (Boolean) values[6];
 	}
 	
 	
@@ -458,6 +462,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		return categoryKey;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void setCategory(HtmlSelectBooleanCheckbox checkbox,String categoryKey){
 		checkbox.getAttributes().put("categoryKey",categoryKey);
 	}
@@ -512,7 +517,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	
 	public void getSelectedAndNotSelectedCategories(IWContext iwc) {
 		this.selectedCategories = new ArrayList<ContentCategory>();
-		notSelectedCategories = new ArrayList<ContentCategory>();
+		this.notSelectedCategories = new ArrayList<ContentCategory>();
 		
 		Locale locale = getLocale(iwc);
 		
@@ -524,13 +529,14 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 				category = CategoryBean.getInstance().getCategory(categoryKey);
 				if (category != null) {
 					if (category.getName(locale.toString()) != null && !category.isDisabled()) {
-						//	If category exists for current locale and it's not disabled
+						//	Category exists for current locale and it's not disabled
 						this.selectedCategories.add(category);
 					}
 				}
 			}
 		}
 		
+		List<String> providedCategoriesKeys = getProvidedCategoriesKeys();
 		Collection<ContentCategory> categories = CategoryBean.getInstance().getCategories(locale);
 		if (categories == null) {
 			localizedCategories = 0;
@@ -540,7 +546,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 			
 			for (ContentCategory category : categories) {
 				if (!category.isDisabled() && (selectedCategories == null || !selectedCategories.contains(category.getId()))) {
-					if (selectAllCategories) {
+					if (providedCategoriesKeys != null && providedCategoriesKeys.contains(category.getId())) {
 						this.selectedCategories.add(category);
 					}
 					else {
@@ -550,20 +556,27 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 			}
 		}
 		
-		if (categories == null || categories.size() == 0) {
+		if (this.selectedCategories.size() == 0 && this.notSelectedCategories.size() == 0) {
 			needDisplayCategoriesSelection = false;
 		}
-		/*else if (this.selectedCategories.size() == 0 && notSelectedCategories.size() == 1) {
-			needDisplayCategoriesSelection = true;
-		}
-		else {
-			needDisplayCategoriesSelection = true;
-		}*/
 		else {
 			needDisplayCategoriesSelection = true;	//	Now ALWAYS showing categories to user
 		}
 		
 		areCategoriesFetched = true;
+	}
+	
+	private List<String> getProvidedCategoriesKeys() {
+		if (setCategories == null || setCategories.equals(CoreConstants.EMPTY) || setCategories.equals(CoreConstants.COMMA)) {
+			return null;
+		}
+		
+		String[] keys = setCategories.split(CoreConstants.COMMA);
+		if (keys == null || keys.length == 0) {
+			return null;
+		}
+		
+		return Arrays.asList(keys);
 	}
 
 	public int getLocalizedCategories() {
@@ -574,12 +587,12 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		this.localeIdentity = localeIdentity;
 	}
 
-	public boolean isSelectAllCategories() {
-		return selectAllCategories;
+	public boolean isSelectAnyCategory() {
+		return selectAnyCategory;
 	}
 
-	public void setSelectAllCategories(boolean selectAllCategories) {
-		this.selectAllCategories = selectAllCategories;
+	public void setSelectAnyCategory(boolean selectAnyCategory) {
+		this.selectAnyCategory = selectAnyCategory;
 	}
-	
+
 }
