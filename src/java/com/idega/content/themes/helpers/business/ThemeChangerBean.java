@@ -2173,7 +2173,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		helper.createSmallImage(theme, false);
 		
 		try {
-			helper.getThemesService().createBuilderTemplate(theme, null);
+			helper.getThemesService().createBuilderTemplate(theme);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			return false;
@@ -2534,8 +2534,6 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 	
 	private boolean createNewTheme(Theme parent, String newName) {
-		String parentThemeTemplateId = String.valueOf(parent.getIBPageID());
-		
 		String linkToTheme = parent.getLinkToDraft();
 		if (linkToTheme == null) {
 			linkToTheme = parent.getLinkToSkeleton();
@@ -2597,7 +2595,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		// Creating new template
 		try {
-			helper.getThemesService().createBuilderTemplate(child, parentThemeTemplateId);
+			helper.getThemesService().createBuilderTemplate(child);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			return false;
@@ -2729,8 +2727,18 @@ public class ThemeChangerBean implements ThemeChanger {
 		else {
 			changedName = name;
 		}
-				
+		
 		return !theme.getName().equals(changedName);
+	}
+	
+	private boolean isThemeChanged(Theme theme) {
+		List<ThemeChange> changes = theme.getChanges();
+		boolean existsChanges = true;
+		if (changes == null || changes.size() == 0) {
+			existsChanges = false;
+		}
+		
+		return existsChanges;
 	}
 	
 	public boolean reloadThemeProperties(String themeId, boolean checkConfig) {

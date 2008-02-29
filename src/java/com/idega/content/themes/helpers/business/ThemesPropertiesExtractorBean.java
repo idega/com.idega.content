@@ -189,7 +189,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 					markThemeAsNotPrepared(theme);
 					return false;
 				}
-				if (!(helper.getThemesService().createBuilderTemplate(theme, null))) {
+				if (!(helper.getThemesService().createBuilderTemplate(theme))) {
 					markThemeAsNotPrepared(theme);
 					return false;
 				}

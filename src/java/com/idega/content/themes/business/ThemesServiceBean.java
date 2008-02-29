@@ -186,7 +186,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 	}
 	
-	public boolean createBuilderTemplate(Theme theme, String parentTemplateId) {
+	public boolean createBuilderTemplate(Theme theme) {
 		if (theme == null) {
 			return false;
 		}
@@ -210,10 +210,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		getBuilderService();
 		
 		//	Creating IBPage (template) for theme
-		String parentId = parentTemplateId;
-		if (parentId == null || ThemesConstants.MINUS_ONE.equals(parentId)) {
-			parentId = builder.getTopLevelTemplateId(builder.getTopLevelTemplates(iwc));
-		}
+		String parentId = builder.getTopLevelTemplateId(builder.getTopLevelTemplates(iwc));
 		if (parentId == null || ThemesConstants.MINUS_ONE.equals(parentId)) {
 			//	No Top Level Template
 			parentId = ThemesHelper.getInstance().getThemesEngine().createRootTemplate(domain, builder, domainID, builder.getIBXMLFormat());
