@@ -24,7 +24,9 @@ function setLanguageForSiteInfo(select) {
 }
 
 function getValues(object) {
-	setLanguageForSiteInfo(object);
+	if (object != null) {
+		setLanguageForSiteInfo(object);
+	}
 	if (SITE_INFO_KEYWORDS == null) {
 		ThemesEngine.getSiteInfoElements(getSiteInfoElementsCallback);
 	}
@@ -123,6 +125,7 @@ function proceedSaving(keywords) {
 		}
 	}
 	ThemesEngine.saveSiteInfo(SITE_INFO_LANGUAGE, SITE_INFO_KEYWORDS, values, saveSiteInfoCallback);
+	return false;
 }
 
 function saveSiteInfoCallback(result) {

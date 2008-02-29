@@ -105,9 +105,9 @@ public class SiteInfo extends Block {
 		form.add(layer);
 		
 		doBusiness(iwc, ThemesHelper.getInstance().getThemeSettings().values());
-		createContents(layer, iwc, true, false);
 		
 		DropdownMenu locales = getLocales(iwc, true, null);
+		createContents(layer, iwc, true, false);
 		
 		Layer formItem = new Layer();
 		formItem.setStyleClass("webfaceFormItem");

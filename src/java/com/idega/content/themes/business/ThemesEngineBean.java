@@ -32,6 +32,7 @@ import com.idega.content.themes.helpers.business.ThemeChanger;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.themes.presentation.PageInfo;
+import com.idega.content.themes.presentation.SiteInfo;
 import com.idega.content.themes.presentation.SiteTreeViewer;
 import com.idega.content.themes.presentation.TemplatesTree;
 import com.idega.content.themes.presentation.ThemeStyleVariations;
@@ -2167,5 +2168,13 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		pageInfo.setId(id);
 		
 		return helper.getThemesService().getBuilderService().getRenderedComponent(CoreUtil.getIWContext(), pageInfo, false);
+	}
+	
+	public Document getReRenderedSiteInfo(String id, String styleClass) {
+		SiteInfo siteInfo = new SiteInfo();
+		siteInfo.setId(id);
+		siteInfo.setStyleClass(styleClass);
+		
+		return helper.getThemesService().getBuilderService().getRenderedComponent(CoreUtil.getIWContext(), siteInfo, false);
 	}
 }

@@ -267,6 +267,7 @@ function savePageInfoWithEnter(event) {
 function saveSiteInfoWithEnter(event) {
 	if (isEnterEvent(event)) { 
 		saveSiteInfo();
+		return false;
 	}
 }
 
@@ -875,4 +876,11 @@ function getUpdatedSiteTemplatesTreeFromServer() {
 			updateSiteTemplatesTree(templatesTree);
 		}
 	});
+}
+
+function updateSiteInfoBoxWithNewValues() {
+	try {
+		setActiveLanguage();
+		getValues(null);
+	} catch(e) {};
 }

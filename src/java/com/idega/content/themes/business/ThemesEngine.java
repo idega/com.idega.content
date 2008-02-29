@@ -213,4 +213,6 @@ public interface ThemesEngine extends IBOService {
 	public Document getUpdatedSiteTree();
 	
 	public Document getUpdatedSiteTemplatesTree();
+	
+	public Document getReRenderedSiteInfo(String id, String styleClass);
 }
