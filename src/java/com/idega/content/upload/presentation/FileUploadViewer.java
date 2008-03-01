@@ -1,5 +1,6 @@
 package com.idega.content.upload.presentation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,8 +13,7 @@ import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.upload.business.FileUploader;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
-import com.idega.idegaweb.IWUserContext;
-import com.idega.presentation.Block;
+import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.PresentationObjectContainer;
@@ -24,7 +24,7 @@ import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.util.CoreConstants;
 
-public class FileUploadViewer extends Block {
+public class FileUploadViewer extends IWBaseComponent {
 	
 	private String actionAfterUpload = null;
 	private String actionAfterCounterReset = null;
@@ -38,6 +38,7 @@ public class FileUploadViewer extends Block {
 	private boolean showLoadingMessage = false;
 	private boolean allowMultipleFiles = false;
 	
+	@Override
 	public void restoreState(FacesContext context, Object state) {
 		Object values[] = (Object[]) state;
 		super.restoreState(context, values[0]);
@@ -53,6 +54,7 @@ public class FileUploadViewer extends Block {
 		this.allowMultipleFiles = (Boolean) values[8];
 	}
 	
+	@Override
 	public Object saveState(FacesContext context) {
 		Object values[] = new Object[9];
 		values[0] = super.saveState(context);
@@ -70,7 +72,11 @@ public class FileUploadViewer extends Block {
 		return values;
 	}
 	
-	public void main(IWContext iwc) {
+	@Override
+	public void encodeBegin(FacesContext context) throws IOException {
+		super.encodeBegin(context);
+		
+		IWContext iwc = IWContext.getIWContext(context);
 		FileUploader uploader = null;
 		try {
 			uploader = SpringBeanLookup.getInstance().getSpringBean(iwc, FileUploader.class);
@@ -86,7 +92,7 @@ public class FileUploadViewer extends Block {
 			extractContent = true;
 		}
 		
-		IWBundle bundle = getBundle(iwc);
+		IWBundle bundle = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER);
 		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
 		
 		Layer container = new Layer();
@@ -213,10 +219,6 @@ public class FileUploadViewer extends Block {
 	private String getJavaScriptSourceLine(String source) {
 		return new StringBuffer("<script type=\"text/javascript\" src=\"").append(source).append("\"></script>\n").toString();
 	}
-	
-	public String getBundleIdentifier() {
-		return ContentConstants.IW_BUNDLE_IDENTIFIER;
-	}
 
 	public String getActionAfterUpload() {
 		return actionAfterUpload;
@@ -288,11 +290,6 @@ public class FileUploadViewer extends Block {
 
 	public void setFormId(String formId) {
 		this.formId = formId;
-	}
-
-	@Override
-	public String getBuilderName(IWUserContext iwuc) {
-		return FileUploadViewer.class.getSimpleName();
 	}
 
 	public String getActionAfterCounterReset() {

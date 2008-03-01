@@ -29,6 +29,7 @@ public class FileUploadViewerTag extends UIComponentTag {
 		return null;
 	}
 	
+	@Override
 	protected void setProperties(UIComponent component) {
 		if (component instanceof FileUploadViewer) {
 			FileUploadViewer uploadViewer = (FileUploadViewer) component;
