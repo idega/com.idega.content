@@ -1,5 +1,5 @@
 /*
- * $Id: ContentUtil.java,v 1.15 2007/08/07 08:33:00 valdas Exp $
+ * $Id: ContentUtil.java,v 1.16 2008/03/18 08:11:04 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -24,10 +24,10 @@ import com.idega.util.CoreConstants;
 
 /**
  * 
- * Last modified: $Date: 2007/08/07 08:33:00 $ by $Author: valdas $
+ * Last modified: $Date: 2008/03/18 08:11:04 $ by $Author: valdas $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
 public class ContentUtil {
 	public static final String MODULE_PREFIX = "cms_";
@@ -120,4 +120,16 @@ public class ContentUtil {
 		
 		return service.getYearMonthPath();
 	}
+
+	public static boolean removeCategoriesViewersFromCache() {
+		BuilderService builder = null;
+		try {
+			builder = BuilderServiceFactory.getBuilderService(IWMainApplication.getDefaultIWApplicationContext());
+		} catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return builder.removeBlockObjectFromCacheByCacheKey(ContentConstants.ARTICLE_CATEGORIES_VIEWER_BLOCK_CACHE_KEY);
+	}
+
 }

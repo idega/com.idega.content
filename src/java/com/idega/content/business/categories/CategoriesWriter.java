@@ -10,6 +10,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 
+import com.idega.content.business.ContentUtil;
 import com.idega.content.data.ContentCategory;
 import com.idega.io.MemoryFileBuffer;
 import com.idega.io.MemoryInputStream;
@@ -65,11 +66,12 @@ public class CategoriesWriter implements Runnable {
 			
 			in.close();
 			rootResource.close();
+			
+			ContentUtil.removeCategoriesViewersFromCache();
 		} catch (IOException e) {
 			log.error("Error storing file " + resourcePath + ": " + e.getMessage());
 			return false;
 		}
 		return true;
 	}
-
 }
