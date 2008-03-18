@@ -37,7 +37,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ServletRequestContext src = new ServletRequestContext(request);
 		if (!FileUploadBase.isMultipartContent(src)) {
-			log.info("Request is not multipart content!");
+			log.error("Request is not multipart content!");
 			return;
 		}
 		
