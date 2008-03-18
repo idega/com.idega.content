@@ -62,6 +62,7 @@ public class ContentConstants {
 	public static final String DELETED_PAGE_IN_LUCID_PROPERTIES_FOR_ARTICLE = "deletedPageInLucidPropertiesForArticle";
 	
 	public static final String PUBLISH_PAGE_IN_LUCID_CODE = "setPagePublished";
+	public static final String SET_PAGE_LOCKED_IN_LUCID_CODE = "setPageLocked";
 	
 	public static final String ARTICLE_CATEGORIES_VIEWER_BLOCK_CACHE_KEY = "articleCategoriesViewerBlockCacheKey";
 }

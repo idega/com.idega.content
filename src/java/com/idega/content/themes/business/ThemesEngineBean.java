@@ -773,6 +773,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 					else if (ContentConstants.PUBLISH_PAGE_IN_LUCID_CODE.equals(s.getCode())) {
 						setValueForPage(pageKey, values[i], ICPageBMPBean.PAGE_IS_PUBLISHED);
 					}
+					else if (ContentConstants.SET_PAGE_LOCKED_IN_LUCID_CODE.equals(s.getCode())) {
+						setValueForPage(pageKey, values[i], ICPageBMPBean.PAGE_IS_LOCKED);
+					}
 					else {
 						newValues = helper.getPageValues(s, values[i]);
 						if (newValues == null) {
@@ -884,6 +887,9 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 					}
 					if (ContentConstants.PUBLISH_PAGE_IN_LUCID_CODE.equals(s.getCode())) {
 						value.append(page.isPublished());
+					}
+					if (ContentConstants.SET_PAGE_LOCKED_IN_LUCID_CODE.equals(s.getCode())) {
+						value.append(page.isLocked());
 					}
 				}
 			}

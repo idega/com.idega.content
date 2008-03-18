@@ -57,4 +57,11 @@
 		<type>boolean</type>
 		<method></method>
 	</key>
+	<key>
+		<code>setPageLocked</code>
+		<label>Locked Page</label>
+		<defaultValue></defaultValue>
+		<type>boolean</type>
+		<method></method>
+	</key>
 </config>
