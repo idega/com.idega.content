@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.34 2008/02/25 13:14:32 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.35 2008/03/18 18:18:40 tryggvil Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -47,10 +47,10 @@ import com.idega.user.data.Group;
 
 /**
  * 
- *  Last modified: $Date: 2008/02/25 13:14:32 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/03/18 18:18:40 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.34 $
+ * @version $Revision: 1.35 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	
@@ -93,7 +93,18 @@ public class IWBundleStarter implements IWBundleStartable{
 	protected void addContentRoleGroups(IWApplicationContext iwac) {
 		try {
 			GroupBusiness groupBiz = (GroupBusiness) IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
-			BuilderService builderService = (BuilderService) IBOLookup.getServiceInstance(iwac, BuilderService.class);
+			
+			BuilderService builderService = null;
+			try{
+				builderService = (BuilderService) IBOLookup.getServiceInstance(iwac, BuilderService.class);
+			}
+			catch(IBOLookupException iboe){
+				System.err.println("Error: com.idega.content.IWBundleStarter: looking up BuilderService: "+iboe.getMessage());
+			}
+			catch(RuntimeException rte){
+				System.err.println("Error: com.idega.content.IWBundleStarter: looking up BuilderService: "+rte.getMessage());
+			}
+		
 			boolean clearCache = false;
 			
 			
@@ -114,7 +125,9 @@ public class IWBundleStarter implements IWBundleStartable{
 			}
 			
 			if(clearCache){
-				builderService.clearAllCaches();
+				if(builderService!=null){
+					builderService.clearAllCaches();
+				}
 			}
 			
 		} catch (IBOLookupException e) {
