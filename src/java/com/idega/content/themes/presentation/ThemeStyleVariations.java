@@ -45,10 +45,12 @@ public class ThemeStyleVariations extends Block {
 		setCacheable(getCacheKey());
 	}
 	
+	@Override
 	public String getCacheKey() {
 		return ThemesConstants.THEME_STYLE_VARIATIONS_CACHE_KEY;
 	}
 	
+	@Override
 	protected String getCacheState(IWContext iwc, String cacheStatePrefix) {
 		String themeID = getThemeId();
 		if (themeID == null) {
