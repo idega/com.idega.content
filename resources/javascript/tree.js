@@ -84,7 +84,7 @@ function executeActionsAfterSiteTreeInLucidWasChanged(param) {
 	trashCan.style.opacity = 0.5;		
 }
 
-function setFrameUrl(uri) {
+function setFrameUrlForLucidApplication(uri, canActAsBuilderUser) {
 	var frame = document.getElementById('treePages');
 	if (frame == null) {
 		return false;
@@ -98,10 +98,10 @@ function setFrameUrl(uri) {
 		return false;
 	}
 	
-	if (SHOW_SOURCE_PAGES) {
+	if (SHOW_SOURCE_PAGES && canActAsBuilderUser) {
 		uri = '/servlet/ObjectInstanciator?idegaweb_instance_class=' + IB_SOURCE_VIEW_CLASS;
 	}
-	if (SHOW_EDIT_PAGES) {
+	if (SHOW_EDIT_PAGES && canActAsBuilderUser) {
 		if (uri.charAt(uri.length-1) != '/') {
 			uri += '/';
 		}
@@ -138,7 +138,15 @@ function getPrewUrl(nodeID) {
 		}		
 	}
 	
-	ThemesEngine.getPageUri(nodeID, setFrameUrl);
+	ThemesEngine.getPageUri(nodeID, {
+		callback: function(uri) {
+			ThemesEngine.canUserActAsBuilderUser({
+				callback: function(rights) {
+					setFrameUrlForLucidApplication(uri, rights);
+				}
+			});
+		}
+	});
 }
 						
 function getId(){

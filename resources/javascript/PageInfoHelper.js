@@ -9,7 +9,6 @@ var GET_THEMES_ID = 0;
 
 var SLIDER_SHOWED_FIRST_TIME = true;
 var MODULES_SHOWN = false;
-var IS_USER_ADMIN = false;
 
 var KEYWORDS = null;
 
@@ -685,13 +684,7 @@ function initializePages() {
 	});
 	
 	resizeTreeContainerInThemes(RESERVED_HEIGHT_FOR_PAGES);
-	
-	ThemesEngine.isUserAdmin({
-		callback: function(isAdmin) {
-			IS_USER_ADMIN = isAdmin;
-		}
-	});
-	
+		
 	BuilderService.getClassNameForSourceView({
 		callback: function(className) {
 			IB_SOURCE_VIEW_CLASS = className;
@@ -817,26 +810,24 @@ function registerPageInfoActions() {
 			
 			button.removeEvents('click');
 			button.addEvent('click', function() {
-				if (IS_USER_ADMIN) {
-					SHOW_SOURCE_PAGES = true;
-					SHOW_EDIT_PAGES = false;
-					
-					if (SHOW_SOURCE_PAGES) {
-						hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
-					}
-					
-					MODULES_SHOWN = false;
-					$('showPageModules').removeClass('active');
-					$('showThemesButton').removeClass('active');
-					$('showEditPagesButton').removeClass('activeButtonInPages');
-					$('showPreviewPagesButton').removeClass('activeButtonInPages');
-					
-					if (!button.hasClass('activeButtonInPages')) {
-						button.addClass('activeButtonInPages');
-					}
-					
-					getPrewUrl(getPageID());
+				SHOW_SOURCE_PAGES = true;
+				SHOW_EDIT_PAGES = false;
+				
+				if (SHOW_SOURCE_PAGES) {
+					hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
 				}
+				
+				MODULES_SHOWN = false;
+				$('showPageModules').removeClass('active');
+				$('showThemesButton').removeClass('active');
+				$('showEditPagesButton').removeClass('activeButtonInPages');
+				$('showPreviewPagesButton').removeClass('activeButtonInPages');
+			
+				if (!button.hasClass('activeButtonInPages')) {
+					button.addClass('activeButtonInPages');
+				}
+				
+				getPrewUrl(getPageID());
 			});
 		}
 	);

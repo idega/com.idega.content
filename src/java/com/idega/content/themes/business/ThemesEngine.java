@@ -184,7 +184,7 @@ public interface ThemesEngine extends IBOService {
 	/**
 	 * @see ThemesEngineBean#isUserAdmin
 	 */
-	public boolean isUserAdmin();
+	public boolean canUserActAsBuilderUser();
 	
 	/**
 	 * @see ThemesEngineBean#getPageUri

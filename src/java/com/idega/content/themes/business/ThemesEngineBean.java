@@ -1975,13 +1975,25 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 		return null;
 	}
 	
-	public boolean isUserAdmin() {
+	public boolean canUserActAsBuilderUser() {
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return false;
 		}
 		
-		return iwc.isSuperAdmin();
+		if (iwc.isSuperAdmin()) {
+			return true;
+		}
+		
+		ICPage page = helper.getThemesService().getICPage(iwc.getCurrentIBPageID());
+		if (page == null) {
+			return false;
+		}
+		if (page.isPublished() && !iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR)) {
+			return false;
+		}
+		
+		return iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR) || iwc.hasRole(StandardRoles.ROLE_KEY_AUTHOR);
 	}
 
 	public String getPageUri(String pageKey) {
