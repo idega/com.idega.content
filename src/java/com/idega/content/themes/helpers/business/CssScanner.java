@@ -1,15 +1,26 @@
 package com.idega.content.themes.helpers.business;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.apache.commons.httpclient.URIException;
+
+import com.idega.content.business.ContentConstants;
 import com.idega.util.CoreConstants;
 import com.idega.util.StringHandler;
 
 public class CssScanner {
 	
+	private static Logger log = Logger.getLogger(CssScanner.class.getName());
+	
 	private BufferedReader readerBuffer = null;
 	private StringBuffer resultBuffer = null;
+	
+	private String linkToTheme = null;
 	
 	private boolean needToReplace = false;
 	
@@ -23,8 +34,10 @@ public class CssScanner {
 	private static final String CLOSER = "}";
 	private static final String UTF_8_DECLARATION = "@charset \"UTF-8\";";
 	
-	public CssScanner(BufferedReader readerBuffer) {
+	public CssScanner(BufferedReader readerBuffer, String linkToTheme) {
 		this.readerBuffer = readerBuffer;
+		this.linkToTheme = linkToTheme;
+		
 		scanFile();
 	}
 	
@@ -50,6 +63,55 @@ public class CssScanner {
 			e.printStackTrace();
 			return;
 		}
+	}
+	
+	private boolean canUseURL(String line) {
+		boolean urlElementExists = true;
+		
+		String urlStart = "url";
+		String[] urls = line.split(urlStart);
+		if (urls == null || urls.length < 2) {
+			return true;
+		}
+		
+		File f = null;
+		String urlValueInCss = null;
+		String path = null;
+		//	Zero element is not interesting...
+		for (int i = 1; (i < urls.length && urlElementExists); i++) {
+			urlValueInCss = urls[i];
+			f = null;
+			
+			int start = urlValueInCss.indexOf(ContentConstants.BRACKET_OPENING);
+			int end = urlValueInCss.lastIndexOf(ContentConstants.BRACKET_CLOSING);
+			urlValueInCss = urlValueInCss.substring(start + 1, end);
+			urlValueInCss = StringHandler.replace(urlValueInCss, "../", ThemesConstants.EMPTY);
+			
+			path = new StringBuffer(linkToTheme).append(urlValueInCss).toString();
+			try {
+				f = ThemesHelper.getInstance().getSlideService().getFile(path);
+			} catch (URIException e) {
+				e.printStackTrace();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+			if (f == null) {
+				urlElementExists = false;
+			}
+			else {
+				try {
+					urlElementExists = f.exists();
+				} catch (Exception e) {
+					e.printStackTrace();
+					urlElementExists = false;
+				}
+			}
+		}
+		
+		if (!urlElementExists) {
+			log.log(Level.SEVERE, "File '" + path + "' does not exist in Theme's pack! Removing CSS expression: " + line);
+		}
+		return urlElementExists;
 	}
 	
 	private String scanLine(String line) {
@@ -87,6 +149,17 @@ public class CssScanner {
 			line = new StringBuffer(colorValue[0]).append(CoreConstants.NUMBER_SIGN).append(color).toString();
 		}
 		
+		//	Checking URL stuff
+		if (line.indexOf("url(") != -1) {
+			if (canUseURL(line)) {
+				return line;
+			}
+			else {
+				return ThemesConstants.EMPTY;
+			}
+		}
+		
+		//	Checking comments
 		if (line.indexOf(OPENER) == -1 && line.indexOf(CLOSER) == -1) {
 			return line;
 		}

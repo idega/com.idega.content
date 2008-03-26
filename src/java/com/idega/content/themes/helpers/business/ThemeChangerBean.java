@@ -284,13 +284,13 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 	
 	private boolean uploadTheme(Document doc, Theme theme) {
-		checkCssFiles(doc);
+		checkCssFiles(doc, theme.getLinkToBase());
 		
 		return uploadTheme(out.outputString(doc), theme, true);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private boolean checkCssFiles(Document doc) {
+	private boolean checkCssFiles(Document doc, String linkToTheme) {
 		if (doc == null) {
 			return false;
 		}
@@ -316,7 +316,7 @@ public class ThemeChangerBean implements ThemeChanger {
 				cssLink = link.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_HREF);
 				
 				if (cssLink != null) {
-					proceedStyleFile(getFixedDocumentContent(cssLink));
+					proceedStyleFile(linkToTheme, getFixedDocumentContent(cssLink));
 				}
 			}
 		}
@@ -399,7 +399,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			member = it.next();
 			files = member.getStyleFiles();
 			for (index = 0; index < files.size(); index++) {
-				if (!proceedStyleFile(new StringBuffer(theme.getLinkToBase()).append(files.get(index)).toString())) {
+				if (!proceedStyleFile(theme.getLinkToBase(), new StringBuffer(theme.getLinkToBase()).append(files.get(index)).toString())) {
 					invalidFiles.add(files.get(index));	//	Invalid CSS file, disabling variation
 				}
 			}
@@ -896,12 +896,12 @@ public class ThemeChangerBean implements ThemeChanger {
 	private boolean prepareThemeDefaultStyleFiles(Theme theme) {
 		List <String> defaultStyles = ThemesConstants.DEFAULT_STYLE_FILES;
 		for (int i = 0; i < defaultStyles.size(); i++) {
-			proceedStyleFile(new StringBuffer(theme.getLinkToBase()).append(defaultStyles.get(i)).toString());
+			proceedStyleFile(theme.getLinkToBase(), new StringBuffer(theme.getLinkToBase()).append(defaultStyles.get(i)).toString());
 		}
 		return true;
 	}
 	
-	private boolean proceedStyleFile(String linkToStyle) {
+	private boolean proceedStyleFile(String linkToTheme, String linkToStyle) {
 		if (linkToStyle == null) {
 			return false;
 		}
@@ -919,7 +919,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		InputStreamReader isr = new InputStreamReader(is);
 		BufferedReader buf = new BufferedReader(isr);
-		CssScanner scanner = new CssScanner(buf);
+		CssScanner scanner = new CssScanner(buf, linkToTheme);
 		
 		helper.closeInputStream(is);
 		helper.closeInputStreamReader(isr);
