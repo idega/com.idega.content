@@ -12,6 +12,7 @@ import com.idega.block.rss.business.RSSBusiness;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.presentation.IWContext;
+import com.idega.util.CoreUtil;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 
@@ -35,17 +36,13 @@ public class ContentItemFeedBean implements Serializable {
 	
 	private void init(IWContext iwc) {
 		if (rss == null) {
-			synchronized (ContentItemFeedBean.class) {
-				if (rss == null) {
-					if (iwc == null) {
-						iwc = IWContext.getInstance();
-					}
-					try {
-						rss = (RSSBusiness) IBOLookup.getServiceInstance(iwc, RSSBusiness.class);
-					} catch (IBOLookupException e) {
-						e.printStackTrace();
-					}
-				}
+			if (iwc == null) {
+				iwc = CoreUtil.getIWContext();
+			}
+			try {
+				rss = (RSSBusiness) IBOLookup.getServiceInstance(iwc, RSSBusiness.class);
+			} catch (IBOLookupException e) {
+				e.printStackTrace();
 			}
 		}
 	}

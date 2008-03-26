@@ -48,6 +48,7 @@ import org.xml.sax.EntityResolver;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.business.SpringBeanLookup;
 import com.idega.content.bean.ContentItemFeedBean;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentSearch;
@@ -137,42 +138,30 @@ public class ThemesHelper implements Singleton {
 		}
 	}
 	
-	public static ThemesHelper getInstance() {
+	public static synchronized ThemesHelper getInstance() {
 		if (helper == null) {
-			synchronized (ThemesHelper.class) {
-				if (helper == null) {
-					helper = new ThemesHelper(false);
-				}
-			}
+			helper = new ThemesHelper(false);
 		}
 		return helper;
 	}
 	
-	public static ThemesHelper getInstance(boolean searchForThemes) {
+	public static synchronized ThemesHelper getInstance(boolean searchForThemes) {
 		if (helper == null) {
-			synchronized (ThemesHelper.class) {
-				if (helper == null) {
-					helper = new ThemesHelper(searchForThemes);
-				}
-			}
+			helper = new ThemesHelper(searchForThemes);
 		}
 		return helper;
 	}
 	
 	protected Generator getImageGenerator(IWContext iwc) {
 		if (generator == null) {
-			synchronized (ThemesHelper.class) {
-				if (generator == null) {
-					if (iwc == null) {
-						iwc = CoreUtil.getIWContext();
-					}
-					if (iwc == null) {
-						generator = new ImageGenerator();
-					}
-					else {
-						generator = new ImageGenerator(iwc);
-					}
-				}
+			if (iwc == null) {
+				iwc = CoreUtil.getIWContext();
+			}
+			if (iwc == null) {
+				generator = new ImageGenerator();
+			}
+			else {
+				generator = new ImageGenerator(iwc);
 			}
 		}
 		return generator;
@@ -202,18 +191,14 @@ public class ThemesHelper implements Singleton {
 	
 	public IWSlideService getSlideService(IWApplicationContext iwac) {
 		if (service == null) {
-			synchronized (ThemesHelper.class) {
-				if (service == null) {
-					try {
-						if (iwac == null) {
-							iwac = CoreUtil.getIWContext();
-						}
-						service = (IWSlideService) IBOLookup.getServiceInstance(iwac, IWSlideService.class);
-					} catch (Exception e) {
-						e.printStackTrace();
-						return null;
-					}
+			try {
+				if (iwac == null) {
+					iwac = CoreUtil.getIWContext();
 				}
+				service = (IWSlideService) IBOLookup.getServiceInstance(iwac, IWSlideService.class);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
 			}
 		}
 		return service;
@@ -225,22 +210,16 @@ public class ThemesHelper implements Singleton {
 	
 	private ContentItemFeedBean getFeedBean() {
 		if (feedBean == null) {
-			synchronized (ThemesHelper.class) {
-				if (feedBean == null) {
-					feedBean = new ContentItemFeedBean(null, ContentItemFeedBean.FEED_TYPE_ATOM_1);
-				}
-			}
+			feedBean = new ContentItemFeedBean(null, ContentItemFeedBean.FEED_TYPE_ATOM_1);
 		}
 		return feedBean;
 	}
 	
-	public void searchForThemes() {
-		synchronized (ThemesHelper.class) {
-			if (checkedFromSlide) {
-				return;
-			}
-			checkedFromSlide = true;
+	public synchronized void searchForThemes() {
+		if (checkedFromSlide) {
+			return;
 		}
+		checkedFromSlide = true;
 		
 		String searchScope = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(ThemesConstants.THEMES_PATH).toString();
 		
@@ -962,12 +941,10 @@ public class ThemesHelper implements Singleton {
 	
 	public ThemesService getThemesService() {
 		if (themesService == null) {
-			synchronized (ThemesHelper.class) {
-				try {
-					themesService = (ThemesService) IBOLookup.getServiceInstance(CoreUtil.getIWContext(), ThemesService.class);
-				} catch (IBOLookupException e) {
-					e.printStackTrace();
-				}
+			try {
+				themesService = (ThemesService) IBOLookup.getServiceInstance(CoreUtil.getIWContext(), ThemesService.class);
+			} catch (IBOLookupException e) {
+				e.printStackTrace();
 			}
 		}
 		return themesService;
@@ -1155,15 +1132,9 @@ public class ThemesHelper implements Singleton {
 		themeQueue.remove(linkToBase);
 	}
 	
-	public ThemesEngine getThemesEngine() {
+	public ThemesEngine getThemesEngine(IWContext iwc) {
 		if (themesEngine == null) {
-			synchronized (ThemesHelper.class) {
-				try {
-					themesEngine = (ThemesEngine) IBOLookup.getServiceInstance(CoreUtil.getIWContext(), ThemesEngine.class);
-				} catch (IBOLookupException e) {
-					e.printStackTrace();
-				}
-			}
+			themesEngine = SpringBeanLookup.getInstance().getSpringBean(iwc, ThemesEngine.class);
 		}
 		return themesEngine;
 	}
@@ -1857,6 +1828,9 @@ public class ThemesHelper implements Singleton {
 			return false;
 		}
 		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return false;
+		}
 		
 		//	Removing Block from cache
 		for (int i = 0; i < keys.size(); i++) {
@@ -1867,7 +1841,7 @@ public class ThemesHelper implements Singleton {
 		theme.clearStyleVariationsCacheKeys();
 		
 		//	Removing rendered variations from cache
-		getThemesEngine().clearVariationFromCache(themeID, iwc);
+		getThemesEngine(iwc).clearVariationFromCache(themeID, iwc);
 		
 		return true;
 	}
