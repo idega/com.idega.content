@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.28 2008/02/28 14:30:47 valdas Exp $
+ * $Id: WebDAVCategories.java,v 1.29 2008/03/26 09:17:54 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -49,10 +49,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2008/02/28 14:30:47 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/03/26 09:17:54 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.29 $
  */
 public class WebDAVCategories extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -559,8 +559,11 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		if (this.selectedCategories.size() == 0 && this.notSelectedCategories.size() == 0) {
 			needDisplayCategoriesSelection = false;
 		}
+		else if (setCategories != null && this.selectedCategories.size() == 1) {
+			needDisplayCategoriesSelection = false;	//	If is set only one category, not showing categories editor
+		}
 		else {
-			needDisplayCategoriesSelection = true;	//	Now ALWAYS showing categories to user
+			needDisplayCategoriesSelection = true;	//	Showing categories to user
 		}
 		
 		areCategoriesFetched = true;
