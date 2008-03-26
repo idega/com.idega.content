@@ -3,8 +3,49 @@
 
 <dwr>
 	<allow>
-		<create creator="ibo" javascript="ThemesEngine" scope="application">
-      		<param name="class" value="com.idega.content.themes.business.ThemesEngine" />
+		<create creator="jsf" javascript="ThemesEngine">
+			<param name="managedBeanName" value="themesEngine" />
+      		<param name="class" value="com.idega.content.themes.business.ThemesEngineBean" />
+      		<include method="getThemes"/>
+      		<include method="getTheme"/>
+      		<include method="getThemeStyleVariations"/>
+      		<include method="changeTheme"/>
+      		<include method="saveTheme"/>
+      		<include method="setSelectedStyle"/>
+      		<include method="changePageUri"/>
+      		<include method="savePageInfo"/>
+      		<include method="getPageInfoValues"/>
+      		<include method="getPageInfoElements"/>
+      		<include method="restoreTheme"/>
+      		<include method="getSiteInfoElements"/>
+      		<include method="getSiteInfoValues"/>
+      		<include method="saveSiteInfoValue"/>
+      		<include method="saveSiteInfo"/>
+      		<include method="createPage"/>
+      		<include method="deletePage"/>
+      		<include method="deletePageAndDecrease"/>
+      		<include method="getPageId"/>
+      		<include method="setPageId"/>
+      		<include method="movePage"/>
+      		<include method="getPathToImageFolder"/>
+      		<include method="isStartPage"/>
+      		<include method="setAsStartPage"/>
+      		<include method="applyMultipleChangesToTheme"/>
+      		<include method="getLocalizedText"/>
+      		<include method="startBuilderApplication"/>
+      		<include method="reloadThemeProperties"/>
+      		<include method="canUserActAsBuilderUser"/>
+      		<include method="getPageUri"/>
+      		<include method="changePageName"/>
+      		<include method="deleteArticlesFromDeletedPages"/>
+      		<include method="deleteArticle"/>
+      		<include method="createChildTemplateForThisTemplate"/>
+      		<include method="isUserContentEditor"/>
+      		<include method="getRenderedPageInfo"/>
+      		<include method="changePageUriAfterPageWasMoved"/>
+      		<include method="getUpdatedSiteTree"/>
+      		<include method="getUpdatedSiteTemplatesTree"/>
+      		<include method="getReRenderedSiteInfo"/>
     	</create>
     	<convert converter="bean" match="com.idega.content.themes.helpers.bean.SimplifiedTheme" />
     	<convert converter="bean" match="com.idega.content.themes.helpers.bean.ThemeChange">
@@ -18,12 +59,12 @@
     	</create>
     	
     	<create creator="jsf" javascript="FileUploader">
-    		<param name="managedBeanName" value="fileUploader"></param>
+    		<param name="managedBeanName" value="fileUploader" />
     		<param name="class" value="com.idega.content.upload.business.FileUploaderBean"/>
 		</create>
 		
 		<create creator="jsf" javascript="FileUploadListener">
-    		<param name="managedBeanName" value="fileUploadProgressListener"></param>
+    		<param name="managedBeanName" value="fileUploadProgressListener" />
     		<param name="class" value="com.idega.content.upload.business.FileUploadProgressListenerBean"/>
 		</create>
 	</allow>

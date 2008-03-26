@@ -3,6 +3,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 	
+	<bean id="themesEngine" class="com.idega.content.themes.business.ThemesEngineBean" scope="session" />
+	
 	<bean id="content.CategoriesEngineBean" class="com.idega.content.business.categories.CategoriesEngineBean" scope="session" />
 	
 	<bean id="themeChanger" class="com.idega.content.themes.helpers.business.ThemeChangerBean" scope="session"></bean>

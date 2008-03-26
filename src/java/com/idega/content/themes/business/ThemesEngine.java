@@ -1,21 +1,22 @@
 package com.idega.content.themes.business;
 
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jdom.Document;
+
+import com.idega.business.SpringBeanName;
 import com.idega.content.themes.helpers.bean.SimplifiedTheme;
 import com.idega.content.themes.helpers.bean.ThemeChange;
 import com.idega.content.themes.helpers.bean.TreeNodeStructure;
+import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
 
-import java.util.ArrayList;
-import com.idega.core.builder.business.BuilderService;
-import com.idega.business.IBOService;
-import java.util.List;
-import java.rmi.RemoteException;
-
-import org.jdom.Document;
-
-public interface ThemesEngine extends IBOService {
+@SpringBeanName("themesEngine")
+public interface ThemesEngine {
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getThemes
 	 */

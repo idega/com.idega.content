@@ -213,8 +213,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		String parentId = builder.getTopLevelTemplateId(builder.getTopLevelTemplates(iwc));
 		if (parentId == null || ThemesConstants.MINUS_ONE.equals(parentId)) {
 			//	No Top Level Template
-			parentId = ThemesHelper.getInstance().getThemesEngine().createRootTemplate(domain, builder, domainID, builder.getIBXMLFormat());
-			ThemesHelper.getInstance().getThemesEngine().initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
+			parentId = ThemesHelper.getInstance().getThemesEngine(iwc).createRootTemplate(domain, builder, domainID, builder.getIBXMLFormat());
+			ThemesHelper.getInstance().getThemesEngine(iwc).initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
 		}
 		String name = StringHandler.removeCharacters(theme.getName(), ContentConstants.SPACE, ContentConstants.UNDER);
 		id = createIBPage(parentId, theme.getName(), builder.getTemplateKey(), null, ThemesConstants.THEMES + name +
@@ -225,7 +225,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		theme.setIBPageID(id);
 		
 		if (updatePageWebDav(theme.getIBPageID(), CoreConstants.WEBDAV_SERVLET_URI + theme.getLinkToSkeleton())) {
-			ThemesHelper.getInstance().getThemesEngine().updateSiteTemplatesTree(iwc, true);
+			ThemesHelper.getInstance().getThemesEngine(iwc).updateSiteTemplatesTree(iwc, true);
 			return true;
 		}
 		
@@ -310,14 +310,10 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	
 	public BuilderService getBuilderService() {
 		if (builder == null) {
-			synchronized (ThemesServiceBean.class) {
-				if (builder == null) {
-					try {
-						builder = BuilderServiceFactory.getBuilderService(getIWApplicationContext());
-					} catch (RemoteException e) {
-						e.printStackTrace();
-					}
-				}
+			try {
+				builder = BuilderServiceFactory.getBuilderService(getIWApplicationContext());
+			} catch (RemoteException e) {
+				e.printStackTrace();
 			}
 		}
 		return builder;

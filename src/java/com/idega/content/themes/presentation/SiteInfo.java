@@ -71,7 +71,7 @@ public class SiteInfo extends Block {
 			return;
 		}
 
-		ThemesEngine engine = ThemesHelper.getInstance().getThemesEngine();
+		ThemesEngine engine = ThemesHelper.getInstance().getThemesEngine(iwc);
 		ICDomain domain = iwc.getIWMainApplication().getIWApplicationContext().getDomain();
 		String keyPressAction = "return saveSiteInfoWithEnter(event)";
 		for (int i = 0; i < settings.size(); i++) {
@@ -145,7 +145,7 @@ public class SiteInfo extends Block {
 			values[i] = iwc.getParameter(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + CoreConstants.DOT +
 					REGION_VALUE);
 		}
-		ThemesHelper.getInstance().getThemesEngine().saveSiteInfo(locale, keywords, values);
+		ThemesHelper.getInstance().getThemesEngine(iwc).saveSiteInfo(locale, keywords, values);
 	}
 	
 	protected Label getLabel(String text, InterfaceObject component) {

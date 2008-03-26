@@ -16,8 +16,6 @@ import org.directwebremoting.ScriptBuffer;
 import org.jdom.Document;
 
 import com.idega.builder.bean.AdvancedProperty;
-import com.idega.business.IBOLookupException;
-import com.idega.business.IBOServiceBean;
 import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentItemChecker;
@@ -58,7 +56,7 @@ import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.webface.WFUtil;
 
-public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
+public class ThemesEngineBean implements ThemesEngine {
 
 	private static final long serialVersionUID = 5875353284352953688L;
 	
@@ -71,7 +69,11 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 	
 	private static final String ARTICLE_VIEWER_TEMPLATE_KEY = "article_viewer_page_key";
 	
-	private ThemesHelper helper = ThemesHelper.getInstance(false);
+	private ThemesHelper helper = null;
+	
+	public ThemesEngineBean() {
+		helper = ThemesHelper.getInstance(false);
+	}
 
 	/**
 	 * Returns info about themes in slide
@@ -1293,12 +1295,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return null;
 		}
 		
-		BuilderService service = null;
-		try {
-			service = (BuilderService) getServiceInstance(BuilderService.class);
-		} catch (IBOLookupException e) {
-			e.printStackTrace();
-		}
+		BuilderService service = helper.getThemesService().getBuilderService();
 		if (service == null) {
 			return null;
 		}
@@ -1321,12 +1318,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return null;
 		}
 		
-		BuilderService service = null;
-		try {
-			service = (BuilderService) getServiceInstance(BuilderService.class);
-		} catch (IBOLookupException e) {
-			e.printStackTrace();
-		}
+		BuilderService service = helper.getThemesService().getBuilderService();
 		if (service == null) {
 			return null;
 		}
@@ -2135,7 +2127,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return true;
 		}
 		
-		ContentItemChecker checker = SpringBeanLookup.getInstance().getSpringBean(getIWApplicationContext(), ContentItemChecker.class);
+		ContentItemChecker checker = SpringBeanLookup.getInstance().getSpringBean(IWMainApplication.getDefaultIWApplicationContext(), ContentItemChecker.class);
 		if (checker == null) {
 			return false;
 		}
@@ -2152,7 +2144,7 @@ public class ThemesEngineBean extends IBOServiceBean implements ThemesEngine {
 			return false;
 		}
 		
-		ContentItemChecker checker = SpringBeanLookup.getInstance().getSpringBean(getIWApplicationContext(), ContentItemChecker.class);
+		ContentItemChecker checker = SpringBeanLookup.getInstance().getSpringBean(IWMainApplication.getDefaultIWApplicationContext(), ContentItemChecker.class);
 		if (checker == null) {
 			return false;
 		}
