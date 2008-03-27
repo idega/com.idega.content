@@ -321,6 +321,7 @@ var PREPARING_THEME_TEXT = 'Preparing...';
 var SELECT_TEMPLATE_FIRST_TEXT = 'Select template first!';
 var ARE_YOU_SURE_YOU_WANT_APPLY_THIS_TEMPLATE = 'Are you sure you want to apply this template?';
 var INSUFFICIENT_RIGHTS_FOR_ACTION_IN_LUCID = 'Sorry, you have insufficient rights for this action!';
+var THEME_CAN_NOT_BE_DELETED = 'Sorry, selected theme can not be deleted.';
 
 function getLocalizedTextForThemes() {
 	ThemesEngine.getLocalizedText(getLocalizedTextForThemesCallback);
@@ -330,7 +331,7 @@ function getLocalizedTextForThemesCallback(list) {
 	if (list == null) {
 		return false;
 	}
-	if (list.length != 36) {
+	if (list.length < 37) {
 		return false;
 	}
 	
@@ -370,6 +371,7 @@ function getLocalizedTextForThemesCallback(list) {
 	SELECT_TEMPLATE_FIRST_TEXT = list[33];
 	ARE_YOU_SURE_YOU_WANT_APPLY_THIS_TEMPLATE = list[34];
 	INSUFFICIENT_RIGHTS_FOR_ACTION_IN_LUCID = list[35];
+	THEME_CAN_NOT_BE_DELETED = list[36];
 	
 }
 

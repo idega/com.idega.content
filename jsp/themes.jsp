@@ -10,10 +10,11 @@
 	<jsf:view>
         <ws:page id="themeManager" javascripturls="
         				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.11/mootools-all-compressed.js,
-						
-						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/for_mootools/1.2/reflection.js,
-						
+        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/for_mootools/1.2/reflection.js,
 						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/moorainbow/1.1/mooRainbow.js,
+        				
+        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/jquery/1.2.3/jquery-compressed.js,
+        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/contextmenu/r2/contextmenu-compressed.js,
 						
 						/dwr/engine.js,
         				/dwr/interface/ThemesEngine.js,
@@ -26,6 +27,8 @@
 			<h:form id="uploadForm" enctype="multipart/form-data">
 				<jsf:verbatim>
 					<script type="text/javascript">
+						var $j = jQuery.noConflict();
+						
 						window.addEvent('domready', function() {
 							var errorHanlder = function() {
 								reloadPage();
@@ -88,6 +91,14 @@
 						</t:div>
 					</t:div>
                	</t:div>
+               	
+               	<t:div styleClass="contextMenu" id="deleteThemeMenu" forceId="true">
+               		<t:htmlTag value="ul">
+               			<t:htmlTag value="li" id="deleteThemeButton" forceId="true">
+               				<t:outputText styleClass="deleteThemeTextStyle" onclick="deleteTheme();" title="#{localizedStrings['com.idega.content']['delete_theme']}" value="#{localizedStrings['com.idega.content']['delete_theme']}" />
+               			</t:htmlTag>
+               		</t:htmlTag>
+				</t:div>
 			</h:form>
         </ws:page>
 	</jsf:view>

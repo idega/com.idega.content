@@ -287,3 +287,6 @@ pageUri=Page URI
 hidePageInMenu=Hidden Page
 setPagePublished=Published Page
 insufficient_rights_for_this_action=Sorry, you have insufficient rights for this action!
+delete_theme=Delete theme
+theme_can_not_be_deleted=Sorry, selected theme can not be deleted.
+theme_was_deleted=Selected theme was deleted.

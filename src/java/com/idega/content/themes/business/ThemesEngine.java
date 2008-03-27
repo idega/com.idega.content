@@ -216,4 +216,6 @@ public interface ThemesEngine {
 	public Document getUpdatedSiteTemplatesTree();
 	
 	public Document getReRenderedSiteInfo(String id, String styleClass);
+	
+	public boolean deleteTheme(String themeId);
 }

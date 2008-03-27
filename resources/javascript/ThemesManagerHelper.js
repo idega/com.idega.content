@@ -374,20 +374,29 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
 			theme = new Theme(simpleTheme.name, simpleTheme.linkToSmallPreview + '?' + time, simpleTheme.linkToBigPreview + '?' + time, simpleTheme.id, simpleTheme.used, simpleTheme.children);
 			
 			var div = new Element('div');
-			div.setAttribute('id', theme.id + '_mainContainer');
-			div.className = 'imageGallery';
+			div.setProperty('id', theme.id + '_mainContainer');
+			div.addClass('imageGallery');
+			if (ENABLE_STYLE_VARIATIONS) {
+				$j(div).contextMenu('deleteThemeMenu', {
+            		onContextMenu: function(e) {
+            			var event = new Event(e);
+            			$('deleteThemeButton').setProperty('themeid', event.target.getProperty('id'));
+            			return true;
+            		}
+            	});
+			}
 			
 			// Is used?
 			if (theme.used) {
-				div.setAttribute('title', $('defaultThemeLabel').value);
+				div.setProperty('title', $('defaultThemeLabel').value);
 			}
 			else {
-				div.setAttribute('title', $('notDefaultThemeLabel').value);
+				div.setProperty('title', $('notDefaultThemeLabel').value);
 			}
 	
 			// Name
 			var textDiv = new Element('div');
-			textDiv.setAttribute('id', theme.id + '_themeNameContainer');
+			textDiv.setProperty('id', theme.id + '_themeNameContainer');
 			if (theme.used) {
 				textDiv.className = 'themeName usedThemeName';
 			}
@@ -400,13 +409,13 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
 			div.appendChild(textDiv);
 			
 			var imageDiv = new Element('div');
-			imageDiv.setAttribute('id', theme.id + '_container');
+			imageDiv.setProperty('id', theme.id + '_container');
 			var image = new Element('img'); 
-	   		image.setAttribute('id', theme.id); 
-	   		image.setAttribute('src', theme.linkToSmallPreview);
-	   		image.setAttribute('width', getImageWidth() + 'px');
-	   		image.setAttribute('height', getImageHeight() + 'px');
-	   		//image.setAttribute('title', theme.themeName);
+	   		image.setProperty('id', theme.id); 
+	   		image.setProperty('src', theme.linkToSmallPreview);
+	   		image.setProperty('width', getImageWidth() + 'px');
+	   		image.setProperty('height', getImageHeight() + 'px');
+	   		//image.setProperty('title', theme.themeName);
 	   		
 	        image.className = 'reflect rheight18 ropacity68';
 	        imageDiv.className = 'galleryImage firstInRow';
@@ -971,4 +980,36 @@ function switchLoadingMessagesForTheme() {
 	closeAllLoadingMessages();
 	
 	showLoadingMessage(PREPARING_THEME_TEXT);
+}
+
+function deleteTheme() {
+	var confirmed = window.confirm(ARE_YOU_SURE_TEXT);
+	
+	var menuInHtml = $('jqContextMenu');
+	var shadowForMenu = menuInHtml.getNext();
+	if (menuInHtml != null) {
+		menuInHtml.setStyle('display', 'none');
+	}
+	if (shadowForMenu != null) {
+		shadowForMenu.setStyle('display', 'none');
+	}
+	
+	if (!confirmed) {
+		return false;
+	}
+	var themeId = $('deleteThemeButton').getProperty('themeid');
+	showLoadingMessage(DELETING_TEXT);
+	ThemesEngine.deleteTheme(themeId, {
+		callback: function(result) {
+			closeAllLoadingMessages();
+			
+			if (!result) {
+				alert(THEME_CAN_NOT_BE_DELETED);
+				return false;
+			}
+			
+			getThemes(null, true, true);
+			return true;
+		}
+	});
 }

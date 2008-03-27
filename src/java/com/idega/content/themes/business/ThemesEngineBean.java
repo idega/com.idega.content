@@ -1,5 +1,6 @@
 package com.idega.content.themes.business;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,7 +12,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.httpclient.HttpException;
 import org.apache.myfaces.custom.tree2.TreeNode;
+import org.apache.webdav.lib.WebdavResource;
 import org.directwebremoting.ScriptBuffer;
 import org.jdom.Document;
 
@@ -52,6 +55,7 @@ import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.servlet.filter.IWWelcomeFilter;
+import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.webface.WFUtil;
@@ -1928,6 +1932,7 @@ public class ThemesEngineBean implements ThemesEngine {
 			localizedText.add(iwrb.getLocalizedString("select_template_first", "Select template first!"));			//	33
 			localizedText.add(iwrb.getLocalizedString("are_you_sure_you_want_apply_this_template", "Are you sure you want to apply this template?"));		//	34
 			localizedText.add(iwrb.getLocalizedString("insufficient_rights_for_this_action", "Sorry, you have insufficient rights for this action!"));	//	35
+			localizedText.add(iwrb.getLocalizedString("theme_can_not_be_deleted", "Sorry, selected theme can not be deleted."));																							//	36
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2186,5 +2191,42 @@ public class ThemesEngineBean implements ThemesEngine {
 		siteInfo.setStyleClass(styleClass);
 		
 		return helper.getThemesService().getBuilderService().getRenderedComponent(CoreUtil.getIWContext(), siteInfo, false);
+	}
+	
+	public boolean deleteTheme(String themeId) {
+		Theme theme = helper.getTheme(themeId);
+		if (theme == null) {
+			return false;
+		}
+		
+		IWSlideService slide = helper.getSlideService(IWMainApplication.getDefaultIWApplicationContext());
+		if (slide == null) {
+			return false;
+		}
+		
+		WebdavResource resource = null;
+		try {
+			resource = slide.getWebdavResourceAuthenticatedAsRoot(theme.getLinkToSkeleton());
+		} catch (HttpException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (resource == null) {
+			return false;
+		}
+		
+		boolean deleted = false;
+		try {
+			deleted = resource.deleteMethod();
+		} catch (HttpException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return deleted;
 	}
 }
