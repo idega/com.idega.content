@@ -163,7 +163,7 @@ version="1.2">
 						<t:div styleClass="filters">
 							<t:commandLink id="showPageModules" forceId="true" styleClass="showPageModulesStyleClass disabledButtonInPages">
 								<t:htmlTag styleClass="outerSpan" value="span">
-									<t:outputText value="#{localizedStrings['com.idega.content']['show_modules']}" styleClass="innerSpan"/>
+									<t:outputText value="#{localizedStrings['com.idega.content']['hide_modules']}" styleClass="innerSpan"/>
 								</t:htmlTag>
 							</t:commandLink>
 							<t:commandLink id="showThemesButton" forceId="true" styleClass="showThemesButtonStyleClass">

@@ -8,7 +8,7 @@ var SET_DISPLAY_PROPERTY_ID = 0;
 var GET_THEMES_ID = 0;
 
 var SLIDER_SHOWED_FIRST_TIME = true;
-var MODULES_SHOWN = false;
+var MODULES_SHOWN = true;
 
 var KEYWORDS = null;
 
@@ -790,7 +790,7 @@ function registerPageInfoActions() {
 					hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
 				}
 				
-				MODULES_SHOWN = false;
+				MODULES_SHOWN = true;
 				$('showPageModules').removeClass('active');
 				$('showEditPagesButton').removeClass('activeButtonInPages');
 				$('showSourcePagesButton').removeClass('activeButtonInPages');
@@ -817,7 +817,7 @@ function registerPageInfoActions() {
 					hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
 				}
 				
-				MODULES_SHOWN = false;
+				MODULES_SHOWN = true;
 				$('showPageModules').removeClass('active');
 				$('showThemesButton').removeClass('active');
 				$('showEditPagesButton').removeClass('activeButtonInPages');
@@ -870,7 +870,12 @@ function manageModulesBackground(element) {
 	}
 	element.disabled = false;
 	
+	MODULES_SHOWN = !MODULES_SHOWN;
+	
 	if (MODULES_SHOWN) {
+		showAllComponentsLabels(frameDocument);
+	}
+	else {
 		hideOldLabels(frameDocument);
 	}
 	
@@ -882,21 +887,21 @@ function manageModulesBackground(element) {
 	for (var i = 0; i < elements.length; i++) {
 		module = elements[i];
 		if (MODULES_SHOWN) {
-			module.removeAttribute('style');
+			showModuleContainerTop($(module));
+			showAllComponentsLabels(module);
+			manageComponentInfoImageVisibility($(module), 'visible');
 		}
 		else {
-			module.setAttribute('style', 'background-color: #FFFF99;');
-			showAllComponentsLabels(module);
+			hideModuleContainerTop($(module));
+			manageComponentInfoImageVisibility($(module), 'hidden');
 		}
 	}
 	
 	if (MODULES_SHOWN) {
-		element.removeClass("active");
-		MODULES_SHOWN = false;
+		element.removeClass('active');
 	}
 	else {
-		element.addClass("active");
-		MODULES_SHOWN = true;
+		element.addClass('active');
 	}
 }
 
