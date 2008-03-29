@@ -4,8 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.ZipInputStream;
 
 import javax.faces.component.UIComponent;
@@ -22,7 +20,6 @@ import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.bean.ContentPathBean;
 import com.idega.content.presentation.WebDAVList;
-import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.presentation.IWContext;
@@ -370,11 +367,6 @@ public class WebDAVUploadBean implements Serializable{
 	
 	private String getUploadFileName() {
 		if (uploadFile == null) {
-			return CoreConstants.EMPTY;
-		}
-		
-		IWContext iwc = CoreUtil.getIWContext();
-		if (iwc == null) {
 			return CoreConstants.EMPTY;
 		}
 		
