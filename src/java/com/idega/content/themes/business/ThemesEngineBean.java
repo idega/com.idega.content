@@ -37,6 +37,7 @@ import com.idega.content.themes.presentation.SiteInfo;
 import com.idega.content.themes.presentation.SiteTreeViewer;
 import com.idega.content.themes.presentation.TemplatesTree;
 import com.idega.content.themes.presentation.ThemeStyleVariations;
+import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
@@ -56,6 +57,7 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.servlet.filter.IWWelcomeFilter;
 import com.idega.slide.business.IWSlideService;
+import com.idega.user.data.GroupBMPBean;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.webface.WFUtil;
@@ -780,6 +782,7 @@ public class ThemesEngineBean implements ThemesEngine {
 						setValueForPage(pageKey, values[i], ICPageBMPBean.PAGE_IS_PUBLISHED);
 					}
 					else if (ContentConstants.SET_PAGE_LOCKED_IN_LUCID_CODE.equals(s.getCode())) {
+						setPageAvailability(iwc, pageKey, values[i]);
 						setValueForPage(pageKey, values[i], ICPageBMPBean.PAGE_IS_LOCKED);
 					}
 					else {
@@ -807,6 +810,47 @@ public class ThemesEngineBean implements ThemesEngine {
 		}
 		
 		return changedPageUri;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private boolean setPageAvailability(IWContext iwc, String pageKey, String availability) {
+		if (pageKey == null || availability == null) {
+			return false;
+		}
+		
+		if (availability.equals(CoreConstants.EMPTY) || availability.equalsIgnoreCase("null") || availability.equals(ThemesConstants.MINUS_ONE)) {
+			return false;
+		}
+		
+		boolean restrictedAccess = Boolean.TRUE.toString().equalsIgnoreCase(availability);
+		String usersGroupId = String.valueOf(GroupBMPBean.GROUP_ID_USERS);
+		String everyOneGroupId = String.valueOf(GroupBMPBean.GROUP_ID_EVERYONE);
+		try {
+			iwc.getAccessController().setPermission(AccessController.CATEGORY_PAGE_INSTANCE, iwc, usersGroupId, pageKey, AccessController.PERMISSION_KEY_VIEW,
+					Boolean.TRUE);
+			iwc.getAccessController().setPermission(AccessController.CATEGORY_PAGE_INSTANCE, iwc, everyOneGroupId, pageKey, AccessController.PERMISSION_KEY_VIEW,
+					!restrictedAccess);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		ICPage page = helper.getThemesService().getICPage(pageKey);
+		if (page == null) {
+			return false;
+		}
+		Collection children = page.getChildren();
+		if (children != null) {
+			Object o = null;
+			for (Iterator it = children.iterator(); it.hasNext();) {
+				o = it.next();
+				if (o instanceof ICTreeNode) {
+					setPageAvailability(iwc, ((ICTreeNode) o).getId(), availability);
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 	@SuppressWarnings({ "unchecked", "deprecation" })
