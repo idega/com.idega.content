@@ -86,6 +86,8 @@ public class CssScanner {
 			int end = urlValueInCss.lastIndexOf(ContentConstants.BRACKET_CLOSING);
 			urlValueInCss = urlValueInCss.substring(start + 1, end);
 			urlValueInCss = StringHandler.replace(urlValueInCss, "../", ThemesConstants.EMPTY);
+			urlValueInCss = StringHandler.replace(urlValueInCss, "'", CoreConstants.EMPTY);
+			urlValueInCss = StringHandler.replace(urlValueInCss, "\"", CoreConstants.EMPTY);
 			
 			path = new StringBuffer(linkToTheme).append(urlValueInCss).toString();
 			try {
