@@ -47,6 +47,7 @@
       		<include method="getUpdatedSiteTemplatesTree"/>
       		<include method="getReRenderedSiteInfo"/>
       		<include method="deleteTheme"/>
+      		<include method="getPageIdByUri"/>
     	</create>
     	<convert converter="bean" match="com.idega.content.themes.helpers.bean.SimplifiedTheme" />
     	<convert converter="bean" match="com.idega.content.themes.helpers.bean.ThemeChange">

@@ -886,3 +886,15 @@ function updateSiteInfoBoxWithNewValues() {
 		getValues(null);
 	} catch(e) {};
 }
+
+function getPagePreviewInFrameUri() {
+	var frameObject = window.frames['treePages'];
+	if (frameObject == null) {
+		return null;
+	}
+	var frameWindow = frameObject.window;
+	if (frameWindow == null) {
+		return null;
+	}
+	return frameWindow.location.pathname;
+}

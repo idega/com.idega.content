@@ -218,4 +218,6 @@ public interface ThemesEngine {
 	public Document getReRenderedSiteInfo(String id, String styleClass);
 	
 	public boolean deleteTheme(String themeId);
+	
+	public String getPageIdByUri(String uri);
 }

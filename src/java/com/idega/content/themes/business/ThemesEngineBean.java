@@ -1463,6 +1463,19 @@ public class ThemesEngineBean implements ThemesEngine {
 		return page.getDeleted();
 	}
 	
+	public String getPageIdByUri(String uri) {
+		if (uri == null) {
+			return null;
+		}
+		
+		try {
+			return BuilderServiceFactory.getBuilderService(IWMainApplication.getDefaultIWApplicationContext()).getPageKeyByURI(uri);
+		} catch(Exception e) {
+		}
+		
+		return null;
+	}
+	
 	public String getPageId() {
 		String id = helper.getLastVisitedPage();
 		if (id != null) {

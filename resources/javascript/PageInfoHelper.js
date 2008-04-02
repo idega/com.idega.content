@@ -437,19 +437,35 @@ function getChildTemplatesForThisTheme() {
 function setTemplateForPageOrPages(isPage, type) {
 	removeStyleOptions(null);
 	if (getThemeForStyle() == null) {
-		return;
+		//	No theme selected
+		return false;
 	}
 	
-	var pageId = getPageID();
-	if (isPage) {
-		if (pageId == null) {
-			return;
-		}
+	var currentPageId = getPageID();
+	if (isPage && currentPageId == null) {
+		//	No page found
+		return false;
+	}
+	
+	var uri = getPagePreviewInFrameUri();
+	if (uri == null) {
+		//	No page in iframe
+		return false;
 	}
 	else {
-		pageId = null;
+		ThemesEngine.getPageIdByUri(uri, {
+			callback: function(id) {
+				var pageInFrameId = id;
+				if (pageInFrameId != null && pageInFrameId != currentPageId) {
+					currentPageId = pageInFrameId;
+				}
+				setTemplateForPageOrPagesWithPageId(currentPageId, type);
+			}
+		});
 	}
-	
+}
+
+function setTemplateForPageOrPagesWithPageId(pageId, type) {
 	if (type > 0) {
 		var confirmed = window.confirm(ARE_YOU_SURE_YOU_WANT_APPLY_THIS_TEMPLATE);
 		if (!confirmed) {
@@ -458,7 +474,7 @@ function setTemplateForPageOrPages(isPage, type) {
 	}
 	
 	showLoadingMessage(getApplyingStyleText());
-	ThemesEngine.setSelectedStyle(getThemeForStyle(), pageId, type, TEMPLATE_ID, {
+	ThemesEngine.setSelectedStyle(getThemeForStyle(), type > 1 ? null : pageId, type, TEMPLATE_ID, {
 		callback: function(result) {
 			closeAllLoadingMessages();
 			
@@ -475,7 +491,7 @@ function setTemplateForPageOrPages(isPage, type) {
 			setNewStyleForSelectedElement(getThemeForStyle() + '_themeNameContainer', 'themeName usedThemeName');
 			
 			WORKING_WITH_TEMPLATE = false;
-			getPrewUrl(getPageID());
+			getPrewUrl(pageId);
 		}
 	});
 }
@@ -772,7 +788,7 @@ function registerPageInfoActions() {
 					button.addClass('activeButtonInPages');
 				}
 				
-				getPrewUrl(getPageID());
+				getPageUriByCheckedId();
 			});
 		}
 	);
@@ -799,7 +815,7 @@ function registerPageInfoActions() {
 					button.addClass('activeButtonInPages');
 				}
 				
-				getPrewUrl(getPageID());
+				getPageUriByCheckedId();
 			});
 		}
 	);
@@ -827,7 +843,7 @@ function registerPageInfoActions() {
 					button.addClass('activeButtonInPages');
 				}
 				
-				getPrewUrl(getPageID());
+				getPageUriByCheckedId();
 			});
 		}
 	);

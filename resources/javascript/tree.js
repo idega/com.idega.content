@@ -4,6 +4,8 @@ var RELOAD_PAGE = false;
 var SHOW_EDIT_PAGES = false;
 var SHOW_SOURCE_PAGES = false;
 
+var PAGE_ID_FROM_FRAME = null;
+
 if(changePageName == null) var changePageName = false;
 
 function saveMyTree(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncrease, nodesToDecrease) {
@@ -129,6 +131,31 @@ function setFrameUrlForLucidApplication(uri, canActAsBuilderUser) {
 	frame.src = '';
 	frame.src = uri;
 	chagePageName = false;
+}
+
+function getPageUriByCheckedId() {
+	var currentId = getPageID();
+	var uri = getPagePreviewInFrameUri();
+	
+	if (uri == null) {
+		getPrewUrl(currentId);
+	}
+	else {
+		ThemesEngine.getPageIdByUri(uri, {
+			callback: function(id) {
+				if (id != null) {
+					PAGE_ID_FROM_FRAME = id;
+				}
+				
+				if (PAGE_ID_FROM_FRAME != null && PAGE_ID_FROM_FRAME != currentId) {
+					getPrewUrl(PAGE_ID_FROM_FRAME);
+				}
+				else {
+					getPrewUrl(currentId);
+				}
+			}
+		});
+	}
 }
 						
 function getPrewUrl(nodeID) {
