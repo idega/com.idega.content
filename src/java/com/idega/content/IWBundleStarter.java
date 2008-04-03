@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.36 2008/04/03 15:44:05 civilis Exp $
+ * $Id: IWBundleStarter.java,v 1.37 2008/04/03 15:47:25 civilis Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -47,10 +47,10 @@ import com.idega.user.data.Group;
 
 /**
  * 
- *  Last modified: $Date: 2008/04/03 15:44:05 $ by $Author: civilis $
+ *  Last modified: $Date: 2008/04/03 15:47:25 $ by $Author: civilis $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.36 $
+ * @version $Revision: 1.37 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	
@@ -138,9 +138,9 @@ public class IWBundleStarter implements IWBundleStartable{
 			e.printStackTrace();
 		} catch (CreateException e) {
 			e.printStackTrace();
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
-		
-		
 	}
 
 	public void stop(IWBundle starterBundle) {
