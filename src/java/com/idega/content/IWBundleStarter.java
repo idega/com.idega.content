@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.35 2008/03/18 18:18:40 tryggvil Exp $
+ * $Id: IWBundleStarter.java,v 1.36 2008/04/03 15:44:05 civilis Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -47,10 +47,10 @@ import com.idega.user.data.Group;
 
 /**
  * 
- *  Last modified: $Date: 2008/03/18 18:18:40 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2008/04/03 15:44:05 $ by $Author: civilis $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.35 $
+ * @version $Revision: 1.36 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	
@@ -103,6 +103,8 @@ public class IWBundleStarter implements IWBundleStartable{
 			}
 			catch(RuntimeException rte){
 				System.err.println("Error: com.idega.content.IWBundleStarter: looking up BuilderService: "+rte.getMessage());
+			} catch (Exception e) {
+				System.err.println("Error: com.idega.content.IWBundleStarter: "+e.getMessage());
 			}
 		
 			boolean clearCache = false;
