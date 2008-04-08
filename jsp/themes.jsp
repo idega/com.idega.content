@@ -92,7 +92,7 @@
 					</t:div>
                	</t:div>
                	
-               	<t:div styleClass="contextMenu" id="deleteThemeMenu" forceId="true">
+               	<t:div styleClass="contextMenu" id="deleteThemeMenu" forceId="true" style="display: none;">
                		<t:htmlTag value="ul">
                			<t:htmlTag value="li" id="deleteThemeButton" forceId="true">
                				<t:outputText styleClass="deleteThemeTextStyle" onclick="deleteTheme();" title="#{localizedStrings['com.idega.content']['delete_theme']}" value="#{localizedStrings['com.idega.content']['delete_theme']}" />
