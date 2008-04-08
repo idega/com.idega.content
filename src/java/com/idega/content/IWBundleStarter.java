@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.37 2008/04/03 15:47:25 civilis Exp $
+ * $Id: IWBundleStarter.java,v 1.38 2008/04/08 18:49:07 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -47,10 +47,10 @@ import com.idega.user.data.Group;
 
 /**
  * 
- *  Last modified: $Date: 2008/04/03 15:47:25 $ by $Author: civilis $
+ *  Last modified: $Date: 2008/04/08 18:49:07 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.37 $
+ * @version $Revision: 1.38 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	
@@ -128,7 +128,7 @@ public class IWBundleStarter implements IWBundleStartable{
 			
 			if(clearCache){
 				if(builderService!=null){
-					builderService.clearAllCaches();
+					builderService.reloadGroupsInCachedDomain(iwac, null);
 				}
 			}
 			
