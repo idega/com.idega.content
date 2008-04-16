@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.38 2008/04/08 18:49:07 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.39 2008/04/16 20:37:10 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -17,11 +17,11 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.ejb.CreateException;
-
 import com.idega.block.rss.business.RSSProducerRegistry;
+import com.idega.builder.business.BuilderLogicWrapper;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentIWActionURIHandler;
 import com.idega.content.business.ContentRSSProducer;
@@ -32,7 +32,6 @@ import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.view.ContentViewManager;
 import com.idega.core.accesscontrol.business.StandardRoles;
-import com.idega.core.builder.business.BuilderService;
 import com.idega.core.uri.IWActionURIManager;
 import com.idega.idegaweb.DefaultIWBundle;
 import com.idega.idegaweb.IWApplicationContext;
@@ -47,10 +46,10 @@ import com.idega.user.data.Group;
 
 /**
  * 
- *  Last modified: $Date: 2008/04/08 18:49:07 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/04/16 20:37:10 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.38 $
+ * @version $Revision: 1.39 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	
@@ -90,54 +89,35 @@ public class IWBundleStarter implements IWBundleStartable{
 	 * Auto generate groups for the editor and author roles so we can set them in the Lucid app
 	 * @param iwac 
 	 */
+	@SuppressWarnings("unchecked")
 	protected void addContentRoleGroups(IWApplicationContext iwac) {
+		boolean clearCache = false;
 		try {
 			GroupBusiness groupBiz = (GroupBusiness) IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
 			
-			BuilderService builderService = null;
-			try{
-				builderService = (BuilderService) IBOLookup.getServiceInstance(iwac, BuilderService.class);
-			}
-			catch(IBOLookupException iboe){
-				System.err.println("Error: com.idega.content.IWBundleStarter: looking up BuilderService: "+iboe.getMessage());
-			}
-			catch(RuntimeException rte){
-				System.err.println("Error: com.idega.content.IWBundleStarter: looking up BuilderService: "+rte.getMessage());
-			} catch (Exception e) {
-				System.err.println("Error: com.idega.content.IWBundleStarter: "+e.getMessage());
-			}
-		
-			boolean clearCache = false;
+			BuilderLogicWrapper builderLogic = SpringBeanLookup.getInstance().getSpringBean(iwac, BuilderLogicWrapper.class);
 			
+			Collection<Group> editorGroups = groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_EDITOR);
+			Collection<Group> authorGroups = groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_AUTHOR);
 			
-			Collection<Group> editorGroups =  groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_EDITOR);
-			Collection<Group> authorGroups =  groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_AUTHOR);
-			
-			//only generate groups if none exist
-			if(editorGroups.isEmpty()){
+			//	Only generate groups if none exist
+			if (editorGroups == null || editorGroups.isEmpty()){
 				Group editorGroup = groupBiz.createGroup(StandardRoles.ROLE_KEY_EDITOR, "This is the system group for content editors.", groupBiz.getGroupTypeHome().getPermissionGroupTypeString(), true);
 				iwac.getIWMainApplication().getAccessController().addRoleToGroup(StandardRoles.ROLE_KEY_EDITOR,editorGroup, iwac);
 				clearCache = true;
 			}
 			
-			if(authorGroups.isEmpty()){
+			if (authorGroups == null || authorGroups.isEmpty()) {
 				Group authorGroup = groupBiz.createGroup(StandardRoles.ROLE_KEY_AUTHOR, "This is the system group for content authors.", groupBiz.getGroupTypeHome().getPermissionGroupTypeString(), true);
 				iwac.getIWMainApplication().getAccessController().addRoleToGroup(StandardRoles.ROLE_KEY_AUTHOR,authorGroup, iwac);
 				clearCache = true;
 			}
 			
-			if(clearCache){
-				if(builderService!=null){
-					builderService.reloadGroupsInCachedDomain(iwac, null);
+			if (clearCache) {
+				if (builderLogic != null) {
+					builderLogic.reloadGroupsInCachedDomain(iwac, null);
 				}
 			}
-			
-		} catch (IBOLookupException e) {
-			e.printStackTrace();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		} catch (CreateException e) {
-			e.printStackTrace();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
