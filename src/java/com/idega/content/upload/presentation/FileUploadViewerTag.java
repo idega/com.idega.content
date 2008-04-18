@@ -4,6 +4,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.webapp.UIComponentTag;
 
 import com.idega.util.CoreConstants;
+import com.idega.webface.WFUtil;
 
 public class FileUploadViewerTag extends UIComponentTag {
 	
@@ -74,6 +75,14 @@ public class FileUploadViewerTag extends UIComponentTag {
 	}
 
 	public void setUploadPath(String uploadPath) {
+		Object path = null;
+		try {
+			path = WFUtil.invoke(uploadPath);
+		} catch(Exception e) {}
+		if (path instanceof String) {
+			uploadPath = (String) path;
+		}
+		
 		this.uploadPath = uploadPath;
 	}
 

@@ -28,7 +28,7 @@ public class FileUploadViewer extends IWBaseComponent {
 	
 	private String actionAfterUpload = null;
 	private String actionAfterCounterReset = null;
-	private String uploadPath = CoreConstants.PUBLIC_PATH;
+	private String uploadPath = CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
 	private String formId = null;
 	
 	private boolean zipFile = false;
@@ -43,15 +43,15 @@ public class FileUploadViewer extends IWBaseComponent {
 		Object values[] = (Object[]) state;
 		super.restoreState(context, values[0]);
 		
-		this.actionAfterUpload = values[1].toString();
-		this.uploadPath = values[2].toString();
+		this.actionAfterUpload = values[1] == null ? null : values[1].toString();
+		this.uploadPath = values[2] == null ? null : values[2].toString();
 		
-		this.zipFile = (Boolean) values[3];
-		this.extractContent = (Boolean) values[4];
-		this.themePack = (Boolean) values[5];
-		this.showProgressBar = (Boolean) values[6];
-		this.showLoadingMessage = (Boolean) values[7];
-		this.allowMultipleFiles = (Boolean) values[8];
+		this.zipFile = values[3] == null ? Boolean.FALSE : (Boolean) values[3];
+		this.extractContent = values[4] == null ? Boolean.FALSE : (Boolean) values[4];
+		this.themePack = values[5] == null ? Boolean.FALSE : (Boolean) values[5];
+		this.showProgressBar = values[6] == null ? Boolean.TRUE : (Boolean) values[6];
+		this.showLoadingMessage = values[7] == null ? Boolean.FALSE : (Boolean) values[7];
+		this.allowMultipleFiles = values[8] == null ? Boolean.FALSE : (Boolean) values[8];
 	}
 	
 	@Override
@@ -73,9 +73,7 @@ public class FileUploadViewer extends IWBaseComponent {
 	}
 	
 	@Override
-	public void encodeBegin(FacesContext context) throws IOException {
-		super.encodeBegin(context);
-		
+	public void initializeComponent(FacesContext context) {
 		IWContext iwc = IWContext.getIWContext(context);
 		FileUploader uploader = null;
 		try {
@@ -117,6 +115,9 @@ public class FileUploadViewer extends IWBaseComponent {
 			formId = form.getId();
 		}
 		
+		if (!uploadPath.endsWith(CoreConstants.SLASH)) {
+			uploadPath = new StringBuffer(uploadPath).append(CoreConstants.SLASH).toString();
+		}
 		HiddenInput path = new HiddenInput(ContentConstants.UPLOADER_PATH, uploadPath);
 		mainContainer.add(path);
 		HiddenInput zipFileValue = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_ZIP_FILE, String.valueOf(zipFile));
@@ -165,6 +166,11 @@ public class FileUploadViewer extends IWBaseComponent {
 		buttonsContainer.add(upload);
 		
 		mainContainer.add(buttonsContainer);
+	}
+	
+	@Override
+	public void encodeBegin(FacesContext context) throws IOException {
+		super.encodeBegin(context);
 	}
 	
 	private String getAction(String id, String loadingMessage, String invalidTypeMessage, String progressBarId, List<String> localization) {
