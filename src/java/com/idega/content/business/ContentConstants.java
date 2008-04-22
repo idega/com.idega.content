@@ -43,6 +43,7 @@ public class ContentConstants {
 	public final static String ATTRIBUTE_HEADLINE = "headline";
 	public final static String ATTRIBUTE_CREATION_DATE = "creation_date";
 	public final static String ATTRIBUTE_BODY = "body";
+	public final static String ATTRIBUTE_TEASER = "teaser";
 	
 	public static final String ARTICLE_ITEM_HEADLINE_STYLE_CLASS = "blog-entry-title";
 	public static final String ARTICLE_ITEM_DATE_STYLE_CLASS = "blog-entry-date";
