@@ -3,11 +3,9 @@ package com.idega.content.presentation;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 
-import com.idega.content.business.ContentUtil;
 import com.idega.presentation.Image;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Link;
-import com.idega.presentation.ui.GenericButton;
 import com.idega.webface.WFBlock;
 import com.idega.webface.WFMenu;
 import com.idega.webface.WFUtil;
@@ -74,23 +72,12 @@ public class WFBlockWithToolbar extends WFBlock {
 			recycleBinImage.setToolTip(title);
 			recycleBinImage.setSrc(trashCanImage);
 			recycleBinImage.setStyleClass("recycleBin");
-//			recycleBinImage.setOnMouseOver("treeObj.prepareToDelete();");
-//			recycleBinImage.setOnMouseOut("treeObj.prepareToDelete();");
 			recycleBinImage.setOnMouseOver("treeObj.mouseOverRecycleBin();");
 			recycleBinImage.setOnMouseOut("treeObj.mouseOutOfRecycleBin();");
 			
 			head.add(collapse, 1, 1);
 			head.add(expand, 2, 1);
 			head.add(recycleBinImage, 3, 1);
-			
-			if (isAddStartPageButton()) {
-				GenericButton startPage = new GenericButton("makeStartPage", ContentUtil.getBundle().getLocalizedString("make_start_page", "Start Page"));
-				startPage.setToolTip( ContentUtil.getBundle().getLocalizedString("make_this_page_start_page", "Make This Page As Start Page"));
-				startPage.setOnClick("makePageAsStartPage();");
-				startPage.setInputType("button");
-				startPage.setId("makeStartPage");
-				head.add(startPage, 4, 1);
-			}
 			
 			toolbar.setMenuHeader(head);			
 		}
