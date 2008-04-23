@@ -207,6 +207,16 @@ version="1.2">
                			<t:htmlTag value="li" id="deletePageButtonCtxMn" forceId="true">
                				<t:outputText styleClass="deletePageButtonCtxMnStyle" onclick="analyzeAndDeletePage();" title="#{localizedStrings['com.idega.content']['delete_page']}" value="#{localizedStrings['com.idega.content']['delete_page']}" />
                			</t:htmlTag>
+               			
+               			<t:htmlTag value="li" id="publishPageButtonCtxMn" forceId="true">
+               				<t:outputText id="publishPageButtonCtxMnSpanElement" forceId="true" styleClass="publishPageButtonCtxMnStyle" onclick="setPageAccessibilityProperty(this.id);" value="publishPageButtonCtxMn" />
+               			</t:htmlTag>
+               			<t:htmlTag value="li" id="lockPageButtonCtxMn" forceId="true" >
+               				<t:outputText id="lockPageButtonCtxMnSpanElement" forceId="true" styleClass="lockPageButtonCtxMnStyle" onclick="setPageAccessibilityProperty(this.id);" value="lockPageButtonCtxMn" />
+               			</t:htmlTag>
+               			<t:htmlTag value="li" id="hidePageButtonCtxMn" forceId="true" >
+               				<t:outputText id="hidePageButtonCtxMnSpanElement" forceId="true" styleClass="hidePageButtonCtxMnStyle" onclick="setPageAccessibilityProperty(this.id);" value="hidePageButtonCtxMn" />
+               			</t:htmlTag>
                		</t:htmlTag>
 				</t:div>
 			</h:form>

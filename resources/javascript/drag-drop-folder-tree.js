@@ -64,13 +64,18 @@
 		this.minusImage = 'nav-minus.gif';
 		this.maximumDepth = 6;
 		var messageMaximumDepthReached;
-				
-		this.floatingContainer = document.createElement('UL');
-		this.floatingContainer.style.position = 'absolute';
-		this.floatingContainer.style.display='none';
-		this.floatingContainer.id = 'floatingContainer';
+		
+		var tempFloatCont = $('floatingContainer');
+		if (tempFloatCont == null) {
+			tempFloatCont = new Element('ul');
+			tempFloatCont.setStyle('position', 'absolute');
+			tempFloatCont.setStyle('display', 'none');
+			tempFloatCont.setProperty('id', 'floatingContainer');
+			tempFloatCont.injectInside($(document.body));
+		}
+		this.floatingContainer = tempFloatCont
+		
 		this.insertAsSub = false;
-		document.body.appendChild(this.floatingContainer);
 		this.dragDropTimer = -1;
 		this.dragNode_noSiblings = false;
 		
@@ -188,18 +193,26 @@
 			return left;
 		},
 		showHideNode : function(e,inputId) {			
-			if(inputId){
-				if(!document.getElementById(inputId))
+			if (inputId) {
+				if (!document.getElementById(inputId)) {
 					return false;
+				}
 				thisNode = document.getElementById(inputId).getElementsByTagName('IMG')[0]; 
 			}
 			else {
 				thisNode = this;
-				if(this.tagName=='A')
-					thisNode = this.parentNode.getElementsByTagName('IMG')[0];											
-			}					
-			if(thisNode.style.visibility=='hidden')
-				return false;		
+				if (this != null && this.tagName=='A') {
+					thisNode = this.parentNode.getElementsByTagName('IMG')[0];
+				}
+			}
+			
+			if (thisNode == null) {
+				return false;
+			}
+			
+			if (thisNode.style.visibility == 'hidden') {
+				return false;
+			}
 			var parentNode = thisNode.parentNode;
 			inputId = parentNode.id.replace(/[^0-9]/g,'');
 			if(thisNode.src.indexOf(JSTreeObj.plusImage)>=0){
@@ -393,9 +406,8 @@
 				overflownContainers.push($(ALL_CURRENT_SITE_STRUCTURE_TREE_ID));
 				
 				JSTreeObj.dragNode_destination = thisObj;
-				var img = thisObj.getElementsByTagName('IMG')[1];
-				var tmpObj = JSTreeObj.dropTargetIndicator;
-				tmpObj.style.display = 'block';
+				var tmpObj = $('dragDropIndicatorContainer');
+				tmpObj.setStyle('display', 'block');
 				
 				var eventSourceObj = this;
 				if (JSTreeObj.dragNode_noSiblings && eventSourceObj.tagName == 'IMG') {
@@ -404,7 +416,7 @@
 				
 				eventSourceObj = $(eventSourceObj);
 				var indicatorLeftValue = 0;
-				var tmpImg = tmpObj.getElementsByTagName('IMG')[0];
+				var tmpImg = $('dragDropIndicatorImage');
 				if (this.tagName=='A' || JSTreeObj.dragNode_noSiblings) {
 					tmpImg.src = tmpImg.src.replace('ind1','ind2');	
 					JSTreeObj.insertAsSub = true;
@@ -444,7 +456,6 @@
 			
 		},
 		dropDragableNodes:function() {
-			var parent;
 			if(JSTreeObj.dragDropTimer<10){				
 				JSTreeObj.dragDropTimer = -1;
 				return false;
@@ -579,8 +590,8 @@
 					JSTreeObj.saveRoot(JSTreeObj.dragNode_source.id, JSTreeObj.dragNode_source.getAttribute('pagetype'), JSTreeObj.dragNode_source.getAttribute('templatefile'), 
 								(JSTreeObj.dragNode_source.getElementsByTagName('a')[0]).innerHTML, true, '1', null);
 								
-				JSTreeObj.dropTargetIndicator.style.display='none';				
-				JSTreeObj.dragDropTimer = -1;								
+					JSTreeObj.dropTargetIndicator.style.display='none';				
+					JSTreeObj.dragDropTimer = -1;								
 				}
 				JSTreeObj.firstTopPage = false;
 				return false;
@@ -907,14 +918,21 @@
 			return newTreeNodes;					
 		},
 		createDropIndicator : function() {
-			this.dropTargetIndicator = document.createElement('DIV');
-			this.dropTargetIndicator.style.position = 'absolute';			
-			this.dropTargetIndicator.style.display='none';			
-			var img = document.createElement('IMG');
-			img.src = imageFolder + 'dragDrop_ind1.gif';
-			img.id = 'dragDropIndicatorImage';
-			this.dropTargetIndicator.appendChild(img);
-			document.body.appendChild(this.dropTargetIndicator);			
+			var tempDropTargetIndicator = $('dragDropIndicatorContainer');
+			if (tempDropTargetIndicator == null) {
+				tempDropTargetIndicator = new Element('div');
+				tempDropTargetIndicator.setStyle('position', 'absolute');			
+				tempDropTargetIndicator.setStyle('display', 'none');	
+				tempDropTargetIndicator.setProperty('id', 'dragDropIndicatorContainer');		
+				
+				var img = new Element('img');
+				img.setProperty('src', imageFolder + 'dragDrop_ind1.gif');
+				img.setProperty('id', 'dragDropIndicatorImage');
+				img.injectInside(tempDropTargetIndicator);
+			
+				tempDropTargetIndicator.injectInside($(document.body));
+			}
+			this.dropTargetIndicator = tempDropTargetIndicator;
 		},
 		dragDropCountLevels : function(obj,direction,stopAtObject){
 			var countLevels = 0;

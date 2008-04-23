@@ -24,6 +24,7 @@ import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentItemChecker;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.bean.ThemesManagerBean;
+import com.idega.content.themes.helpers.bean.PageAccessibilityProperty;
 import com.idega.content.themes.helpers.bean.Setting;
 import com.idega.content.themes.helpers.bean.SimplifiedTheme;
 import com.idega.content.themes.helpers.bean.Theme;
@@ -854,7 +855,7 @@ public class ThemesEngineBean implements ThemesEngine {
 	}
 	
 	@SuppressWarnings({ "unchecked", "deprecation" })
-	public boolean setValueForPage(String pageKey, String value, String columnName) {
+	private boolean setValueForPage(String pageKey, String value, String columnName) {
 		if (pageKey == null || value == null) {
 			return false;
 		}
@@ -2260,5 +2261,85 @@ public class ThemesEngineBean implements ThemesEngine {
 		}
 		
 		return deleted;
+	}
+
+	public boolean setBuiltInStyle(String themeId, String builtInStyleId) {
+		/*try {
+			return helper.getThemeChanger().setBuiltInStyle(themeId, builtInStyleId);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+		*/
+		return true;
+	}
+	
+	public List<PageAccessibilityProperty> getPageAccessibilityProperties(String pageKey) {
+		if (pageKey == null) {
+			return null;
+		}
+		
+		ICPage page = null;
+		try {
+			page = helper.getThemesService().getICPage(pageKey);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		if (page == null) {
+			return null;
+		}
+		
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return null;
+		}
+		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
+		
+		List<PageAccessibilityProperty> properties = new ArrayList<PageAccessibilityProperty>();
+		
+		boolean published = page.isPublished();
+		String localization = published ? iwrb.getLocalizedString("unpublish_page", "Unpublish page") : iwrb.getLocalizedString("publish_page", "Publish page");
+		PageAccessibilityProperty property = new PageAccessibilityProperty(String.valueOf(!published), localization);
+		property.setCode(ContentConstants.PUBLISH_PAGE_IN_LUCID_CODE);
+		property.setColumnName(ICPageBMPBean.PAGE_IS_PUBLISHED);
+		property.setElementId("publishPageButtonCtxMn");
+		properties.add(property);
+		
+		boolean locked = page.isLocked();
+		localization = locked ? iwrb.getLocalizedString("unlock_page", "Unclock page") : iwrb.getLocalizedString("lock_page", "Lock page");
+		property = new PageAccessibilityProperty(String.valueOf(!locked), localization);
+		property.setCode(ContentConstants.SET_PAGE_LOCKED_IN_LUCID_CODE);
+		property.setColumnName(ICPageBMPBean.PAGE_IS_LOCKED);
+		property.setElementId("lockPageButtonCtxMn");
+		properties.add(property);
+		
+		boolean hidden = page.isHidePageInMenu();
+		localization = hidden ? iwrb.getLocalizedString("show_page_in_menu", "Show page in menu") : iwrb.getLocalizedString("hide_page_in_menu", "Hide page in menu");
+		property = new PageAccessibilityProperty(String.valueOf(!hidden), localization);
+		property.setCode(ContentConstants.HIDE_MENU_IN_PAGE);
+		property.setColumnName(ICPageBMPBean.HIDE_PAGE_IN_MENU);
+		property.setElementId("hidePageButtonCtxMn");
+		properties.add(property);
+		
+		return properties;
+	}
+	
+	public boolean setPageAccessibilityProperty(String pageKey, String code, String value, String columnName) {
+		if (pageKey == null || code == null || columnName == null) {
+			return false;
+		}
+		
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return false;
+		}
+
+		if (ContentConstants.SET_PAGE_LOCKED_IN_LUCID_CODE.equals(code)) {
+			if (!setPageAvailability(iwc, pageKey, value)) {
+				return false;
+			}
+		}
+		
+		return setValueForPage(pageKey, value, columnName);
 	}
 }

@@ -48,12 +48,16 @@
       		<include method="getReRenderedSiteInfo"/>
       		<include method="deleteTheme"/>
       		<include method="getPageIdByUri"/>
+      		<include method="setBuiltInStyle"/>
+      		<include method="getPageAccessibilityProperties"/>
+      		<include method="setPageAccessibilityProperty"/>
     	</create>
     	<convert converter="bean" match="com.idega.content.themes.helpers.bean.SimplifiedTheme" />
     	<convert converter="bean" match="com.idega.content.themes.helpers.bean.ThemeChange">
     		<param name="exclude" value="limitedSelection" />
     	</convert>
     	<convert converter="bean" match="com.idega.content.themes.helpers.bean.TreeNodeStructure" />
+    	<convert converter="bean" match="com.idega.content.themes.helpers.bean.PageAccessibilityProperty"/>
     	
     	<create creator="jsf" javascript="CategoriesEngine">
 	    	<param name="managedBeanName" value="content.CategoriesEngineBean" />
@@ -74,12 +78,16 @@
 	<signatures>
 		<![CDATA[
   			import java.util.List;
+  			
+  			import com.idega.content.themes.helpers.bean.PageAccessibilityProperty;
+  			
   			import com.idega.content.themes.helpers.bean.SimplifiedTheme;
   			import com.idega.content.themes.helpers.bean.ThemeChange;
 			import com.idega.content.themes.helpers.bean.TreeNodeStructure;
 			
   			ThemesEngine.applyMultipleChangesToTheme(String, List<ThemeChange>, String);
   			ThemesEngine.createPage(List<TreeNodeStructure>, Boolean, String, List<String>);
+  			List<PageAccessibilityProperty> ThemesEngine.getPageAccessibilityProperties(String);
   		]]>
 	</signatures>
 </dwr>

@@ -1022,6 +1022,7 @@ function analyzeAndDeletePage() {
 		return false;
 	}
 	
+	movingNode = true;
 	JSTreeObj.deleteNodes = true;
 	JSTreeObj.dragDropTimer = 50;
 	
@@ -1062,6 +1063,8 @@ function analyzeAndDeletePage() {
 	nextSiteTreeNode = containerOfElementBeingDeleted.getNext()
 	
 	JSTreeObj.dropDragableNodesCopy(nodeBeingDeletedId);
+	
+	movingNode = false;
 }
 
 function analyzeAndMakePageAsStartPage() {
@@ -1073,6 +1076,34 @@ function analyzeAndMakePageAsStartPage() {
 	ThemesEngine.setAsStartPage(elementId, {
 		callback: function(result) {
 			closeAllLoadingMessages();
+		}
+	});
+}
+
+function setPageAccessibilityProperty(id) {
+	hideContextMenu();
+	
+	var clickedElement = $(id);
+	if (clickedElement == null) {
+		return false;
+	}
+	
+	var pageId = clickedElement.getProperty('pageid');
+	var code = clickedElement.getProperty('pp_code');
+	var value = clickedElement.getProperty('pp_value');
+	var columnName = clickedElement.getProperty('pp_column');
+	
+	showLoadingMessage(SAVING_THEME);
+	ThemesEngine.setPageAccessibilityProperty(pageId, code, value, columnName, {
+		callback: function(result) {
+			closeAllLoadingMessages();
+
+			if (result!= null) {
+				if (pageId == getPageID()) {
+					getPrewUrl(pageId);
+					getPageInfoValues();
+				}
+			}
 		}
 	});
 }

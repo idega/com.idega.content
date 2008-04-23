@@ -7,6 +7,7 @@ import java.util.List;
 import org.jdom.Document;
 
 import com.idega.business.SpringBeanName;
+import com.idega.content.themes.helpers.bean.PageAccessibilityProperty;
 import com.idega.content.themes.helpers.bean.SimplifiedTheme;
 import com.idega.content.themes.helpers.bean.ThemeChange;
 import com.idega.content.themes.helpers.bean.TreeNodeStructure;
@@ -220,4 +221,10 @@ public interface ThemesEngine {
 	public boolean deleteTheme(String themeId);
 	
 	public String getPageIdByUri(String uri);
+	
+	public boolean setBuiltInStyle(String themeId, String builtInStyleId);
+	
+	public List<PageAccessibilityProperty> getPageAccessibilityProperties(String pageKey);
+	
+	public boolean setPageAccessibilityProperty(String pageKey, String code, String value, String columnName);
 }

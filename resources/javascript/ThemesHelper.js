@@ -591,36 +591,90 @@ function registerActionsForSiteTree() {
 	
 	$$('img.pageTreeNameIconStyle').each(
 		function(element) {
+			var parentForElement = element.getParent();
+			while(parentForElement != null && parentForElement.getTag() != 'div') {
+				parentForElement = parentForElement.getParent();
+			}
+			if (parentForElement == null) {
+				return false;
+			}
+			if (parentForElement.getProperty('id') != ALL_CURRENT_SITE_STRUCTURE_TREE_ID) {
+				return false;
+			}
+			
 			addLucidContextMenuToElement(element);
 		}
 	);
 }
 
 function addLucidContextMenuToElement(element) {
+	var propertyKey = 'contextmenuenabled';
+	var propertyValue = element.getProperty(propertyKey);
+	if (propertyValue != null && propertyValue == '1') {
+		return false;
+	}
+	
 	$j(element).contextMenu('sitePageMenuCtxMn', {
-		onContextMenu: function(e) {
-			var event = new Event(e);
-			var rightClickedElement = $(event.target);
-			var elementId = rightClickedElement.getProperty('id');
-			if (elementId == null || elementId == '') {
-				try {
-					elementId = rightClickedElement.getParent().getProperty('id');
-				} catch(e) {}
-			}
-			if (elementId == null) {
+		onShowMenu: function(e, menu) {
+			doContextMenuChangesForLucid(e);
+			return menu;
+		}
+	});
+	
+	element.setProperty(propertyKey, '1');
+}
+
+function doContextMenuChangesForLucid(e) {
+	var event = new Event(e);
+	var rightClickedElement = $(event.target);
+	var pageId = rightClickedElement.getParent().getProperty('id');
+	if (pageId == null) {
+		return false;
+	}
+	ThemesEngine.getPageAccessibilityProperties(pageId, {
+		callback: function(properties) {
+			if (properties == null) {
+				alert('Menu can not be displayed: did not receive page properties!');
 				return false;
+			}
+		
+			for (var i = 0; i < properties.length; i++) {
+				createSpanElementForContextMenuItem(properties[i], pageId);
 			}
 			
 			var ids = new Array();
 			ids.push('makePageStartPageButtonCtxMn');
 			ids.push('deletePageButtonCtxMn');
 			for (var i = 0; i < ids.length; i++) {
-				$(ids[i]).setProperty('pageid', elementId);
+				$(ids[i]).setProperty('pageid', pageId);
 			}
-			
-			return true;
 		}
 	});
+}
+
+function createSpanElementForContextMenuItem(property, pageId) {
+	var menuItem = $(property.elementId);
+	if (menuItem == null) {
+		return false;
+	}
+	
+	var spans = getElementsByClassName(document, 'span', property.elementId + 'Style');
+	if (spans == null || spans.length == 0) {
+		return false;
+	}
+	
+	var span = null;
+	for (var i = 0; i < spans.length; i++) {
+		span = $(spans[i]);
+		
+		span.empty();
+		span.setProperty('pageid', pageId);
+		span.setProperty('pp_code', property.code);
+		span.setProperty('pp_value', property.id);
+		span.setProperty('pp_column', property.columnName);
+		span.setProperty('title', property.value);
+		span.setText(property.value);
+	}
 }
 
 function registerActionsOnSiteTreeElement(element) {
