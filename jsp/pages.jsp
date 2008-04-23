@@ -18,6 +18,9 @@ version="1.2">
 						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.11/mootools-all-compressed.js,
         				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/for_mootools/1.2/reflection.js,
         				
+        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/jquery/1.2.3/jquery-compressed.js,
+        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/contextmenu/r2/contextmenu-compressed.js,
+        				
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
@@ -27,6 +30,8 @@ version="1.2">
 			<h:form id="pagesForm" onsubmit="return false;">
 				<f:verbatim>
                 	<script type="text/javascript">
+                		var $j = jQuery.noConflict();
+                	
                 		window.addEvent('domready', function() {
 							var errorHanlder = function() {
 								reloadPage();
@@ -191,6 +196,18 @@ version="1.2">
 							</t:commandLink>
 						</t:div>
 					</t:div>
+				</t:div>
+				
+				<t:div styleClass="contextMenu" id="sitePageMenuCtxMn" forceId="true" style="display: none;">
+               		<t:htmlTag value="ul">
+               			<t:htmlTag value="li" id="makePageStartPageButtonCtxMn" forceId="true">
+               				<t:outputText styleClass="makePageStartPageButtonCtxMnStyle" onclick="analyzeAndMakePageAsStartPage();" title="#{localizedStrings['com.idega.content']['make_this_page_start_page']}" value="#{localizedStrings['com.idega.content']['make_start_page']}" />
+               			</t:htmlTag>
+               		
+               			<t:htmlTag value="li" id="deletePageButtonCtxMn" forceId="true">
+               				<t:outputText styleClass="deletePageButtonCtxMnStyle" onclick="analyzeAndDeletePage();" title="#{localizedStrings['com.idega.content']['delete_page']}" value="#{localizedStrings['com.idega.content']['delete_page']}" />
+               			</t:htmlTag>
+               		</t:htmlTag>
 				</t:div>
 			</h:form>
 		</ws:page>

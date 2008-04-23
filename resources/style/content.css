@@ -980,6 +980,7 @@ html * .scrollTable {
 .emptySiteTreeTextContainerStyleClass {
 	text-align: center;
 	font-size: 24pt;
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
 }
 
 .removeFileUploadInputImageStyle {

@@ -1252,7 +1252,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		}
 
 		//	Creating new tree order
-		increaseNodesNumbersInLevel(followingNodes, -1, null);
+		changeNodesOrderInLevel(followingNodes, -1, null);
 		
 		updateSiteTree(null);
 		
@@ -1440,7 +1440,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		}
 		
 		try {
-			decreaseNodesNumbersInLevel(followingNodes, -1, null);	
+			changeNodesOrderInLevel(followingNodes, -1, null);	
 			helper.getThemesService().deleteIBPage(pageId, deleteChildren, true);
 		} catch (RemoteException e) {
 			e.printStackTrace();
@@ -1521,11 +1521,11 @@ public class ThemesEngineBean implements ThemesEngine {
 		service.setTreeOrder(nodeId, numberInLevel);
 
 		if (nodesToIncrease != null) {
-			increaseNodesNumbersInLevel(nodesToIncrease, numberInLevel, service);
+			changeNodesOrderInLevel(nodesToIncrease, 1, service);
 		}
 		
 		if (nodesToDecrease != null) {
-			decreaseNodesNumbersInLevel(nodesToDecrease, numberInLevel, service);
+			changeNodesOrderInLevel(nodesToDecrease, -1, service);
 		}
 		
 		if (newParentId < 0) {
@@ -1789,64 +1789,39 @@ public class ThemesEngineBean implements ThemesEngine {
 		
 		return null;
 	}
-
-	private boolean decreaseNodesNumbersInLevel(List<String> nodes, int numberInLevel, BuilderService service) {
-		if (nodes == null) {
+	
+	private boolean changeNodesOrderInLevel(List<String> nodes, int orderChange, BuilderService service) {
+		if (nodes == null || nodes.isEmpty()) {
 			return false;
-		}		
+		}
 		if (service == null) {
 			service = helper.getThemesService().getBuilderService();
+		}
+		if (service == null) {
+			return false;
 		}
 		
 		int id = -1;
 		ICPage page = null;
-		for (int i = 0; i < nodes.size(); i++) {
+		for (String nodeId: nodes) {
+			id = -1;
+			page = null;
+			
 			try {
-				id = Integer.valueOf(nodes.get(i)).intValue();
+				id = Integer.valueOf(nodeId);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			} catch (NullPointerException e) {
-				System.out.println("List element nr. " + i + " is null");
 				e.printStackTrace();
 			}
-			if (id != -1)
-				page = helper.getThemesService().getICPage(id);
-			if (page != null) {
-				page.setTreeOrder(page.getTreeOrder()-1);
-				service.decreaseTreeOrder(id);
-				page.store();
-			}
-		}
-		return true;
-	}
-	
-	private boolean increaseNodesNumbersInLevel(List<String> nodes, int numberInLevel, BuilderService service) {
-		if (nodes == null) {
-			return false;
-		}
-		if (service == null) {
-			service = helper.getThemesService().getBuilderService();
-		}
-		int id = -1;
-		ICPage page = null;
-		for (int i = 0; i < nodes.size(); i++){
-			try {
-				id = Integer.valueOf(nodes.get(i)).intValue();
-			} catch (NumberFormatException e) {
-				System.out.println("Can't convert "+nodes.get(i)+"to integer");
-				e.printStackTrace();
-			} catch (NullPointerException e) {
-				System.out.println("List element nr. " + i + " is null");
-				e.printStackTrace();
-			}
-			page = null;	// Reseting
+			
 			if (id != -1) {
-				page = helper.getThemesService().getICPage(id);
-			}
-			if (page != null) {
-				page.setTreeOrder(page.getTreeOrder()+1);
-				service.increaseTreeOrder(id);
-				page.store();
+				page = helper.getThemesService().getICPage(nodeId);
+				if (page != null) {
+					page.setTreeOrder(page.getTreeOrder() + orderChange);
+					service.changeTreeOrder(id, orderChange);
+					page.store();
+				}
 			}
 		}
 		
@@ -1905,7 +1880,7 @@ public class ThemesEngineBean implements ThemesEngine {
 					}
 				}
 			}
-			increaseNodesNumbersInLevel(increaseLevelOnTop, -1, builder);
+			changeNodesOrderInLevel(increaseLevelOnTop, -1, builder);
 		}
 		else {
 			//	Not top level page
@@ -1935,7 +1910,7 @@ public class ThemesEngineBean implements ThemesEngine {
 					}
 				}
 			}
-			decreaseNodesNumbersInLevel(decreaseLevelOnTop, -1, builder);
+			changeNodesOrderInLevel(decreaseLevelOnTop, -1, builder);
 		}
 		return true;
 	}

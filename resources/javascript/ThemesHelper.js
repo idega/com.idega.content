@@ -588,6 +588,39 @@ function registerActionsForSiteTree() {
 			registerActionsOnSiteTreeElement(element);
 	   	}
 	);
+	
+	$$('img.pageTreeNameIconStyle').each(
+		function(element) {
+			addLucidContextMenuToElement(element);
+		}
+	);
+}
+
+function addLucidContextMenuToElement(element) {
+	$j(element).contextMenu('sitePageMenuCtxMn', {
+		onContextMenu: function(e) {
+			var event = new Event(e);
+			var rightClickedElement = $(event.target);
+			var elementId = rightClickedElement.getProperty('id');
+			if (elementId == null || elementId == '') {
+				try {
+					elementId = rightClickedElement.getParent().getProperty('id');
+				} catch(e) {}
+			}
+			if (elementId == null) {
+				return false;
+			}
+			
+			var ids = new Array();
+			ids.push('makePageStartPageButtonCtxMn');
+			ids.push('deletePageButtonCtxMn');
+			for (var i = 0; i < ids.length; i++) {
+				$(ids[i]).setProperty('pageid', elementId);
+			}
+			
+			return true;
+		}
+	});
 }
 
 function registerActionsOnSiteTreeElement(element) {
@@ -607,6 +640,24 @@ function registerActionsOnSiteTreeElement(element) {
 		handleSiteTreeNodeClick(element);
 		return false;
 	});
+	
+	//	Context menu
+	addLucidContextMenuToElement(element);
+}
+
+function hideContextMenu() {
+	var menuInHtml = $('jqContextMenu');
+	if (menuInHtml == null) {
+		return false;
+	}
+	
+	var shadowForMenu = menuInHtml.getNext();
+	if (menuInHtml != null) {
+		menuInHtml.setStyle('display', 'none');
+	}
+	if (shadowForMenu != null) {
+		shadowForMenu.setStyle('display', 'none');
+	}
 }
 
 var DOUBLE_CLICKE_TIME = 250;		//	Waiting time for other clicks on the same element

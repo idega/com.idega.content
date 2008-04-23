@@ -128,7 +128,8 @@ function getPageInfoElementsCallback(allKeywords) {
 	});
 }
 
-function showSlider(container) {
+var SLIDER_IS_IN_MOTION = false;
+function showSlider(container) {	
 	resizeSlider();
 	
 	container = $(container);
@@ -140,6 +141,7 @@ function showSlider(container) {
 	var showSliderEffect = new Fx.Style(container, 'opacity', {duration: 1000, onComplete: function() {
 		setDisplayPropertyToElement(container.id, 'block', null);
 		getThemesSlider();
+		SLIDER_IS_IN_MOTION = false;
 	}});
 	showSliderEffect.start(0, 1);
 }
@@ -156,6 +158,10 @@ function getThemesSlider() {
 }
 
 function manageSlider(buttonID) {
+	if (SLIDER_IS_IN_MOTION) {
+		return false;
+	}
+	
 	var container = $('themesSliderContainer');
 	if (container == null) {
 		return;
@@ -164,6 +170,8 @@ function manageSlider(buttonID) {
 	if (button == null) {
 		return;
 	}
+	
+	SLIDER_IS_IN_MOTION = true;
 	if (container.getStyle('display') == 'none') {
 		button.addClass('active');
 		changeFrameHeight(-FRAME_CHANGE);
@@ -182,7 +190,9 @@ function hideThemesSliderInPages(container, button) {
 	
 	if ($(container).getStyle('display') != 'none') {
 		removeStyleOptions(null);
-		var hideSlider = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
+		var hideSlider = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION, onComplete: function() {
+			SLIDER_IS_IN_MOTION = false;
+		}});
 		hideSlider.start(1, 0);
 		SET_DISPLAY_PROPERTY_ID = window.setTimeout("setDisplayPropertyToElement('"+container.id+"', 'none', "+FRAME_CHANGE+")", SHOW_ELEMENT_TRANSITION_DURATION);
 	}
@@ -664,15 +674,6 @@ function isStartPageCallback(isStart) {
 	}
 }
 
-function makePageAsStartPage() {
-	showLoadingMessage(getChangingStructureText());
-	ThemesEngine.setAsStartPage(getPageID(), setAsStartPageCallback);
-}
-
-function setAsStartPageCallback(result) {
-	closeAllLoadingMessages();
-}
-
 function closeNewPage(container, buttonId, buttonText) {
 	setButtonText(buttonId, buttonText);
 	
@@ -1002,4 +1003,76 @@ function updateSiteTemplatesTree(tree) {
 	registerActionsForTemplatesInLucid();
 	
 	getThemes(null, true, SLIDER_SHOWED_FIRST_TIME);
+}
+
+function getFixedPageIdFromElementId(id) {
+	if (id == null) {
+		return null;
+	}
+	
+	return id.replace('a', '');
+}
+
+function analyzeAndDeletePage() {
+	hideContextMenu();
+	
+	var elementId = $('deletePageButtonCtxMn').getProperty('pageid');
+	
+	if (!JSTreeObj) {
+		return false;
+	}
+	
+	JSTreeObj.deleteNodes = true;
+	JSTreeObj.dragDropTimer = 50;
+	
+	var containerOfElementBeingDeleted = null;	//	Must be LI tag
+	if (elementId.indexOf('a') == -1) {
+		containerOfElementBeingDeleted = $(elementId);
+	}
+	else {
+		containerOfElementBeingDeleted = $(elementId).getParent();
+	}
+	if (containerOfElementBeingDeleted == null) {
+		return false;
+	}
+	JSTreeObj.dragNode_source = containerOfElementBeingDeleted;
+	JSTreeObj.dragNode_parent = containerOfElementBeingDeleted.getParent();
+	
+	var parentElement = null;
+	try {
+		parentElement = containerOfElementBeingDeleted.getParent().getParent();	//	Parent LI or main DIV tag
+	} catch(e) {}
+	if (parentElement == null) {
+		return false;
+	}
+	
+	var nodeBeingDeletedId = containerOfElementBeingDeleted.getProperty('id');
+	if (nodeBeingDeletedId == null) {
+		return false;
+	}
+	var parentNodeIdOfNodeBeingDeleted = parentElement.getProperty('id');
+	if (parentNodeIdOfNodeBeingDeleted == null) {
+		return false;
+	}
+	
+	JSTreeObj.previousPlaceInLevel = JSTreeObj.getOrderInLevel(nodeBeingDeletedId, parentNodeIdOfNodeBeingDeleted);
+	JSTreeObj.previousParentId = parentNodeIdOfNodeBeingDeleted;
+	
+	previousSiteTreeNode = containerOfElementBeingDeleted.getPrevious();
+	nextSiteTreeNode = containerOfElementBeingDeleted.getNext()
+	
+	JSTreeObj.dropDragableNodesCopy(nodeBeingDeletedId);
+}
+
+function analyzeAndMakePageAsStartPage() {
+	hideContextMenu();
+	
+	var elementId = getFixedPageIdFromElementId($('makePageStartPageButtonCtxMn').getProperty('pageid'));
+	
+	showLoadingMessage(getChangingStructureText());
+	ThemesEngine.setAsStartPage(elementId, {
+		callback: function(result) {
+			closeAllLoadingMessages();
+		}
+	});
 }

@@ -44,7 +44,12 @@ function getNewId(id){
 	return id;
 }
 
-function deletePage(pageId, followingNodes){
+function deletePage(pageId, followingNodes, nodeBeingDeletedId) {
+	var elementToRemove = $(nodeBeingDeletedId);
+	if (elementToRemove != null) {
+		elementToRemove.injectInside($(JSTreeObj.floatingContainer));
+	}
+	
 	var wantToDelete = confirm(getAreYouSureText());
 	if (wantToDelete) {
 		showLoadingMessage(getDeletingText());

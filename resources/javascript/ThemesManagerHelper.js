@@ -985,14 +985,7 @@ function switchLoadingMessagesForTheme() {
 function deleteTheme() {
 	var confirmed = window.confirm(ARE_YOU_SURE_TEXT);
 	
-	var menuInHtml = $('jqContextMenu');
-	var shadowForMenu = menuInHtml.getNext();
-	if (menuInHtml != null) {
-		menuInHtml.setStyle('display', 'none');
-	}
-	if (shadowForMenu != null) {
-		shadowForMenu.setStyle('display', 'none');
-	}
+	hideContextMenu();
 	
 	if (!confirmed) {
 		return false;
@@ -1010,6 +1003,24 @@ function deleteTheme() {
 			
 			getThemes(null, true, true);
 			return true;
+		}
+	});
+}
+
+function setBuiltInStyle(themeId, builtInStyleId) {
+	if (themeId == null || builtInStyleId == null) {
+		return false;
+	}
+	
+	THEME_ID = themeId;
+	showLoadingMessage(getThemeChangingText());
+	ThemesEngine.setBuiltInStyle(themeId, builtInStyleId, {
+		callback: function(result) {
+			closeAllLoadingMessages();
+			
+			if (result) {
+				changeThemeCallback(themeId);
+			}
 		}
 	});
 }
