@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.39 2008/04/16 20:37:10 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.40 2008/04/24 01:04:56 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -43,13 +43,14 @@ import com.idega.idegaweb.include.GlobalIncludeManager;
 import com.idega.slide.business.IWSlideService;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.data.Group;
+import com.idega.util.CoreConstants;
 
 /**
  * 
- *  Last modified: $Date: 2008/04/16 20:37:10 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/04/24 01:04:56 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.39 $
+ * @version $Revision: 1.40 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	
@@ -95,7 +96,12 @@ public class IWBundleStarter implements IWBundleStartable{
 		try {
 			GroupBusiness groupBiz = (GroupBusiness) IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
 			
-			BuilderLogicWrapper builderLogic = SpringBeanLookup.getInstance().getSpringBean(iwac, BuilderLogicWrapper.class);
+			BuilderLogicWrapper builderLogic = null;
+			try {
+				builderLogic = (BuilderLogicWrapper) SpringBeanLookup.getInstance().getSpringBean(iwac.getIWMainApplication().getServletContext(), CoreConstants.SPRING_BEAN_NAME_BUILDER_LOGIC_WRAPPER);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 			
 			Collection<Group> editorGroups = groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_EDITOR);
 			Collection<Group> authorGroups = groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_AUTHOR);
