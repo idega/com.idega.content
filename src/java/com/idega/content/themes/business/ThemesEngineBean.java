@@ -192,7 +192,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void addTemplatesAsChildrenToTheme(SimplifiedTheme theme, int templateId) {
 		if (theme == null) {
 			return;
@@ -207,7 +206,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void addAllBuilderTypeTemplates(String key, List<SimplifiedTheme> childrenTemplates, BuilderService builder) {
 		if (key == null) {
 			return;
@@ -256,7 +254,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		return false;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private Map getVariationsCache(IWContext iwc) {
 		IWCacheManager2 cache = IWCacheManager2.getInstance(iwc.getIWMainApplication());
 		if (cache == null) {
@@ -265,7 +262,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		return cache.getCache(ThemesConstants.THEME_STYLE_VARIATIONS_CACHE_KEY);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void putVariationsToCache(String variations, IWContext iwc, String themeID) {
 		if (variations == null || iwc == null || themeID == null) {
 			return;
@@ -274,7 +270,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		variationsCache.put(themeID, variations);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public boolean clearVariationFromCache(String themeID, IWContext iwc) {
 		if (themeID == null) {
 			return false;
@@ -293,7 +288,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		return true;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private String getVariationsFromCache(String themeID, IWContext iwc) {
 		Map variations = getVariationsCache(iwc);
 		Object o = variations.get(themeID);
@@ -438,7 +432,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		return result;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean setStyleForChildren(String pageKey, int templateKey, IWContext iwc, ICDomain cachedDomain, boolean isContentEditor, Theme theme) {
 		Map tree = getTree(iwc);
 		if (tree == null) {
@@ -511,7 +504,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		return true;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private Map getTree(IWContext iwc) {
 		try {
 			return helper.getThemesService().getBuilderService().getTree(iwc);
@@ -521,7 +513,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean setSiteStyle(int templateID, IWContext iwc, boolean setStyleForChildren, boolean isContentEditor, Theme theme) {
 		Map tree = getTree(iwc);
 		if (tree == null) {
@@ -562,7 +553,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		return helper.getThemesService().getBuilderService().setProperty(pageID, ThemesConstants.MINUS_ONE, method, new String[]{title}, appl);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public String changePageUriAfterPageWasMoved(String pageKey) {
 		if (pageKey == null) {
 			return null;
@@ -813,7 +803,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		return changedPageUri;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean setPageAvailability(IWContext iwc, String pageKey, String availability) {
 		if (pageKey == null || availability == null) {
 			return false;
@@ -854,7 +843,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		return true;
 	}
 	
-	@SuppressWarnings({ "unchecked", "deprecation" })
 	private boolean setValueForPage(String pageKey, String value, String columnName) {
 		if (pageKey == null || value == null) {
 			return false;
@@ -1725,7 +1713,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		return result;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private int getArticleViewerTemplateId(BuilderService builder, IWContext iwc) {
 		if (builder == null || iwc == null) {
 			return -1;
@@ -1852,7 +1839,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		return struct; 
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean manageNewSiteTreeOrder(IWContext iwc, BuilderService builder, ICPage newRootPage, int newRoot) {
 		if (iwc == null || builder == null || newRootPage == null || newRoot == -1) {
 			return false;
@@ -2098,7 +2084,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		return false;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public boolean deleteArticlesFromDeletedPages(String pageKey) {
 		if (pageKey == null) {
 			return false;

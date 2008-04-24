@@ -81,6 +81,7 @@ public class ContentItemRssProducer  extends RSSAbstractProducer implements RSSP
 //			e.printStackTrace();
 //		}
 //	}	
+	@Override
 	public void handleRSSRequest(RSSRequest rssRequest) throws IOException {
 		// TODO Auto-generated method stub
 		
@@ -271,9 +272,5 @@ public class ContentItemRssProducer  extends RSSAbstractProducer implements RSSP
 		String feedXML = this.getRSSBusiness().convertFeedToRSS2XMLString(feed);	
 		//deletes the previous version
 		this.getIWSlideService(rssRequest).uploadFileAndCreateFoldersFromStringAsRoot(uri+RSS_FOLDER_NAME+"/", RSS_FILE_NAME, feedXML,this.getRSSContentType(),true);
-	}
-	
-	private void getEntriesFromFolder(){
-		
 	}
 }

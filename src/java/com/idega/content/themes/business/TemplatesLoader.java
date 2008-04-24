@@ -117,7 +117,6 @@ public class TemplatesLoader implements JarLoader {
 	 * A generic way to add page types from an xml Document
 	 * @param pageDocument
 	 */
-	@SuppressWarnings("unchecked")
 	public void addPageTypesFromDocument(Document pageDocument) {
 		Element root = pageDocument.getRootElement();		
 		Collection<Element> siteRoot = root.getChildren();
@@ -146,7 +145,6 @@ public class TemplatesLoader implements JarLoader {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void addSiteTemplatesFromDocument(Document siteTemplateDocument) {
 		SortedMap <String, SiteTemplate> siteMap = null;
 		Map siteTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(SITE_TEMPLATES_CACHE_KEY);

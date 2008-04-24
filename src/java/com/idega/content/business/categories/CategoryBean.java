@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.7 2008/01/30 15:32:46 valdas Exp $
+ * $Id: CategoryBean.java,v 1.8 2008/04/24 21:41:49 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -58,10 +58,10 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2008/01/30 15:32:46 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/04/24 21:41:49 $ by $Author: laddi $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class CategoryBean {
 	private static final Log log = LogFactory.getLog(CategoryBean.class);
@@ -72,6 +72,7 @@ public class CategoryBean {
 	/**
 	 * @deprecated this file will no longer be used
 	 */
+	@Deprecated
 	private static final String CATEGORY_CONFIG_FILE = CATEGORY_CONFIG_PATH+"categories.prop";
 	private static final String CATEGORY_PROPERTIES_FILE = CATEGORY_CONFIG_PATH+"categories.xml";
 	private IWMainApplication iwma;
@@ -108,7 +109,7 @@ public class CategoryBean {
 			valuesToKeys = new HashMap<String, String>();
 			String lang = getCurrentLocale();
 			for (Iterator<String> iter = cats.iterator(); iter.hasNext();) {
-				String cat = (String) iter.next();
+				String cat = iter.next();
 				String key = CategoryBean.getCategoryKey(cat);
 				ContentCategory category = new ContentCategory(key);
 				category.addName(lang, cat);
@@ -135,7 +136,6 @@ public class CategoryBean {
 			}
 		}
 		
-		@SuppressWarnings("unchecked")
 		private void updateCategoriesOnFiles(String resourcePath) {
 			if (resourcePath.indexOf(ThemesConstants.THEMES_PATH) >= 0) {
 				return;
@@ -281,6 +281,7 @@ public class CategoryBean {
 	 * @return categories
 	 * @deprecated this file is no longer used
 	 */
+	@Deprecated
 	public String getCategoriesAsString() {
 		IWUserContext iwuc = IWContext.getInstance();
 		String categories = null;
@@ -366,7 +367,6 @@ public class CategoryBean {
 	 * Loads category definitions from <code>categories.xml</code> file.
 	 * @return categories as Map<String, ContentCategory>, or <code>null</code> if loading failed.
 	 */
-	@SuppressWarnings({ "unchecked", "serial" })
 	private Map<String, ContentCategory> loadCategories() {
 		Map<String, ContentCategory> map = new TreeMap<String, ContentCategory>();
 		

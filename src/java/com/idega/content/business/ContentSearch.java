@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.38 2007/10/03 21:51:21 eiki Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.39 2008/04/24 21:41:50 laddi Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -73,7 +73,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2007/10/03 21:51:21 $ by $Author: eiki $ This class
+ * Last modified: $Date: 2008/04/24 21:41:50 $ by $Author: laddi $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -83,11 +83,11 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.38 $
+ * @version $Revision: 1.39 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
-	private static final String DASL_WHERE_XML_SNIPPET = "</D:where>";
+	//private static final String DASL_WHERE_XML_SNIPPET = "</D:where>";
 	public static final String SEARCH_NAME_LOCALIZABLE_KEY = "content_search.name";
 	public static final String SEARCH_DESCRIPTION_LOCALIZABLE_KEY = "content_search.description";
 	public static final String SEARCH_TYPE = "document";
@@ -867,6 +867,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 		this.numberOfResultItems = numberOfResultItems;
 	}
 	
+	@Override
 	public Object clone(){
 		ContentSearch obj = null;
 		try {

@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.29 2008/03/26 09:17:54 valdas Exp $
+ * $Id: WebDAVCategories.java,v 1.30 2008/04/24 21:41:50 laddi Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -49,10 +49,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2008/03/26 09:17:54 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/04/24 21:41:50 $ by $Author: laddi $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.29 $
+ * @version $Revision: 1.30 $
  */
 public class WebDAVCategories extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -96,6 +96,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		this.resourcePath = path;
 	}
 	
+	@Override
 	protected void initializeComponent(FacesContext context) {
 		add(getEditContainer(IWContext.getIWContext(context), false));
 	}
@@ -425,6 +426,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	/**
 	 * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
 	 */
+	@Override
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[7];
 		values[0] = super.saveState(ctx);
@@ -441,6 +443,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	 * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext,
 	 *      java.lang.Object)
 	 */
+	@Override
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[]) state;
 		super.restoreState(ctx, values[0]);
@@ -453,6 +456,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	}
 	
 	
+	@Override
 	public void encodeBegin(FacesContext context) throws IOException{
 		super.encodeBegin(context);
 	}
@@ -462,7 +466,6 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		return categoryKey;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void setCategory(HtmlSelectBooleanCheckbox checkbox,String categoryKey){
 		checkbox.getAttributes().put("categoryKey",categoryKey);
 	}

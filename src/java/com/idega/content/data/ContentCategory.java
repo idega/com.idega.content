@@ -1,5 +1,5 @@
 /**
- * $Id: ContentCategory.java,v 1.8 2008/02/11 09:18:00 valdas Exp $
+ * $Id: ContentCategory.java,v 1.9 2008/04/24 21:41:50 laddi Exp $
  * Created in 2007 by gediminas
  *
  * Copyright (C) 2000-2007 Idega Software hf. All Rights Reserved.
@@ -111,7 +111,6 @@ public class ContentCategory {
 		getNames().put(lang, name);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void setFromXML(Element cat) {
 		this.id = cat.getAttributeValue("id");
 		Attribute disabledAttr = cat.getAttribute("disabled");

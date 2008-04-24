@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.40 2008/04/24 01:04:56 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.41 2008/04/24 21:42:38 laddi Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -47,10 +47,10 @@ import com.idega.util.CoreConstants;
 
 /**
  * 
- *  Last modified: $Date: 2008/04/24 01:04:56 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/04/24 21:42:38 $ by $Author: laddi $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.40 $
+ * @version $Revision: 1.41 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	
@@ -90,7 +90,6 @@ public class IWBundleStarter implements IWBundleStartable{
 	 * Auto generate groups for the editor and author roles so we can set them in the Lucid app
 	 * @param iwac 
 	 */
-	@SuppressWarnings("unchecked")
 	protected void addContentRoleGroups(IWApplicationContext iwac) {
 		boolean clearCache = false;
 		try {
