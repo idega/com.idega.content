@@ -33,6 +33,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 
 	protected String currentResourcePath = null;
 
+	@Override
 	protected abstract void initializeComponent(FacesContext context);
 
 	public static IWBundle getBundle() {
@@ -87,7 +88,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 	protected boolean removeClickedFile(WebdavExtendedResource resource) {
 		try {
 			String parentPath = null;
-			if (resource == null) {
+			if (resource != null) {
 				parentPath = resource.getParentPath().replaceFirst(getIWSlideSession().getWebdavServerURI(), "");
 			}
 			WFUtil.invoke("WebDAVListBean", "setWebDAVPath", parentPath, String.class);
@@ -138,6 +139,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 		return this.parentContentViewer;
 	}
 	
+	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
 		String webDavPath = (String) this.getAttributes().get("path");
 		String path = null;
@@ -184,6 +186,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 		super.encodeBegin(context);
 	}
 
+	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
 		super.encodeChildren(context);
 		for (Iterator iter = getChildren().iterator(); iter.hasNext();) {
@@ -192,6 +195,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 		}
 	}
 
+	@Override
 	public boolean getRendersChildren() {
 		return true;
 	}
@@ -214,6 +218,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 		this.currentResourcePath = currentResourcePath;
 	}
 	
+	@Override
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[2];
 		values[0] = super.saveState(ctx);
@@ -221,6 +226,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 		return values;
 	}
 
+	@Override
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[]) state;
 		super.restoreState(ctx, values[0]);
