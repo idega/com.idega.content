@@ -60,7 +60,6 @@ public class SiteInfo extends Block {
 		return locales;
 	}
 	
-	@SuppressWarnings("unchecked")
 	protected void createContents(UIComponent layer, IWContext iwc, boolean boldText, boolean addKeyPressAction) {
 		Setting setting = null;
 		List <Setting> settings = new ArrayList <Setting> (ThemesHelper.getInstance().getThemeSettings().values());

@@ -26,7 +26,7 @@ public class SiteTreeViewer extends Block {
 	private boolean showLines = false;
 	private boolean addStyleClassForLink = true;
 
-	@SuppressWarnings({ "unchecked", "deprecation" })
+	@Override
 	public void main(IWContext iwc) {
 		if (rootNode == null) {
 			return;
@@ -79,10 +79,12 @@ public class SiteTreeViewer extends Block {
 		this.iwTreeId = iwTreeId;
 	}
 
+	@Override
 	public String getRendererType() {
 		return rendererType;
 	}
 
+	@Override
 	public void setRendererType(String rendererType) {
 		this.rendererType = rendererType;
 	}
@@ -135,6 +137,7 @@ public class SiteTreeViewer extends Block {
 		this.addStyleClassForLink = addStyleClassForLink;
 	}
 
+	@Override
 	public String getBundleIdentifier() {
 		return ContentConstants.IW_BUNDLE_IDENTIFIER;
 	}

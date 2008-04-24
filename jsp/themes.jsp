@@ -85,9 +85,11 @@
 								</t:div>
 							</t:div>
 						</t:div>
-						<t:div styleClass="uploadForm">
+						<t:div id="themeUploader" forceId="true" styleClass="uploadForm">
 							<h:outputText styleClass="variationHeading" value="#{localizedStrings['com.idega.content']['upload_theme']}"></h:outputText>
-							<c:FileUploadViewer themePack="true" formId="uploadForm" allowMultipleFiles="true" actionAfterUpload="getThemes(THEME_ID, true, true);" actionAfterCounterReset="switchLoadingMessagesForTheme();" />
+							<t:div styleClass="uploadThemeForm">
+								<c:FileUploadViewer themePack="true" formId="uploadForm" allowMultipleFiles="true" actionAfterUpload="getThemes(THEME_ID, true, true);" actionAfterCounterReset="switchLoadingMessagesForTheme();" />
+							</t:div>
 						</t:div>
 					</t:div>
                	</t:div>

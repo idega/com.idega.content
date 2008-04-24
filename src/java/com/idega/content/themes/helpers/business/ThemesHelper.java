@@ -263,7 +263,6 @@ public class ThemesHelper implements Singleton {
 		return loadedResults;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public List<SearchResult> search(String searchKey, String searchScope) {
 		if (searchKey == null || searchScope == null) {
 			return null;
@@ -698,7 +697,6 @@ public class ThemesHelper implements Singleton {
 		loadedPageSettings = true;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void loadSettings(Map <String, Setting> settings, Document doc) {
 		if (doc == null) {
 			return;
@@ -1240,7 +1238,6 @@ public class ThemesHelper implements Singleton {
 		return doc;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private List<Element> getArticleViewerElements(Document doc) {
 		if (doc == null) {
 			return null;
@@ -1272,7 +1269,6 @@ public class ThemesHelper implements Singleton {
 		return articleViewers;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private Attribute getArticleViewerResourcePathValueAttribute(Element articleViewer) {
 		if (articleViewer == null) {
 			return null;
@@ -1574,7 +1570,6 @@ public class ThemesHelper implements Singleton {
 		return uri.toString();
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean addIDsToModules(Element root, int pageID) {
 		if (root == null || pageID < 0) {
 			return false;

@@ -24,7 +24,6 @@ import com.idega.util.CoreConstants;
 
 public class TemplatesTree extends Block {
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void main(IWContext iwc) {
 		Layer container = new Layer();
@@ -67,7 +66,6 @@ public class TemplatesTree extends Block {
 		buttons.add(createTemplate);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void addTemplatesToTree(Lists tree, Collection templates, Locale l, IWBundle iwb) {
 		if (templates == null || templates.size() == 0) {
 			return;

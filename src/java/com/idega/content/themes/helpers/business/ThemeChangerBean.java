@@ -210,7 +210,6 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param head
 	 * @return boolean
 	 */
-	@SuppressWarnings("unchecked")
 	private boolean proceedHeadContent(String linkToBase, Element head) {
 		if (linkToBase == null || head == null) {
 			return false;
@@ -289,7 +288,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		return uploadTheme(out.outputString(doc), theme, true);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean checkCssFiles(Document doc, String linkToTheme) {
 		if (doc == null) {
 			return false;
@@ -660,7 +658,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return null;
 	}
 	
-	private List<String> getValuesByPatterns(String source, List<String> regexs) {
+	/*private List<String> getValuesByPatterns(String source, List<String> regexs) {
 		if (source == null || regexs == null) {
 			return null;
 		}
@@ -692,7 +690,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		return destination;
-	}
+	}*/
 	
 	private String getCssExpressionWithDecimalNumbers(String expression) {
 		if (expression.indexOf(CoreConstants.NUMBER_SIGN) == -1) {
@@ -956,7 +954,6 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param attributeValue
 	 * @return index
 	 */
-	@SuppressWarnings("unchecked")
 	private int getElementIndex(List contents, String attributeType, String attributeValue) {
 		int index = 0;
 		if (contents == null) {
@@ -1070,7 +1067,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		return content;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void checkElementAttributes(Element e, List<String> validAttributes) {
 		if (e == null || validAttributes == null) {
 			return;
@@ -1198,7 +1194,6 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param body
 	 * @return boolean
 	 */
-	@SuppressWarnings("unchecked")
 	private boolean proceedBodyContent(String linkToBase, Element body) {
 		if (body == null) {
 			return false;
@@ -1279,7 +1274,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private List getNodesByXpath(Element container, String expression) {
 		if (container == null || expression == null) {
 			return null;
@@ -1297,7 +1291,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return null;
 	}
 	
-	private Attribute getElementAtribute(Element e, String name, Namespace ns) {
+	/*private Attribute getElementAtribute(Element e, String name, Namespace ns) {
 		if (e == null || name == null) {
 			return null;
 		}
@@ -1314,7 +1308,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		return a;
-	}
+	}*/
 	
 	private boolean fixTag(Element e, String attributeName, String linkToBase) {
 		if (e == null || attributeName == null || linkToBase == null) {
@@ -1627,7 +1621,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean hasElementChildren(Element e) {
 		if (e == null) {
 			return false;
@@ -1838,7 +1831,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return theme.getId();
 	}
 	
-	private Element getChildElement(Element parent, String childName, Namespace ns) {
+	/*private Element getChildElement(Element parent, String childName, Namespace ns) {
 		if (parent == null || childName == null) {
 			return null;
 		}
@@ -1855,7 +1848,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		return child;
-	}
+	}*/
 	
 	private boolean changeThemeColourVariation(Theme theme, ThemeChange change) {
 		if (theme == null || change == null) {
@@ -1916,8 +1909,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		theme.addThemeChange(change);
 	}
 	
-	@SuppressWarnings("unchecked")
-	private List<Element> getElementChildren(Element parent, String name, Namespace ns) {
+	/*private List<Element> getElementChildren(Element parent, String name, Namespace ns) {
 		if (parent == null || name == null) {
 			return null;
 		}
@@ -1934,7 +1926,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		return children;
-	}
+	}*/
 	
 	/**
 	 * Changes theme's old style with new
@@ -1943,7 +1935,6 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param newStyle
 	 * @return boolean
 	 */
-	@SuppressWarnings("unchecked")
 	private boolean changeThemeStyle(String linkToBase, Element head, ThemeStyleGroupMember oldStyle, ThemeStyleGroupMember newStyle) {
 		if (head == null) {
 			return false;
@@ -2267,7 +2258,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		return false;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean setDefaultStylesToTheme(Theme theme) {
 		if (theme == null) {
 			return false;
@@ -2458,7 +2448,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean replaceColourFilesInDoc(Document doc, String linkToBase, List<String> oldFiles, List<String> newFiles) {
 		if (doc == null || oldFiles == null || newFiles == null) {
 			return false;
@@ -2731,7 +2720,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return !theme.getName().equals(changedName);
 	}
 	
-	private boolean isThemeChanged(Theme theme) {
+	/*private boolean isThemeChanged(Theme theme) {
 		List<ThemeChange> changes = theme.getChanges();
 		boolean existsChanges = true;
 		if (changes == null || changes.size() == 0) {
@@ -2739,7 +2728,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		return existsChanges;
-	}
+	}*/
 	
 	public boolean reloadThemeProperties(String themeId, boolean checkConfig) {
 		if (themeId == null) {

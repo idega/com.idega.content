@@ -66,6 +66,7 @@ html>body #mainThemesContentContainer {
 	top: 5px;
 	right: 5px;
 	width: 252px;
+	overflow: hidden;
 
 	height: expression(document.body.clientHeight ? document.body.clientHeight - 96 + 'px' : document.documentElement.clientHeight - 96 + 'px');
 }
@@ -110,7 +111,7 @@ span.variationHeading {
 }
 
 #themeSaveArea .wf_webdav_upload {
-	padding: 5px;
+	padding: 3px;
 }
 
 #themeSaveArea .wf_webdav_upload .inputLabel {
@@ -125,9 +126,10 @@ span.variationHeading {
 	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
 	color: #1f1f1f;
 	margin-right: 8px;
-	margin-bottom: 6px;
+	margin-bottom: 3px;
 	float: left !important;
-	width: 130px;
+	width: 110px;
+	clear: right;
 	font-weight: normal;
 	padding: 2px 3px;
 }
@@ -231,12 +233,24 @@ div#mainThemesContentContainer {
 	left: 200px;
 }
 
+#themeUploader {
+	position: absolute !important;
+	bottom: 0 !important;
+	height: 100px !important;
+	overflow: hidden !important;
+}
+
+.uploadThemeForm {
+	overflow: auto;
+	height: 79px;
+}
+
 .fileUploadInputsContainerStyle {
 	padding: 5px;
 }
 
 input.fileUploadInputStyle {
-	width: auto !important;
+	width: 200px !important;
 	clear: both;
 }
 

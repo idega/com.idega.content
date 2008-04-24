@@ -44,6 +44,7 @@ public class ApplicationPropertyViewer extends Block {
 		setUseBuilderObjectControl(false);	//	We don't need 'wrappers' in Builder for this PO
 	}
 	
+	@Override
 	public void main(IWContext iwc) {
 		if (applicationPropertyKey == null) {
 			return;
@@ -114,12 +115,14 @@ public class ApplicationPropertyViewer extends Block {
 		this.applicationPropertyKey = key;
 	}
 	
+	@Override
 	public void restoreState(FacesContext context, Object state) {
 		Object values[] = (Object[]) state;
 		super.restoreState(context, values[0]);
 		this.applicationPropertyKey = (String) values[1];
 	}
 
+	@Override
 	public Object saveState(FacesContext context) {
 		Object values[] = new Object[2];
 		values[0] = super.saveState(context);
@@ -127,7 +130,6 @@ public class ApplicationPropertyViewer extends Block {
 		return values;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void addPropertyEditAction(IWContext iwc, PresentationObject component, String key, String settingKey, boolean needsReload) {
 		if (iwc == null || component == null || key == null) {
 			return;
@@ -172,6 +174,7 @@ public class ApplicationPropertyViewer extends Block {
 		}
 	}
 	
+	@Override
 	public String getBuilderName(IWUserContext iwuc) {
 		String name = ContentUtil.getBundle().getComponentName(ApplicationPropertyViewer.class);
 		if (name == null || ThemesConstants.EMPTY.equals(name)) {

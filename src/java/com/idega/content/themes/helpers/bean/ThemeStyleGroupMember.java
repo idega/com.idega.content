@@ -13,7 +13,7 @@ public class ThemeStyleGroupMember {
 	
 	private boolean stylesheet = true;
 	private boolean enabled = false;
-	private boolean limitedSelection = false;;
+	private boolean limitedSelection = false;
 
 	private List <String> styleFiles = null;
 	
