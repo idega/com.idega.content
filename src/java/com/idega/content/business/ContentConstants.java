@@ -50,7 +50,6 @@ public class ContentConstants {
 	public static final String ARTICLE_ITEM_BODY_STYLE_CLASS = "blog-entry-body";
 	
 	public static final String BOOLEAN_TYPE = "boolean";
-	public static final String HIDE_MENU_IN_PAGE = "hidePageInMenu";
 	
 	public static final String CONTENT_ITEM_ACTION_EDIT = "edit";
 	public static final String CONTENT_ITEM_ACTION_DELETE = "delete";
@@ -62,6 +61,7 @@ public class ContentConstants {
 	
 	public static final String DELETED_PAGE_IN_LUCID_PROPERTIES_FOR_ARTICLE = "deletedPageInLucidPropertiesForArticle";
 	
+	public static final String HIDE_MENU_IN_PAGE = "hidePageInMenu";
 	public static final String PUBLISH_PAGE_IN_LUCID_CODE = "setPagePublished";
 	public static final String SET_PAGE_LOCKED_IN_LUCID_CODE = "setPageLocked";
 	
