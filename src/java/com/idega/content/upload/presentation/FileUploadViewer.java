@@ -115,9 +115,6 @@ public class FileUploadViewer extends IWBaseComponent {
 			formId = form.getId();
 		}
 		
-		if (!uploadPath.endsWith(CoreConstants.SLASH)) {
-			uploadPath = new StringBuffer(uploadPath).append(CoreConstants.SLASH).toString();
-		}
 		HiddenInput path = new HiddenInput(ContentConstants.UPLOADER_PATH, uploadPath);
 		mainContainer.add(path);
 		HiddenInput zipFileValue = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_ZIP_FILE, String.valueOf(zipFile));

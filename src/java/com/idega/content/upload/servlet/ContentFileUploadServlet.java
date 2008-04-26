@@ -24,6 +24,7 @@ import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.upload.bean.UploadFile;
 import com.idega.content.upload.business.FileUploadProgressListener;
 import com.idega.content.upload.business.FileUploader;
+import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 
 public class ContentFileUploadServlet extends HttpServlet {
@@ -33,6 +34,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 	private static final long serialVersionUID = -6282517406996613536L;	
 	private static final long MAX_UPLOAD_SIZE = 1024 * 1024 * 1024;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ServletRequestContext src = new ServletRequestContext(request);
@@ -97,6 +99,18 @@ public class ContentFileUploadServlet extends HttpServlet {
         }
         
         if (files.size() > 0) {
+        	//	Checking upload path
+        	if (uploadPath == null) {
+        		//	Using default upload path
+        		uploadPath = CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
+        	}
+        	if (!uploadPath.startsWith(CoreConstants.SLASH)) {
+    			uploadPath = CoreConstants.SLASH + uploadPath;
+    		}
+    		if (!uploadPath.endsWith(CoreConstants.SLASH)) {
+    			uploadPath += CoreConstants.SLASH;
+    		}
+    		
         	boolean isIE = CoreUtil.isIE(request);
         	FileUploader uploader = SpringBeanLookup.getInstance().getSpringBean(request.getSession(), FileUploader.class);
         	
