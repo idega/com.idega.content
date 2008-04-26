@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.31 2008/02/21 08:57:47 laddi Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.32 2008/04/26 01:00:34 valdas Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -37,10 +37,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2008/02/21 08:57:47 $ by $Author: laddi $
+ * Last modified: $Date: 2008/04/26 01:00:34 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.31 $
+ * @version $Revision: 1.32 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -842,7 +842,9 @@ public class ContentItemViewer extends WFContainer {
 		if (appContext.endsWith("/")){
 			appContext = appContext.substring(0, appContext.lastIndexOf("/"));			
 		}
-		moreLink.setValue(appContext+getDetailsViewerPath());
+		
+		String detailsViewerPath = getDetailsViewerPath();
+		moreLink.setValue(detailsViewerPath == null ? appContext : appContext + detailsViewerPath);
 		return moreLink;
 	}
 	
