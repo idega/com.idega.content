@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.27 2008/04/29 09:51:17 valdas Exp $
+ * $Id: ContentItemListViewer.java,v 1.28 2008/04/29 10:59:48 valdas Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -38,10 +38,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- * Last modified: $Date: 2008/04/29 09:51:17 $ by $Author: valdas $
+ * Last modified: $Date: 2008/04/29 10:59:48 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.28 $
  */
 public class ContentItemListViewer extends UIData implements CacheableUIComponent {
 
@@ -62,6 +62,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	private static final String DEFAULT_RENDERER_TYPE = "content_list_viewer";
 	private int maxNumberOfDisplayed=-1;
 	
+	private boolean showAllItems = false;
 	private String articleItemViewerFilter = null;
 	
 	public static final String ITEMS_CATEGORY_VIEW = "items_list_category_view";
@@ -325,7 +326,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	 */
 	@Override
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[12];
+		Object values[] = new Object[13];
 		values[0] = super.saveState(ctx);
 		values[1] = this.managedBeanId;
 		values[2] = this.resourcePath;
@@ -338,6 +339,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		values[9] = this.categoriesList;
 		values[10] = new Integer(this.maxNumberOfDisplayed);
 		values[11] = this.articleItemViewerFilter;
+		values[12] = this.showAllItems;
 		return values;
 	}
 	
@@ -359,6 +361,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		this.categoriesList = (List<String>) values[9];
 		this.maxNumberOfDisplayed=((Integer)values[10]).intValue();
 		this.articleItemViewerFilter = values[11] == null ? null : String.valueOf(values[11]);
+		this.showAllItems = values[12] == null ? false : Boolean.valueOf(values[12].toString());
 		
 		notifyManagedBeanOfVariableValues();
 		
@@ -454,17 +457,17 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	 * @param categoriesList
 	 */
 	public void setCategories(String categories){
-		if(categories!=null){
-			List<String> cats = new ArrayList<String>();
-			StringTokenizer tokenizer = new StringTokenizer(categories, CategoryBean.CATEGORY_DELIMETER);
-			while(tokenizer.hasMoreTokens()){
-				cats.add(tokenizer.nextToken().trim());
-			}
-			List<String> cats2 = (cats.isEmpty())?null:cats;
-			setCategoriesList(cats2);
-		} else {	
-			//null
+		if (categories == null) {
+			return;
 		}
+			
+		List<String> cats = new ArrayList<String>();
+		StringTokenizer tokenizer = new StringTokenizer(categories, CategoryBean.CATEGORY_DELIMETER);
+		while(tokenizer.hasMoreTokens()){
+			cats.add(tokenizer.nextToken().trim());
+		}
+		List<String> cats2 = (cats.isEmpty())?null:cats;
+		setCategoriesList(cats2);
 	}
 	
 	public String getCategories() {
@@ -630,4 +633,13 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		this.articleItemViewerFilter = articleItemViewerFilter;
 		notifyManagedBeanOfViewerIdentifier(articleItemViewerFilter);
 	}
+
+	public boolean isShowAllItems() {
+		return showAllItems;
+	}
+
+	public void setShowAllItems(boolean showAllItems) {
+		this.showAllItems = showAllItems;
+	}
+
 }
