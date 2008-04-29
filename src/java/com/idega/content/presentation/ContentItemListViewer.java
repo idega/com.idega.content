@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.25 2008/02/21 08:57:47 laddi Exp $
+ * $Id: ContentItemListViewer.java,v 1.26 2008/04/29 09:19:43 valdas Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.idega.content.bean.ContentItem;
 import com.idega.content.bean.ContentListViewerManagedBean;
+import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.business.categories.CategoryBean;
 import com.idega.core.cache.CacheableUIComponent;
@@ -35,12 +36,12 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- * Last modified: $Date: 2008/02/21 08:57:47 $ by $Author: laddi $
+ * Last modified: $Date: 2008/04/29 09:19:43 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.25 $
+ * @version $Revision: 1.26 $
  */
-public class ContentItemListViewer extends UIData implements CacheableUIComponent{
+public class ContentItemListViewer extends UIData implements CacheableUIComponent {
 
 	private String managedBeanId;
 	private String resourcePath;
@@ -58,6 +59,8 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	
 	private static final String DEFAULT_RENDERER_TYPE = "content_list_viewer";
 	private int maxNumberOfDisplayed=-1;
+	
+	private String articleItemViewerFilter = null;
 	
 	public static final String ITEMS_CATEGORY_VIEW = "items_list_category_view";
 	
@@ -86,8 +89,6 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		this.managedBeanId = managedBeanId;
 		String var = managedBeanId + "_var";
 		setVar(var);
-
-		//notifyManagedBeanOfVariableValues();
 	}
 	
 	protected String[] getToolbarActions(){
@@ -95,12 +96,11 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	}
 	
 	protected void initializeInEncodeBegin(){
-		
 		notifyManagedBeanOfVariableValues();
+		
 		ContentListViewerManagedBean bean = getManagedBean();
-		ContentItemViewer viewer = bean.getContentViewer();//WFUtil.invoke(this.managedBeanId,"getContentViewer");
+		ContentItemViewer viewer = bean.getContentViewer();
 		viewer.setShowRequestedItem(false);
-		//viewer.setHeadlineAsLink(getHeadlineAsLink());
 		addContentItemViewer(viewer);
 		
 		String[] actions = getToolbarActions();
@@ -119,12 +119,11 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 				toolbar.setBaseFolderPath(basePath);
 			}
 			
-			//toolbar.setResourcePath(getResourcePath());
-			toolbar.setActionHandlerIdentifier(bean.getIWActionURIHandlerIdentifier());//WFUtil.invoke(this.managedBeanId,"getIWActionURIHandlerIdentifier"));
+			toolbar.setActionHandlerIdentifier(bean.getIWActionURIHandlerIdentifier());
 			this.setHeader(toolbar);
 		}
 		
-		List attachementViewers = bean.getAttachmentViewers();//WFUtil.invoke(this.managedBeanId,"getAttachmentViewers");
+		List attachementViewers = bean.getAttachmentViewers();
 		if(attachementViewers!=null){
 			for (ListIterator iter = attachementViewers.listIterator(); iter.hasNext();) {
 				ContentItemViewer attachmentViewer = (ContentItemViewer) iter.next();
@@ -162,7 +161,6 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
         String path = vb != null ? (String)vb.getValue(getFacesContext()) : null;
         if(path==null){
 	        	if(this.managedBeanId!=null){
-	        		//path = (String)WFUtil.invoke(this.managedBeanId,"getResourcePath");
 	        		path = getManagedBean().getBaseFolderPath();
 	        	}
         }
@@ -187,7 +185,6 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	@Override
 	public Object getValue(){
 		if(this.model==null){
-			//List items = (List)WFUtil.invoke(this.managedBeanId,"getContentItems");
 			List items = getManagedBean().getContentItems();
 			if(items!=null){
 				this.model = new WFDataModel();
@@ -208,6 +205,8 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	public void encodeBegin(FacesContext context) throws IOException{
 		UIComponentCacher cacher = getCacher(context);
 		setItemCategoryFromRequest(context);
+		setViewerIdentifier(context);
+		
 		if(cacher.existsInCache(this,context)){
 			// do nothing:
 		}
@@ -324,7 +323,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	 */
 	@Override
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[11];
+		Object values[] = new Object[12];
 		values[0] = super.saveState(ctx);
 		values[1] = this.managedBeanId;
 		values[2] = this.resourcePath;
@@ -336,6 +335,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		values[8] = Boolean.valueOf(this.initialized);
 		values[9] = this.categoriesList;
 		values[10] = new Integer(this.maxNumberOfDisplayed);
+		values[11] = this.articleItemViewerFilter;
 		return values;
 	}
 	
@@ -356,14 +356,18 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		this.initialized = ((Boolean)values[8]).booleanValue();
 		this.categoriesList = (List<String>) values[9];
 		this.maxNumberOfDisplayed=((Integer)values[10]).intValue();
+		this.articleItemViewerFilter = values[11] == null ? null : String.valueOf(values[11]);
+		
 		notifyManagedBeanOfVariableValues();
 		
 	}
 	
-	protected void notifyManagedBeanOfVariableValues(){
+	protected void notifyManagedBeanOfVariableValues() {
 		notifyManagedBeanOfBaseFolderPath(this.resourcePath);
 		notifyManagedBeanOfDetailsViewerPath(this.detailsViewerPath);
 		notifyManagedBeanOfCategories(this.categoriesList);
+		notifyManagedBeanOfViewerIdentifier(this.articleItemViewerFilter);
+		
 		int maxItems = getMaxNumberOfDisplayed();
 		if(maxItems!=-1){
 			getManagedBean().setMaxNumberOfDisplayed(maxItems);
@@ -375,7 +379,6 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	 */
 	private void notifyManagedBeanOfBaseFolderPath(String resourcePath) {
 		if(this.managedBeanId!=null){
-			//WFUtil.invoke(this.managedBeanId,"setResourcePath",resourcePath,String.class);
 			getManagedBean().setBaseFolderPath(resourcePath);
 		}
 	}
@@ -385,18 +388,19 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	 */
 	private void notifyManagedBeanOfDetailsViewerPath(String path) {
 		if(this.managedBeanId!=null){
-			//WFUtil.invoke(this.managedBeanId,"setDetailsViewerPath",path,String.class);
 			getManagedBean().setDetailsViewerPath(this.detailsViewerPath);
 		}
 	}
 	
-	/**
-	 * @param resourcePath
-	 */
-	private void notifyManagedBeanOfCategories(List categories) {
+	private void notifyManagedBeanOfCategories(List<String> categories) {
 		if(this.managedBeanId!=null){
-			//WFUtil.invoke(this.managedBeanId,"setCategories",categoriesList,List.class);
 			getManagedBean().setCategories(categories);
+		}
+	}
+	
+	private void notifyManagedBeanOfViewerIdentifier(String identifier) {
+		if (this.managedBeanId != null) {
+			getManagedBean().setViewerIdentifier(identifier);
 		}
 	}
 
@@ -438,7 +442,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	/**
 	 * @return Returns the categoriesList.
 	 */
-	public List getCategoriesList() {
+	public List<String> getCategoriesList() {
 		return this.categoriesList;
 	}
 	/**
@@ -532,17 +536,30 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		else{
 			buf.append("view");
 		}
+		
+		//	Categories
 		String categories = this.getCategories();
 		if(categories!=null){
 			buf.append(UIComponentCacher.UNDERSCORE);
 			buf.append(categories);
 		}
+		
+		//	Viewer identifier
+		String viewerIdentifier = getArticleItemViewerFilter();
+		if (viewerIdentifier != null) {
+			buf.append(UIComponentCacher.UNDERSCORE);
+			buf.append(viewerIdentifier);
+		}
+		
+		//	Number of max items
 		buf.append(UIComponentCacher.UNDERSCORE);
 		buf.append(this.maxNumberOfDisplayed);
+		
 		if(this.detailsViewerPath!=null){
 			buf.append(UIComponentCacher.UNDERSCORE);
 			buf.append(this.detailsViewerPath);
 		}
+		
 		if(this._columnClasses!=null){
 			buf.append(UIComponentCacher.UNDERSCORE);
 			buf.append(this._columnClasses);
@@ -563,6 +580,12 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 			buf.append(UIComponentCacher.UNDERSCORE);
 			buf.append(this.resourcePath);
 		}
+		
+		//	Resource path set in request?
+		String resourcePathFromRequest = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
+		if (resourcePathFromRequest != null) {
+			buf.append(UIComponentCacher.UNDERSCORE).append(resourcePathFromRequest);
+		}
 		return buf.toString();
 	}
 	
@@ -575,5 +598,25 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		if (category != null) { // Just to be sure not overriding (maybe) existing category
 			setCategories(category);
 		}
+	}
+	
+	private void setViewerIdentifier(FacesContext context) {
+		if (context == null) {
+			return;
+		}
+		HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+		String identifier = request.getParameter(ContentConstants.CONTENT_ITEM_VIEWER_IDENTIFIER_PARAMETER);
+		if (identifier != null) {
+			setArticleItemViewerFilter(identifier);
+		}
+	}
+
+	public String getArticleItemViewerFilter() {
+		return articleItemViewerFilter;
+	}
+
+	public void setArticleItemViewerFilter(String articleItemViewerFilter) {
+		this.articleItemViewerFilter = articleItemViewerFilter;
+		notifyManagedBeanOfViewerIdentifier(articleItemViewerFilter);
 	}
 }

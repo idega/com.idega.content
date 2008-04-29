@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.32 2008/04/26 01:00:34 valdas Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.33 2008/04/29 09:19:43 valdas Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -37,10 +37,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2008/04/26 01:00:34 $ by $Author: valdas $
+ * Last modified: $Date: 2008/04/29 09:19:43 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.32 $
+ * @version $Revision: 1.33 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -69,11 +69,14 @@ public class ContentItemViewer extends WFContainer {
 	 * instance currently renders
 	 */
 	private String resourcePath = null;
-	private boolean showRequestedItem = true;
-	private Boolean renderDetailsCommand = null;
-	private ContentItem contentItemCach = null;
 	private String detailsViewerPath;
+	private String articleItemViewerFilter = null;
+	
+	private boolean showRequestedItem = true;
 	private boolean autoCreateResource=true;
+	private Boolean renderDetailsCommand = null;
+
+	private ContentItem contentItemCach = null;
 	
 	public ContentItemViewer() {
 		super();
@@ -164,15 +167,18 @@ public class ContentItemViewer extends WFContainer {
 	}
 
 	protected UIComponent getFieldViewerPrefixComponent(String fieldName) {
-		return getFieldViewer(fieldName).getPrefixComponent();
+		ContentItemFieldViewer comp = getFieldViewer(fieldName);
+		return comp == null ? null : comp.getPrefixComponent();
 	}
 
 	protected UIComponent getFieldViewerComponent(String fieldName) {
-		return getFieldViewer(fieldName).getMainComponent();
+		ContentItemFieldViewer comp = getFieldViewer(fieldName);
+		return comp == null ? null : comp.getMainComponent();
 	}
 
 	protected UIComponent getFieldViewerSuffixComponent(String fieldName) {
-		return getFieldViewer(fieldName).getSuffixComponent();
+		ContentItemFieldViewer comp = getFieldViewer(fieldName);
+		return comp == null ? null : comp.getSuffixComponent();
 	}
 
 	public String getFacetName(String fieldName) {
@@ -404,19 +410,6 @@ public class ContentItemViewer extends WFContainer {
 
 	@Override
 	public boolean isRendered() {
-		/*ContentItem item = getContentItem();
-		if (item != null) {
-			if(isAutoCreateResource()){
-				return true;
-			}
-			else{
-				Boolean renderd = item.getRendered();
-				if (renderd != null) {
-					return renderd.booleanValue();
-				}
-			}
-		}
-		return super.isRendered();*/
 		return true;
 	}
 
@@ -446,62 +439,34 @@ public class ContentItemViewer extends WFContainer {
 	 */
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
-		
 		UIComponentCacher cacher = getCacher(context);
-		/*if(cacher.existsInCache(this,context)){
-			// do nothing:
+		
+		if (this.showRequestedItem) {
+			IWContext iwc = IWContext.getIWContext(context);
+			String paramResourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
+			if(paramResourcePath!=null){
+				setResourcePath(paramResourcePath);
+			}
 		}
-		else{
-			if(cacher.isCacheEnbled(this,context)){
-				cacher.beginCache(this,context);
-			}*/
-			if (this.showRequestedItem) {
-				IWContext iwc = IWContext.getIWContext(context);
-				String paramResourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
-				if(paramResourcePath!=null){
-					setResourcePath(paramResourcePath);
-				}
-			}
-			
-			
-			super.encodeBegin(context);
-			if(cacher.isCacheEnbled(this,context)){
-				if(!cacher.existsInCache(this,context)){
-					updateValues();
-				}
-			}
-			else{
+		
+		super.encodeBegin(context);
+		if(cacher.isCacheEnbled(this,context)){
+			if(!cacher.existsInCache(this,context)){
 				updateValues();
 			}
-			
-		/*}*/
-		
+		}
+		else{
+			updateValues();
+		}
 	}
 
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
-		/*UIComponentCacher cacher = getCacher(context);
-		if(cacher.existsInCache(this,context)){
-			//do nothing
-		}
-		else{
-			super.encodeChildren(context);
-		}*/
 		super.encodeChildren(context);
 	}
 	
 	@Override
 	public void encodeEnd(FacesContext context) throws IOException {
-		/*UIComponentCacher cacher = getCacher(context);
-		if(cacher.existsInCache(this,context)){
-			cacher.encodeCached(this,context);
-		}
-		else{
-			super.encodeEnd(context);
-			if(cacher.isCacheEnbled(this,context)){
-				cacher.endCache(this,context);
-			}
-		}*/
 		super.encodeEnd(context);
 	}
 
@@ -702,8 +667,11 @@ public class ContentItemViewer extends WFContainer {
 					UIParameter parameter = (UIParameter) component;
 					if (ContentViewer.PARAMETER_CONTENT_RESOURCE.equals(parameter.getName())) {
 						parameter.setValue(getResourcePath());
-						updated = true;
 					}
+					else if (ContentConstants.CONTENT_ITEM_VIEWER_IDENTIFIER_PARAMETER.equals(parameter.getName())) {
+						parameter.setValue(getArticleItemViewerFilter());
+					}
+					updated = true;
 				}
 			}
 			if (!updated) {
@@ -711,6 +679,14 @@ public class ContentItemViewer extends WFContainer {
 				parameter.setName(ContentViewer.PARAMETER_CONTENT_RESOURCE);
 				parameter.setValue(getResourcePath());
 				childrens.add(parameter);
+				
+				String viewerIdentifier = getArticleItemViewerFilter();
+				if (viewerIdentifier != null && !CoreConstants.EMPTY.equals(viewerIdentifier)) {
+					UIParameter par = new UIParameter();
+					par.setName(ContentConstants.CONTENT_ITEM_VIEWER_IDENTIFIER_PARAMETER);
+					par.setValue(viewerIdentifier);
+					childrens.add(par);
+				}
 			}
 		}
 	}
@@ -753,7 +729,7 @@ public class ContentItemViewer extends WFContainer {
 	 */
 	@Override
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[10];
+		Object values[] = new Object[11];
 		values[0] = super.saveState(ctx);
 		values[1] = this.fieldPrefixValueMap;
 		values[2] = this.fieldLocalValueMap;
@@ -764,6 +740,7 @@ public class ContentItemViewer extends WFContainer {
 		values[7] = this.resourcePath;
 		values[8] = this.detailsViewerPath;
 		values[9] = Boolean.valueOf(this.autoCreateResource);
+		values[10] = this.articleItemViewerFilter;
 		return values;
 	}
 
@@ -784,6 +761,7 @@ public class ContentItemViewer extends WFContainer {
 		this.resourcePath = (String) values[7];
 		this.detailsViewerPath=(String)values[8];
 		this.autoCreateResource=((Boolean)values[9]).booleanValue();
+		this.articleItemViewerFilter = values[10] == null ? null : String.valueOf(values[10]);
 	}
 
 	public String getPrefixStyleClass() {
@@ -888,7 +866,7 @@ public class ContentItemViewer extends WFContainer {
 		}
 		if (this.showRequestedItem) {
 			String resourceUrl = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
-			if(resourceUrl!=null){//&&showRequestedItem){
+			if (resourceUrl != null) {
 				state.append(resourceUrl);
 			}
 		}
@@ -898,7 +876,18 @@ public class ContentItemViewer extends WFContainer {
 		if (this.resourcePath!=null) {
 			state.append(this.resourcePath);
 		}
+		if (articleItemViewerFilter != null) {
+			state.append(articleItemViewerFilter);
+		}
 		return state.toString();
+	}
+
+	public String getArticleItemViewerFilter() {
+		return articleItemViewerFilter;
+	}
+
+	public void setArticleItemViewerFilter(String articleItemViewerFilter) {
+		this.articleItemViewerFilter = articleItemViewerFilter;
 	}
 
 }

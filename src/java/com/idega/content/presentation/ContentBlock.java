@@ -3,11 +3,14 @@ package com.idega.content.presentation;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Iterator;
+
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
+
 import org.apache.commons.httpclient.HttpException;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentUtil;
@@ -49,7 +52,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 	}
 
 	public void refreshList() {
-		WFUtil.invoke("WebDAVListBean","refresh", this, UIComponent.class);
+		WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "refresh", this, UIComponent.class);
 	}
 
 	public WebdavExtendedResource getWebdavExentededResource(String path) {
@@ -91,8 +94,8 @@ public abstract class ContentBlock extends IWBaseComponent {
 			if (resource != null) {
 				parentPath = resource.getParentPath().replaceFirst(getIWSlideSession().getWebdavServerURI(), "");
 			}
-			WFUtil.invoke("WebDAVListBean", "setWebDAVPath", parentPath, String.class);
-			WFUtil.invoke("WebDAVListBean","setClickedFilePath", null, String.class);
+			WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setWebDAVPath", parentPath, String.class);
+			WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setClickedFilePath", null, String.class);
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();

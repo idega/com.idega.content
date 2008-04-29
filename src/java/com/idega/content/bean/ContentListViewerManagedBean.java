@@ -1,5 +1,5 @@
 /*
- * $Id: ContentListViewerManagedBean.java,v 1.6 2006/10/12 12:46:55 gediminas Exp $
+ * $Id: ContentListViewerManagedBean.java,v 1.7 2008/04/29 09:19:44 valdas Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -10,16 +10,17 @@
 package com.idega.content.bean;
 
 import java.util.List;
+
 import com.idega.content.presentation.ContentItemViewer;
 
 
 
 /**
  * 
- *  Last modified: $Date: 2006/10/12 12:46:55 $ by $Author: gediminas $
+ *  Last modified: $Date: 2008/04/29 09:19:44 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public interface ContentListViewerManagedBean {
 	/**
@@ -37,7 +38,8 @@ public interface ContentListViewerManagedBean {
 	public void setBaseFolderPath(String path);
 	public String getBaseFolderPath();
 	public void setDetailsViewerPath(String path);
-	public void setCategories(List categories);
+	public void setCategories(List<String> categories);
+	public void setViewerIdentifier(String viewerIdentifier);
 	
 	/**
 	 * 

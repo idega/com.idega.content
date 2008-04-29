@@ -66,4 +66,6 @@ public class ContentConstants {
 	public static final String SET_PAGE_LOCKED_IN_LUCID_CODE = "setPageLocked";
 	
 	public static final String ARTICLE_CATEGORIES_VIEWER_BLOCK_CACHE_KEY = "articleCategoriesViewerBlockCacheKey";
+	
+	public static final String CONTENT_ITEM_VIEWER_IDENTIFIER_PARAMETER = "contentItemViewerIdentifier";
 }
