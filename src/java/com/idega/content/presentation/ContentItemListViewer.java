@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.26 2008/04/29 09:19:43 valdas Exp $
+ * $Id: ContentItemListViewer.java,v 1.27 2008/04/29 09:51:17 valdas Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -27,19 +27,21 @@ import com.idega.content.bean.ContentListViewerManagedBean;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.business.categories.CategoryBean;
+import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.cache.CacheableUIComponent;
 import com.idega.core.cache.UIComponentCacher;
 import com.idega.presentation.IWContext;
+import com.idega.user.data.User;
 import com.idega.webface.WFUtil;
 import com.idega.webface.model.WFDataModel;
 
 
 /**
  * 
- * Last modified: $Date: 2008/04/29 09:19:43 $ by $Author: valdas $
+ * Last modified: $Date: 2008/04/29 09:51:17 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.26 $
+ * @version $Revision: 1.27 $
  */
 public class ContentItemListViewer extends UIData implements CacheableUIComponent {
 
@@ -586,6 +588,15 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		if (resourcePathFromRequest != null) {
 			buf.append(UIComponentCacher.UNDERSCORE).append(resourcePathFromRequest);
 		}
+		
+		User currentUser = null;
+		try {
+			currentUser = iwc.getCurrentUser();
+		} catch(NotLoggedOnException e) {}
+		if (currentUser != null) {
+			buf.append(UIComponentCacher.UNDERSCORE).append(currentUser.getId());	//	Will help to have cached lists by users' rights
+		}
+		
 		return buf.toString();
 	}
 	
