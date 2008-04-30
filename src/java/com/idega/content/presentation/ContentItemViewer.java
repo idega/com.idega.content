@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewer.java,v 1.33 2008/04/29 09:19:43 valdas Exp $ Created
+ * $Id: ContentItemViewer.java,v 1.34 2008/04/30 14:31:03 valdas Exp $ Created
  * on 26.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -37,10 +37,10 @@ import com.idega.webface.WFUtil;
 
 /**
  * 
- * Last modified: $Date: 2008/04/29 09:19:43 $ by $Author: valdas $
+ * Last modified: $Date: 2008/04/30 14:31:03 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.33 $
+ * @version $Revision: 1.34 $
  */
 public class ContentItemViewer extends WFContainer {
 
@@ -59,11 +59,6 @@ public class ContentItemViewer extends WFContainer {
 	public static final String FACET_JAVA_SCRIPT = "content_item_java_script";
 	public static final String FACET_STYLE_SHEET = "content_item_style_sheet";
 	
-	/*
-	 * The field requestedResourcePath is used to store the path that is
-	 * requested by a http request
-	 */
-	//private String requestedResourcePath = null;
 	/*
 	 * The field resourcePath is used to store the path to the resource this
 	 * instance currently renders
@@ -291,7 +286,8 @@ public class ContentItemViewer extends WFContainer {
 		div.setValueComponent(output);
 		getFacets().put(getFacetName(fieldName), div);
 	}
-/**
+
+	/**
 	 * <p>
 	 * TODO tryggvil describe method getValueBindingComponent
 	 * </p>
@@ -308,7 +304,6 @@ public class ContentItemViewer extends WFContainer {
 			return output;
 		}
 	}
-
 
 	/**
 	 * 
@@ -348,7 +343,7 @@ public class ContentItemViewer extends WFContainer {
 	 * @return
 	 */
 	protected String getViwerFacetStyleClassPrefix() {
-		return "";
+		return CoreConstants.EMPTY;
 	}
 
 	/**
@@ -420,15 +415,6 @@ public class ContentItemViewer extends WFContainer {
 	 */
 	@Override
 	public void decode(FacesContext context) {
-		// TODO USE DECODE RATHER THAN ENCODEBEGIN! not working because->NEVER
-		// CALLED!
-		if (this.showRequestedItem) {
-			IWContext iwc = IWContext.getIWContext(context);
-			String paramResourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
-			if (paramResourcePath != null) {
-				setResourcePath(paramResourcePath);
-			}
-		}
 		updateValues();
 	}
 
@@ -440,14 +426,6 @@ public class ContentItemViewer extends WFContainer {
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
 		UIComponentCacher cacher = getCacher(context);
-		
-		if (this.showRequestedItem) {
-			IWContext iwc = IWContext.getIWContext(context);
-			String paramResourcePath = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
-			if(paramResourcePath!=null){
-				setResourcePath(paramResourcePath);
-			}
-		}
 		
 		super.encodeBegin(context);
 		if(cacher.isCacheEnbled(this,context)){
@@ -543,13 +521,7 @@ public class ContentItemViewer extends WFContainer {
 	@Override
 	public void processDecodes(FacesContext context) {
 		super.processDecodes(context);
-		// if(showRequestedItem){
-		// IWContext iwc = IWContext.getIWContext(context);
-		// String resourcePath = iwc.getParameter(PARAMETER_CONTENT_RESOURCE);
-		// if(resourcePath!=null){
-		// requestedResourcePath = resourcePath;
-		// }
-		// }
+
 		ContentItem item = getContentItem();
 		if (item != null) {
 			String attr[] = getViewerFieldNames();
@@ -714,12 +686,10 @@ public class ContentItemViewer extends WFContainer {
 	}
 
 	public void setToolbar(ContentItemToolbar toolbar) {
-		// setViewerFacet(FACET_TOOLBAR, toolbar);
 		getFacets().put(FACET_TOOLBAR, toolbar);
 	}
 
 	public ContentItemToolbar getToolbar() {
-		// ContentItemToolbar bar = getViewerFacet(FACET_TOOLBAR);
 		ContentItemToolbar bar = (ContentItemToolbar) getFacets().get(FACET_TOOLBAR);
 		return bar;
 	}

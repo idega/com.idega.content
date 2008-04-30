@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.28 2008/04/29 10:59:48 valdas Exp $
+ * $Id: ContentItemListViewer.java,v 1.29 2008/04/30 14:31:04 valdas Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -11,7 +11,6 @@ package com.idega.content.presentation;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.StringTokenizer;
@@ -38,10 +37,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- * Last modified: $Date: 2008/04/29 10:59:48 $ by $Author: valdas $
+ * Last modified: $Date: 2008/04/30 14:31:04 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.29 $
  */
 public class ContentItemListViewer extends UIData implements CacheableUIComponent {
 
@@ -208,8 +207,10 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	public void encodeBegin(FacesContext context) throws IOException{
 		UIComponentCacher cacher = getCacher(context);
 		setItemCategoryFromRequest(context);
-		setViewerIdentifier(context);
 		
+		if (getArticleItemViewerFilter() == null) {
+			setArticleItemViewerFilter(this.getId());
+		}
 		if(cacher.existsInCache(this,context)){
 			// do nothing:
 		}
@@ -471,19 +472,18 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	}
 	
 	public String getCategories() {
-		if(this.categoriesList!=null){
-			Iterator iter = this.categoriesList.iterator();
-			if(iter.hasNext()){
-				StringBuffer catString = new StringBuffer();
-				catString.append(iter.next());
-				while(iter.hasNext()){
-					catString.append(CategoryBean.CATEGORY_DELIMETER);
-					catString.append(iter.next());
-				}
-				return catString.toString();
+		if (this.categoriesList == null || this.categoriesList.isEmpty()) {
+			return null;
+		}
+		
+		StringBuffer catString = new StringBuffer();
+		for (int i = 0; i < this.categoriesList.size(); i++) {
+			catString.append(this.categoriesList.get(i));
+			if ((i + 1) < this.categoriesList.size()) {
+				catString.append(CategoryBean.CATEGORY_DELIMETER);
 			}
 		}
-		return null;
+		return catString.toString();
 	}
 	
 	
@@ -592,6 +592,12 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 			buf.append(UIComponentCacher.UNDERSCORE).append(resourcePathFromRequest);
 		}
 		
+		//	Identifier set in request?
+		String identifierFromRequest = iwc.getParameter(ContentConstants.CONTENT_ITEM_VIEWER_IDENTIFIER_PARAMETER);
+		if (identifierFromRequest != null) {
+			buf.append(UIComponentCacher.UNDERSCORE).append(identifierFromRequest);
+		}
+		
 		User currentUser = null;
 		try {
 			currentUser = iwc.getCurrentUser();
@@ -611,17 +617,6 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		String category = request.getParameter(ITEMS_CATEGORY_VIEW);
 		if (category != null) { // Just to be sure not overriding (maybe) existing category
 			setCategories(category);
-		}
-	}
-	
-	private void setViewerIdentifier(FacesContext context) {
-		if (context == null) {
-			return;
-		}
-		HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-		String identifier = request.getParameter(ContentConstants.CONTENT_ITEM_VIEWER_IDENTIFIER_PARAMETER);
-		if (identifier != null) {
-			setArticleItemViewerFilter(identifier);
 		}
 	}
 
