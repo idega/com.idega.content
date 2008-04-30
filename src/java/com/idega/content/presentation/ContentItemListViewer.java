@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemListViewer.java,v 1.29 2008/04/30 14:31:04 valdas Exp $
+ * $Id: ContentItemListViewer.java,v 1.30 2008/04/30 16:08:41 valdas Exp $
  * Created on 27.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -37,10 +37,10 @@ import com.idega.webface.model.WFDataModel;
 
 /**
  * 
- * Last modified: $Date: 2008/04/30 14:31:04 $ by $Author: valdas $
+ * Last modified: $Date: 2008/04/30 16:08:41 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.29 $
+ * @version $Revision: 1.30 $
  */
 public class ContentItemListViewer extends UIData implements CacheableUIComponent {
 
@@ -208,8 +208,10 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		UIComponentCacher cacher = getCacher(context);
 		setItemCategoryFromRequest(context);
 		
-		if (getArticleItemViewerFilter() == null) {
-			setArticleItemViewerFilter(this.getId());
+		if (!showAllItems) {
+			if (getArticleItemViewerFilter() == null) {
+				setArticleItemViewerFilter(this.getId());
+			}
 		}
 		if(cacher.existsInCache(this,context)){
 			// do nothing:
