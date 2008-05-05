@@ -34,7 +34,6 @@ public class ContentFileUploadServlet extends HttpServlet {
 	private static final long serialVersionUID = -6282517406996613536L;	
 	private static final long MAX_UPLOAD_SIZE = 1024 * 1024 * 1024;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ServletRequestContext src = new ServletRequestContext(request);
