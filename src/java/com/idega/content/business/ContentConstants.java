@@ -69,4 +69,8 @@ public class ContentConstants {
 	public static final String ARTICLE_CATEGORIES_VIEWER_BLOCK_CACHE_KEY = "articleCategoriesViewerBlockCacheKey";
 	
 	public static final String CONTENT_ITEM_VIEWER_IDENTIFIER_PARAMETER = "contentItemViewerIdentifier";
+	
+	public static final String FACET_NAME_FOR_CONTENT_ITEMS_LIST_BACK_BUTTON = "contentItemsListBackButton";
+	
+	public static final String BASIC_THEMES_ADDED_PROPERTY = "basicThemesAdded";
 }
