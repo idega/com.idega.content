@@ -36,7 +36,6 @@ import javax.ejb.FinderException;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpURL;
 import org.apache.commons.httpclient.URIException;
-import org.htmlcleaner.HtmlCleaner;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -168,21 +167,11 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public ThemeChanger getThemeChanger() {
-		Object o = WFUtil.getBeanInstance("themeChanger");
-		if (o instanceof ThemeChanger) {
-			return (ThemeChanger) o;
-		}
-		
-		return null;
+		return SpringBeanLookup.getInstance().getSpringBean(IWMainApplication.getDefaultIWApplicationContext(), ThemeChanger.class);
 	}
 	
 	public ThemesPropertiesExtractor getThemesPropertiesExtractor() {
-		Object o = WFUtil.getBeanInstance("themesPropertiesExtractor");
-		if (o instanceof ThemesPropertiesExtractor) {
-			return (ThemesPropertiesExtractor) o;
-		}
-		
-		return null;
+		return SpringBeanLookup.getInstance().getSpringBean(IWMainApplication.getDefaultIWApplicationContext(), ThemesPropertiesExtractor.class);
 	}
 	
 	protected IWSlideService getSlideService() {
@@ -263,6 +252,7 @@ public class ThemesHelper implements Singleton {
 		return loadedResults;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<SearchResult> search(String searchKey, String searchScope) {
 		if (searchKey == null || searchScope == null) {
 			return null;
@@ -559,19 +549,7 @@ public class ThemesHelper implements Singleton {
 		InputStream stream = getInputStream(url, useLog);
 		
 		if (stream != null && cleanWithHtmlCleaner) {
-			HtmlCleaner cleaner = new HtmlCleaner(stream);
-			cleaner.setOmitDoctypeDeclaration(false);
-			cleaner.setOmitComments(true);
-			String content = null;
-			try {
-				cleaner.clean();
-				content = cleaner.getPrettyXmlAsString();
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			} finally {
-				closeInputStream(stream);
-			}
+			String content = getThemesService().getBuilderService().getCleanedHtmlContent(stream, false, false, true);
 			if (content == null) {
 				return null;
 			}
@@ -697,6 +675,7 @@ public class ThemesHelper implements Singleton {
 		loadedPageSettings = true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void loadSettings(Map <String, Setting> settings, Document doc) {
 		if (doc == null) {
 			return;
@@ -768,7 +747,7 @@ public class ThemesHelper implements Singleton {
 		return getInputStream(link, false);
 	}
 	
-	protected boolean closeInputStream(InputStream is) {
+	public boolean closeInputStream(InputStream is) {
 		if (is == null) {
 			return true;
 		}
@@ -1130,9 +1109,9 @@ public class ThemesHelper implements Singleton {
 		themeQueue.remove(linkToBase);
 	}
 	
-	public ThemesEngine getThemesEngine(IWContext iwc) {
+	public ThemesEngine getThemesEngine(IWApplicationContext iwac) {
 		if (themesEngine == null) {
-			themesEngine = SpringBeanLookup.getInstance().getSpringBean(iwc, ThemesEngine.class);
+			themesEngine = SpringBeanLookup.getInstance().getSpringBean(iwac, ThemesEngine.class);
 		}
 		return themesEngine;
 	}
@@ -1238,6 +1217,7 @@ public class ThemesHelper implements Singleton {
 		return doc;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private List<Element> getArticleViewerElements(Document doc) {
 		if (doc == null) {
 			return null;
@@ -1269,6 +1249,7 @@ public class ThemesHelper implements Singleton {
 		return articleViewers;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Attribute getArticleViewerResourcePathValueAttribute(Element articleViewer) {
 		if (articleViewer == null) {
 			return null;
@@ -1570,6 +1551,7 @@ public class ThemesHelper implements Singleton {
 		return uri.toString();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean addIDsToModules(Element root, int pageID) {
 		if (root == null || pageID < 0) {
 			return false;
