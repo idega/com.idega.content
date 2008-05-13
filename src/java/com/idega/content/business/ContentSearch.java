@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.39 2008/04/24 21:41:50 laddi Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.40 2008/05/13 12:37:59 valdas Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -69,11 +69,12 @@ import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
+import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2008/04/24 21:41:50 $ by $Author: laddi $ This class
+ * Last modified: $Date: 2008/05/13 12:37:59 $ by $Author: valdas $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -83,7 +84,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.39 $
+ * @version $Revision: 1.40 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -242,16 +243,18 @@ public class ContentSearch extends Object implements SearchPlugin{
 		searcher.setSearchType(SEARCH_TYPE);
 		searcher.setSearchQuery(searchQuery);
 		try {
-			
 			Credentials hostCredentials = null;
 			IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(),IWSlideService.class);
 					
-			if(isUsingRootAccessForSearch()){
+			if (isUsingRootAccessForSearch()) {
 				hostCredentials = service.getRootUserCredentials();
 			}
-			else{
-				IWSlideSession session = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
-				hostCredentials = session.getUserCredentials();
+			else {
+				IWContext iwc = CoreUtil.getIWContext();
+				if (iwc != null) {
+					IWSlideSession session = (IWSlideSession) IBOLookup.getSessionInstance(iwc, IWSlideSession.class);
+					hostCredentials = session.getUserCredentials();
+				}
 			}
 			
 			String servletMapping = service.getWebdavServerURI();
@@ -307,6 +310,9 @@ public class ContentSearch extends Object implements SearchPlugin{
 			e.printStackTrace();
 		}
 		catch (IOException e) {
+			e.printStackTrace();
+		}
+		catch(NullPointerException e) {
 			e.printStackTrace();
 		}
 		return searcher;
