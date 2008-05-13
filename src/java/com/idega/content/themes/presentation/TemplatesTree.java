@@ -1,12 +1,15 @@
 package com.idega.content.themes.presentation;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 import com.idega.content.business.ContentConstants;
 import com.idega.core.builder.business.BuilderService;
+import com.idega.core.business.ICTreeNodeComparator;
 import com.idega.core.data.ICTreeNode;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
@@ -24,6 +27,7 @@ import com.idega.util.CoreConstants;
 
 public class TemplatesTree extends Block {
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void main(IWContext iwc) {
 		Layer container = new Layer();
@@ -46,7 +50,7 @@ public class TemplatesTree extends Block {
 		}
 		
 		Collection topLevelTemplates = builder.getTopLevelTemplates(iwc);
-		if (topLevelTemplates == null || topLevelTemplates.size() == 0) {
+		if (topLevelTemplates == null || topLevelTemplates.isEmpty()) {
 			container.add(new Heading4(iwrb.getLocalizedString("there_are_no_templates", "There are no templates in system")));
 			return;
 		}
@@ -66,50 +70,48 @@ public class TemplatesTree extends Block {
 		buttons.add(createTemplate);
 	}
 	
-	private void addTemplatesToTree(Lists tree, Collection templates, Locale l, IWBundle iwb) {
+	@SuppressWarnings("unchecked")
+	private void addTemplatesToTree(Lists tree, Collection<ICTreeNode> templates, Locale l, IWBundle iwb) {
 		if (templates == null || templates.size() == 0) {
 			return;
 		}
 		
-		Object o = null;
-		ICTreeNode template = null;
+		List<ICTreeNode> topTemplates = new ArrayList<ICTreeNode>(templates);
+		Collections.sort(topTemplates, new ICTreeNodeComparator(l));
+		
 		String name = null;
 		Collection templateChildren = null;
-		for (Iterator it = templates.iterator(); it.hasNext();) {
-			o = it.next();
+		String imageUri = iwb.getVirtualPathWithFileNameString("images/template.png");
+		String folderImageUri = iwb.getVirtualPathWithFileNameString("images/folder_template.png");
+		for (ICTreeNode template: topTemplates) {
+			name = null;
+			templateChildren = null;
 			
-			if (o instanceof ICTreeNode) {
-				name = null;
-				templateChildren = null;
+			name = template.getNodeName(l);
+			if (name == null || CoreConstants.EMPTY.equals(name)) {
+				name = template.getNodeName();
+			}
+			
+			ListItem item = new ListItem();
+			
+			Image icon = new Image(imageUri);
+			item.add(icon);
+			
+			Link templateName = new Link(name);
+			templateName.setURL("javascript:void(0);");
+			templateName.setStyleClass("templateNameInLucidTemplatesTreeStyle");
+			templateName.setMarkupAttribute("templateid", template.getId());
+			item.add(templateName);
+			tree.add(item);
+			
+			templateChildren = template.getChildren();
+			if (templateChildren != null && templateChildren.size() > 0) {
+				icon.setURL(folderImageUri);
 				
-				template = (ICTreeNode) o;
+				Lists newTree = new Lists();
+				item.add(newTree);
 				
-				name = template.getNodeName(l);
-				if (name == null || CoreConstants.EMPTY.equals(name)) {
-					name = template.getNodeName();
-				}
-				
-				ListItem item = new ListItem();
-				String imageUri = iwb.getVirtualPathWithFileNameString("images/template.png");
-				Image icon = new Image(imageUri);
-				item.add(icon);
-				
-				Link templateName = new Link(name);
-				templateName.setURL("javascript:void(0);");
-				templateName.setStyleClass("templateNameInLucidTemplatesTreeStyle");
-				templateName.setMarkupAttribute("templateid", template.getId());
-				item.add(templateName);
-				tree.add(item);
-				
-				templateChildren = template.getChildren();
-				if (templateChildren != null && templateChildren.size() > 0) {
-					icon.setURL(iwb.getVirtualPathWithFileNameString("images/folder_template.png"));
-					
-					Lists newTree = new Lists();
-					item.add(newTree);
-					
-					addTemplatesToTree(newTree, templateChildren, l, iwb);
-				}
+				addTemplatesToTree(newTree, templateChildren, l, iwb);
 			}
 		}
 	}
