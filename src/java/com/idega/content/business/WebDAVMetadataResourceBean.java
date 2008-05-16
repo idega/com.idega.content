@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadataResourceBean.java,v 1.14 2007/09/25 12:02:50 valdas Exp $
+ * $Id: WebDAVMetadataResourceBean.java,v 1.15 2008/05/16 14:58:43 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -15,8 +15,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.PropertyName;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOSessionBean;
 import com.idega.content.business.categories.CategoryBean;
@@ -25,19 +29,21 @@ import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavRootResource;
+import com.idega.util.CoreUtil;
 
 
 /**
  * A resource bean that holds metadata info for the selected resouce
  * 
- * Last modified: $Date: 2007/09/25 12:02:50 $ by $Author: valdas $
+ * Last modified: $Date: 2008/05/16 14:58:43 $ by $Author: valdas $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
-public class WebDAVMetadataResourceBean extends IBOSessionBean 
-implements WebDAVMetadataResource
-{
+public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAVMetadataResource {
+
+	private static final long serialVersionUID = -4731482043715283036L;
+	
 	//TODO change to use a map so that many metadata blocks can be displayed on one page.
 //	private Map map = new HashMap();
 	private Collection metadataBeans = null;	//Holding MetadataValueBean
@@ -87,7 +93,7 @@ implements WebDAVMetadataResource
 	 */
 	public Collection<String> getCategories(String resourcePath) throws RemoteException, IOException {
 		if(selectedCategories == null || !checkPath(resourcePath)) {
-			setSelectedCategories(resourcePath,getCategoriesFromRepository(resourcePath));
+			setSelectedCategories(resourcePath, getCategoriesFromRepository(resourcePath));
 		}
 		return this.selectedCategories;
 	}
@@ -154,23 +160,24 @@ implements WebDAVMetadataResource
 	 * @throws IOException
 	 */
 	protected Collection<String> getCategoriesFromRepository(String resourcePath) throws RemoteException, IOException {
-		//selectedCategories = new ArrayList();
-	
-		IWContext iwc = IWContext.getInstance();
-		IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-		IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
-
-		WebdavRootResource rootResource = session.getWebdavRootResource();
-
-		String filePath = resourcePath;
-		String serverURI = service.getWebdavServerURI();
-		if(!resourcePath.startsWith(serverURI)) {
-			filePath = service.getURI(resourcePath);
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return null;
 		}
 		
-//		System.out.println("Getting categories for "+filePath);
+		String filePath = resourcePath;
 		try {
-			Enumeration enumerator = rootResource.propfindMethod(filePath,new PropertyName("DAV","categories").toString());
+			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+	
+			WebdavRootResource rootResource = session.getWebdavRootResource();
+	
+			String serverURI = service.getWebdavServerURI();
+			if(!resourcePath.startsWith(serverURI)) {
+				filePath = service.getURI(resourcePath);
+			}
+		
+			Enumeration enumerator = rootResource.propfindMethod(filePath, new PropertyName("DAV","categories").toString());
 	
 			StringBuffer value = new StringBuffer();
 			while(enumerator.hasMoreElements()) {
@@ -179,8 +186,9 @@ implements WebDAVMetadataResource
 			
 			this.selectedCategories=CategoryBean.getCategoriesFromString(value.toString());
 			
-		}catch (HttpException e) {
-			System.out.println("Warning could not load categories for "+filePath);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Logger.getLogger(WebDAVMetadataResourceBean.class.getName()).log(Level.SEVERE, "Warning could not load categories for "+ filePath);
 		}
 		
 		return this.selectedCategories;
