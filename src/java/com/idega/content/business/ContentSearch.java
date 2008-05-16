@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.40 2008/05/13 12:37:59 valdas Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.41 2008/05/16 14:57:13 valdas Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -74,7 +74,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2008/05/13 12:37:59 $ by $Author: valdas $ This class
+ * Last modified: $Date: 2008/05/16 14:57:13 $ by $Author: valdas $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -84,7 +84,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.40 $
+ * @version $Revision: 1.41 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -966,7 +966,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 * @param scope from what point in Slide you want to start e.g. /files/public
 	 * @return returns a collection of SearchResult objects
 	 */
-	public Collection doSimpleDASLSearch(String searchString, String scope){
+	public Collection<SearchResult> doSimpleDASLSearch(String searchString, String scope){
 
 		Map<String, String> queryMap = new HashMap<String, String>();
 		queryMap.put("mysearchstring", searchString);
@@ -979,7 +979,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 		l.add(combinedSearch);
 		
 		Search search = createSearch(query,l);
-		Collection results = search.getSearchResults();
+		Collection<SearchResult> results = search.getSearchResults();
 		
 		return results;
 		
