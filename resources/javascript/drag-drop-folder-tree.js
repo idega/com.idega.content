@@ -1226,8 +1226,10 @@
 				var nodes = initExpandedNodes.split(',');
 			}
 			
-			document.documentElement.onmousemove = JSTreeObj.moveDragableNodes;	
-			document.documentElement.onmouseup = JSTreeObj.dropDragableNodesCopy;
+			try {
+				document.documentElement.onmousemove = JSTreeObj.moveDragableNodes;	
+				document.documentElement.onmouseup = JSTreeObj.dropDragableNodesCopy;
+			} catch(e) {}
 			
 			if (sourceTree) {
 				this.actionOnMouseUp = 'copy';
@@ -1314,9 +1316,11 @@
 			if (iconfile) {
 				folderImg.src = iconfile;
 			}
-				
-			document.documentElement.onmousemove = JSTreeObj.moveDragableNodes;
-			document.documentElement.onmouseup = JSTreeObj.dropDragableNodesCopy;
+			
+			try {
+				document.documentElement.onmousemove = JSTreeObj.moveDragableNodes;
+				document.documentElement.onmouseup = JSTreeObj.dropDragableNodesCopy;
+			} catch(e) {}
 			
 			this.actionOnMouseUp = 'move';
 		},					

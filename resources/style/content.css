@@ -1533,3 +1533,7 @@ iframe.contentItemEditorFrameStyle {
 	height: 100%;
 	padding: 0;
 }
+
+#div_id_new_page_tree {
+	overflow: auto;
+}
