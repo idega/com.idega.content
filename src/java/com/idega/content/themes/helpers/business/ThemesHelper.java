@@ -48,6 +48,7 @@ import org.xml.sax.EntityResolver;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.business.SpringBeanLookup;
 import com.idega.content.bean.ContentItemFeedBean;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentSearch;
@@ -1124,7 +1125,7 @@ public class ThemesHelper implements Singleton {
 	public ThemesEngine getThemesEngine() throws NullPointerException {
 		if (themesEngine == null) {
 			try {
-				themesEngine = (ThemesEngine) WFUtil.getBeanInstance(ThemesEngine.SPRING_BEAN_IDENTIFIER);
+				themesEngine = (ThemesEngine)SpringBeanLookup.getInstance().getSpringBean(IWMainApplication.getDefaultIWMainApplication().getServletContext(), ThemesEngine.SPRING_BEAN_IDENTIFIER);
 			} catch(Exception e) {
 				log.log(Level.SEVERE, "Exception getting ThemesEngine", e);
 				return null;
