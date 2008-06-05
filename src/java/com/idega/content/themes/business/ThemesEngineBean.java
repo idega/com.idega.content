@@ -18,6 +18,9 @@ import org.apache.webdav.lib.WebdavResource;
 import org.directwebremoting.ScriptBuffer;
 import org.directwebremoting.WebContextFactory;
 import org.jdom.Document;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.business.SpringBeanLookup;
@@ -34,6 +37,7 @@ import com.idega.content.themes.helpers.bean.TreeNodeStructure;
 import com.idega.content.themes.helpers.business.ThemeChanger;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
+import com.idega.content.themes.helpers.business.ThemesPropertiesExtractor;
 import com.idega.content.themes.presentation.PageInfo;
 import com.idega.content.themes.presentation.SiteInfo;
 import com.idega.content.themes.presentation.SiteTreeViewer;
@@ -64,13 +68,14 @@ import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.webface.WFUtil;
 
+@Scope("singleton")
+@Service(ThemesEngine.SPRING_BEAN_IDENTIFIER)
 public class ThemesEngineBean implements ThemesEngine {
 
 	private static final long serialVersionUID = 5875353284352953688L;
 	
 	private static final String PAGE_URI = "pageUri";
 	private static final String PAGE_TITLE = "pageTitle";
-	private static final String PATH_TO_IMAGE_FOLDER = ContentUtil.getBundle().getResourcesPath() + "/images/";
 	
 	private static final String ARTICLE_VIEWER_NAME = "Article Viewer";
 	private static final String ARTICLE_VIEWER_SUBTYPE = "viewer";
@@ -79,8 +84,20 @@ public class ThemesEngineBean implements ThemesEngine {
 	
 	private ThemesHelper helper = null;
 	
+	private ThemeChanger themeChanger = null;
+	private ThemesPropertiesExtractor themesPropertiesExtractor = null;
+	
+	private String pathToImagesFolder = null;
+	
 	public ThemesEngineBean() {
 		helper = ThemesHelper.getInstance(false);
+	}
+	
+	private String getPathToImagesFolder() {
+		if (pathToImagesFolder == null) {
+			pathToImagesFolder = ContentUtil.getBundle().getResourcesPath() + "/images/";
+		}
+		return pathToImagesFolder;
 	}
 
 	/**
@@ -113,7 +130,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		
 		//	Exists some themes, preparing for usage
 		try {
-			helper.getThemesPropertiesExtractor().prepareThemes(pLists, configs, false);
+			getThemesPropertiesExtractor().prepareThemes(pLists, configs, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -355,7 +372,7 @@ public class ThemesEngineBean implements ThemesEngine {
 	 */
 	public String changeTheme(String themeKey, String themeName, ThemeChange change) {
 		try {
-			return helper.getThemeChanger().changeTheme(themeKey, themeName, change);
+			return getThemeChanger().changeTheme(themeKey, themeName, change);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -368,7 +385,7 @@ public class ThemesEngineBean implements ThemesEngine {
 	 */
 	public boolean saveTheme(String themeKey, String themeName) {
 		try {
-			return helper.getThemeChanger().saveTheme(themeKey, themeName);
+			return getThemeChanger().saveTheme(themeKey, themeName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -978,7 +995,7 @@ public class ThemesEngineBean implements ThemesEngine {
 	 */
 	public boolean restoreTheme(String themeID) {
 		try {
-			return helper.getThemeChanger().restoreTheme(themeID);
+			return getThemeChanger().restoreTheme(themeID);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1557,7 +1574,7 @@ public class ThemesEngineBean implements ThemesEngine {
 	}
 	
 	public String getPathToImageFolder(){
-		return PATH_TO_IMAGE_FOLDER;
+		return getPathToImagesFolder();
 	}
 	
 	public boolean isStartPage(String pageKey) {
@@ -1796,7 +1813,7 @@ public class ThemesEngineBean implements ThemesEngine {
 	
 	public String applyMultipleChangesToTheme(String themeID, List<ThemeChange> changes, String themeName) {
 		try {
-			return helper.getThemeChanger().applyMultipleChangesToTheme(themeID, changes, themeName);
+			return getThemeChanger().applyMultipleChangesToTheme(themeID, changes, themeName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -2001,7 +2018,7 @@ public class ThemesEngineBean implements ThemesEngine {
 	}
 	
 	public String reloadThemeProperties(String themeId) {
-		ThemeChanger changer = helper.getThemeChanger();
+		ThemeChanger changer = getThemeChanger();
 		if (changer == null) {
 			return null;
 		}
@@ -2278,7 +2295,7 @@ public class ThemesEngineBean implements ThemesEngine {
 
 	public boolean setBuiltInStyle(String themeId, String builtInStyleId) {
 		/*try {
-			return helper.getThemeChanger().setBuiltInStyle(themeId, builtInStyleId);
+			return getThemeChanger().setBuiltInStyle(themeId, builtInStyleId);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -2354,5 +2371,23 @@ public class ThemesEngineBean implements ThemesEngine {
 		}
 		
 		return setValueForPage(pageKey, value, columnName);
+	}
+
+	public ThemeChanger getThemeChanger() {
+		return themeChanger;
+	}
+
+	@Autowired
+	public void setThemeChanger(ThemeChanger themeChanger) {
+		this.themeChanger = themeChanger;
+	}
+
+	public ThemesPropertiesExtractor getThemesPropertiesExtractor() {
+		return themesPropertiesExtractor;
+	}
+
+	@Autowired
+	public void setThemesPropertiesExtractor(ThemesPropertiesExtractor themesPropertiesExtractor) {
+		this.themesPropertiesExtractor = themesPropertiesExtractor;
 	}
 }

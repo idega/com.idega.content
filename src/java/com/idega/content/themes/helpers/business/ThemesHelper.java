@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ejb.FinderException;
@@ -47,7 +48,6 @@ import org.xml.sax.EntityResolver;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
-import com.idega.business.SpringBeanLookup;
 import com.idega.content.bean.ContentItemFeedBean;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentSearch;
@@ -82,6 +82,7 @@ import com.idega.util.CoreUtil;
 import com.idega.util.StringHandler;
 import com.idega.webface.WFUtil;
 
+//	TODO: make this class Spring bean
 public class ThemesHelper implements Singleton {
 	
 	private static Logger log = Logger.getLogger(ThemesHelper.class.getName());
@@ -90,8 +91,9 @@ public class ThemesHelper implements Singleton {
 	private volatile Generator generator = null;
 	private volatile IWSlideService service = null;
 	private volatile ThemesService themesService = null;
-	private volatile ThemesEngine themesEngine = null;
 	private volatile ContentItemFeedBean feedBean = null;
+	
+	private ThemesEngine themesEngine = null;
 	
 	private Map<String, Theme> themes = null;
 	private Map<String, Setting> themeSettings = null;
@@ -166,12 +168,22 @@ public class ThemesHelper implements Singleton {
 		return generator;
 	}
 	
-	public ThemeChanger getThemeChanger() {
-		return SpringBeanLookup.getInstance().getSpringBean(IWMainApplication.getDefaultIWApplicationContext(), ThemeChanger.class);
+	public ThemeChanger getThemeChanger() throws NullPointerException {
+		try {
+			return getThemesEngine().getThemeChanger();
+		} catch(Exception e) {
+			log.log(Level.SEVERE, "Error getting ThemeChanger", e);
+			return null;
+		}
 	}
 	
-	public ThemesPropertiesExtractor getThemesPropertiesExtractor() {
-		return SpringBeanLookup.getInstance().getSpringBean(IWMainApplication.getDefaultIWApplicationContext(), ThemesPropertiesExtractor.class);
+	public ThemesPropertiesExtractor getThemesPropertiesExtractor() throws NullPointerException {
+		try {
+			return getThemesEngine().getThemesPropertiesExtractor();
+		} catch(Exception e) {
+			log.log(Level.SEVERE, "Error getting ThemesPropertiesExtractor", e);
+			return null;
+		}
 	}
 	
 	protected IWSlideService getSlideService() {
@@ -1109,10 +1121,16 @@ public class ThemesHelper implements Singleton {
 		themeQueue.remove(linkToBase);
 	}
 	
-	public ThemesEngine getThemesEngine(IWApplicationContext iwac) {
+	public ThemesEngine getThemesEngine() throws NullPointerException {
 		if (themesEngine == null) {
-			themesEngine = SpringBeanLookup.getInstance().getSpringBean(iwac, ThemesEngine.class);
+			try {
+				themesEngine = (ThemesEngine) WFUtil.getBeanInstance(ThemesEngine.SPRING_BEAN_IDENTIFIER);
+			} catch(Exception e) {
+				log.log(Level.SEVERE, "Exception getting ThemesEngine", e);
+				return null;
+			}
 		}
+		
 		return themesEngine;
 	}
 
@@ -1818,7 +1836,12 @@ public class ThemesHelper implements Singleton {
 		theme.clearStyleVariationsCacheKeys();
 		
 		//	Removing rendered variations from cache
-		getThemesEngine(iwc).clearVariationFromCache(themeID, iwc);
+		try {
+			getThemesEngine().clearVariationFromCache(themeID, iwc);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 		
 		return true;
 	}

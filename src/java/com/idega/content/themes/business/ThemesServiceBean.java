@@ -198,6 +198,12 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		if (iwc == null) {
 			return false;
 		}
+		
+		ThemesEngine themesEngine = ThemesHelper.getInstance().getThemesEngine();
+		if (themesEngine == null) {
+			return false;
+		}
+		
 		int domainID = -1;
 		ICDomain domain = iwc.getDomain();
 		if (domain == null) {
@@ -211,8 +217,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		String parentId = builder.getTopLevelTemplateId(builder.getTopLevelTemplates(iwc));
 		if (parentId == null || ThemesConstants.MINUS_ONE.equals(parentId)) {
 			//	No Top Level Template
-			parentId = ThemesHelper.getInstance().getThemesEngine(iwc).createRootTemplate(domain, builder, domainID, builder.getIBXMLFormat());
-			ThemesHelper.getInstance().getThemesEngine(iwc).initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
+			parentId = themesEngine.createRootTemplate(domain, builder, domainID, builder.getIBXMLFormat());
+			themesEngine.initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
 		}
 		String name = StringHandler.removeCharacters(theme.getName(), ContentConstants.SPACE, ContentConstants.UNDER);
 		id = createIBPage(parentId, theme.getName(), builder.getTemplateKey(), null, ThemesConstants.THEMES + name +
@@ -223,7 +229,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		theme.setIBPageID(id);
 		
 		if (updatePageWebDav(theme.getIBPageID(), CoreConstants.WEBDAV_SERVLET_URI + theme.getLinkToSkeleton())) {
-			ThemesHelper.getInstance().getThemesEngine(iwc).updateSiteTemplatesTree(iwc, true);
+			themesEngine.updateSiteTemplatesTree(iwc, true);
 			return true;
 		}
 		

@@ -8,6 +8,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 
 import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.bean.Theme;
@@ -15,15 +17,21 @@ import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
 import com.idega.util.CoreConstants;
 import com.idega.util.StringHandler;
 
+@Scope("singleton")
+@Service(ThemesPropertiesExtractor.SPRING_BEAN_IDENTIFIER)
 public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor {
 
-	private ThemesHelper helper = ThemesHelper.getInstance();
+	private ThemesHelper helper = null;
 	
 	private static final String LIMITED_SELECTION = "1";
 	private static final String CSS_EXTENSION = ".css";
 	private static final String PNG_EXTENSION = ".png";
 	
 	private static final Log log = LogFactory.getLog(ThemesPropertiesExtractor.class);
+	
+	public ThemesPropertiesExtractorBean() {
+		helper = ThemesHelper.getInstance();
+	}
 	
 	public void prepareThemes(List<String> pLists, List<String> configs, boolean useThread) {
 		//	Initializing ImageGenerator
@@ -73,7 +81,12 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 	
 	private boolean prepareTheme(Theme theme, List<String> pLists, List<String> configs, boolean useThread) {
 		if (useThread) {
-			ThemePropertiesExtractor extractor = new ThemePropertiesExtractor(theme, helper.getThemesPropertiesExtractor(), pLists, configs);
+			ThemesPropertiesExtractor propExtractor = helper.getThemesPropertiesExtractor();
+			if (propExtractor == null) {
+				return false;
+			}
+			
+			ThemePropertiesExtractor extractor = new ThemePropertiesExtractor(theme, propExtractor, pLists, configs);
 			extractor.start();
 			return true;
 		}
@@ -180,6 +193,10 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		if (theme.isNewTheme()) {
 			theme.setNewTheme(true);
 			ThemeChanger changer = helper.getThemeChanger();
+			if (changer == null) {
+				markThemeAsNotPrepared(theme);
+				return false;
+			}
 			try {
 				if (!(changer.prepareThemeStyleFiles(theme))) {	//	Checking and preparing CSS files
 					markThemeAsNotPrepared(theme);
@@ -582,6 +599,9 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 	
 	private void disableAllStyles(Theme theme) {
 		ThemeChanger changer = helper.getThemeChanger();
+		if (changer == null) {
+			return;
+		}
 		
 		List <String> groupNames = theme.getStyleGroupsNames();
 		ThemeStyleGroupMember member = null;

@@ -70,7 +70,11 @@ public class SiteInfo extends Block {
 			return;
 		}
 
-		ThemesEngine engine = ThemesHelper.getInstance().getThemesEngine(iwc);
+		ThemesEngine engine = ThemesHelper.getInstance().getThemesEngine();
+		if (engine == null) {
+			return;
+		}
+		
 		ICDomain domain = iwc.getIWMainApplication().getIWApplicationContext().getDomain();
 		String keyPressAction = "return saveSiteInfoWithEnter(event)";
 		for (int i = 0; i < settings.size(); i++) {
@@ -144,7 +148,12 @@ public class SiteInfo extends Block {
 			values[i] = iwc.getParameter(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + CoreConstants.DOT +
 					REGION_VALUE);
 		}
-		ThemesHelper.getInstance().getThemesEngine(iwc).saveSiteInfo(locale, keywords, values);
+		
+		try {
+			ThemesHelper.getInstance().getThemesEngine().saveSiteInfo(locale, keywords, values);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	protected Label getLabel(String text, InterfaceObject component) {

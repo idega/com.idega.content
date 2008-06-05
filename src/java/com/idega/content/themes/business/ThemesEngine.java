@@ -6,18 +6,21 @@ import java.util.List;
 
 import org.jdom.Document;
 
-import com.idega.business.SpringBeanName;
 import com.idega.content.themes.helpers.bean.PageAccessibilityProperty;
 import com.idega.content.themes.helpers.bean.SimplifiedTheme;
 import com.idega.content.themes.helpers.bean.ThemeChange;
 import com.idega.content.themes.helpers.bean.TreeNodeStructure;
+import com.idega.content.themes.helpers.business.ThemeChanger;
+import com.idega.content.themes.helpers.business.ThemesPropertiesExtractor;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
 
-@SpringBeanName("themesEngine")
 public interface ThemesEngine {
+	
+	public static final String SPRING_BEAN_IDENTIFIER = "themesEngine";
+	
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getThemes
 	 */
@@ -227,4 +230,8 @@ public interface ThemesEngine {
 	public List<PageAccessibilityProperty> getPageAccessibilityProperties(String pageKey);
 	
 	public boolean setPageAccessibilityProperty(String pageKey, String code, String value, String columnName);
+	
+	public ThemeChanger getThemeChanger();
+	
+	public ThemesPropertiesExtractor getThemesPropertiesExtractor();
 }

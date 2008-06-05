@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collection;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Scope;
@@ -35,32 +36,39 @@ import com.idega.webface.WFUtil;
 @Service
 public class ThemesInstaller implements ApplicationListener {
 
+	private ThemesEngine themesEngine = null;
+	
 	public void onApplicationEvent(ApplicationEvent event) {
 		if (!(event instanceof IWMainSlideStartedEvent)) {
 			return;
 		}
 
 		IWMainSlideStartedEvent slideEvent = (IWMainSlideStartedEvent) event;
-		Thread themesInstaller = new Thread(new ThemesInstallerRunner(slideEvent.getIWMA()));
+		IWMainApplication iwma = slideEvent.getIWMA();
+		Thread themesInstaller = new Thread(new ThemesInstallerRunner(getThemesEngine(), iwma));
 		themesInstaller.start();
 	}
 	
 	private class ThemesInstallerRunner implements Runnable {
 		private IWMainApplication iwma = null;
+		private ThemesEngine themesEngine = null;
 		
-		private ThemesInstallerRunner(IWMainApplication iwma) {
+		private ThemesInstallerRunner(ThemesEngine themesEngine, IWMainApplication iwma) {
 			this.iwma = iwma;
+			this.themesEngine = themesEngine;
 		}
 		
 		public void run() {
 			IWMainApplicationSettings settings = iwma.getSettings();
 			if (settings == null) {
+				activateThemes();
 				return;
 			}
 			
 			String property = settings.getProperty(ContentConstants.BASIC_THEMES_ADDED_PROPERTY, Boolean.FALSE.toString());
 			boolean themesAlreadyInstalled = property != null && !property.equalsIgnoreCase(Boolean.FALSE.toString());
 			if (themesAlreadyInstalled) {
+				activateThemes();
 				return;
 			}
 			
@@ -69,6 +77,7 @@ public class ThemesInstaller implements ApplicationListener {
 			Collection<Theme> allThemes = helper.getAllThemes();
 			if (allThemes != null && !allThemes.isEmpty()) {
 				//	There some themes already - not importing basic themes
+				activateThemes();
 				return;
 			}
 		
@@ -110,6 +119,22 @@ public class ThemesInstaller implements ApplicationListener {
 				helper.closeInputStream(stream);
 			}
 		}
+		
+		private void activateThemes() {
+			if (themesEngine == null) {
+				return;
+			}
+			themesEngine.getThemes();
+		}
+	}
+
+	public ThemesEngine getThemesEngine() {
+		return themesEngine;
+	}
+
+	@Autowired
+	public void setThemesEngine(ThemesEngine themesEngine) {
+		this.themesEngine = themesEngine;
 	}
 
 }

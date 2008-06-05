@@ -2,11 +2,11 @@ package com.idega.content.themes.helpers.business;
 
 import java.util.List;
 
-import com.idega.business.SpringBeanName;
 import com.idega.content.themes.helpers.bean.Theme;
 
-@SpringBeanName("themesPropertiesExtractor")
 public interface ThemesPropertiesExtractor {
+
+	public static final String SPRING_BEAN_IDENTIFIER = "themesPropertiesExtractor";
 	
 	public boolean prepareTheme(boolean checkConfigFile, Theme theme, List<String> pLists, List<String> configs) throws Exception;
 	

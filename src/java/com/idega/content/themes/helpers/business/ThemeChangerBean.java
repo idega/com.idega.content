@@ -31,6 +31,8 @@ import org.jdom.Namespace;
 import org.jdom.Text;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 
 import bsh.Interpreter;
 
@@ -49,6 +51,8 @@ import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 
+@Scope("singleton")
+@Service(ThemeChanger.SPRING_BEAN_IDENTIFIER)
 public class ThemeChangerBean implements ThemeChanger {
 
 	private static final Log log = LogFactory.getLog(ThemeChangerBean.class);
@@ -103,7 +107,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	private String[] _unChangedCaseAttributes = new String[] {HREF, "src"};
 	private List<String> unChangedCaseAttributes = Collections.unmodifiableList(Arrays.asList(_unChangedCaseAttributes));
 	
-	private ThemesHelper helper = ThemesHelper.getInstance();
+	private ThemesHelper helper = null;
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
 	private XMLOutputter out = null;
 	private Interpreter mathInterpreter = null;
@@ -120,6 +124,8 @@ public class ThemeChangerBean implements ThemeChanger {
 		out.setFormat(Format.getPrettyFormat());
 		
 		mathInterpreter = new bsh.Interpreter();
+		
+		helper = ThemesHelper.getInstance();
 	}
 	
 	private boolean prepareHeadContent(Theme theme, String skeleton) {

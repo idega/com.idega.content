@@ -6,13 +6,13 @@ import java.util.Map;
 import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
 
-import com.idega.business.SpringBeanName;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeChange;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
 
-@SpringBeanName("themeChanger")
 public interface ThemeChanger {
+	
+	public static final String SPRING_BEAN_IDENTIFIER = "themeChanger";
 	
 	public boolean restoreTheme(String themeKey) throws Exception;
 
