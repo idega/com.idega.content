@@ -353,21 +353,18 @@
 				JSTreeObj.floatingContainer.appendChild(JSTreeObj.dragNode_source);	
 			}
 		},
-		moveDragableNodes : function(e) {			
-			var divTags = document.getElementsByTagName('div');
-			var divTag = null;
-			for (var i = 0; i < divTags.length; i++) {
-				if (divTags[i].getAttribute('class') == 'current_structure') {
-					divTag = divTags[i];
-				}
-			}
+		moveDragableNodes: function(e) {
 			try {
-				if (JSTreeObj) {
-					if (JSTreeObj.dragDropTimer < 10) {
-						return false;
-					}
+				if (JSTreeObj == null) {
+					return false;
 				}
-			} catch(ex) {}
+			} catch(e) {
+				return false;
+			}
+			
+			if (JSTreeObj.dragDropTimer < 10) {
+				return false;
+			}
 			
 			e = new Event(e);
 
@@ -1187,11 +1184,16 @@
 					input.id = menuItems[no].id + 'input';
 					addEventsToSiteTreeInput($(input.id));
 					
-					aTag.setAttribute('href', 'javascript:void(0)');	
-					if(!noDrag)aTag.onmousedown = JSTreeObj.initDrag;
-					if(!noChildren)aTag.onmousemove = JSTreeObj.moveDragableNodes;
-					if(sourceTree)aTag.onmousedown = JSTreeObj.copyDragableNode;
-					if(sourceTree)aTag.onclick = JSTreeObj.createNodeOnClick;
+					aTag.setAttribute('href', 'javascript:void(0)');
+					
+					try {
+						if(!noDrag)aTag.onmousedown = JSTreeObj.initDrag;
+						if(!noChildren)aTag.onmousemove = JSTreeObj.moveDragableNodes;
+						if(sourceTree)aTag.onmousedown = JSTreeObj.copyDragableNode;
+						if(sourceTree)aTag.onclick = JSTreeObj.createNodeOnClick;
+					} catch(e) {
+						return false;
+					}
 				}
 								
 				menuItems[no].insertBefore(img,input);
@@ -1199,13 +1201,21 @@
 				var folderImg = new Element('img');
 				folderImg.addClass('pageTreeNameIconStyle');
 				
-				if(!noDrag){
-					if(sourceTree)
-						folderImg.onmousedown = JSTreeObj.copyDragableNode;
-					else
-						folderImg.onmousedown = JSTreeObj.initDrag;
+				try {
+					if (!noDrag) {
+						if (sourceTree) {
+							folderImg.onmousedown = JSTreeObj.copyDragableNode;
+						}
+						else {
+							folderImg.onmousedown = JSTreeObj.initDrag;
+						}
+					}
+					if (!noChildren) {
+						folderImg.onmousemove = JSTreeObj.moveDragableNodes;
+					}
+				} catch(e) {
+					return false;
 				}
-				if(!noChildren)folderImg.onmousemove = JSTreeObj.moveDragableNodes;
 
 				if(iconfile){	
 					if (iconfile.toString() == '')
@@ -1227,9 +1237,11 @@
 			}
 			
 			try {
-				document.documentElement.onmousemove = JSTreeObj.moveDragableNodes;	
+				document.documentElement.onmousemove = JSTreeObj.moveDragableNodes;
 				document.documentElement.onmouseup = JSTreeObj.dropDragableNodesCopy;
-			} catch(e) {}
+			} catch(e) {
+				return false;
+			}
 			
 			if (sourceTree) {
 				this.actionOnMouseUp = 'copy';
@@ -1285,28 +1297,33 @@
 			input.id = node.id + 'input';
 			addEventsToSiteTreeInput($(input.id));
 			
-			if (!noDrag) {
-				aTag.onmousedown = JSTreeObj.initDrag;
-			}
-			if (!noChildren) {
-				aTag.onmousemove = JSTreeObj.moveDragableNodes;
-			}
-			if (sourceTree) {
-				aTag.onmousedown = JSTreeObj.copyDragableNode;
-			}	
-			
-			if (!noDrag) {
+			try {
+				if (!noDrag) {
+					aTag.onmousedown = JSTreeObj.initDrag;
+				}
+				if (!noChildren) {
+					aTag.onmousemove = JSTreeObj.moveDragableNodes;
+				}
 				if (sourceTree) {
-					folderImg.onmousedown = JSTreeObj.copyDragableNode;
+					aTag.onmousedown = JSTreeObj.copyDragableNode;
+				}	
+				
+				if (!noDrag) {
+					if (sourceTree) {
+						folderImg.onmousedown = JSTreeObj.copyDragableNode;
+					}
+					else {
+						folderImg.onmousedown = JSTreeObj.initDrag;
+					}
 				}
-				else {
-					folderImg.onmousedown = JSTreeObj.initDrag;
+				
+				if (!noChildren) {
+					folderImg.onmousemove = JSTreeObj.moveDragableNodes;
 				}
+			} catch(e) {
+				return false;
 			}
 			
-			if (!noChildren) {
-				folderImg.onmousemove = JSTreeObj.moveDragableNodes;
-			}	
 			if (node.className) {
 				folderImg.src = imageFolder + node.className;
 			}
@@ -1320,7 +1337,9 @@
 			try {
 				document.documentElement.onmousemove = JSTreeObj.moveDragableNodes;
 				document.documentElement.onmouseup = JSTreeObj.dropDragableNodesCopy;
-			} catch(e) {}
+			} catch(e) {
+				return false;
+			}
 			
 			this.actionOnMouseUp = 'move';
 		},					
