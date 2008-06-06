@@ -96,13 +96,9 @@ function getPageInfoElementsCallback(allKeywords) {
 						needReload = true;
 					}
 					else {
-						var nodeLink = null;
-						for (var j = 0; j < nodeLinks.length; j++) {
-							nodeLink = nodeLinks[j];
-							
-							nodeLink.empty();
-							nodeLink.setText(pageInfoValue);
-						}
+						var nodeLink = $(nodeLinks[0]);
+						nodeLink.empty();
+						nodeLink.setText(pageInfoValue);
 					}
 				}
 			}
