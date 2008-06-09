@@ -15,7 +15,6 @@ import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
 import com.idega.util.CoreConstants;
-import com.idega.util.StringHandler;
 
 @Scope("singleton")
 @Service(ThemesPropertiesExtractor.SPRING_BEAN_IDENTIFIER)
@@ -175,7 +174,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		String linkToConfig = null;
 		if (checkConfigFile) {
 			//	Getting theme name, which will be used to search for configuration file
-			String searchName = StringHandler.removeCharacters(theme.getName(), ContentConstants.SPACE, ContentConstants.UNDER);
+			String searchName = helper.getPreparedThemeNameToUseInRepository(theme);
 			String skeletonName = null;
 			if (theme.getLinkToSkeleton().indexOf(ThemesConstants.THEME) != -1) {
 				skeletonName = helper.decode(helper.getFileNameWithExtension(theme.getLinkToSkeleton()), true);
@@ -494,10 +493,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		String file = null;
 		String stylePath = null;
 		for (int i = 0; i < files.size(); i++) {
-			file = (files.get(i)).getText();
-			file = StringHandler.removeCharacters(file, ContentConstants.SPACE, ContentConstants.UNDER);
-			file = StringHandler.removeCharacters(file, ContentConstants.BRACKET_OPENING, ContentConstants.EMPTY);
-			file = StringHandler.removeCharacters(file, ContentConstants.BRACKET_CLOSING, ContentConstants.EMPTY);
+			file = helper.getFixedSlideFileName((files.get(i)).getText());
 			
 			//	In Theme.plist sometimes occurs errors, e.g. css file with .png extension
 			if (file.endsWith(PNG_EXTENSION)) {

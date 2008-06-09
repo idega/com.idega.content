@@ -1049,12 +1049,31 @@ public class ThemesHelper implements Singleton {
 		
 		root.setContent(rootElements);
 		doc.setRootElement(root);
+		
+		String fileName = getPreparedThemeNameToUseInRepository(theme);
 		try {
-			return changer.uploadDocument(doc, theme.getLinkToBaseAsItIs(), StringHandler.removeCharacters(theme.getName(), ContentConstants.SPACE, ContentConstants.UNDER) + ThemesConstants.IDEGA_THEME_INFO, theme, false);
+			return changer.uploadDocument(doc, theme.getLinkToBaseAsItIs(), fileName + ThemesConstants.IDEGA_THEME_INFO, theme, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	public String getPreparedThemeNameToUseInRepository(Theme theme) {
+		if (theme == null) {
+			return null;
+		}
+		
+		return getPreparedThemeNameToUseInRepository(theme.getName());
+	}
+	
+	public String getPreparedThemeNameToUseInRepository(String themeName) {
+		if (themeName == null) {
+			return null;
+		}
+		
+		String fileName = StringHandler.removeCharacters(themeName, ContentConstants.SPACE, ContentConstants.UNDER);
+		return StringHandler.replace(fileName, "'", CoreConstants.EMPTY);
 	}
 	
 	public String[] getPageValues(Setting s, String value) {
@@ -1372,11 +1391,12 @@ public class ThemesHelper implements Singleton {
 		return false;
 	}
 	
-	private String getFixedSlideFileName(String fileName) {
+	public String getFixedSlideFileName(String fileName) {
 		if (fileName == null) {
 			return null;
 		}
-		fileName = StringHandler.removeCharacters(fileName, ContentConstants.SPACE, ContentConstants.UNDER);
+		
+		fileName = getPreparedThemeNameToUseInRepository(fileName);
 		fileName = StringHandler.removeCharacters(fileName, ContentConstants.BRACKET_OPENING, ContentConstants.EMPTY);
 		fileName = StringHandler.removeCharacters(fileName, ContentConstants.BRACKET_CLOSING, ContentConstants.EMPTY);
 		

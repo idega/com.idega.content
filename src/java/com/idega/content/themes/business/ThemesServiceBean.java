@@ -29,7 +29,6 @@ import com.idega.slide.business.IWContentEvent;
 import com.idega.slide.business.IWSlideChangeListener;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
-import com.idega.util.StringHandler;
 
 public class ThemesServiceBean extends IBOServiceBean implements ThemesService, IWSlideChangeListener{
 
@@ -220,7 +219,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			parentId = themesEngine.createRootTemplate(domain, builder, domainID, builder.getIBXMLFormat());
 			themesEngine.initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
 		}
-		String name = StringHandler.removeCharacters(theme.getName(), ContentConstants.SPACE, ContentConstants.UNDER);
+		String name = ThemesHelper.getInstance().getPreparedThemeNameToUseInRepository(theme);
 		id = createIBPage(parentId, theme.getName(), builder.getTemplateKey(), null, ThemesConstants.THEMES + name +
 				ContentConstants.SLASH, null, domainID, builder.getHTMLTemplateKey(), null);
 		if (id == -1) {

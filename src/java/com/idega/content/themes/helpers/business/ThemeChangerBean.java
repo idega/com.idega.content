@@ -2547,7 +2547,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		String tempName = new StringBuilder(newName).append(ThemesConstants.THEME).toString();
-		String themeName = StringHandler.removeCharacters(tempName, ContentConstants.SPACE, ContentConstants.UNDER);
+		String themeName = helper.getPreparedThemeNameToUseInRepository(tempName);
 		
 		//	Adding theme to system
 		String tempLink = new StringBuffer(decodedLinkToBase).append(themeName).toString();
