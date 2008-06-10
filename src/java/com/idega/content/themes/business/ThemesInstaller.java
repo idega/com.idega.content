@@ -59,6 +59,12 @@ public class ThemesInstaller implements ApplicationListener {
 		}
 		
 		public void run() {
+			if (1 == 1) {
+				//	TODO:	Temporarily auto deploying is turned off!
+				activateThemes();
+				return;
+			}
+			
 			IWMainApplicationSettings settings = iwma.getSettings();
 			if (settings == null) {
 				activateThemes();
