@@ -837,7 +837,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		}
 		
 		if (changedPageUri != null) {
-			updateSiteTree(iwc);
+			updateSiteTree(false);
 		}
 		
 		return changedPageUri;
@@ -1166,7 +1166,7 @@ public class ThemesEngineBean implements ThemesEngine {
 			saveSiteInfoValue(language, keywords[i], values[i], settings, domain, cachedDomain);
 		}
 		
-		updateSiteTree(null);
+		updateSiteTree(false);
 		
 		return true;
 	}
@@ -1285,7 +1285,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		//	Creating new tree order
 		changeNodesOrderInLevel(followingNodes, -1, null);
 		
-		updateSiteTree(null);
+		updateSiteTree(false);
 		
 		return newIds;
 	}
@@ -1405,13 +1405,17 @@ public class ThemesEngineBean implements ThemesEngine {
 		return service.getRenderedComponent(iwc, tree, true);
 	}
 	
-	private void updateSiteTree(IWContext iwc, boolean updateAllSessions) {
+	private void updateSiteTree(boolean updateAllSessions, boolean useThreads) {
 		Thread scriptCaller = new Thread(new ScriptCaller(WebContextFactory.get(), new ScriptBuffer("getUpdatedSiteTreeFromServer();"), updateAllSessions));
+		if (!useThreads) {
+			scriptCaller.run();
+			return;
+		}
 		scriptCaller.start();
 	}
 	
-	private void updateSiteTree(IWContext iwc) {
-		updateSiteTree(iwc, false);
+	private void updateSiteTree(boolean useThreads) {
+		updateSiteTree(false, useThreads);
 	}
 	
 	private int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup) {
@@ -1478,7 +1482,7 @@ public class ThemesEngineBean implements ThemesEngine {
 			return false;
 		}
 		
-		updateSiteTree(null);
+		updateSiteTree(false);
 		
 		return true;
 	}
@@ -1567,7 +1571,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		}
 		
 		if (result) {
-			updateSiteTree(iwc);
+			updateSiteTree(false);
 		}
 		
 		return result;
@@ -1674,7 +1678,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		
 		builder.clearAllCaches();
 		
-		updateSiteTree(iwc, true);
+		updateSiteTree(true, false);
 		
 		return true;
 	}
@@ -2098,7 +2102,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		}
 		
 		if (changePageName(id, newName, iwc)) {
-			updateSiteTree(iwc);
+			updateSiteTree(false);
 			return true;
 		}
 		
