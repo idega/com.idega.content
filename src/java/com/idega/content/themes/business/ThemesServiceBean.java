@@ -89,6 +89,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		return deletePage(pageID, deleteChildren, false, true, markPagesForDeletingArticles);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean deletePage(String pageKey, boolean deleteChildren, boolean canUseDefaultUser, boolean clearCache, boolean markPagesForDeletingArticles) {
 		if (pageKey == null) {
 			return false;
@@ -161,6 +162,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		iwc.setSessionAttribute(ContentConstants.DELETED_PAGE_IN_LUCID_PROPERTIES_FOR_ARTICLE, ids);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void putAllIdsOfPageAndChildren(String pageKey, List<String> ids) {
 		ICPage page = getICPage(pageKey);
 		
@@ -258,6 +260,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		return createIBPage(parentId, name, type, templateId, pageUri, subType, domainId, format, sourceMarkup, null);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup, String treeOrder) {
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
