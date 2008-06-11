@@ -140,7 +140,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			e.printStackTrace();
 			return false;
 		}
-		if (content == null) {
+		if (content == null || CoreConstants.EMPTY.equals(content)) {
 			return false;
 		}
 		
