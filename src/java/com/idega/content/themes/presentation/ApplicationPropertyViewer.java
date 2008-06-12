@@ -1,20 +1,21 @@
 package com.idega.content.themes.presentation;
 
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
 
-import org.apache.myfaces.renderkit.html.util.AddResource;
-import org.apache.myfaces.renderkit.html.util.AddResourceFactory;
-
 import com.idega.block.web2.business.Web2Business;
-import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.bean.Setting;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
+import com.idega.idegaweb.IWBundle;
+import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
@@ -24,6 +25,8 @@ import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Heading2;
 import com.idega.presentation.text.Text;
 import com.idega.util.CoreConstants;
+import com.idega.util.PresentationUtil;
+import com.idega.webface.WFUtil;
 
 /**
  * This class displays the current value of an application property, localized if available.
@@ -77,7 +80,7 @@ public class ApplicationPropertyViewer extends Block {
 		
 		if (key.indexOf(getCheckKey(ThemesConstants.LOGO)) != -1) {
 			String siteLogo = "site_logo";
-			String name = ContentUtil.getBundle().getLocalizedString(siteLogo);
+			String name = ContentUtil.getBundle().getResourceBundle(iwc).getLocalizedString(siteLogo);
 			if (value.equals(ContentConstants.EMPTY)) {
 				name = FIFTEEN_SPACE;
 			}
@@ -130,48 +133,53 @@ public class ApplicationPropertyViewer extends Block {
 		return values;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void addPropertyEditAction(IWContext iwc, PresentationObject component, String key, String settingKey, boolean needsReload) {
 		if (iwc == null || component == null || key == null) {
 			return;
 		}
-		if (ContentUtil.hasContentEditorRoles(iwc)) {
-			//	Adding script files for DWR
-			AddResource adder = AddResourceFactory.getInstance(iwc);
-			adder.addJavaScriptAtPosition(iwc, AddResource.HEADER_BEGIN, CoreConstants.DWR_ENGINE_SCRIPT);
-			adder.addJavaScriptAtPosition(iwc, AddResource.HEADER_BEGIN, "/dwr/interface/ThemesEngine.js");
-			
-			try {
-				Web2Business web2 = SpringBeanLookup.getInstance().getSpringBean(iwc, Web2Business.class);
-				adder.addJavaScriptAtPosition(iwc, AddResource.HEADER_BEGIN, web2.getBundleURIToMootoolsLib());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-			String property = ThemesHelper.getInstance().extractValueFromString(key, key.indexOf(CoreConstants.DOT) + 1,
-					key.lastIndexOf(CoreConstants.DOT));
-			
-			Map<String, Setting> settings = ThemesHelper.getInstance().getThemeSettings();
-			Setting s = settings.get(settingKey);
-			String title = ContentConstants.EMPTY;
-			if (s != null) {
-				title = s.getLabel();
-			}
-			
-			String id = new StringBuffer(property).append(ThemesConstants.ADD_FOR_PROPERTY_CHANGE).append(component.getId()).toString();
-			component.setID(id);
-			if (component.attributes == null) {
-				component.attributes = new HashMap();
-			}
-			StringBuffer javaScript = new StringBuffer();
-			javaScript.append("changeSiteInfo('").append(id).append("', '").append(ContentUtil.getBundle().getLocalizedString("saving", "Saving..."));
-			javaScript.append("', ").append(needsReload).append(");");
-			component.attributes.put("ondblclick", javaScript.toString());
-			
-			component.setStyleClass(STYLE_CLASS);
-			
-			String localizedText = ContentUtil.getBundle().getLocalizedString("double_click_to_edit", "Double click to edit");
-			component.setToolTip(new StringBuffer(title).append(": ").append(localizedText).toString());
+		if (!ContentUtil.hasContentEditorRoles(iwc)) {
+			return;
 		}
+		
+		IWBundle bundle = ContentUtil.getBundle();
+		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
+		Web2Business web2 = (Web2Business) WFUtil.getBeanInstance(Web2Business.SPRING_BEAN_IDENTIFIER);
+		
+		//	Adding script files
+		List<String> scripts = new ArrayList<String>();
+		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
+		scripts.add("/dwr/interface/ThemesEngine.js");
+		scripts.add(bundle.getVirtualPathWithFileNameString("javascript/ApplicationPropertyHelper.js"));
+		try {
+			scripts.add(web2.getBundleURIToMootoolsLib());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		
+		String property = ThemesHelper.getInstance().extractValueFromString(key, key.indexOf(CoreConstants.DOT) + 1, key.lastIndexOf(CoreConstants.DOT));
+		
+		Map<String, Setting> settings = ThemesHelper.getInstance().getThemeSettings();
+		Setting s = settings.get(settingKey);
+		String title = ContentConstants.EMPTY;
+		if (s != null) {
+			title = s.getLabel();
+		}
+		
+		String id = new StringBuffer(property).append(ThemesConstants.ADD_FOR_PROPERTY_CHANGE).append(component.getId()).toString();
+		component.setID(id);
+		if (component.attributes == null) {
+			component.attributes = new HashMap();
+		}
+		StringBuffer onDblClickAction = new StringBuffer();
+		onDblClickAction.append("changeSiteInfo('").append(id).append("', '").append(iwrb.getLocalizedString("saving", "Saving..."));
+		onDblClickAction.append("', ").append(needsReload).append(")");
+		component.attributes.put("ondblclick", PresentationUtil.getJavaScriptLinesLoadedLazily(scripts, onDblClickAction.toString()));
+		
+		component.setStyleClass(STYLE_CLASS);
+		
+		String localizedText = iwrb.getLocalizedString("double_click_to_edit", "Double click to edit");
+		component.setToolTip(new StringBuffer(title).append(": ").append(localizedText).toString());
 	}
 	
 	@Override
