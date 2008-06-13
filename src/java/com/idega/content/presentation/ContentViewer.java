@@ -79,7 +79,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	private boolean showFolders = true;
 	private boolean showPublicFolder = true;
 	private boolean showDropboxFolder = true;
-	private Collection columnsToHide = null;
+	private Collection<String> columnsToHide = null;
 	private boolean maintainPath = false;
 	private boolean useVersionControl = true;
 	private boolean showPermissionTab = true;
@@ -94,12 +94,9 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		super();
 	}
 	
-	public void initializeComponent(FacesContext context) {	
-
-//		String startFolder = (String) this.getAttributes().get("startFolder");
-//		String iconTheme = (String) this.getAttributes().get("iconTheme");
-//		rootFolder ="/files/shared";
-
+	@SuppressWarnings("unchecked")
+	@Override
+	public void initializeComponent(FacesContext context) {
 		WFBlock listBlock = new WFBlock();
 		listBlock.setStyleClass(listBlock.getStyleClass()+" contentListBlock");
 		WFTitlebar tb = new WFTitlebar();
@@ -108,9 +105,6 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		tb.addTitleText(getBundle().getLocalizedText("document_list"));
 		tb.addTitleText(getCurrentResourceName());
 		tb.setToolTip(getCurrentFolderPath());
-//		tb.addTitleText("WebDAVListBean.virtualWebDAVPath", true);
-//		tb.addTitleText("WebDAVListBean.webDAVPath", true);
-//		listBlock.setToolbarEmbeddedInTitlebar(true);
 		listBlock.setTitlebar(tb);
 		listBlock.setToolbar(getToolbar(listBlockId));
 
@@ -181,7 +175,6 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		uploadBar.addTitleText(getBundle().getLocalizedText("upload"));
 		uploadBar.addTitleText(getCurrentResourceName());
 		uploadBlock.setTitlebar(uploadBar);
-		//uploadBlock.setToolbar(new WFToolbar());
 		WebDAVUpload upload = new WebDAVUpload();
 		if (startFolder == null) {
 			upload.setUploadPath(currentFolderPath);
@@ -195,7 +188,6 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			}
 		}
 		upload.setShowStatusAfterUploadAttempt(true);
-//		upload.setRendered(renderWebDAVUpload);
 		upload.setId(getId()+"_upload");
 		upload.setUseVersionComment(true);
 		uploadBlock.add(upload);
@@ -211,10 +203,6 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		deleter.setRendered(this.renderWebDAVDeleter);
 		deleter.setId(getId()+"_deleter");
 		deleteBlock.add(deleter);
-//		getFacets().put(BAR, bar);
-//		getChildren().add(bar);
-//		super.setToolbar(bar);
-		
 
 		WFBlock permissionsBlock = new WFBlock();
 		WFTitlebar permissionsBar = new WFTitlebar();
@@ -269,7 +257,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	
 	public void setColumnsToHide(String columns) {
 		if (columns != null) {
-			Collection v = new Vector();
+			Collection<String> v = new Vector<String>();
 			int index = columns.indexOf(",");
 			while (index > -1) {
 				String tmp = columns.substring(0, index);
@@ -285,21 +273,17 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	
 	public String getColumnsToHide(){
 		if(this.columnsToHide!=null){
-			return ListUtil.convertListOfStringsToCommaseparatedString((List)this.columnsToHide);
+			return ListUtil.convertListOfStringsToCommaseparatedString((List<String>)this.columnsToHide);
 		}
 		
 		return null;
 	}
 	
-	/* (non-Javadoc)
-	 * @see javax.faces.component.UIComponent#decode(javax.faces.context.FacesContext)
-	 */
+	@SuppressWarnings("unchecked")
 	public void decode(FacesContext context) {
-		//super.decode(arg0);
 		//TODO USE DECODE, DOES NOT WORK BECAUSE IT IS NEVER CALLED!
 		
 		Map parameters = context.getExternalContext().getRequestMap();
-		
 		
 		String action = (String) parameters.get(PARAMETER_ACTION);
 		String resourceURL = (String) parameters.get(PARAMETER_CONTENT_RESOURCE);
@@ -370,10 +354,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		return false;
 	}
 	
-	
-	
+	@SuppressWarnings("unchecked")
 	public void encodeBegin(FacesContext context) throws IOException {
-//		Boolean useUserHomeFolder = (Boolean) this.getAttributes().get("useUserHomeFolder");
 		if (this.useUserHomeFolder) {
 			try {
 				this.rootFolder = super.getIWSlideSession().getUserHomeFolder();
@@ -417,13 +399,13 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		}
 
 		if (!this.maintainPath) {
-			WFUtil.invoke("WebDAVListBean", "resetSorter");
-			WFUtil.invoke("WebDAVListBean", "setClickedFilePath", null, String.class);
-			WFUtil.invoke("WebDAVListBean", "setWebDAVPath", this.rootFolder, String.class);
-			WFUtil.invoke("WebDAVListBean", "setRootFolder", this.rootFolder, String.class);
+			WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "resetSorter");
+			WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setClickedFilePath", null, String.class);
+			WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setWebDAVPath", this.rootFolder, String.class);
+			WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setRootFolder", this.rootFolder, String.class);
 		}
 		
-		Boolean fileSelected = (Boolean) WFUtil.invoke("WebDAVListBean", "getIsClickedFile");
+		Boolean fileSelected = (Boolean) WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "getIsClickedFile");
 
 		String tmp = (String) context.getExternalContext().getRequestParameterMap().get(PARAMETER_ROOT_FOLDER);
 		if (tmp != null) {
@@ -431,10 +413,10 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(iwuc, IWSlideSession.class);
 			String webDAVServerURI = ss.getWebdavServerURI();
 			tmp = tmp.replaceFirst(webDAVServerURI, "");
-			WFUtil.invoke("WebDAVListBean", "setWebDAVPath", tmp);
+			WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setWebDAVPath", tmp);
 			this.rootFolder = tmp;
 		}
-		if (ACTION_LIST.equals(this.currentAction)) { //currentAction == null || 
+		if (ACTION_LIST.equals(this.currentAction)) {
 			
 			this.renderListLink = true;
 			this.renderDetailsLink = false;
@@ -468,7 +450,6 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		}
 		
 		if(!getShowPermissionTab()){
-//			renderWebDAVFilePermissions = false;
 			this.renderPermissionsLink=false;
 		}
 		
@@ -482,23 +463,16 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	public void encodeChildren(FacesContext context) throws IOException {
 		super.encodeChildren(context);
 
-//		UIComponent bar = getFacet(BAR);
-//		if (bar != null) {
-//			renderChild(context, bar);
-//		}
-
 		UIComponent list = getFacet(ACTION_LIST);
 		if (list != null) {
 			list.setRendered(this.renderWebDAVList);
 			renderChild(context, list);
-			//((WFBlock)list).setToolbar(getToolbar());
 		}
 		
 		UIComponent details = getFacet(ACTION_FILE_DETAILS);
 		if (details != null) {
 			details.setRendered(this.renderWebDAVFileDetails);
 			renderChild(context, details);
-			//((WFBlock)details).setToolbar(getToolbar());
 		}
 
 		UIComponent detailsLess = getFacet(ACTION_FILE_DETAILS_LESS);
@@ -523,7 +497,6 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		if (permissions != null) {
 			permissions.setRendered(this.renderWebDAVFilePermissions);
 			renderChild(context, permissions);
-			//((WFBlock)permissions).setToolbar(getToolbar());
 		}
 		
 		UIComponent deleter = getFacet(ACTION_DELETE);
@@ -539,40 +512,34 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		}
 	}
 		
+	@SuppressWarnings("unchecked")
 	public WFToolbar getToolbar(String baseId) {
 		WFToolbar bar = new WFToolbar();
 		bar.setId(baseId+"_toolbar");
 		WFToolbarButton list = new WFToolbarButton();
-//		WFToolbarButton list = new WFToolbarButton("/images/list.jpg",getBundle());
 		list.getAttributes().put(PARAMETER_ACTION, ACTION_LIST);
 		list.setId(baseId+"_btnList");
 		list.setStyleClass("content_viewer_document_list");
 		list.setToolTip(getBundle().getLocalizedString("document_list"));
 		list.setDisplayText(getBundle().getLocalizedString("document_list"));
-//		list.setToolTip("Document List");
 		list.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
-//		list.setValueBinding("rendered", WFUtil.createValueBinding("#{contentviewerbean.renderListLink}"));
 		list.setRendered(this.renderListLink);
 
 		WFToolbarButton details = new WFToolbarButton();
-//		WFToolbarButton details = new WFToolbarButton("/images/details.jpg",getBundle());
 		details.getAttributes().put(PARAMETER_ACTION, ACTION_FILE_DETAILS);
 		details.setStyleClass("content_viewer_details");
 		details.setId(baseId+"_btnDetails");
-//		details.setToolTip("Document Details");
 		details.setToolTip(getBundle().getLocalizedString("document_details"));
 		details.setDisplayText(getBundle().getLocalizedString("document_details"));
 		details.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		details.setRendered(this.renderDetailsLink);
 
 		WFToolbarButton preview = new WFToolbarButton();
-//		WFToolbarButton preview = new WFToolbarButton("/images/preview.jpg",getBundle());
 		preview.getAttributes().put(PARAMETER_ACTION, ACTION_PREVIEW);
 		preview.setId(baseId+"_btnPreview");
 		preview.setStyleClass("content_viewer_preview");
 		preview.setToolTip(getBundle().getLocalizedString("preview"));
 		preview.setDisplayText(getBundle().getLocalizedString("preview"));
-//		preview.setToolTip("Preview");
 		preview.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
 		preview.setRendered(this.renderPreviewLink);
 		
@@ -586,11 +553,9 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		newFolder.setRendered(this.showFolders && this.renderNewFolderLink);
 
 		WFToolbarButton permissions = new WFToolbarButton();
-//		WFToolbarButton permissions = new WFToolbarButton("/images/permissions.gif",getBundle());
 		permissions.getAttributes().put(PARAMETER_ACTION, ACTION_PERMISSIONS);
 		permissions.setId(baseId+"_btnPermissions");
 		permissions.setStyleClass("content_viewer_permissions");
-//		permissions.setToolTip("Permissions");
 		permissions.setToolTip(getBundle().getLocalizedString("permissions"));
 		permissions.setDisplayText(getBundle().getLocalizedString("permissions"));
 		permissions.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
@@ -602,11 +567,10 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		bar.addButton(preview);
 		bar.addButton(permissions);
 
-//		super.setToolbar(bar);
-//		getChildren().add(bar);
 		return bar;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
 		Object source = actionEvent.getSource();
 		if (source instanceof WFToolbarButton) {
@@ -640,7 +604,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 					if ((obj instanceof UIParameter)) {
 						if (PATH_TO_DELETE.equals(((UIParameter) obj).getName())) {
 							path = (String) ((UIParameter) obj).getValue();
-							WFUtil.invoke("WebDAVListBean", "setClickedFilePath", path);
+							WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setClickedFilePath", path);
 							String currentPath = null;
 							if (path.indexOf(CoreConstants.SLASH) != -1) {
 								currentPath = path.substring(0, path.lastIndexOf(CoreConstants.SLASH));
@@ -648,11 +612,9 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 							if (currentPath != null) {
 								WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", currentPath);	//	Setting current path to reload
 							}
-//							path = (String) WFUtil.createMethodBinding("#{WebDAVListBean.getClickedFilePath}", null).invoke(context,null);
 						}
 					}
 				}
-//				String path = (String) ((HtmlCommandLink)source).getAttributes().get(PATH_TO_DELETE);
 				setRenderFlags(action);
 			}
 			maintainPath(true);
@@ -668,7 +630,6 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	}
 
 	public void setRenderFlags(String action) {
-		//System.out.println("[ContentViewer] action = "+action);
 		this.currentAction = action;
 		if (ACTION_LIST.equals(action)) {
 			this.renderWebDAVList = true;
@@ -678,7 +639,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			this.renderWebDAVFilePermissions = false;
 			this.renderWebDAVDeleter = false;
 			this.renderWebDAVUploadeComponent = true;
-			WFUtil.invoke("WebDAVListBean","setClickedFilePath", null, String.class);
+			WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setClickedFilePath", null, String.class);
 			
 		} else if (ACTION_FILE_DETAILS.equals(action)) {
 			this.renderWebDAVList = false;
@@ -753,6 +714,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		return values;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[]) state;
 		super.restoreState(ctx, values[0]);
@@ -773,7 +735,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		this.startFolder = ((String) values[15]);
 		this.useUserHomeFolder = ((Boolean) values[16]).booleanValue();
 		this.showFolders = ((Boolean) values[17]).booleanValue();
-		this.columnsToHide = ((Collection) values[18]);
+		this.columnsToHide = ((Collection<String>) values[18]);
 		this.useVersionControl = ((Boolean) values[19]).booleanValue();
 		this.renderWebDAVUploadeComponent = ((Boolean) values[20]).booleanValue();
 		this.showPermissionTab = ((Boolean) values[21]).booleanValue();
@@ -821,10 +783,10 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		if (index > -1) {
 			String path = resource.substring(0, index);
 			setCurrentFolderPath(path);
-			WFUtil.invoke("WebDAVListBean", "setWebDAVPath", path);
+			WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setWebDAVPath", path);
 			
 			if (!resource.endsWith("/")) {
-				WFUtil.invoke("WebDAVListBean", "setClickedFilePath", resource);
+				WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setClickedFilePath", resource);
 				String file = resource.substring(index+1);
 				setCurrentFileName(file);
 			}
@@ -854,12 +816,6 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	public String getCurrentResourceName() {
 		if (this.currentResourceName == null) {
 			this.currentResourceName = "";
-//			String tmp = null;
-//			if (rootFolder != null) {
-//				tmp = currentFolderPath.replaceAll(rootFolder, "");
-//			} else {
-//				tmp = currentFolderPath;
-//			}
 			int index = this.currentFolderPath.lastIndexOf("/");
 			try {
 				if (index >= 0 && !this.currentFolderPath.equals("/")) {

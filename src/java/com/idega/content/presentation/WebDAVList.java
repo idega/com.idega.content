@@ -3,14 +3,17 @@ package com.idega.content.presentation;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
+
 import org.apache.myfaces.custom.savestate.UISaveState;
 
 import com.idega.content.bean.ContentPathBean;
 import com.idega.content.business.ContentConstants;
 import com.idega.presentation.IWBaseComponent;
+import com.idega.util.CoreConstants;
 import com.idega.webface.WFList;
 import com.idega.webface.WFUtil;
 
@@ -29,13 +32,14 @@ public class WebDAVList extends IWBaseComponent {
 	private boolean showFolders = true;
 	private boolean showPublicFolder = true;
 	private boolean showDropboxFolder = true;
-	private Collection columnsToHide = null;
+	private Collection<String> columnsToHide = null;
 	private boolean useVersionControl = true;
 	private String onFileClickEvent = null;
 	
 	public WebDAVList() {
 	}
 	
+	@Override
 	protected void initializeComponent(FacesContext context) {
 		Object o = WFUtil.invoke(ContentPathBean.BEAN_ID, "getPath");
 		String pathFromContent = null;
@@ -51,22 +55,22 @@ public class WebDAVList extends IWBaseComponent {
 		if (this.startFolder != null) {
 			bean.setStartFolder(this.startFolder);
 		} else {
-			bean.setStartFolder("");
+			bean.setStartFolder(CoreConstants.EMPTY);
 		}
 		if (this.rootFolder != null) {
 			bean.setRootFolder(this.rootFolder);
 		} else {
-			bean.setRootFolder("");
+			bean.setRootFolder(CoreConstants.EMPTY);
 		}
 		if (this.iconTheme != null) {
 			bean.setIconTheme(this.iconTheme);
 		} else {
-			bean.setIconTheme("");
+			bean.setIconTheme(CoreConstants.EMPTY);
 		}
 		if (this.onFileClickEvent != null) {
 			bean.setOnFileClickEvent(this.onFileClickEvent);
 		} else {
-			bean.setOnFileClickEvent("");
+			bean.setOnFileClickEvent(CoreConstants.EMPTY);
 		}
 		
 		bean.setShowFolders(new Boolean(this.showFolders));
@@ -74,22 +78,13 @@ public class WebDAVList extends IWBaseComponent {
 		bean.setShowDropboxFolder(new Boolean(this.showDropboxFolder));
 		if (this.columnsToHide != null) {
 			bean.addColumnsToHide(this.columnsToHide);
-		} else {
-			//bean.setColumnsToHide(new Vector());
 		}
 		bean.setUseVersionControl(new Boolean(this.useVersionControl));
 		
-		
-		//WFContainer wrapper = new WFContainer();
-		//wrapper.setStyleClass("scrollWrapper");
 		this.setId(this.getId());
 		WFList list = new WFList(WEB_DAV_LIST_BEAN_ID, 0, 0);
-		/*list.setListStyleClass(list.getListStyleClass()+" scrollContainer");
-		list.setId("scrollContainer");
-		list.setStyleClass("scrollTable");*/
 		list.setBodyScrollable(true);
 		list.setId(this.getId()+"_l");
-		//wrapper.getChildren().add(list);
 		add(list);
 		
 		
@@ -105,7 +100,7 @@ public class WebDAVList extends IWBaseComponent {
 	}
 	
 	protected WebDAVListManagedBean getWebDAVListManagedBean(){
-		return  (WebDAVListManagedBean) WFUtil.getBeanInstance(WEB_DAV_LIST_BEAN_ID);
+		return (WebDAVListManagedBean) WFUtil.getBeanInstance(WEB_DAV_LIST_BEAN_ID);
 	}
 	
 	public void setStartFolder(String start) {
@@ -132,7 +127,7 @@ public class WebDAVList extends IWBaseComponent {
 		this.showDropboxFolder = showDropboxFolder;
 	}
 	
-	public void setColumnsToHide(Collection columns) {
+	public void setColumnsToHide(Collection<String> columns) {
 		this.columnsToHide = columns;
 	}
 	
@@ -146,8 +141,8 @@ public class WebDAVList extends IWBaseComponent {
 	
 	public void encodeChildren(FacesContext context) throws IOException{
 		super.encodeChildren(context);
-		for (Iterator iter = getChildren().iterator(); iter.hasNext();) {
-			UIComponent child = (UIComponent) iter.next();
+		for (Iterator<UIComponent> iter = getChildren().iterator(); iter.hasNext();) {
+			UIComponent child = iter.next();
 			renderChild(context,child);
 		}
 	}
@@ -155,6 +150,4 @@ public class WebDAVList extends IWBaseComponent {
 	public boolean getRendersChildren() {
 		return true;
 	}
-	
-	
 }
