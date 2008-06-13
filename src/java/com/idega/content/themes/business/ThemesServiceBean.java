@@ -67,7 +67,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			}
 		}
 		else {
-			if (!ThemesHelper.getInstance().isCreatedManually(uri) && ThemesHelper.getInstance().isCorrectThemeTemplateFile(uri, ThemesConstants.THEME_SKELETONS_FILTER) && isNewTheme(uri)) {
+			if (!ThemesHelper.getInstance().isCreatedManually(uri) && ThemesHelper.getInstance().isCorrectThemeTemplateFile(uri, ThemesConstants.THEME_SKELETONS_FILTER) &&
+					isNewTheme(uri)) {
 				try {
 					ThemesHelper.getInstance().getThemesLoader().loadTheme(uri, ThemesHelper.getInstance().urlEncode(uri), true, false);
 				} catch (Exception e) {
@@ -225,8 +226,11 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			themesEngine.initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
 		}
 		String name = ThemesHelper.getInstance().getPreparedThemeNameToUseInRepository(theme);
-		id = createIBPage(parentId, theme.getName(), builder.getTemplateKey(), null, ThemesConstants.THEMES + name +
-				ContentConstants.SLASH, null, domainID, builder.getHTMLTemplateKey(), null);
+		
+		String suffix = getSuffixForTemplate(theme.getName());
+		String templateName = suffix == null ? theme.getName() : new StringBuilder(theme.getName()).append(suffix).toString();
+		String uri = new StringBuilder(ThemesConstants.THEMES).append(name).append(suffix == null?CoreConstants.EMPTY : suffix).append(ContentConstants.SLASH).toString();
+		id = createIBPage(parentId, templateName, builder.getTemplateKey(), null, uri, null, domainID, builder.getHTMLTemplateKey(), null);
 		if (id == -1) {
 			return false;
 		}
@@ -238,6 +242,33 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		
 		return false;
+	}
+	
+	private String getSuffixForTemplate(String name) {
+		int counter = 0;
+		
+		Collection<ICPage> templates = null;
+		try {
+			templates = getICPageHome().findAllByName(name);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		String queryName = null;
+		while (templates != null && !templates.isEmpty()) {
+			counter++;
+			queryName = new StringBuilder(name).append(CoreConstants.UNDER).append(counter).toString();
+			
+			try {
+				templates = getICPageHome().findAllByName(queryName);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+		
+		return counter == 0 ? null : new StringBuilder(CoreConstants.UNDER).append(counter).toString();
 	}
 	
 	public boolean updatePageWebDav(int id, String uri) {
@@ -259,12 +290,14 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		return true;
 	}
 	
-	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup){
+	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format,
+			String sourceMarkup) {
 		return createIBPage(parentId, name, type, templateId, pageUri, subType, domainId, format, sourceMarkup, null);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format, String sourceMarkup, String treeOrder) {
+	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format,
+			String sourceMarkup, String treeOrder) {
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return -1;
@@ -402,7 +435,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		
 		int templateId = -1;
 		try {
-			templateId = createIBPage(parentTemplateKey, name, builder.getTemplateKey(), parentTemplateKey, null, null, domain.getID(), builder.getIBXMLFormat(), null, null);
+			templateId = createIBPage(parentTemplateKey, name, builder.getTemplateKey(), parentTemplateKey, null, null, domain.getID(), builder.getIBXMLFormat(), null,
+					null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
