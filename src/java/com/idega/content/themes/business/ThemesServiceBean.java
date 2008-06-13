@@ -74,6 +74,9 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 					e.printStackTrace();
 				}
 			}
+			if (uri.endsWith(ThemesConstants.THEME_PREDEFINED_STYLE_CONFIG_FILE)) {
+				ThemesHelper.getInstance().addPredefinedThemeStyle(uri);
+			}
 		}
 	}
 	

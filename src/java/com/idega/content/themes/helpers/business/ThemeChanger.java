@@ -22,7 +22,7 @@ public interface ThemeChanger {
 	
 	public String applyMultipleChangesToTheme(String themeKey, List<ThemeChange> changes, String themeName) throws Exception;
 	
-	public String changeTheme(String themeKey, String themeName, ThemeChange change) throws Exception;
+	public String changeTheme(String themeKey, String themeName, ThemeChange change, boolean lastChange) throws Exception;
 	
 	public List <ThemeStyleGroupMember> getEnabledStyles(Theme theme) throws Exception;
 	
@@ -39,4 +39,6 @@ public interface ThemeChanger {
 	public boolean uploadDocument(Document doc, String linkToBase, String fileName, Theme theme, boolean isTheme) throws Exception;
 	
 	public boolean reloadThemeProperties(String themeKey, boolean checkConfig) throws Exception;
+	
+	public boolean setBuiltInStyle(String themeId, String builtInStyleId) throws Exception;
 }

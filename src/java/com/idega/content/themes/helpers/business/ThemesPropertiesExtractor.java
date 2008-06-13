@@ -8,8 +8,8 @@ public interface ThemesPropertiesExtractor {
 
 	public static final String SPRING_BEAN_IDENTIFIER = "themesPropertiesExtractor";
 	
-	public boolean prepareTheme(boolean checkConfigFile, Theme theme, List<String> pLists, List<String> configs) throws Exception;
+	public boolean prepareTheme(boolean checkConfigFile, Theme theme, List<String> pLists, List<String> configs, List<String> predefinedStyles) throws Exception;
 	
-	public void prepareThemes(List<String> pLists, List<String> configs, boolean useThread) throws Exception;
+	public void prepareThemes(List<String> pLists, List<String> configs, List<String> predefinedStyles, boolean useThread) throws Exception;
 
 }

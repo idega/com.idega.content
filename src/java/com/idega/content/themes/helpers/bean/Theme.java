@@ -26,6 +26,7 @@ public class Theme {
 	
 	private String name;
 	private String changedName;
+	private String currentlyUsedBuiltInStyleUri = null;
 	
 	private List<String> styleGroupsNames;
 	private List<String> styleVariationsCacheKeys;
@@ -33,6 +34,7 @@ public class Theme {
 	private List<String> originalColourFiles = null;
 	private List<ThemeChange> changes;
 	private List<AdvancedProperty> extraRegions = null;
+	private List<BuiltInThemeStyle> builtInStyles = null;
 
 	private Map<String, ThemeStyleGroupMember> styleGroupsMembers;
 	private Map<String, String> styleVariables = null;
@@ -46,6 +48,7 @@ public class Theme {
 		this.originalColourFiles = new ArrayList<String>();
 		this.extraRegions = new ArrayList<AdvancedProperty>();
 		this.changes = new ArrayList<ThemeChange>();
+		this.builtInStyles = new ArrayList<BuiltInThemeStyle>();
 		
 		this.styleGroupsMembers = new HashMap<String, ThemeStyleGroupMember>();
 		this.styleVariables = new HashMap<String, String>();
@@ -305,4 +308,34 @@ public class Theme {
 		this.extraRegions = extraRegions;
 	}
 
+	public List<BuiltInThemeStyle> getBuiltInThemeStyles() {
+		return builtInStyles;
+	}
+	
+	public void addBuiltInStyle(BuiltInThemeStyle style) {
+		this.builtInStyles.add(style);
+	}
+	
+	public BuiltInThemeStyle getBuiltInThemeStyle(String id) {
+		if (id == null) {
+			return null;
+		}
+		
+		for (BuiltInThemeStyle style: getBuiltInThemeStyles()) {
+			if (style.getId().equals(id)) {
+				return style;
+			}
+		}
+		
+		return null;
+	}
+
+	public String getCurrentlyUsedBuiltInStyleUri() {
+		return currentlyUsedBuiltInStyleUri;
+	}
+
+	public void setCurrentlyUsedBuiltInStyleUri(String currentlyUsedBuiltInStyleUri) {
+		this.currentlyUsedBuiltInStyleUri = currentlyUsedBuiltInStyleUri;
+	}
+	
 }

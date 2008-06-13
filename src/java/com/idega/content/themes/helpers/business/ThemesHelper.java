@@ -68,9 +68,9 @@ import com.idega.core.component.data.ICObjectInstance;
 import com.idega.core.component.data.ICObjectInstanceHome;
 import com.idega.core.search.business.SearchResult;
 import com.idega.data.IDOLookup;
-import com.idega.graphics.business.Generator;
-import com.idega.graphics.business.GraphicsConstants;
-import com.idega.graphics.business.ImageGenerator;
+import com.idega.graphics.image.business.ImageGenerator;
+import com.idega.graphics.image.business.ImageGeneratorImpl;
+import com.idega.graphics.util.GraphicsConstants;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
@@ -89,7 +89,7 @@ public class ThemesHelper implements Singleton {
 	private static Logger log = Logger.getLogger(ThemesHelper.class.getName());
 	
 	private volatile static ThemesHelper helper = null;
-	private volatile Generator generator = null;
+	private volatile ImageGenerator generator = null;
 	private volatile IWSlideService service = null;
 	private volatile ThemesService themesService = null;
 	private volatile ContentItemFeedBean feedBean = null;
@@ -103,6 +103,7 @@ public class ThemesHelper implements Singleton {
 	private List<String> themeQueue = null;
 	private List<String> urisToThemes = null;
 	private List<String> loadedThemes = null;
+	private List<String> predefinedThemeStyles = null;
 	
 	private boolean checkedFromSlide = false;
 	private boolean loadedThemeSettings = false;
@@ -133,6 +134,7 @@ public class ThemesHelper implements Singleton {
 		urisToThemes = new ArrayList <String> ();
 		loadedThemes = new ArrayList<String>();
 		moduleIds = new ArrayList<String>();
+		predefinedThemeStyles = new ArrayList<String>();
 		
 		numberGenerator = new Random();
 		if (canUseSlide) {
@@ -154,16 +156,16 @@ public class ThemesHelper implements Singleton {
 		return helper;
 	}
 	
-	protected Generator getImageGenerator(IWContext iwc) {
+	protected ImageGenerator getImageGenerator(IWContext iwc) {
 		if (generator == null) {
 			if (iwc == null) {
 				iwc = CoreUtil.getIWContext();
 			}
 			if (iwc == null) {
-				generator = new ImageGenerator();
+				generator = new ImageGeneratorImpl();
 			}
 			else {
-				generator = new ImageGenerator(iwc);
+				generator = new ImageGeneratorImpl(iwc);
 			}
 		}
 		return generator;
@@ -877,7 +879,7 @@ public class ThemesHelper implements Singleton {
 		String newName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).append(CoreConstants.DOT).append(extension).toString();
 		boolean isJpg = extension.equals(GraphicsConstants.JPG_FILE_NAME_EXTENSION);
 		
-		Generator imageGenerator = getImageGenerator(null);
+		ImageGenerator imageGenerator = getImageGenerator(null);
 		InputStream stream = getInputStream(url);
 		if (stream == null) {
 			return false;
@@ -1047,6 +1049,12 @@ public class ThemesHelper implements Singleton {
 			rootElements.add(regions);
 		}
 		
+		//	Current built-in style
+		String uriOfCurrentlyUsedBuiltInStyle = theme.getCurrentlyUsedBuiltInStyleUri();
+		Element builtInStyleUri = new Element(ThemesConstants.CON_URI_OF_CURRENT_BUILT_IN_STYLE);
+		builtInStyleUri.setText(uriOfCurrentlyUsedBuiltInStyle == null ? ThemesConstants.MINUS_ONE : uriOfCurrentlyUsedBuiltInStyle);
+		rootElements.add(builtInStyleUri);
+		
 		root.setContent(rootElements);
 		doc.setRootElement(root);
 		
@@ -1144,7 +1152,7 @@ public class ThemesHelper implements Singleton {
 	public ThemesEngine getThemesEngine() throws NullPointerException {
 		if (themesEngine == null) {
 			try {
-				themesEngine = (ThemesEngine)SpringBeanLookup.getInstance().getSpringBean(IWMainApplication.getDefaultIWMainApplication().getServletContext(), ThemesEngine.SPRING_BEAN_IDENTIFIER);
+				themesEngine = (ThemesEngine) SpringBeanLookup.getInstance().getSpringBean(IWMainApplication.getDefaultIWMainApplication().getServletContext(), ThemesEngine.SPRING_BEAN_IDENTIFIER);
 			} catch(Exception e) {
 				log.log(Level.SEVERE, "Exception getting ThemesEngine", e);
 				return null;
@@ -1894,7 +1902,7 @@ public class ThemesHelper implements Singleton {
 			dimensions.add(new Dimension(ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT));
 		}
 	
-		Generator imageGenerator = getImageGenerator(null);
+		ImageGenerator imageGenerator = getImageGenerator(null);
 		
 		List<BufferedImage> images = imageGenerator.generatePreviews(url, dimensions, isJpg, quality);
 		if (images == null) {
@@ -1968,5 +1976,25 @@ public class ThemesHelper implements Singleton {
 		}
 		name.append(CoreConstants.DOT).append(getFileExtension(file));
 		return name.toString();
+	}
+	
+	public void addPredefinedThemeStyle(String uri) {
+		if (predefinedThemeStyles.contains(uri)) {
+			return;
+		}
+		
+		predefinedThemeStyles.add(uri);
+	}
+	
+	public List<String> getPredefinedThemeStyles() {
+		return predefinedThemeStyles;
+	}
+	
+	protected String getBuiltInThemeStyleId(Theme theme) {
+		String id = String.valueOf(getRandomNumber(Integer.MAX_VALUE));
+		while (theme.getBuiltInThemeStyle(id) != null) {
+			id = String.valueOf(getRandomNumber(Integer.MAX_VALUE));
+		}
+		return id;
 	}
 }

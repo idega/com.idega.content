@@ -151,6 +151,7 @@ public class ThemesConstants {
 	protected static final String CON_EXTRA_REGIONS = "extra-regions";
 	protected static final String CON_EXTRA_REGION = "extra-region";
 	protected static final String CON_ATT_EXTRA_REGION_PARENT = "extra-region-parent";
+	protected static final String CON_URI_OF_CURRENT_BUILT_IN_STYLE = "uri-of-current-built-in-style";
 	
 	protected static final int SMALL_PREVIEW_WIDTH = 149;
 	protected static final int SMALL_PREVIEW_HEIGHT = 112;
@@ -189,7 +190,7 @@ public class ThemesConstants {
 	public static final String DOMAIN_NAME = SYSTEM_SETTINGS + "Name";
 	public static final String DOMAIN_SERVER_NAME = SYSTEM_SETTINGS + "ServerName";
 	
-	public static final String MINUS_ONE = "-1";
+	public static final String MINUS_ONE = ContentConstants.MINUS_ONE;
 	
 	public static final String DEFAULT_DOMAIN_NAME = "Default Site";
 	
@@ -205,4 +206,7 @@ public class ThemesConstants {
 
 	protected static final Boolean IS_THEME_PREVIEW_JPG = Boolean.TRUE;
 	protected static final Float THEME_PREVIEW_QUALITY = new Float(1f);
+	
+	public static final String THEME_PREDEFINED_STYLE_CONFIG_FILE = ".rwstyle";
+	public static final String DEFAULT_THEME_STYLE_ID = "defaultThemeStyleId";
 }

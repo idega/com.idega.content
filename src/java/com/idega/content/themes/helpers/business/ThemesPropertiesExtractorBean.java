@@ -1,6 +1,7 @@
 package com.idega.content.themes.helpers.business;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,9 +13,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.idega.content.business.ContentConstants;
+import com.idega.content.themes.helpers.bean.BuiltInThemeStyle;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
 import com.idega.util.CoreConstants;
+import com.idega.util.StringHandler;
 
 @Scope("singleton")
 @Service(ThemesPropertiesExtractor.SPRING_BEAN_IDENTIFIER)
@@ -32,7 +35,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		helper = ThemesHelper.getInstance();
 	}
 	
-	public void prepareThemes(List<String> pLists, List<String> configs, boolean useThread) {
+	public void prepareThemes(List<String> pLists, List<String> configs, List<String> predefinedStyles, boolean useThread) {
 		//	Initializing ImageGenerator
 		helper.getImageGenerator(null);
 		
@@ -43,7 +46,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		Theme theme = null;
 		for (int i = 0; i < themesToPrepare.size(); i++) {
 			theme = themesToPrepare.get(i);
-			if (!prepareTheme(theme, pLists, configs, useThread)) {
+			if (!prepareTheme(theme, pLists, configs, predefinedStyles, useThread)) {
 				markThemeAsNotPrepared(theme);
 			}
 		}
@@ -78,19 +81,19 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return newThemes;
 	}
 	
-	private boolean prepareTheme(Theme theme, List<String> pLists, List<String> configs, boolean useThread) {
+	private boolean prepareTheme(Theme theme, List<String> pLists, List<String> configs, List<String> predefinedStyles, boolean useThread) {
 		if (useThread) {
 			ThemesPropertiesExtractor propExtractor = helper.getThemesPropertiesExtractor();
 			if (propExtractor == null) {
 				return false;
 			}
-			
-			ThemePropertiesExtractor extractor = new ThemePropertiesExtractor(theme, propExtractor, pLists, configs);
+		
+			ThemePropertiesExtractor extractor = new ThemePropertiesExtractor(theme, propExtractor, pLists, configs, predefinedStyles);
 			extractor.start();
 			return true;
 		}
 		
-		return prepareTheme(true, theme, pLists, configs);
+		return prepareTheme(true, theme, pLists, configs, predefinedStyles);
 	}
 	
 	private String getPropertiesFile(Theme theme, List<String> pLists) {
@@ -124,7 +127,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return null;
 	}
 	
-	public boolean prepareTheme(boolean checkConfigFile, Theme theme, List<String> pLists, List<String> configs) {
+	public boolean prepareTheme(boolean checkConfigFile, Theme theme, List<String> pLists, List<String> configs, List<String> predefinedStyles) {
 		if (theme == null) {
 			return false;
 		}
@@ -236,6 +239,12 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 			}
 		}
 		
+		//	Extracting predefined styles (*.rwstyle) for current theme
+		if (!extractPredefinedStyles(theme, predefinedStyles)) {
+			markThemeAsNotPrepared(theme);
+			return false;
+		}
+		
 		// Creating configuration file
 		if (linkToConfig == null && checkConfigFile) {
 			if (!helper.createThemeConfig(theme)) {
@@ -253,6 +262,126 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return true;
 	}
 	
+	private boolean extractPredefinedStyles(Theme theme, List<String> predefinedStyles) {
+		if (theme == null) {
+			return false;
+		}
+		
+		if (predefinedStyles == null) {
+			predefinedStyles = new ArrayList<String>(helper.getPredefinedThemeStyles());
+			if (predefinedStyles.isEmpty()) {
+				return true;
+			}
+		}
+		
+		String linkToBase = theme.getLinkToBase();
+		List<String> thisThemesStyles = new ArrayList<String>();
+		for (String style: predefinedStyles) {
+			if (style.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
+				style = style.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
+			}
+			
+			if (style.startsWith(linkToBase)) {
+				thisThemesStyles.add(style);
+			}
+		}
+		if (thisThemesStyles.isEmpty()) {
+			return true;
+		}
+		
+		List<String> allPredefinedStyles = helper.getPredefinedThemeStyles();
+		for (String style: thisThemesStyles) {
+			if (parsePredefinedStyle(theme, style)) {	
+				allPredefinedStyles.remove(style);
+			}
+		}
+		
+		return true;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private boolean parsePredefinedStyle(Theme theme, String uri) {
+		if (theme == null || uri == null) {
+			return false;
+		}
+		
+		Document styleConfig = helper.getXMLDocument(new StringBuilder(helper.getFullWebRoot()).append(uri).toString());
+		if (styleConfig == null) {
+			return false;
+		}
+		
+		Element root = styleConfig.getRootElement();
+		if (root == null) {
+			return false;
+		}
+		
+		Element dict = root.getChild(ThemesConstants.TAG_DICT);
+		if (dict == null) {
+			return false;
+		}
+		
+		List<Element> content = dict.getChildren();
+		if (content == null || content.isEmpty()) {
+			return true;
+		}
+		
+		String styleName = getValueFromNextElement("Style Name", dict);
+		if (styleName == null) {
+			return false;
+		}
+		
+		Map<String, String> colours = new HashMap<String, String>();
+		Element coloursConfig = getNextElement(getElementByValue("Colours", content), content);
+		if (coloursConfig != null) {
+			List<Element> colourElements = coloursConfig.getChildren("key");
+			if (colourElements != null && !colourElements.isEmpty()) {
+				String colourName = null;
+				String colourValue = null;
+				for (Element colourNameElement: colourElements) {
+					colourName = colourNameElement.getTextNormalize();
+					colourValue = getValueFromNextElement(colourName, coloursConfig);
+					
+					if (colourName != null && colourValue != null) {
+						colourName = StringHandler.replace(colourName, CoreConstants.PERCENT, CoreConstants.EMPTY);
+						colours.put(colourName, colourValue);
+					}
+				}
+			}
+		}
+		
+		Map<String, String> variations = new HashMap<String, String>();
+		Element variationsConfig = getNextElement(getElementByValue("Selections", content), content);
+		if (variationsConfig != null) {
+			List<Element> variationElements = variationsConfig.getChildren();
+			if (variationElements != null && !variationElements.isEmpty()) {
+				String fullVariation = null;
+				String variationGroup = null;
+				String variationValue = null;
+				int firstDotIndex = -1;
+				for (Element variationElement: variationElements) {
+					fullVariation = variationElement.getTextNormalize();
+					
+					firstDotIndex = fullVariation.indexOf(CoreConstants.DOT);
+					if (fullVariation != null && firstDotIndex != -1) {
+						variationGroup = fullVariation.substring(0, firstDotIndex);
+						variationValue = fullVariation.substring(firstDotIndex + 1);
+						if (variationGroup != null && variationValue != null) {
+							variations.put(variationGroup, variationValue);
+						}
+					}
+				}
+			}
+		}
+		
+		BuiltInThemeStyle style = new BuiltInThemeStyle(helper.getBuiltInThemeStyleId(theme), styleName, uri);
+		style.setColours(colours);
+		style.setVariations(variations);
+		theme.addBuiltInStyle(style);
+		
+		return true;
+	}
+	
+	@SuppressWarnings("unchecked")
 	private boolean extractProperties(Theme theme, String link) {
 		Document doc = helper.getXMLDocument(link);
 		if (doc == null) {
@@ -268,6 +397,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return extractStyles(theme, ThemesConstants.RW_STYLE_VARIATIONS, base.getChildren());
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean extractColourFiles(Theme theme, String tagValue, Element root) {
 		if (theme == null || root == null) {
 			return false;
@@ -345,6 +475,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private String getValueFromNextElement(String parentElementValue, Element baseElement) {
 		String value = ThemesConstants.EMPTY;
 		if (baseElement == null) {
@@ -399,6 +530,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean extractStyleVariations(Theme theme, String styleGroupName, List<Element> styleVariations, boolean limitedSelection) {
 		if (styleVariations == null) {
 			return false;
@@ -456,6 +588,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private List<Element> getStyleGroups(String elementSearchKey, List children) {
 		Element styleBaseElement = getNextElement(elementSearchKey, children);
 		if (styleBaseElement == null) {
@@ -468,6 +601,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return styleGroupsBase.getChildren(ThemesConstants.TAG_DICT);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private List<Element> getStyleGroupElements(Element style) {
 		if (style == null) {
 			return null;
@@ -482,6 +616,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return styleElements.getChildren();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean extractStyleVariationFiles(ThemeStyleGroupMember member, Element styleFiles, String linkToBase) {
 		if (styleFiles == null || linkToBase == null) {
 			return false;
@@ -506,6 +641,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean extractConfiguration(Theme theme, String link) {
 		Document doc = helper.getXMLDocument(link);
 		if (doc == null || theme == null) {
@@ -545,12 +681,18 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 			return false;
 		}
 		
+		Element builtInStyleUri = root.getChild(ThemesConstants.CON_URI_OF_CURRENT_BUILT_IN_STYLE);
+		if (builtInStyleUri != null) {
+			theme.setCurrentlyUsedBuiltInStyleUri(builtInStyleUri.getTextNormalize());
+		}
+		
 		Element extraRegions = root.getChild(ThemesConstants.CON_EXTRA_REGIONS);
 		loadExtraRegions(theme, extraRegions);
 		
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void loadExtraRegions(Theme theme, Element regions) {
 		if (theme == null || regions == null) {
 			return;

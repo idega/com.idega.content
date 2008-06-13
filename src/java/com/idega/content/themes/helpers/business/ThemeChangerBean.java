@@ -38,6 +38,7 @@ import bsh.Interpreter;
 
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.content.business.ContentConstants;
+import com.idega.content.themes.helpers.bean.BuiltInThemeStyle;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeChange;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
@@ -118,6 +119,8 @@ public class ThemeChangerBean implements ThemeChanger {
 	
 	private String[] _regularExpressionsForNeedlessStuff = new String[] {/*" xmlns.+\"", */"..<?doc.+?>"};
 	private List<String> regularExpressionsForNeedlessStuff = Collections.unmodifiableList(Arrays.asList(_regularExpressionsForNeedlessStuff));
+	
+	String defaultColour = "#ffffff";
 	
 	public ThemeChangerBean() {
 		out = new XMLOutputter();
@@ -216,6 +219,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param head
 	 * @return boolean
 	 */
+	@SuppressWarnings("unchecked")
 	private boolean proceedHeadContent(String linkToBase, Element head) {
 		if (linkToBase == null || head == null) {
 			return false;
@@ -294,6 +298,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return uploadTheme(out.outputString(doc), theme, true);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean checkCssFiles(Document doc, String linkToTheme) {
 		if (doc == null) {
 			return false;
@@ -486,7 +491,6 @@ public class ThemeChangerBean implements ThemeChanger {
 			return null;
 		}
 		
-		String defaultColour = "#ffffff";
 		int start = -1;
 		int end = -1;
 		List<String> searchTerm = ListUtil.convertStringArrayToList(new String[] {CoreConstants.PERCENT});
@@ -547,16 +551,22 @@ public class ThemeChangerBean implements ThemeChanger {
 			start = getStartIndexForCssVariable(content, variable, CoreConstants.PERCENT);
 			end = getEndIndexForCssVariable(content, variable, searchTerm, true, true);
 			if (!canSubstring(content, start, end)) {
-				return value;	//	Error
+				log.error("Can not extract CSS expression '"+variable+"' because of invalid indexes: start index: " + start + ", end index: " + end +
+						". Using default colour: '"+defaultColour+"'");
+				cssValue = defaultColour;	//	Error
 			}
 			
 			originalValue = content.substring(start, end);
 			cssValue = computeCssValue(originalValue, variable, value);
 			if (cssValue == null) {
-				return value;	//	Error
+				log.error("Error occured computed CSS value for variable '"+variable+"', using default colour ('"+defaultColour+"') for this variable.");
+				cssValue = defaultColour;	//	Error
 			}
 			else if (cssValue.length() != 4 && cssValue.length() != 7) {
-				return value;
+				int requiredLength = cssValue.length() > 4 ? 7 : 4;
+				while (cssValue.length() < requiredLength) {
+					cssValue = cssValue.replaceFirst(CoreConstants.NUMBER_SIGN, String.valueOf(CoreConstants.NUMBER_SIGN + 0));
+				}
 			}
 			
 			content = StringHandler.replace(content, originalValue, cssValue);
@@ -960,6 +970,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param attributeValue
 	 * @return index
 	 */
+	@SuppressWarnings("unchecked")
 	private int getElementIndex(List contents, String attributeType, String attributeValue) {
 		int index = 0;
 		if (contents == null) {
@@ -1073,6 +1084,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return content;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void checkElementAttributes(Element e, List<String> validAttributes) {
 		if (e == null || validAttributes == null) {
 			return;
@@ -1200,6 +1212,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param body
 	 * @return boolean
 	 */
+	@SuppressWarnings("unchecked")
 	private boolean proceedBodyContent(String linkToBase, Element body) {
 		if (body == null) {
 			return false;
@@ -1280,6 +1293,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private List getNodesByXpath(Element container, String expression) {
 		if (container == null || expression == null) {
 			return null;
@@ -1296,25 +1310,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		return null;
 	}
-	
-	/*private Attribute getElementAtribute(Element e, String name, Namespace ns) {
-		if (e == null || name == null) {
-			return null;
-		}
-		
-		Attribute a = null;
-		if (ns == null) {
-			a = e.getAttribute(name);
-		}
-		else {
-			a = e.getAttribute(name, ns);
-			if (a == null) {
-				a = e.getAttribute(name);
-			}
-		}
-		
-		return a;
-	}*/
 	
 	private boolean fixTag(Element e, String attributeName, String linkToBase) {
 		if (e == null || attributeName == null || linkToBase == null) {
@@ -1627,17 +1622,17 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean hasElementChildren(Element e) {
 		if (e == null) {
 			return false;
 		}
-		List<Element> children = e.getChildren();
-		if (children == null) {
+		
+		List children = e.getChildren();
+		if (children == null || children.isEmpty()) {
 			return false;
 		}
-		if (children.size() == 0) {
-			return false;
-		}
+		
 		return true;
 	}
 	
@@ -1723,7 +1718,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param variation
 	 * @return String
 	 */
-	public String changeTheme(String themeKey, String themeName, ThemeChange change) {		
+	public String changeTheme(String themeKey, String themeName, ThemeChange change, boolean lastChange) {		
 		if (themeKey == null || change == null) {
 			return null;
 		}
@@ -1736,14 +1731,20 @@ public class ThemeChangerBean implements ThemeChanger {
 			return null;
 		}
 		
-		String changed = changeTheme(doc, theme, themeName, change);
+		String changed = changeTheme(doc, theme, themeName, change, lastChange);
 		if (changed == null) {
 			return null;
 		}
 		
-		if (finishThemeChange(theme, doc, true)) {
+		if (lastChange) {
+			if (finishThemeChange(theme, doc, true)) {
+				return themeKey;
+			}
+		}
+		else {
 			return themeKey;
 		}
+		
 		return null;
 	}
 	
@@ -1765,7 +1766,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 	
-	private String changeTheme(Document doc, Theme theme, String themeName, ThemeChange change) {
+	private String changeTheme(Document doc, Theme theme, String themeName, ThemeChange change, boolean lastChange) {
 		if (doc == null || theme == null || change == null) {
 			return null;
 		}
@@ -1792,12 +1793,9 @@ public class ThemeChangerBean implements ThemeChanger {
 		} else if (change.isColor()) {
 			//	Changing color in CSS file
 			needUpload = false;
-			if (!changeThemeColourVariation(theme, change)) {
+			if (!changeThemeColourVariation(theme, change, lastChange)) {
 				return null;
 			}
-		} else if (change.isPredefinedStyle()) {
-			//	Using predefined style
-			//	TODO
 		} else {
 			//	Multiple variations, need to know either add CSS or remove
 			limitedSelection = false;
@@ -1830,33 +1828,18 @@ public class ThemeChangerBean implements ThemeChanger {
 			newStyle.setEnabled(true);
 		}
 		
-		if (styleChanger != null) {
+		boolean addThemeChange = styleChanger == null ? false : true;
+		if (oldStyle != null && newStyle != null) {
+			addThemeChange = !(oldStyle == newStyle);
+		}
+		if (addThemeChange) {
 			addThemeChange(theme, styleChanger, limitedSelection);
 		}
 		
 		return theme.getId();
 	}
 	
-	/*private Element getChildElement(Element parent, String childName, Namespace ns) {
-		if (parent == null || childName == null) {
-			return null;
-		}
-		
-		Element child = null;
-		if (ns == null) {
-			child = parent.getChild(childName);
-		}
-		else {
-			child = parent.getChild(childName, ns);
-			if (child == null) {
-				child = parent.getChild(childName);
-			}
-		}
-		
-		return child;
-	}*/
-	
-	private boolean changeThemeColourVariation(Theme theme, ThemeChange change) {
+	private boolean changeThemeColourVariation(Theme theme, ThemeChange change, boolean lastChange) {
 		if (theme == null || change == null) {
 			return false;
 		}
@@ -1869,12 +1852,20 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		ThemeStyleGroupMember colourVariation = getColorGroupMember(theme, variable);
 		if (colourVariation == null) {
-			return false;
+			if (lastChange) {
+				return false;
+			}
+		}
+		else {
+			addThemeChange(theme, colourVariation, true);
+			theme.addStyleVariable(variable, value);
 		}
 		
-		addThemeChange(theme, colourVariation, true);
-		theme.addStyleVariable(variable, value);
-		return setValuesToColourFiles(theme);
+		if (lastChange) {
+			return setValuesToColourFiles(theme);
+		}
+		
+		return true;
 	}
 	
 	private ThemeStyleGroupMember getColorGroupMember(Theme theme, String variable) {
@@ -1915,25 +1906,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		theme.addThemeChange(change);
 	}
 	
-	/*private List<Element> getElementChildren(Element parent, String name, Namespace ns) {
-		if (parent == null || name == null) {
-			return null;
-		}
-		
-		List<Element> children = null;
-		if (ns == null) {
-			children = parent.getChildren(name);
-		}
-		else {
-			children = parent.getChildren(name, ns);
-			if (children == null || children.size() == 0) {
-				children = parent.getChildren(name);
-			}
-		}
-		
-		return children;
-	}*/
-	
 	/**
 	 * Changes theme's old style with new
 	 * @param head
@@ -1941,7 +1913,14 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param newStyle
 	 * @return boolean
 	 */
+	@SuppressWarnings("unchecked")
 	private boolean changeThemeStyle(String linkToBase, Element head, ThemeStyleGroupMember oldStyle, ThemeStyleGroupMember newStyle) {
+		if (oldStyle != null && newStyle != null) {
+			if (oldStyle == newStyle) {
+				return true;
+			}
+		}
+		
 		if (head == null) {
 			return false;
 		}
@@ -2255,7 +2234,8 @@ public class ThemeChangerBean implements ThemeChanger {
 			theme.setLinkToDraftPreview(null);
 			theme.setLinkToDraft(null);
 			theme.setChanges(new ArrayList<ThemeChange>());
-		
+			theme.setCurrentlyUsedBuiltInStyleUri(null);
+			
 			helper.createThemeConfig(theme);
 			
 			return true;
@@ -2264,6 +2244,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return false;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean setDefaultStylesToTheme(Theme theme) {
 		if (theme == null) {
 			return false;
@@ -2644,6 +2625,11 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		child.setExtraRegions(new ArrayList<AdvancedProperty>(parent.getExtraRegions()));
 		
+		child.setCurrentlyUsedBuiltInStyleUri(parent.getCurrentlyUsedBuiltInStyleUri());
+		for (BuiltInThemeStyle style: parent.getBuiltInThemeStyles()) {
+			child.addBuiltInStyle(new BuiltInThemeStyle(helper.getBuiltInThemeStyleId(child), style));
+		}
+		
 		return true;
 	}
 	
@@ -2691,7 +2677,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			ThemeChange change = null;
 			for (int i = 0; (i < changes.size() && changed != null); i++) {
 				change = changes.get(i);
-				changed = changeTheme(doc, theme, themeName, change);
+				changed = changeTheme(doc, theme, themeName, change, (i + 1) == changes.size());
 			}
 		}
 		
@@ -2726,16 +2712,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		return !theme.getName().equals(changedName);
 	}
 	
-	/*private boolean isThemeChanged(Theme theme) {
-		List<ThemeChange> changes = theme.getChanges();
-		boolean existsChanges = true;
-		if (changes == null || changes.size() == 0) {
-			existsChanges = false;
-		}
-		
-		return existsChanges;
-	}*/
-	
 	public boolean reloadThemeProperties(String themeId, boolean checkConfig) {
 		if (themeId == null) {
 			return false;
@@ -2749,7 +2725,8 @@ public class ThemeChangerBean implements ThemeChanger {
 		helper.clearVariationFromCache(themeId);												//	Clearing cache
 		theme.clearProperties();																//	Clearing properties
 		try {
-			helper.getThemesPropertiesExtractor().prepareTheme(checkConfig, theme, null, null);	//	Extracting new properties (also setting default state)
+			//	Extracting new properties (also setting default state)
+			helper.getThemesPropertiesExtractor().prepareTheme(checkConfig, theme, null, null, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -2779,6 +2756,81 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		return enabled;
+	}
+
+	public boolean setBuiltInStyle(String themeId, String builtInStyleId) throws Exception {
+		if (themeId == null || builtInStyleId == null) {
+			return false;
+		}
+		
+		Theme theme = helper.getTheme(themeId);
+		if (theme == null) {
+			return false;
+		}
+		
+		if (builtInStyleId.equals(ThemesConstants.DEFAULT_THEME_STYLE_ID)) {
+			String currentlyUsedStyledUri = theme.getCurrentlyUsedBuiltInStyleUri();
+			if (currentlyUsedStyledUri == null || ThemesConstants.MINUS_ONE.equals(currentlyUsedStyledUri)) {
+				return false;
+			}
+			return restoreTheme(theme, true);
+		}
+		
+		BuiltInThemeStyle style = theme.getBuiltInThemeStyle(builtInStyleId);
+		if (style == null) {
+			return false;
+		}
+		
+		String currentUri = theme.getCurrentlyUsedBuiltInStyleUri();
+		if (currentUri != null && currentUri.equals(style.getUri())) {
+			return false;
+		}
+		
+		Map<String, String> colors = style.getColours();
+		Map<String, String> variations = style.getVariations();
+		
+		List<ThemeChange> changes = getMultipleThemeChanges(variations, themeId, false);
+		changes.addAll(getMultipleThemeChanges(colors, themeId, true));
+		
+		if (changes.isEmpty()) {
+			return false;
+		}
+		
+		theme.setCurrentlyUsedBuiltInStyleUri(style.getUri());
+		if (applyMultipleChangesToTheme(themeId, changes, theme.getName()) == null) {
+			theme.setCurrentlyUsedBuiltInStyleUri(null);
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private List<ThemeChange> getMultipleThemeChanges(Map<String, String> info, String themeId, boolean colorChanges) {
+		List<ThemeChange> changes = new ArrayList<ThemeChange>();
+		if (info == null || info.isEmpty()) {
+			return changes;
+		}
+		
+		ThemeChange change = null;
+		String keyValue = null;
+		for (Iterator<String> key = info.keySet().iterator(); key.hasNext();) {
+			keyValue = key.next();
+			change = new ThemeChange();
+			
+			change.setThemeId(themeId);
+			change.setStyleGroupName(keyValue);
+			change.setVariation(info.get(keyValue));
+			
+			change.setRadio(!colorChanges);
+			change.setEnabled(true);
+			change.setVariable(keyValue);
+			change.setColor(colorChanges);
+			change.setPredefinedStyle(false);
+			
+			changes.add(change);
+		}
+		
+		return changes;
 	}
 
 }

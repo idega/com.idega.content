@@ -108,6 +108,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		
 		List<String> pLists = null;
 		List<String> configs = null;
+		List<String> predefinedThemeStyles = helper.getPredefinedThemeStyles();
 		if (!helper.isCheckedFromSlide()) {
 			String searchScope = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(ThemesConstants.THEMES_PATH).toString();
 			
@@ -118,6 +119,10 @@ public class ThemesEngineBean implements ThemesEngine {
 			String configSearchKey = new StringBuffer("*").append(ThemesConstants.IDEGA_THEME_INFO).toString();
 			List<SearchResult> configurationXmls = helper.search(configSearchKey, searchScope);
 			configs = helper.loadSearchResults(configurationXmls, null);
+			
+			String predefinedThemeStyleSearchKey = new StringBuffer("*").append(ThemesConstants.THEME_PREDEFINED_STYLE_CONFIG_FILE).toString();
+			List<SearchResult> predefinedStyles = helper.search(predefinedThemeStyleSearchKey, searchScope);
+			predefinedThemeStyles.addAll(helper.loadSearchResults(predefinedStyles, null));
 		}
 		
 		helper.searchForThemes();
@@ -130,7 +135,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		
 		//	Exists some themes, preparing for usage
 		try {
-			getThemesPropertiesExtractor().prepareThemes(pLists, configs, false);
+			getThemesPropertiesExtractor().prepareThemes(pLists, configs, new ArrayList<String>(predefinedThemeStyles), false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -372,7 +377,7 @@ public class ThemesEngineBean implements ThemesEngine {
 	 */
 	public String changeTheme(String themeKey, String themeName, ThemeChange change) {
 		try {
-			return getThemeChanger().changeTheme(themeKey, themeName, change);
+			return getThemeChanger().changeTheme(themeKey, themeName, change, true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -2298,14 +2303,12 @@ public class ThemesEngineBean implements ThemesEngine {
 	}
 
 	public boolean setBuiltInStyle(String themeId, String builtInStyleId) {
-		/*try {
+		try {
 			return getThemeChanger().setBuiltInStyle(themeId, builtInStyleId);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		return false;
-		*/
-		return true;
 	}
 	
 	public List<PageAccessibilityProperty> getPageAccessibilityProperties(String pageKey) {
@@ -2376,7 +2379,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		
 		return setValueForPage(pageKey, value, columnName);
 	}
-
+	
 	public ThemeChanger getThemeChanger() {
 		return themeChanger;
 	}

@@ -1,5 +1,6 @@
 package com.idega.content.themes.presentation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +8,7 @@ import javax.faces.component.UIComponent;
 
 import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.bean.ThemesManagerBean;
+import com.idega.content.themes.helpers.bean.BuiltInThemeStyle;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
 import com.idega.content.themes.helpers.business.ThemesConstants;
@@ -86,8 +88,62 @@ public class ThemeStyleVariations extends Block {
 		Lists styles = new Lists();
 		addVariations(theme, styles);
 		
+		addBuiltInStyles(theme, styles, iwc);
+		
 		container.add(styles);
 		this.add(container);
+	}
+	
+	private void addBuiltInStyles(Theme theme, Lists styles, IWContext iwc) {
+		List<BuiltInThemeStyle> builtInStyles = new ArrayList<BuiltInThemeStyle>(theme.getBuiltInThemeStyles());
+		if (builtInStyles.isEmpty()) {
+			return;
+		}
+		
+		IWResourceBundle iwrb = getResourceBundle(iwc);
+		
+		BuiltInThemeStyle defaultStyle = new BuiltInThemeStyle(ThemesConstants.DEFAULT_THEME_STYLE_ID);
+		defaultStyle.setName(iwrb.getLocalizedString("theme_default", "Theme Default"));
+		if (!builtInStyles.contains(defaultStyle)) {
+			builtInStyles.add(0, defaultStyle);
+		}
+		
+		ListItem builtStyleContainer = new ListItem();
+		styles.add(builtStyleContainer);
+		
+		Layer container = new Layer();
+		builtStyleContainer.add(container);
+		container.setStyleClass(VARIATION_GROUP_STYLE);
+		
+		Lists allBuiltInStyles = new Lists();
+		container.add(allBuiltInStyles);
+		ListItem allBuiltInStylesContainer = new ListItem();
+		allBuiltInStyles.add(allBuiltInStylesContainer);
+		
+		Layer labelContainer = new Layer();
+		allBuiltInStylesContainer.add(labelContainer);
+		labelContainer.setStyleClass(VARIATION_GROUP_NAME_STYLE);
+		labelContainer.add(new Text(iwrb.getLocalizedString("built_in_style", "Built-in Styles")));
+		
+		Lists realStylesContainer = new Lists();
+		allBuiltInStylesContainer.add(realStylesContainer);
+		ListItem builtInStyleContainer = null;
+		String groupName = "themeBuiltInStylesGroup";
+		RadioButton styleSelection = null;
+		String themeId = theme.getId();
+		String currentlyUsedStyle = theme.getCurrentlyUsedBuiltInStyleUri();
+		for (BuiltInThemeStyle style: builtInStyles) {
+			builtInStyleContainer = new ListItem();
+			realStylesContainer.add(builtInStyleContainer);
+			
+			styleSelection = new RadioButton(groupName, style.getName());
+			styleSelection.setOnClick(new StringBuilder("setBuiltInStyle('").append(themeId).append("', '").append(style.getId()).append("');").toString());
+			if (currentlyUsedStyle != null && !ThemesConstants.MINUS_ONE.equals(currentlyUsedStyle) && currentlyUsedStyle.equals(style.getUri())) {
+				styleSelection.setSelected();
+			}
+			builtInStyleContainer.add(styleSelection);
+			builtInStyleContainer.add(new Text(style.getName()));
+		}
 	}
 	
 	private void addRehreshThemeBlock(IWContext iwc, Theme theme, Layer container) {
