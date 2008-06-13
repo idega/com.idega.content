@@ -325,7 +325,7 @@ public class ThemeChangerBean implements ThemeChanger {
 				cssLink = link.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_HREF);
 				
 				if (cssLink != null) {
-					proceedStyleFile(linkToTheme, getFixedDocumentContent(cssLink));
+					proceedStyleFile(linkToTheme, getFixedDocumentContent(cssLink), false);
 				}
 			}
 		}
@@ -408,7 +408,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			member = it.next();
 			files = member.getStyleFiles();
 			for (index = 0; index < files.size(); index++) {
-				if (!proceedStyleFile(theme.getLinkToBase(), new StringBuffer(theme.getLinkToBase()).append(files.get(index)).toString())) {
+				if (!proceedStyleFile(theme.getLinkToBase(), new StringBuffer(theme.getLinkToBase()).append(files.get(index)).toString(), false)) {
 					invalidFiles.add(files.get(index));	//	Invalid CSS file, disabling variation
 				}
 			}
@@ -910,12 +910,12 @@ public class ThemeChangerBean implements ThemeChanger {
 	private boolean prepareThemeDefaultStyleFiles(Theme theme) {
 		List <String> defaultStyles = ThemesConstants.DEFAULT_STYLE_FILES;
 		for (int i = 0; i < defaultStyles.size(); i++) {
-			proceedStyleFile(theme.getLinkToBase(), new StringBuffer(theme.getLinkToBase()).append(defaultStyles.get(i)).toString());
+			proceedStyleFile(theme.getLinkToBase(), new StringBuffer(theme.getLinkToBase()).append(defaultStyles.get(i)).toString(), true);
 		}
 		return true;
 	}
 	
-	private boolean proceedStyleFile(String linkToTheme, String linkToStyle) {
+	private boolean proceedStyleFile(String linkToTheme, String linkToStyle, boolean standardFiles) {
 		if (linkToStyle == null) {
 			return false;
 		}
@@ -928,7 +928,9 @@ public class ThemeChangerBean implements ThemeChanger {
 		fullLink = new StringBuffer(helper.getFullWebRoot()).append(linkToStyle).toString();
 		InputStream is = helper.getInputStream(fullLink);
 		if (is == null) {
-			log.error(new StringBuilder("Cann't get CSS file: '").append(linkToStyle).append("' from Theme pack!"));
+			if (!standardFiles) {
+				log.warn(new StringBuilder("Cann't get CSS file: '").append(linkToStyle).append("' from Theme pack!"));
+			}
 			return false;
 		}
 		InputStreamReader isr = new InputStreamReader(is);
@@ -1197,7 +1199,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param value
 	 * @return boolean
 	 */
-	private boolean needAddRegion(List <String> regions, String value) {
+	private boolean needAddRegion(List<String> regions, String value) {
 		if (regions == null || value == null) {
 			return false;
 		}

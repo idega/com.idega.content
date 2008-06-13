@@ -1,30 +1,13 @@
 package com.idega.content.themes.business;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.Collection;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.idega.content.business.ContentConstants;
-import com.idega.content.business.WebDAVUploadBean;
-import com.idega.content.presentation.WebDAVUpload;
-import com.idega.content.themes.helpers.bean.Theme;
-import com.idega.content.themes.helpers.business.ThemesConstants;
-import com.idega.content.themes.helpers.business.ThemesHelper;
-import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
-import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWMainSlideStartedEvent;
-import com.idega.servlet.filter.IWBundleResourceFilter;
-import com.idega.slide.business.IWSlideService;
-import com.idega.webface.WFUtil;
 
 /**
  * Installs basic themes on Slide startup
@@ -38,15 +21,26 @@ public class ThemesInstaller implements ApplicationListener {
 
 	private ThemesEngine themesEngine = null;
 	
+	private boolean processHasStarted = false;
+	
 	public void onApplicationEvent(ApplicationEvent event) {
 		if (!(event instanceof IWMainSlideStartedEvent)) {
 			return;
 		}
+		
+		if (processHasStarted) {
+			return;
+		}
+		processHasStarted = true;
 
-		IWMainSlideStartedEvent slideEvent = (IWMainSlideStartedEvent) event;
-		IWMainApplication iwma = slideEvent.getIWMA();
+		processHasStarted = installOrActivateThemes((IWMainSlideStartedEvent) event);
+	}
+	
+	private synchronized boolean installOrActivateThemes(IWMainSlideStartedEvent event) {
+		IWMainApplication iwma = event.getIWMA();
 		Thread themesInstaller = new Thread(new ThemesInstallerRunner(getThemesEngine(), iwma));
 		themesInstaller.start();
+		return true;
 	}
 	
 	private class ThemesInstallerRunner implements Runnable {
@@ -54,25 +48,20 @@ public class ThemesInstaller implements ApplicationListener {
 		private ThemesEngine themesEngine = null;
 		
 		private ThemesInstallerRunner(ThemesEngine themesEngine, IWMainApplication iwma) {
-			this.iwma = iwma;
 			this.themesEngine = themesEngine;
+			this.iwma = iwma;
 		}
 		
 		public void run() {
-			if (1 == 1) {
-				//	TODO:	Temporarily auto deploying is turned off!
-				activateThemes();
-				return;
-			}
+			activateThemes();	//	TODO: for now not auto installing themes
 			
-			IWMainApplicationSettings settings = iwma.getSettings();
+			/*IWMainApplicationSettings settings = iwma.getSettings();
 			if (settings == null) {
 				activateThemes();
 				return;
 			}
 			
-			String property = settings.getProperty(ContentConstants.BASIC_THEMES_ADDED_PROPERTY, Boolean.FALSE.toString());
-			boolean themesAlreadyInstalled = property != null && !property.equalsIgnoreCase(Boolean.FALSE.toString());
+			boolean themesAlreadyInstalled = settings.getBoolean(ContentConstants.BASIC_THEMES_ADDED_PROPERTY, false);
 			if (themesAlreadyInstalled) {
 				activateThemes();
 				return;
@@ -118,19 +107,23 @@ public class ThemesInstaller implements ApplicationListener {
 			uploadBean.setUploadFilePath(ThemesConstants.THEMES_PATH);
 			try {
 				boolean selfInstallingResult = uploadBean.uploadZipFile(true, "Basic_themes", stream, slide);
+				if (selfInstallingResult) {
+					selfInstallingResult = activateThemes();
+				}
 				settings.setProperty(ContentConstants.BASIC_THEMES_ADDED_PROPERTY, String.valueOf(selfInstallingResult));
 			} catch(Exception e) {
 				e.printStackTrace();
 			} finally {
 				helper.closeInputStream(stream);
-			}
+			}*/
 		}
 		
-		private void activateThemes() {
+		private boolean activateThemes() {
 			if (themesEngine == null) {
-				return;
+				return false;
 			}
-			themesEngine.getThemes();
+			
+			return themesEngine.getThemes() == null ? false : true;
 		}
 	}
 

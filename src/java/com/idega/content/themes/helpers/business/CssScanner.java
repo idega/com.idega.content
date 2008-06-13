@@ -111,7 +111,7 @@ public class CssScanner {
 		}
 		
 		if (!urlElementExists) {
-			log.log(Level.SEVERE, "File '" + path + "' does not exist in Theme's pack! Removing CSS expression: " + line);
+			log.log(Level.WARNING, "File '" + path + "' does not exist in Theme's pack! Removing CSS expression: " + line);
 		}
 		return urlElementExists;
 	}
