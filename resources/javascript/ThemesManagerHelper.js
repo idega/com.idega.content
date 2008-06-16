@@ -72,9 +72,16 @@ function getThemeStyleVariationsCallback(variations, loadingLayerOverElement) {
 		loadingLayerOverElement.remove();
 	}
 	
-	if (variations == null) {
+	var container = $('themeStyleVariations');
+	if (container == null) {
 		return false;
 	}
+	
+	if (variations == null) {
+		container.empty();
+		return false;
+	}
+	
 	var theme = getTheme(THEME_ID);
 	if (theme != null) {
 		setIfUsedTheme(theme.used);
@@ -82,10 +89,7 @@ function getThemeStyleVariationsCallback(variations, loadingLayerOverElement) {
 	else {
 		setIfUsedTheme(false);
 	}
-	var container = $('themeStyleVariations');
-	if (container == null) {
-		return false;
-	}
+	
 	container.empty();
 	container = replaceHtml(container, variations);
 	
@@ -346,19 +350,24 @@ function getThemes(themeID, addReflect, needScrollToDefaultTheme) {
 }
 
 function getThemesCallback(themes, needScrollToDefaultTheme) {
-	closeLoadingMessage();
-	if (themes == null) {
-		hideThemesContainer();
-		return;
-	}
-
-	showThemesContainer();
+	closeAllLoadingMessages();
+	
 	var container = $(CONTAINER_ID);
 	if (container == null) {
 		return;
 	}
 	
 	container.empty();
+	
+	if (themes == null) {
+		getThemeStyleVariationsCallback(null, null);
+		setPreview('');
+		setThemeName('');
+		hideThemesContainer();
+		return;
+	}
+
+	showThemesContainer();
 	
 	THEMES = new Array();
 	var simpleTheme = null;
@@ -577,10 +586,19 @@ function setPreview(url) {
 		return false;
 	}
 	
+	if (url == null || url == '') {
+		preview.setProperty('src', '');
+		return false;
+	}
+	
 	var imageUnloader = null;
 	var images = [url];
 	var loadedImages = [];
-	var loadingLayerOverElement = $(setLoadingLayerForElement(preview.id, false, preview.getSize(), preview.getPosition()));
+	var previewSize = preview.getSize();
+	var loadingLayerOverElement = null;
+	if (previewSize.size.x != 0 && previewSize.size.y == 0) {
+		loadingLayerOverElement = $(setLoadingLayerForElement(preview.id, false, previewSize, preview.getPosition()));
+	}
 	
 	new Asset.images(images, {
 		onProgress: function(i) {
@@ -592,7 +610,9 @@ function setPreview(url) {
 		},
 		onComplete: function() {
 			try {
-				loadingLayerOverElement.remove();
+				if (loadingLayerOverElement != null) {
+					loadingLayerOverElement.remove();
+				}
 			} catch(e) {}
 			
 			imageUnloader.start(1, 0.8);
