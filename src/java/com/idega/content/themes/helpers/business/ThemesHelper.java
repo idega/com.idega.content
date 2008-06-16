@@ -229,7 +229,7 @@ public class ThemesHelper implements Singleton {
 		
 		List<SearchResult> themes = search(ThemesConstants.THEME_SEARCH_KEY, searchScope);
 		if (themes == null) {
-			log.warning(this.getClass().getName() + ": ContentSearch.doSimpleDASLSearch returned results Collection, which is null: " + themes);
+			log.log(Level.WARNING, "ContentSearch.doSimpleDASLSearch returned results Collection, which is null!");
 			checkedFromSlide = false;
 			return;
 		}
@@ -614,11 +614,11 @@ public class ThemesHelper implements Singleton {
 			try {
 				document = builder.build(reader);
 			} catch (JDOMException e) {
-				log.warning(this.getClass().getName() + ": JDOM exception");
+				log.log(Level.SEVERE, "JDOM exception trying to build JDOM Document");
 				e.printStackTrace();
 				return null;
 			} catch (IOException e) {
-				log.warning(this.getClass().getName() + ": IOException trying to build a JDOM Document");
+				log.log(Level.SEVERE, "IOException trying to build a JDOM Document");
 				e.printStackTrace();
 				return null;
 			}
@@ -729,7 +729,7 @@ public class ThemesHelper implements Singleton {
 			File file = IWBundleResourceFilter.copyResourceFromJarToWebapp(IWMainApplication.getDefaultIWMainApplication(), uri);
 			if (file == null) {
 				if (printError) {
-					log.warning("Error getting file (file was not found): " + uri);
+					log.log(Level.WARNING, "Error getting file (file was not found): " + uri);
 				}
 				return null;
 			}
@@ -739,7 +739,7 @@ public class ThemesHelper implements Singleton {
 			} catch (FileNotFoundException e) {
 				if (printError) {
 	        		e.printStackTrace();
-	        		log.warning("Error getting file: " + uri);
+	        		log.log(Level.WARNING, "Error getting file: " + uri);
 	        	}
 			}
 		}
@@ -750,7 +750,7 @@ public class ThemesHelper implements Singleton {
 			} catch(Exception e) {
 				if (printError) {
 	        		e.printStackTrace();
-	        		log.warning("Error getting URL: " + uri);
+	        		log.log(Level.WARNING, "Error getting URL: " + uri);
 	        	}
 			}
 		}
@@ -1337,7 +1337,7 @@ public class ThemesHelper implements Singleton {
 		}
 		Document doc = getXMLDocument(templateFile, false, true);
 		if (doc == null) {
-			log.warning(this.getClass().getName() + ": Template file ("+templateFile+") wasn'tfound!");
+			log.log(Level.WARNING, "Template file ("+templateFile+") wasn'tfound!");
 			return null;
 		}
 		doc = preparePageDocument(doc, articlesPaths, pageId);
@@ -1633,8 +1633,8 @@ public class ThemesHelper implements Singleton {
 					if (MODULE_ELEMENT_NAME.equals(e.getName())) {
 						icObjectId = getICObjectId(e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE), icoHome);
 						if (icObjectId == -1) {
-							log.warning(this.getClass().getName() +": Didn't get ICObject for: "+e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE));
-							log.warning(this.getClass().getName() + ": Generating unique module id");
+							log.log(Level.WARNING, "Didn't get ICObject for: "+e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE));
+							log.log(Level.WARNING, "Generating unique module id");
 							moduleID = getUniqueIdByNumberAndDate(MODULE_ID_SCOPE);
 							while (moduleIds.contains(moduleID)) {
 								moduleID = getUniqueIdByNumberAndDate(MODULE_ID_SCOPE);
@@ -1654,7 +1654,7 @@ public class ThemesHelper implements Singleton {
 							moduleIdAttribute.setValue(moduleID);
 						}
 						else {
-							log.warning("Didn't find module id attribute for: " + e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE));
+							log.log(Level.WARNING, "Didn't find module id attribute for: " + e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE));
 						}
 					}
 				}
