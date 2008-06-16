@@ -15,11 +15,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jaxen.JaxenException;
 import org.jaxen.jdom.JDOMXPath;
 import org.jdom.Attribute;
@@ -56,7 +56,7 @@ import com.idega.util.StringHandler;
 @Service(ThemeChanger.SPRING_BEAN_IDENTIFIER)
 public class ThemeChangerBean implements ThemeChanger {
 
-	private static final Log log = LogFactory.getLog(ThemeChangerBean.class);
+	private static final Logger logger = Logger.getLogger(ThemeChangerBean.class.getName());
 	
 	// These are defaults in RapidWeaver, we are using its to generate good preview
 	private static final String IMAGE_START = "<img src=";
@@ -120,7 +120,12 @@ public class ThemeChangerBean implements ThemeChanger {
 	private String[] _regularExpressionsForNeedlessStuff = new String[] {/*" xmlns.+\"", */"..<?doc.+?>"};
 	private List<String> regularExpressionsForNeedlessStuff = Collections.unmodifiableList(Arrays.asList(_regularExpressionsForNeedlessStuff));
 	
-	String defaultColour = "#ffffff";
+	private String[] _searchTerms = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"};
+	private List<String> searchTerms = Collections.unmodifiableList(Arrays.asList(_searchTerms));
+	
+	private Map<String, Integer> hexToDecNumbersMap = new HashMap<String, Integer>();
+	
+	private String defaultColour = "#ffffff";
 	
 	public ThemeChangerBean() {
 		out = new XMLOutputter();
@@ -201,7 +206,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 		
-		// Adding IBPage regions
+		// Adding Builder page regions
 		if (!proceedBodyContent(path, root.getChild(HTML_BODY, namespace))) {
 			return false;
 		}
@@ -253,7 +258,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 
 		Text t = null;
-		for (Iterator <Text> itt = textElements.iterator(); itt.hasNext(); ) {
+		for (Iterator<Text> itt = textElements.iterator(); itt.hasNext(); ) {
 			t = itt.next();
 			if (needAddRegion(ThemesConstants.REGIONS, t.getTextNormalize())) {
 				head.addContent(getCommentsCollection(fixValue(t.getTextNormalize(), linkToBase)));
@@ -544,84 +549,58 @@ public class ThemeChangerBean implements ThemeChanger {
 		int start = -1;
 		int end = -1;
 		String originalValue = null;
-		String cssValue = null;
+		String computedCSSValue = null;
 		List<String> searchTerm = new ArrayList<String>();
 		searchTerm.add(CoreConstants.PERCENT);
 		while (content.indexOf(variable) != -1) {
 			start = getStartIndexForCssVariable(content, variable, CoreConstants.PERCENT);
 			end = getEndIndexForCssVariable(content, variable, searchTerm, true, true);
 			if (!canSubstring(content, start, end)) {
-				log.error("Can not extract CSS expression '"+variable+"' because of invalid indexes: start index: " + start + ", end index: " + end +
+				logger.log(Level.WARNING, "Can not extract CSS expression '"+variable+"' because of invalid indexes: start index: " + start + ", end index: " + end +
 						". Using default colour: '"+defaultColour+"'");
-				cssValue = defaultColour;	//	Error
+				computedCSSValue = defaultColour;	//	Error
 			}
 			
 			originalValue = content.substring(start, end);
-			cssValue = computeCssValue(originalValue, variable, value);
-			if (cssValue == null) {
-				log.error("Error occured computed CSS value for variable '"+variable+"', using default colour ('"+defaultColour+"') for this variable.");
-				cssValue = defaultColour;	//	Error
+			computedCSSValue = computeCssValue(originalValue, variable, value);
+			if (computedCSSValue == null) {
+				logger.log(Level.WARNING, "Error occured computed CSS value for variable '"+variable+"', using default colour ('"+defaultColour+"') for this variable.");
+				computedCSSValue = defaultColour;	//	Error
 			}
-			else if (cssValue.length() != 4 && cssValue.length() != 7) {
-				int requiredLength = cssValue.length() > 4 ? 7 : 4;
-				while (cssValue.length() < requiredLength) {
-					cssValue = cssValue.replaceFirst(CoreConstants.NUMBER_SIGN, String.valueOf(CoreConstants.NUMBER_SIGN + 0));
+			else if (computedCSSValue.length() != 4 && computedCSSValue.length() != 7) {
+				int requiredLength = computedCSSValue.length() > 4 ? 7 : 4;
+				while (computedCSSValue.length() < requiredLength) {
+					computedCSSValue = computedCSSValue.replaceFirst(CoreConstants.NUMBER_SIGN, String.valueOf(CoreConstants.NUMBER_SIGN + 0));
 				}
 			}
 			
-			content = StringHandler.replace(content, originalValue, cssValue);
+			content = StringHandler.replace(content, originalValue, computedCSSValue);
 		}
 		
 		return content;
 	}
 	
-	private String computeCssValue(String originalValue, String variable, String value) {
-		if (originalValue.indexOf(CoreConstants.PLUS) == -1 && originalValue.indexOf(CoreConstants.MINUS) == -1 && originalValue.indexOf(CoreConstants.STAR) == -1) {
+	private String computeCssValue(String colourExpression, String variable, String value) {
+		if (colourExpression.indexOf(CoreConstants.PLUS) == -1 && colourExpression.indexOf(CoreConstants.MINUS) == -1 && colourExpression.indexOf(CoreConstants.STAR) == -1) {
+			//	No math expression
 			return value;
 		}
 		
-		originalValue = originalValue.toLowerCase();
-		originalValue = StringHandler.replace(originalValue, CoreConstants.PERCENT, CoreConstants.EMPTY);	//	Removing '%'
+		String finalHexExpression = null;
 		
-		if (originalValue.indexOf("r(") == -1 && originalValue.indexOf("g(") == -1 && originalValue.indexOf("b(") == -1) {
-			originalValue = StringHandler.replace(originalValue, variable, value);							//	Replacing variable with value
+		colourExpression = colourExpression.toLowerCase();
+		colourExpression = StringHandler.replace(colourExpression, CoreConstants.PERCENT, CoreConstants.EMPTY);	//	Removing '%'
+		colourExpression = StringHandler.replace(colourExpression, variable, value);							//	Replacing variable with value
+		
+		boolean normalExpression = colourExpression.indexOf("r(") == -1 && colourExpression.indexOf("g(") == -1 && colourExpression.indexOf("b(") == -1;
+		if (normalExpression) {
+			finalHexExpression = getComputedHeximalValueByCSSExpression(colourExpression);						//	Hex numbers replaced with decimal
 		}
 		else {
-			originalValue = getComputedHeximalValueByRGB(originalValue, variable, value);					//	Making expression
-			if (originalValue == null) {
-				return value;
-			}
+			finalHexExpression = getComputedHeximalValueByRGB(colourExpression, variable, value);				//	Making expression
 		}
 		
-		originalValue = getCssExpressionWithDecimalNumbers(originalValue);									//	Hex numbers replaced with decimal
-		if (originalValue == null) {
-			return value;
-		}
-		
-		Object o = null;
-		try {
-			o = mathInterpreter.eval(originalValue);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return value;
-		}
-		if (o == null) {
-			return value;
-		}
-		
-		String computedValue = String.valueOf(o);
-		int index = computedValue.indexOf(CoreConstants.DOT);
-		if (index != -1) {
-			computedValue = StringHandler.replace(computedValue, computedValue.substring(index), CoreConstants.EMPTY);
-			index = -1;
-		}
-		
-		try {
-			return new StringBuffer(CoreConstants.NUMBER_SIGN).append(Integer.toHexString(new Integer(computedValue))).toString();
-		} catch(Exception e) {
-			e.printStackTrace();
-			return value;
-		}
+		return finalHexExpression == null ? value : finalHexExpression;
 	}
 	
 	private String getComputedHeximalValueByRGB(String originalValue, String variable, String value) {
@@ -708,38 +687,194 @@ public class ThemeChangerBean implements ThemeChanger {
 		return destination;
 	}*/
 	
-	private String getCssExpressionWithDecimalNumbers(String expression) {
-		if (expression.indexOf(CoreConstants.NUMBER_SIGN) == -1) {
-			return expression;
+	private String makeMultiplication(String expression) {
+		return expression;	//	TODO: make logic
+	}
+	
+	private String[] getHexValueSplitted(String hexValue) {
+		if (hexValue.startsWith(CoreConstants.NUMBER_SIGN)) {
+			hexValue = StringHandler.replace(hexValue, CoreConstants.NUMBER_SIGN, CoreConstants.EMPTY);
 		}
 		
-		int start = -1;
-		int end = -1;
-		String key = CoreConstants.NUMBER_SIGN;
-		String[] _searchTerms = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"};
-		List<String> searchTerms = ListUtil.convertStringArrayToList(_searchTerms);
-		String hexidecimal = null;
-		int decimal = -1;
-		while (expression.indexOf(CoreConstants.NUMBER_SIGN) != -1) {
-			start = getStartIndexForCssVariable(expression, key, CoreConstants.NUMBER_SIGN);
-			end = getEndIndexForCssVariable(expression, key, searchTerms, false, false);
-			
-			if (!(canSubstring(expression, start, end))) {
-				return null;	//	Error
-			}
-			
-			hexidecimal = expression.substring(start, end);
-			try {
-				decimal = Integer.decode(hexidecimal);
-			} catch(Exception e) {
-				e.printStackTrace();
+		hexValue = hexValue.trim();
+		
+		if (hexValue.length() != 3 && hexValue.length() != 6) {
+			logger.log(Level.WARNING, "Invalid length (must be 3 or 6) for hex value: " + hexValue);
+			return null;
+		}
+		
+		String[] hexParts = new String[3];
+		int beginIndex = 0;
+		int stepSize = hexValue.length() == 3 ? 1 : 2;
+		int endIndex = stepSize;
+		for (int i = 0; i < hexParts.length; i++) {
+			if (!(canSubstring(hexValue, beginIndex, endIndex))) {
+				logger.log(Level.WARNING, "Got invalid indexes (begin: "+beginIndex+", end: " + endIndex + ") while splitting hex value: " + hexValue);
 				return null;
 			}
 			
-			expression = StringHandler.replace(expression, hexidecimal, String.valueOf(decimal));
+			hexParts[i] = new StringBuilder(CoreConstants.NUMBER_SIGN).append(hexValue.substring(beginIndex, endIndex)).toString();
+			beginIndex += stepSize;
+			endIndex += stepSize;
 		}
 		
-		return expression;
+		return hexParts;
+	}
+	
+	private String getHexValueFromExpression(String expression) {
+		int start = getStartIndexForCssVariable(expression, CoreConstants.NUMBER_SIGN, CoreConstants.NUMBER_SIGN);
+		int end = getEndIndexForCssVariable(expression, CoreConstants.NUMBER_SIGN, searchTerms, false, false);
+		
+		if (!(canSubstring(expression, start, end))) {
+			return null;	//	Error
+		}
+			
+		return expression.substring(start, end);
+	}
+	
+	private String executeColourOperation(String operand1, String operation, String operand2) {
+		String[] splitted1 = getHexValueSplitted(operand1);
+		String[] splitted2 = getHexValueSplitted(operand2);
+	
+		if (splitted1 == null || splitted2 == null) {
+			return null;
+		}
+		
+		Object result = null;
+		String mathOperation = null;
+		Integer resultInDecimals = null;
+		List<Integer> hexPartsInDecimals = new ArrayList<Integer>();
+		for (int i = 0; i <splitted1.length; i++) {
+			result = null;
+			mathOperation = null;
+			try {
+				mathOperation = new StringBuffer().append(Integer.decode(splitted1[i])).append(operation).append(Integer.decode(splitted2[i])).toString();
+			} catch(NumberFormatException e) {
+				logger.log(Level.SEVERE, "Error while converting hex value to decimal", e);
+				return null;
+			}
+			if (mathOperation == null) {
+				return null;
+			}
+			
+			resultInDecimals = hexToDecNumbersMap.get(mathOperation);
+			if (resultInDecimals == null) {
+				try {
+					result = mathInterpreter.eval(mathOperation);
+				} catch(Exception e) {
+					logger.log(Level.SEVERE, "Error while computing CSS colour value: " + mathOperation, e);
+					return null;
+				}
+				if (result == null) {
+					logger.log(Level.SEVERE, "Error while computing CSS colour value: " + mathOperation);
+					return null;
+				}
+				
+				try {
+					resultInDecimals = Integer.valueOf(result.toString());
+				} catch(NumberFormatException e) {
+					logger.log(Level.SEVERE, "Error while making Integer from String: " + result);
+					return null;
+				}
+				if (resultInDecimals == null) {
+					return null;
+				}
+				
+				hexToDecNumbersMap.put(mathOperation, resultInDecimals);
+			}
+			
+			hexPartsInDecimals.add(resultInDecimals);
+		}
+		
+		if (hexPartsInDecimals.isEmpty()) {
+			return null;
+		}
+		
+		String hexPartInString = null;
+		StringBuffer computedHexValue = new StringBuffer(CoreConstants.NUMBER_SIGN);
+		for (Integer hexPart: hexPartsInDecimals) {
+			if (hexPart < 0) {
+				hexPart = 0;
+			}
+			if (hexPart > 255) {
+				hexPart = 255;
+			}
+			
+			hexPartInString = null;
+			try {
+				hexPartInString = Integer.toHexString(hexPart);
+			} catch(NumberFormatException e) {
+				logger.log(Level.SEVERE, "Error while converting decimal to hex: " + hexPart, e);
+				return null;
+			}
+			if (hexPartInString == null) {
+				return null;
+			}
+			
+			computedHexValue.append(hexPartInString);
+		}
+		
+		
+		return computedHexValue.toString();
+	}
+	
+	private String getComputedHeximalValueByCSSExpression(String expression) {
+		int multiplicationOperation = expression.indexOf(CoreConstants.STAR);
+		while (multiplicationOperation != -1) {
+			//	Firstly making multiplication operations
+			expression = makeMultiplication(expression);
+			multiplicationOperation = expression.indexOf(CoreConstants.STAR);
+		}
+		
+		String variable = getHexValueFromExpression(expression);
+		if (variable == null) {
+			return null;
+		}
+		
+		expression = StringHandler.replace(expression, variable, CoreConstants.EMPTY);
+		
+		String operand = null;
+		List<String> operands = new ArrayList<String>();
+		while (expression.indexOf(CoreConstants.NUMBER_SIGN) != -1) {
+			operand = getHexValueFromExpression(expression);
+			if (operand == null) {
+				return null;
+			}
+			
+			operands.add(operand);
+			expression = StringHandler.replace(expression, operand, CoreConstants.EMPTY);
+		}
+		
+		if (operands.isEmpty()) {
+			return variable;
+		}
+		if (expression == null || expression.equals(CoreConstants.EMPTY)) {
+			return null;
+		}
+		expression = expression.replaceAll(CoreConstants.SPACE, CoreConstants.EMPTY);
+		if (expression.equals(CoreConstants.EMPTY) || expression.length() != operands.size()) {
+			return null;
+		}
+		
+		//	Now left only operations: -, +
+		int index = 0;
+		String operation = null;
+		String computedCSSValue = variable;
+		while (expression.length() > 0) {
+			operation = expression.substring(0, 1);
+			if (operation.equals(CoreConstants.MINUS) || operation.equals(CoreConstants.PLUS)) {
+				computedCSSValue = executeColourOperation(computedCSSValue, operation, operands.get(index));
+				
+				if (computedCSSValue == null) {
+					return null;
+				}
+			}
+			
+			expression = expression.substring(1);
+			index++;
+		}
+		
+		return computedCSSValue;
 	}
 	
 	private boolean canSubstring(String content, int start, int end) {
@@ -929,7 +1064,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		InputStream is = helper.getInputStream(fullLink);
 		if (is == null) {
 			if (!standardFiles) {
-				log.warn(new StringBuilder("Cann't get CSS file: '").append(linkToStyle).append("' from Theme pack!"));
+				logger.log(Level.WARNING, new StringBuilder("Cann't get CSS file: '").append(linkToStyle).append("' from Theme pack!").toString());
 			}
 			return false;
 		}
@@ -2110,7 +2245,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		if (isNewName(themeName, theme)) {
-			log.info("Creating new theme: " + themeName);
+			logger.log(Level.INFO, "Creating new theme: " + themeName);
 			return createNewTheme(theme, themeName);
 		}
 		
