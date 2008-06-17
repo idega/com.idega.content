@@ -41,4 +41,6 @@ public interface ThemeChanger {
 	public boolean reloadThemeProperties(String themeKey, boolean checkConfig) throws Exception;
 	
 	public boolean setBuiltInStyle(String themeId, String builtInStyleId) throws Exception;
+	
+	public ThemeStyleGroupMember getColorGroupMember(Theme theme, String variable) throws Exception;
 }

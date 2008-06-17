@@ -31,10 +31,9 @@ import org.jdom.Namespace;
 import org.jdom.Text;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-
-import bsh.Interpreter;
 
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.content.business.ContentConstants;
@@ -49,7 +48,6 @@ import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
-import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 
 @Scope("singleton")
@@ -102,40 +100,40 @@ public class ThemeChangerBean implements ThemeChanger {
 	
 	private static final String[] TOOLBAR_NAV_MENU = new String[] {"Frontpage", "Products", "Customers", "Partners", "The Company", "News"};
 	
-	private String[] _validLinkTagAttributes = new String[] {"charset", HREF, "hreflang", "media", "rel", "rev", "target", "type", "title"};
-	private List<String> validLinkTagAttributes = Collections.unmodifiableList(Arrays.asList(_validLinkTagAttributes));
+	private static final String[] _VALID_LINK_TAG_ATTRIBUTES = new String[] {"charset", HREF, "hreflang", "media", "rel", "rev", "target", "type", "title"};
+	private static final List<String> VALID_LINK_TAG_ATTRIBUTES = Collections.unmodifiableList(Arrays.asList(_VALID_LINK_TAG_ATTRIBUTES));
 	
-	private String[] _unChangedCaseAttributes = new String[] {HREF, "src"};
-	private List<String> unChangedCaseAttributes = Collections.unmodifiableList(Arrays.asList(_unChangedCaseAttributes));
+	private static final String[] _UN_CHANGED_CASE_ATTRIBUTES = new String[] {HREF, "src"};
+	private static final List<String> UN_CHANGED_CASE_ATTRIBUTES = Collections.unmodifiableList(Arrays.asList(_UN_CHANGED_CASE_ATTRIBUTES));
+	
+	private static final String[] _THEME_HEAD_VARIABLES = new String[] {"%header%", "%style_variations%", "%user_styles%", "%user_javascript%",
+														"%plugin_header%", "%user_header%"};
+	private static final List<String> THEME_HEAD_VARIABLES = Collections.unmodifiableList(Arrays.asList(_THEME_HEAD_VARIABLES));
+	
+	private static final String[] _REGULAR_EXORESSIONS_FOR_NEEDLESS_STUFF = new String[] {/*" xmlns.+\"", */"..<?doc.+?>"};
+	private static final List<String> REGULAR_EXORESSIONS_FOR_NEEDLESS_STUFF = Collections.unmodifiableList(Arrays.asList(_REGULAR_EXORESSIONS_FOR_NEEDLESS_STUFF));
 	
 	private ThemesHelper helper = null;
 	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
 	private XMLOutputter out = null;
-	private Interpreter mathInterpreter = null;
-	
-	private String[] _themeHeadVariables = new String[] {"%header%", "%style_variations%", "%user_styles%", "%user_javascript%",
-														"%plugin_header%", "%user_header%"};
-	private List<String> themeHeadVariables = Collections.unmodifiableList(Arrays.asList(_themeHeadVariables));
-	
-	private String[] _regularExpressionsForNeedlessStuff = new String[] {/*" xmlns.+\"", */"..<?doc.+?>"};
-	private List<String> regularExpressionsForNeedlessStuff = Collections.unmodifiableList(Arrays.asList(_regularExpressionsForNeedlessStuff));
-	
-	private String[] _searchTerms = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"};
-	private List<String> searchTerms = Collections.unmodifiableList(Arrays.asList(_searchTerms));
-	
-	private Map<String, Integer> hexToDecNumbersMap = new HashMap<String, Integer>();
-	
-	private String defaultColour = "#ffffff";
+	private ColourExpressionCalculator colourCalculator = null;
 	
 	public ThemeChangerBean() {
 		out = new XMLOutputter();
 		out.setFormat(Format.getPrettyFormat());
 		
-		mathInterpreter = new bsh.Interpreter();
-		
 		helper = ThemesHelper.getInstance();
 	}
 	
+	public ColourExpressionCalculator getColourCalculator() {
+		return colourCalculator;
+	}
+
+	@Autowired
+	public void setColourCalculator(ColourExpressionCalculator colourCalculator) {
+		this.colourCalculator = colourCalculator;
+	}
+
 	private boolean prepareHeadContent(Theme theme, String skeleton) {
 		if (theme == null || skeleton == null) {
 			return false;
@@ -154,8 +152,8 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		String variable = null;
 		String value = null;
-		for (int i = 0; i < themeHeadVariables.size(); i++) {
-			variable = themeHeadVariables.get(i);
+		for (int i = 0; i < THEME_HEAD_VARIABLES.size(); i++) {
+			variable = THEME_HEAD_VARIABLES.get(i);
 			value = getThemeValueByVariable(variable);
 			
 			content = StringHandler.replace(content, variable, value);
@@ -283,7 +281,7 @@ public class ThemeChangerBean implements ThemeChanger {
 					
 					if (ELEMENT_LINK_NAME.equals(element.getName().toLowerCase())) {
 						//	<link>
-						checkElementAttributes(element, validLinkTagAttributes);
+						checkElementAttributes(element, VALID_LINK_TAG_ATTRIBUTES);
 					}
 				}
 			}
@@ -425,523 +423,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 	
 	private boolean setValuesToColourFiles(Theme theme) {
-		if (theme == null) {
-			return false;
-		}
-		
-		if (!theme.hasColourFiles()) {
-			return true;
-		}
-		
-		List<String> colourFiles = theme.getColourFiles();
-		IWSlideService slide = helper.getSlideService();
-		if (slide == null) {
-			return false;
-		}
-		
-		List<String> keys = theme.getStyleVariablesKeys();
-		
-		String file = null;
-		String webRoot = helper.getFullWebRoot();
-		String sourceLink = null;
-		InputStream stream = null;
-		String key = null;
-		for (int i = 0; i < colourFiles.size(); i++) {
-			file = colourFiles.get(i);
-			
-			sourceLink = new StringBuffer(webRoot).append(theme.getLinkToBase()).append(helper.getThemeColourFileName(theme, null, file, true)).toString();
-			stream = helper.getInputStream(sourceLink);
-			if (stream == null) {
-				return false;
-			}
-			
-			String content = null;
-			try {
-				content = StringHandler.getContentFromInputStream(stream);
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				helper.closeInputStream(stream);
-			}
-			if (content == null) {
-				return false;
-			}
-			
-			for (int j = 0; (j < keys.size() && content != null); j++) {
-				key = keys.get(j);
-				content = replaceColourFileContent(content, key, theme.getStyleVariableValue(key));
-			}
-			
-			content = checkIfAllVariablesReplaced(content, theme);
-			
-			if (content == null) {
-				return false;
-			}
-			
-			try {
-				if (!(slide.uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBase(), file, content, CoreConstants.CONTENT_TYPE_TEXT_CSS, true))) {
-					return false;
-				}
-			} catch (RemoteException e) {
-				e.printStackTrace();
-				return false;
-			}
-		}
-		
-		return true;
-	}
-	
-	private String checkIfAllVariablesReplaced(String content, Theme theme) {
-		if (content == null || theme == null) {
-			return null;
-		}
-		
-		int start = -1;
-		int end = -1;
-		List<String> searchTerm = ListUtil.convertStringArrayToList(new String[] {CoreConstants.PERCENT});
-		String cssExpression = null;
-		String fixedCssExpression = null;
-		String variable = null;
-		String styleValue = null;
-		ThemeStyleGroupMember colourVariation = null;
-		while (content.indexOf(CoreConstants.PERCENT) != -1) {
-			cssExpression = null;
-			fixedCssExpression = null;
-			variable = null;
-			styleValue = null;
-			colourVariation = null;
-			
-			start = getStartIndexForCssVariable(content, CoreConstants.PERCENT, CoreConstants.PERCENT);
-			end = getEndIndexForCssVariable(content, CoreConstants.PERCENT, searchTerm, true, true);
-			
-			if (!(canSubstring(content, start, end))) {
-				return content;
-			}
-
-			cssExpression = content.substring(start, end);
-			variable = StringHandler.remove(cssExpression, CoreConstants.PERCENT);
-			styleValue = theme.getStyleVariableValue(variable);
-			if (styleValue == null) {
-				colourVariation = getColorGroupMember(theme, variable);
-				if (colourVariation != null) {
-					styleValue = colourVariation.getColour();
-				}
-			}
-			if (styleValue == null) {
-				styleValue = defaultColour;
-			}
-			
-			fixedCssExpression = computeCssValue(cssExpression, variable, styleValue);
-			content = StringHandler.replace(content, cssExpression, fixedCssExpression);
-		}
-		
-		return content;
-	}
-	
-	private String replaceColourFileContent(String content, String variable, String value) {
-		if (content == null) {
-			return null;
-		}
-		if (variable == null || value == null) {
-			return null;
-		}
-		
-		int start = -1;
-		int end = -1;
-		String originalValue = null;
-		String computedCSSValue = null;
-		List<String> searchTerm = new ArrayList<String>();
-		searchTerm.add(CoreConstants.PERCENT);
-		while (content.indexOf(variable) != -1) {
-			start = getStartIndexForCssVariable(content, variable, CoreConstants.PERCENT);
-			end = getEndIndexForCssVariable(content, variable, searchTerm, true, true);
-			if (!canSubstring(content, start, end)) {
-				logger.log(Level.WARNING, "Can not extract CSS expression '"+variable+"' because of invalid indexes: start index: " + start + ", end index: " + end +
-						". Using default colour: '"+defaultColour+"'");
-				computedCSSValue = defaultColour;	//	Error
-			}
-			
-			originalValue = content.substring(start, end);
-			computedCSSValue = computeCssValue(originalValue, variable, value);
-			if (computedCSSValue == null) {
-				logger.log(Level.WARNING, "Error occured computed CSS value for variable '"+variable+"', using default colour ('"+defaultColour+"') for this variable.");
-				computedCSSValue = defaultColour;	//	Error
-			}
-			else if (computedCSSValue.length() != 4 && computedCSSValue.length() != 7) {
-				int requiredLength = computedCSSValue.length() > 4 ? 7 : 4;
-				while (computedCSSValue.length() < requiredLength) {
-					computedCSSValue = computedCSSValue.replaceFirst(CoreConstants.NUMBER_SIGN, String.valueOf(CoreConstants.NUMBER_SIGN + 0));
-				}
-			}
-			
-			content = StringHandler.replace(content, originalValue, computedCSSValue);
-		}
-		
-		return content;
-	}
-	
-	private String computeCssValue(String colourExpression, String variable, String value) {
-		if (colourExpression.indexOf(CoreConstants.PLUS) == -1 && colourExpression.indexOf(CoreConstants.MINUS) == -1 && colourExpression.indexOf(CoreConstants.STAR) == -1) {
-			//	No math expression
-			return value;
-		}
-		
-		String finalHexExpression = null;
-		
-		colourExpression = colourExpression.toLowerCase();
-		colourExpression = StringHandler.replace(colourExpression, CoreConstants.PERCENT, CoreConstants.EMPTY);	//	Removing '%'
-		colourExpression = StringHandler.replace(colourExpression, variable, value);							//	Replacing variable with value
-		
-		boolean normalExpression = colourExpression.indexOf("r(") == -1 && colourExpression.indexOf("g(") == -1 && colourExpression.indexOf("b(") == -1;
-		if (normalExpression) {
-			finalHexExpression = getComputedHeximalValueByCSSExpression(colourExpression);						//	Hex numbers replaced with decimal
-		}
-		else {
-			finalHexExpression = getComputedHeximalValueByRGB(colourExpression, variable, value);				//	Making expression
-		}
-		
-		return finalHexExpression == null ? value : finalHexExpression;
-	}
-	
-	private String getComputedHeximalValueByRGB(String originalValue, String variable, String value) {
-		//	TODO not finished RGB stuff!
-		if (originalValue == null || variable == null || value == null) {
-			return null;
-		}
-		
-		if (value.startsWith(CoreConstants.NUMBER_SIGN)) {
-			value = value.substring(1);
-		}
-		
-		/*String doubleRegex = "(?i)(?:"+
-		"\\b\\d+\\.\\d*(?:e[+-]?\\d+|)[fF]?|"+// ex: 34., 3.E2
-		"\\d*\\.\\d+(?:e[+-]?\\d+|)[fF]?|"+ // ex: .2, .994e+4
-		"\\b\\d+e[+-]?\\d+[fF]?|"+ // ex: 1e-15
-		"\\b\\d+[fF]"+ // ex: 22f
-		")[fF]?";
-//		String intRegex = "\\d*";
-		
-		List<String> rgbRegexs = new ArrayList<String>();
-//		rgbRegexs.add("[r][\\p{Punct}]["+doubleRegex+"][\\p{Punct}][g][\\p{Punct}]["+doubleRegex+"][\\p{Punct}][b][\\p{Punct}]["+doubleRegex+"][\\p{Punct}]");
-//		rgbRegexs.add("[r][\\p{Punct}][\\p{Digit}*][\\p{Punct}][g][\\p{Punct}][\\p{Digit}*][\\p{Punct}][b][\\p{Punct}][\\p{Digit}*][\\p{Punct}]");
-		rgbRegexs.add(doubleRegex);
-//		rgbRegexs.add(intRegex);
-		List<String> rgbs = getValuesByPatterns(originalValue, rgbRegexs);
-		if (rgbs == null || rgbs.size() == 0) {
-			return null;
-		}
-		
-		String[] valueParts = new String[3];
-		String valuePart = null;
-		if (value.length() == 3) {
-			valuePart = value.substring(0, 1);
-			valueParts[0] = new StringBuffer(valuePart).append(valuePart).toString();	//	Red
-			
-			valuePart = value.substring(1, 2);
-			valueParts[1] = new StringBuffer(valuePart).append(valuePart).toString();	//	Green
-			
-			valuePart = value.substring(2);
-			valueParts[2] = new StringBuffer(valuePart).append(valuePart).toString();	//	Blue
-		}
-		else {
-			valueParts[0] = value.substring(0, 2);	//	Red
-			valueParts[1] = value.substring(2, 4);	//	Green
-			valueParts[2] = value.substring(4);		//	Blue
-		}
-		
-//		System.out.println(rgbs);*/
-		return null;
-	}
-	
-	/*private List<String> getValuesByPatterns(String source, List<String> regexs) {
-		if (source == null || regexs == null) {
-			return null;
-		}
-		
-		List<String> destination = new ArrayList<String>();
-		Pattern p = null;
-		Matcher m = null;
-		String value = null;
-		
-		for (int i = 0; i < regexs.size(); i++) {
-			try {
-				p = Pattern.compile(regexs.get(i));
-				m = p.matcher(source);
-				while (m.find()) {
-					int start = m.start();
-					int end = m.end();
-					if (canSubstring(source, start, end)) {
-						value = source.substring(start, end);
-						try {
-							Double.valueOf(value);
-							destination.add(value);
-						} catch(Exception e){
-							e.printStackTrace();
-						}
-					}
-				}
-			} catch(Exception e) {
-			}
-		}
-		
-		return destination;
-	}*/
-	
-	private String makeMultiplication(String expression) {
-		return expression;	//	TODO: make logic
-	}
-	
-	private String[] getHexValueSplitted(String hexValue) {
-		if (hexValue.startsWith(CoreConstants.NUMBER_SIGN)) {
-			hexValue = StringHandler.replace(hexValue, CoreConstants.NUMBER_SIGN, CoreConstants.EMPTY);
-		}
-		
-		hexValue = hexValue.trim();
-		
-		if (hexValue.length() != 3 && hexValue.length() != 6) {
-			logger.log(Level.WARNING, "Invalid length (must be 3 or 6) for hex value: " + hexValue);
-			return null;
-		}
-		
-		String[] hexParts = new String[3];
-		int beginIndex = 0;
-		int stepSize = hexValue.length() == 3 ? 1 : 2;
-		int endIndex = stepSize;
-		for (int i = 0; i < hexParts.length; i++) {
-			if (!(canSubstring(hexValue, beginIndex, endIndex))) {
-				logger.log(Level.WARNING, "Got invalid indexes (begin: "+beginIndex+", end: " + endIndex + ") while splitting hex value: " + hexValue);
-				return null;
-			}
-			
-			hexParts[i] = new StringBuilder(CoreConstants.NUMBER_SIGN).append(hexValue.substring(beginIndex, endIndex)).toString();
-			beginIndex += stepSize;
-			endIndex += stepSize;
-		}
-		
-		return hexParts;
-	}
-	
-	private String getHexValueFromExpression(String expression) {
-		int start = getStartIndexForCssVariable(expression, CoreConstants.NUMBER_SIGN, CoreConstants.NUMBER_SIGN);
-		int end = getEndIndexForCssVariable(expression, CoreConstants.NUMBER_SIGN, searchTerms, false, false);
-		
-		if (!(canSubstring(expression, start, end))) {
-			return null;	//	Error
-		}
-			
-		return expression.substring(start, end);
-	}
-	
-	private String executeColourOperation(String operand1, String operation, String operand2) {
-		String[] splitted1 = getHexValueSplitted(operand1);
-		String[] splitted2 = getHexValueSplitted(operand2);
-	
-		if (splitted1 == null || splitted2 == null) {
-			return null;
-		}
-		
-		Object result = null;
-		String mathOperation = null;
-		Integer resultInDecimals = null;
-		List<Integer> hexPartsInDecimals = new ArrayList<Integer>();
-		for (int i = 0; i <splitted1.length; i++) {
-			result = null;
-			mathOperation = null;
-			try {
-				mathOperation = new StringBuffer().append(Integer.decode(splitted1[i])).append(operation).append(Integer.decode(splitted2[i])).toString();
-			} catch(NumberFormatException e) {
-				logger.log(Level.SEVERE, "Error while converting hex value to decimal", e);
-				return null;
-			}
-			if (mathOperation == null) {
-				return null;
-			}
-			
-			resultInDecimals = hexToDecNumbersMap.get(mathOperation);
-			if (resultInDecimals == null) {
-				try {
-					result = mathInterpreter.eval(mathOperation);
-				} catch(Exception e) {
-					logger.log(Level.SEVERE, "Error while computing CSS colour value: " + mathOperation, e);
-					return null;
-				}
-				if (result == null) {
-					logger.log(Level.SEVERE, "Error while computing CSS colour value: " + mathOperation);
-					return null;
-				}
-				
-				try {
-					resultInDecimals = Integer.valueOf(result.toString());
-				} catch(NumberFormatException e) {
-					logger.log(Level.SEVERE, "Error while making Integer from String: " + result);
-					return null;
-				}
-				if (resultInDecimals == null) {
-					return null;
-				}
-				
-				hexToDecNumbersMap.put(mathOperation, resultInDecimals);
-			}
-			
-			hexPartsInDecimals.add(resultInDecimals);
-		}
-		
-		if (hexPartsInDecimals.isEmpty()) {
-			return null;
-		}
-		
-		String hexPartInString = null;
-		StringBuffer computedHexValue = new StringBuffer(CoreConstants.NUMBER_SIGN);
-		for (Integer hexPart: hexPartsInDecimals) {
-			if (hexPart < 0) {
-				hexPart = 0;
-			}
-			if (hexPart > 255) {
-				hexPart = 255;
-			}
-			
-			hexPartInString = null;
-			try {
-				hexPartInString = Integer.toHexString(hexPart);
-			} catch(NumberFormatException e) {
-				logger.log(Level.SEVERE, "Error while converting decimal to hex: " + hexPart, e);
-				return null;
-			}
-			if (hexPartInString == null) {
-				return null;
-			}
-			
-			computedHexValue.append(hexPartInString);
-		}
-		
-		
-		return computedHexValue.toString();
-	}
-	
-	private String getComputedHeximalValueByCSSExpression(String expression) {
-		int multiplicationOperation = expression.indexOf(CoreConstants.STAR);
-		while (multiplicationOperation != -1) {
-			//	Firstly making multiplication operations
-			expression = makeMultiplication(expression);
-			multiplicationOperation = expression.indexOf(CoreConstants.STAR);
-		}
-		
-		String variable = getHexValueFromExpression(expression);
-		if (variable == null) {
-			return null;
-		}
-		
-		expression = StringHandler.replace(expression, variable, CoreConstants.EMPTY);
-		
-		String operand = null;
-		List<String> operands = new ArrayList<String>();
-		while (expression.indexOf(CoreConstants.NUMBER_SIGN) != -1) {
-			operand = getHexValueFromExpression(expression);
-			if (operand == null) {
-				return null;
-			}
-			
-			operands.add(operand);
-			expression = StringHandler.replace(expression, operand, CoreConstants.EMPTY);
-		}
-		
-		if (operands.isEmpty()) {
-			return variable;
-		}
-		if (expression == null || expression.equals(CoreConstants.EMPTY)) {
-			return null;
-		}
-		expression = expression.replaceAll(CoreConstants.SPACE, CoreConstants.EMPTY);
-		if (expression.equals(CoreConstants.EMPTY) || expression.length() != operands.size()) {
-			return null;
-		}
-		
-		//	Now left only operations: -, +
-		int index = 0;
-		String operation = null;
-		String computedCSSValue = variable;
-		while (expression.length() > 0) {
-			operation = expression.substring(0, 1);
-			if (operation.equals(CoreConstants.MINUS) || operation.equals(CoreConstants.PLUS)) {
-				computedCSSValue = executeColourOperation(computedCSSValue, operation, operands.get(index));
-				
-				if (computedCSSValue == null) {
-					return null;
-				}
-			}
-			
-			expression = expression.substring(1);
-			index++;
-		}
-		
-		return computedCSSValue;
-	}
-	
-	private boolean canSubstring(String content, int start, int end) {
-		if (content == null || start == -1 || end == -1) {
-			return false;
-		}
-		
-		if (start < 0 || end <= start || end > content.length()) {
-			return false;
-		}
-		
-		return true;
-	}
-	
-	private int getEndIndexForCssVariable(String content, String key, List<String> searchTerms, boolean checkIfContains, boolean increaseIndex) {
-		int index = content.indexOf(key);
-		if (index == -1) {
-			return -1;
-		}
-		
-		index += key.length();
-		
-		boolean foundPercentMarkAtTheEnd = false;
-		while (!foundPercentMarkAtTheEnd && index < content.length()) {
-			if (checkIfContains) {
-				if (searchTerms.contains(content.substring(index, index + 1))) {
-					foundPercentMarkAtTheEnd = true;
-				}
-				else {
-					index++;
-				}
-			}
-			else {
-				if (!(searchTerms.contains(content.substring(index, index + 1)))) {
-					foundPercentMarkAtTheEnd = true;
-				}
-				else {
-					index++;
-				}
-			}
-		}
-		
-		if (increaseIndex) {
-			if (index + 1 < content.length()) {
-				index++;
-			}
-		}
-		return index;
-	}
-	
-	private int getStartIndexForCssVariable(String content, String key, String searchTerm) {
-		int index = content.indexOf(key);
-		if (index == -1) {
-			return -1;
-		}
-		
-		boolean foundPercentMarkAtTheBegin = false;
-		while (!foundPercentMarkAtTheBegin && index > 0) {
-			if (content.substring(index).startsWith(searchTerm)) {
-				foundPercentMarkAtTheBegin = true;
-			}
-			else {
-				index--;
-			}
-		}
-		
-		return index;
+		return getColourCalculator().setValuesToColourFiles(theme);
 	}
 	
 	private boolean createCopiesForColourFiles(Theme theme, String oldName) {
@@ -1064,7 +546,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		InputStream is = helper.getInputStream(fullLink);
 		if (is == null) {
 			if (!standardFiles) {
-				logger.log(Level.WARNING, new StringBuilder("Cann't get CSS file: '").append(linkToStyle).append("' from Theme pack!").toString());
+				logger.log(Level.WARNING, new StringBuilder("Can't get CSS file: '").append(linkToStyle).append("' from Theme pack!").toString());
 			}
 			return false;
 		}
@@ -1173,8 +655,8 @@ public class ThemeChangerBean implements ThemeChanger {
 		Pattern p = null;
 		Matcher m = null;
 		List<String> stuffToRemove = new ArrayList<String>();
-		for (int i = 0; i < regularExpressionsForNeedlessStuff.size(); i++) {
-			expression = regularExpressionsForNeedlessStuff.get(i);
+		for (int i = 0; i < REGULAR_EXORESSIONS_FOR_NEEDLESS_STUFF.size(); i++) {
+			expression = REGULAR_EXORESSIONS_FOR_NEEDLESS_STUFF.get(i);
 			
 			p = Pattern.compile(expression);
 			m = p.matcher(content);
@@ -1250,7 +732,7 @@ public class ThemeChangerBean implements ThemeChanger {
 				}
 				else {
 					name = name.toLowerCase();
-					if (!unChangedCaseAttributes.contains(name)) {
+					if (!UN_CHANGED_CASE_ATTRIBUTES.contains(name)) {
 						value = value.toLowerCase();
 					}
 					if (!validAttributes.contains(name)) {
@@ -2005,7 +1487,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 	
-	private ThemeStyleGroupMember getColorGroupMember(Theme theme, String variable) {
+	public ThemeStyleGroupMember getColorGroupMember(Theme theme, String variable) {
 		if (theme == null || variable == null) {
 			return null;
 		}
