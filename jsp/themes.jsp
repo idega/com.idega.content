@@ -30,10 +30,7 @@
 						var $j = jQuery.noConflict();
 						
 						window.addEvent('domready', function() {
-							var errorHanlder = function() {
-								reloadPage();
-							}
-							DWREngine.setErrorHandler(errorHanlder);
+                			errorHandlerInLucid();
 						});
 						window.addEvent('domready', getLocalizedTextForThemes);
 						window.addEvent('domready', initializeThemes);

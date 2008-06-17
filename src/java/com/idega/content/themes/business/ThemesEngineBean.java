@@ -2005,6 +2005,7 @@ public class ThemesEngineBean implements ThemesEngine {
 			localizedText.add(iwrb.getLocalizedString("are_you_sure_you_want_apply_this_template", "Are you sure you want to apply this template?"));		//	34
 			localizedText.add(iwrb.getLocalizedString("insufficient_rights_for_this_action", "Sorry, you have insufficient rights for this action!"));	//	35
 			localizedText.add(iwrb.getLocalizedString("theme_can_not_be_deleted", "Sorry, selected theme can not be deleted."));																							//	36
+			localizedText.add(iwrb.getLocalizedString("error_in_lucid", "Sorry, error occurred... Reloading page might help to avoid it. Do you want to reload page?"));	//	37
 			
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -33,10 +33,7 @@ version="1.2">
                 		var $j = jQuery.noConflict();
                 	
                 		window.addEvent('domready', function() {
-							var errorHanlder = function() {
-								reloadPage();
-							}
-							DWREngine.setErrorHandler(errorHanlder);
+                			errorHandlerInLucid();
 						});
 						window.addEvent('domready', function() {
 							ThemesEngine.isUserContentEditor(markIfUserIsContentEditor);

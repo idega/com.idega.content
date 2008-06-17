@@ -322,6 +322,7 @@ var SELECT_TEMPLATE_FIRST_TEXT = 'Select template first!';
 var ARE_YOU_SURE_YOU_WANT_APPLY_THIS_TEMPLATE = 'Are you sure you want to apply this template?';
 var INSUFFICIENT_RIGHTS_FOR_ACTION_IN_LUCID = 'Sorry, you have insufficient rights for this action!';
 var THEME_CAN_NOT_BE_DELETED = 'Sorry, selected theme can not be deleted.';
+var ERROR_OCCURRED_IN_LUCID = 'Sorry, error occurred... Reloading page might help to avoid it. Do you want to reload page?';
 
 function getLocalizedTextForThemes() {
 	ThemesEngine.getLocalizedText(getLocalizedTextForThemesCallback);
@@ -331,7 +332,7 @@ function getLocalizedTextForThemesCallback(list) {
 	if (list == null) {
 		return false;
 	}
-	if (list.length < 37) {
+	if (list.length < 38) {
 		return false;
 	}
 	
@@ -372,6 +373,7 @@ function getLocalizedTextForThemesCallback(list) {
 	ARE_YOU_SURE_YOU_WANT_APPLY_THIS_TEMPLATE = list[34];
 	INSUFFICIENT_RIGHTS_FOR_ACTION_IN_LUCID = list[35];
 	THEME_CAN_NOT_BE_DELETED = list[36];
+	ERROR_OCCURRED_IN_LUCID = list[37];
 	
 }
 
@@ -1002,4 +1004,16 @@ function getPagePreviewInFrameUri() {
 		return null;
 	}
 	return frameWindow.location.pathname;
+}
+
+function errorHandlerInLucid() {
+	var errorHanlder = function() {
+		closeAllLoadingMessages();
+		closeAllLocalLoadingLayers();
+		
+		if (window.confirm(ERROR_OCCURRED_IN_LUCID)) {
+			reloadPage();
+		}
+	}
+	DWREngine.setErrorHandler(errorHanlder);
 }

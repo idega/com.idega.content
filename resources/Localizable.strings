@@ -251,3 +251,4 @@ unlock_page=Unclock page
 lock_page=Lock page
 show_page_in_menu=Show page in menu
 hide_page_in_menu=Hide page in menu
+error_in_lucid=Sorry, error occurred... Reloading page might help to avoid it. Do you want to reload page?
