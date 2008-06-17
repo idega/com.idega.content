@@ -249,7 +249,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		
 		Collection<ICPage> templates = null;
 		try {
-			templates = getICPageHome().findAllByName(name);
+			templates = getICPageHome().findAllByName(name, true);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -261,7 +261,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			queryName = new StringBuilder(name).append(CoreConstants.UNDER).append(counter).toString();
 			
 			try {
-				templates = getICPageHome().findAllByName(queryName);
+				templates = getICPageHome().findAllByName(queryName, true);
 			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
