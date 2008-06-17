@@ -361,7 +361,7 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
 	
 	if (themes == null) {
 		getThemeStyleVariationsCallback(null, null);
-		setPreview('');
+		setPreview(null);
 		setThemeName('');
 		hideThemesContainer();
 		return;
@@ -580,14 +580,26 @@ function Theme(name, linkToSmallPreview, linkToBigPreview, id, used, children) {
 	this.children = children;
 }
 
+function createNewPreviewObjectForTheme() {
+	var newImage = new Element('img');
+	newImage.setProperty('id', 'themePreview');
+	newImage.injectInside($('themePreviewContainer'));
+}
+
 function setPreview(url) {
 	var preview = $('themePreview');
 	if (preview == null) {
-		return false;
+		createNewPreviewObjectForTheme();
+	}
+	preview = $('themePreview');
+	if (preview == null) {
+		return false;	//	Something wrong!
 	}
 	
 	if (url == null || url == '') {
-		preview.setProperty('src', '');
+		preview.removeProperty('src');
+		$('themePreviewContainer').empty();
+		createNewPreviewObjectForTheme();
 		return false;
 	}
 	
@@ -596,7 +608,7 @@ function setPreview(url) {
 	var loadedImages = [];
 	var previewSize = preview.getSize();
 	var loadingLayerOverElement = null;
-	if (previewSize.size.x != 0 && previewSize.size.y == 0) {
+	if (previewSize.size.x != 0 && previewSize.size.y != 0) {
 		loadingLayerOverElement = $(setLoadingLayerForElement(preview.id, false, previewSize, preview.getPosition()));
 	}
 	
@@ -998,8 +1010,11 @@ function addThemeColorChange(mooColor) {
 
 function switchLoadingMessagesForTheme() {
 	closeAllLoadingMessages();
+	closeAllLocalLoadingLayers();
 	
-	showLoadingMessage(PREPARING_THEME_TEXT);
+	if (!IE) {
+		showLoadingMessage(PREPARING_THEME_TEXT);
+	}
 }
 
 function deleteTheme() {
