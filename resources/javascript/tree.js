@@ -17,17 +17,8 @@ function saveMyTree(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncreas
 		callback: function(result) {
 			closeAllLoadingMessages();
 			if (result) {
-				ThemesEngine.changePageUriAfterPageWasMoved(sourceNodeId, {
-					callback: function(newUri) {
-						if (newUri == null) {
-							reloadPage();
-						}
-						else {
-							getPageInfoValues();
-							boldCurrentTreeElement();
-						}
-					}
-				});
+				getPageInfoValues();
+				boldCurrentTreeElement();
 			}
 			else {
 				reloadPage();

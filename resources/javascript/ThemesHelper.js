@@ -76,20 +76,8 @@ function setGlobalPageId(ID) {
 }
 
 function changePageTitleCallback(result) {
-	if (result == null) {
-		return;
-	}
-	var pageUri = document.getElementById('pageUri');
-	if (pageUri != null) {
-		pageUri.value = result;
-	}
-	if (!isSiteMap()) {
-		if (getPageID() != null) {
-			if (getPageID() != -1) {
-				setTimeout("getPrewUrl('"+getPageID()+"')", 1000);
-			}
-		}
-	}
+	getPrewUrl(getPageID());
+	getPageInfoValues();
 }
 
 function changePageTitleInPageInfo(title) {

@@ -735,7 +735,7 @@
 							if (linkFirstChild != null) {
 								newPageUri = linkFirstChild.innerHTML;
 							}
-							ThemesEngine.changePageUri(JSTreeObj.dragNode_source.id, newPageUri, false, changePageTitleCallback);
+							changePageTitleCallback(null);
 						}
 						else{
 							var newParentId = treeObj.getNewParent(null,null,'floatingContainer'+JSTreeObj.dragNode_source.id, null);					
@@ -1392,7 +1392,7 @@
 			return newTreeNodes;			
 		},	
 		getNewId : function(id){
-			closeLoadingMessage();
+			closeAllLoadingMessages();
 			if (id == null) {
 				return false;
 			}
@@ -1404,7 +1404,7 @@
 				JSTreeObj.initNode(document.getElementById(id[i]));		
 				var newName = (document.getElementById(id[i]).getElementsByTagName('a')[0]).innerHTML;
 				if (movingNode) {
-					ThemesEngine.changePageUri(id[i], newName, false, changePageTitleCallback);
+					changePageTitleCallback(null);
 				}
 			}
 			var lastID = id[id.length - 1];
