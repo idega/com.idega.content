@@ -389,7 +389,8 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
 				$j(div).contextMenu('deleteThemeMenu', {
             		onContextMenu: function(e) {
             			var event = new Event(e);
-            			$('deleteThemeButton').setProperty('themeid', event.target.getProperty('id'));
+            			var themeId = event.target.getProperty('id');
+            			$('deleteThemeButton').setProperty('themeid', themeId);
             			return true;
             		}
             	});
@@ -1018,6 +1019,8 @@ function switchLoadingMessagesForTheme() {
 }
 
 function deleteTheme() {
+	var themeId = $('deleteThemeButton').getProperty('themeid');
+	
 	var confirmed = window.confirm(ARE_YOU_SURE_TEXT);
 	
 	hideContextMenu();
@@ -1025,7 +1028,7 @@ function deleteTheme() {
 	if (!confirmed) {
 		return false;
 	}
-	var themeId = $('deleteThemeButton').getProperty('themeid');
+	
 	showLoadingMessage(DELETING_TEXT);
 	ThemesEngine.deleteTheme(themeId, {
 		callback: function(result) {
