@@ -1,12 +1,8 @@
-var ajaxObjects = new Array();
-
 var RELOAD_PAGE = false;
 var SHOW_EDIT_PAGES = false;
 var SHOW_SOURCE_PAGES = false;
 
 var PAGE_ID_FROM_FRAME = null;
-
-if(changePageName == null) var changePageName = false;
 
 function saveMyTree(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncrease, nodesToDecrease) {
 	showLoadingMessage(getMovingText());
@@ -91,7 +87,7 @@ function executeActionsAfterSiteTreeInLucidWasChanged(param) {
 	trashCan.style.opacity = 0.5;		
 }
 
-function setFrameUrlForLucidApplication(uri, canActAsBuilderUser) {
+function setFrameUrlForLucidApplication(uri, pageId, canActAsBuilderUser) {
 	var frame = document.getElementById('treePages');
 	if (frame == null) {
 		return false;
@@ -107,6 +103,9 @@ function setFrameUrlForLucidApplication(uri, canActAsBuilderUser) {
 	
 	if (SHOW_SOURCE_PAGES && canActAsBuilderUser) {
 		uri = '/servlet/ObjectInstanciator?idegaweb_instance_class=' + IB_SOURCE_VIEW_CLASS;
+		if (pageId != null) {
+			uri += '&pageForSourceId=' + pageId;
+		}
 	}
 	if (SHOW_EDIT_PAGES && canActAsBuilderUser) {
 		if (uri.charAt(uri.length-1) != '/') {
@@ -153,9 +152,13 @@ function getPageUriByCheckedId() {
 				}
 				
 				if (PAGE_ID_FROM_FRAME != null && PAGE_ID_FROM_FRAME != currentId) {
+					if (!WORKING_WITH_TEMPLATE && currentId != null) {
+						PAGE_ID_FROM_FRAME = currentId;
+					}
 					getPrewUrl(PAGE_ID_FROM_FRAME);
 				}
 				else {
+					PAGE_ID_FROM_FRAME = null;
 					getPrewUrl(currentId);
 				}
 			}
@@ -167,6 +170,7 @@ function getPrewUrl(nodeID) {
 	if (WORKING_WITH_TEMPLATE) {
 		if (nodeID != TEMPLATE_ID) {
 			nodeID = TEMPLATE_ID;
+			PAGE_ID_FROM_FRAME = null;
 		}		
 	}
 	
@@ -174,17 +178,9 @@ function getPrewUrl(nodeID) {
 		callback: function(uri) {
 			ThemesEngine.canUserActAsBuilderUser({
 				callback: function(rights) {
-					setFrameUrlForLucidApplication(uri, rights);
+					setFrameUrlForLucidApplication(uri, nodeID, rights);
 				}
 			});
 		}
 	});
-}
-						
-function getId(){
-	return this.parentNode.id;
-}
-
-function changeName() {
-	document.getElementById('page_tree_div').id = url;
 }

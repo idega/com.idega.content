@@ -52,7 +52,7 @@ function getPageID() {
 
 function setPageID(ID) {
 	PAGE_ID = ID;
-	ThemesEngine.setPageId(ID, nothingToDo);
+	ThemesEngine.setPageId(ID);
 }
 
 function nothingToDo(parameter) {
