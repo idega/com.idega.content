@@ -582,9 +582,14 @@ function Theme(name, linkToSmallPreview, linkToBigPreview, id, used, children) {
 }
 
 function createNewPreviewObjectForTheme() {
+	var previewContainer = $('themePreviewContainer');
+	if (previewContainer == null) {
+		return false;
+	}
+	
 	var newImage = new Element('img');
 	newImage.setProperty('id', 'themePreview');
-	newImage.injectInside($('themePreviewContainer'));
+	newImage.injectInside(previewContainer);
 }
 
 function setPreview(url) {
@@ -594,7 +599,7 @@ function setPreview(url) {
 	}
 	preview = $('themePreview');
 	if (preview == null) {
-		return false;	//	Something wrong!
+		return false;
 	}
 	
 	if (url == null || url == '') {
