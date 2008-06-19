@@ -532,12 +532,4 @@
 	     </renderer>
 	</render-kit>
 
-  <render-kit>
-    <renderer>
-      <component-family>javax.faces.Panel</component-family>
-      <renderer-type>com.idega.content.presentation.Div</renderer-type>
-      <renderer-class>com.idega.content.presentation.DivRenderer</renderer-class>
-    </renderer>
-  </render-kit>
-
 </faces-config>
