@@ -689,7 +689,42 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		Element extraRegions = root.getChild(ThemesConstants.CON_EXTRA_REGIONS);
 		loadExtraRegions(theme, extraRegions);
 		
+		Element originalColourFiles = root.getChild(ThemesConstants.CON_COLOUR_FILES_ORIGINAL);
+		Element colourFiles = root.getChild(ThemesConstants.CON_COLOUR_FILES);
+		loadColourFiles(theme, originalColourFiles, colourFiles);
+		
 		return true;
+	}
+	
+	private void loadColourFiles(Theme theme, Element originalFilesElement, Element filesElement) {
+		List<String> originalFiles = getParsedColourFiles(originalFilesElement);
+		if (originalFiles != null) {
+			theme.setOriginalColourFiles(originalFiles);
+		}
+		
+		List<String> files = getParsedColourFiles(filesElement);
+		if (files != null) {
+			theme.setColourFiles(files);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<String> getParsedColourFiles(Element parentElement) {
+		if (parentElement == null) {
+			return null;
+		}
+		
+		List<Element> files = parentElement.getChildren(ThemesConstants.CON_COLOUR_FILE);
+		if (files == null || files.isEmpty()) {
+			return null;
+		}
+		
+		List<String> parsedFiles = new ArrayList<String>();
+		for (Element file: files) {
+			parsedFiles.add(file.getTextNormalize());
+		}
+		
+		return parsedFiles;
 	}
 	
 	@SuppressWarnings("unchecked")

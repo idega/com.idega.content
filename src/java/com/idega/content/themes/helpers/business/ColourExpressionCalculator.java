@@ -19,6 +19,7 @@ import bsh.Interpreter;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
+import com.idega.core.search.business.SearchResult;
 import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.ListUtil;
@@ -26,11 +27,11 @@ import com.idega.util.StringHandler;
 
 /**
  * @author <a href="mailto:valdas@idega.com">Valdas Žemaitis</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
  * Calculates color value (hex value) from given expression
  *
- * Last modified: $Date: 2008/06/17 15:13:43 $ by $Author: valdas $
+ * Last modified: $Date: 2008/06/20 08:16:33 $ by $Author: valdas $
  */
 
 @Service
@@ -62,6 +63,24 @@ public class ColourExpressionCalculator {
 		helper = ThemesHelper.getInstance();
 	}
 
+	private List<String> getOriginalColourFilesBySearch(Theme theme) {
+		String searchScope = theme.getLinkToBase();
+		if (!searchScope.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
+			searchScope = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(searchScope).toString();
+		}
+		
+		List<SearchResult> searchResults = helper.search("*_original.css", searchScope);
+		if (searchResults == null || searchResults.isEmpty()) {
+			return null;
+		}
+		
+		List<String> files = new ArrayList<String>();
+		for (SearchResult result: searchResults) {
+			files.add(StringHandler.remove(result.getSearchResultURI(), searchScope));
+		}
+		return files;
+	}
+	
 	protected boolean setValuesToColourFiles(Theme theme) {
 		if (theme == null) {
 			return false;
@@ -71,7 +90,17 @@ public class ColourExpressionCalculator {
 			return true;
 		}
 		
-		List<String> colourFiles = theme.getColourFiles();
+		List<String> originalColourFiles = theme.getOriginalColourFiles();
+		boolean addOriginalFile = false;
+		if (originalColourFiles == null || originalColourFiles.isEmpty()) {
+			originalColourFiles = getOriginalColourFilesBySearch(theme);
+			addOriginalFile = true;
+		}
+		if (originalColourFiles == null || originalColourFiles.isEmpty()) {
+			logger.log(Level.WARNING, "No colour files found for theme: " + theme.getName() + ", " + theme.getLinkToBase());
+			return false;
+		}
+		
 		IWSlideService slide = helper.getSlideService();
 		if (slide == null) {
 			return false;
@@ -80,29 +109,38 @@ public class ColourExpressionCalculator {
 		List<String> keys = theme.getStyleVariablesKeys();
 		
 		String file = null;
+		String originalColourFile = null;
 		String webRoot = helper.getFullWebRoot();
 		String sourceLink = null;
 		InputStream stream = null;
 		String key = null;
-		for (int i = 0; i < colourFiles.size(); i++) {
-			file = colourFiles.get(i);
+		for (int i = 0; i < originalColourFiles.size(); i++) {
+			originalColourFile = originalColourFiles.get(i);
 			
-			sourceLink = new StringBuffer(webRoot).append(theme.getLinkToBase()).append(helper.getThemeColourFileName(theme, null, file, true)).toString();
+			file = getColourFileByOriginalFile(theme, originalColourFile);
+			if (file == null) {
+				logger.log(Level.WARNING, "Colour file for original CSS file ('" + originalColourFile + "') was not found, can't set new values!");
+				continue;
+			}
+			
+			sourceLink = new StringBuffer(webRoot).append(theme.getLinkToBase()).append(originalColourFile).toString();
 			stream = helper.getInputStream(sourceLink);
 			if (stream == null) {
-				return false;
+				logger.log(Level.WARNING, "Can't read CSS file from: " + sourceLink);
+				continue;
 			}
 			
 			String content = null;
 			try {
 				content = StringHandler.getContentFromInputStream(stream);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.log(Level.SEVERE, "Error while reading content from stream: " + sourceLink, e);
 			} finally {
 				helper.closeInputStream(stream);
 			}
 			if (content == null) {
-				return false;
+				logger.log(Level.WARNING, "No content in CSS file: " + sourceLink);
+				continue;
 			}
 			
 			for (int j = 0; (j < keys.size() && content != null); j++) {
@@ -113,20 +151,47 @@ public class ColourExpressionCalculator {
 			content = checkIfAllVariablesReplaced(content, theme);
 			
 			if (content == null) {
-				return false;
+				logger.log(Level.WARNING, "No content in CSS file: " + sourceLink);
+				continue;
 			}
 			
 			try {
 				if (!(slide.uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBase(), file, content, CoreConstants.CONTENT_TYPE_TEXT_CSS, true))) {
-					return false;
+					logger.log(Level.WARNING, "Error while writing file: " + file);
+					continue;
 				}
 			} catch (RemoteException e) {
-				e.printStackTrace();
-				return false;
+				logger.log(Level.SEVERE, "Error while writing file: " + file, e);
+			}
+			
+			if (addOriginalFile) {
+				theme.addOriginalColourFile(originalColourFile);
 			}
 		}
 		
 		return true;
+	}
+	
+	private String getColourFileByOriginalFile(Theme theme, String originalFile) {
+		List<String> files = theme.getColourFiles();
+		if (files == null || files.isEmpty()) {
+			return null;
+		}
+		
+		String fileStart = null;
+		int underIndex = originalFile.indexOf(CoreConstants.UNDER);
+		if (underIndex == -1) {
+			return null;
+		}
+		
+		fileStart = originalFile.substring(0, underIndex);
+		for (String file: files) {
+			if (file.startsWith(fileStart)) {
+				return file;
+			}
+		}
+		
+		return null;
 	}
 	
 	private String checkIfAllVariablesReplaced(String content, Theme theme) {

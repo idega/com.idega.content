@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -502,38 +501,20 @@ public class ThemesHelper implements Singleton {
 	}
 	
 	public List<Theme> getSortedThemes() {
-		List<Theme> sorted = new ArrayList<Theme>();
-		List<Theme> notSorted = getAvailableThemes();
+		List<Theme> availableThemes = getAvailableThemes();
 		
-		if (notSorted == null) {
-			return sorted;
+		if (availableThemes == null || availableThemes.isEmpty()) {
+			return null;
 		}
 		
-		SortedMap<String, Theme> sortedMap = Collections.synchronizedSortedMap(new TreeMap<String, Theme>());
-		String newName = ContentConstants.EMPTY;
-		try {
-			for (int i = 0; i < notSorted.size(); i++) {
-				if (sortedMap.get(notSorted.get(i).getName()) == null) {
-					sortedMap.put(notSorted.get(i).getName(), notSorted.get(i));
-				}
-				else {	// Theme with the same name exist!
-					int j = 0;
-					newName = new StringBuffer(notSorted.get(i).getName()).append(j).toString();
-					while (sortedMap.get(newName) != null) {
-						j++;
-						newName = new StringBuffer(notSorted.get(i).getName()).append(j).toString();
-					}
-					sortedMap.put(newName, notSorted.get(i));
-				}
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
+		Locale locale = null;
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc != null) {
+			locale = iwc.getCurrentLocale();
 		}
-		if (sortedMap == null) {
-			return new ArrayList<Theme>();
-		}
-		sorted = new ArrayList<Theme>(sortedMap.values());
-		return sorted;
+		Collections.sort(availableThemes, new ThemesComparator(locale == null ? Locale.ENGLISH : locale));
+		
+		return availableThemes;
 	}
 	
 	protected synchronized void addUriToTheme(String uri) {
@@ -1014,6 +995,10 @@ public class ThemesHelper implements Singleton {
 		styles.setContent(stylesElements);
 		rootElements.add(styles);
 		
+		//	Color files
+		addColourFilesToConfig(rootElements, theme.getOriginalColourFiles(), ThemesConstants.CON_COLOUR_FILES_ORIGINAL);
+		addColourFilesToConfig(rootElements, theme.getColourFiles(), ThemesConstants.CON_COLOUR_FILES);
+		
 		//	Big preview image
 		Element preview = new Element(ThemesConstants.CON_PREVIEW);
 		preview.setText(theme.getLinkToThemePreview());
@@ -1065,6 +1050,26 @@ public class ThemesHelper implements Singleton {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	private void addColourFilesToConfig(Collection<Element> rootElements, List<String> files, String elementName) {
+		Element filesElement = new Element(elementName);
+		
+		Element fileElement = null;
+		Collection<Element> filesCollection = new ArrayList<Element>();
+		for (String file: files) {
+			fileElement = new Element(ThemesConstants.CON_COLOUR_FILE);
+			fileElement.setText(file);
+			
+			filesCollection.add(fileElement);
+		}
+		
+		if (filesCollection.isEmpty()) {
+			return;
+		}
+		
+		filesElement.setContent(filesCollection);
+		rootElements.add(filesElement);
 	}
 	
 	public String getPreparedThemeNameToUseInRepository(Theme theme) {

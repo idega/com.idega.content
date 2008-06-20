@@ -152,6 +152,9 @@ public class ThemesConstants {
 	protected static final String CON_EXTRA_REGION = "extra-region";
 	protected static final String CON_ATT_EXTRA_REGION_PARENT = "extra-region-parent";
 	protected static final String CON_URI_OF_CURRENT_BUILT_IN_STYLE = "uri-of-current-built-in-style";
+	protected static final String CON_COLOUR_FILES = "colour-files";
+	protected static final String CON_COLOUR_FILES_ORIGINAL = "colour-files-original";
+	protected static final String CON_COLOUR_FILE = "colour-file";
 	
 	protected static final int SMALL_PREVIEW_WIDTH = 149;
 	protected static final int SMALL_PREVIEW_HEIGHT = 112;
