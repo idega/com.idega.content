@@ -364,6 +364,10 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
 		setPreview(null);
 		setThemeName('');
 		hideThemesContainer();
+		var themeUsability = $('themeUsability');
+		if (themeUsability != null) {
+			themeUsability.empty();
+		}
 		return;
 	}
 
@@ -554,11 +558,9 @@ function setIfUsedTheme(used) {
 	if (element == null) {
 		return;
 	}
-	if (element.childNodes != null) {
-		for (var i = 0; element.childNodes.length; i++) {
-			element.removeChild(element.childNodes[i]);
-		}
-	}
+	
+	element.empty();
+		
 	var text = '';
 	if (used) {
 		text = $('defaultThemeLabel').value;

@@ -1470,12 +1470,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		ThemeStyleGroupMember colourVariation = getColorGroupMember(theme, variable);
-		if (colourVariation == null) {
-			if (lastChange) {
-				return false;
-			}
-		}
-		else {
+		if (colourVariation != null) {
 			addThemeChange(theme, colourVariation, true);
 			theme.addStyleVariable(variable, value);
 		}
