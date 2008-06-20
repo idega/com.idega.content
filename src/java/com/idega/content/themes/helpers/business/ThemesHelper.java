@@ -984,6 +984,7 @@ public class ThemesHelper implements Singleton {
 					if (hexColor == null) {
 						hexColor = member.getColour();
 					}
+					member.setColour(hexColor);
 					color.setText(hexColor);
 					styleElements.add(color);
 				}
