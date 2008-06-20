@@ -253,7 +253,19 @@ public class Theme {
 			return;
 		}
 		
-		colourFiles.add(colourFile);
+		if (!colourFiles.contains(colourFile)) {
+			colourFiles.add(colourFile);
+		}
+	}
+	
+	public void addOriginalColourFile(String originalColourFile) {
+		if (originalColourFile == null) {
+			return;
+		}
+		
+		if (!originalColourFiles.contains(originalColourFile)) {
+			originalColourFiles.add(originalColourFile);
+		}
 	}
 	
 	public void addStyleVariable(String variable, String value) {

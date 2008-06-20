@@ -142,6 +142,9 @@ public class ThemesEngineBean implements ThemesEngine {
 		}
 		
 		List <Theme> themes = helper.getSortedThemes();
+		if (themes == null) {
+			return null;
+		}
 		SimplifiedTheme simpleTheme = null;
 		for (int i = 0; i < themes.size(); i++) {
 			simpleTheme = getSimpleTheme(themes.get(i));
