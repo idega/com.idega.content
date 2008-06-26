@@ -10,8 +10,10 @@ import com.idega.content.upload.bean.UploadFile;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 
-@SpringBeanName("fileUploader")
+@SpringBeanName(FileUploader.SPRING_BEAN_IDENTIFIER)
 public interface FileUploader {
+	
+	public static final String SPRING_BEAN_IDENTIFIER = "fileUploader";
 	
 	/**
 	 * @see com.idega.content.upload.business.FileUploaderBean#uploadFile

@@ -7,7 +7,6 @@ import java.util.List;
 import javax.faces.context.FacesContext;
 
 import com.idega.block.web2.business.Web2Business;
-import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.upload.business.FileUploader;
@@ -23,6 +22,8 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.util.CoreConstants;
+import com.idega.util.PresentationUtil;
+import com.idega.webface.WFUtil;
 
 public class FileUploadViewer extends IWBaseComponent {
 	
@@ -77,7 +78,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		IWContext iwc = IWContext.getIWContext(context);
 		FileUploader uploader = null;
 		try {
-			uploader = SpringBeanLookup.getInstance().getSpringBean(iwc, FileUploader.class);
+			uploader = WFUtil.getBeanInstance(context, FileUploader.SPRING_BEAN_IDENTIFIER);
 			uploader.initializeUploader(iwc);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -97,7 +98,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		add(container);
 
 		StringBuffer script = new StringBuffer(getJavaScriptSourceLine(bundle.getVirtualPathWithFileNameString("javascript/FileUploadHelper.js")));
-		Web2Business web2 = SpringBeanLookup.getInstance().getSpringBean(iwc, Web2Business.class);
+		Web2Business web2 = WFUtil.getBeanInstance(context, Web2Business.SPRING_BEAN_IDENTIFIER);
 		script.append(getJavaScriptSourceLine(web2.getBundleURIToYUIScript()));
 		script.append(getJavaScriptSourceLine(CoreConstants.DWR_ENGINE_SCRIPT));
 		script.append(getJavaScriptSourceLine("/dwr/interface/FileUploader.js"));
@@ -220,7 +221,7 @@ public class FileUploadViewer extends IWBaseComponent {
 	}
 	
 	private String getJavaScriptSourceLine(String source) {
-		return new StringBuffer("<script type=\"text/javascript\" src=\"").append(source).append("\"></script>\n").toString();
+		return PresentationUtil.getJavaScriptSourceLine(source);
 	}
 
 	public String getActionAfterUpload() {
