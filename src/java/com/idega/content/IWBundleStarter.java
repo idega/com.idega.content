@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.41 2008/04/24 21:42:38 laddi Exp $
+ * $Id: IWBundleStarter.java,v 1.42 2008/07/02 19:25:33 civilis Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -21,7 +21,6 @@ import com.idega.block.rss.business.RSSProducerRegistry;
 import com.idega.builder.business.BuilderLogicWrapper;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
-import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentIWActionURIHandler;
 import com.idega.content.business.ContentRSSProducer;
@@ -44,13 +43,14 @@ import com.idega.slide.business.IWSlideService;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.data.Group;
 import com.idega.util.CoreConstants;
+import com.idega.util.expression.ELUtil;
 
 /**
  * 
- *  Last modified: $Date: 2008/04/24 21:42:38 $ by $Author: laddi $
+ *  Last modified: $Date: 2008/07/02 19:25:33 $ by $Author: civilis $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.41 $
+ * @version $Revision: 1.42 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	
@@ -95,14 +95,11 @@ public class IWBundleStarter implements IWBundleStartable{
 		try {
 			GroupBusiness groupBiz = (GroupBusiness) IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
 			
-			BuilderLogicWrapper builderLogic = null;
-			try {
-				builderLogic = (BuilderLogicWrapper) SpringBeanLookup.getInstance().getSpringBean(iwac.getIWMainApplication().getServletContext(), CoreConstants.SPRING_BEAN_NAME_BUILDER_LOGIC_WRAPPER);
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
+			BuilderLogicWrapper builderLogic = ELUtil.getInstance().getBean(CoreConstants.SPRING_BEAN_NAME_BUILDER_LOGIC_WRAPPER);
 			
+			@SuppressWarnings("unchecked")
 			Collection<Group> editorGroups = groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_EDITOR);
+			@SuppressWarnings("unchecked")
 			Collection<Group> authorGroups = groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_AUTHOR);
 			
 			//	Only generate groups if none exist

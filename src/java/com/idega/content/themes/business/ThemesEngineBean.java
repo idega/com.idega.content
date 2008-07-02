@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.idega.builder.bean.AdvancedProperty;
-import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentItemChecker;
 import com.idega.content.business.ContentUtil;
@@ -66,6 +65,7 @@ import com.idega.slide.business.IWSlideService;
 import com.idega.user.data.GroupBMPBean;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
 
 @Scope("singleton")
@@ -2208,7 +2208,7 @@ public class ThemesEngineBean implements ThemesEngine {
 			return true;
 		}
 		
-		ContentItemChecker checker = SpringBeanLookup.getInstance().getSpringBean(IWMainApplication.getDefaultIWApplicationContext(), ContentItemChecker.class);
+		ContentItemChecker checker = ELUtil.getInstance().getBean(ContentItemChecker.class);
 		if (checker == null) {
 			return false;
 		}
@@ -2225,7 +2225,7 @@ public class ThemesEngineBean implements ThemesEngine {
 			return false;
 		}
 		
-		ContentItemChecker checker = SpringBeanLookup.getInstance().getSpringBean(IWMainApplication.getDefaultIWApplicationContext(), ContentItemChecker.class);
+		ContentItemChecker checker = ELUtil.getInstance().getBean(ContentItemChecker.class);
 		if (checker == null) {
 			return false;
 		}

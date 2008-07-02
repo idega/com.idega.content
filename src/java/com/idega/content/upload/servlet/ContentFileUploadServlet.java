@@ -18,7 +18,6 @@ import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.idega.business.SpringBeanLookup;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.upload.bean.UploadFile;
@@ -26,6 +25,7 @@ import com.idega.content.upload.business.FileUploadProgressListener;
 import com.idega.content.upload.business.FileUploader;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.expression.ELUtil;
 
 public class ContentFileUploadServlet extends HttpServlet {
 
@@ -47,13 +47,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 		boolean themePack = false;
 		boolean extractContent = false;
 		
-		FileUploadProgressListener uploadProgressListner = null;
-		try {
-			uploadProgressListner = SpringBeanLookup.getInstance().getSpringBean(request.getSession(), FileUploadProgressListener.class);
-		} catch(Exception e) {
-			e.printStackTrace();
-			return;
-		}
+		FileUploadProgressListener uploadProgressListner = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
 		
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		FileUploadBase fileUploadService = new FileUpload(factory);
@@ -111,7 +105,7 @@ public class ContentFileUploadServlet extends HttpServlet {
     		}
     		
         	boolean isIE = CoreUtil.isIE(request);
-        	FileUploader uploader = SpringBeanLookup.getInstance().getSpringBean(request.getSession(), FileUploader.class);
+        	FileUploader uploader = ELUtil.getInstance().getBean(FileUploader.class);
         	
         	if (zipFile || themePack) {
         		if (themePack) {

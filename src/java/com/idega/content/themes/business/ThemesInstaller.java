@@ -38,8 +38,8 @@ public class ThemesInstaller implements ApplicationListener {
 	
 	private synchronized boolean installOrActivateThemes(IWMainSlideStartedEvent event) {
 		IWMainApplication iwma = event.getIWMA();
-		Thread themesInstaller = new Thread(new ThemesInstallerRunner(getThemesEngine(), iwma));
-		themesInstaller.start();
+//		Thread themesInstaller = new Thread(new ThemesInstallerRunner(getThemesEngine(), iwma));
+//		themesInstaller.start();
 		return true;
 	}
 	
