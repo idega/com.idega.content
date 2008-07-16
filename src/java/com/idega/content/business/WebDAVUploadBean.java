@@ -327,7 +327,7 @@ public class WebDAVUploadBean implements Serializable{
 		ZipInputStream zipStream = null;
 		try {
 			zipStream = new ZipInputStream(stream);
-			if (slide.uploadZipFileContents(zipStream, path, null)) {
+			if (slide.uploadZipFileContents(zipStream, path)) {
 				resultInfo = "Success uploading zip file's contents";
 				result = true;
 			}
