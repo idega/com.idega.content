@@ -21,6 +21,8 @@ public class ContentConstants {
 	public static final String PAGES_START_URI = SLASH + PAGES_START_URI_WITHOUT_FIRST_SLASH;
 	
 	public static final String ARTICLE_VIEWER_URI = "/articleviewer/";
+	public static final String RESOURCES_IMAGES_URI = "/resources/images/";
+	public static final String BUNDLES_URI = "/idegaweb/bundles/";
 	
 	public static final String ARTICLE_PATH_START = BASE_ROOT_SLIDE + "/article";
 	public static final String ARTICLE_SCOPE = "article";
