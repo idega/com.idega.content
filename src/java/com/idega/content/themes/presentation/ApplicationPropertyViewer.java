@@ -9,7 +9,6 @@ import java.util.Map;
 import javax.faces.context.FacesContext;
 
 import com.idega.block.web2.business.Web2Business;
-import com.idega.content.IWBundleStarter;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.bean.Setting;
@@ -41,7 +40,7 @@ public class ApplicationPropertyViewer extends Block {
 	
 	private static final String STYLE_CLASS = "applicationPropertyStyleClass";
 	private static final String FIFTEEN_SPACE = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-	private static final String TEMP_IMAGE = "spacer.gif";
+	private static final String TEMP_IMAGE = "images/spacer.gif";
 	
 	private String applicationPropertyKey = null;
 	
@@ -81,11 +80,12 @@ public class ApplicationPropertyViewer extends Block {
 		}
 		
 		if (key.indexOf(getCheckKey(ThemesConstants.LOGO)) != -1) {
+			IWBundle bundle = ContentUtil.getBundle();
+			
 			String siteLogo = "site_logo";
-			String name = ContentUtil.getBundle().getResourceBundle(iwc).getLocalizedString(siteLogo);
+			String name = bundle.getResourceBundle(iwc).getLocalizedString(siteLogo);
 			if (value.equals(ContentConstants.EMPTY)) {
 				name = FIFTEEN_SPACE;
-				IWBundle bundle = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER);
 				value = bundle.getVirtualPathWithFileNameString(TEMP_IMAGE);
 
 			}
