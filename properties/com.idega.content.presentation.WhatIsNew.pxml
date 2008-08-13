@@ -447,7 +447,7 @@
             </value>
             <type>map</type>
           </key>
-           <key>
+          <key>
             <name>:method:1:implied:void:setToHideResultsLayer:boolean:</name>
             <value>
               <map>

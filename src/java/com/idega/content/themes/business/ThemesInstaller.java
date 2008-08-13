@@ -88,6 +88,7 @@ public class ThemesInstaller implements ApplicationListener {
 				return;
 			}
 			
+			//	TODO: get file from URL
 			IWBundle bundle = iwma.getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER);
 			File themesPackage = IWBundleResourceFilter.copyResourceFromJarToWebapp(iwma, bundle.getVirtualPathWithFileNameString("themes/basic_themes.zip"));
 			if (themesPackage == null) {
