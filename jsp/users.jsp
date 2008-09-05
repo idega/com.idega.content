@@ -8,11 +8,13 @@
 	xmlns:bu="http://xmlns.idega.com/com.idega.builder">
 	
     <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
+
     <f:view>
     	<ws:page id="simpleUserApplication">							
 			<h:form id="simpleUserApplicationForm">
 				<wf:wfblock id="simpleUserApplicationBlock" title="#{localizedStrings['com.idega.content']['users']}">
-					<bu:module id="simpleUserApplicationModule" componentClass="#{userApplicationEngine.getSimpleUserApplicationClassName}">
+					<bu:module id="simpleUserApplicationModule" componentClass="com.idega.user.app.SimpleUserApp">
+					<!--<bu:module id="simpleUserApplicationModule" componentClass="#{userApplicationEngine.getSimpleUserApplicationClassName}">-->
 						<bu:property name=":method:1:implied:void:setAllFieldsEditable:boolean:" value="Y" type="java.lang.String" />
 						<bu:property name=":method:1:implied:void:setAddGroupCreateButton:boolean:" value="Y" type="java.lang.String" />
 						<bu:property name=":method:1:implied:void:setAddGroupEditButton:boolean:" value="Y" type="java.lang.String" />
