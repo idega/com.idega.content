@@ -8,7 +8,6 @@
 	xmlns:bu="http://xmlns.idega.com/com.idega.builder">
 	
     <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
-    
     <f:view>
     	<ws:page id="simpleUserApplication">							
 			<h:form id="simpleUserApplicationForm">
