@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page-templates>
+	<page name="Empty Page" type="empty" iconfile="idegaweb/bundles/com.idega.content.bundle/resources/images/pageIcons/empty.png" templatefile="idegaweb/bundles/com.idega.content.bundle/resources/pages/idega_theme_empty_page.xml"></page>
+</page-templates>
