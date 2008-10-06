@@ -1235,6 +1235,8 @@ ul#page_tree_div li ul {
 
 .closeNewPageOrPagesStyle {
 	cursor: pointer;
+	float: right;
+	margin-top: 2px;
 }
 
 .disabledButtonInPages {
