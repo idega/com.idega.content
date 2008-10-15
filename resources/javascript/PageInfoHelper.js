@@ -697,7 +697,8 @@ function initializePages() {
 	});
 	
 	resizeTreeContainerInThemes(RESERVED_HEIGHT_FOR_PAGES);
-		
+	resizeNewPageContainers(150);
+	
 	BuilderService.getClassNameForSourceView({
 		callback: function(className) {
 			IB_SOURCE_VIEW_CLASS = className;

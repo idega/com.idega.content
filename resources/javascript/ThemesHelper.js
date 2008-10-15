@@ -922,6 +922,24 @@ function resizeTreeContainerInThemes(reservedHeight) {
 	}
 }
 
+function resizeNewPageContainers(reservedHeight) {
+	var totalHeight = getTotalHeight();
+	var availableHeight = totalHeight - reservedHeight;
+	if (availableHeight < 0) {
+		return false;
+	}
+	
+	var newPageContainer = $('newPageContainer');
+	if (newPageContainer != null) {
+		newPageContainer.setStyle('max-height', availableHeight + 'px');
+	}
+	
+	var newPagesContainer = $('newPagesContainer');
+	if (newPagesContainer != null) {
+		newPagesContainer.setStyle('max-height', availableHeight + 'px');
+	}
+}
+
 function controlLucidAppWindow() {
 	if (isSiteMap()) {
 		resizeTreeContainerInThemes(RESERVED_HEIGHT_FOR_SITE);
