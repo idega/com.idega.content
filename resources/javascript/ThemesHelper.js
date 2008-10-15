@@ -929,12 +929,12 @@ function resizeNewPageContainers(reservedHeight) {
 		return false;
 	}
 	
-	var newPageContainer = $('newPageContainer');
+	var newPageContainer = $('pageTemplatesStretcher');
 	if (newPageContainer != null) {
 		newPageContainer.setStyle('max-height', availableHeight + 'px');
 	}
 	
-	var newPagesContainer = $('newPagesContainer');
+	var newPagesContainer = $('site_templates');
 	if (newPagesContainer != null) {
 		newPagesContainer.setStyle('max-height', availableHeight + 'px');
 	}

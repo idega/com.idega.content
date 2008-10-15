@@ -1167,10 +1167,17 @@ ul#page_tree_div {
 ul#page_tree_div li {
 	list-style: none;
 	line-height: 22px;
+	padding: 0 12px;
+	white-space: nowrap;
 }
 
 ul#page_tree_div li img {
 	vertical-align: middle;
+	display: none;
+}
+
+ul#page_tree_div li img.pageTreeNameIconStyle {
+	display: inline;
 }
 
 ul#page_tree_div li a {
@@ -1230,7 +1237,7 @@ ul#page_tree_div li ul {
 }
 
 #pagesAccordion ul {
-	padding: 5px 15px 8px 0 !important;
+	padding: 5px 20px 8px 0 !important;
 }
 
 .closeNewPageOrPagesStyle {
@@ -1536,6 +1543,6 @@ iframe.contentItemEditorFrameStyle {
 	padding: 0;
 }
 
-#div_id_new_page_tree {
+#pageTemplatesStretcher, #site_templates {
 	overflow: auto;
 }
