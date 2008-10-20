@@ -48,6 +48,7 @@ import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
+import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 
 @Scope("singleton")
@@ -898,7 +899,7 @@ public class ThemeChangerBean implements ThemeChanger {
 					}
 					if (ELEMENT_SCRIPT_NAME.equals(e.getName())) {	//	<script> tags needs advanced handling
 						fixDocumentElement(e, linkToBase);
-						if (!hasElementChildren(e)) {
+						if (!hasElementChildren(e, true)) {
 							e.addContent(getComment(IDEGA_COMMENT));
 						}
 					}
@@ -1234,7 +1235,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			}
 		}
 		
-		if (!hasElementChildren(e)) {
+		if (!hasElementChildren(e, false)) {
 			e.addContent(getComment(IDEGA_COMMENT));
 		}
 		
@@ -1242,13 +1243,21 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private boolean hasElementChildren(Element e) {
+	private boolean hasElementChildren(Element e, boolean checkContentOnly) {
 		if (e == null) {
 			return false;
 		}
 		
+		if (checkContentOnly) {
+			List content = e.getContent();
+			if (ListUtil.isEmpty(content)) {
+				return false;
+			}
+			return true;
+		}
+		
 		List children = e.getChildren();
-		if (children == null || children.isEmpty()) {
+		if (ListUtil.isEmpty(children)) {
 			return false;
 		}
 		
