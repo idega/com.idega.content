@@ -8,6 +8,7 @@ import javax.faces.context.FacesContext;
 
 import com.idega.block.web2.business.Web2Business;
 import com.idega.content.business.ContentConstants;
+import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.upload.business.FileUploader;
 import com.idega.idegaweb.IWBundle;
@@ -23,6 +24,7 @@ import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.util.CoreConstants;
 import com.idega.util.PresentationUtil;
+import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
 
 public class FileUploadViewer extends IWBaseComponent {
@@ -96,14 +98,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		
 		Layer container = new Layer();
 		add(container);
-
-		StringBuffer script = new StringBuffer(getJavaScriptSourceLine(bundle.getVirtualPathWithFileNameString("javascript/FileUploadHelper.js")));
-		Web2Business web2 = WFUtil.getBeanInstance(context, Web2Business.SPRING_BEAN_IDENTIFIER);
-		script.append(getJavaScriptSourceLine(web2.getBundleURIToYUIScript()));
-		script.append(getJavaScriptSourceLine(CoreConstants.DWR_ENGINE_SCRIPT));
-		script.append(getJavaScriptSourceLine("/dwr/interface/FileUploader.js"));
-		script.append(getJavaScriptSourceLine("/dwr/interface/FileUploadListener.js"));
-		container.add(script.toString());
+		container.setStyleClass("fileUploadViewerMainLayerStyle");
 		
 		PresentationObjectContainer mainContainer = container;
 		if (formId == null) {
@@ -136,7 +131,7 @@ public class FileUploadViewer extends IWBaseComponent {
 			GenericButton addFileInput = new GenericButton(iwrb.getLocalizedString("add_file", "Add file"));
 			StringBuffer action = new StringBuffer("addFileInputForUpload('").append(id).append("', '").append(iwrb.getLocalizedString("loading", "Loading..."));
 			action.append("');");
-			addFileInput.setOnClick(action.toString());
+			addFileInput.setOnClick(getActionToLoadFilesAndExecuteCustomAction(action.toString()));
 			buttonsContainer.add(addFileInput);
 		}
 		
@@ -192,7 +187,7 @@ public class FileUploadViewer extends IWBaseComponent {
 
 		action.append(");");
 		
-		return action.toString();
+		return getActionToLoadFilesAndExecuteCustomAction(action.toString());
 	}
 	
 	private String getJavaScriptAction(String action) {
@@ -220,8 +215,16 @@ public class FileUploadViewer extends IWBaseComponent {
 		return script.toString();
 	}
 	
-	private String getJavaScriptSourceLine(String source) {
-		return PresentationUtil.getJavaScriptSourceLine(source);
+	private String getActionToLoadFilesAndExecuteCustomAction(String customAction) {
+		Web2Business web2 = ELUtil.getInstance().getBean(Web2Business.SPRING_BEAN_IDENTIFIER);
+		List<String> scripts = new ArrayList<String>();
+		scripts.add(ContentUtil.getBundle().getVirtualPathWithFileNameString("javascript/FileUploadHelper.js"));
+		scripts.add(web2.getBundleURIToYUIScript());
+		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
+		scripts.add("/dwr/interface/FileUploader.js");
+		scripts.add("/dwr/interface/FileUploadListener.js");
+		
+		return PresentationUtil.getJavaScriptLinesLoadedLazily(scripts, customAction);
 	}
 
 	public String getActionAfterUpload() {

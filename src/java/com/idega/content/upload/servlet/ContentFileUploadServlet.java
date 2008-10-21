@@ -25,6 +25,7 @@ import com.idega.content.upload.business.FileUploadProgressListener;
 import com.idega.content.upload.business.FileUploader;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.ListUtil;
 import com.idega.util.expression.ELUtil;
 
 public class ContentFileUploadServlet extends HttpServlet {
@@ -34,6 +35,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 	private static final long serialVersionUID = -6282517406996613536L;	
 	private static final long MAX_UPLOAD_SIZE = 1024 * 1024 * 1024;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ServletRequestContext src = new ServletRequestContext(request);
@@ -61,7 +63,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 			e.printStackTrace();
 			return;
 		}
-		if (fileItems == null || fileItems.size() == 0) {
+		if (ListUtil.isEmpty(fileItems)) {
 			log.info("No files to upload!");
         	return;
         }

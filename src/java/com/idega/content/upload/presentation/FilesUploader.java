@@ -34,7 +34,7 @@ public class FilesUploader extends Block {
 		uploadButton.setURL(getUriToComponent(iwc));
 		uploadButton.setMarkupAttribute("rel", "sexylightbox");
 		uploadButton.setOnClick(new StringBuilder("$('").append(uploadButton.getId())
-									.append("').href += '&height=' + Math.round(window.getHeight() * 0.8) + '&width=' + Math.round(window.getWidth() * 0.8);")
+									.append("').href += '&height=' + Math.round(window.getHeight() * 0.5) + '&width=' + Math.round(window.getWidth() * 0.8);")
 								.toString());
 		
 		String imagesDir = iwc.getIWMainApplication().getBundle(Web2BusinessBean.WEB2_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString(

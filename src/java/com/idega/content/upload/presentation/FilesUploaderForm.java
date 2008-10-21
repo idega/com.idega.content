@@ -11,9 +11,14 @@ public class FilesUploaderForm extends Block {
 	public void main(IWContext iwc) {
 		Layer container = new Layer();
 		add(container);
-		container.setStyleClass("FilesUploaderFormStyle");
+		container.setStyleClass("filesUploaderFormStyle");
 		
-		container.add("Hello, world!");
+		Layer uploaderContainer = new Layer();
+		uploaderContainer.setStyleClass("filesUploaderUploaderContainerStyle");
+		container.add(uploaderContainer);
+		FileUploadViewer uploader = new FileUploadViewer();
+		uploaderContainer.add(uploader);
+		uploader.setAllowMultipleFiles(true);
 	}
 
 	@Override
