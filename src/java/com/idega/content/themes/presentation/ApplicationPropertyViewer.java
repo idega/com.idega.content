@@ -75,7 +75,7 @@ public class ApplicationPropertyViewer extends Block {
 			return;
 		}
 		
-		if (!ContentUtil.hasContentEditorRoles(iwc) && ContentConstants.EMPTY.equals(value)) {	// Nothing to display
+		if (!ContentUtil.hasContentEditorRoles(iwc) || ContentConstants.EMPTY.equals(value)) {	// Nothing to display
 			return;
 		}
 		
