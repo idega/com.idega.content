@@ -1082,35 +1082,38 @@ html>body .pageInfoButtonsContainer a {
 	background-color: #fff;
 }
 
-ul#page_tree_div {
+ul#page_tree_div, ul#rootUl {
 	margin: 0;
 	padding: 0;
 }
 
-ul#page_tree_div li {
+ul#page_tree_div li, ul#rootUl li {
 	list-style: none;
 	line-height: 22px;
 	padding: 0 12px;
 	white-space: nowrap;
 }
 
-ul#page_tree_div li img {
+ul#page_tree_div li img, ul#rootUl li img {
 	vertical-align: middle;
-	display: none;
 }
 
-ul#page_tree_div li img.pageTreeNameIconStyle {
-	display: inline;
+#div_id_new_page_tree ul#page_tree_div li img, #site_templates ul#page_tree_div li img {
+	display: none;	
 }
 
-ul#page_tree_div li a {
+ul#page_tree_div li img.pageTreeNameIconStyle, ul#rootUl li img.pageTreeNameIconStyle {
+	display: inline !important;
+}
+
+ul#page_tree_div li a, ul#rootUl li a {
 	margin-left: 5px;
 	line-height: 22px;
 	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
 	color: #3d3d3d
 }
 
-ul#page_tree_div li ul {
+ul#page_tree_div li ul, ul#rootUl li ul {
 	padding-left: 18px;
 }
 
