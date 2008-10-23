@@ -21,8 +21,6 @@ import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.PresentationObject;
-import com.idega.presentation.text.Heading1;
-import com.idega.presentation.text.Heading2;
 import com.idega.presentation.text.Text;
 import com.idega.util.CoreConstants;
 import com.idega.util.PresentationUtil;
@@ -100,14 +98,14 @@ public class ApplicationPropertyViewer extends Block {
 		}
 		
 		if (key.indexOf(getCheckKey(ThemesConstants.SITE_TITLE)) != -1) {
-			Heading1 h1 = new Heading1(value);
+			Text h1 = new Text(value);
 			addPropertyEditAction(iwc, h1, key, settingKey, false);
 			this.add(h1);
 			return;
 		}
 		
 		if (key.indexOf(getCheckKey(ThemesConstants.SITE_SLOGAN)) != -1) {
-			Heading2 h2 = new Heading2(value);
+			Text h2 = new Text(value);
 			addPropertyEditAction(iwc, h2, key, settingKey, false);
 			this.add(h2);
 			return;

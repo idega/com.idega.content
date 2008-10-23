@@ -9,7 +9,7 @@
 version="1.2">
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 <jsf:view>
-        <ws:page id="contentsearch1">
+        <ws:page id="contentsearch1" stylesheeturls="/idegaweb/bundles/com.idega.content.bundle/resources/style/content.css">
                 <h:form id="contentsearchform1">
                 <wf:wfblock id="contentsearchblock1" title="#{localizedStrings['com.idega.content']['search']}">
                 		<builder:module id="contentsearcher1" componentClass="com.idega.core.search.presentation.Searcher" />

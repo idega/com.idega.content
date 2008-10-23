@@ -127,6 +127,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		mainContainer.add(fileInputs);
 		
 		Layer buttonsContainer = new Layer();
+		buttonsContainer.setStyleClass("fileUploadButtonsContainerStyle");
 		if (allowMultipleFiles) {
 			GenericButton addFileInput = new GenericButton(iwrb.getLocalizedString("add_file", "Add file"));
 			StringBuffer action = new StringBuffer("addFileInputForUpload('").append(id).append("', '").append(iwrb.getLocalizedString("loading", "Loading..."));

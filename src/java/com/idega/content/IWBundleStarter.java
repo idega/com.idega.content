@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.42 2008/07/02 19:25:33 civilis Exp $
+ * $Id: IWBundleStarter.java,v 1.43 2008/10/23 06:03:44 laddi Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -38,7 +38,6 @@ import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWBundleStartable;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
-import com.idega.idegaweb.include.GlobalIncludeManager;
 import com.idega.slide.business.IWSlideService;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.data.Group;
@@ -47,10 +46,10 @@ import com.idega.util.expression.ELUtil;
 
 /**
  * 
- *  Last modified: $Date: 2008/07/02 19:25:33 $ by $Author: civilis $
+ *  Last modified: $Date: 2008/10/23 06:03:44 $ by $Author: laddi $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.42 $
+ * @version $Revision: 1.43 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	
@@ -68,7 +67,7 @@ public class IWBundleStarter implements IWBundleStartable{
 		
 		ContentViewManager cViewManager = ContentViewManager.getInstance(starterBundle.getApplication());
 		cViewManager.initializeStandardNodes(starterBundle);
-		GlobalIncludeManager.getInstance().addBundleStyleSheet(ContentConstants.IW_BUNDLE_IDENTIFIER, "/style/content.css");
+		//GlobalIncludeManager.getInstance().addBundleStyleSheet(ContentConstants.IW_BUNDLE_IDENTIFIER, "/style/content.css");
 		
 		
 		IWApplicationContext iwac = starterBundle.getApplication().getIWApplicationContext();

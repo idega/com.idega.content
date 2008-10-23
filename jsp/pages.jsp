@@ -26,7 +26,9 @@ version="1.2">
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/PageInfoHelper.js,
 						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js,
-						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/SiteManagerHelper.js">
+						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/SiteManagerHelper.js"
+						
+						stylesheeturls="/idegaweb/bundles/com.idega.content.bundle/resources/style/content.css">
 			<h:form id="pagesForm" onsubmit="return false;">
 				<f:verbatim>
                 	<script type="text/javascript">

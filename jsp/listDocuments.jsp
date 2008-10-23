@@ -8,7 +8,7 @@
 	xmlns:co="http://xmlns.idega.com/com.idega.content">
     <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
     <f:view>
-    		<ws:page id="listdocuments1">
+    		<ws:page id="listdocuments1" stylesheeturls="/idegaweb/bundles/com.idega.content.bundle/resources/style/content.css">
                <h:form id="uploadForm" enctype="multipart/form-data">
 				<co:ContentViewer rootPath="/files" startPath="/files" id="gt"/>
 			</h:form>

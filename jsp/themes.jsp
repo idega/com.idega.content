@@ -23,7 +23,8 @@
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/PageInfoHelper.js,
         				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js"
         				
-        				stylesheeturls="/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/moorainbow/1.1/mooRainbow.css">
+        				stylesheeturls="/idegaweb/bundles/com.idega.content.bundle/resources/style/content.css,
+        								/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/moorainbow/1.1/mooRainbow.css">
 			<h:form id="uploadForm" enctype="multipart/form-data">
 				<jsf:verbatim>
 					<script type="text/javascript">
@@ -73,9 +74,11 @@
 						<t:div id="themeSaveArea" forceId="true">
 							<h:outputText styleClass="variationHeading" value="#{localizedStrings['com.idega.content']['save_theme']}"></h:outputText>
 							<t:div styleClass="wf_webdav_upload">
-								<h:outputText styleClass="inputLabel" value="#{localizedStrings['com.idega.content']['theme_name']}"></h:outputText>
-								<t:inputText id="theme_name" forceId="true"></t:inputText>
-								<t:div>
+								<t:div styleClass="themeSaveAreaInput">
+									<h:outputText styleClass="inputLabel" value="#{localizedStrings['com.idega.content']['theme_name']}"></h:outputText>
+									<t:inputText id="theme_name" forceId="true"></t:inputText>
+								</t:div>
+								<t:div styleClass="themeSaveAreaButtons">
 									<t:commandButton id="changeVariationsButton" type="button" forceId="true" onclick="changeVariations()" title="#{localizedStrings['com.idega.content']['change_variations']}" value="#{localizedStrings['com.idega.content']['change']}"></t:commandButton>
 									<t:commandButton id="themeSaveButton" type="button" forceId="true" onclick="saveTheme()" title="#{localizedStrings['com.idega.content']['save']}" value="#{localizedStrings['com.idega.content']['save']}"></t:commandButton>
 									<t:commandButton id="themeRestoreButton" type="button" forceId="true" onclick="restoreTheme()" title="#{localizedStrings['com.idega.content']['restore_theme_to_original_state']}" value="#{localizedStrings['com.idega.content']['restore_theme']}"></t:commandButton>

@@ -10,7 +10,7 @@
     <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 
     <f:view>
-    	<ws:page id="simpleUserApplication">							
+    	<ws:page id="simpleUserApplication" stylesheeturls="/idegaweb/bundles/com.idega.content.bundle/resources/style/content.css">							
 			<h:form id="simpleUserApplicationForm">
 				<wf:wfblock id="simpleUserApplicationBlock" title="#{localizedStrings['com.idega.content']['users']}">
 					<bu:module id="simpleUserApplicationModule" componentClass="com.idega.user.app.SimpleUserApp">

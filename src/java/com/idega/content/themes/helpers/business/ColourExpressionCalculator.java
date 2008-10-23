@@ -27,11 +27,11 @@ import com.idega.util.StringHandler;
 
 /**
  * @author <a href="mailto:valdas@idega.com">Valdas Žemaitis</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  *
  * Calculates color value (hex value) from given expression
  *
- * Last modified: $Date: 2008/06/20 08:16:33 $ by $Author: valdas $
+ * Last modified: $Date: 2008/10/23 06:03:44 $ by $Author: laddi $
  */
 
 @Service
@@ -259,7 +259,7 @@ public class ColourExpressionCalculator {
 		String computedCSSValue = null;
 		List<String> searchTerm = new ArrayList<String>();
 		searchTerm.add(CoreConstants.PERCENT);
-		while (content.indexOf(variable) != -1) {
+		while (content.indexOf("%" + variable + "%") != -1) {
 			start = getStartIndexForCssVariable(content, variable, CoreConstants.PERCENT);
 			end = getEndIndexForCssVariable(content, variable, searchTerm, true, true);
 			if (!canSubstring(content, start, end)) {
@@ -717,9 +717,12 @@ public class ColourExpressionCalculator {
 	}
 	
 	private int getEndIndexForCssVariable(String content, String key, List<String> searchTerms, boolean checkIfContains, boolean increaseIndex) {
-		int index = content.indexOf(key);
+		int index = content.indexOf("%" + key + "%");
 		if (index == -1) {
 			return -1;
+		}
+		else {
+			index++;
 		}
 		
 		index += key.length();
@@ -753,9 +756,12 @@ public class ColourExpressionCalculator {
 	}
 	
 	private int getStartIndexForCssVariable(String content, String key, String searchTerm) {
-		int index = content.indexOf(key);
+		int index = content.indexOf("%" + key + "%");
 		if (index == -1) {
 			return -1;
+		}
+		else {
+			index++;
 		}
 		
 		boolean foundPercentMarkAtTheBegin = false;
