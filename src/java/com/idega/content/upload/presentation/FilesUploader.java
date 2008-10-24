@@ -13,20 +13,29 @@ import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
+import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.PresentationUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
 public class FilesUploader extends Block {
 
+	private String parentPath = null;
+	
 	@Override
 	public void main(IWContext iwc) {
 		Layer container = new Layer();
 		add(container);
 		container.setStyleClass("filesUploaderContainerStyle");
+		
+		if (StringUtil.isEmpty(parentPath)) {
+			container.add(new Heading1(getResourceBundle(iwc).getLocalizedString("unkown_parent_path", "Provide parent path!")));
+			return;
+		}
 		
 		Link uploadButton = new Link(new Span(new Text(getResourceBundle(iwc).getLocalizedString("upload", "Upload"))));
 		container.add(uploadButton);
@@ -46,7 +55,7 @@ public class FilesUploader extends Block {
 		}
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction.toString());
 		
-		addResources(iwc, true);
+		addResources(iwc, false);
 	}
 	
 	private String getUriToComponent(IWContext iwc) {
@@ -60,7 +69,12 @@ public class FilesUploader extends Block {
 			return null;
 		}
 		
-		List<AdvancedProperty> parameters = new ArrayList<AdvancedProperty>();	//	TODO: do we need any?
+		List<AdvancedProperty> parameters = new ArrayList<AdvancedProperty>();
+		parameters.add(new AdvancedProperty(FilesUploaderForm.PARENT_PATH_FOLDER_CHOOSER_PARAMETER, parentPath));
+		
+		//	TODO
+//		parameters.add(new AdvancedProperty("width", "450"));
+//		parameters.add(new AdvancedProperty("height", "300"));
 		
 		return builderService.getUriToObject(FilesUploaderForm.class, parameters);
 	}
@@ -71,6 +85,14 @@ public class FilesUploader extends Block {
 		PresentationUtil.addStyleSheetToHeader(iwc, web2.getBundleURIToSexyLightBoxStyleFile());		
 	}
 	
+	public String getParentPath() {
+		return parentPath;
+	}
+
+	public void setParentPath(String parentPath) {
+		this.parentPath = parentPath;
+	}
+
 	@Override
 	public String getBundleIdentifier() {
 		return ContentConstants.IW_BUNDLE_IDENTIFIER;

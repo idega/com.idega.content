@@ -40,6 +40,7 @@ public class FileUploadViewer extends IWBaseComponent {
 	private boolean showProgressBar = true;
 	private boolean showLoadingMessage = false;
 	private boolean allowMultipleFiles = false;
+	private boolean autoAddFileInput = false;
 	
 	@Override
 	public void restoreState(FacesContext context, Object state) {
@@ -55,11 +56,12 @@ public class FileUploadViewer extends IWBaseComponent {
 		this.showProgressBar = values[6] == null ? Boolean.TRUE : (Boolean) values[6];
 		this.showLoadingMessage = values[7] == null ? Boolean.FALSE : (Boolean) values[7];
 		this.allowMultipleFiles = values[8] == null ? Boolean.FALSE : (Boolean) values[8];
+		this.autoAddFileInput = values[9] == null ? Boolean.FALSE : (Boolean) values[9];
 	}
 	
 	@Override
 	public Object saveState(FacesContext context) {
-		Object values[] = new Object[9];
+		Object values[] = new Object[10];
 		values[0] = super.saveState(context);
 		
 		values[1] = this.actionAfterUpload;
@@ -71,6 +73,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		values[6] = this.showProgressBar;
 		values[7] = this.showLoadingMessage;
 		values[8] = this.allowMultipleFiles;
+		values[9] = this.autoAddFileInput;
 		
 		return values;
 	}
@@ -112,6 +115,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		}
 		
 		HiddenInput path = new HiddenInput(ContentConstants.UPLOADER_PATH, uploadPath);
+		path.setStyleClass(ContentConstants.UPLOADER_PATH);
 		mainContainer.add(path);
 		HiddenInput zipFileValue = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_ZIP_FILE, String.valueOf(zipFile));
 		mainContainer.add(zipFileValue);
@@ -123,16 +127,14 @@ public class FileUploadViewer extends IWBaseComponent {
 		Layer fileInputs = new Layer();
 		String id = fileInputs.getId();
 		fileInputs.setStyleClass("fileUploadInputsContainerStyle");
-		fileInputs.add(uploader.getFileInput(iwc, false));	//	Not adding 'remove' image - at least one file input should remain
+		fileInputs.add(uploader.getFileInput(iwc, id, false));	//	Not adding 'remove' image - at least one file input should remain
 		mainContainer.add(fileInputs);
 		
 		Layer buttonsContainer = new Layer();
 		buttonsContainer.setStyleClass("fileUploadButtonsContainerStyle");
 		if (allowMultipleFiles) {
 			GenericButton addFileInput = new GenericButton(iwrb.getLocalizedString("add_file", "Add file"));
-			StringBuffer action = new StringBuffer("addFileInputForUpload('").append(id).append("', '").append(iwrb.getLocalizedString("loading", "Loading..."));
-			action.append("');");
-			addFileInput.setOnClick(getActionToLoadFilesAndExecuteCustomAction(action.toString()));
+			addFileInput.setOnClick(getActionToLoadFilesAndExecuteCustomAction(uploader.getAddFileInputJavaScriptAction(id, iwrb)));
 			buttonsContainer.add(addFileInput);
 		}
 		
@@ -216,12 +218,13 @@ public class FileUploadViewer extends IWBaseComponent {
 		return script.toString();
 	}
 	
-	private String getActionToLoadFilesAndExecuteCustomAction(String customAction) {
+	public static final String getActionToLoadFilesAndExecuteCustomAction(String customAction) {
 		Web2Business web2 = ELUtil.getInstance().getBean(Web2Business.SPRING_BEAN_IDENTIFIER);
 		List<String> scripts = new ArrayList<String>();
 		scripts.add(ContentUtil.getBundle().getVirtualPathWithFileNameString("javascript/FileUploadHelper.js"));
 		scripts.add(web2.getBundleURIToYUIScript());
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
+		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
 		scripts.add("/dwr/interface/FileUploader.js");
 		scripts.add("/dwr/interface/FileUploadListener.js");
 		
@@ -306,6 +309,14 @@ public class FileUploadViewer extends IWBaseComponent {
 
 	public void setActionAfterCounterReset(String actionAfterCounterReset) {
 		this.actionAfterCounterReset = actionAfterCounterReset;
+	}
+
+	public boolean isAutoAddFileInput() {
+		return autoAddFileInput;
+	}
+
+	public void setAutoAddFileInput(boolean autoAddFileInput) {
+		this.autoAddFileInput = autoAddFileInput;
 	}
 
 }

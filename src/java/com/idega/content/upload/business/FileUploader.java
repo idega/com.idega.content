@@ -7,6 +7,7 @@ import org.jdom.Document;
 
 import com.idega.business.SpringBeanName;
 import com.idega.content.upload.bean.UploadFile;
+import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 
@@ -33,12 +34,14 @@ public interface FileUploader {
 	/**
 	 * @see com.idega.content.upload.business.FileUploaderBean#getFileInput
 	 */
-	public Layer getFileInput(IWContext iwc, boolean addRemoveImage);
+	public Layer getFileInput(IWContext iwc, String id, boolean addRemoveImage);
 	
 	/**
 	 * @see com.idega.content.upload.business.FileUploaderBean#getRenderedFileInput
 	 */
-	public Document getRenderedFileInput();
+	public Document getRenderedFileInput(String id);
 	
 	public void initializeUploader(IWContext iwc);
+	
+	public String getAddFileInputJavaScriptAction(String containerId, IWResourceBundle iwrb);
 }

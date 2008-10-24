@@ -13,6 +13,7 @@ import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.WebDAVUploadBean;
 import com.idega.content.upload.bean.UploadFile;
+import com.idega.content.upload.presentation.FileUploadViewer;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.idegaweb.IWBundle;
@@ -45,7 +46,7 @@ public class FileUploaderBean implements FileUploader {
 		getSlideService(iwc);
 	}
 	
-	public Layer getFileInput(IWContext iwc, boolean addRemoveImage) {
+	public Layer getFileInput(IWContext iwc, String id, boolean addRemoveImage) {
 		if (iwc == null) {
 			return null;
 		}
@@ -62,6 +63,7 @@ public class FileUploaderBean implements FileUploader {
 		input.setStyleClass("fileUploadInputStyle");
 		input.setName(ContentConstants.UPLOAD_FIELD_NAME);
 		fileInputContainer.add(input);
+		input.setOnChange(FileUploadViewer.getActionToLoadFilesAndExecuteCustomAction(getAddFileInputJavaScriptAction(id, iwrb)));
 		
 		if (addRemoveImage) {
 			Image remove = new Image(bundle.getVirtualPathWithFileNameString("images/delete.png"), name, 18, 18);
@@ -73,7 +75,7 @@ public class FileUploaderBean implements FileUploader {
 		return fileInputContainer;
 	}
 	
-	public Document getRenderedFileInput() {
+	public Document getRenderedFileInput(String id) {
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return null;
@@ -84,7 +86,7 @@ public class FileUploaderBean implements FileUploader {
 			return null;
 		}
 		
-		return builder.getRenderedComponent(iwc, getFileInput(iwc, true), false);
+		return builder.getRenderedComponent(iwc, getFileInput(iwc, id, true), false);
 	}
 
 	public boolean uploadFile(List<UploadFile> files, String uploadPath, boolean isIE) {
@@ -205,5 +207,10 @@ public class FileUploaderBean implements FileUploader {
 			}
 		}
 		return slide;
+	}
+
+	public String getAddFileInputJavaScriptAction(String containerId, IWResourceBundle iwrb) {
+		return new StringBuilder("addFileInputForUpload('").append(containerId).append("', '").append(iwrb.getLocalizedString("loading", "Loading..."))
+				.append("');").toString();
 	}
 }

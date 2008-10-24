@@ -1,3 +1,5 @@
+if (!FileUploadHelper) var FileUploadHelper = {};
+
 var UPLOADING_FILE_PROGRESS_BOX_TEXT = 'Uploading file';
 var UPLOADING_FILE_PLEASE_WAIT_PROGRESS_BOX_TEXT = 'completed, please wait...';
 var UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT = 'Upload was successfully finished.';
@@ -178,7 +180,7 @@ function getFilesValuesToUpload(inputs, zipFile, invalidTypeMessage) {
 function addFileInputForUpload(id, message) {
 	showLoadingMessage(message);
 	
-	FileUploader.getRenderedFileInput({
+	FileUploader.getRenderedFileInput(id, {
 		callback: function(component) {
 			closeAllLoadingMessages();
 			
@@ -190,4 +192,17 @@ function addFileInputForUpload(id, message) {
 			insertNodesToContainer(component, container);
 		}
 	});
+}
+
+FileUploadHelper.changeUploadPath = function(newUploadPath, className) {
+	var uploadPathInputs = $$('input.' + className);
+	if (uploadPathInputs == null || uploadPathInputs.length == 0) {
+		return false;
+	}
+	
+	var input = null;
+	for (var i = 0; i < uploadPathInputs.length; i++) {
+		input = $(uploadPathInputs[i]);
+		input.setProperty('value', newUploadPath);
+	}
 }
