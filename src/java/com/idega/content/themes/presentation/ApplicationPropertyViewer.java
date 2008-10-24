@@ -24,6 +24,7 @@ import com.idega.presentation.PresentationObject;
 import com.idega.presentation.text.Text;
 import com.idega.util.CoreConstants;
 import com.idega.util.PresentationUtil;
+import com.idega.util.StringUtil;
 import com.idega.webface.WFUtil;
 
 /**
@@ -73,8 +74,10 @@ public class ApplicationPropertyViewer extends Block {
 			return;
 		}
 		
-		if (!ContentUtil.hasContentEditorRoles(iwc) || ContentConstants.EMPTY.equals(value)) {	// Nothing to display
-			return;
+		if (!ContentUtil.hasContentEditorRoles(iwc)) {
+			if (StringUtil.isEmpty(value) || FIFTEEN_SPACE.equals(value) || value.length() == 15) {	// Nothing to display
+				return;
+			}
 		}
 		
 		if (key.indexOf(getCheckKey(ThemesConstants.LOGO)) != -1) {
