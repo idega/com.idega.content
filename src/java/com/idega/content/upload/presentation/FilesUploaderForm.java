@@ -57,6 +57,8 @@ public class FilesUploaderForm extends Block {
 		uploaderContainer.add(uploader);
 		uploader.setUploadPath(StringUtil.isEmpty(uploadPath) ? parentPath : uploadPath);
 		uploader.setAutoAddFileInput(true);
+		uploader.setShowLoadingMessage(true);
+//		uploader.setActionAfterUpload("alert('uploaded!!!');");	//	TODO: close light box
 	}
 
 	@SuppressWarnings("unchecked")

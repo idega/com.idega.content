@@ -177,7 +177,20 @@ function getFilesValuesToUpload(inputs, zipFile, invalidTypeMessage) {
 	return files;
 }
 
-function addFileInputForUpload(id, message) {
+function addFileInputForUpload(id, message, className) {
+	var foundEmptyInput = false;
+	var currentInputs = $$('input.' + className, id);
+	if (currentInputs != null) {
+		var valueProperty = null;
+		for (var i = 0; (i < currentInputs.length && !foundEmptyInput); i++) {
+			valueProperty = $(currentInputs[i]).getProperty('value');
+			foundEmptyInput = (valueProperty == null || valueProperty == '');
+		}
+	}
+	if (foundEmptyInput) {
+		return;
+	}
+	
 	showLoadingMessage(message);
 	
 	FileUploader.getRenderedFileInput(id, {

@@ -55,7 +55,7 @@ public class FilesUploader extends Block {
 		}
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction.toString());
 		
-		addResources(iwc, false);
+		addResources(iwc, true);
 	}
 	
 	private String getUriToComponent(IWContext iwc) {

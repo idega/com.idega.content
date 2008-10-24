@@ -33,6 +33,8 @@ public class FileUploaderBean implements FileUploader {
 	private BuilderService builder = null;
 	private IWSlideService slide = null;
 	
+	public static final String FILE_UPLOAD_INPUT_STYLE = "fileUploadInputStyle";
+	
 	public void initializeUploader(IWContext iwc) {
 		if (iwc == null) {
 			return;
@@ -60,7 +62,7 @@ public class FileUploaderBean implements FileUploader {
 		
 		FileInput input = new FileInput();
 		input.getId();
-		input.setStyleClass("fileUploadInputStyle");
+		input.setStyleClass(FILE_UPLOAD_INPUT_STYLE);
 		input.setName(ContentConstants.UPLOAD_FIELD_NAME);
 		fileInputContainer.add(input);
 		input.setOnChange(FileUploadViewer.getActionToLoadFilesAndExecuteCustomAction(getAddFileInputJavaScriptAction(id, iwrb)));
@@ -211,6 +213,6 @@ public class FileUploaderBean implements FileUploader {
 
 	public String getAddFileInputJavaScriptAction(String containerId, IWResourceBundle iwrb) {
 		return new StringBuilder("addFileInputForUpload('").append(containerId).append("', '").append(iwrb.getLocalizedString("loading", "Loading..."))
-				.append("');").toString();
+				.append("', '").append(FILE_UPLOAD_INPUT_STYLE).append("');").toString();
 	}
 }
