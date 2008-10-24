@@ -75,7 +75,7 @@ public class ContentFileUploadServlet extends HttpServlet {
         	file = fileItems.get(i);
         	fieldName = file.getFieldName();
         	if (fieldName != null) {
-        		if (fieldName.equals(ContentConstants.UPLOAD_FIELD_NAME)) {
+        		if (file.getSize() > 0 && fieldName.equals(ContentConstants.UPLOAD_FIELD_NAME)) {
         			files.add(new UploadFile(file.getName(), file.getContentType(), file.getSize(), file.get()));
         		}
         		else if (fieldName.equals(ContentConstants.UPLOADER_PATH)) {
