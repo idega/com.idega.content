@@ -50,6 +50,7 @@ import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
+import com.idega.util.StringUtil;
 
 @Scope("singleton")
 @Service(ThemeChanger.SPRING_BEAN_IDENTIFIER)
@@ -1013,7 +1014,8 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 	
 	private String getBreadCrumbContent() {
-		return new StringBuffer("<a href=\"javascript:void(0)\">").append(TOOLBAR_NAV_MENU[0]).append("</a>").append(NO_BREAK_STRING).append(NO_BREAK_STRING).toString();
+		return new StringBuffer("<a href=\"javascript:void(0)\">").append(TOOLBAR_NAV_MENU[0]).append("</a>").append(NO_BREAK_STRING).append(NO_BREAK_STRING)
+				.toString();
 	}
 	
 	private String getToolBarContent() {
@@ -1264,75 +1266,57 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private boolean fixSiteRegion(Element e, String heading, String headingKeyword) {
 		if (e == null || heading == null) {
 			return false;
 		}
-		if (detachElement(e, heading, headingKeyword)) {
-			e.addContent(getCommentsCollection(headingKeyword));
-			addElementToRegion(e, e.getContentSize() - 1, heading, headingKeyword);	
-			return true;
-		}
-		return false;
-	}
-	
-	private boolean addElementToRegion(Element e, int index, String elementName, String applicationPropertyKey) {
-		if (e == null || elementName == null || applicationPropertyKey == null) {
+		
+		List<Element> headings = e.getChildren(heading, namespace);
+		if (ListUtil.isEmpty(headings)) {
 			return false;
 		}
-		if (index < 0) {
-			index = 0;
+		
+		String propKey = new StringBuilder(ThemesConstants.THEMES_PROPERTY_START).append(headingKeyword).append(ThemesConstants.THEMES_PROPERTY_END).toString();
+		Collection<Object> contents = null;
+		List<Text> oldTexts = null;
+		for (Element headingElement: headings) {
+			String text = headingElement.getTextNormalize();
+			if (!StringUtil.isEmpty(text) && text.indexOf(headingKeyword) != -1) {
+				Attribute id = headingElement.getAttribute("id");
+				if (id == null) {
+					id = new Attribute("id", headingKeyword);
+					headingElement.setAttribute(id);
+				}
+				
+				contents = headingElement.getContent();
+				if (!ListUtil.isEmpty(contents)) {
+					for (Object o: contents) {
+						if (o instanceof Text) {
+							if (ListUtil.isEmpty(oldTexts)) {
+								oldTexts = new ArrayList<Text>();
+							}
+							oldTexts.add((Text) o);
+						}
+					}
+				}
+				
+				//	Adding region definition
+				headingElement.addContent(getCommentsCollection(headingKeyword));
+				
+				//	Adding text
+				String newText = getApplicationSettings().getProperty(propKey);
+				headingElement.addContent(headingElement.getContentSize() - 1, new Text(StringUtil.isEmpty(newText) ? CoreConstants.EMPTY : newText));
+				
+				if (!ListUtil.isEmpty(oldTexts)) {
+					for (Iterator<Text> oldTextsIter = oldTexts.iterator(); oldTextsIter.hasNext();) {
+						oldTextsIter.next().detach();
+					}
+				}
+			}
 		}
-		e.addContent(index, getSimpleTextElement(elementName, applicationPropertyKey));
+		
 		return true;
-	}
-	
-	private boolean detachElement(Element parent, String elementName, String content) {
-		if (parent == null || elementName == null || content == null) {
-			return false;
-		}
-		Element useless = parent.getChild(elementName, namespace);
-		if (useless != null) {
-			String text = useless.getTextNormalize();
-			if (text == null) {
-				return false;
-			}
-			if (text.indexOf(content) == -1) {
-				return false;
-			}
-			useless.detach();
-			return true;
-		}
-		return false;
-	}
-	
-	private Collection <Element> getSimpleTextElement(String containerName, String propertyKey) {
-		if (propertyKey == null) {
-			return new ArrayList<Element>();
-		}
-		IWMainApplicationSettings settings = getApplicationSettings();
-		if (settings == null) {
-			return new ArrayList<Element>();
-		}
-		StringBuffer prop = new StringBuffer(ThemesConstants.THEMES_PROPERTY_START).append(propertyKey).append(ThemesConstants.THEMES_PROPERTY_END);
-		String propertyValue = settings.getProperty(prop.toString());
-		if (propertyValue == null) {
-			return new ArrayList<Element>();
-		}
-		if (ThemesConstants.EMPTY.equals(propertyValue)) {
-			return new ArrayList<Element>();
-		}
-		Collection <Element> mainContainer = new ArrayList<Element>();
-		Element parent = new Element(containerName, namespace);
-		
-		Collection <Text> textContainer = new ArrayList<Text>();
-		Text text = new Text(propertyValue);
-		
-		textContainer.add(text);
-		parent.addContent(textContainer);
-		mainContainer.add(parent);
-		
-		return mainContainer;
 	}
 	
 	private boolean clearThemeVariationsFromCache(String themeID) {
@@ -1911,7 +1895,8 @@ public class ThemeChangerBean implements ThemeChanger {
 								ThemeStyleGroupMember member = getExistingDefaultStyle(styleHref, styles);
 								if (member == null) {
 									stylesToRemove.add(child);	//	Style is needless: it's not declared as default in properties list
-									stylesIndexes.put(getStyleGroupNameByHref(theme, styleHref), getElementIndex(header.getContent(), ThemesConstants.TAG_ATTRIBUTE_HREF, child.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_HREF)));
+									stylesIndexes.put(getStyleGroupNameByHref(theme, styleHref), getElementIndex(header.getContent(),
+													ThemesConstants.TAG_ATTRIBUTE_HREF, child.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_HREF)));
 								}
 								else {
 									styleMembers.add(member);
