@@ -20,7 +20,6 @@ import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.PresentationObjectContainer;
 import com.idega.presentation.Span;
-import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
@@ -156,13 +155,10 @@ public class FileUploadViewer extends IWBaseComponent {
 		String uploadStatus = iwrb.getLocalizedString("completed_please_wait", "completed, please wait...");
 		
 		Layer progressBarBox = new Layer();
-		progressBarBox.setStyleClass("fileUploaderProgressBarStyle");
-		progressBarBox.setStyleAttribute("visibility: hidden;");
-		String progressBarId = progressBarBox.getId();
-		Span progressText = new Span();
-		progressText.add(new Text(new StringBuffer(uploadingFile).append(": 0% ").append(uploadStatus).toString()));
-		progressText.setId(progressBarId + "_progressText");
-		progressBarBox.add(progressText);
+		Span progressBar = new Span();
+		progressBarBox.add(progressBar);
+		progressBar.setStyleClass("progressBar");
+		String progressBarId = progressBar.getId();
 		mainContainer.add(progressBarBox);
 		
 		List<String> localization = new ArrayList<String>(3);

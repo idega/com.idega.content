@@ -60,6 +60,7 @@ FileUploadHelper.uploadFiles = function(id, message, showProgressBar, showMessag
 			YAHOO.util.Connect.asyncRequest('POST', '/servlet/ContentFileUploadServlet', uploadHandler);
 			
 			if (showProgressBar) {
+				jQuery('#' + progressBarId).progressBar(0, { showText: true});
 				showUploadInfoInProgressBar(progressBarId, actionAfterCounterReset);
 			}
 		}
@@ -74,14 +75,14 @@ function showUploadInfoInProgressBar(progressBarId, actionAfterCounterReset) {
 function fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset) {
 	FileUploadListener.getFileUploadStatus({
 		callback: function(status) {
-			var textBox = document.getElementById(progressBarId + '_progressText');
-			
 			if (status == null) {
 				status = '0';
 			}
+			
+			jQuery('#' + progressBarId).progressBar(status);
 
 			if (status == '100') {
-				textBox.innerHTML = UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT;
+				jQuery('#' + progressBarId).html(UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT);
 				var functionAfterCompletedUpload = function() {
 					resetFileUploaderCounterAfterTimeOut(progressBarId, actionAfterCounterReset);
 				}
@@ -89,11 +90,10 @@ function fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterRese
 				return false;
 			}
 			else {
-				textBox.innerHTML = UPLOADING_FILE_PROGRESS_BOX_TEXT + ': ' + status + '% ' + UPLOADING_FILE_PLEASE_WAIT_PROGRESS_BOX_TEXT;
 				var functionWhileUploading = function() {
 					fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset);
 				}
-				window.setTimeout(functionWhileUploading, 1000);
+				window.setTimeout(functionWhileUploading, 750);
 			}
 		}
 	});
