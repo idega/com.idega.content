@@ -10,5 +10,6 @@ public interface FileUploadProgressListener extends ProgressListener {
 	public String getFileUploadStatus();
 	
 	public boolean resetFileUploaderCounters();
-	
+
+	public boolean isUploadInProgress(String id);
 }

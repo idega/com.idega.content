@@ -24,6 +24,7 @@ public class FilesUploaderForm extends Block {
 	private String parentPath = null;
 	
 	protected static final String PARENT_PATH_FOLDER_CHOOSER_PARAMETER = "parentPathForFolderChooserPrm";
+	protected static final String COMPONENT_TO_RERENDER_ID_PARAMETER = "componentToRerenderIdPrm";
 	
 	@Override
 	public void main(IWContext iwc) {
@@ -59,6 +60,10 @@ public class FilesUploaderForm extends Block {
 		uploader.setAutoAddFileInput(true);
 		uploader.setShowLoadingMessage(true);
 		uploader.setActionAfterCounterReset("MOOdalBox.close();");
+		
+		if (iwc.isParameterSet(COMPONENT_TO_RERENDER_ID_PARAMETER)) {
+			uploader.setComponentToRerenderId(iwc.getParameter(COMPONENT_TO_RERENDER_ID_PARAMETER));
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -107,7 +112,7 @@ public class FilesUploaderForm extends Block {
 		
 		StringBuilder action = new StringBuilder("FileUploadHelper.changeUploadPath(DWRUtil.getValue('").append(folders.getId()).append("'), '")
 								.append(ContentConstants.UPLOADER_PATH).append("');");
-		folders.setOnChange(FileUploadViewer.getActionToLoadFilesAndExecuteCustomAction(action.toString()));
+		folders.setOnChange(FileUploadViewer.getActionToLoadFilesAndExecuteCustomAction(action.toString(), true, true));
 		
 		return folders;
 	}

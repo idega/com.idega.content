@@ -3,6 +3,10 @@ package com.idega.content.upload.business;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import com.idega.idegaweb.IWApplicationContext;
+import com.idega.idegaweb.IWMainApplication;
+import com.idega.util.StringUtil;
+
 
 public class FileUploadProgressListenerBean implements FileUploadProgressListener {
 	
@@ -28,6 +32,24 @@ public class FileUploadProgressListenerBean implements FileUploadProgressListene
 		fileSize = 0;
 		
 		return true;
+	}
+
+	public boolean isUploadInProgress(String id) {
+		if (StringUtil.isEmpty(id)) {
+			return false;
+		}
+		
+		IWApplicationContext iwac = IWMainApplication.getDefaultIWApplicationContext();
+		if (iwac == null) {
+			return false;
+		}
+		
+		Object o = iwac.getApplicationAttribute(id);
+		if (o instanceof Boolean) {
+			return (Boolean) o;
+		}
+		
+		return false;
 	}
 	
 }

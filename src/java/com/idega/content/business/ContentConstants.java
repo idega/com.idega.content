@@ -40,6 +40,7 @@ public class ContentConstants {
 	public static final String UPLOADER_UPLOAD_ZIP_FILE = "web2FileUploaderUploadZipFileValue";
 	public static final String UPLOADER_UPLOAD_THEME_PACK = "web2FileUploaderUploadThemePackValue";
 	public static final String UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE = "web2FileUploaderExtractArchivedFileValue";
+	public static final String UPLOADER_UPLOAD_IDENTIFIER = "web2FileUploaderUploadIdentifier";
 
 	public final static String ATTRIBUTE_HEADLINE = "headline";
 	public final static String ATTRIBUTE_CREATION_DATE = "creation_date";

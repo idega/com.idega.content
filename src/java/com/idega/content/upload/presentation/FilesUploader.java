@@ -23,6 +23,7 @@ import com.idega.util.expression.ELUtil;
 public class FilesUploader extends Block {
 
 	private String parentPath = null;
+	private String componentToRerenderId = null;
 	
 	@Override
 	public void main(IWContext iwc) {
@@ -40,7 +41,8 @@ public class FilesUploader extends Block {
 		uploadButton.setStyleClass("filesUploaderUploadButtonStyle");
 		uploadButton.setURL("javascript:void(0);");
 		uploadButton.setOnClick(new StringBuilder("MOOdalBox.open('").append(getUriToComponent(iwc)).append("', '")
-						.append(getResourceBundle(iwc).getLocalizedString("files_uploader.upload_files_window", "Files uploader")).append("', '400 250');").toString());
+						.append(getResourceBundle(iwc).getLocalizedString("files_uploader.upload_files_window", "Files uploader")).append("', '400 250');")
+						.toString());
 		
 		addResources(iwc, true);
 	}
@@ -58,6 +60,9 @@ public class FilesUploader extends Block {
 		
 		List<AdvancedProperty> parameters = new ArrayList<AdvancedProperty>();
 		parameters.add(new AdvancedProperty(FilesUploaderForm.PARENT_PATH_FOLDER_CHOOSER_PARAMETER, parentPath));
+		if (!StringUtil.isEmpty(componentToRerenderId)) {
+			parameters.add(new AdvancedProperty(FilesUploaderForm.COMPONENT_TO_RERENDER_ID_PARAMETER, componentToRerenderId));
+		}
 		
 		return builderService.getUriToObject(FilesUploaderForm.class, parameters);
 	}
@@ -79,6 +84,14 @@ public class FilesUploader extends Block {
 
 	public void setParentPath(String parentPath) {
 		this.parentPath = parentPath;
+	}
+
+	public String getComponentToRerenderId() {
+		return componentToRerenderId;
+	}
+
+	public void setComponentToRerenderId(String componentToRerenderId) {
+		this.componentToRerenderId = componentToRerenderId;
 	}
 
 	@Override

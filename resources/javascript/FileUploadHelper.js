@@ -4,8 +4,8 @@ var UPLOADING_FILE_PROGRESS_BOX_TEXT = 'Uploading file';
 var UPLOADING_FILE_PLEASE_WAIT_PROGRESS_BOX_TEXT = 'completed, please wait...';
 var UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT = 'Upload was successfully finished.';
 
-function uploadFiles(id, message, showProgressBar, showMessage, zipFile, invalidTypeMessage, formId, progressBarId, localization, actionAfterUpload,
-						actionAfterCounterReset) {
+FileUploadHelper.uploadFiles = function(id, message, showProgressBar, showMessage, zipFile, invalidTypeMessage, formId, progressBarId, localization, actionAfterUpload,
+						actionAfterCounterReset, uploadId) {
 	if (localization != null) {
 		if (localization.length == 3) {
 			UPLOADING_FILE_PROGRESS_BOX_TEXT = localization[0];
@@ -177,7 +177,7 @@ function getFilesValuesToUpload(inputs, zipFile, invalidTypeMessage) {
 	return files;
 }
 
-function addFileInputForUpload(id, message, className) {
+function addFileInputForUpload(id, message, className, showProgressBar, addjQuery) {
 	var foundEmptyInput = false;
 	var currentInputs = $$('input.' + className, id);
 	if (currentInputs != null) {
@@ -193,7 +193,7 @@ function addFileInputForUpload(id, message, className) {
 	
 	showLoadingMessage(message);
 	
-	FileUploader.getRenderedFileInput(id, {
+	FileUploader.getRenderedFileInput(id, showProgressBar, addjQuery, {
 		callback: function(component) {
 			closeAllLoadingMessages();
 			
@@ -218,4 +218,23 @@ FileUploadHelper.changeUploadPath = function(newUploadPath, className) {
 		input = $(uploadPathInputs[i]);
 		input.setProperty('value', newUploadPath);
 	}
+}
+
+FileUploadHelper.reRenderComponent = function(id) {
+	FileUploader.getRenderedComponent(id, {
+		callback: function(componentHTML) {
+			if (componentHTML == null) {
+				reloadPage();
+				return false;
+			}
+			
+			var componentToReplace = jQuery('#' + id);
+			if (componentToReplace == null || componentToReplace.length == 0) {
+				reloadPage();
+				return false;
+			}
+			
+			componentToReplace.replaceWith(jQuery(componentHTML));
+		}
+	});
 }

@@ -6,8 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.jdom.Document;
+import javax.faces.component.UIComponent;
 
+import org.directwebremoting.WebContext;
+import org.directwebremoting.WebContextFactory;
+import org.jdom.Document;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentConstants;
@@ -25,6 +28,7 @@ import com.idega.presentation.ui.FileInput;
 import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.StringUtil;
 
 public class FileUploaderBean implements FileUploader {
 
@@ -48,7 +52,7 @@ public class FileUploaderBean implements FileUploader {
 		getSlideService(iwc);
 	}
 	
-	public Layer getFileInput(IWContext iwc, String id, boolean addRemoveImage) {
+	public Layer getFileInput(IWContext iwc, String id, boolean addRemoveImage, boolean showProgressBar, boolean addjQuery) {
 		if (iwc == null) {
 			return null;
 		}
@@ -65,7 +69,8 @@ public class FileUploaderBean implements FileUploader {
 		input.setStyleClass(FILE_UPLOAD_INPUT_STYLE);
 		input.setName(ContentConstants.UPLOAD_FIELD_NAME);
 		fileInputContainer.add(input);
-		input.setOnChange(FileUploadViewer.getActionToLoadFilesAndExecuteCustomAction(getAddFileInputJavaScriptAction(id, iwrb)));
+		input.setOnChange(FileUploadViewer.getActionToLoadFilesAndExecuteCustomAction(getAddFileInputJavaScriptAction(id, iwrb, showProgressBar, addjQuery),
+				showProgressBar, addjQuery));
 		
 		if (addRemoveImage) {
 			Image remove = new Image(bundle.getVirtualPathWithFileNameString("images/delete.png"), name, 18, 18);
@@ -77,7 +82,7 @@ public class FileUploaderBean implements FileUploader {
 		return fileInputContainer;
 	}
 	
-	public Document getRenderedFileInput(String id) {
+	public Document getRenderedFileInput(String id, boolean showProgressBar, boolean addjQuery) {
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return null;
@@ -88,7 +93,7 @@ public class FileUploaderBean implements FileUploader {
 			return null;
 		}
 		
-		return builder.getRenderedComponent(iwc, getFileInput(iwc, id, true), false);
+		return builder.getRenderedComponent(iwc, getFileInput(iwc, id, true, showProgressBar, addjQuery), false);
 	}
 
 	public boolean uploadFile(List<UploadFile> files, String uploadPath, boolean isIE) {
@@ -211,8 +216,41 @@ public class FileUploaderBean implements FileUploader {
 		return slide;
 	}
 
-	public String getAddFileInputJavaScriptAction(String containerId, IWResourceBundle iwrb) {
+	public String getAddFileInputJavaScriptAction(String containerId, IWResourceBundle iwrb, boolean showProgressBar, boolean addjQuery) {
 		return new StringBuilder("addFileInputForUpload('").append(containerId).append("', '").append(iwrb.getLocalizedString("loading", "Loading..."))
-				.append("', '").append(FILE_UPLOAD_INPUT_STYLE).append("');").toString();
+				.append("', '").append(FILE_UPLOAD_INPUT_STYLE).append("', ").append(showProgressBar).append(", ").append(addjQuery).append(");").toString();
 	}
+
+	public String getRenderedComponent(String id) {
+		if (StringUtil.isEmpty(id)) {
+			return null;
+		}
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return null;
+		}
+		BuilderService builderService = getBuilderService(iwc);
+		if (builderService == null) {
+			return null;
+		}
+		
+		String currentPageId = null;
+		WebContext webContext = WebContextFactory.get();
+		if (webContext == null) {
+			currentPageId = String.valueOf(iwc.getCurrentIBPageID());
+		}
+		else {
+			currentPageId = builderService.getPageKeyByURI(webContext.getCurrentPage());
+		}
+		if (StringUtil.isEmpty(currentPageId)) {
+			return null;
+		}
+		
+		UIComponent component = builderService.findComponentInPage(iwc, currentPageId, id);
+		if (component == null) {
+			return null;
+		}
+		return builderService.getRenderedComponent(component, iwc, false);
+	}
+	
 }

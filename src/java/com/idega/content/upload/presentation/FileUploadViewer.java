@@ -3,9 +3,11 @@ package com.idega.content.upload.presentation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.faces.context.FacesContext;
 
+import com.idega.block.web2.business.JQueryPlugin;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
@@ -24,6 +26,7 @@ import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.util.CoreConstants;
 import com.idega.util.PresentationUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
 
@@ -33,6 +36,7 @@ public class FileUploadViewer extends IWBaseComponent {
 	private String actionAfterCounterReset = null;
 	private String uploadPath = CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
 	private String formId = null;
+	private String componentToRerenderId = null;
 	
 	private boolean zipFile = false;
 	private boolean extractContent = false;
@@ -57,11 +61,13 @@ public class FileUploadViewer extends IWBaseComponent {
 		this.showLoadingMessage = values[7] == null ? Boolean.FALSE : (Boolean) values[7];
 		this.allowMultipleFiles = values[8] == null ? Boolean.FALSE : (Boolean) values[8];
 		this.autoAddFileInput = values[9] == null ? Boolean.FALSE : (Boolean) values[9];
+		
+		this.componentToRerenderId = values[10] == null ? null : values[10].toString();
 	}
 	
 	@Override
 	public Object saveState(FacesContext context) {
-		Object values[] = new Object[10];
+		Object values[] = new Object[11];
 		values[0] = super.saveState(context);
 		
 		values[1] = this.actionAfterUpload;
@@ -74,6 +80,8 @@ public class FileUploadViewer extends IWBaseComponent {
 		values[7] = this.showLoadingMessage;
 		values[8] = this.allowMultipleFiles;
 		values[9] = this.autoAddFileInput;
+		
+		values[10] = this.componentToRerenderId;
 		
 		return values;
 	}
@@ -102,6 +110,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		Layer container = new Layer();
 		add(container);
 		container.setStyleClass("fileUploadViewerMainLayerStyle");
+		container.add(PresentationUtil.getStyleSheetSourceLine(bundle.getVirtualPathWithFileNameString("style/filesUploader.css")));
 		
 		PresentationObjectContainer mainContainer = container;
 		if (formId == null) {
@@ -123,18 +132,23 @@ public class FileUploadViewer extends IWBaseComponent {
 		mainContainer.add(themePackValue);
 		HiddenInput extractContentValue = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE, String.valueOf(extractContent));
 		mainContainer.add(extractContentValue);
+		String uploadId = getGeneratedUploadId();
+		HiddenInput uploadIdInput = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_IDENTIFIER, uploadId);
+		mainContainer.add(uploadIdInput);
 		
 		Layer fileInputs = new Layer();
 		String id = fileInputs.getId();
 		fileInputs.setStyleClass("fileUploadInputsContainerStyle");
-		fileInputs.add(uploader.getFileInput(iwc, id, false));	//	Not adding 'remove' image - at least one file input should remain
+		//	Not adding 'remove' image - at least one file input should remain
+		fileInputs.add(uploader.getFileInput(iwc, id, false, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId)));	
 		mainContainer.add(fileInputs);
 		
 		Layer buttonsContainer = new Layer();
 		buttonsContainer.setStyleClass("fileUploadButtonsContainerStyle");
 		if (allowMultipleFiles) {
 			GenericButton addFileInput = new GenericButton(iwrb.getLocalizedString("add_file", "Add file"));
-			addFileInput.setOnClick(getActionToLoadFilesAndExecuteCustomAction(uploader.getAddFileInputJavaScriptAction(id, iwrb)));
+			addFileInput.setOnClick(getActionToLoadFilesAndExecuteCustomAction(uploader.getAddFileInputJavaScriptAction(id, iwrb, isShowProgressBar(),
+					!StringUtil.isEmpty(componentToRerenderId)), isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId)));
 			buttonsContainer.add(addFileInput);
 		}
 		
@@ -158,10 +172,15 @@ public class FileUploadViewer extends IWBaseComponent {
 		
 		String inavlidTypeMessage = iwrb.getLocalizedString("incorrect_file_type", "Unsupported file type! Only zip files allowed");
 		GenericButton upload = new GenericButton(iwrb.getLocalizedString("upload", "Upload"));
-		upload.setOnClick(getAction(id, iwrb.getLocalizedString("uploading", "Uploading..."), inavlidTypeMessage, progressBarId, localization));
+		upload.setOnClick(getAction(id, iwrb.getLocalizedString("uploading", "Uploading..."), inavlidTypeMessage, progressBarId, localization, uploadId));
 		buttonsContainer.add(upload);
 		
 		mainContainer.add(buttonsContainer);
+	}
+	
+	private String getGeneratedUploadId() {
+		Random random = new Random();
+		return new StringBuilder("uploadId").append(System.currentTimeMillis()).append("_").append(random.nextInt(Integer.MAX_VALUE)).toString();
 	}
 	
 	@Override
@@ -169,10 +188,10 @@ public class FileUploadViewer extends IWBaseComponent {
 		super.encodeBegin(context);
 	}
 	
-	private String getAction(String id, String loadingMessage, String invalidTypeMessage, String progressBarId, List<String> localization) {
-		StringBuffer action = new StringBuffer("uploadFiles('").append(id).append("', '").append(loadingMessage).append("', ").append(showProgressBar).append(", ");
-		action.append(showLoadingMessage).append(", ").append(zipFile).append(", '").append(invalidTypeMessage).append("', '").append(formId).append("', '");
-		action.append(progressBarId).append("', ");
+	private String getAction(String id, String loadingMessage, String invalidTypeMessage, String progressBarId, List<String> localization, String uploadId) {
+		StringBuffer action = new StringBuffer("FileUploadHelper.uploadFiles('").append(id).append("', '").append(loadingMessage).append("', ")
+			.append(showProgressBar).append(", ").append(showLoadingMessage).append(", ").append(zipFile).append(", '").append(invalidTypeMessage).append("', '")
+			.append(formId).append("', '").append(progressBarId).append("', ");
 		
 		action.append("['");
 		for (int i = 0; i < localization.size(); i++) {
@@ -184,13 +203,15 @@ public class FileUploadViewer extends IWBaseComponent {
 		}
 		action.append("'], ");
 		
-		action.append(getJavaScriptAction(actionAfterUpload));
+		action.append(getJavaScriptAction(getActionAfterUpload()));
 		action.append(", ");
-		action.append(getJavaScriptAction(actionAfterCounterReset));
-
+		action.append(getJavaScriptAction(getActionAfterCounterReset()));
+		
+		action.append(", '").append(uploadId).append("'");
+		
 		action.append(");");
 		
-		return getActionToLoadFilesAndExecuteCustomAction(action.toString());
+		return getActionToLoadFilesAndExecuteCustomAction(action.toString(), isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId));
 	}
 	
 	private String getJavaScriptAction(String action) {
@@ -218,7 +239,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		return script.toString();
 	}
 	
-	public static final String getActionToLoadFilesAndExecuteCustomAction(String customAction) {
+	public static final String getActionToLoadFilesAndExecuteCustomAction(String customAction, boolean showProgressBar, boolean addjQuery) {
 		Web2Business web2 = ELUtil.getInstance().getBean(Web2Business.SPRING_BEAN_IDENTIFIER);
 		List<String> scripts = new ArrayList<String>();
 		scripts.add(ContentUtil.getBundle().getVirtualPathWithFileNameString("javascript/FileUploadHelper.js"));
@@ -227,12 +248,30 @@ public class FileUploadViewer extends IWBaseComponent {
 		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
 		scripts.add("/dwr/interface/FileUploader.js");
 		scripts.add("/dwr/interface/FileUploadListener.js");
+		if (addjQuery || showProgressBar) {
+			scripts.add(web2.getBundleURIToJQueryLib());
+		}
+		if (showProgressBar) {
+			scripts.add(web2.getBundleURIToJQueryPlugin(JQueryPlugin.PROGRESS_BAR));
+		}
 		
 		return PresentationUtil.getJavaScriptLinesLoadedLazily(scripts, customAction);
 	}
 
 	public String getActionAfterUpload() {
-		return actionAfterUpload;
+		if (StringUtil.isEmpty(componentToRerenderId)) {
+			return actionAfterUpload;
+		}
+		
+		String reRenderAction = new StringBuilder("FileUploadHelper.reRenderComponent('").append(componentToRerenderId).append("');").toString();
+		if (StringUtil.isEmpty(actionAfterUpload)) {
+			return reRenderAction;
+		}
+		
+		if (!actionAfterUpload.endsWith(CoreConstants.SEMICOLON)) {
+			actionAfterUpload += CoreConstants.SEMICOLON;
+		}
+		return actionAfterUpload + reRenderAction;
 	}
 
 	public void setActionAfterUpload(String actionAfterUpload) {
@@ -317,6 +356,14 @@ public class FileUploadViewer extends IWBaseComponent {
 
 	public void setAutoAddFileInput(boolean autoAddFileInput) {
 		this.autoAddFileInput = autoAddFileInput;
+	}
+
+	public String getComponentToRerenderId() {
+		return componentToRerenderId;
+	}
+
+	public void setComponentToRerenderId(String componentToRerenderId) {
+		this.componentToRerenderId = componentToRerenderId;
 	}
 
 }

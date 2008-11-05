@@ -23,9 +23,12 @@ import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.upload.bean.UploadFile;
 import com.idega.content.upload.business.FileUploadProgressListener;
 import com.idega.content.upload.business.FileUploader;
+import com.idega.idegaweb.IWApplicationContext;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.ListUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
 public class ContentFileUploadServlet extends HttpServlet {
@@ -67,14 +70,15 @@ public class ContentFileUploadServlet extends HttpServlet {
 			log.info("No files to upload!");
         	return;
         }
-        
+
         List<UploadFile> files = new ArrayList<UploadFile>();
         FileItem file = null;
+        String uploadId = null;
         String fieldName = null;
         for (int i = 0; i < fileItems.size(); i++) {
         	file = fileItems.get(i);
         	fieldName = file.getFieldName();
-        	if (fieldName != null) {
+        	if (!StringUtil.isEmpty(fieldName)) {
         		if (file.getSize() > 0 && fieldName.equals(ContentConstants.UPLOAD_FIELD_NAME)) {
         			files.add(new UploadFile(file.getName(), file.getContentType(), file.getSize(), file.get()));
         		}
@@ -90,36 +94,55 @@ public class ContentFileUploadServlet extends HttpServlet {
         		else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE)) {
         			extractContent = getValueFromString(getValueFromBytes(file.get()));
         		}
+        		else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_IDENTIFIER)) {
+        			uploadId = getValueFromBytes(file.get());
+        		}
         	}
         }
         
-        if (files.size() > 0) {
-        	//	Checking upload path
-        	if (uploadPath == null) {
-        		//	Using default upload path
-        		uploadPath = CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
-        	}
-        	if (!uploadPath.startsWith(CoreConstants.SLASH)) {
-    			uploadPath = CoreConstants.SLASH + uploadPath;
-    		}
-    		if (!uploadPath.endsWith(CoreConstants.SLASH)) {
-    			uploadPath += CoreConstants.SLASH;
-    		}
-    		
-        	boolean isIE = CoreUtil.isIE(request);
-        	FileUploader uploader = ELUtil.getInstance().getBean(FileUploader.class);
-        	
-        	if (zipFile || themePack) {
-        		if (themePack) {
-        			uploadPath = ThemesConstants.THEMES_PATH;
-        			uploader.uploadThemePack(files, uploadPath, isIE);
-        		}
-        		else {
-        			uploader.uploadZipFile(files, uploadPath, extractContent, isIE);
-        		}
-        	}
-        	else {
-        		uploader.uploadFile(files, uploadPath, isIE);
+        if (ListUtil.isEmpty(files)) {
+        	log.info("No files to upload!");
+        	return;
+        }
+        
+        IWApplicationContext iwac = IWMainApplication.getDefaultIWApplicationContext();
+        if (!StringUtil.isEmpty(uploadId) && iwac != null) {
+        	iwac.setApplicationAttribute(uploadId, Boolean.TRUE);
+        }
+        
+        try {
+	        //	Checking upload path
+	        if (uploadPath == null) {
+	        	//	Using default upload path
+	        	uploadPath = CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
+	        }
+	        if (!uploadPath.startsWith(CoreConstants.SLASH)) {
+	    		uploadPath = CoreConstants.SLASH + uploadPath;
+	    	}
+	    	if (!uploadPath.endsWith(CoreConstants.SLASH)) {
+	    		uploadPath += CoreConstants.SLASH;
+	    	}
+	    	
+	        boolean isIE = CoreUtil.isIE(request);
+	        FileUploader uploader = ELUtil.getInstance().getBean(FileUploader.class);
+	        
+	        if (zipFile || themePack) {
+	        	if (themePack) {
+	        		uploadPath = ThemesConstants.THEMES_PATH;
+	        		uploader.uploadThemePack(files, uploadPath, isIE);
+	        	}
+	        	else {
+	        		uploader.uploadZipFile(files, uploadPath, extractContent, isIE);
+	        	}
+	        }
+	        else {
+	        	uploader.uploadFile(files, uploadPath, isIE);
+	        }
+        } catch(Exception e) {
+        	log.fatal("Files uploader failed!", e);
+        } finally {
+        	if (!StringUtil.isEmpty(uploadId) && iwac != null) {
+        		iwac.removeApplicationAttribute(uploadId);
         	}
         }
 	}
