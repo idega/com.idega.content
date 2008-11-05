@@ -32,17 +32,17 @@ ul.content_item_toolbar {
 	border-left: 0;	
 }
 
-.blog-entry {
+.blog-entry, .article_item {
 	position: relative;
 	border: 1px transparent solid;
 }
 
-.blog-entry.hovered {
+.blog-entry.hovered, .article_item.hovered {
 	background-color: #efefef;
 	border: 1px #a0a0a0 solid;
 }
 
-.blog-entry div.content_item_toolbar {
+.blog-entry div.content_item_toolbar, .article_item div.content_item_toolbar {
 	position: absolute;
 	top: -5px;
 	right: -5px;
