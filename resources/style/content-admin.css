@@ -1,82 +1,91 @@
-.content_item_toolbar,.content_item_toolbar li {
+div.content_item_toolbar {
+	width: 100%;
+	overflow: hidden;
+}
+
+ul.content_item_toolbar {
 	list-style: none;
 	margin: 0;
+	padding: 0;
+	float: left;
+	border: 1px #555 solid;
+	background: url(images/content-admin.gif) top left repeat-x #ccc;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
 	padding: 0;
 }
 
 .content_item_toolbar li {
+	margin: 0;
 	float: left;
-	height: 16px;
-	border: 1px solid #D7D7D7;
-	border-width: 0 1px 0 0;
-}
-
-.content_item_toolbar li a,.content_item_toolbar li span {
-	float: left;
-	padding: 0 0 0 16px;
-	height: 18px;
-	font-weight: normal;
-	color: #464646;
-}
-
-.content_item_toolbar li.wf_toolbarbuttonselected {
-	background: #E7E7E7 url(images/tabbar/bg_item_selected.gif) repeat-x;
-}
-
-.content_item_toolbar li a,.content_item_toolbar li a:hover,.content_item_toolbar li span {
-	background-position: 0px 0px;
-	background-repeat: no-repeat;
-}
-
-.content_item_toolbar li a:hover {
-	background-color: #e7e7e7;
-}
-
-.content_item_toolbar {
-	padding: 1px;
-	margin: 4px;
-	font-family: Verdana, Helvetica, Sans-Serif;
-	font-size: 0.9em;
-	overflow: hidden;
-}
-
-.content_item_toolbar ul {
-	padding: 0px;
-	margin: 0px;
-	overflow: hidden;
-}
-
-.content_item_toolbar li {
-	border: 1px solid #D3D3D3;
-	background-color: #F2F2F2;
-	margin: 1px;
-	padding: 3px;
-	list-style: none;
-	display: inline;
-}
-
-.content_item_toolbar li.first {
-	clear: left;
+	line-height: 1em;
+	border-right: 1px #555 solid;
+	border-left: 1px #eeeeee solid;
 }
 
 .content_item_toolbar li.last {
-	clear: right;
+	border-right: 0;
 }
 
-.content_item_toolbar li .edit {
-	background-image: url(images/edit_16.gif);
+.content_item_toolbar li.first {
+	border-left: 0;	
 }
 
-.content_item_toolbar li .delete {
-	background-image: url(images/del_16.gif);
+.blog-entry {
+	position: relative;
+	border: 1px transparent solid;
 }
 
-.content_item_toolbar li .create {
-	background-image: url(images/new_16.gif);
+.blog-entry.hovered {
+	background-color: #efefef;
+	border: 1px #a0a0a0 solid;
 }
 
-.content_item_toolbar li a span {
-	display: none;
+.blog-entry div.content_item_toolbar {
+	position: absolute;
+	top: -5px;
+	right: -5px;
+	width: auto;
+}
+
+.content_item_toolbar li a {
+	font-size: 11px;
+	color: #333;
+	text-shadow: #fff 1px 1px 1px;
+	padding: 4px 10px;
+	display: block;
+}
+
+.commentsController {
+	width: 100%;
+	overflow: hidden;
+	margin-bottom: 6px;
+}
+
+.commentsController .commentsControllerInputs {
+	border: 1px #555 solid;
+	background: url(images/content-admin.gif) top left repeat-x #ccc;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	float: left;
+	font-size: 11px;
+	color: #333;
+	text-shadow: #fff 1px 1px 1px;
+	padding: 4px 10px;
+	line-height: 1em;
+}
+
+.commentsController .commentsControllerInputs input {
+	float: left;
+	margin: 0;
+	margin-right: 4px;
+}
+
+.commentsController .commentsControllerInputs label {
+	float: left;
+	padding-top: 3px;
 }
 
 iframe.contentItemEditorFrameStyle {

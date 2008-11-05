@@ -27,6 +27,8 @@ public class FilesUploader extends Block {
 	
 	@Override
 	public void main(IWContext iwc) {
+		PresentationUtil.addStyleSheetToHeader(iwc, iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/filesUploader.css"));
+		
 		Layer container = new Layer();
 		add(container);
 		container.setStyleClass("filesUploaderContainerStyle");
@@ -41,7 +43,7 @@ public class FilesUploader extends Block {
 		uploadButton.setStyleClass("filesUploaderUploadButtonStyle");
 		uploadButton.setURL("javascript:void(0);");
 		uploadButton.setOnClick(new StringBuilder("MOOdalBox.open('").append(getUriToComponent(iwc)).append("', '")
-						.append(getResourceBundle(iwc).getLocalizedString("files_uploader.upload_files_window", "Files uploader")).append("', '400 250');")
+						.append(getResourceBundle(iwc).getLocalizedString("files_uploader.upload_files_window", "Files uploader")).append("', '400 300');")
 						.toString());
 		
 		addResources(iwc, true);

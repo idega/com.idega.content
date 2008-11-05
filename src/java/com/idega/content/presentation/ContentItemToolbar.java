@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.19 2008/02/21 10:29:48 valdas Exp $
+ * $Id: ContentItemToolbar.java,v 1.20 2008/11/05 16:37:39 laddi Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -24,6 +24,7 @@ import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.uri.IWActionURIManager;
+import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Span;
 import com.idega.presentation.text.Text;
@@ -36,10 +37,10 @@ import com.idega.webface.WFToolbar;
  *  <p>
  *  Toolbar used by new content management system to display editor buttons.
  *  </p>
- *  Last modified: $Date: 2008/02/21 10:29:48 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/11/05 16:37:39 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.20 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
@@ -152,7 +153,9 @@ public class ContentItemToolbar extends WFToolbar {
 	}
 	
 	
-	public void update(){
+	public void update(IWContext iwc){
+		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc.getCurrentLocale());
+		
 		Set<String> s = getActions().keySet();
 		for (Iterator<String> iter = s.iterator(); iter.hasNext();) {
 			String action = iter.next();
@@ -178,6 +181,7 @@ public class ContentItemToolbar extends WFToolbar {
 					link.getChildren().add(basePathParameter);
 				}
 				link.setAction(action);
+				link.setTitle(iwrb.getLocalizedString("action." + action, action));
 			}
 		}
 	}
@@ -216,7 +220,8 @@ public class ContentItemToolbar extends WFToolbar {
 	
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
-		update();
+		IWContext iwc = IWContext.getIWContext(context);
+		update(iwc);
 		super.encodeBegin(context);
 	}
 	

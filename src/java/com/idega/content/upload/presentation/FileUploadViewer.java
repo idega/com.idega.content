@@ -109,7 +109,6 @@ public class FileUploadViewer extends IWBaseComponent {
 		Layer container = new Layer();
 		add(container);
 		container.setStyleClass("fileUploadViewerMainLayerStyle");
-		container.add(PresentationUtil.getStyleSheetSourceLine(bundle.getVirtualPathWithFileNameString("style/filesUploader.css")));
 		
 		PresentationObjectContainer mainContainer = container;
 		if (formId == null) {
