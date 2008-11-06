@@ -17,11 +17,12 @@ ul.content_item_toolbar {
 }
 
 .content_item_toolbar li {
-	margin: 0;
+	margin: 0 !important;
 	float: left;
-	line-height: 20px;
+	line-height: 20px !important;
 	border-right: 1px #555 solid;
 	border-left: 1px #eeeeee solid;
+	padding: 0 !important;
 }
 
 .content_item_toolbar li.last {
@@ -35,6 +36,12 @@ ul.content_item_toolbar {
 .blog-entry, .article_item {
 	position: relative;
 	border: 1px transparent solid;
+	height: 21px;
+}
+
+html>body .blog-entry, html>body .article_item {
+	height: auto;
+	min-height: 21px;
 }
 
 .blog-entry.hovered, .article_item.hovered {
@@ -50,11 +57,12 @@ ul.content_item_toolbar {
 }
 
 .content_item_toolbar li a {
-	font-size: 11px;
+	font-size: 11px !important;
 	color: #333;
 	text-shadow: #fff 1px 1px 1px;
 	padding: 0 10px;
 	display: block;
+	background: none;
 }
 
 .commentsController {
