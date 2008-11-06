@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.20 2008/11/05 16:37:39 laddi Exp $
+ * $Id: ContentItemToolbar.java,v 1.21 2008/11/06 10:07:57 laddi Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -10,10 +10,12 @@
 package com.idega.content.presentation;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.faces.component.UIParameter;
 import javax.faces.component.html.HtmlOutputLink;
@@ -37,10 +39,10 @@ import com.idega.webface.WFToolbar;
  *  <p>
  *  Toolbar used by new content management system to display editor buttons.
  *  </p>
- *  Last modified: $Date: 2008/11/05 16:37:39 $ by $Author: laddi $
+ *  Last modified: $Date: 2008/11/06 10:07:57 $ by $Author: laddi $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.20 $
+ * @version $Revision: 1.21 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
@@ -156,7 +158,11 @@ public class ContentItemToolbar extends WFToolbar {
 	public void update(IWContext iwc){
 		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc.getCurrentLocale());
 		
-		Set<String> s = getActions().keySet();
+		List<String> s = new ArrayList(getActions().keySet());
+		/* Hack to make actions display in the same order, always... */
+		Collections.sort(s);
+		Collections.reverse(s);
+		/* End of hack.. */
 		for (Iterator<String> iter = s.iterator(); iter.hasNext();) {
 			String action = iter.next();
 			ContentItemToolbarButton link = (ContentItemToolbarButton)getToolbarButton(action);
