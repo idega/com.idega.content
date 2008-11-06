@@ -14,8 +14,8 @@
 	font-size: 11px;
 	color: #333;
 	text-shadow: #fff 1px 1px 1px;
-	padding: 4px 10px;
-	line-height: 1.2em;
+	padding: 0 10px;
+	line-height: 20px;
 }
 
 .filesUploaderFormStyle {
@@ -90,11 +90,11 @@ div#mb_contents {
 	font-family: "Lucida Sans", "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
 	color: #1f1f1f;
 	background-color: transparent !important;
-	border: 0;
+	border: 0 !important;
 }
 
 div#mb_bottom {
-	border: 0;
+	border: 0 !important;
 	overflow: hidden;
 	height: 32px !important;
 	background-color: #d7d7d7 !important;

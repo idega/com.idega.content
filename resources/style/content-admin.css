@@ -19,7 +19,7 @@ ul.content_item_toolbar {
 .content_item_toolbar li {
 	margin: 0;
 	float: left;
-	line-height: 1em;
+	line-height: 20px;
 	border-right: 1px #555 solid;
 	border-left: 1px #eeeeee solid;
 }
@@ -53,7 +53,7 @@ ul.content_item_toolbar {
 	font-size: 11px;
 	color: #333;
 	text-shadow: #fff 1px 1px 1px;
-	padding: 4px 10px;
+	padding: 0 10px;
 	display: block;
 }
 
@@ -73,8 +73,8 @@ ul.content_item_toolbar {
 	font-size: 11px;
 	color: #333;
 	text-shadow: #fff 1px 1px 1px;
-	padding: 4px 10px;
-	line-height: 1em;
+	padding: 0 10px;
+	line-height: 20px;
 }
 
 .commentsController .commentsControllerInputs input {
