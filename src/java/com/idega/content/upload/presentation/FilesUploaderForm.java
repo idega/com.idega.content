@@ -1,5 +1,6 @@
 package com.idega.content.upload.presentation;
 
+import java.io.File;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -38,6 +39,12 @@ public class FilesUploaderForm extends Block {
 		if (StringUtil.isEmpty(parentPath)) {
 			container.add(new Heading1(getResourceBundle(iwc).getLocalizedString("unkown_parent_path_in_repository", "Provide parent path in repository!")));
 			return;
+		}
+		if (!parentPath.startsWith(CoreConstants.SLASH)) {
+			parentPath = new StringBuilder(CoreConstants.SLASH).append(parentPath).toString();
+		}
+		if (!parentPath.endsWith(CoreConstants.SLASH)) {
+			parentPath = new StringBuilder(parentPath).append(CoreConstants.SLASH).toString();
 		}
 		
 		Layer folderChooserContainer = new Layer();
@@ -96,6 +103,7 @@ public class FilesUploaderForm extends Block {
 			return folders;
 		}
 		
+		File file = null;
 		String pathString = null;
 		for (int i = 0; i < paths.size(); i++) {
 			pathString = paths.get(i).toString();
@@ -103,7 +111,13 @@ public class FilesUploaderForm extends Block {
 				pathString = pathString.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
 			}
 			
-			folders.add(new SelectOption(pathString, pathString));
+			file = null;
+			try {
+				file = slide.getFile(pathString);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			folders.add(new SelectOption(file == null ? pathString.replaceFirst(parentPath, CoreConstants.EMPTY) : file.getName(), pathString));
 			
 			if (i == 0) {
 				folders.setSelectedElement(pathString);

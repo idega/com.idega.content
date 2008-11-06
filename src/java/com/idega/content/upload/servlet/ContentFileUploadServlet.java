@@ -3,6 +3,8 @@ package com.idega.content.upload.servlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,9 +17,6 @@ import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.upload.bean.UploadFile;
@@ -33,7 +32,7 @@ import com.idega.util.expression.ELUtil;
 
 public class ContentFileUploadServlet extends HttpServlet {
 
-	private static Log log = LogFactory.getLog(ContentFileUploadServlet.class);
+	private static Logger LOGGER = Logger.getLogger(ContentFileUploadServlet.class.getName());
 	
 	private static final long serialVersionUID = -6282517406996613536L;	
 	private static final long MAX_UPLOAD_SIZE = 1024 * 1024 * 1024;
@@ -43,7 +42,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ServletRequestContext src = new ServletRequestContext(request);
 		if (!FileUploadBase.isMultipartContent(src)) {
-			log.error("Request is not multipart content!");
+			LOGGER.log(Level.WARNING, "Request is not multipart content, terminating upload!");
 			return;
 		}
 		
@@ -67,18 +66,16 @@ public class ContentFileUploadServlet extends HttpServlet {
 			return;
 		}
 		if (ListUtil.isEmpty(fileItems)) {
-			log.info("No files to upload!");
-        	return;
-        }
-
-        List<UploadFile> files = new ArrayList<UploadFile>();
-        FileItem file = null;
-        String uploadId = null;
-        String fieldName = null;
-        for (int i = 0; i < fileItems.size(); i++) {
-        	file = fileItems.get(i);
-        	fieldName = file.getFieldName();
-        	if (!StringUtil.isEmpty(fieldName)) {
+			LOGGER.log(Level.WARNING, "No files to upload, terminating upload!");
+			return;
+		}
+		
+		String uploadId = null;
+		String fieldName = null;
+		List<UploadFile> files = new ArrayList<UploadFile>();
+		for (FileItem file: fileItems) {
+			fieldName = file.getFieldName();
+			if (!StringUtil.isEmpty(fieldName)) {
         		if (file.getSize() > 0 && fieldName.equals(ContentConstants.UPLOAD_FIELD_NAME)) {
         			files.add(new UploadFile(file.getName(), file.getContentType(), file.getSize(), file.get()));
         		}
@@ -101,7 +98,7 @@ public class ContentFileUploadServlet extends HttpServlet {
         }
         
         if (ListUtil.isEmpty(files)) {
-        	log.info("No files to upload!");
+        	LOGGER.log(Level.WARNING, "No files to upload, terminating upload!");
         	return;
         }
         
@@ -139,7 +136,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 	        	uploader.uploadFile(files, uploadPath, isIE);
 	        }
         } catch(Exception e) {
-        	log.fatal("Files uploader failed!", e);
+        	LOGGER.log(Level.SEVERE, "Files uploader failed!", e);
         } finally {
         	if (!StringUtil.isEmpty(uploadId) && iwac != null) {
         		iwac.removeApplicationAttribute(uploadId);
