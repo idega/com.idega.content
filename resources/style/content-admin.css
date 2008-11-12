@@ -1,28 +1,40 @@
 div.content_item_toolbar {
 	width: 100%;
 	overflow: hidden;
+	display: none;
 }
 
 ul.content_item_toolbar {
+	border: 1px #fff solid;
 	list-style: none;
 	margin: 0;
 	padding: 0;
 	float: left;
-	border: 1px #555 solid;
-	background: url(images/content-admin.gif) top left repeat-x #ccc;
-	border-radius: 8px;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
+	background: #666;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
 	padding: 0;
 }
 
 .content_item_toolbar li {
 	margin: 0 !important;
 	float: left;
-	line-height: 20px !important;
-	border-right: 1px #555 solid;
-	border-left: 1px #eeeeee solid;
+	line-height: 1em !important;
+	border-left: 1px #fff solid;
 	padding: 0 !important;
+}
+
+.content_item_toolbar li a {
+	line-height: 1em !important;
+	text-decoration: none;
+	color: #fff !important;
+	font-size: 9px !important;
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif !important;
+	text-shadow: #fff 1px 1px 1px;
+	padding: 3px 10px;
+	display: block;
+	background: none;
 }
 
 .content_item_toolbar li.last {
@@ -51,38 +63,31 @@ html>body .blog-entry, html>body .article_item {
 
 .blog-entry div.content_item_toolbar, .article_item div.content_item_toolbar {
 	position: absolute;
-	top: -5px;
-	right: -5px;
+	top: 1px;
+	right: 1px;
 	width: auto;
 }
 
-.content_item_toolbar li a {
-	font-size: 11px !important;
-	color: #333;
-	text-shadow: #fff 1px 1px 1px;
-	padding: 0 10px;
-	display: block;
-	background: none;
-}
-
 .commentsController {
-	width: 100%;
-	overflow: hidden;
-	margin-bottom: 6px;
+	display: none;
+	position: relative;
 }
 
 .commentsController .commentsControllerInputs {
-	border: 1px #555 solid;
-	background: url(images/content-admin.gif) top left repeat-x #ccc;
-	border-radius: 8px;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
+	border: 1px #fff solid;
+	background: #666;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
 	float: left;
-	font-size: 11px;
-	color: #333;
+	color: #fff !important;
+	font-size: 9px !important;
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif !important;
 	text-shadow: #fff 1px 1px 1px;
-	padding: 0 10px;
-	line-height: 20px;
+	padding: 2px 6px;
+	line-height: 1em !important;
+	position: absolute;
+	right: 0;
 }
 
 .commentsController .commentsControllerInputs input {
@@ -93,7 +98,7 @@ html>body .blog-entry, html>body .article_item {
 
 .commentsController .commentsControllerInputs label {
 	float: left;
-	padding-top: 3px;
+	margin-top: 3px;
 }
 
 iframe.contentItemEditorFrameStyle {
