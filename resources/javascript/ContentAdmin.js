@@ -1,5 +1,3 @@
-jQuery.noConflict();
-
 jQuery(document).ready(function() {
 	jQuery('div.content_item_toolbar').hover(
 		function() {
