@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemViewerRenderer.java,v 1.6 2008/01/23 12:11:59 valdas Exp $
+ * $Id: ContentItemViewerRenderer.java,v 1.7 2008/11/14 12:56:32 valdas Exp $
  * Created on 16.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -12,6 +12,8 @@ package com.idega.content.renderkit;
 import java.io.IOException;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
+
+import com.idega.content.business.ContentConstants;
 import com.idega.content.presentation.ContentItemViewer;
 import com.idega.util.RenderUtils;
 import com.idega.webface.renderkit.ContainerRenderer;
@@ -19,10 +21,10 @@ import com.idega.webface.renderkit.ContainerRenderer;
 
 /**
  * 
- *  Last modified: $Date: 2008/01/23 12:11:59 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/11/14 12:56:32 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class ContentItemViewerRenderer extends ContainerRenderer {
 	
@@ -32,6 +34,7 @@ public class ContentItemViewerRenderer extends ContainerRenderer {
 	 * @see javax.faces.render.Renderer#encodeChildren(javax.faces.context.FacesContext,
 	 *      javax.faces.component.UIComponent)
 	 */
+	@Override
 	public void encodeChildren(FacesContext ctx, UIComponent comp) throws IOException {
 		if (!comp.isRendered()) {
 			return;
@@ -41,7 +44,7 @@ public class ContentItemViewerRenderer extends ContainerRenderer {
 		
 		renderHeader(ctx,viewer);
 		
-		renderJavaScriptForComments(ctx, viewer);
+		renderCustomComponent(ctx, viewer, ContentItemViewer.FACET_COMMENTS_SCRIPTS);
 
 		boolean renderToolbarAbove = false;
 		if(renderToolbarAbove){
@@ -58,11 +61,13 @@ public class ContentItemViewerRenderer extends ContainerRenderer {
 		
 		renderFooter(ctx,viewer);
 		
-		renderComments(ctx, viewer);
+		renderCustomComponent(ctx, viewer, ContentItemViewer.FACET_ITEM_COMMENTS);
 		
-		renderJavaScriptForFeed(ctx, viewer);
+		renderCustomComponent(ctx, viewer, ContentItemViewer.FACET_FEED_SCRIPT);
 		
-		renderJavaScript(ctx, viewer);
+		renderCustomComponent(ctx, viewer, ContentItemViewer.FACET_JAVA_SCRIPT);
+		
+		renderCustomComponent(ctx, viewer, ContentConstants.CONTENT_ITEM_IDENTIFIER_NAME);
 	}
 	
 	public void renderFields(FacesContext context, ContentItemViewer viewer) throws IOException {
@@ -105,36 +110,12 @@ public class ContentItemViewerRenderer extends ContainerRenderer {
 	 * @throws IOException
 	 */
 	public void renderToolbar(FacesContext ctx, ContentItemViewer viewer) throws IOException {
-		UIComponent toolbar = (UIComponent) viewer.getFacets().get(ContentItemViewer.FACET_TOOLBAR);
+		UIComponent toolbar = viewer.getFacets().get(ContentItemViewer.FACET_TOOLBAR);
 		RenderUtils.renderChild(ctx,toolbar);
 	}
 	
-	public void renderComments(FacesContext ctx, ContentItemViewer viewer) throws IOException {
-		UIComponent comments = (UIComponent) viewer.getFacets().get(ContentItemViewer.FACET_ITEM_COMMENTS);
-		if (comments == null) {
-			return;
-		}
-		RenderUtils.renderChild(ctx, comments);
-	}
-	
-	public void renderJavaScriptForComments(FacesContext ctx,ContentItemViewer viewer) throws IOException {
-		UIComponent script = (UIComponent) viewer.getFacets().get(ContentItemViewer.FACET_COMMENTS_SCRIPTS);
-		if (script == null) {
-			return;
-		}
-		RenderUtils.renderChild(ctx, script);
-	}
-
-	public void renderJavaScriptForFeed(FacesContext ctx,ContentItemViewer viewer) throws IOException {
-		UIComponent script = (UIComponent) viewer.getFacets().get(ContentItemViewer.FACET_FEED_SCRIPT);
-		if (script == null) {
-			return;
-		}
-		RenderUtils.renderChild(ctx, script);
-	}
-	
-	private void renderJavaScript(FacesContext ctx, ContentItemViewer viewer) throws IOException {
-		Object o = viewer.getFacets().get(ContentItemViewer.FACET_JAVA_SCRIPT);
+	private void renderCustomComponent(FacesContext ctx, ContentItemViewer viewer, String facetName) throws IOException {
+		Object o = viewer.getFacets().get(facetName);
 		if (o instanceof UIComponent) {
 			RenderUtils.renderChild(ctx, (UIComponent) o);
 		}

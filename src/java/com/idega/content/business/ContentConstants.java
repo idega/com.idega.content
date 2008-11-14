@@ -74,4 +74,7 @@ public class ContentConstants {
 	public static final String FACET_NAME_FOR_CONTENT_ITEMS_LIST_BACK_BUTTON = "contentItemsListBackButton";
 	
 	public static final String BASIC_THEMES_ADDED_PROPERTY = "basicThemesAdded";
+	
+	public static final String CONTENT_ITEM_IDENTIFIER_NAME = "contentItemIdentifierName";
+	public static final String CONTENT_ITEM_IDENTIFIER_STYLE_CLASS = "contentItemIdentifierStyleClass";
 }
