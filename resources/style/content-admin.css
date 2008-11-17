@@ -1,7 +1,6 @@
 div.content_item_toolbar {
 	width: 100%;
 	overflow: hidden;
-	display: none;
 }
 
 ul.content_item_toolbar {
@@ -23,6 +22,7 @@ ul.content_item_toolbar {
 	line-height: 1em !important;
 	border-left: 1px #fff solid;
 	padding: 0 !important;
+	background: none !important;
 }
 
 .content_item_toolbar li a {
@@ -31,10 +31,14 @@ ul.content_item_toolbar {
 	color: #fff !important;
 	font-size: 9px !important;
 	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif !important;
-	text-shadow: #fff 1px 1px 1px;
+	text-shadow: #000 1px 1px 1px;
 	padding: 3px 10px;
 	display: block;
 	background: none;
+}
+
+.content_item_toolbar li a span {
+	color: #fff !important;
 }
 
 .content_item_toolbar li.last {
@@ -69,7 +73,6 @@ html>body .blog-entry, html>body .article_item {
 }
 
 .commentsController {
-	display: none;
 	position: relative;
 }
 
@@ -83,7 +86,7 @@ html>body .blog-entry, html>body .article_item {
 	color: #fff !important;
 	font-size: 9px !important;
 	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif !important;
-	text-shadow: #fff 1px 1px 1px;
+	text-shadow: #000 1px 1px 1px;
 	padding: 2px 6px;
 	line-height: 1em !important;
 	position: absolute;
