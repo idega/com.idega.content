@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.30 2008/04/24 21:41:50 laddi Exp $
+ * $Id: WebDAVCategories.java,v 1.31 2008/11/17 18:01:31 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -39,6 +39,7 @@ import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.util.CoreConstants;
+import com.idega.util.ListUtil;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFResourceUtil;
 
@@ -49,10 +50,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2008/04/24 21:41:50 $ by $Author: laddi $
+ *  Last modified: $Date: 2008/11/17 18:01:31 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.30 $
+ * @version $Revision: 1.31 $
  */
 public class WebDAVCategories extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -524,8 +525,14 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		
 		Locale locale = getLocale(iwc);
 		
-		Collection<String> selectedCategories = getSetCategoriesList();
-		if (selectedCategories != null) {
+		Collection<String> selectedCategories = null;
+		try {
+			selectedCategories = getSetCategoriesList();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		if (!ListUtil.isEmpty(selectedCategories)) {
 			ContentCategory category = null;
 			for (Iterator<String> selectedIter = selectedCategories.iterator(); selectedIter.hasNext();) {
 				String categoryKey = selectedIter.next();

@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.22 2008/11/14 12:56:32 valdas Exp $
+ * $Id: ContentItemToolbar.java,v 1.23 2008/11/17 18:01:31 valdas Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -32,6 +32,7 @@ import com.idega.presentation.Span;
 import com.idega.presentation.text.Text;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.URLUtil;
 import com.idega.webface.WFToolbar;
 
@@ -40,10 +41,10 @@ import com.idega.webface.WFToolbar;
  *  <p>
  *  Toolbar used by new content management system to display editor buttons.
  *  </p>
- *  Last modified: $Date: 2008/11/14 12:56:32 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/11/17 18:01:31 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.22 $
+ * @version $Revision: 1.23 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
@@ -62,6 +63,7 @@ public class ContentItemToolbar extends WFToolbar {
 	private String categories;
 	private String baseFolderPath;
 	private Boolean addMoodalBoxRel = false;
+	private String containerId;
 	
 	/**
 	 * 
@@ -99,6 +101,7 @@ public class ContentItemToolbar extends WFToolbar {
 		if (renderingAttribute instanceof Boolean) {
 			URLUtil urlUtil = new URLUtil(url);
 			urlUtil.addParameter(ContentConstants.RENDERING_COMPONENT_OF_ARTICLE_LIST, ((Boolean) renderingAttribute).toString());
+			urlUtil.addParameter(ContentConstants.CONTENT_LIST_ITEMS_IDENTIFIER, containerId);
 			
 			url = urlUtil.toString();
 		}
@@ -288,13 +291,17 @@ public class ContentItemToolbar extends WFToolbar {
 	 */
 	@Override
 	public Object saveState(FacesContext ctx) {
-		Object values[] = new Object[6];
+		Object values[] = new Object[StringUtil.isEmpty(containerId) ? 6 : 7];
 		values[0] = super.saveState(ctx);
 		values[1] = this.resourcePath;
 		values[2] = this.actionHandlerIdentifier;
 		values[3] = this.categories;
 		values[4] = this.baseFolderPath;
 		values[5] = this.addMoodalBoxRel;
+		
+		if (!StringUtil.isEmpty(containerId)) {
+			values[6] = this.containerId;
+		}
 		return values;
 	}
 	
@@ -310,6 +317,10 @@ public class ContentItemToolbar extends WFToolbar {
 		this.categories=(String)values[3];
 		this.baseFolderPath=(String)values[4];
 		this.addMoodalBoxRel = (Boolean) values[5];
+		
+		if (values.length == 7) {
+			this.containerId = values[6].toString();
+		}
 	}
 	
 	
@@ -343,6 +354,14 @@ public class ContentItemToolbar extends WFToolbar {
 	 */
 	public void setBaseFolderPath(String basePath) {
 		this.baseFolderPath = basePath;
+	}
+
+	public String getContainerId() {
+		return containerId;
+	}
+
+	public void setContainerId(String containerId) {
+		this.containerId = containerId;
 	}
 
 }

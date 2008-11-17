@@ -1,5 +1,5 @@
 /*
- * $Id: ContentListViewerRenderer.java,v 1.12 2008/01/23 12:11:59 valdas Exp $ Created on
+ * $Id: ContentListViewerRenderer.java,v 1.13 2008/11/17 18:01:31 valdas Exp $ Created on
  * 27.1.2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -24,6 +24,8 @@ import org.apache.myfaces.shared_tomahawk.renderkit.html.HTML;
 import org.apache.myfaces.shared_tomahawk.renderkit.html.HtmlRendererUtils;
 import org.apache.myfaces.shared_tomahawk.util.ArrayUtils;
 import org.apache.myfaces.shared_tomahawk.util.StringUtils;
+
+import com.idega.content.business.ContentConstants;
 import com.idega.content.presentation.ContentItemListViewer;
 import com.idega.content.presentation.ContentItemViewer;
 import com.idega.util.RenderUtils;
@@ -32,10 +34,10 @@ import com.idega.webface.renderkit.BaseRenderer;
 
 /**
  * 
- * Last modified: $Date: 2008/01/23 12:11:59 $ by $Author: valdas $
+ * Last modified: $Date: 2008/11/17 18:01:31 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class ContentListViewerRenderer extends BaseRenderer {
 	
@@ -58,10 +60,12 @@ public class ContentListViewerRenderer extends BaseRenderer {
 		getLogger().log(Level.WARNING, message);
 	}
 
+	@Override
 	public boolean getRendersChildren() {
 		return true;
 	}
 
+	@Override
 	public void encodeBegin(FacesContext facesContext, UIComponent uiComponent) throws IOException {
 		RendererUtils.checkParamValidity(facesContext, uiComponent, UIData.class);
 		ResponseWriter writer = facesContext.getResponseWriter();
@@ -71,26 +75,18 @@ public class ContentListViewerRenderer extends BaseRenderer {
 		writer.writeAttribute(HTML.ID_ATTR, uiComponent.getClientId(facesContext), null);
 		HtmlRendererUtils.renderHTMLAttributes(writer, uiComponent, HTML.COMMON_PASSTROUGH_ATTRIBUTES);
 //		renderFacet(facesContext, writer, (UIData) uiComponent, true);
-		renderCommentsScript(facesContext, uiComponent);
-		renderCommentsController(facesContext, uiComponent);
+		renderCustomComponent(facesContext, uiComponent, ContentItemViewer.FACET_COMMENTS_SCRIPTS);
+		renderCustomComponent(facesContext, uiComponent, FACET_ITEM_COMMENTS_CONTROLLER);
 		renderHeader(facesContext,(UIData)uiComponent);
-		renderJavaScript(facesContext, uiComponent);
+		renderCustomComponent(facesContext, uiComponent, ContentItemViewer.FACET_JAVA_SCRIPT);
+		renderCustomComponent(facesContext, uiComponent, ContentConstants.CONTENT_LIST_ITEMS_IDENTIFIER_NAME);
 	}
 	
-	private void renderCommentsScript(FacesContext facesContext, UIComponent list) throws IOException {
-		UIComponent script = (UIComponent) list.getFacets().get(ContentItemViewer.FACET_COMMENTS_SCRIPTS);
-		if (script == null) {
-			return;
+	private void renderCustomComponent(FacesContext facesContext, UIComponent list, String facetName) throws IOException {
+		Object component = list.getFacets().get(facetName);
+		if (component instanceof UIComponent) {
+			RenderUtils.renderChild(facesContext, (UIComponent) component);
 		}
-		RenderUtils.renderChild(facesContext, script);
-	}
-	
-	private void renderCommentsController(FacesContext facesContext, UIComponent list) throws IOException {
-		UIComponent comments = (UIComponent) list.getFacets().get(FACET_ITEM_COMMENTS_CONTROLLER);
-		if (comments == null) {
-			return;
-		}
-		RenderUtils.renderChild(facesContext, comments);
 	}
 
 	/**
@@ -112,6 +108,7 @@ public class ContentListViewerRenderer extends BaseRenderer {
 		RenderUtils.renderChild(facesContext,comp);
 	}
 
+	@Override
 	public void encodeChildren(FacesContext facesContext, UIComponent component) throws IOException {		
 		RendererUtils.checkParamValidity(facesContext, component, UIData.class);
 		UIData uiData = (UIData) component;
@@ -245,6 +242,7 @@ public class ContentListViewerRenderer extends BaseRenderer {
 	protected void afterViewerList(FacesContext facesContext, UIData uiData) throws IOException {
 	}
 
+	@Override
 	public void encodeEnd(FacesContext facesContext, UIComponent uiComponent) throws IOException {
 		RendererUtils.checkParamValidity(facesContext, uiComponent, UIData.class);
 		ResponseWriter writer = facesContext.getResponseWriter();
@@ -337,14 +335,6 @@ public class ContentListViewerRenderer extends BaseRenderer {
 //			RendererUtils.renderChild(facesContext, facet);
 //		}
 //		writer.endElement(HTML.TD_ELEM);
-	}
-	
-	private void renderJavaScript(FacesContext ctx, UIComponent list) throws IOException {
-		Object o = list.getFacets().get(ContentItemViewer.FACET_JAVA_SCRIPT);
-		if (o instanceof UIComponent) {
-			RenderUtils.renderChild(ctx, (UIComponent) o);
-		}
-		return;
 	}
 
 	//-------------------------------------------------------------

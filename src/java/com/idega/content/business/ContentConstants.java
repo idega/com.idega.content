@@ -77,4 +77,6 @@ public class ContentConstants {
 	
 	public static final String CONTENT_ITEM_IDENTIFIER_NAME = "contentItemIdentifierName";
 	public static final String CONTENT_ITEM_IDENTIFIER_STYLE_CLASS = "contentItemIdentifierStyleClass";
+	public static final String CONTENT_LIST_ITEMS_IDENTIFIER_NAME = "contentListItemsIdentifierName";
+	public static final String CONTENT_LIST_ITEMS_IDENTIFIER = "contentListItemsIdentifier";
 }
