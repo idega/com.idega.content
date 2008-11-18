@@ -15,20 +15,20 @@ version="1.2">
         				/dwr/interface/ThemesEngine.js,
         				/dwr/interface/BuilderService.js,
 						
-						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.11/mootools-all-compressed.js,
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/for_mootools/1.2/reflection.js,
+						/idegaweb/bundles/com.idega.block.web2.0/resources/javascript/mootools/1.11/mootools-all-compressed.js,
+        				/idegaweb/bundles/com.idega.block.web2.0/resources/javascript/reflection/for_mootools/1.2/reflection.js,
         				
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/jquery/1.2.3/jquery-compressed.js,
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/contextmenu/r2/contextmenu-compressed.js,
+        				/idegaweb/bundles/com.idega.block.web2.0/resources/javascript/jquery/1.2.3/jquery-compressed.js,
+        				/idegaweb/bundles/com.idega.block.web2.0/resources/javascript/contextmenu/r2/contextmenu-compressed.js,
         				
-        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
-        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
-        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
-        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/PageInfoHelper.js,
-						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js,
-						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/SiteManagerHelper.js"
+        				/idegaweb/bundles/com.idega.content/resources/javascript/drag-drop-folder-tree.js,
+        				/idegaweb/bundles/com.idega.content/resources/javascript/ThemesHelper.js,
+        				/idegaweb/bundles/com.idega.content/resources/javascript/ThemesManagerHelper.js,
+        				/idegaweb/bundles/com.idega.content/resources/javascript/PageInfoHelper.js,
+						/idegaweb/bundles/com.idega.content/resources/javascript/tree.js,
+						/idegaweb/bundles/com.idega.content/resources/javascript/SiteManagerHelper.js"
 						
-						stylesheeturls="/idegaweb/bundles/com.idega.content.bundle/resources/style/content.css">
+						stylesheeturls="/idegaweb/bundles/com.idega.content/resources/style/content.css">
 			<h:form id="pagesForm" onsubmit="return false;">
 				<f:verbatim>
                 	<script type="text/javascript">

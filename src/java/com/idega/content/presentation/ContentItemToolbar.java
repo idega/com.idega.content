@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemToolbar.java,v 1.24 2008/11/17 22:07:24 laddi Exp $
+ * $Id: ContentItemToolbar.java,v 1.25 2008/11/18 09:11:16 valdas Exp $
  * Created on 18.2.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -41,10 +41,10 @@ import com.idega.webface.WFToolbar;
  *  <p>
  *  Toolbar used by new content management system to display editor buttons.
  *  </p>
- *  Last modified: $Date: 2008/11/17 22:07:24 $ by $Author: laddi $
+ *  Last modified: $Date: 2008/11/18 09:11:16 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.24 $
+ * @version $Revision: 1.25 $
  */
 public class ContentItemToolbar extends WFToolbar {
 	
@@ -101,7 +101,10 @@ public class ContentItemToolbar extends WFToolbar {
 		if (renderingAttribute instanceof Boolean) {
 			URLUtil urlUtil = new URLUtil(url);
 			urlUtil.addParameter(ContentConstants.RENDERING_COMPONENT_OF_ARTICLE_LIST, ((Boolean) renderingAttribute).toString());
-			urlUtil.addParameter(ContentConstants.CONTENT_LIST_ITEMS_IDENTIFIER, containerId);
+			
+			if (!StringUtil.isEmpty(containerId)) {
+				urlUtil.addParameter(ContentConstants.CONTENT_LIST_ITEMS_IDENTIFIER, containerId);
+			}
 			
 			url = urlUtil.toString();
 		}
