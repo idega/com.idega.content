@@ -84,7 +84,7 @@ public class ApplicationPropertyViewer extends Block {
 			IWBundle bundle = ContentUtil.getBundle();
 			
 			String siteLogo = "site_logo";
-			String name = bundle.getResourceBundle(iwc).getLocalizedString(siteLogo);
+			String name = bundle.getResourceBundle(iwc).getLocalizedString(siteLogo, siteLogo);
 			if (value.equals(ContentConstants.EMPTY)) {
 				name = FIFTEEN_SPACE;
 				value = bundle.getVirtualPathWithFileNameString(TEMP_IMAGE);
