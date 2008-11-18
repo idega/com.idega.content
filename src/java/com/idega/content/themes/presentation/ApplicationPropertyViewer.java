@@ -156,6 +156,7 @@ public class ApplicationPropertyViewer extends Block {
 		List<String> scripts = new ArrayList<String>();
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
 		scripts.add("/dwr/interface/ThemesEngine.js");
+		scripts.add("/dwr/interface/AdminToolbarSession.js");
 		scripts.add(bundle.getVirtualPathWithFileNameString("javascript/ApplicationPropertyHelper.js"));
 		try {
 			scripts.add(web2.getBundleURIToMootoolsLib());
@@ -178,8 +179,8 @@ public class ApplicationPropertyViewer extends Block {
 			component.attributes = new HashMap();
 		}
 		StringBuffer onDblClickAction = new StringBuffer();
-		onDblClickAction.append("changeSiteInfo('").append(id).append("', '").append(iwrb.getLocalizedString("saving", "Saving..."));
-		onDblClickAction.append("', ").append(needsReload).append(")");
+		onDblClickAction.append("AdminToolbarSession.getMode({ callback: function(mode) { if ('isContentAdmin' == mode) {changeSiteInfo('").append(id).append("', '")
+						.append(iwrb.getLocalizedString("saving", "Saving...")).append("', ").append(needsReload).append(");} else return false; } });");
 		component.attributes.put("ondblclick", PresentationUtil.getJavaScriptLinesLoadedLazily(scripts, onDblClickAction.toString()));
 		
 		component.setStyleClass(STYLE_CLASS);
