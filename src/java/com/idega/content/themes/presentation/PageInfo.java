@@ -38,7 +38,7 @@ public class PageInfo extends ContentBlock {
 		if (styleClass != null) {
 			pageInfo.setStyleClass(getStyleClass());
 		}
-
+		
 		ThemesHelper.getInstance().loadPageSettings(ThemesHelper.getInstance().getWebRootWithoutContent() + ThemesConstants.PAGE_SETTINGS);
 		Iterator<Setting> pageSettings = ThemesHelper.getInstance().getPageSettings().values().iterator();
 		Setting s = null;
@@ -49,8 +49,7 @@ public class PageInfo extends ContentBlock {
 		
 		String keyPressAction = "return savePageInfoWithEnter(event)";
 		
-		IWResourceBundle iwrb = getIWResourceBundle(context, ContentConstants.IW_BUNDLE_IDENTIFIER);
-		String localizedLabel = null;
+		IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
 		boolean enableInput = true;
 		for (Iterator<Setting> it = pageSettings; it.hasNext();) {
 			s = it.next();
@@ -60,11 +59,7 @@ public class PageInfo extends ContentBlock {
 			container.setStyleClass("webfaceFormItem");
 			
 			Label label = new Label();
-			localizedLabel = iwrb.getLocalizedString(s.getCode());
-			if (localizedLabel == null) {
-				localizedLabel = s.getLabel();
-			}
-			label.setLabel(localizedLabel);
+			label.setLabel(iwrb.getLocalizedString(s.getCode(), s.getLabel()));
 			container.add(label);
 			
 			if (ContentConstants.BOOLEAN_TYPE.equals(s.getType())) {
