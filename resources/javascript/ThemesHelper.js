@@ -310,7 +310,7 @@ var SELECT_TEMPLATE_FIRST_TEXT = 'Select template first!';
 var ARE_YOU_SURE_YOU_WANT_APPLY_THIS_TEMPLATE = 'Are you sure you want to apply this template?';
 var INSUFFICIENT_RIGHTS_FOR_ACTION_IN_LUCID = 'Sorry, you have insufficient rights for this action!';
 var THEME_CAN_NOT_BE_DELETED = 'Sorry, selected theme can not be deleted.';
-var ERROR_OCCURRED_IN_LUCID = 'Sorry, error occurred... Reloading page might help to avoid it. Do you want to reload page?';
+var ERROR_OCCURRED_IN_LUCID = 'Oops! Out of cheese error! Please reboot the Universe and try again...or the page.';
 
 function getLocalizedTextForThemes() {
 	ThemesEngine.getLocalizedText(getLocalizedTextForThemesCallback);
