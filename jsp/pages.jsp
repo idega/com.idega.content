@@ -141,6 +141,11 @@ version="1.2">
                 	<t:div style="float: left; width: 255px; visibility: hidden;">
                 		<t:commandLink value="none" />
                 	</t:div>
+					<t:div styleClass="lucidLocaleChooserContainerStyle">
+						<t:selectOneMenu value="#{lucidEngine.currentLocaleValue}" onchange="LucidHelper.setSelectedLocale();" id="lucidLocaleSwitcher" forceId="true">
+							<f:selectItems value="#{lucidEngine.availableLocales}" />
+						</t:selectOneMenu>
+					</t:div>
                 	<t:div styleClass="leftButtonStyle">
                 		<t:commandLink id="newPageButton" forceId="true" styleClass="newPageButtonStyleClass" value="#{localizedStrings['com.idega.content']['new_page']}"></t:commandLink>
                 		<t:commandLink id="newPagesButton" forceId="true" styleClass="newPagesButtonStyleClass" value="#{localizedStrings['com.idega.content']['new_pages']}"></t:commandLink>

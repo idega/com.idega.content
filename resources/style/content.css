@@ -1476,3 +1476,7 @@ iframe.contentItemEditorFrameStyle {
 #pageTemplatesStretcher, #site_templates {
 	overflow: auto;
 }
+
+div.lucidLocaleChooserContainerStyle {
+	float: left;
+}

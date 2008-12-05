@@ -959,6 +959,23 @@ LucidHelper.reloadFrame = function() {
 	window.treePages.location.reload();
 }
 
+LucidHelper.setSelectedLocale = function() {
+	var locale = DWRUtil.getValue('lucidLocaleSwitcher');
+	if (locale == null || locale == '' || locale == '-1') {
+		return false;
+	}
+	
+	showLoadingMessage(LOADING_TEXT);
+	LucidEngine.setLocale(locale, {
+		callback: function(success) {
+			if (success) {
+				reloadPage();
+			}
+			closeAllLoadingMessages();
+		}
+	});
+}
+
 function setHrefToVoidFunction(element) {
 	element.setProperty('href', 'javascript:void(0)');
 }

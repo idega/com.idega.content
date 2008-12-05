@@ -79,6 +79,7 @@
       		<param name="class" value="com.idega.content.lucid.business.LucidEngineImpl" />
       		<include method="getPermissionWindowResources"/>
       		<include method="getPropertiesWindowResources"/>
+      		<include method="setLocale"/>
       	</create>
 	</allow>
   

@@ -4,8 +4,11 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.faces.model.SelectItem;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -17,11 +20,15 @@ import com.idega.builder.business.BuilderLogicWrapper;
 import com.idega.content.business.ContentUtil;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.builder.business.ICBuilderConstants;
+import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.ListUtil;
+import com.idega.util.LocaleUtil;
+import com.idega.util.StringUtil;
 
 @Service("lucidEngine")
 @Scope("singleton")
@@ -38,7 +45,7 @@ public class LucidEngineImpl implements LucidEngine {
 	
 	public String getJavaScriptResources() {
 		//	DWR
-		StringBuilder js = new StringBuilder("/dwr/engine.js,/dwr/interface/ThemesEngine.js,/dwr/interface/BuilderService.js,/dwr/interface/LucidEngine.js,");
+		StringBuilder js = new StringBuilder("/dwr/util.js,/dwr/engine.js,/dwr/interface/ThemesEngine.js,/dwr/interface/BuilderService.js,/dwr/interface/LucidEngine.js,");
 		
 		//	MooTools
 		try {
@@ -142,5 +149,63 @@ public class LucidEngineImpl implements LucidEngine {
 		}
 		
 		return iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR);
+	}
+
+	public List<SelectItem> getAvailableLocales() {
+		List<Locale> locales = ICLocaleBusiness.getListOfLocalesJAVA();
+		if (ListUtil.isEmpty(locales)) {
+			return null;
+		}
+		
+		Locale currentLocale = null;
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return null;
+		}
+		
+		currentLocale = iwc.getCurrentLocale();
+		if (currentLocale == null) {
+			currentLocale = Locale.ENGLISH;
+		}
+		
+		List<SelectItem> availableLocales = new ArrayList<SelectItem>();
+		for (Locale locale: locales) {
+			availableLocales.add(new SelectItem(locale.toString(), locale.getDisplayName(currentLocale)));
+		}
+		
+		availableLocales.add(0, new SelectItem(String.valueOf(-1),
+									ContentUtil.getBundle().getResourceBundle(currentLocale).getLocalizedString("lucid.change_locale", "Change locale")));
+		
+		return availableLocales;
+	}
+
+	public boolean setLocale(String locale) {
+		if (StringUtil.isEmpty(locale)) {
+			return false;
+		}
+		
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return false;
+		}
+		
+		Locale newLocale = LocaleUtil.getLocale(locale);
+		if (newLocale != null && !newLocale.equals(locale)) {
+			iwc.setCurrentLocale(newLocale);
+			return true;
+		}
+		
+		return false;
+	}
+
+	public String getCurrentLocaleValue() {
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc != null) {
+			Locale locale = iwc.getCurrentLocale();
+			if (locale != null) {
+				return locale.toString();
+			}
+		}
+		return String.valueOf(-1);
 	}
 }
