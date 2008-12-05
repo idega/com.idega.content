@@ -299,3 +299,5 @@ values=Values
 version=Version
 version_comment=and a version comment (optional)
 yes=Yes
+lucid.page_properties=Properties
+lucid.page_permissions=Permissions

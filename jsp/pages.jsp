@@ -10,25 +10,7 @@
 version="1.2">
 	<jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 	<f:view>
-		<ws:page id="pages" javascripturls="
-						/dwr/engine.js,
-        				/dwr/interface/ThemesEngine.js,
-        				/dwr/interface/BuilderService.js,
-						
-						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.11/mootools-all-compressed.js,
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/for_mootools/1.2/reflection.js,
-        				
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/jquery/1.2.3/jquery-compressed.js,
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/contextmenu/r2/contextmenu-compressed.js,
-        				
-        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/drag-drop-folder-tree.js,
-        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js,
-        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
-        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/PageInfoHelper.js,
-						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/tree.js,
-						/idegaweb/bundles/com.idega.content.bundle/resources/javascript/SiteManagerHelper.js"
-						
-						stylesheeturls="/idegaweb/bundles/com.idega.content.bundle/resources/style/content.css">
+		<ws:page id="pages" javascripturls="#{lucidEngine.getJavaScriptResources()}" stylesheeturls="#{lucidEngine.getStyleSheetResources()}">
 			<h:form id="pagesForm" onsubmit="return false;">
 				<f:verbatim>
                 	<script type="text/javascript">
@@ -162,6 +144,8 @@ version="1.2">
                 	<t:div styleClass="leftButtonStyle">
                 		<t:commandLink id="newPageButton" forceId="true" styleClass="newPageButtonStyleClass" value="#{localizedStrings['com.idega.content']['new_page']}"></t:commandLink>
                 		<t:commandLink id="newPagesButton" forceId="true" styleClass="newPagesButtonStyleClass" value="#{localizedStrings['com.idega.content']['new_pages']}"></t:commandLink>
+                		<t:commandLink rendered="#{lucidEngine.contentEditor}" id="pagePropertiesButton" forceId="true" styleClass="pagePropertiesButtonStyleClass" value="#{localizedStrings['com.idega.content']['lucid.page_properties']}"></t:commandLink>
+						<t:commandLink rendered="#{lucidEngine.contentEditor}" id="pagePermissionsButton" forceId="true" styleClass="pagePermissionsButtonStyleClass" value="#{localizedStrings['com.idega.content']['lucid.page_permissions']}"></t:commandLink>
                 	</t:div>
 					<t:div styleClass="rightButtonStyle">
 						<t:div styleClass="filters">

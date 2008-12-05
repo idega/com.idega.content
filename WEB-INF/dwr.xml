@@ -73,6 +73,13 @@
     		<param name="managedBeanName" value="fileUploadProgressListener" />
     		<param name="class" value="com.idega.content.upload.business.FileUploadProgressListenerBean"/>
 		</create>
+		
+		<create creator="jsf" javascript="LucidEngine">
+			<param name="managedBeanName" value="lucidEngine" />
+      		<param name="class" value="com.idega.content.lucid.business.LucidEngineImpl" />
+      		<include method="getPermissionWindowResources"/>
+      		<include method="getPropertiesWindowResources"/>
+      	</create>
 	</allow>
   
 	<signatures>

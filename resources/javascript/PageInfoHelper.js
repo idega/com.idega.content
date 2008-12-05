@@ -1,3 +1,9 @@
+if (LucidHelper == null) var LucidHelper = {};
+
+LucidHelper.thickBoxResources = null;
+LucidHelper.pagePermissionsWindowUri = null;
+LucidHelper.pagePropertiesWindowUri = null;
+
 var THEME_ID = null;
 
 var SCROLLER_IMAGE_WIDTH = 23;
@@ -729,6 +735,72 @@ function registerPageInfoActions() {
     	}
     );
     
+    $$('a.pagePropertiesButtonStyleClass').each(
+		function(element) {
+			setHrefToVoidFunction(element);
+			
+			element.removeEvents('click');
+			element.addEvent('click', function() {
+				showLoadingMessage(LOADING_TEXT);
+				
+				if (LucidHelper.thickBoxResources == null || LucidHelper.pagePropertiesWindowUri == null) {
+					LucidEngine.getPropertiesWindowResources({
+						callback: function(resources) {
+							if (resources == null) {
+								return false;
+							}
+							
+							LucidHelper.pagePropertiesWindowUri = resources[0];
+							
+							LucidHelper.thickBoxResources = new Array();
+							for (var i = 1; i < resources.length; i++) {
+								LucidHelper.thickBoxResources.push(resources[i]);
+							}
+							
+							LucidHelper.showPagePropertiesWindow();
+						}
+					});
+				}
+				else {
+					LucidHelper.showPagePropertiesWindow();
+				}
+			});
+    	}
+    );
+    
+    $$('a.pagePermissionsButtonStyleClass').each(
+		function(element) {
+			setHrefToVoidFunction(element);
+			
+			element.removeEvents('click');
+			element.addEvent('click', function() {
+				showLoadingMessage(LOADING_TEXT);
+				
+				if (LucidHelper.thickBoxResources == null || LucidHelper.pagePermissionsWindowUri == null) {
+					LucidEngine.getPermissionWindowResources({
+						callback: function(resources) {
+							if (resources == null) {
+								return false;
+							}
+							
+							LucidHelper.pagePermissionsWindowUri = resources[0];
+							
+							LucidHelper.thickBoxResources = new Array();
+							for (var i = 1; i < resources.length; i++) {
+								LucidHelper.thickBoxResources.push(resources[i]);
+							}
+							
+							LucidHelper.showPagePermissionsWindow();
+						}
+					});
+				}
+				else {
+					LucidHelper.showPagePermissionsWindow();
+				}
+			});
+    	}
+    );
+    
     $$('input.saveButtonStyleClass').each(
     	function(element) {
     		element.removeEvents('click');
@@ -862,6 +934,29 @@ function registerPageInfoActions() {
 	
 	registerActionsForSiteTree();
 	boldCurrentTreeElement();
+}
+
+LucidHelper.showPagePermissionsWindow = function() {
+	LazyLoader.loadMultiple(LucidHelper.thickBoxResources, function() {
+		tb_fullInit();
+		var uri = LucidHelper.pagePermissionsWindowUri + '&ic_permissionobj_identifier=' + getPageID() +
+															'&ic_permission_category=3&TB_iframe=true&modal=true&height=300&width=400';
+		tb_show('', uri, null, null);
+		closeAllLoadingMessages();
+	});
+}
+
+LucidHelper.showPagePropertiesWindow = function() {
+	LazyLoader.loadMultiple(LucidHelper.thickBoxResources, function() {
+		tb_fullInit();
+		var uri = LucidHelper.pagePropertiesWindowUri + '&ib_page=' + getPageID() + '&TB_iframe=true&modal=true&height=500&width=600';
+		tb_show('', uri, null, null);
+		closeAllLoadingMessages();
+	});
+}
+
+LucidHelper.reloadFrame = function() {
+	alert('reload iFrame');
 }
 
 function setHrefToVoidFunction(element) {

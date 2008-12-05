@@ -1019,6 +1019,14 @@ html>body .pageInfoButtonsContainer a {
 	background: url(images/new_multiple_24.gif) top center no-repeat;
 }
 
+.pageInfoButtonsContainer a#pagePropertiesButton {
+	background: url(../images/page_properties.png) top center no-repeat;
+}
+
+.pageInfoButtonsContainer a#pagePermissionsButton {
+	background: url(../images/page_permissions.png) top center no-repeat;
+}
+
 .pageInfoButtonsContainer a#showPageModules .innerSpan {
 	background: url(images/sinfo_16.png) top center no-repeat;
 }
