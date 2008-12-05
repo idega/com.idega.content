@@ -956,7 +956,7 @@ LucidHelper.showPagePropertiesWindow = function() {
 }
 
 LucidHelper.reloadFrame = function() {
-	alert('reload iFrame');
+	window.treePages.location.reload();
 }
 
 function setHrefToVoidFunction(element) {
