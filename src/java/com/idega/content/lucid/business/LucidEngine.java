@@ -17,6 +17,8 @@ public interface LucidEngine extends Serializable {
 	
 	public boolean isContentEditor();
 	
+	public boolean isSuperAdmin();
+	
 	public boolean setLocale(String locale);
 	
 	public List<SelectItem> getAvailableLocales();

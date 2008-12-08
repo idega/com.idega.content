@@ -37,7 +37,7 @@ version="1.2">
                 </f:verbatim>
                 
                 <t:div styleClass="topToolbarContainer">
-               		<t:commandLink rendered="#{lucidEngine.contentEditor}" id="showSourcePagesButton" forceId="true" styleClass="showSourcePagesButtonStyleClass">
+               		<t:commandLink rendered="#{lucidEngine.superAdmin}" id="showSourcePagesButton" forceId="true" styleClass="showSourcePagesButtonStyleClass">
 						<t:outputText value="#{localizedStrings['com.idega.content']['page_source']}" styleClass="innerSpan"/>
 					</t:commandLink>
 					<t:selectOneMenu value="#{lucidEngine.currentLocaleValue}" onchange="LucidHelper.setSelectedLocale();" id="lucidLocaleSwitcher" forceId="true">

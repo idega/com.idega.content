@@ -134,6 +134,20 @@ public class LucidEngineImpl implements LucidEngine {
 	}
 
 	public boolean isContentEditor() {
+		if (isSuperAdmin()) {
+			return true;
+		}
+		
+		try {
+			return CoreUtil.getIWContext().hasRole(StandardRoles.ROLE_KEY_EDITOR);
+		} catch(Exception e) {
+			LOGGER.log(Level.WARNING, "Error while determining if user is content editor", e);
+		}
+		
+		return false;
+	}
+	
+	public boolean isSuperAdmin() {
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return false;
@@ -148,7 +162,7 @@ public class LucidEngineImpl implements LucidEngine {
 			return false;
 		}
 		
-		return iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR);
+		return iwc.isSuperAdmin();
 	}
 
 	public List<SelectItem> getAvailableLocales() {

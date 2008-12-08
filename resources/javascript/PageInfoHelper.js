@@ -894,6 +894,31 @@ function registerPageInfoActions() {
 			
 			button.removeEvents('click');
 			button.addEvent('click', function() {
+				if (button.hasClass('viewingPageSourceInLucid')) {
+					SHOW_SOURCE_PAGES = false;
+					SHOW_EDIT_PAGES = false;
+					
+					if (SHOW_SOURCE_PAGES) {
+						hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
+					}
+					
+					MODULES_SHOWN = true;
+					jQuery('#showPageModules').removeClass('active');
+					jQuery('#showEditPagesButton').removeClass('activeButtonInPages');
+					jQuery('#showSourcePagesButton').removeClass('activeButtonInPages');
+					
+					if (!button.hasClass('activeButtonInPages')) {
+						button.addClass('activeButtonInPages');
+					}
+					
+					getPageUriByCheckedId();
+					
+					button.removeClass('viewingPageSourceInLucid');
+					return false;
+				}
+				
+				button.addClass('viewingPageSourceInLucid');
+				
 				SHOW_SOURCE_PAGES = true;
 				SHOW_EDIT_PAGES = false;
 				

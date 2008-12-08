@@ -80,6 +80,7 @@
       		<include method="getPermissionWindowResources"/>
       		<include method="getPropertiesWindowResources"/>
       		<include method="setLocale"/>
+      		<include method="isSuperAdmin"/>
       	</create>
 	</allow>
   
