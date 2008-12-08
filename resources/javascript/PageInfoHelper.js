@@ -589,7 +589,7 @@ function resizeFrame() {
 	}
 	
 	//	Height
-	var availableHeight = getTotalHeight() - 148;
+	var availableHeight = getTotalHeight() - 91;
 	if (availableHeight > 0) {
 		container.setStyle('height', availableHeight + 'px');
 	}
@@ -877,9 +877,9 @@ function registerPageInfoActions() {
 				}
 				
 				MODULES_SHOWN = true;
-				$('showPageModules').removeClass('active');
-				$('showEditPagesButton').removeClass('activeButtonInPages');
-				$('showSourcePagesButton').removeClass('activeButtonInPages');
+				jQuery('#showPageModules').removeClass('active');
+				jQuery('#showEditPagesButton').removeClass('activeButtonInPages');
+				jQuery('#showSourcePagesButton').removeClass('activeButtonInPages');
 				
 				if (!button.hasClass('activeButtonInPages')) {
 					button.addClass('activeButtonInPages');
@@ -904,10 +904,10 @@ function registerPageInfoActions() {
 				}
 				
 				MODULES_SHOWN = true;
-				$('showPageModules').removeClass('active');
-				$('showThemesButton').removeClass('active');
-				$('showEditPagesButton').removeClass('activeButtonInPages');
-				$('showPreviewPagesButton').removeClass('activeButtonInPages');
+				jQuery('#showPageModules').removeClass('active');
+				jQuery('#showThemesButton').removeClass('active');
+				jQuery('#showEditPagesButton').removeClass('activeButtonInPages');
+				jQuery('#showPreviewPagesButton').removeClass('activeButtonInPages');
 			
 				if (!button.hasClass('activeButtonInPages')) {
 					button.addClass('activeButtonInPages');
@@ -969,7 +969,7 @@ LucidHelper.setSelectedLocale = function() {
 	LucidEngine.setLocale(locale, {
 		callback: function(success) {
 			if (success) {
-				reloadPage();
+				window.location.reload();
 			}
 			closeAllLoadingMessages();
 		}

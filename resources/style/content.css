@@ -916,7 +916,7 @@ html * .scrollTable {
 	right: 0px;
 	left: 0px;
 	width: auto;
-	bottom: 57px;
+	bottom: 0px;
 	overflow: hidden;
 }
 
@@ -983,7 +983,7 @@ body.site_manager .mainPagesContentStyle {
 	padding-right: 12px;
 }
 
-.pageInfoButtonsContainer a {
+.lucidManagementButtons a {
 	display: block;
 	float: left;
 	padding-top: 30px;
@@ -998,11 +998,11 @@ body.site_manager .mainPagesContentStyle {
 	text-shadow: #fff 1px 1px 1px;
 }
 
-.pageInfoButtonsContainer a:hover {
+.lucidManagementButtons a:hover {
 	text-decoration: none;	
 }
 
-html>body .pageInfoButtonsContainer a {
+html>body .lucidManagementButtons a {
 	min-width: 24px;
 	width: auto;
 }
@@ -1011,23 +1011,23 @@ html>body .pageInfoButtonsContainer a {
 	float: left;	
 }
 
-.pageInfoButtonsContainer a#newPageButton {
+.lucidManagementButtons a#newPageButton {
 	background: url(images/new_24.gif) top center no-repeat;
 }
 
-.pageInfoButtonsContainer a#newPagesButton {
+.lucidManagementButtons a#newPagesButton {
 	background: url(images/new_multiple_24.gif) top center no-repeat;
 }
 
-.pageInfoButtonsContainer a#pagePropertiesButton {
+.lucidManagementButtons a#pagePropertiesButton {
 	background: url(../images/page_properties.png) top center no-repeat;
 }
 
-.pageInfoButtonsContainer a#pagePermissionsButton {
+.lucidManagementButtons a#pagePermissionsButton {
 	background: url(../images/page_permissions.png) top center no-repeat;
 }
 
-.pageInfoButtonsContainer a#showPageModules .innerSpan {
+.lucidManagementButtons a#showPageModules .innerSpan {
 	background: url(images/sinfo_16.png) top center no-repeat;
 }
 

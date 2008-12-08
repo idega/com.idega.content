@@ -106,19 +106,19 @@ function setFrameUrlForLucidApplication(uri, pageId, canActAsBuilderUser) {
 	}
 	
 	if (SHOW_EDIT_PAGES) {
-		$('showPageModules').removeClass('disabledButtonInPages');
-		$('showThemesButton').removeClass('disabledButtonInPages');
+		jQuery('#showPageModules').removeClass('disabledButtonInPages');
+		jQuery('#showThemesButton').removeClass('disabledButtonInPages');
 	}
 	else {
-		if (!$('showPageModules').hasClass('disabledButtonInPages')) {
-			$('showPageModules').addClass('disabledButtonInPages');
+		if (!jQuery('#showPageModules').hasClass('disabledButtonInPages')) {
+			jQuery('#showPageModules').addClass('disabledButtonInPages');
 		}
 		if (!SHOW_SOURCE_PAGES) {
-			$('showThemesButton').removeClass('disabledButtonInPages');
+			jQuery('#showThemesButton').removeClass('disabledButtonInPages');
 		}
 		else {
-			if (!$('showThemesButton').hasClass('disabledButtonInPages')) {
-				$('showThemesButton').addClass('disabledButtonInPages');
+			if (!jQuery('#showThemesButton').hasClass('disabledButtonInPages')) {
+				jQuery('#showThemesButton').addClass('disabledButtonInPages');
 			}
 		}
 	}

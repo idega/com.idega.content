@@ -38,6 +38,25 @@ version="1.2">
                 
                 <t:div styleClass="mainPagesContentStyle">
                 	<t:div id="leftSide" forceId="true" styleClass="accordionInPages">
+						<t:div id="lucidManagementButtons" forceId="true">
+							<t:div styleClass="lucidLocaleChooserContainerStyle">
+								<t:selectOneMenu value="#{lucidEngine.currentLocaleValue}" onchange="LucidHelper.setSelectedLocale();" id="lucidLocaleSwitcher" forceId="true">
+									<f:selectItems value="#{lucidEngine.availableLocales}" />
+								</t:selectOneMenu>
+							</t:div>
+		                	<t:div styleClass="leftButtonStyle">
+		                		<t:commandLink id="newPageButton" forceId="true" styleClass="newPageButtonStyleClass" value="#{localizedStrings['com.idega.content']['new_page']}"></t:commandLink>
+		                		<t:commandLink id="newPagesButton" forceId="true" styleClass="newPagesButtonStyleClass" value="#{localizedStrings['com.idega.content']['new_pages']}"></t:commandLink>
+		                		<t:commandLink rendered="#{lucidEngine.contentEditor}" id="pagePropertiesButton" forceId="true" styleClass="pagePropertiesButtonStyleClass" value="#{localizedStrings['com.idega.content']['lucid.page_properties']}"></t:commandLink>
+								<t:commandLink rendered="#{lucidEngine.contentEditor}" id="pagePermissionsButton" forceId="true" styleClass="pagePermissionsButtonStyleClass" value="#{localizedStrings['com.idega.content']['lucid.page_permissions']}"></t:commandLink>
+		                		<t:commandLink rendered="#{lucidEngine.contentEditor}" id="showSourcePagesButton" forceId="true" styleClass="showSourcePagesButtonStyleClass">
+								<t:htmlTag styleClass="outerSpan" value="span">
+									<t:outputText value="#{localizedStrings['com.idega.content']['page_source']}" styleClass="innerSpan"/>
+								</t:htmlTag>
+							</t:commandLink>
+		                	</t:div>
+						</t:div>
+						<t:div styleClass="spacer" />
 						<t:div id="accordion" forceId="true">
 							<t:htmlTag styleClass="toggler atStart firstToggler" value="span">
 								<h:outputText styleClass="title" value="#{localizedStrings['com.idega.content']['current_site_structure']}"/>
@@ -136,55 +155,6 @@ version="1.2">
 						});
 					</script>
 				</f:verbatim>
-                
-                <t:div styleClass="pageInfoButtonsContainer">
-                	<t:div style="float: left; width: 255px; visibility: hidden;">
-                		<t:commandLink value="none" />
-                	</t:div>
-					<t:div styleClass="lucidLocaleChooserContainerStyle">
-						<t:selectOneMenu value="#{lucidEngine.currentLocaleValue}" onchange="LucidHelper.setSelectedLocale();" id="lucidLocaleSwitcher" forceId="true">
-							<f:selectItems value="#{lucidEngine.availableLocales}" />
-						</t:selectOneMenu>
-					</t:div>
-                	<t:div styleClass="leftButtonStyle">
-                		<t:commandLink id="newPageButton" forceId="true" styleClass="newPageButtonStyleClass" value="#{localizedStrings['com.idega.content']['new_page']}"></t:commandLink>
-                		<t:commandLink id="newPagesButton" forceId="true" styleClass="newPagesButtonStyleClass" value="#{localizedStrings['com.idega.content']['new_pages']}"></t:commandLink>
-                		<t:commandLink rendered="#{lucidEngine.contentEditor}" id="pagePropertiesButton" forceId="true" styleClass="pagePropertiesButtonStyleClass" value="#{localizedStrings['com.idega.content']['lucid.page_properties']}"></t:commandLink>
-						<t:commandLink rendered="#{lucidEngine.contentEditor}" id="pagePermissionsButton" forceId="true" styleClass="pagePermissionsButtonStyleClass" value="#{localizedStrings['com.idega.content']['lucid.page_permissions']}"></t:commandLink>
-                	</t:div>
-					<t:div styleClass="rightButtonStyle">
-						<t:div styleClass="filters">
-							<t:commandLink id="showPageModules" forceId="true" styleClass="showPageModulesStyleClass disabledButtonInPages">
-								<t:htmlTag styleClass="outerSpan" value="span">
-									<t:outputText value="#{localizedStrings['com.idega.content']['hide_modules']}" styleClass="innerSpan"/>
-								</t:htmlTag>
-							</t:commandLink>
-							<t:commandLink id="showThemesButton" forceId="true" styleClass="showThemesButtonStyleClass">
-								<t:htmlTag styleClass="outerSpan" value="span">
-									<t:outputText value="#{localizedStrings['com.idega.content']['show_themes']}" styleClass="innerSpan"/>
-								</t:htmlTag>
-							</t:commandLink>
-						</t:div>
-												
-						<t:div styleClass="states">
-							<t:commandLink id="showPreviewPagesButton" forceId="true" styleClass="showPreviewPagesButtonStyleClass activeButtonInPages">
-								<t:htmlTag styleClass="outerSpan" value="span">
-									<t:outputText value="#{localizedStrings['com.idega.content']['preview']}" styleClass="innerSpan"/>
-								</t:htmlTag>
-							</t:commandLink>
-							<t:commandLink id="showEditPagesButton" forceId="true" styleClass="showEditPagesButtonStyleClass">
-								<t:htmlTag styleClass="outerSpan" value="span">
-									<t:outputText value="#{localizedStrings['com.idega.content']['edit']}" styleClass="innerSpan"/>
-								</t:htmlTag>
-							</t:commandLink>
-							<t:commandLink id="showSourcePagesButton" forceId="true" styleClass="showSourcePagesButtonStyleClass">
-								<t:htmlTag styleClass="outerSpan" value="span">
-									<t:outputText value="#{localizedStrings['com.idega.content']['page_source']}" styleClass="innerSpan"/>
-								</t:htmlTag>
-							</t:commandLink>
-						</t:div>
-					</t:div>
-				</t:div>
 				
 				<t:div styleClass="contextMenu" id="sitePageMenuCtxMn" forceId="true" style="display: none;">
                		<t:htmlTag value="ul">
