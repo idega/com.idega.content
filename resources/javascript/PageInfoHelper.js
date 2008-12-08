@@ -677,8 +677,6 @@ function isStartPageCallback(isStart) {
 }
 
 function closeNewPage(container, buttonId, buttonText) {
-	setButtonText(buttonId, buttonText);
-	
 	if (container != null) {
 		var hideNewPage = new Fx.Style(container, 'opacity', {duration: SHOW_ELEMENT_TRANSITION_DURATION});
 		hideNewPage.start(1, 0);
