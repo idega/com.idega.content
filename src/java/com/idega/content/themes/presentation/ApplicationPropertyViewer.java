@@ -97,7 +97,7 @@ public class ApplicationPropertyViewer extends Block {
 		}
 		
 		if (value.equals(ContentConstants.EMPTY)) {
-			value = FIFTEEN_SPACE;
+			//value = FIFTEEN_SPACE;
 		}
 		
 		if (key.indexOf(getCheckKey(ThemesConstants.SITE_TITLE)) != -1) {
