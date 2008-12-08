@@ -961,7 +961,7 @@ function createAccordionForLucid() {
 			element.removeClass('hiddenElement');
 			element.addClass('selectedElement');
 
-			var heightForAccordion = getTotalHeight() - 225;
+			var heightForAccordion = getTotalHeight() - 188;
 			if (heightForAccordion > 0) {
 				element.setStyle('height', heightForAccordion + 'px');
 			}

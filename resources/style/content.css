@@ -927,7 +927,7 @@ body.site_manager .mainPagesContentStyle {
 .accordionInPages {
 	position: absolute;
 	margin: 0;
-	top: 5px;
+	top: 25px;
 	left: 5px;
 	bottom: 5px;
 	height: auto;
@@ -1479,4 +1479,83 @@ iframe.contentItemEditorFrameStyle {
 
 div.lucidLocaleChooserContainerStyle {
 	float: left;
+}
+
+div.topToolbarContainer {
+	position: absolute;
+	top: -29px;
+	right: 10px;
+	height: 28px;
+}
+
+div.topToolbarContainer a {
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+	color: #1F1F1F;
+	display: block;
+	float: left;
+	line-height: 16px;
+	padding-left: 8px;
+	margin-top: 7px;
+	margin-right: 20px;
+}
+
+div.topToolbarContainer a.activeButtonInPages {
+	background: url(images/sub_navigation_left.png) left no-repeat;
+	color: #fff;
+	text-shadow: #555 1px 1px 1px;
+}
+
+div.topToolbarContainer a span {
+	display:block;
+	float:left;
+	line-height:16px;
+	padding:0 11px 0 3px;
+}
+
+div.topToolbarContainer a.activeButtonInPages span {
+	background: url(images/sub_navigation_right.png) right no-repeat;
+}
+
+div.topToolbarContainer select {
+	float: left;
+	font-size: 11px;
+	margin: 0;
+	margin-top: 6px;
+}
+
+div#leftButtons {
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	height: 16px;
+	width: 268px;
+}
+
+div#leftButtons a {
+	display: block;
+	float: left;
+	width: 16px;
+	height: 16px;
+	text-align: center;
+	margin: 0 4px;
+}
+
+div#leftButtons a.newPageButtonStyleClass {
+	background: url(images/lefticons/new_16.png) top left no-repeat;
+}
+
+div#leftButtons a.newPagesButtonStyleClass {
+	background: url(images/lefticons/docs_16.png) top left no-repeat;
+}
+
+div#leftButtons a.pagePropertiesButtonStyleClass {
+	background: url(images/lefticons/prefs_16.png) top left no-repeat;
+}
+
+div#leftButtons a.pagePermissionsButtonStyleClass {
+	background: url(images/lefticons/lock_16.png) top left no-repeat;
+}
+
+div#leftButtons a span {
+	display: none;
 }
