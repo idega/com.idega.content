@@ -960,8 +960,15 @@ function createAccordionForLucid() {
 
 			element.removeClass('hiddenElement');
 			element.addClass('selectedElement');
+			
+			if (element.id == 'sitemap') {
+				$('leftButtons').setStyle('display', 'block');
+			}
+			else {
+				$('leftButtons').setStyle('display', 'none');
+			}
 
-			var heightForAccordion = getTotalHeight() - 188;
+			var heightForAccordion = getTotalHeight() - 168;
 			if (heightForAccordion > 0) {
 				element.setStyle('height', heightForAccordion + 'px');
 			}

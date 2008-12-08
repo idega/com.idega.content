@@ -927,7 +927,7 @@ body.site_manager .mainPagesContentStyle {
 .accordionInPages {
 	position: absolute;
 	margin: 0;
-	top: 25px;
+	top: 5px;
 	left: 5px;
 	bottom: 5px;
 	height: auto;
@@ -1525,19 +1525,27 @@ div.topToolbarContainer select {
 
 div#leftButtons {
 	position: absolute;
-	top: 5px;
-	left: 5px;
-	height: 16px;
-	width: 268px;
+	top: 24px;
+	background-color: #fff;
+	border: 1px #cacaca solid;
+	border-left: 0;
+	border-radius-topright: 6px;
+	-moz-border-radius-topright: 6px;
+	-webkit-border-radius-topright: 6px;
+	border-radius-bottomright: 6px;
+	-moz-border-radius-bottomright: 6px;
+	-webkit-border-radius-bottomright: 6px;
+	left: 274px;
+	z-index: 100;
 }
 
 div#leftButtons a {
 	display: block;
-	float: left;
 	width: 16px;
 	height: 16px;
 	text-align: center;
-	margin: 0 4px;
+	margin: 6px;
+	margin-left: 2px;
 }
 
 div#leftButtons a.newPageButtonStyleClass {
