@@ -824,70 +824,6 @@ function registerPageInfoActions() {
 	   	}
 	);
 	
-	$$('a.showPageModulesStyleClass').each(
-		function(element) {
-			setHrefToVoidFunction(element);
-			
-			element.removeEvents('click');
-			var manageModulesBackgroundFunction = function() {
-				manageModulesBackground(element);
-			};
-			element.addEvent('click', function() {
-				if (SHOW_EDIT_PAGES) {
-					manageModulesBackgroundFunction();
-				}
-			});
-		}
-	);
-	
-	$$('a.showEditPagesButtonStyleClass').each(
-		function(button) {
-			setHrefToVoidFunction(button);
-			
-			button.removeEvents('click');
-			button.addEvent('click', function() {
-				SHOW_SOURCE_PAGES = false;
-				SHOW_EDIT_PAGES = true;
-				
-				$('showPreviewPagesButton').removeClass('activeButtonInPages');
-				$('showSourcePagesButton').removeClass('activeButtonInPages');
-				
-				if (!button.hasClass('activeButtonInPages')) {
-					button.addClass('activeButtonInPages');
-				}
-				
-				getPageUriByCheckedId();
-			});
-		}
-	);
-	
-	$$('a.showPreviewPagesButtonStyleClass').each(
-		function(button) {
-			setHrefToVoidFunction(button);
-			
-			button.removeEvents('click');
-			button.addEvent('click', function() {
-				SHOW_SOURCE_PAGES = false;
-				SHOW_EDIT_PAGES = false;
-				
-				if (SHOW_SOURCE_PAGES) {
-					hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
-				}
-				
-				MODULES_SHOWN = true;
-				jQuery('#showPageModules').removeClass('active');
-				jQuery('#showEditPagesButton').removeClass('activeButtonInPages');
-				jQuery('#showSourcePagesButton').removeClass('activeButtonInPages');
-				
-				if (!button.hasClass('activeButtonInPages')) {
-					button.addClass('activeButtonInPages');
-				}
-				
-				getPageUriByCheckedId();
-			});
-		}
-	);
-	
 	$$('a.showSourcePagesButtonStyleClass').each(
 		function(button) {
 			setHrefToVoidFunction(button);
@@ -914,6 +850,8 @@ function registerPageInfoActions() {
 					getPageUriByCheckedId();
 					
 					button.removeClass('viewingPageSourceInLucid');
+					button.removeClass('activeButtonInPages');
+					
 					return false;
 				}
 				
