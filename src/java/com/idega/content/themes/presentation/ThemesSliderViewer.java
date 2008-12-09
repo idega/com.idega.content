@@ -1,5 +1,9 @@
 package com.idega.content.themes.presentation;
 
+import java.rmi.RemoteException;
+import java.util.Arrays;
+
+import com.idega.block.web2.business.Web2Business;
 import com.idega.content.business.ContentConstants;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
@@ -7,6 +11,10 @@ import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
+import com.idega.util.CoreUtil;
+import com.idega.util.PresentationUtil;
+import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
 
 public class ThemesSliderViewer extends Block {
 	
@@ -15,6 +23,9 @@ public class ThemesSliderViewer extends Block {
 	
 	private boolean hiddenOnLoad = false;
 	
+	private String initAction;
+	
+	@Override
 	public void main(IWContext iwc) {
 		IWBundle bundle = getBundle(iwc);
 		IWResourceBundle iwrb = getResourceBundle(iwc);
@@ -54,6 +65,31 @@ public class ThemesSliderViewer extends Block {
 				iwrb.getLocalizedString("scroll_right", "Scroll to right"), "rightScroller"));
 		container.add(rightScroller);
 		
+		//	Resources
+		Web2Business web2 = ELUtil.getInstance().getBean(Web2Business.SPRING_BEAN_IDENTIFIER);
+		try {
+			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
+					web2.getBundleURIToMootoolsLib(),
+					web2.getReflectionForMootoolsScriptFilePath(),
+					
+					web2.getBundleURIToJQueryLib(),
+					web2.getBundleUriToContextMenuScript(),
+					
+					bundle.getVirtualPathWithFileNameString("javascript/ThemesHelper.js"),
+					bundle.getVirtualPathWithFileNameString("javascript/PageInfoHelper.js"),
+					bundle.getVirtualPathWithFileNameString("javascript/ThemesManagerHelper.js")
+			));
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		if (!StringUtil.isEmpty(initAction)) {
+			String action = getInitAction();
+			if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
+				action = new StringBuilder("jQuery(window).load(function() {").append(action).append("});").toString();
+			}
+			PresentationUtil.addJavaScriptActionToBody(iwc, action);
+		}
+		
 		add(container);
 	}
 	
@@ -87,7 +123,16 @@ public class ThemesSliderViewer extends Block {
 	public void setHiddenOnLoad(boolean hiddenOnLoad) {
 		this.hiddenOnLoad = hiddenOnLoad;
 	}
+	
+	public String getInitAction() {
+		return initAction;
+	}
 
+	public void setInitAction(String initAction) {
+		this.initAction = initAction;
+	}
+
+	@Override
 	public String getBundleIdentifier() {
 		return ContentConstants.IW_BUNDLE_IDENTIFIER;
 	}

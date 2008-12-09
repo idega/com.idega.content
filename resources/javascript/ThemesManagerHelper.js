@@ -40,6 +40,11 @@ function getImageHeight() {
 }
 
 function getThemeStyleVariations(themeID) {
+	var variationsContainer = $('themeVariationsContainer');
+	if (variationsContainer == null) {
+		return;
+	}
+	
 	if (THEME_ID != null) {
 		var oldTheme = getTheme(THEME_ID);
 		if (oldTheme != null) {
@@ -51,7 +56,6 @@ function getThemeStyleVariations(themeID) {
 		}
 	}
 	
-	var variationsContainer = $('themeVariationsContainer');
 	var loadingLayerOverElement = $(setLoadingLayerForElement(variationsContainer.id, false, variationsContainer.getSize(), variationsContainer.getPosition()));
 	
 	setGlobalId(themeID);
@@ -338,6 +342,8 @@ function getThemes(themeID, addReflect, needScrollToDefaultTheme) {
 	needReflection = addReflect;
 	ThemesEngine.getThemes({
 		callback: function(themes) {
+			closeAllLoadingMessages();
+			
 			getThemesCallback(themes, needScrollToDefaultTheme);
 			
 			if (loadingLayer != null) {
@@ -390,7 +396,7 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
 			div.setProperty('id', theme.id + '_mainContainer');
 			div.addClass('imageGallery');
 			if (ENABLE_STYLE_VARIATIONS) {
-				$j(div).contextMenu('deleteThemeMenu', {
+				jQuery(div).contextMenu('deleteThemeMenu', {
             		onContextMenu: function(e) {
             			var event = new Event(e);
             			var themeId = event.target.getProperty('id');
@@ -402,10 +408,10 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
 			
 			// Is used?
 			if (theme.used) {
-				div.setProperty('title', $('defaultThemeLabel').value);
+				div.setProperty('title', jQuery('#defaultThemeLabel').attr('value'));
 			}
 			else {
-				div.setProperty('title', $('notDefaultThemeLabel').value);
+				div.setProperty('title', jQuery('#notDefaultThemeLabel').attr('value'));
 			}
 	
 			// Name
@@ -563,11 +569,15 @@ function setIfUsedTheme(used) {
 		
 	var text = '';
 	if (used) {
-		text = $('defaultThemeLabel').value;
+		text = jQuery('#defaultThemeLabel').attr('value');
 	}
 	else {
-		text = $('notDefaultThemeLabel').value;
+		text = jQuery('#notDefaultThemeLabel').attr('value');
 	}
+	if (text == null) {
+		text = '';
+	}
+	
 	element.appendChild(document.createTextNode(text));
 	
 	highlightElement(element, 500, '#FFFF44');

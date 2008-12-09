@@ -11,6 +11,10 @@ public interface LucidEngine extends Serializable {
 	
 	public String getStyleSheetResources();
 	
+	public String getJavaScriptResourcesForThemes();
+	
+	public String getStyleSheetResourcesForThemes();
+	
 	public List<String> getPermissionWindowResources();
 	
 	public List<String> getPropertiesWindowResources();

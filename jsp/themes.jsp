@@ -8,28 +8,10 @@
         xmlns:t="http://myfaces.apache.org/tomahawk" version="1.2">
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 	<jsf:view>
-        <ws:page id="themeManager" javascripturls="
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.11/mootools-all-compressed.js,
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/reflection/for_mootools/1.2/reflection.js,
-						/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/moorainbow/1.1/mooRainbow.js,
-        				
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/jquery/1.2.3/jquery-compressed.js,
-        				/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/contextmenu/r2/contextmenu-compressed.js,
-						
-						/dwr/engine.js,
-        				/dwr/interface/ThemesEngine.js,
-						
-        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesManagerHelper.js,
-        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/PageInfoHelper.js,
-        				/idegaweb/bundles/com.idega.content.bundle/resources/javascript/ThemesHelper.js"
-        				
-        				stylesheeturls="/idegaweb/bundles/com.idega.content.bundle/resources/style/content.css,
-        								/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/moorainbow/1.1/mooRainbow.css">
+        <ws:page id="themeManager" javascripturls="#{lucidEngine.getJavaScriptResourcesForThemes()}" stylesheeturls="#{lucidEngine.getStyleSheetResourcesForThemes()}">
 			<h:form id="uploadForm" enctype="multipart/form-data">
 				<jsf:verbatim>
 					<script type="text/javascript">
-						var $j = jQuery.noConflict();
-						
 						window.addEvent('domready', function() {
                 			errorHandlerInLucid();
 						});

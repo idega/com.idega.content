@@ -45,7 +45,9 @@ public class LucidEngineImpl implements LucidEngine {
 	
 	public String getJavaScriptResources() {
 		//	DWR
-		StringBuilder js = new StringBuilder("/dwr/util.js,/dwr/engine.js,/dwr/interface/ThemesEngine.js,/dwr/interface/BuilderService.js,/dwr/interface/LucidEngine.js,");
+		StringBuilder js = new StringBuilder(CoreConstants.DWR_UTIL_SCRIPT).append(CoreConstants.COMMA);
+		js.append(CoreConstants.DWR_ENGINE_SCRIPT).append(CoreConstants.COMMA);
+		js.append("/dwr/interface/ThemesEngine.js,/dwr/interface/BuilderService.js,/dwr/interface/LucidEngine.js,");
 		
 		//	MooTools
 		try {
@@ -53,11 +55,7 @@ public class LucidEngineImpl implements LucidEngine {
 		} catch (RemoteException e) {
 			LOGGER.log(Level.WARNING, "Error getting URI to MooTools script", e);
 		}
-		try {
-			js.append(web2.getBundleURIToReflectionLib()).append(CoreConstants.COMMA);
-		} catch (RemoteException e) {
-			LOGGER.log(Level.WARNING, "Error getting URI to Reflection script", e);
-		}
+		js.append(web2.getReflectionForMootoolsScriptFilePath()).append(CoreConstants.COMMA);
 		
 		//	jQuery
 		js.append(web2.getBundleURIToJQueryLib()).append(CoreConstants.COMMA);
@@ -74,9 +72,43 @@ public class LucidEngineImpl implements LucidEngine {
 		
 		return js.toString();
 	}
+	
+	public String getJavaScriptResourcesForThemes() {
+		StringBuilder js = new StringBuilder();
+		
+		//	MooTools
+		try {
+			js.append(web2.getBundleURIToMootoolsLib()).append(CoreConstants.COMMA);
+		} catch (RemoteException e) {
+			LOGGER.log(Level.WARNING, "Error getting URI to MooTools script", e);
+		}
+		js.append(web2.getReflectionForMootoolsScriptFilePath()).append(CoreConstants.COMMA);
+		js.append(web2.getBundleUriToMooRainbowScript()).append(CoreConstants.COMMA);
+		
+		//	jQuery
+		js.append(web2.getBundleURIToJQueryLib()).append(CoreConstants.COMMA);
+		js.append(web2.getBundleUriToContextMenuScript()).append(CoreConstants.COMMA);
+		
+		//	DWR
+		js.append(CoreConstants.DWR_ENGINE_SCRIPT).append(CoreConstants.COMMA).append("/dwr/interface/ThemesEngine.js,");
+		
+		//	Helpers
+		IWBundle bundle = ContentUtil.getBundle();
+		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesManagerHelper.js")).append(CoreConstants.COMMA);
+		js.append(bundle.getVirtualPathWithFileNameString("javascript/PageInfoHelper.js")).append(CoreConstants.COMMA);
+		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesHelper.js"));
+		
+		return js.toString();
+	}
 
 	public String getStyleSheetResources() {
 		return ContentUtil.getBundle().getVirtualPathWithFileNameString("style/content.css");
+	}
+	
+	public String getStyleSheetResourcesForThemes() {
+		return new StringBuilder(ContentUtil.getBundle().getVirtualPathWithFileNameString("style/content.css")).append(CoreConstants.COMMA)
+					.append(web2.getBundleUriToMooRainbowStyle())
+				.toString();
 	}
 
 	public Web2Business getWeb2() {

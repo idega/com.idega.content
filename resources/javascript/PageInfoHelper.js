@@ -168,24 +168,30 @@ function manageSlider(buttonID) {
 	if (container == null) {
 		return;
 	}
-	var button = $(buttonID);
-	if (button == null) {
-		return;
-	}
+	
+	showLoadingMessage(LOADING_TEXT);
+	
+	var button = buttonID == null ? null : $(buttonID);
 	
 	SLIDER_IS_IN_MOTION = true;
 	if (container.getStyle('display') == 'none') {
-		button.addClass('active');
+		if (button != null) {
+			button.addClass('active');
+		}
+		
 		changeFrameHeight(-FRAME_CHANGE);
 		showSlider(container);
 	}
 	else {
-		button.removeClass('active');
-		hideThemesSliderInPages(container, button);
+		if (button != null) {
+			button.removeClass('active');
+		}
+		
+		hideThemesSliderInPages(container);
 	}
 }
 
-function hideThemesSliderInPages(container, button) {
+function hideThemesSliderInPages(container) {
 	if (container == null) {
 		return false;
 	}
@@ -835,7 +841,7 @@ function registerPageInfoActions() {
 					SHOW_EDIT_PAGES = false;
 					
 					if (SHOW_SOURCE_PAGES) {
-						hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
+						hideThemesSliderInPages($('themesSliderContainer'));
 					}
 					
 					MODULES_SHOWN = true;
@@ -861,7 +867,7 @@ function registerPageInfoActions() {
 				SHOW_EDIT_PAGES = false;
 				
 				if (SHOW_SOURCE_PAGES) {
-					hideThemesSliderInPages($('themesSliderContainer'), $('showThemesButton'));
+					hideThemesSliderInPages($('themesSliderContainer'));
 				}
 				
 				MODULES_SHOWN = true;

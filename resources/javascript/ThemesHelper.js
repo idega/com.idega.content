@@ -604,7 +604,7 @@ function addLucidContextMenuToElement(element) {
 		return false;
 	}
 	
-	$j(element).contextMenu('sitePageMenuCtxMn', {
+	jQuery(element).contextMenu('sitePageMenuCtxMn', {
 		onShowMenu: function(e, menu) {
 			doContextMenuChangesForLucid(e);
 			return menu;
