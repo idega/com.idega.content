@@ -457,29 +457,12 @@ function setTemplateForPageOrPages(isPage, type) {
 		//	No theme selected
 		return false;
 	}
-	
-	var currentPageId = getPageID();
-	if (isPage && currentPageId == null) {
-		//	No page found
-		return false;
-	}
-	
-	var uri = getPagePreviewInFrameUri();
-	if (uri == null) {
-		//	No page in iframe
-		return false;
-	}
-	else {
-		ThemesEngine.getPageIdByUri(uri, {
-			callback: function(id) {
-				var pageInFrameId = id;
-				if (pageInFrameId != null && pageInFrameId != currentPageId) {
-					currentPageId = pageInFrameId;
-				}
-				setTemplateForPageOrPagesWithPageId(currentPageId, type);
-			}
-		});
-	}
+
+	ThemesEngine.getPageIdByUri(window.location.pathname, {
+		callback: function(id) {
+			setTemplateForPageOrPagesWithPageId(id, type);
+		}
+	});
 }
 
 function setTemplateForPageOrPagesWithPageId(pageId, type) {
@@ -508,7 +491,7 @@ function setTemplateForPageOrPagesWithPageId(pageId, type) {
 			setNewStyleForSelectedElement(getThemeForStyle() + '_themeNameContainer', 'themeName usedThemeName');
 			
 			WORKING_WITH_TEMPLATE = false;
-			getPrewUrl(pageId);
+			reloadPage();
 		}
 	});
 }
