@@ -137,7 +137,6 @@ function showSlider(container) {
 	container = $(container);
 	container.setStyle('position', 'absolute');
 	container.setStyle('bottom', '5px');
-	container.setStyle('left', RESERVED_WIDTH + 'px');
 	container.setStyle('right', '5px');
 	
 	var showSliderEffect = new Fx.Style(container, 'opacity', {duration: 1000, onComplete: function() {
@@ -521,7 +520,7 @@ function resizeSlider() {
 		return;
 	}
 
-	var available = getTotalWidth() - RESERVED_WIDTH - 6;
+	var available = getTotalWidth() - 14;
 	if (available > 0) {
 		container.setStyle('width', available + 'px');
 		themesTicker.setStyle('width', (available - 50) + 'px');

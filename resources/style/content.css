@@ -241,7 +241,7 @@ head:first-child+body div[class].contentListBlock div[class].wf_blockmainarea di
 	overflow: hidden;
 	width: auto !important;
 	position: absolute;
-	left: 28px;
+	left: 32px;
 	right: 32px;
 }
 

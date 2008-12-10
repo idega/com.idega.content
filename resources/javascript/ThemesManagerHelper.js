@@ -32,7 +32,7 @@ function getImageWidth() {
 }
 
 function getAllImageSpace() {
-	return (getImageWidth() + 8);
+	return (getImageWidth() + 3);
 }
 
 function getImageHeight() {
@@ -235,8 +235,10 @@ function scroll(id) {
 	
 	// Checking if need to scroll
 	if (tickerWidth > containerWidth) {	// All themes are visible in slider
-		moveSlider(0);	// Restoring slider		return;
+		moveSlider(0);	// Restoring slider
+		return;
 	}
+	
 	themesToSlide = Math.floor(tickerWidth / getAllImageSpace());
 	if (themesToSlide < 0) {	// No space to slide?
 		return;
