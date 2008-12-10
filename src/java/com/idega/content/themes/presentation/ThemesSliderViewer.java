@@ -11,6 +11,7 @@ import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
+import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
@@ -75,6 +76,9 @@ public class ThemesSliderViewer extends Block {
 					web2.getBundleURIToJQueryLib(),
 					web2.getBundleUriToContextMenuScript(),
 					
+					CoreConstants.DWR_ENGINE_SCRIPT,
+					"/dwr/interface/ThemesEngine.js",
+					
 					bundle.getVirtualPathWithFileNameString("javascript/ThemesHelper.js"),
 					bundle.getVirtualPathWithFileNameString("javascript/PageInfoHelper.js"),
 					bundle.getVirtualPathWithFileNameString("javascript/ThemesManagerHelper.js")
@@ -82,6 +86,9 @@ public class ThemesSliderViewer extends Block {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
+		
+		PresentationUtil.addStyleSheetToHeader(iwc, bundle.getVirtualPathWithFileNameString("style/content.css"));
+		
 		if (!StringUtil.isEmpty(initAction)) {
 			String action = getInitAction();
 			if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
