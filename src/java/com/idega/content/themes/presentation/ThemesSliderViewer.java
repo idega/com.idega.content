@@ -79,9 +79,9 @@ public class ThemesSliderViewer extends Block {
 					CoreConstants.DWR_ENGINE_SCRIPT,
 					"/dwr/interface/ThemesEngine.js",
 					
-					bundle.getVirtualPathWithFileNameString("javascript/ThemesHelper.js"),
-					bundle.getVirtualPathWithFileNameString("javascript/PageInfoHelper.js"),
-					bundle.getVirtualPathWithFileNameString("javascript/ThemesManagerHelper.js")
+					bundle.getVirtualPathWithFileNameString("javascript/ThemesHelper-compressed.js"),
+					bundle.getVirtualPathWithFileNameString("javascript/PageInfoHelper-compressed.js"),
+					bundle.getVirtualPathWithFileNameString("javascript/ThemesManagerHelper-compressed.js")
 			));
 		} catch (RemoteException e) {
 			e.printStackTrace();

@@ -55,7 +55,6 @@ public class LucidEngineImpl implements LucidEngine {
 		} catch (RemoteException e) {
 			LOGGER.log(Level.WARNING, "Error getting URI to MooTools script", e);
 		}
-		js.append(web2.getReflectionForMootoolsScriptFilePath()).append(CoreConstants.COMMA);
 		
 		//	jQuery
 		js.append(web2.getBundleURIToJQueryLib()).append(CoreConstants.COMMA);
@@ -63,10 +62,9 @@ public class LucidEngineImpl implements LucidEngine {
 		
 		//	Helpers
 		IWBundle bundle = ContentUtil.getBundle();
-		js.append(bundle.getVirtualPathWithFileNameString("javascript/drag-drop-folder-tree.js")).append(CoreConstants.COMMA);
-		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesHelper.js")).append(CoreConstants.COMMA);
-		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesManagerHelper.js")).append(CoreConstants.COMMA);
-		js.append(bundle.getVirtualPathWithFileNameString("javascript/PageInfoHelper.js")).append(CoreConstants.COMMA);
+		js.append(bundle.getVirtualPathWithFileNameString("javascript/drag-drop-folder-tree-compressed.js")).append(CoreConstants.COMMA);
+		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesHelper-compressed.js")).append(CoreConstants.COMMA);
+		js.append(bundle.getVirtualPathWithFileNameString("javascript/PageInfoHelper-compressed.js")).append(CoreConstants.COMMA);
 		js.append(bundle.getVirtualPathWithFileNameString("javascript/tree.js")).append(CoreConstants.COMMA);
 		js.append(bundle.getVirtualPathWithFileNameString("javascript/SiteManagerHelper.js"));
 		
@@ -94,9 +92,9 @@ public class LucidEngineImpl implements LucidEngine {
 		
 		//	Helpers
 		IWBundle bundle = ContentUtil.getBundle();
-		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesManagerHelper.js")).append(CoreConstants.COMMA);
-		js.append(bundle.getVirtualPathWithFileNameString("javascript/PageInfoHelper.js")).append(CoreConstants.COMMA);
-		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesHelper.js"));
+		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesManagerHelper-compressed.js")).append(CoreConstants.COMMA);
+		js.append(bundle.getVirtualPathWithFileNameString("javascript/PageInfoHelper-compressed.js")).append(CoreConstants.COMMA);
+		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesHelper-compressed.js"));
 		
 		return js.toString();
 	}
