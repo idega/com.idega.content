@@ -1,5 +1,5 @@
 /*
- * $Id: WhatIsNew.java,v 1.8 2007/10/03 22:59:42 eiki Exp $
+ * $Id: WhatIsNew.java,v 1.9 2008/12/11 08:03:58 laddi Exp $
  * Created on Jun 21, 2006
  *
  * Copyright (C) 2006 Idega Software hf. All Rights Reserved.
@@ -26,20 +26,22 @@ import com.idega.content.business.IWCacheInvalidatorIWSlideListener;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.search.business.SearchPlugin;
 import com.idega.core.search.presentation.SearchResults;
+import com.idega.idegaweb.IWBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Text;
 import com.idega.slide.business.IWSlideSession;
+import com.idega.util.PresentationUtil;
 
 /**
  * A block that displays the latest or all entries in the file repository ordered by modification date<br>
  * It extends SearchResults block and forces it to only use a DASL search (ContentSearch) with specific settings<br>
  * and the query is by default set to "*" and the path to "files" but that can be changed.
  * 
- *  Last modified: $Date: 2007/10/03 22:59:42 $ by $Author: eiki $
+ *  Last modified: $Date: 2008/12/11 08:03:58 $ by $Author: laddi $
  * 
  * @author <a href="mailto:eiki@idega.com">eiki</a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class WhatIsNew extends SearchResults {
 
@@ -64,6 +66,7 @@ public class WhatIsNew extends SearchResults {
 		super();
 		this.setCacheable(WHAT_IS_NEW_CACHE_KEY, 0);
 		this.setStyleClass(STYLE_CLASS_WHATISNEW);
+		this.setOpenLinksInAnotherWindow(true);
 	}
 
 	/*
@@ -71,6 +74,7 @@ public class WhatIsNew extends SearchResults {
 	 * 
 	 * @see com.idega.presentation.PresentationObject#main(com.idega.presentation.IWContext)
 	 */
+	@Override
 	public void main(IWContext iwc) throws Exception {
 		//just listen for changes
 		startCachingStrategy();
@@ -89,7 +93,11 @@ public class WhatIsNew extends SearchResults {
 	
 	
 
+	@Override
 	protected String getCacheState(IWContext iwc, String cacheStatePrefix) {
+		IWBundle iwb = IWContext.getInstance().getIWMainApplication().getCoreBundle();
+		PresentationUtil.addStyleSheetToHeader(iwc, iwb.getVirtualPathWithFileNameString("style/search.css"));
+
 		StringBuffer buffer = new StringBuffer(cacheStatePrefix);
 		buffer.append(getSearchQueryString(iwc))
 		.append(getStartingPointURI())
@@ -117,6 +125,7 @@ public class WhatIsNew extends SearchResults {
 	/* (non-Javadoc)
 	 * @see com.idega.core.search.presentation.SearchResults#configureSearchPlugin(com.idega.core.search.business.SearchPlugin)
 	 */
+	@Override
 	protected SearchPlugin configureSearchPlugin(SearchPlugin searchPlugin) {
 		if(searchPlugin instanceof ContentSearch){
 			//Get a copy of the plugin
@@ -140,6 +149,7 @@ public class WhatIsNew extends SearchResults {
 	
 	private HashMap groups = null;
 	
+	@Override
 	protected void addResultRow(Layer container, Layer rowContainer, String rowKey) {
 		if (groupByExtraInfo) {
 			if (rowKey.endsWith("/")) {
@@ -156,6 +166,7 @@ public class WhatIsNew extends SearchResults {
 		}
 	}
 	
+	@Override
 	protected void beforeAddingResultRows(Layer container) {
 		// CREATE THE MAP FOR THE CONTAINER
 		if (groupByExtraInfo) {
@@ -163,6 +174,7 @@ public class WhatIsNew extends SearchResults {
 		}
 	
 	}
+	@Override
 	protected void afterAddingResultRows(Layer container) {
 		if (groupByExtraInfo) {
 			Set keySet = groups.keySet();
@@ -209,6 +221,7 @@ public class WhatIsNew extends SearchResults {
 	/* (non-Javadoc)
 	 * @see com.idega.core.search.presentation.SearchResults#isAdvancedSearch(com.idega.presentation.IWContext)
 	 */
+	@Override
 	protected boolean isAdvancedSearch(IWContext iwc) {
 		return false;
 	}
@@ -216,6 +229,7 @@ public class WhatIsNew extends SearchResults {
 	/* (non-Javadoc)
 	 * @see com.idega.core.search.presentation.SearchResults#getQueryString(com.idega.presentation.IWContext)
 	 */
+	@Override
 	protected String getSearchQueryString(IWContext iwc) {
 		String query = "*";
 		if(super.searchQueryString==null){
@@ -229,6 +243,7 @@ public class WhatIsNew extends SearchResults {
 	/* (non-Javadoc)
 	 * @see com.idega.core.search.presentation.SearchResults#isSimpleSearch(com.idega.presentation.IWContext)
 	 */
+	@Override
 	protected boolean isSimpleSearch(IWContext iwc) {
 		return true;
 	}
@@ -236,6 +251,7 @@ public class WhatIsNew extends SearchResults {
 	/* (non-Javadoc)
 	 * @see com.idega.core.search.presentation.SearchResults#getSearchPluginsToUse()
 	 */
+	@Override
 	public String getSearchPluginsToUse() {
 		return "ContentSearch";
 	}
