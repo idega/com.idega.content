@@ -14,8 +14,6 @@ version="1.2">
 			<h:form id="pagesForm" onsubmit="return false;">
 				<f:verbatim>
                 	<script type="text/javascript">
-                		var $j = jQuery.noConflict();
-                	
                 		window.addEvent('domready', function() {
                 			errorHandlerInLucid();
 						});

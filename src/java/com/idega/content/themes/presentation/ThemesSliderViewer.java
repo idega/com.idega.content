@@ -80,8 +80,8 @@ public class ThemesSliderViewer extends Block {
 					"/dwr/interface/ThemesEngine.js",
 					
 					bundle.getVirtualPathWithFileNameString("javascript/ThemesHelper-compressed.js"),
-					bundle.getVirtualPathWithFileNameString("javascript/PageInfoHelper-compressed.js"),
-					bundle.getVirtualPathWithFileNameString("javascript/ThemesManagerHelper-compressed.js")
+					bundle.getVirtualPathWithFileNameString("javascript/ThemesManagerHelper-compressed.js"),
+					bundle.getVirtualPathWithFileNameString("javascript/ThemesSliderHelper-compressed.js")
 			));
 		} catch (RemoteException e) {
 			e.printStackTrace();

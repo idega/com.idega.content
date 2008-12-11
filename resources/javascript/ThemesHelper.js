@@ -2,7 +2,7 @@ var PAGE_ID = null;
 var TEMPLATE_ID = null;
 
 var RESERVED_HEIGHT = 82;
-var RESERVED_HEIGHT_FOR_PAGES = RESERVED_HEIGHT + 197;
+var RESERVED_HEIGHT_FOR_PAGES = RESERVED_HEIGHT + 140;
 var RESERVED_HEIGHT_FOR_SITE = RESERVED_HEIGHT + 94;
 
 var IS_SITE_MAP = false;
@@ -910,7 +910,7 @@ function resizeTreeContainerInThemes(reservedHeight) {
 			siteTreeContainer.setStyle('height', height + 'px');
 		}
 
-		var heightForAccordion = totalHeight - 225;
+		var heightForAccordion = totalHeight - 168;
 		if (heightForAccordion > 0) {
 			$$('.selectedElement').setStyle('height', heightForAccordion + 'px');
 		}
@@ -918,7 +918,6 @@ function resizeTreeContainerInThemes(reservedHeight) {
 	
 	if (!isSiteMap()) {
 		resizeFrame();
-		resizeSlider();
 	}
 }
 
@@ -995,7 +994,9 @@ function getUpdatedSiteTreeFromServer() {
 function getUpdatedSiteTemplatesTreeFromServer() {
 	ThemesEngine.getUpdatedSiteTemplatesTree({
 		callback: function(templatesTree) {
-			updateSiteTemplatesTree(templatesTree);
+			try {
+				updateSiteTemplatesTree(templatesTree);
+			} catch(e) {}
 		}
 	});
 }

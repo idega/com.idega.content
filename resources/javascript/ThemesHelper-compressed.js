@@ -1,5 +1,5 @@
 
-var PAGE_ID=null;var TEMPLATE_ID=null;var RESERVED_HEIGHT=82;var RESERVED_HEIGHT_FOR_PAGES=RESERVED_HEIGHT+197;var RESERVED_HEIGHT_FOR_SITE=RESERVED_HEIGHT+94;var IS_SITE_MAP=false;var NEED_RELOAD_BUILDER_PAGE=false;var NEED_REDIRECT=false;var EMPTY_SITE_TREE_TEXT_CONTAINER_ID='emptySiteTreeTextContainer';var CURRENT_SITE_STRUCTURE_TREE_ID='current_structure_tree';var ALL_CURRENT_SITE_STRUCTURE_TREE_ID='div_id_'+CURRENT_SITE_STRUCTURE_TREE_ID;var WORKING_WITH_TEMPLATE=false;var USER_IS_CONTENT_EDITOR=false;function markIfUserIsContentEditor(userIsContentEditor){USER_IS_CONTENT_EDITOR=userIsContentEditor;}
+var PAGE_ID=null;var TEMPLATE_ID=null;var RESERVED_HEIGHT=82;var RESERVED_HEIGHT_FOR_PAGES=RESERVED_HEIGHT+140;var RESERVED_HEIGHT_FOR_SITE=RESERVED_HEIGHT+94;var IS_SITE_MAP=false;var NEED_RELOAD_BUILDER_PAGE=false;var NEED_REDIRECT=false;var EMPTY_SITE_TREE_TEXT_CONTAINER_ID='emptySiteTreeTextContainer';var CURRENT_SITE_STRUCTURE_TREE_ID='current_structure_tree';var ALL_CURRENT_SITE_STRUCTURE_TREE_ID='div_id_'+CURRENT_SITE_STRUCTURE_TREE_ID;var WORKING_WITH_TEMPLATE=false;var USER_IS_CONTENT_EDITOR=false;function markIfUserIsContentEditor(userIsContentEditor){USER_IS_CONTENT_EDITOR=userIsContentEditor;}
 function setNeedRedirect(redirect){NEED_REDIRECT=redirect;}
 function isNeedRedirect(){return NEED_REDIRECT;}
 function isSiteMap(){return IS_SITE_MAP;}
@@ -147,8 +147,8 @@ checkIfNotEmptySiteTree(ALL_CURRENT_SITE_STRUCTURE_TREE_ID);registerActionsForSi
 function showLayerAndResumeUpdatingTree(){if(TIME_OUT_ID_FOR_ELEMENT_LOADING_LAYER!=null){window.clearTimeout(TIME_OUT_ID_FOR_ELEMENT_LOADING_LAYER);TIME_OUT_ID_FOR_ELEMENT_LOADING_LAYER=null;}
 LOADING_LAYER_ABOVE_TREE.remove();LOADING_LAYER_ABOVE_TREE=null;}
 function resizeTreeContainerInThemes(reservedHeight){var siteTreeContainer=$(ALL_CURRENT_SITE_STRUCTURE_TREE_ID);if(siteTreeContainer){var totalHeight=getTotalHeight();var height=totalHeight-reservedHeight;if(height>0){siteTreeContainer.setStyle('height',height+'px');}
-var heightForAccordion=totalHeight-225;if(heightForAccordion>0){$$('.selectedElement').setStyle('height',heightForAccordion+'px');}}
-if(!isSiteMap()){resizeFrame();resizeSlider();}}
+var heightForAccordion=totalHeight-168;if(heightForAccordion>0){$$('.selectedElement').setStyle('height',heightForAccordion+'px');}}
+if(!isSiteMap()){resizeFrame();}}
 function resizeNewPageContainers(reservedHeight){var totalHeight=getTotalHeight();var availableHeight=totalHeight-reservedHeight;if(availableHeight<0){return false;}
 var newPageContainer=$('pageTemplatesStretcher');if(newPageContainer!=null){newPageContainer.setStyle('max-height',availableHeight+'px');}
 var newPagesContainer=$('site_templates');if(newPagesContainer!=null){newPagesContainer.setStyle('max-height',availableHeight+'px');}}
@@ -158,7 +158,7 @@ function createAccordionForLucid(){var accordion=new Accordion('span.atStart','d
 else{$('leftButtons').setStyle('display','none');}
 var heightForAccordion=getTotalHeight()-168;if(heightForAccordion>0){element.setStyle('height',heightForAccordion+'px');}},onBackground:function(toggler,element){toggler.removeClass('selectedToggler');element.removeClass('selectedElement');element.addClass('hiddenElement');element.setStyle('height','0px');}},$('accordion'));}
 function getUpdatedSiteTreeFromServer(){ThemesEngine.getUpdatedSiteTree({callback:function(tree){updateSiteTree(tree);}});}
-function getUpdatedSiteTemplatesTreeFromServer(){ThemesEngine.getUpdatedSiteTemplatesTree({callback:function(templatesTree){updateSiteTemplatesTree(templatesTree);}});}
+function getUpdatedSiteTemplatesTreeFromServer(){ThemesEngine.getUpdatedSiteTemplatesTree({callback:function(templatesTree){try{updateSiteTemplatesTree(templatesTree);}catch(e){}}});}
 function updateSiteInfoBoxWithNewValues(){try{setActiveLanguage();getValues(null);}catch(e){};}
 function getPagePreviewInFrameUri(){var frameObject=window.frames['treePages'];if(frameObject==null){return null;}
 var frameWindow=frameObject.window;if(frameWindow==null){return null;}

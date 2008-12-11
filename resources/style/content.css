@@ -340,12 +340,13 @@ html>body .themesSlider {
 }
 
 .themeChooseStyle {
-	position: absolute;
+	position: fixed;
 	width: 147px;
 	height: 110px;
 	z-index: 9999;
 	clear: both;
 	margin-top: 40px;
+	bottom: 55px;
 }
 
 .themeChooseStyle .themesButtonContainer {
@@ -1386,13 +1387,15 @@ a#mb_close_link {
 }
 
 #themeTemplateChildrenContainer {
-	position: absolute;
+	position: fixed;
 	background: #fff;
 	margin-top: 42px;
 	margin-left: -30px !important;
 	width: 205px;
 	background: url(images/child-templates-bottom.png) left bottom no-repeat;
 	padding-bottom: 18px;
+	position: fixed;
+	bottom: 155px;
 }
 
 #themeTemplateChildrenContainer ul {
