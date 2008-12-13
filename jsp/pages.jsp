@@ -4,6 +4,7 @@
         xmlns:f="http://java.sun.com/jsf/core"
         xmlns:t="http://myfaces.apache.org/tomahawk"
         xmlns:wf="http://xmlns.idega.com/com.idega.webface"
+        xmlns:wf12="http://xmlns.idega.com/com.idega.webface12"
         xmlns:ws="http://xmlns.idega.com/com.idega.workspace"
  		xmlns:c="http://xmlns.idega.com/com.idega.content"
         xmlns:web2="http://xmlns.idega.com/com.idega.block.web2.0"
@@ -69,13 +70,13 @@ version="1.2">
 							<t:div id="sitemap" forceId="true" styleClass="element atStart">
 		 						<t:div id="site_tree_container" forceId="true">
 		 							<c:block_with_toolbar id="page_tree_div" addStartPageButton="true" styleClass="site_tree_container_site_accordion" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png">
-										<wf:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
+										<wf12:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 											<f:facet name="PageTreeNode">
 												<h:outputLink styleClass="pageTreeNames">
 													<h:outputText value="#{node.description}"/>
 												</h:outputLink>
 											</f:facet>
-										</wf:iwtree>
+										</wf12:iwtree>
 									</c:block_with_toolbar>
 								</t:div>			
 							</t:div>
@@ -122,7 +123,7 @@ version="1.2">
 							<t:outputText value="#{localizedStrings['com.idega.content']['page_types']}" styleClass="title"> </t:outputText>
 						</t:htmlTag>
 						<t:div id="pageTemplatesStretcher" forceId="true" styleClass="element templatesContainer">
-							<wf:iwtree value="#{siteTemplateBean.pageTree}" id="new_page_tree" var="node" varNodeToggler="t" clientSideToggle="true"	sourceTree="true"	showRootNode="false">
+							<wf12:iwtree value="#{siteTemplateBean.pageTree}" id="new_page_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 								<f:facet name="IWTreeNode">
 									<h:panelGroup>
 										<h:outputLink>
@@ -130,7 +131,7 @@ version="1.2">
 										</h:outputLink>
 									</h:panelGroup>
 								</f:facet>
-							</wf:iwtree>
+							</wf12:iwtree>
 						</t:div>
 					</t:div>
 				</t:div>
