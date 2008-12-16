@@ -123,7 +123,7 @@ version="1.2">
 							<t:outputText value="#{localizedStrings['com.idega.content']['page_types']}" styleClass="title"> </t:outputText>
 						</t:htmlTag>
 						<t:div id="pageTemplatesStretcher" forceId="true" styleClass="element templatesContainer">
-							<wf12:iwtree value="#{siteTemplateBean.pageTree}" id="new_page_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
+							<wf12:iwtree value="#{siteTemplateBean.pageTree}" id="new_page_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false" sourceTree="true">
 								<f:facet name="IWTreeNode">
 									<h:panelGroup>
 										<h:outputLink>
