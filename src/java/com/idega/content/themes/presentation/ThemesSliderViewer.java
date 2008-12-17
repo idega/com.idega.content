@@ -43,7 +43,7 @@ public class ThemesSliderViewer extends Block {
 		Layer leftScroller = new Layer();
 		leftScroller.setId("leftScrollerContainer");
 		leftScroller.setStyleClass("themeScroller");
-		leftScroller.add(getScrollImage(bundle.getVirtualPathWithFileNameString("images/left.gif"),
+		leftScroller.add(getScrollImage(bundle.getVirtualPathWithFileNameString("images/left.png"),
 				iwrb.getLocalizedString("scroll_left", "Scroll to left"), "leftScroller"));
 		container.add(leftScroller);
 		
@@ -62,7 +62,7 @@ public class ThemesSliderViewer extends Block {
 		Layer rightScroller = new Layer();
 		rightScroller.setId("rightScrollerContainer");
 		rightScroller.setStyleClass("themeScroller rightThemeScroller");
-		rightScroller.add(getScrollImage(bundle.getVirtualPathWithFileNameString("images/right.gif"),
+		rightScroller.add(getScrollImage(bundle.getVirtualPathWithFileNameString("images/right.png"),
 				iwrb.getLocalizedString("scroll_right", "Scroll to right"), "rightScroller"));
 		container.add(rightScroller);
 		
