@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.44 2008/11/13 07:12:58 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.45 2008/12/19 08:57:58 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 import com.idega.block.rss.business.RSSProducerRegistry;
 import com.idega.builder.business.BuilderLogicWrapper;
@@ -41,14 +41,15 @@ import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.slide.business.IWSlideService;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.data.Group;
+import com.idega.util.ListUtil;
 import com.idega.util.expression.ELUtil;
 
 /**
  * 
- *  Last modified: $Date: 2008/11/13 07:12:58 $ by $Author: valdas $
+ *  Last modified: $Date: 2008/12/19 08:57:58 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.44 $
+ * @version $Revision: 1.45 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	
@@ -161,12 +162,12 @@ public class IWBundleStarter implements IWBundleStartable{
 			closeInputStream(stream);
 		}
 		
-		Map <String, Setting> settings = helper.getThemeSettings();
-		if (settings == null) {
+		List<Setting> settings = helper.getThemeSettings();
+		if (ListUtil.isEmpty(settings)) {
 			return;
 		}
 		IWMainApplicationSettings applicationSettings = bundle.getApplication().getSettings();
-		for (Setting setting : settings.values()) {
+		for (Setting setting : settings) {
 			String key = ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + ThemesConstants.THEMES_PROPERTY_END;
 			if (applicationSettings.getProperty(key) == null) { // Not overriding existing values
 				applicationSettings.setProperty(key, setting.getDefaultValue());

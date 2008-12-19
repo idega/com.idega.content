@@ -65,6 +65,7 @@ import com.idega.slide.business.IWSlideService;
 import com.idega.user.data.GroupBMPBean;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
 
@@ -1012,7 +1013,7 @@ public class ThemesEngineBean implements ThemesEngine {
 	}
 	
 	public String[] getSiteInfoElements() {
-		Collection <Setting> c = helper.getThemeSettings().values();
+		Collection <Setting> c = helper.getThemeSettings();
 		if (c == null) {
 			return null;
 		}
@@ -1023,7 +1024,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		if (keywords == null || language == null) {
 			return null;
 		}
-		Collection <Setting> c = helper.getThemeSettings().values();
+		Collection <Setting> c = helper.getThemeSettings();
 		if (c == null) {
 			return null;
 		}
@@ -1041,11 +1042,11 @@ public class ThemesEngineBean implements ThemesEngine {
 		if (keyword == null || language == null || settings == null) {
 			return ThemesConstants.EMPTY;
 		}
-		keyword = ThemesConstants.THEMES_PROPERTY_START + keyword + CoreConstants.DOT + language;
-		if (keyword.indexOf(ThemesConstants.SYSTEM_SETTINGS) == -1) {
+		keyword = keyword.indexOf("_PAGE_URI") == -1 ? ThemesConstants.THEMES_PROPERTY_START + keyword + CoreConstants.DOT + language : keyword;
+		if (keyword.indexOf(ThemesConstants.SYSTEM_SETTINGS) == -1 && keyword.indexOf("_PAGE_URI") == -1) {
 			return settings.getProperty(keyword);
 		}
-		else {
+		else if (keyword.indexOf(ThemesConstants.SYSTEM_SETTINGS) != -1) {
 			//	System Settings
 			if (domain == null) {
 				IWContext iwc = CoreUtil.getIWContext();
@@ -1064,6 +1065,9 @@ public class ThemesEngineBean implements ThemesEngine {
 					return domain.getServerName();
 				}
 			}
+		} else if (keyword.indexOf("_PAGE_URI") != -1) {
+			String applicationProperty = settings.getProperty(keyword);
+			return StringUtil.isEmpty(applicationProperty) ? CoreConstants.EMPTY : applicationProperty;
 		}
 		return ThemesConstants.EMPTY;
 	}
@@ -1092,7 +1096,7 @@ public class ThemesEngineBean implements ThemesEngine {
 			return false;
 		}
 
-		if (keyword.indexOf(ThemesConstants.SYSTEM_SETTINGS) == -1) {
+		if (keyword.indexOf(ThemesConstants.SYSTEM_SETTINGS) == -1 && keyword.indexOf("_PAGE_URI") == -1) {
 			if (settings == null) {
 				return false;
 			}
@@ -1107,7 +1111,7 @@ public class ThemesEngineBean implements ThemesEngine {
 				settings.setProperty(ThemesConstants.THEMES_PROPERTY_START + keyword + language, value);
 			}
 		}
-		else {
+		else if (keyword.indexOf(ThemesConstants.SYSTEM_SETTINGS) != -1) {
 			//	Saving System Settings
 			if (cachedDomain == null) {
 				return false;
@@ -1127,6 +1131,17 @@ public class ThemesEngineBean implements ThemesEngine {
 					}
 					domain.store();
 				}
+			}
+		} else if (keyword.indexOf("_PAGE_URI") != -1) {
+			if (settings == null) {
+				return false;
+			}
+			
+			if (StringUtil.isEmpty(value)) {
+				settings.removeProperty(keyword);
+			}
+			else {
+				settings.setProperty(keyword, value);
 			}
 		}
 		

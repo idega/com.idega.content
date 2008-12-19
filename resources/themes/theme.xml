@@ -2,11 +2,11 @@
 
 <config>
 	<key>
-		<code>title</code>
-		<label>Title</label>
-		<defaultValue>My Page</defaultValue>
+		<code>mainDomainServerName</code>
+		<label>Domain name</label>
+		<defaultValue></defaultValue>
 		<type>text</type>
-		<method>setPageTitle</method>
+		<method></method>
 	</key>
 	<key>
 		<code>site_title</code>
@@ -23,11 +23,11 @@
 		<method>setSiteSlogan</method>
 	</key>
 	<key>
-		<code>content</code>
-		<label>Content</label>
+		<code>logo</code>
+		<label>Site logo</label>
 		<defaultValue></defaultValue>
 		<type>text</type>
-		<method>setContent</method>
+		<method>setSiteLogo</method>
 	</key>
 	<key>
 		<code>sidebar_title</code>
@@ -45,23 +45,23 @@
 	</key>
 	<key>
 		<code>mainDomainName</code>
-		<label>System Name</label>
+		<label>System name</label>
 		<defaultValue></defaultValue>
 		<type>text</type>
 		<method></method>
 	</key>
 	<key>
-		<code>mainDomainServerName</code>
-		<label>Domain Name</label>
+		<code>403_PAGE_URI</code>
+		<label>403 (unauthorized) page URI</label>
 		<defaultValue></defaultValue>
 		<type>text</type>
 		<method></method>
 	</key>
 	<key>
-		<code>logo</code>
-		<label>Site Logo</label>
+		<code>404_PAGE_URI</code>
+		<label>404 (not found) page URI</label>
 		<defaultValue></defaultValue>
 		<type>text</type>
-		<method>setSiteLogo</method>
+		<method></method>
 	</key>
 </config>

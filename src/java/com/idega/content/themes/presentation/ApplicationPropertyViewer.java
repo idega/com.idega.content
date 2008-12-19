@@ -4,8 +4,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import javax.faces.context.FacesContext;
 
 import com.idega.block.web2.business.Web2Business;
@@ -23,6 +21,7 @@ import com.idega.presentation.Image;
 import com.idega.presentation.PresentationObject;
 import com.idega.presentation.text.Text;
 import com.idega.util.CoreConstants;
+import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
 import com.idega.webface.WFUtil;
@@ -166,8 +165,8 @@ public class ApplicationPropertyViewer extends Block {
 		
 		String property = ThemesHelper.getInstance().extractValueFromString(key, key.indexOf(CoreConstants.DOT) + 1, key.lastIndexOf(CoreConstants.DOT));
 		
-		Map<String, Setting> settings = ThemesHelper.getInstance().getThemeSettings();
-		Setting s = settings.get(settingKey);
+		List<Setting> settings = ThemesHelper.getInstance().getThemeSettings();
+		Setting s = getSetting(settings, settingKey);
 		String title = ContentConstants.EMPTY;
 		if (s != null) {
 			title = s.getLabel();
@@ -186,7 +185,21 @@ public class ApplicationPropertyViewer extends Block {
 		component.setStyleClass(STYLE_CLASS);
 		
 		String localizedText = iwrb.getLocalizedString("double_click_to_edit", "Double click to edit");
-		component.setToolTip(new StringBuffer(title).append(": ").append(localizedText).toString());
+		component.setTitle(new StringBuffer(title).append(": ").append(localizedText).toString());
+	}
+	
+	private Setting getSetting(List<Setting> settings, String key) {
+		if (ListUtil.isEmpty(settings) || StringUtil.isEmpty(key)) {
+			return null;
+		}
+		
+		for (Setting setting: settings) {
+			if (key.equals(setting.getCode())) {
+				return setting;
+			}
+		}
+		
+		return null;
 	}
 	
 	@Override

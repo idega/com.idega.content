@@ -52,7 +52,7 @@ function getSiteInfoValuesCallback(values) {
 	
 	var element = null;
 	for (var i = 0; i < SITE_INFO_KEYWORDS.length; i++) {
-		element = document.getElementById(SITE_INFO_KEYWORDS[i]);
+		element = document.getElementById('id' + SITE_INFO_KEYWORDS[i]);
 		if (element != null) {
 			element.value = values[i];
 		}
@@ -107,7 +107,7 @@ function proceedSaving(keywords) {
 	var values = new Array();
 	var element = null;
 	for (var i = 0; i < SITE_INFO_KEYWORDS.length; i++) {
-		element = document.getElementById(SITE_INFO_KEYWORDS[i]);
+		element = document.getElementById('id' + SITE_INFO_KEYWORDS[i]);
 		if (element != null) {
 			values.push(element.value);
 			if (SITE_INFO_KEYWORDS[i] == 'mainDomainName') {

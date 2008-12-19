@@ -25,7 +25,7 @@ public class SiteInfoJsf extends SiteInfo {
 		}
 		
 		WFTitlebar bar = new WFTitlebar();
-		bar.addTitleText(ContentUtil.getBundle().getLocalizedText("site_info"));
+		bar.addTitleText(ContentUtil.getBundle().getLocalizedString("site_info", "Site Info"));
 		siteInfo.setTitlebar(bar);
 		
 		DropdownMenu locales = getLocales(iwc, false, "getValues(this)");
@@ -35,7 +35,7 @@ public class SiteInfoJsf extends SiteInfo {
 		
 		Layer formItem = new Layer();
 		formItem.setStyleClass("webfaceFormItem");
-		formItem.add(getLabel(ContentUtil.getBundle().getLocalizedString("locale"), locales));
+		formItem.add(getLabel(ContentUtil.getBundle().getLocalizedString("site_info.locale", "Locale"), locales));
 		formItem.add(locales);
 		siteInfo.getChildren().add(formItem);
 		
@@ -43,7 +43,7 @@ public class SiteInfoJsf extends SiteInfo {
 		buttonLayer.setStyleClass("webfaceButtonLayer");
 		siteInfo.getChildren().add(buttonLayer);
 
-		GenericButton save = new GenericButton(ContentUtil.getBundle().getLocalizedString("save"));
+		GenericButton save = new GenericButton(ContentUtil.getBundle().getLocalizedString("save", "Save"));
 		save.setStyleClass("button");
 		save.setId("saveSiteInfoButton");
 		save.setOnClick("saveSiteInfo()");
@@ -51,7 +51,7 @@ public class SiteInfoJsf extends SiteInfo {
 		
 		add(siteInfo);
 		
-		doBusiness(iwc, ThemesHelper.getInstance().getThemeSettings().values());
+		doBusiness(iwc, ThemesHelper.getInstance().getThemeSettings());
 	}
 
 	@Override

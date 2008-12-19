@@ -1,7 +1,5 @@
 package com.idega.content.themes.presentation;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.faces.component.UIComponent;
@@ -13,6 +11,7 @@ import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.localisation.business.ICLocaleBusiness;
+import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
@@ -61,8 +60,7 @@ public class SiteInfo extends Block {
 	}
 	
 	protected void createContents(UIComponent layer, IWContext iwc, boolean boldText, boolean addKeyPressAction) {
-		Setting setting = null;
-		List <Setting> settings = new ArrayList <Setting> (ThemesHelper.getInstance().getThemeSettings().values());
+		List<Setting> settings = ThemesHelper.getInstance().getThemeSettings();
 		if (settings == null) {
 			return;
 		}
@@ -75,22 +73,23 @@ public class SiteInfo extends Block {
 			return;
 		}
 		
+		IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
 		ICDomain domain = iwc.getIWMainApplication().getIWApplicationContext().getDomain();
 		String keyPressAction = "return saveSiteInfoWithEnter(event)";
-		for (int i = 0; i < settings.size(); i++) {
-			setting = settings.get(i);
-			
+		for (Setting setting: settings) {
 			Layer formItem = new Layer();
 			formItem.setStyleClass("webfaceFormItem");
 			if (TYPE_TEXT.equals(setting.getType())) {
-				TextInput regionValue = new TextInput(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + CoreConstants.DOT + REGION_VALUE);
+				TextInput regionValue = new TextInput(new StringBuilder(ThemesConstants.THEMES_PROPERTY_START).append(setting.getCode()).append(CoreConstants.DOT)
+														.append(REGION_VALUE).toString());
 				if (addKeyPressAction) {
 					regionValue.setOnKeyPress(keyPressAction);
 				}
-				regionValue.setId(setting.getCode());
+				regionValue.setId(new StringBuilder("id").append(setting.getCode()).toString());
 				regionValue.setValue(engine.getSiteInfoValue(setting.getCode(), locale, iwc.getApplicationSettings(), domain));
 				
-				formItem.add(getLabel(setting.getLabel(), regionValue));
+				formItem.add(getLabel(iwrb.getLocalizedString(new StringBuilder("site_info.").append(setting.getCode()).toString(), setting.getLabel()),
+																															regionValue));
 				formItem.add(regionValue);
 				layer.getChildren().add(formItem);
 			}
@@ -107,14 +106,14 @@ public class SiteInfo extends Block {
 		layer.setStyleClass("webfaceFormSection");
 		form.add(layer);
 		
-		doBusiness(iwc, ThemesHelper.getInstance().getThemeSettings().values());
+		doBusiness(iwc, ThemesHelper.getInstance().getThemeSettings());
 		
 		DropdownMenu locales = getLocales(iwc, true, null);
 		createContents(layer, iwc, true, false);
 		
 		Layer formItem = new Layer();
 		formItem.setStyleClass("webfaceFormItem");
-		formItem.add(getLabel(ContentUtil.getBundle().getLocalizedString("locale"), locales));
+		formItem.add(getLabel(ContentUtil.getBundle().getLocalizedString("site_info.locale", "Locale"), locales));
 		formItem.add(locales);
 		layer.add(formItem);
 		
@@ -122,7 +121,7 @@ public class SiteInfo extends Block {
 		buttonLayer.setStyleClass("webfaceButtonLayer");
 		form.add(buttonLayer);
 
-		SubmitButton save = new SubmitButton(ContentUtil.getBundle().getLocalizedString("save"), SAVE_PARAMETER, SAVE_ACTION);
+		SubmitButton save = new SubmitButton(ContentUtil.getBundle().getLocalizedString("save", "Save"), SAVE_PARAMETER, SAVE_ACTION);
 		save.setStyleClass("button");
 		save.setID(SAVE_ACTION);
 		buttonLayer.add(save);
@@ -130,23 +129,22 @@ public class SiteInfo extends Block {
 		add(form);
 	}
 	
-	protected void doBusiness(IWContext iwc, Collection <Setting> c) {
+	protected void doBusiness(IWContext iwc, List <Setting> settings) {
 		if (!SAVE_ACTION.equals(iwc.getParameter(SAVE_PARAMETER))) {
 			return;
 		}
-		if (locale == null || c == null) {
+		if (locale == null || settings == null) {
 			return;
 		}
 		
 		Setting setting = null;
-		List <Setting> l = new ArrayList <Setting> (c);
-		String[] keywords = new String[l.size()];
-		String[] values = new String[l.size()];
-		for (int i = 0; i < l.size(); i++) {
-			setting = l.get(i);
+		String[] keywords = new String[settings.size()];
+		String[] values = new String[settings.size()];
+		for (int i = 0; i < settings.size(); i++) {
+			setting = settings.get(i);
 			keywords[i] = setting.getCode();
-			values[i] = iwc.getParameter(ThemesConstants.THEMES_PROPERTY_START + setting.getCode() + CoreConstants.DOT +
-					REGION_VALUE);
+			values[i] = iwc.getParameter(new StringBuilder(ThemesConstants.THEMES_PROPERTY_START).append(setting.getCode()).append(CoreConstants.DOT)
+											.append(REGION_VALUE).toString());
 		}
 		
 		try {

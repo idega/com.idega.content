@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -96,8 +95,8 @@ public class ThemesHelper implements Singleton {
 	private ThemesEngine themesEngine = null;
 	
 	private Map<String, Theme> themes = null;
-	private Map<String, Setting> themeSettings = null;
 	private Map<String, Setting> pageSettings = null;
+	private List<Setting> themeSettings = null;
 	private List<String> moduleIds = null;
 	private List<String> themeQueue = null;
 	private List<String> urisToThemes = null;
@@ -127,7 +126,7 @@ public class ThemesHelper implements Singleton {
 		themes = new HashMap <String, Theme> ();
 		pageSettings = new HashMap <String, Setting> ();
 		
-		themeSettings = Collections.synchronizedMap(new TreeMap<String, Setting>());
+		themeSettings = Collections.synchronizedList(new ArrayList<Setting>());
 		
 		themeQueue = new ArrayList <String> ();
 		urisToThemes = new ArrayList <String> ();
@@ -641,7 +640,7 @@ public class ThemesHelper implements Singleton {
 		return themes;
 	}
 	
-	public Map <String, Setting> getThemeSettings() {
+	public List<Setting> getThemeSettings() {
 		return themeSettings;
 	}
 	
@@ -655,7 +654,7 @@ public class ThemesHelper implements Singleton {
 		}
 		
 		try {
-			loadSettings(themeSettings, getXMLDocument(stream));
+			loadSettings(null, themeSettings, getXMLDocument(stream));
 			loadedThemeSettings = true;
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -667,12 +666,12 @@ public class ThemesHelper implements Singleton {
 		if (loadedPageSettings) {
 			return;
 		}
-		loadSettings(pageSettings, getXMLDocument(url));
+		loadSettings(pageSettings, null, getXMLDocument(url));
 		loadedPageSettings = true;
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void loadSettings(Map <String, Setting> settings, Document doc) {
+	private void loadSettings(Map<String, Setting> settingsInMap, List<Setting> settingsInList, Document doc) {
 		if (doc == null) {
 			return;
 		}
@@ -696,7 +695,12 @@ public class ThemesHelper implements Singleton {
 			setting.setType(key.getChildTextNormalize(ThemesConstants.SETTING_TYPE));
 			setting.setMethod(key.getChildTextNormalize(ThemesConstants.SETTING_METHOD));
 			
-			settings.put(setting.getCode(), setting);
+			if (settingsInList == null) {
+				settingsInMap.put(setting.getCode(), setting);
+			}
+			else {
+				settingsInList.add(setting);
+			}
 		}
 	}
 
