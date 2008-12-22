@@ -62,9 +62,9 @@ public class LucidEngineImpl implements LucidEngine {
 		
 		//	Helpers
 		IWBundle bundle = ContentUtil.getBundle();
-		js.append(bundle.getVirtualPathWithFileNameString("javascript/drag-drop-folder-tree-compressed.js")).append(CoreConstants.COMMA);
-		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesHelper-compressed.js")).append(CoreConstants.COMMA);
-		js.append(bundle.getVirtualPathWithFileNameString("javascript/LucidHelper-compressed.js")).append(CoreConstants.COMMA);
+		js.append(bundle.getVirtualPathWithFileNameString("javascript/drag-drop-folder-tree.js")).append(CoreConstants.COMMA);
+		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesHelper.js")).append(CoreConstants.COMMA);
+		js.append(bundle.getVirtualPathWithFileNameString("javascript/LucidHelper.js")).append(CoreConstants.COMMA);
 		js.append(bundle.getVirtualPathWithFileNameString("javascript/tree.js")).append(CoreConstants.COMMA);
 		js.append(bundle.getVirtualPathWithFileNameString("javascript/SiteManagerHelper.js"));
 		
@@ -92,9 +92,9 @@ public class LucidEngineImpl implements LucidEngine {
 		
 		//	Helpers
 		IWBundle bundle = ContentUtil.getBundle();
-		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesManagerHelper-compressed.js")).append(CoreConstants.COMMA);
-		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesSliderHelper-compressed.js")).append(CoreConstants.COMMA);
-		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesHelper-compressed.js"));
+		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesManagerHelper.js")).append(CoreConstants.COMMA);
+		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesSliderHelper.js")).append(CoreConstants.COMMA);
+		js.append(bundle.getVirtualPathWithFileNameString("javascript/ThemesHelper.js"));
 		
 		return js.toString();
 	}
