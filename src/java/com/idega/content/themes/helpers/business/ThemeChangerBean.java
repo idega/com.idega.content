@@ -51,6 +51,8 @@ import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
+import com.idega.util.resources.ResourceScanner;
 
 @Scope("singleton")
 @Service(ThemeChanger.SPRING_BEAN_IDENTIFIER)
@@ -554,7 +556,10 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		InputStreamReader isr = new InputStreamReader(is);
 		BufferedReader buf = new BufferedReader(isr);
-		CssScanner scanner = new CssScanner(buf, linkToTheme);
+		ResourceScanner scanner = ELUtil.getInstance().getBean(CssScanner.SPRING_BEAN_IDENTIFIER);
+		scanner.setReaderBuffer(buf);
+		scanner.setLinkToTheme(linkToTheme);
+		scanner.scanFile();
 		
 		helper.closeInputStream(is);
 		helper.closeInputStreamReader(isr);

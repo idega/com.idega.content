@@ -4,18 +4,31 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.httpclient.URIException;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 
 import com.idega.content.business.ContentConstants;
+import com.idega.servlet.filter.IWBundleResourceFilter;
+import com.idega.util.ArrayUtil;
 import com.idega.util.CoreConstants;
+import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
+import com.idega.util.StringUtil;
+import com.idega.util.resources.ResourceScanner;
 
-public class CssScanner {
+@Scope("session")
+@Service(CssScanner.SPRING_BEAN_IDENTIFIER)
+public class CssScanner implements ResourceScanner {
 	
-	private static Logger log = Logger.getLogger(CssScanner.class.getName());
+	private static final long serialVersionUID = -694282023660051365L;
+	private static Logger LOGGER = Logger.getLogger(CssScanner.class.getName());
+	
+	public static final String SPRING_BEAN_IDENTIFIER = "cssScanner";
 	
 	private BufferedReader readerBuffer = null;
 	private StringBuffer resultBuffer = null;
@@ -30,18 +43,12 @@ public class CssScanner {
 	private static final String COLOR_STRING = "color";
 	private static final String COMMENT_BEGIN = "/*";
 	private static final String COMMENT_END = "*/";
+	private static final String DIRECTORY_LEVEL_UP = "../";
 	private static final String OPENER = "{";
 	private static final String CLOSER = "}";
 	private static final String UTF_8_DECLARATION = "@charset \"UTF-8\";";
 	
-	public CssScanner(BufferedReader readerBuffer, String linkToTheme) {
-		this.readerBuffer = readerBuffer;
-		this.linkToTheme = linkToTheme;
-		
-		scanFile();
-	}
-	
-	protected void scanFile() {
+	public void scanFile() {
 		if (readerBuffer == null) {
 			return;
 		}
@@ -64,7 +71,15 @@ public class CssScanner {
 			return;
 		}
 	}
-	
+
+	public void setReaderBuffer(BufferedReader readerBuffer) {
+		this.readerBuffer = readerBuffer;
+	}
+
+	public void setLinkToTheme(String linkToTheme) {
+		this.linkToTheme = linkToTheme;
+	}
+
 	private boolean canUseURL(String line) {
 		boolean urlElementExists = true;
 		
@@ -85,7 +100,7 @@ public class CssScanner {
 			int start = urlValueInCss.indexOf(ContentConstants.BRACKET_OPENING);
 			int end = urlValueInCss.lastIndexOf(ContentConstants.BRACKET_CLOSING);
 			urlValueInCss = urlValueInCss.substring(start + 1, end);
-			urlValueInCss = StringHandler.replace(urlValueInCss, "../", ThemesConstants.EMPTY);
+			urlValueInCss = StringHandler.replace(urlValueInCss, DIRECTORY_LEVEL_UP, ThemesConstants.EMPTY);
 			urlValueInCss = StringHandler.replace(urlValueInCss, "'", CoreConstants.EMPTY);
 			urlValueInCss = StringHandler.replace(urlValueInCss, "\"", CoreConstants.EMPTY);
 			
@@ -111,7 +126,7 @@ public class CssScanner {
 		}
 		
 		if (!urlElementExists) {
-			log.log(Level.WARNING, "File '" + path + "' does not exist in Theme's pack! Removing CSS expression: " + line);
+			LOGGER.log(Level.WARNING, "File '" + path + "' does not exist in Theme's pack! Removing CSS expression: " + line);
 		}
 		return urlElementExists;
 	}
@@ -238,12 +253,84 @@ public class CssScanner {
 		return line;
 	}
 
-	protected StringBuffer getResultBuffer() {
+	public StringBuffer getResultBuffer() {
 		return resultBuffer;
 	}
 
-	protected boolean isNeedToReplace() {
+	public boolean isNeedToReplace() {
 		return needToReplace;
+	}
+
+	public String getParsedContent(List<String> contentLines, String fileUri) {
+		if (ListUtil.isEmpty(contentLines) || StringUtil.isEmpty(fileUri)) {
+			return null;
+		}
+		
+		String parsedLine = null;
+		StringBuilder parsedContent = new StringBuilder();
+		for (String line: contentLines) {
+			parsedLine = getParsedLine(line, fileUri);
+			parsedContent.append("\n").append(parsedLine);
+		}
+		
+		return parsedContent.toString();
+	}
+	
+	private String getParsedLine(String line, String fileUri) {
+		String urlExpressionStart = "url(";
+		if (line.indexOf(urlExpressionStart) == -1) {
+			return line;
+		}
+		if (line.indexOf(COMMENT_BEGIN) != -1 || line.indexOf(COMMENT_END) != -1) {
+			return line;
+		}
+		if (line.indexOf(IWBundleResourceFilter.BUNDLES_STANDARD_DIR) != -1) {
+			return line;
+		}
+		
+		line = line.replaceAll(CoreConstants.QOUTE_SINGLE_MARK, CoreConstants.EMPTY);
+		line = line.replaceAll(CoreConstants.QOUTE_MARK, CoreConstants.EMPTY);
+		
+		int startIndex = line.indexOf(urlExpressionStart);
+		int endIndex = line.indexOf(")");
+		String urlExpression = line.substring(startIndex + urlExpressionStart.length(), endIndex);
+		String originalExpression = urlExpression;
+		
+		String urlReplacement = null;
+		
+		int levelsUp = 0;
+		if (urlExpression.startsWith(DIRECTORY_LEVEL_UP)) {
+			while (urlExpression.indexOf(DIRECTORY_LEVEL_UP) != -1) {
+				urlExpression = urlExpression.replaceFirst(DIRECTORY_LEVEL_UP, CoreConstants.EMPTY);
+				levelsUp++;
+			}
+		}
+		
+		if (levelsUp == 0) {
+			urlReplacement = new StringBuilder(fileUri).append(urlExpression).toString();
+		}
+		else {
+			String[] resourceParts = fileUri.split(CoreConstants.SLASH);
+			if (ArrayUtil.isEmpty(resourceParts)) {
+				return line;
+			}
+			
+			StringBuilder newUrlExpression = new StringBuilder();
+			for (int i = 0; i < (resourceParts.length - levelsUp); i++) {
+				if (!StringUtil.isEmpty(resourceParts[i])) {
+					newUrlExpression.append(CoreConstants.SLASH).append(resourceParts[i]);
+				}
+			}
+			
+			urlReplacement = newUrlExpression.append(CoreConstants.SLASH).append(urlExpression).toString();
+		}
+		
+		if (StringUtil.isEmpty(urlReplacement)) {
+			return line;
+		}
+		
+		line = line.replace(originalExpression, urlReplacement);
+		return line;
 	}
 
 }
