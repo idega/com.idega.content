@@ -923,7 +923,6 @@ function existThemeChange(themeId, styleGroupName, variation, radio, enabled) {
 }
 
 function initializeThemes() {
-	insertStyleFile();
 	initScript(false, true, true);
 	resizeThemesContentContainer();
 	getThemes(null, true, true);

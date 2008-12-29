@@ -105,7 +105,8 @@ public class LucidEngineImpl implements LucidEngine {
 	
 	public String getStyleSheetResourcesForThemes() {
 		return new StringBuilder(ContentUtil.getBundle().getVirtualPathWithFileNameString("style/content.css")).append(CoreConstants.COMMA)
-					.append(web2.getBundleUriToMooRainbowStyle())
+								.append(web2.getBundleUriToMooRainbowStyle()).append(CoreConstants.COMMA)
+								.append(ContentUtil.getBundle().getVirtualPathWithFileNameString("style/themes_manager.css"))
 				.toString();
 	}
 
