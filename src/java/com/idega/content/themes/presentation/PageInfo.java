@@ -59,7 +59,7 @@ public class PageInfo extends ContentBlock {
 			container.setStyleClass("webfaceFormItem");
 			
 			Label label = new Label();
-			label.setLabel(iwrb.getLocalizedString(s.getCode(), s.getLabel()));
+			label.setLabel(iwrb.getLocalizedString(new StringBuilder("page_info.").append(s.getCode()).toString(), s.getLabel()));
 			container.add(label);
 			
 			if (ContentConstants.BOOLEAN_TYPE.equals(s.getType())) {
@@ -70,11 +70,11 @@ public class PageInfo extends ContentBlock {
 				buttons.add(hiddenInput);
 				
 				RadioButton yes = getRadioButton(Boolean.TRUE.toString(), s.getCode(), enableInput);
-				Label yesLabel = new Label(iwrb.getLocalizedString("yes", "Yes"), yes);
+				Label yesLabel = new Label(iwrb.getLocalizedString("page_info.yes", "Yes"), yes);
 				yesLabel.setStyleAttribute("width", "20px");
 				
 				RadioButton no = getRadioButton(Boolean.FALSE.toString(), s.getCode(), enableInput);
-				Label noLabel = new Label(iwrb.getLocalizedString("no", "No"), no);
+				Label noLabel = new Label(iwrb.getLocalizedString("page_info.no", "No"), no);
 				noLabel.setStyleAttribute("width", "20px");
 				
 				buttons.add(yesLabel);
@@ -102,7 +102,7 @@ public class PageInfo extends ContentBlock {
 		Layer buttonContainer = new Layer();
 		buttonContainer.setStyleClass("webfaceButtonLayer");
 		
-		GenericButton save = new GenericButton("saveButton", ContentUtil.getBundle().getLocalizedString("save"));
+		GenericButton save = new GenericButton("saveButton", iwrb.getLocalizedString("save", "Save"));
 		save.setInputType("button");
 		save.setId("saveButton");
 		save.setStyleClass("saveButtonStyleClass");
