@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.46 2008/02/28 14:30:13 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.47 2009/01/06 15:17:24 tryggvil Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -12,14 +12,23 @@ package com.idega.content.bean;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
+import javax.jcr.Node;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.Property;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.jcr.ValueFormatException;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.util.WebdavStatus;
@@ -31,6 +40,7 @@ import com.idega.content.business.ContentItemHelper;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.core.accesscontrol.business.StandardRoles;
+import com.idega.core.content.RepositoryHelper;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
@@ -39,6 +49,7 @@ import com.idega.slide.util.IWSlideConstants;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
+import com.idega.util.expression.ELUtil;
 import com.sun.syndication.io.impl.DateParser;
 
 /**
@@ -46,12 +57,26 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2008/02/28 14:30:13 $ by $Author: valdas $
+ *  Last modified: $Date: 2009/01/06 15:17:24 $ by $Author: tryggvil $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.46 $
+ * @version $Revision: 1.47 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
+	
+    public static final String DISPLAYNAME = "displayname";
+    public static final String GETCONTENTLANGUAGE = "getcontentlanguage";
+    public static final String GETCONTENTLENGTH = "getcontentlength";
+    public static final String GETLASTMODIFIED = "getlastmodified";
+    public static final String CREATIONDATE = "creationdate";
+    public static final String RESOURCETYPE = "resourcetype";
+    public static final String SOURCE = "source";
+    public static final String GETCONTENTTYPE = "getcontenttype";
+    public static final String GETETAG = "getetag";
+    public static final String ISHIDDEN = "ishidden";
+    public static final String ISCOLLECTION = "iscollection";
+    public static final String SUPPORTEDLOCK = "supportedlock";
+    public static final String LOCKDISCOVERY = "lockdiscovery";
 	
 	private Locale _locale = null;
 	private String _name = null;
@@ -86,10 +111,12 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	
 	private List versions;
 	
-	private String webDavResourceCategories = null; // This string is parsed from WebDavResource
+	private String categories = null; // This string is parsed from WebDavResource
 	
 	private boolean setPublishedDateByDefault = false;
-	
+	//private boolean persistToWebDav=false;
+	//private boolean persistToJCR=true;
+	private Session session;
 	/**
 	 * Default constructor.
 	 */
@@ -323,6 +350,20 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 //		System.out.print("["+this.toString()+"]:");
 //		System.out.println("Attempting to load path "+path);
 		clear();
+		boolean returner = false;
+		if(isPersistToWebDav()){
+			returner = loadFromWebDav(path);
+		}
+		else if(isPersistToJCR()){
+			returner = loadFromJCR(path);
+		}
+		return returner;
+
+	}
+
+
+	protected boolean loadFromWebDav(String path) throws IOException,
+			RemoteException, HttpException {
 		IWUserContext iwuc = IWContext.getInstance();
 		boolean returner = true;
 		try {
@@ -372,10 +413,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 			}
 		}
 		return returner;
-
 	}
-	
-	
 
 	/**
 	 * @param webdavResource
@@ -384,7 +422,99 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	protected boolean load(WebdavExtendedResource webdavResource) throws IOException {
 		return true;
 	}
+	
+	protected boolean loadFromJCR(String path) throws IOException,
+	RemoteException, HttpException {
+		//IWContext iwc = IWContext.getInstance();
+		boolean returner = true;
+		try {
+			//IWSlideSession session = getIWSlideSession(iwuc);
+			Session session = getSession();
+			Node folderNode = session.getRootNode().getNode(path);
+			
+			//WebdavExtendedResource webdavResource = session.getWebdavResource(path);
+			//webdavResource.setProperties();
+			
+			//here I don't use the varible 'path' since it can actually be the URI
+			setResourcePath(folderNode.getPath());
+			Property displayNameProp = folderNode.getProperty(DISPLAYNAME);
+			if(displayNameProp!=null){
+				setName(displayNameProp.getValue().getString());
+			}
+			
+			//String versionName = webdavResource.getVersionName();
+			/*List versions = VersionHelper.getAllVersions(webdavResource);
+			if(versions!=null){
+				setVersions(versions);
+				String latestVersion = VersionHelper.getLatestVersionName(versions);
+				setVersionName(latestVersion);
+			}*/
+			
+			Property createDateProp = folderNode.getProperty(CREATIONDATE);
+			if(createDateProp!=null){
+				try{
+					Calendar creationDate = createDateProp.getDate();
+					//String sCreateDate = createDateProp.getValue().getString();
+					setCreationDate(new IWTimestamp((GregorianCalendar)creationDate).getTimestamp());
+				}
+				catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+			
+			Property lastmodifiedProp = folderNode.getProperty(GETLASTMODIFIED);
+			if(lastmodifiedProp!=null){
+				//long lLastmodified = Long.parseLong(lastmodifiedProp.getValue().getString());
+				try{
+					//long lLastmodified = lastmodifiedProp.getValue().getLong();
+					//IWTimestamp lastModified = new IWTimestamp(lLastmodified);
+					//setLastModifiedDate(lastModified.getTimestamp());
+					Calendar creationDate = lastmodifiedProp.getDate();
+					//String sCreateDate = createDateProp.getValue().getString();
+					setLastModifiedDate(new IWTimestamp((GregorianCalendar)creationDate).getTimestamp());
+				}
+				catch(ValueFormatException vfe){
+					vfe.printStackTrace();
+				}
+			}
+			
+			try{
+				Property categoriesProp = folderNode.getProperty(IWSlideConstants.PROPERTYNAME_CATEGORY);
+				if(categoriesProp!=null){
+					String categories = categoriesProp.getValue().getString();
+					setCategories(categories);
+				}
+			}
+			catch(PathNotFoundException pnfe){}
+			
+			returner = load(folderNode);
+			setExists(true);
+		//	System.out.print("["+this.toString()+"]:");
+		//	System.out.println("Load "+((returner)?"":"not")+" successful of path "+path);
+		} catch(PathNotFoundException e) {
+			//if(e.getReasonCode()==WebdavStatus.SC_NOT_FOUND) {
+				/*if(isAutoCreateResource()){
+					//in this case ignore the error message that it isn't fount
+					return true;
+				}
+				else{*/
+					setRendered(false);
+					return false;
+				//}
+			//} else {
+			//	throw e;
+			//}
+		} catch (RepositoryException e) {
+			e.printStackTrace();
+			setRendered(false);
+			return false;
+		}
+		return returner;
+	}
 
+	protected boolean load(Node folderNode) throws IOException, RepositoryException{
+		return true;
+	}
 	
 	protected IWSlideSession getIWSlideSession(IWUserContext iwuc){
 		IWSlideSession session=null;
@@ -555,19 +685,61 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		}
 	}
 	
+	protected Node getNode(){
+		String resourcePath = getResourcePath();
+		try {
+			return getSession().getRootNode().getNode(resourcePath);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public Session getSession() throws RepositoryException{
+		if(session==null){
+			IWContext iwc = IWContext.getInstance();
+			Session session = iwc.getRepositorySession();
+			return session;
+		}
+		else{
+			return session;
+		}
+	}
+	
+	public void setSession(Session session){
+		this.session=session;
+	}
+	
 
 	public void delete(){
 		try {
 			String resourcePath = getResourcePath();
-			WebdavExtendedResource webdavResource = getWebdavResource();
-			webdavResource.deleteMethod();
-			webdavResource.close();
-			clear();
+			if(isPersistToWebDav()){
+				deleteFromWebDav(resourcePath);
+			}
+			else if(isPersistToJCR()){
+				deleteFromJCR(resourcePath);
+			}
 			System.out.println("Deleted: "+resourcePath+" successfully");
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+
+	private void deleteFromWebDav(String resourcePath) throws HttpException, IOException {
+		WebdavExtendedResource webdavResource = getWebdavResource();
+		webdavResource.deleteMethod();
+		webdavResource.close();
+		clear();
+	}
+	
+	private void deleteFromJCR(String resourcePath) throws Exception {
+		Node folderNode = getNode();
+		folderNode.remove();
+		clear();
+		getSession().save();
 	}
 
 
@@ -590,17 +762,21 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	
 	public void setWebDavResourceCategories(Enumeration webDavResourceCategories) {
 		if (webDavResourceCategories == null) {
-			this.webDavResourceCategories = null;
+			setCategories(null);
 		}
 		StringBuffer categories = new StringBuffer();
 		while (webDavResourceCategories.hasMoreElements()) {
 			categories.append(webDavResourceCategories.nextElement());
 		}
-		this.webDavResourceCategories = categories.toString();
+		setCategories(categories.toString());
 	}
 
-	public String getWebDavResourceCategories() {
-		return webDavResourceCategories;
+	public String getCategoriesString() {
+		return this.categories;
+	}
+	
+	public void setCategories(String categories){
+		this.categories=categories;
 	}
 	
 	/**
@@ -655,8 +831,21 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		description = getFixedDescription(description);
 		
 		ContentItemFeedBean feedBean = new ContentItemFeedBean(iwc, ContentItemFeedBean.FEED_TYPE_ATOM_1);
+		return getFeedEntryAsXML(feedTitle, feedDescription, title,
+				description, body, author, categories, source, comment,
+				linkToComments, published, updated, server, articleURL.toString(),
+				creatorId, feedBean);
+	}
+
+
+	public String getFeedEntryAsXML(String feedTitle, String feedDescription,
+			String title, String description, String body, String author,
+			List<String> categories, String source, String comment,
+			String linkToComments, Timestamp published, Timestamp updated,
+			String server, String articleURL, String creatorId,
+			ContentItemFeedBean feedBean) {
 		return feedBean.getFeedEntryAsXML(feedTitle, server, feedDescription, title, updated, published, description,
-				body, author, getLanguage(), categories, articleURL.toString(), source, comment, linkToComments, creatorId);
+				body, author, getLanguage(), categories, articleURL, source, comment, linkToComments, creatorId);
 	}
 	
 	private String getFixedDescription(String description) {
@@ -737,5 +926,32 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	public void setSetPublishedDateByDefault(boolean setPublishedDateByDefault) {
 		this.setPublishedDateByDefault = setPublishedDateByDefault;
 	}
+
+
+	/*public void setPersistToWebDav(boolean persistToWebDav) {
+		this.persistToWebDav = persistToWebDav;
+	}*/
+
+
+	public boolean isPersistToWebDav() {
+		return getContentRepositoryMode().isPersistToWebDav();
+	}
+
+
+	/*public void setPersistToJCR(boolean persistToJCR) {
+		this.persistToJCR = persistToJCR;
+	}*/
+
+
+	public boolean isPersistToJCR() {
+		return getContentRepositoryMode().isPersistToJCR();
+	}
 	
+	public RepositoryHelper getRepositoryHelper() {
+		return (RepositoryHelper)ELUtil.getInstance().getBean(RepositoryHelper.SPRING_BEAN_IDENTIFIER);
+	}
+
+	public ContentRepositoryMode getContentRepositoryMode(){
+		return (ContentRepositoryMode)ELUtil.getInstance().getBean(ContentRepositoryMode.SPRING_BEAN_IDENTIFIER);
+	}
 }

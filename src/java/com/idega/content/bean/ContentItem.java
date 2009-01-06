@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItem.java,v 1.6 2006/01/04 14:33:52 tryggvil Exp $
+ * $Id: ContentItem.java,v 1.7 2009/01/06 15:17:24 tryggvil Exp $
  * Created on 28.1.2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -16,12 +16,12 @@ import java.util.Locale;
 /**
  *  <p>
  *  Class which is a general interface for working with 'Content Items'.<br/>
- *  Content Items are pieces of content stored as files or resources in the WebDav repository.
+ *  Content Items are pieces of content stored as files or resources in the Content (WebDav/JCR) repository.
  *  </p>
- *  Last modified: $Date: 2006/01/04 14:33:52 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2009/01/06 15:17:24 $ by $Author: tryggvil $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public interface ContentItem {
 	public Object getValue(String fieldName);
@@ -43,7 +43,7 @@ public interface ContentItem {
 	public String getVersionName();
 	/**
 	 * <p>
-	 * Path to to the resource for this contentItem in the WebDav respository.
+	 * Path to to the resource for this contentItem in the WebDav/JCR respository.
 	 * </p>
 	 * @return
 	 */

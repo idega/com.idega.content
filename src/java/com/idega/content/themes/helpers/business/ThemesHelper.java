@@ -212,7 +212,7 @@ public class ThemesHelper implements Singleton {
 	
 	private ContentItemFeedBean getFeedBean() {
 		if (feedBean == null) {
-			feedBean = new ContentItemFeedBean(null, ContentItemFeedBean.FEED_TYPE_ATOM_1);
+			feedBean = new ContentItemFeedBean((IWContext)null, ContentItemFeedBean.FEED_TYPE_ATOM_1);
 		}
 		return feedBean;
 	}

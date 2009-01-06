@@ -34,6 +34,11 @@ public class ContentItemFeedBean implements Serializable {
 		init(iwc);
 	}
 	
+	public ContentItemFeedBean(RSSBusiness rss, String feedType) {
+		this.feedType = feedType;
+		this.rss=rss;
+	}
+	
 	private void init(IWContext iwc) {
 		if (rss == null) {
 			if (iwc == null) {

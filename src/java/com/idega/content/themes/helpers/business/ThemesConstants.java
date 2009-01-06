@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.idega.content.business.ContentConstants;
-import com.idega.content.business.ContentUtil;
 import com.idega.util.CoreConstants;
 
 public class ThemesConstants {
@@ -19,7 +18,8 @@ public class ThemesConstants {
 	
 	public static final String XML_EXTENSION = "xml";
 	
-	private static final String BASE_ROOT_APPL = ContentUtil.getBundle().getResourcesPath();
+	//private static final String BASE_ROOT_APPL = ContentUtil.getBundle().getResourcesPath();
+	private static final String BASE_ROOT_APPL = "/idegaweb/bundles/com.idega.content.bundle/resources";
 	
 	protected static final String BASE_THEME_IMAGES = BASE_ROOT_APPL + "/images/themes/";
 	
