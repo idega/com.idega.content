@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.32 2009/01/06 10:35:13 valdas Exp $
+ * $Id: WebDAVCategories.java,v 1.33 2009/01/06 23:46:39 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -42,6 +42,7 @@ import com.idega.presentation.ui.Label;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.ListUtil;
+import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFResourceUtil;
@@ -53,10 +54,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2009/01/06 10:35:13 $ by $Author: valdas $
+ *  Last modified: $Date: 2009/01/06 23:46:39 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.32 $
+ * @version $Revision: 1.33 $
  */
 public class WebDAVCategories extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -365,7 +366,8 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	}
 	
 	private String getCategoryKey(ContentCategory category) {
-		return new StringBuilder("contentcategory_").append(category.getId()).toString();
+		String clearedKey = StringHandler.stripNonRomanCharacters(category.getId());
+		return new StringBuilder("contentcategory_").append(clearedKey).toString();
 	}
 	
 	public void saveCategoriesSettings() {
