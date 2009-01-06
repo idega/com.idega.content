@@ -61,9 +61,9 @@
 									<t:inputText id="theme_name" forceId="true"></t:inputText>
 								</t:div>
 								<t:div styleClass="themeSaveAreaButtons">
-									<t:commandButton id="changeVariationsButton" type="button" forceId="true" onclick="changeVariations()" title="#{localizedStrings['com.idega.content']['change_variations']}" value="#{localizedStrings['com.idega.content']['change']}"></t:commandButton>
-									<t:commandButton id="themeSaveButton" type="button" forceId="true" onclick="saveTheme()" title="#{localizedStrings['com.idega.content']['save']}" value="#{localizedStrings['com.idega.content']['save']}"></t:commandButton>
-									<t:commandButton id="themeRestoreButton" type="button" forceId="true" onclick="restoreTheme()" title="#{localizedStrings['com.idega.content']['restore_theme_to_original_state']}" value="#{localizedStrings['com.idega.content']['restore_theme']}"></t:commandButton>
+									<input id="changeVariationsButton" type="button" onclick="changeVariations()" title="#{localizedStrings['com.idega.content']['change_variations']}" value="#{localizedStrings['com.idega.content']['change']}"></input>
+									<input id="themeSaveButton" type="button" onclick="saveTheme()" title="#{localizedStrings['com.idega.content']['save']}" value="#{localizedStrings['com.idega.content']['save']}"></input>
+									<input id="themeRestoreButton" type="button" onclick="restoreTheme()" title="#{localizedStrings['com.idega.content']['restore_theme_to_original_state']}" value="#{localizedStrings['com.idega.content']['restore_theme']}"></input>
 								</t:div>
 							</t:div>
 						</t:div>
