@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.45 2008/12/19 08:57:58 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.46 2009/01/06 05:51:14 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -46,10 +46,10 @@ import com.idega.util.expression.ELUtil;
 
 /**
  * 
- *  Last modified: $Date: 2008/12/19 08:57:58 $ by $Author: valdas $
+ *  Last modified: $Date: 2009/01/06 05:51:14 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.45 $
+ * @version $Revision: 1.46 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	
@@ -94,8 +94,6 @@ public class IWBundleStarter implements IWBundleStartable{
 		try {
 			GroupBusiness groupBiz = (GroupBusiness) IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
 			
-			BuilderLogicWrapper builderLogic = ELUtil.getInstance().getBean(BuilderLogicWrapper.SPRING_BEAN_NAME_BUILDER_LOGIC_WRAPPER);
-			
 			@SuppressWarnings("unchecked")
 			Collection<Group> editorGroups = groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_EDITOR);
 			@SuppressWarnings("unchecked")
@@ -115,9 +113,8 @@ public class IWBundleStarter implements IWBundleStartable{
 			}
 			
 			if (clearCache) {
-				if (builderLogic != null) {
-					builderLogic.reloadGroupsInCachedDomain(iwac, null);
-				}
+				BuilderLogicWrapper builderLogic = ELUtil.getInstance().getBean(BuilderLogicWrapper.SPRING_BEAN_NAME_BUILDER_LOGIC_WRAPPER);
+				builderLogic.reloadGroupsInCachedDomain(iwac, null);
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
