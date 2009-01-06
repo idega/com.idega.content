@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.31 2008/11/17 18:01:31 valdas Exp $
+ * $Id: WebDAVCategories.java,v 1.32 2009/01/06 10:35:13 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -38,8 +38,11 @@ import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
+import com.idega.presentation.ui.Label;
 import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
 import com.idega.util.ListUtil;
+import com.idega.util.StringUtil;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFResourceUtil;
 
@@ -50,10 +53,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2008/11/17 18:01:31 $ by $Author: valdas $
+ *  Last modified: $Date: 2009/01/06 10:35:13 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.31 $
+ * @version $Revision: 1.32 $
  */
 public class WebDAVCategories extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -162,52 +165,34 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		
 		Table categoriesTable = new Table();
 		int selectedCategoriesCount = 0;
-		ContentCategory category = null;
 		Locale locale = getLocale(iwc);
-		for (int i = 0; i < selectedCategories.size(); i++) {
-			category = selectedCategories.get(i);
-						
+		for (ContentCategory selectedCategory: selectedCategories) {
 			//	Checkbox
 			HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
-			setCategory(smc, category.getId());
-			smc.setValue(Boolean.TRUE);
-			String id = getCategoryId()+selectedCategoriesCount;
-			smc.setId(id);
+			smc.setId(getCategoryKey(selectedCategory));
+			smc.setSelected(Boolean.TRUE);
 			categoriesTable.add(smc,selectedCategoriesCount%COLLUMNS + 1,selectedCategoriesCount/COLLUMNS + 1);
 			
 			//	Text
-			HtmlOutputText catText = new HtmlOutputText();
-			String catLabel = category.getName(locale.toString());
-			catText.setValue(catLabel);
-			categoriesTable.add(catText,selectedCategoriesCount%COLLUMNS + 1,selectedCategoriesCount/COLLUMNS + 1);
+			Label categoryName = new Label(selectedCategory.getName(locale.toString()), smc);
+			categoriesTable.add(categoryName, selectedCategoriesCount%COLLUMNS + 1, selectedCategoriesCount/COLLUMNS + 1);
 			selectedCategoriesCount++;
 		}
 
 		//	Display all the non-selected categories
-		for (int i = 0; i < notSelectedCategories.size(); i++) {
-			category = notSelectedCategories.get(i);
-			
-			//Checkbox
+		for (ContentCategory notSelectedCategory: notSelectedCategories) {
 			HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
-			setCategory(smc, category.getId());
+			smc.setId(getCategoryKey(notSelectedCategory));
 			if (!submitted) {
 				if (notSelectedCategories.size() == 1 && selectedCategories.size() == 0 && selectAnyCategory) {
-					smc.setValue(Boolean.TRUE);
-					smc.setSelected(true);
+					smc.setSelected(Boolean.TRUE);
 				}
 			}
-			else {
-				smc.setValue(Boolean.FALSE);
-			}
-			String id = getCategoryId(selectedCategoriesCount);
-			smc.setId(id);
-			categoriesTable.add(smc,selectedCategoriesCount%COLLUMNS + 1,selectedCategoriesCount/COLLUMNS + 1);
+			categoriesTable.add(smc, selectedCategoriesCount%COLLUMNS + 1, selectedCategoriesCount/COLLUMNS + 1);
 	
-			//Text
-			HtmlOutputText catText = new HtmlOutputText();
-			String catLabel = category.getName(locale.toString());
-			catText.setValue(catLabel);
-			categoriesTable.add(catText,selectedCategoriesCount%COLLUMNS + 1,selectedCategoriesCount/COLLUMNS + 1);
+			//	Text
+			Label categoryName = new Label(notSelectedCategory.getName(locale.toString()), smc);
+			categoriesTable.add(categoryName, selectedCategoriesCount%COLLUMNS + 1, selectedCategoriesCount/COLLUMNS + 1);
 			selectedCategoriesCount++;
 		}
 		
@@ -261,27 +246,6 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	 */
 	private String getSaveButtonId() {
 		return this.getId()+"_save";
-	}
-
-	/**
-	 * <p>
-	 * TODO tryggvil describe method getCategoryId
-	 * </p>
-	 * @param count
-	 * @return
-	 */
-	private String getCategoryId(int count) {
-		return getCategoryId()+count;
-	}
-
-	/**
-	 * <p>
-	 * TODO tryggvil describe method getCategoryId
-	 * </p>
-	 * @return
-	 */
-	private String getCategoryId() {
-		return this.getId()+"_category_";
 	}
 
 	/**
@@ -387,24 +351,21 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		}
 	}
 	
-	public String getEnabledCategories() {
+	public String getEnabledCategories(IWContext iwc) {
 		StringBuffer categories = new StringBuffer(CategoryBean.CATEGORY_DELIMETER);
 		CategoryBean categoryBean = CategoryBean.getInstance();
-		int categoriesCount = categoryBean.getCategories().size();
-		HtmlSelectBooleanCheckbox checkBox = null;
-		String categoryKey;
-		String checkId;
-		for (int i = 0; i < categoriesCount; i++) {
-			checkId = getCategoryId(i);
-			checkBox = (HtmlSelectBooleanCheckbox) getParent().findComponent(checkId);
-			if (checkBox != null) {
-				categoryKey = getCategory(checkBox);
-				if (checkBox.isSelected()) {
-					categories.append(categoryKey).append(CategoryBean.CATEGORY_DELIMETER);
-				}
+		String selectedCategory = null;
+		for (ContentCategory category: categoryBean.getCategories()) {
+			selectedCategory = iwc.getParameter(getCategoryKey(category));
+			if (!StringUtil.isEmpty(selectedCategory) && selectedCategory.equals(Boolean.TRUE.toString())) {
+				categories.append(category.getId()).append(CategoryBean.CATEGORY_DELIMETER);
 			}
 		}
 		return categories.toString();
+	}
+	
+	private String getCategoryKey(ContentCategory category) {
+		return new StringBuilder("contentcategory_").append(category.getId()).toString();
 	}
 	
 	public void saveCategoriesSettings() {
@@ -412,12 +373,13 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 			throw new RuntimeException("resourcePath is null");
 		}
 		
+		IWContext iwc = CoreUtil.getIWContext();
+		
 		//	Save the selection of categories to the article
-		String categories = getEnabledCategories();
+		String categories = getEnabledCategories(iwc);
 			
-		IWContext iwuc = IWContext.getInstance();
 		try {
-			WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(iwuc, WebDAVMetadataResource.class);
+			WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(iwc, WebDAVMetadataResource.class);
 			resource.setCategories(resourcePath, categories.toString(), getSetCategoriesOnParent());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -460,15 +422,6 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException{
 		super.encodeBegin(context);
-	}
-
-	public String getCategory(HtmlSelectBooleanCheckbox checkbox){
-		String categoryKey =  (String) checkbox.getAttributes().get("categoryKey");
-		return categoryKey;
-	}
-	
-	public void setCategory(HtmlSelectBooleanCheckbox checkbox,String categoryKey){
-		checkbox.getAttributes().put("categoryKey",categoryKey);
 	}
 
 	/**
