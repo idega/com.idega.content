@@ -111,9 +111,11 @@ public class SiteInfo extends Block {
 		DropdownMenu locales = getLocales(iwc, true, null);
 		createContents(layer, iwc, true, false);
 		
+		IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
+		
 		Layer formItem = new Layer();
 		formItem.setStyleClass("webfaceFormItem");
-		formItem.add(getLabel(ContentUtil.getBundle().getLocalizedString("site_info.locale", "Locale"), locales));
+		formItem.add(getLabel(iwrb.getLocalizedString("site_info.locale", "Locale"), locales));
 		formItem.add(locales);
 		layer.add(formItem);
 		
@@ -121,7 +123,7 @@ public class SiteInfo extends Block {
 		buttonLayer.setStyleClass("webfaceButtonLayer");
 		form.add(buttonLayer);
 
-		SubmitButton save = new SubmitButton(ContentUtil.getBundle().getLocalizedString("save", "Save"), SAVE_PARAMETER, SAVE_ACTION);
+		SubmitButton save = new SubmitButton(iwrb.getLocalizedString("save", "Save"), SAVE_PARAMETER, SAVE_ACTION);
 		save.setStyleClass("button");
 		save.setID(SAVE_ACTION);
 		buttonLayer.add(save);
