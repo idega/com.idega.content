@@ -1040,7 +1040,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	
 	private String getContentReplace(String defaultValue) {
 		StringBuffer content = new StringBuffer();
-		if (defaultValue != null && !ThemesConstants.EMPTY.equals(defaultValue)) {
+		if (!StringUtil.isEmpty(defaultValue)) {
 			content.append(defaultValue).append(ThemesConstants.NEW_LINE);
 		}
 		Locale l = null;
@@ -1103,32 +1103,30 @@ public class ThemeChangerBean implements ThemeChanger {
 			return region.toString();
 		}
 		
-		String propertyValue = getApplicationSettings().getProperty(key.toString());
-		if (propertyValue != null) {
-			if (value.equals(FOOTER)) {
-				region.append(COPY_AND_SPACE).append(getBasicReplace(null, propertyValue, null));
-				
-				region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END);
-				region.append(ThemesConstants.COMMENT_END);
-				return region.toString();
-			}
+		String propertyValue = getApplicationSettings().getProperty(key.toString(), CoreConstants.EMPTY);
+		if (value.equals(FOOTER)) {
+			region.append(COPY_AND_SPACE).append(getBasicReplace(null, propertyValue, null));
 			
-			if (value.equals(CONTENT)) {
-				region.append(getContentReplace(propertyValue)).append(ThemesConstants.COMMENT_BEGIN);
-				region.append(ThemesConstants.TEMPLATE_REGION_END).append(ThemesConstants.COMMENT_END);
-				return region.toString();
-			}
-			
-			if (value.equals(ThemesConstants.LOGO) && !(propertyValue.equals(CoreConstants.EMPTY))) {
-				region.append("<img src=\"").append(propertyValue).append("\"></img>");
-				
-				region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END);
-				region.append(ThemesConstants.COMMENT_END);
-				return region.toString();
-			}
-			
-			region.append(propertyValue);
+			region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END);
+			region.append(ThemesConstants.COMMENT_END);
+			return region.toString();
 		}
+		
+		if (value.equals(CONTENT)) {
+			region.append(getContentReplace(propertyValue)).append(ThemesConstants.COMMENT_BEGIN);
+			region.append(ThemesConstants.TEMPLATE_REGION_END).append(ThemesConstants.COMMENT_END);
+			return region.toString();
+		}
+		
+		if (value.equals(ThemesConstants.LOGO) && !(propertyValue.equals(CoreConstants.EMPTY))) {
+			region.append("<img src=\"").append(propertyValue).append("\"></img>");
+			
+			region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END);
+			region.append(ThemesConstants.COMMENT_END);
+			return region.toString();
+		}
+		region.append(propertyValue);
+		
 		region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END).append(ThemesConstants.COMMENT_END);
 		return region.toString();
 	}
