@@ -206,7 +206,6 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		updateDataModel(new Integer(this.startPage), new Integer(this.rows));
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
 		UIComponent comp = actionEvent.getComponent();
 		
@@ -663,7 +662,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			v.add(0,upBean);
 		}
 
-		return (WebDAVBean[]) v.toArray(new WebDAVBean[]{});
+		return v.toArray(new WebDAVBean[]{});
 	}
 	
 	private void sortResources(List<WebDAVBean> v) {
