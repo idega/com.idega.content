@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.33 2009/01/06 23:46:39 valdas Exp $
+ * $Id: WebDAVCategories.java,v 1.34 2009/01/09 14:16:54 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -14,6 +14,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -22,11 +23,12 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputText;
-import javax.faces.component.html.HtmlSelectBooleanCheckbox;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
+
+import org.apache.myfaces.component.html.ext.HtmlSelectBooleanCheckbox;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -34,6 +36,7 @@ import com.idega.content.bean.ManagedContentBeans;
 import com.idega.content.business.WebDAVMetadataResource;
 import com.idega.content.business.categories.CategoryBean;
 import com.idega.content.data.ContentCategory;
+import com.idega.content.data.ContentCategoryComparator;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
@@ -54,10 +57,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2009/01/06 23:46:39 $ by $Author: valdas $
+ *  Last modified: $Date: 2009/01/09 14:16:54 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.33 $
+ * @version $Revision: 1.34 $
  */
 public class WebDAVCategories extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -153,6 +156,15 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	public void setDisplayHeader(boolean display){
 		this.displayHeader=display;
 	}
+	
+	private List<ContentCategory> getSortedCategories(List<ContentCategory> categories, Locale locale) {
+		if (ListUtil.isEmpty(categories)) {
+			return null;
+		}
+		
+		Collections.sort(categories, new ContentCategoryComparator(locale));
+		return categories;
+	}
 
 	/**
 	 * <p> Creates a table with checkboxes for all the available categories </p>
@@ -165,49 +177,43 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		}
 		
 		Table categoriesTable = new Table();
-		int selectedCategoriesCount = 0;
+		int categoriesCount = 0;
 		Locale locale = getLocale(iwc);
-		for (ContentCategory selectedCategory: selectedCategories) {
-			//	Checkbox
-			HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
-			smc.setId(getCategoryKey(selectedCategory));
-			smc.setSelected(Boolean.TRUE);
-			categoriesTable.add(smc,selectedCategoriesCount%COLLUMNS + 1,selectedCategoriesCount/COLLUMNS + 1);
-			
-			//	Text
-			Label categoryName = new Label(selectedCategory.getName(locale.toString()), smc);
-			categoriesTable.add(categoryName, selectedCategoriesCount%COLLUMNS + 1, selectedCategoriesCount/COLLUMNS + 1);
-			selectedCategoriesCount++;
-		}
-
-		//	Display all the non-selected categories
-		for (ContentCategory notSelectedCategory: notSelectedCategories) {
-			HtmlSelectBooleanCheckbox smc = new HtmlSelectBooleanCheckbox();
-			smc.setId(getCategoryKey(notSelectedCategory));
-			if (!submitted) {
-				if (notSelectedCategories.size() == 1 && selectedCategories.size() == 0 && selectAnyCategory) {
-					smc.setSelected(Boolean.TRUE);
+		
+		List<ContentCategory> allCategories = new ArrayList<ContentCategory>(selectedCategories);
+		allCategories.addAll(notSelectedCategories);
+		allCategories =	getSortedCategories(allCategories, locale);
+		for (ContentCategory category: allCategories) {
+			HtmlSelectBooleanCheckbox categoryCheckBox = (HtmlSelectBooleanCheckbox) iwc.getApplication().createComponent(HtmlSelectBooleanCheckbox.COMPONENT_TYPE);
+			categoryCheckBox.setId(getCategoryKey(category));
+			if (selectedCategories.contains(category)) {
+				categoryCheckBox.setSelected(Boolean.TRUE);
+			}
+			else {
+				if (!submitted) {
+					if (notSelectedCategories.size() == 1 && selectedCategories.size() == 0 && selectAnyCategory) {
+						categoryCheckBox.setSelected(Boolean.TRUE);
+					}
 				}
 			}
-			categoriesTable.add(smc, selectedCategoriesCount%COLLUMNS + 1, selectedCategoriesCount/COLLUMNS + 1);
-	
-			//	Text
-			Label categoryName = new Label(notSelectedCategory.getName(locale.toString()), smc);
-			categoriesTable.add(categoryName, selectedCategoriesCount%COLLUMNS + 1, selectedCategoriesCount/COLLUMNS + 1);
-			selectedCategoriesCount++;
+			categoriesTable.add(categoryCheckBox, categoriesCount%COLLUMNS + 1,categoriesCount/COLLUMNS + 1);
+			
+			Label categoryName = new Label(category.getName(locale.toString()), categoryCheckBox);
+			categoriesTable.add(categoryName, categoriesCount%COLLUMNS + 1, categoriesCount/COLLUMNS + 1);
+			categoriesCount++;
 		}
 		
-		categoriesTable.setColumns(Math.min(selectedCategoriesCount,COLLUMNS));
-		selectedCategoriesCount--;
-		categoriesTable.setRows(selectedCategoriesCount/COLLUMNS + 1);
+		categoriesTable.setColumns(Math.min(categoriesCount,COLLUMNS));
+		categoriesCount--;
+		categoriesTable.setRows(categoriesCount/COLLUMNS + 1);
 
 		if (getDisplaySaveButton()) {
 			//	Add the save button
 			if(this.resourcePath!=null && this.resourcePath.length()>0) {
 				WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
 				HtmlCommandButton addCategoryButton = localizer.getButtonVB(getSaveButtonId(), "save", this);
-				categoriesTable.add(addCategoryButton,1,selectedCategoriesCount/COLLUMNS + 2);
-				categoriesTable.setRows(selectedCategoriesCount/COLLUMNS + 2);
+				categoriesTable.add(addCategoryButton,1,categoriesCount/COLLUMNS + 2);
+				categoriesTable.setRows(categoriesCount/COLLUMNS + 2);
 			}
 		}
 			
