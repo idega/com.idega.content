@@ -192,12 +192,12 @@ public class ThemesEngineBean implements ThemesEngine {
 			}
 			
 			// Big preview
-			link = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase());
-			if (theme.getLinkToDraftPreview() == null) {
-				link.append(helper.encode(theme.getLinkToThemePreview(), true));
+			link = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI);
+			if (StringUtil.isEmpty(theme.getLinkToDraft())) {
+				link.append(theme.getLinkToSkeleton());
 			}
 			else {
-				link.append(helper.encode(theme.getLinkToDraftPreview(), true));
+				link.append(theme.getLinkToDraft());
 			}
 			simpleTheme.setLinkToBigPreview(link.toString());
 			

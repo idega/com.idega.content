@@ -231,9 +231,9 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		}
 		
 		//	Checking previews
-		if (theme.getLinkToThemePreview() == null || theme.getLinkToSmallPreview() == null) {
+		if (theme.getLinkToSmallPreview() == null) {
 			//	And creating if don't exist
-			if (!helper.generatePreviewsForTheme(theme, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY, false)) {
+			if (!helper.generatePreviewsForTheme(theme, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY)) {
 				markThemeAsNotPrepared(theme);
 				return false;
 			}
@@ -666,9 +666,6 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		for (int i = 0; i < styles.size(); i++) {
 			setEnabledStyles(theme, styles.get(i));
 		}
-		
-		Element preview = root.getChild(ThemesConstants.CON_PREVIEW);
-		theme.setLinkToThemePreview(preview.getTextNormalize());
 		
 		Element smallPreview = root.getChild(ThemesConstants.CON_SMALL_PREVIEW);
 		theme.setLinkToSmallPreview(smallPreview.getTextNormalize());

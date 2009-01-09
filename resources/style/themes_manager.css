@@ -200,6 +200,11 @@ img#themePreview {
 	width: 100%;
 }
 
+iframe#themePreviewFrame {
+	height: 100% !important;
+	width: 100% !important;
+}
+
 div#mainThemesContentContainer {
 	height: auto !important;	
 }

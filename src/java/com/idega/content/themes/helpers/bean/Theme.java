@@ -20,8 +20,6 @@ public class Theme {
 	private String linkToProperties;
 	private String linkToBase;
 	private String linkToBaseAsItIs;
-	private String linkToThemePreview;
-	private String linkToDraftPreview;
 	private String linkToSmallPreview;
 	
 	private String name;
@@ -90,14 +88,6 @@ public class Theme {
 
 	public void setPropertiesExtracted(boolean propertiesExtracted) {
 		this.propertiesExtracted = propertiesExtracted;
-	}
-
-	public String getLinkToThemePreview() {
-		return linkToThemePreview;
-	}
-
-	public void setLinkToThemePreview(String linkToImage) {
-		this.linkToThemePreview = linkToImage;
 	}
 
 	public String getName() {
@@ -189,14 +179,6 @@ public class Theme {
 	
 	public void addThemeChange(ThemeChange change) {
 		changes.add(0, change);
-	}
-
-	public String getLinkToDraftPreview() {
-		return linkToDraftPreview;
-	}
-
-	public void setLinkToDraftPreview(String linkToDraftPreview) {
-		this.linkToDraftPreview = linkToDraftPreview;
 	}
 
 	public boolean isLoading() {

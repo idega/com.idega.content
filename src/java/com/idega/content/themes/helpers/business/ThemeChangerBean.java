@@ -1370,11 +1370,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		theme.setLinkToDraft(new StringBuffer(theme.getLinkToBase()).append(draft).toString());
-
-		if (!helper.generatePreviewsForTheme(theme, true, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY, generateOnlyBigPreview)) {
-			theme.setLinkToDraft(null);
-			return false;
-		}
 		
 		clearThemeVariationsFromCache(theme.getId());
 		
@@ -1751,10 +1746,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		theme.setLocked(false);
 		
 		theme.setLinkToDraft(null);
-		if (theme.getLinkToDraftPreview() != null) {
-			theme.setLinkToThemePreview(theme.getLinkToDraftPreview());
-		}
-		theme.setLinkToDraftPreview(null);
 		
 		helper.createSmallImage(theme, false);
 		
@@ -1839,9 +1830,8 @@ public class ThemeChangerBean implements ThemeChanger {
 			}
 		}
 		
-		if (helper.generatePreviewsForTheme(theme, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY, false)) {
+		if (helper.generatePreviewsForTheme(theme, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY)) {
 			theme.setChangedName(null);
-			theme.setLinkToDraftPreview(null);
 			theme.setLinkToDraft(null);
 			theme.setChanges(new ArrayList<ThemeChange>());
 			theme.setCurrentlyUsedBuiltInStyleUri(null);
@@ -2173,7 +2163,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		restoreTheme(parent, false);
 		
 		//	Generating previews
-		 if (!helper.generatePreviewsForTheme(child, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY, false)) {
+		 if (!helper.generatePreviewsForTheme(child, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY)) {
 			 return false;
 		 }
 		

@@ -1,7 +1,6 @@
 package com.idega.content.themes.helpers.business;
 
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,6 +18,7 @@ import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -67,7 +67,6 @@ import com.idega.core.search.business.SearchResult;
 import com.idega.data.IDOLookup;
 import com.idega.graphics.image.business.ImageGenerator;
 import com.idega.graphics.image.business.ImageGeneratorImpl;
-import com.idega.graphics.util.GraphicsConstants;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
@@ -850,70 +849,16 @@ public class ThemesHelper implements Singleton {
 		return encoded.toString();
 	}
 	
-	protected boolean createSmallImage(Theme theme, String url) {
-		if (theme == null || url == null) {
+	protected boolean createSmallImage(Theme theme) {
+		if (theme == null) {
 			return false;
 		}
 		
-		String extension = getFileExtension(url);
-		if (extension == null) {
-			return false;
-		}
-		extension = extension.toLowerCase();
-		String mimeType = new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString();
-		String newName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).append(CoreConstants.DOT).append(extension).toString();
-		boolean isJpg = extension.equals(GraphicsConstants.JPG_FILE_NAME_EXTENSION);
-		
-		ImageGenerator imageGenerator = getImageGenerator(null);
-		InputStream stream = getInputStream(url);
-		if (stream == null) {
-			return false;
-		}
-		Image image = null;
-		try {
-			image = imageGenerator.getScaledImage(stream, ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT, isJpg);
-		} catch(Exception e) {
-			e.printStackTrace();
-			image = null;
-		} finally {
-			closeInputStream(stream);
-		}
-		if (image == null) {
-			return generatePreviewsForTheme(theme, false, isJpg, ThemesConstants.THEME_PREVIEW_QUALITY, false);
-		}
-		stream = imageGenerator.getImageInputStream(image, extension, isJpg);
-		if (stream == null) {
-			return false;
-		}
-		boolean uploadedSuccessfully = true;
-		try {
-			uploadedSuccessfully = getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), newName, stream, mimeType, true);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			closeInputStream(stream);
-		}
-		if (uploadedSuccessfully) {
-			theme.setLinkToSmallPreview(newName);
-		}
-		
-		return uploadedSuccessfully;
+		return generatePreviewsForTheme(theme, false, false, ThemesConstants.THEME_PREVIEW_QUALITY);
 	}
 	
 	protected boolean createSmallImage(Theme theme, boolean useDraftPreview) {
-		String encodedUriToImage = null;
-		String uriToImage = null;
-		if (useDraftPreview) {
-			uriToImage = theme.getLinkToDraftPreview();
-		}
-		else {
-			uriToImage = theme.getLinkToThemePreview();
-		}
-		encodedUriToImage = encode(uriToImage, true);
-		
-		String url = new StringBuffer(getFullWebRoot()).append(theme.getLinkToBase()).append(encodedUriToImage).toString();
-		return createSmallImage(theme, url);
+		return createSmallImage(theme);
 	}
 	
 	public ThemesService getThemesService() {
@@ -1003,11 +948,6 @@ public class ThemesHelper implements Singleton {
 		//	Color files
 		addColourFilesToConfig(rootElements, theme.getOriginalColourFiles(), ThemesConstants.CON_COLOUR_FILES_ORIGINAL);
 		addColourFilesToConfig(rootElements, theme.getColourFiles(), ThemesConstants.CON_COLOUR_FILES);
-		
-		//	Big preview image
-		Element preview = new Element(ThemesConstants.CON_PREVIEW);
-		preview.setText(theme.getLinkToThemePreview());
-		rootElements.add(preview);
 		
 		//	Small preview image
 		Element smallPreview = new Element(ThemesConstants.CON_SMALL_PREVIEW);
@@ -1888,35 +1828,21 @@ public class ThemesHelper implements Singleton {
 	 * @param quality
 	 * @return true - success, false - failure
 	 */
-	protected boolean generatePreviewsForTheme(Theme theme, boolean useDraft, boolean isJpg, float quality, boolean generateOnlyBigPreview) {
-		String url = getFullWebRoot();
-		String bigPreviewName = null;
+	protected boolean generatePreviewsForTheme(Theme theme, boolean useDraft, boolean isJpg, float quality) {
+		StringBuilder url = new StringBuilder(getFullWebRoot()).append(useDraft ? theme.getLinkToDraft() : theme.getLinkToSkeleton());
 		String smallPreviewName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).toString();
-		if (useDraft) {
-			url = new StringBuffer(url).append(theme.getLinkToDraft()).toString();
-			bigPreviewName = new StringBuffer(theme.getName()).append(ThemesConstants.DRAFT_PREVIEW).toString();
-		}
-		else {
-			url = new StringBuffer(url).append(theme.getLinkToSkeleton()).toString();
-			bigPreviewName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_PREVIEW).toString();
-		}
 		
-		List<Dimension> dimensions = new ArrayList<Dimension>(2);
-		dimensions.add(new Dimension(ThemesConstants.PREVIEW_WIDTH, ThemesConstants.PREVIEW_HEIGHT));
-		if (!generateOnlyBigPreview) {
-			dimensions.add(new Dimension(ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT));
-		}
+		List<Dimension> dimensions = Arrays.asList(new Dimension(ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT));
 	
 		ImageGenerator imageGenerator = getImageGenerator(null);
 		
-		List<BufferedImage> images = imageGenerator.generatePreviews(url, dimensions, isJpg, quality);
+		List<BufferedImage> images = imageGenerator.generatePreviews(url.toString(), dimensions, isJpg, quality);
 		if (images == null) {
 			return false;
 		}
 		
 		String extension = imageGenerator.getFileExtension();
 		String mimeType = new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString();
-		bigPreviewName = new StringBuffer(bigPreviewName).append(CoreConstants.DOT).append(extension).toString();
 		smallPreviewName = new StringBuffer(smallPreviewName).append(CoreConstants.DOT).append(extension).toString();
 		
 		BufferedImage image = null;
@@ -1926,22 +1852,10 @@ public class ThemesHelper implements Singleton {
 			image = images.get(i);
 			stream = imageGenerator.getImageInputStream(image, extension);
 			try {
-				if (image.getWidth() >= ThemesConstants.PREVIEW_WIDTH) {	// Is it a big image?
-					if (slide.uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), bigPreviewName, stream, mimeType, true)) {
-						if (useDraft) {
-							theme.setLinkToDraftPreview(bigPreviewName);
-						}
-						else {
-							theme.setLinkToThemePreview(bigPreviewName);
-						}
-					}
+				if (slide.uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), smallPreviewName, stream, mimeType, true)) {
+					theme.setLinkToSmallPreview(smallPreviewName);
 				}
-				else {	//	Small image
-					if (slide.uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), smallPreviewName, stream, mimeType, true)) {
-						theme.setLinkToSmallPreview(smallPreviewName);
-					}
-				}
-			} catch (RemoteException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				return false;
 			} finally {

@@ -601,17 +601,17 @@ function createNewPreviewObjectForTheme() {
 		return false;
 	}
 	
-	var newImage = new Element('img');
-	newImage.setProperty('id', 'themePreview');
-	newImage.injectInside(previewContainer);
+	var newFrame = new Element('iframe');
+	newFrame.setProperty('id', 'themePreviewFrame');
+	newFrame.injectInside(previewContainer);
 }
 
 function setPreview(url) {
-	var preview = $('themePreview');
+	var preview = $('themePreviewFrame');
 	if (preview == null) {
 		createNewPreviewObjectForTheme();
 	}
-	preview = $('themePreview');
+	preview = $('themePreviewFrame');
 	if (preview == null) {
 		return false;
 	}
@@ -623,52 +623,7 @@ function setPreview(url) {
 		return false;
 	}
 	
-	var imageUnloader = null;
-	var images = [url];
-	var loadedImages = [];
-	var previewSize = preview.getSize();
-	var loadingLayerOverElement = null;
-	if (previewSize.size.x != 0 && previewSize.size.y != 0) {
-		loadingLayerOverElement = $(setLoadingLayerForElement(preview.id, false, previewSize, preview.getPosition()));
-	}
-	
-	new Asset.images(images, {
-		onProgress: function(i) {
-			imageUnloader = new Fx.Style(preview.getParent(), 'opacity', {duration: 125, transition: Fx.Transitions.linear, wait: true, onComplete: function() {
-				changeBigThemePreviewImageWithMootools(loadedImages);
-			}});
-			
-			loadedImages[i] = this;
-		},
-		onComplete: function() {
-			try {
-				if (loadingLayerOverElement != null) {
-					loadingLayerOverElement.remove();
-				}
-			} catch(e) {}
-			
-			imageUnloader.start(1, 0.8);
-		}
-	});
-}
-
-function changeBigThemePreviewImageWithMootools(loadedImages) {
-	if ($('themePreview') == null) {
-		return false;
-	}
-	
-	loadedImages.each(function(image, i) {
-		var parentContainer = $('themePreview').getParent();
-		$('themePreview').remove();
-		
-		parentContainer.setStyle('visibility', 'hidden');
-		parentContainer.setStyle('opacity', 0.8);
-		image.setProperty('id', 'themePreview');
-		image.injectInside(parentContainer);
-		
-		var imageChanger = new Fx.Style(parentContainer, 'opacity', {duration: 125, transition: Fx.Transitions.linear, wait: false});
-		imageChanger.start(0.8, 1);
-	});
+	preview.setProperty('src', url);
 }
 
 function getTheme(themeID) {

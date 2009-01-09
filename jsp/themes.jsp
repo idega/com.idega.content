@@ -39,7 +39,7 @@
 					</t:div>
 					<t:div id="themePreviewContainer" forceId="true" styleClass="themePreviewContainerStyle">
 						<jsf:verbatim>
-							<img id="themePreview" />
+							<iframe name="themePreviewFrame" id="themePreviewFrame">iframe</iframe>
 						</jsf:verbatim>
 					</t:div>
 						
