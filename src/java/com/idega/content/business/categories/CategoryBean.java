@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.8 2008/04/24 21:41:49 laddi Exp $
+ * $Id: CategoryBean.java,v 1.9 2009/01/09 10:15:11 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -9,7 +9,6 @@
  */
 package com.idega.content.business.categories;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
@@ -50,6 +49,7 @@ import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavRootResource;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.IOUtil;
 import com.idega.util.StringHandler;
 
 
@@ -58,10 +58,10 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2008/04/24 21:41:49 $ by $Author: laddi $
+ *  Last modified: $Date: 2009/01/09 10:15:11 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class CategoryBean {
 	private static final Log log = LogFactory.getLog(CategoryBean.class);
@@ -73,8 +73,9 @@ public class CategoryBean {
 	 * @deprecated this file will no longer be used
 	 */
 	@Deprecated
-	private static final String CATEGORY_CONFIG_FILE = CATEGORY_CONFIG_PATH+"categories.prop";
-	private static final String CATEGORY_PROPERTIES_FILE = CATEGORY_CONFIG_PATH+"categories.xml";
+	private static final String CATEGORY_CONFIG_FILE = CATEGORY_CONFIG_PATH + "categories.prop";
+	public static final String CATEGORIES_FILE = "categories.xml";
+	private static final String CATEGORY_PROPERTIES_FILE = CATEGORY_CONFIG_PATH + CATEGORIES_FILE;
 	private IWMainApplication iwma;
 	protected Map<String, ContentCategory> categories;
 	
@@ -211,16 +212,6 @@ public class CategoryBean {
 			iwma.setAttribute(BEAN_KEY, bean);
 		}
 		return bean;
-	}
-	
-	public IWSlideSession getSlideSession() {
-		try {
-			IWContext iwc = IWContext.getInstance();
-			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-			return session;
-		} catch (IBOLookupException e) {
-			throw new RuntimeException("Error getting IWSlideSession");
-		}
 	}
 
 	public IWSlideService getSlideService() {
@@ -371,16 +362,9 @@ public class CategoryBean {
 		Map<String, ContentCategory> map = new TreeMap<String, ContentCategory>();
 		
 		InputStream stream = null;
-		WebdavRootResource rootResource = null;
 		try {
 			String resourcePath = getSlideService().getURI(CATEGORY_PROPERTIES_FILE);
-			rootResource = getSlideSession().getWebdavRootResource();
-
-			if (rootResource.getStatusCode() != WebdavStatus.SC_OK) {
-				throw new FileNotFoundException("File not found " + CATEGORY_PROPERTIES_FILE);
-			}
-			
-			stream = rootResource.getMethodData(resourcePath);
+			stream = getSlideService().getInputStream(resourcePath);
 			SAXBuilder builder = new SAXBuilder();
 			Document document = builder.build(stream);
 			Element root = document.getRootElement();
@@ -411,16 +395,7 @@ public class CategoryBean {
 		catch (JDOMException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				if (stream != null) { 
-					stream.close();
-				}
-				if (rootResource != null) {
-					rootResource.close();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			IOUtil.closeInputStream(stream);
 		}
 
 		return map;
@@ -433,8 +408,8 @@ public class CategoryBean {
 	public synchronized boolean storeCategories(boolean useThread) {
 		CategoriesWriter writer = null;
 		try {
-			writer = new CategoriesWriter(this.categories, getSlideService().getURI(CATEGORY_PROPERTIES_FILE), getSlideSession());
-		} catch (RemoteException e) {
+			writer = new CategoriesWriter(this.categories, CATEGORY_PROPERTIES_FILE, getSlideService());
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}

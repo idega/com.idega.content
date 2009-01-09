@@ -1,7 +1,6 @@
 package com.idega.content.business.categories;
 
-import java.io.IOException;
-import java.util.Iterator;
+import java.io.InputStream;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -15,8 +14,9 @@ import com.idega.content.data.ContentCategory;
 import com.idega.io.MemoryFileBuffer;
 import com.idega.io.MemoryInputStream;
 import com.idega.io.MemoryOutputStream;
-import com.idega.slide.business.IWSlideSession;
-import com.idega.slide.util.WebdavRootResource;
+import com.idega.slide.business.IWSlideService;
+import com.idega.util.CoreConstants;
+import com.idega.util.IOUtil;
 
 public class CategoriesWriter implements Runnable {
 	
@@ -26,12 +26,12 @@ public class CategoriesWriter implements Runnable {
 
 	private String resourcePath = null;
 	
-	private IWSlideSession session = null;
+	private IWSlideService slideService = null;
 	
-	public CategoriesWriter(Map<String, ContentCategory> categories, String resourcePath, IWSlideSession session) {
+	public CategoriesWriter(Map<String, ContentCategory> categories, String resourcePath, IWSlideService slideService) {
 		this.categories = categories;
 		this.resourcePath = resourcePath;
-		this.session = session;
+		this.slideService = slideService;
 	}
 
 	public void run() {
@@ -39,11 +39,10 @@ public class CategoriesWriter implements Runnable {
 	}
 	
 	protected boolean writeCategories() {
+		InputStream stream = null;
 		try {
 			Element root = new Element("categories");
-			Iterator<String> keys = this.categories.keySet().iterator();
-			while (keys.hasNext()) {
-				String key = keys.next();
+			for (String key: this.categories.keySet()) {
 				ContentCategory category = this.categories.get(key);
 				Element cat = category.getAsXML();
 				root.addContent(cat);
@@ -56,21 +55,17 @@ public class CategoriesWriter implements Runnable {
 			outputter.output(document, out);
 			out.close();
 			
-			MemoryInputStream in = new MemoryInputStream(buf);
+			stream = new MemoryInputStream(buf);
 	
-			WebdavRootResource rootResource = session.getWebdavRootResource();
-			boolean putOK = rootResource.putMethod(resourcePath, in);
-			if (!putOK) {
-				log.error("Could not store to webdav: " + rootResource.getStatusMessage());
+			String directory = resourcePath.substring(0, resourcePath.lastIndexOf(CoreConstants.SLASH) + 1);
+			if (slideService.uploadFile(directory, CategoryBean.CATEGORIES_FILE, "text/xml", stream)) {
+				ContentUtil.removeCategoriesViewersFromCache();
 			}
-			
-			in.close();
-			rootResource.close();
-			
-			ContentUtil.removeCategoriesViewersFromCache();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error("Error storing file " + resourcePath + ": " + e.getMessage());
 			return false;
+		} finally {
+			IOUtil.closeInputStream(stream);
 		}
 		return true;
 	}
