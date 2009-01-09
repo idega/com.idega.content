@@ -102,7 +102,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	
 	private static final String IDEGA_COMMENT = "idega";
 	
-	private static final String[] TOOLBAR_NAV_MENU = new String[] {"Frontpage", "Products", "Customers", "Partners", "The Company", "News"};
+	private static final String[] TOOLBAR_NAV_MENU = new String[] {"Frontpage", "Products", "Customers", "The Company"};
 	
 	private static final String[] _VALID_LINK_TAG_ATTRIBUTES = new String[] {"charset", HREF, "hreflang", "media", "rel", "rev", "target", "type", "title"};
 	private static final List<String> VALID_LINK_TAG_ATTRIBUTES = Collections.unmodifiableList(Arrays.asList(_VALID_LINK_TAG_ATTRIBUTES));
