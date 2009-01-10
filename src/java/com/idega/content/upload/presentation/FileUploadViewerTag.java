@@ -19,6 +19,7 @@ public class FileUploadViewerTag extends UIComponentTag {
 	private boolean showProgressBar = true;
 	private boolean showLoadingMessage = true;
 	private boolean allowMultipleFiles = false;
+	private boolean autoAddFileInput = true;
 
 	@Override
 	public String getComponentType() {
@@ -46,9 +47,11 @@ public class FileUploadViewerTag extends UIComponentTag {
 			uploadViewer.setShowProgressBar(showProgressBar);
 			uploadViewer.setShowLoadingMessage(showLoadingMessage);
 			uploadViewer.setAllowMultipleFiles(allowMultipleFiles);
+			uploadViewer.setAutoAddFileInput(autoAddFileInput);
 		}
 	}
 
+	@Override
 	public void release() {
 		this.actionAfterUpload = null;
 		this.actionAfterCounterReset = null;
@@ -60,6 +63,7 @@ public class FileUploadViewerTag extends UIComponentTag {
 		this.showProgressBar = true;
 		this.showLoadingMessage = true;
 		this.allowMultipleFiles = false;
+		this.autoAddFileInput = false;
 	}
 	
 	public String getActionAfterUpload() {
@@ -148,6 +152,14 @@ public class FileUploadViewerTag extends UIComponentTag {
 
 	public void setActionAfterCounterReset(String actionAfterCounterReset) {
 		this.actionAfterCounterReset = actionAfterCounterReset;
+	}
+
+	public boolean isAutoAddFileInput() {
+		return autoAddFileInput;
+	}
+
+	public void setAutoAddFileInput(boolean autoAddFileInput) {
+		this.autoAddFileInput = autoAddFileInput;
 	}
 	
 }

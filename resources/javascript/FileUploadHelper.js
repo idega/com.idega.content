@@ -45,10 +45,18 @@ FileUploadHelper.uploadFiles = function(id, message, showProgressBar, showMessag
 		upload: function(o) {
 			closeAllLoadingMessages();
 			
+			var inputsToRemove = new Array();
 			for (var i = 0; i < inputs.length; i++) {
 				inputs[i].setAttribute('value', '');
 				inputs[i].value = '';
+				
+				if (i > 0) {
+					inputsToRemove.push(inputs[i]);
+				}
 			}
+			jQuery.each(inputsToRemove, function() {
+				jQuery(this).parent().remove();
+			});
 			
 			executeUserDefinedActionsAfterUploadFinished(actionAfterUpload);
 		}
@@ -145,7 +153,15 @@ function executeUserDefinedActionsAfterUploadFinished(actionAfterUpload) {
 }
 
 function removeFileInput(id, message) {
-	var confirmed = window.confirm(message);
+	var confirmed = false;
+	var value = document.getElementById(id).getValue();
+	if (value == null || value == '') {
+		confirmed = true;
+	}
+	
+	if (!confirmed) {
+		confirmed = window.confirm(message);
+	}
 	if (confirmed) {
 		var container = document.getElementById(id);
 		var parentContainer = container.parentNode;
@@ -177,7 +193,7 @@ function getFilesValuesToUpload(inputs, zipFile, invalidTypeMessage) {
 	return files;
 }
 
-function addFileInputForUpload(id, message, className, showProgressBar, addjQuery) {
+function addFileInputForUpload(id, message, className, showProgressBar, addjQuery, autoAddFileInput) {
 	var foundEmptyInput = false;
 	var currentInputs = $$('input.' + className, id);
 	if (currentInputs != null) {
@@ -193,7 +209,7 @@ function addFileInputForUpload(id, message, className, showProgressBar, addjQuer
 	
 	showLoadingMessage(message);
 	
-	FileUploader.getRenderedFileInput(id, showProgressBar, addjQuery, {
+	FileUploader.getRenderedFileInput(id, showProgressBar, addjQuery, autoAddFileInput, {
 		callback: function(component) {
 			closeAllLoadingMessages();
 			

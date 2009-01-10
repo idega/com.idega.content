@@ -621,6 +621,13 @@
 			<description>Allow multiple files to be uploaded?</description>
 		</attribute>
 		<attribute>
+			<name>autoAddFileInput</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+			<type>boolean</type>
+			<description>Auto add file input?</description>
+		</attribute>
+		<attribute>
 			<name>formId</name>
 			<required>false</required>
 			<rtexprvalue>false</rtexprvalue>

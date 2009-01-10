@@ -43,7 +43,7 @@ public class FileUploadViewer extends IWBaseComponent {
 	private boolean showProgressBar = true;
 	private boolean showLoadingMessage = false;
 	private boolean allowMultipleFiles = false;
-	private boolean autoAddFileInput = false;
+	private boolean autoAddFileInput = true;
 	
 	@Override
 	public void restoreState(FacesContext context, Object state) {
@@ -138,7 +138,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		String id = fileInputs.getId();
 		fileInputs.setStyleClass("fileUploadInputsContainerStyle");
 		//	Not adding 'remove' image - at least one file input should remain
-		fileInputs.add(uploader.getFileInput(iwc, id, false, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId)));	
+		fileInputs.add(uploader.getFileInput(iwc, id, false, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId), isAutoAddFileInput()));	
 		mainContainer.add(fileInputs);
 		
 		Layer buttonsContainer = new Layer();
@@ -146,7 +146,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		if (allowMultipleFiles) {
 			GenericButton addFileInput = new GenericButton(iwrb.getLocalizedString("add_file", "Add file"));
 			addFileInput.setOnClick(getActionToLoadFilesAndExecuteCustomAction(uploader.getAddFileInputJavaScriptAction(id, iwrb, isShowProgressBar(),
-					!StringUtil.isEmpty(componentToRerenderId)), isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId)));
+					!StringUtil.isEmpty(componentToRerenderId), isAutoAddFileInput()), isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId)));
 			buttonsContainer.add(addFileInput);
 		}
 		
