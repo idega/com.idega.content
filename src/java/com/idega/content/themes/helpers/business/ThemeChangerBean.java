@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.content.business.ContentConstants;
+import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.bean.BuiltInThemeStyle;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeChange;
@@ -103,6 +104,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final String IDEGA_COMMENT = "idega";
 	
 	private static final String[] TOOLBAR_NAV_MENU = new String[] {"Frontpage", "Products", "Customers", "The Company"};
+	private static final String[] TOOLBAR_CHILDREN_NAV_MENU = new String[] {"News", "Services"};
 	
 	private static final String[] _VALID_LINK_TAG_ATTRIBUTES = new String[] {"charset", HREF, "hreflang", "media", "rel", "rev", "target", "type", "title"};
 	private static final List<String> VALID_LINK_TAG_ATTRIBUTES = Collections.unmodifiableList(Arrays.asList(_VALID_LINK_TAG_ATTRIBUTES));
@@ -1032,6 +1034,20 @@ public class ThemeChangerBean implements ThemeChanger {
 				navMenu.append(" class=\"current\" id=\"current\"");
 			}
 			navMenu.append(" href=\"javascript:void(0)\" rel=\"self\">").append(TOOLBAR_NAV_MENU[i]).append("</a>");
+			if (i == 0) {
+				navMenu.append("<ul>");
+				for (int j = 0; j < TOOLBAR_CHILDREN_NAV_MENU.length; j++) {
+					navMenu.append("<li>")
+								.append("<a");
+					if (j == 0) {
+						navMenu.append(" class=\"current\" id=\"current\"");
+					}
+						navMenu.append(" href=\"javascript:void(0)\" rel=\"self\" >").append(TOOLBAR_CHILDREN_NAV_MENU[j]).append("</a>")
+						.append("</li>");
+				}
+				navMenu.append("</ul>");
+			}
+			
 			navMenu.append("</li>");
 		}
 		navMenu.append("</ul>");
@@ -1086,7 +1102,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		StringBuffer key = new StringBuffer(ThemesConstants.THEMES_PROPERTY_START).append(value);
 		key.append(ThemesConstants.THEMES_PROPERTY_END);
 		
-		if (value.equals(ThemesConstants.TOOLBAR)) {
+		if (value.equals(ThemesConstants.TOOLBAR) || value.startsWith(ThemesConstants.TOOLBAR)) {
 			//	Outputs the menu links for the site.
 			region.append(getToolBarContent());
 			
@@ -1103,7 +1119,11 @@ public class ThemeChangerBean implements ThemeChanger {
 			return region.toString();
 		}
 		
-		String propertyValue = getApplicationSettings().getProperty(key.toString(), CoreConstants.EMPTY);
+		String defaultValue = CoreConstants.EMPTY;
+		if (value.equals(ThemesConstants.LOGO)) {
+			defaultValue = ContentUtil.getBundle().getVirtualPathWithFileNameString("images/idegalogo.png");
+		}
+		String propertyValue = getApplicationSettings().getProperty(key.toString(), defaultValue);
 		if (value.equals(FOOTER)) {
 			region.append(COPY_AND_SPACE).append(getBasicReplace(null, propertyValue, null));
 			
