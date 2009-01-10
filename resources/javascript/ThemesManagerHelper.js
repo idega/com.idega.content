@@ -827,6 +827,10 @@ function addThemeChange(themeId, styleGroupName, variation, variationType, enabl
 	if (index < 0) {
 		THEME_CHANGES.push(new ThemeChange(themeId, styleGroupName, variation, radio, enabled, variable, color, predefinedStyle));
 	}
+	
+	if (isChangeThemeImmediateyl()) {
+		changeVariations();
+	}
 }
 
 function addThemeChangeByThemesManager(themeId, styleGroupName, variation, variationType, clickedElementId, variable) {
@@ -1034,4 +1038,8 @@ function setBuiltInStyle(themeId, builtInStyleId) {
 			}
 		}
 	});
+}
+
+function isChangeThemeImmediateyl() {
+	return true;//jQuery('#changeVariationsImmediately').attr('checked');
 }
