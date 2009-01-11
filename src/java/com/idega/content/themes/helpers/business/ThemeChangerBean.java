@@ -62,13 +62,12 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final Logger logger = Logger.getLogger(ThemeChangerBean.class.getName());
 	
 	// These are defaults in RapidWeaver, we are using its to generate good preview
-	private static final String IMAGE_START = "<img src=";
-	private static final String IMAGE_POSITION = "style=\"margin: 2px; float: ";
+	private static final String IMAGE_START = "<img class=\"imageStyle\" src=";
 	private static final String IMAGE_END = " />";
 	private static final String CONTENT_PARAGRAPH_TITLE = "<div class=\"blog-entry\"><h1 class=\"blog-entry-title\">";
 	private static final String CONTENT_PARAGRAPH_DATE = "</h1><div class=\"blog-entry-date\">";
 	private static final String CONTENT_PARAGRAPH_LINK = "</div><div class=\"blog-entry-body\">";
-	private static final String CONTENT_PARAGRAPH_END = "</div></div><br /><br />";
+	private static final String CONTENT_PARAGRAPH_END = "</div>";
 	
 	private static final String HREF = "href";
 	
@@ -105,6 +104,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	
 	private static final String[] TOOLBAR_NAV_MENU = new String[] {"Frontpage", "Products", "Customers", "The Company"};
 	private static final String[] TOOLBAR_CHILDREN_NAV_MENU = new String[] {"News", "Services"};
+	private static final String[] DUMMY_CATEGORIES = new String[] {"Personal", "Work", "Humor", "Idega"};
 	
 	private static final String[] _VALID_LINK_TAG_ATTRIBUTES = new String[] {"charset", HREF, "hreflang", "media", "rel", "rev", "target", "type", "title"};
 	private static final List<String> VALID_LINK_TAG_ATTRIBUTES = Collections.unmodifiableList(Arrays.asList(_VALID_LINK_TAG_ATTRIBUTES));
@@ -785,9 +785,9 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param commentValue
 	 * @return Collection
 	 */
-	private Collection <Comment> getCommentsCollection(String commentValue) {
-		Collection <Comment> c = new ArrayList <Comment> ();
-		c.add(new Comment(new StringBuffer(ThemesConstants.TEMPLATE_REGION_BEGIN).append(commentValue).append(ThemesConstants.TEMPLATE_REGION_MIDDLE).toString()));
+	private Collection<Content> getCommentsCollection(String commentValue) {
+		Collection<Content> c = new ArrayList<Content>();
+		c.add(new Comment(new StringBuffer(ThemesConstants.TEMPLATE_REGION_BEGIN).append(commentValue).append(ThemesConstants.TEMPLATE_REGION_MIDDLE).toString()));		
 		c.add(new Comment(ThemesConstants.TEMPLATE_REGION_END));
 		return c;
 	}
@@ -1068,25 +1068,46 @@ public class ThemeChangerBean implements ThemeChanger {
 			l = Locale.ENGLISH;
 		}
 		
-		IWTimestamp timestamp = new IWTimestamp(new Date());
 		content.append(ThemesConstants.NEW_LINE);
-		for (int i = 0; i < ThemesConstants.DUMMY_ARTICLES.size(); i++) {
-			content.append(CONTENT_PARAGRAPH_TITLE).append(ThemesConstants.ARTICLE_TITLE);
-			if (ThemesConstants.DUMMY_ARTICLES.size() > 1) {
-				content.append(CoreConstants.SPACE).append(i + 1);
-			}
-			content.append(CONTENT_PARAGRAPH_DATE);
-			content.append(timestamp.getLocaleDate(l, DateFormat.MEDIUM));
-			content.append(CONTENT_PARAGRAPH_LINK);
-			content.append(IMAGE_START).append(ThemesConstants.SINGLE_QUOTE);
+		
+		content.append(getDummyArticle(l, "Breaking news!", "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum bibendum, ligula ut feugiat rutrum, mauris libero ultricies nulla, at hendrerit lectus dui bibendum metus. Phasellus quis nulla nec mauris sollicitudin ornare. Vivamus faucibus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Cras vulputate condimentum ipsum. Duis urna eros, commodo id, sagittis sed, sodales eu, ante.", true));
+		content.append(getDummyArticle(l, "A very successful start", "Etiam ante. Cras risus dolor, porta nec, adipiscing eu, scelerisque at, metus. Mauris nunc eros, porttitor nec, tincidunt ut, rutrum eget, massa. In facilisis nisi. Sed non lorem malesuada quam egestas bibendum. Quisque bibendum ullamcorper purus.", false));
+		
+		content.append(ThemesConstants.NEW_LINE);
+		return content.toString();
+	}
+	
+	private String getDummyArticle(Locale locale, String title, String body, boolean addImage) {
+		IWTimestamp timestamp = new IWTimestamp(new Date());
+		
+		StringBuilder content = new StringBuilder(CONTENT_PARAGRAPH_TITLE).append(title).append(CONTENT_PARAGRAPH_DATE);
+		content.append(timestamp.getLocaleDate(locale, DateFormat.MEDIUM)).append(CONTENT_PARAGRAPH_LINK);
+		
+		if (addImage) {
+			content.append("<div class=\"image-right\">").append(IMAGE_START).append(ThemesConstants.SINGLE_QUOTE);
 			content.append(ThemesConstants.BASE_THEME_IMAGES);
 			content.append(ThemesConstants.THEME_IMAGES.get(helper.getRandomNumber(ThemesConstants.THEME_IMAGES.size())));
-			content.append(ThemesConstants.SINGLE_QUOTE).append(CoreConstants.SPACE).append(IMAGE_POSITION);
-			content.append(ThemesConstants.IMAGE_POSITIONS.get(helper.getRandomNumber(ThemesConstants.IMAGE_POSITIONS.size())));
-			content.append(ThemesConstants.SINGLE_QUOTE).append(IMAGE_END);
-			content.append(ThemesConstants.DUMMY_ARTICLES.get(i)).append(CONTENT_PARAGRAPH_END);
+			content.append(ThemesConstants.SINGLE_QUOTE).append(CoreConstants.SPACE).append(IMAGE_END).append("</div>");
 		}
-		content.append(ThemesConstants.NEW_LINE);
+		
+		content.append(body);
+		
+		content.append("<div class=\"content_item_comments_style\">")
+					.append("<div>")
+						.append("<a href=\"javascript:void(0)\">Comments(").append(helper.getRandomNumber(20)).append(")</a>")
+						.append("&nbsp;")
+						.append("<a href=\"javascript:void(0)\">")
+							.append("<img title=\"Atom feed\" src=\"").append(ContentUtil.getBundle().getVirtualPathWithFileNameString("images/feed.png"))
+								.append("\" name=\"Atom feed\" alt=\"\"/>")
+						.append("</a>")
+					.append("</div>")
+					.append("<div>")
+						.append("<a href=\"javascript:void(0)\">Add your comment</a>")
+					.append("</div>")
+			.append("</div>");
+		
+		content.append(CONTENT_PARAGRAPH_END).append(CONTENT_PARAGRAPH_END);
+		
 		return content.toString();
 	}
 	
@@ -1145,6 +1166,14 @@ public class ThemeChangerBean implements ThemeChanger {
 			region.append(ThemesConstants.COMMENT_END);
 			return region.toString();
 		}
+		if (value.equals("sidebar")) {
+			region.append(getDummyCategories());
+			
+			region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END);
+			region.append(ThemesConstants.COMMENT_END);
+			return region.toString();
+		}
+		
 		region.append(propertyValue);
 		
 		region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END).append(ThemesConstants.COMMENT_END);
@@ -1265,6 +1294,27 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		return true;
+	}
+	
+	private String getDummyCategories() {
+		StringBuilder content = new StringBuilder();		
+		content.append("<div id=\"blog-categories\">");
+		
+		int index = 0;
+		for (String category: DUMMY_CATEGORIES) {
+			if (index % 2 == 0) {
+				content.append("<div class=\"blog-category-link-disabled\">").append(category).append("</div>");
+			}
+			else {
+				content.append("<a href=\"javascript:void(0)\" class=\"blog-category-link-enabled\">").append(category).append("</a>");
+				content.append("<br />");
+			}
+			
+			index++;
+		}
+		
+		content.append("</div>");
+		return content.toString();
 	}
 	
 	@SuppressWarnings("unchecked")
