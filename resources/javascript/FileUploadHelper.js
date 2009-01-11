@@ -55,7 +55,10 @@ FileUploadHelper.uploadFiles = function(id, message, showProgressBar, showMessag
 				}
 			}
 			jQuery.each(inputsToRemove, function() {
-				jQuery(this).parent().remove();
+				var input = jQuery(this);
+				input.parent().hide('normal', function() {
+					input.parent().remove();
+				})
 			});
 			
 			executeUserDefinedActionsAfterUploadFinished(actionAfterUpload);
@@ -68,16 +71,19 @@ FileUploadHelper.uploadFiles = function(id, message, showProgressBar, showMessag
 			YAHOO.util.Connect.asyncRequest('POST', '/servlet/ContentFileUploadServlet', uploadHandler);
 			
 			if (showProgressBar) {
-				jQuery('#' + progressBarId).progressBar(0, { showText: true});
-				showUploadInfoInProgressBar(progressBarId, actionAfterCounterReset);
+				jQuery('#' + progressBarId).parent().hide('fast', function() {
+					jQuery('#' + progressBarId).progressBar(0, { showText: true});
+					showUploadInfoInProgressBar(progressBarId, actionAfterCounterReset);
+				});
 			}
 		}
 	});
 }
 
 function showUploadInfoInProgressBar(progressBarId, actionAfterCounterReset) {
-	document.getElementById(progressBarId).style.visibility = 'visible';	
-	fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset);
+	jQuery('#' + progressBarId).parent().show('normal', function() {
+		fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset);
+	});
 }
 
 function fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset) {
@@ -110,8 +116,16 @@ function fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterRese
 function resetFileUploaderCounterAfterTimeOut(progressBarId, customActionAfterCounterReset) {
 	FileUploadListener.resetFileUploaderCounters({
 		callback:function(result) {
-			document.getElementById(progressBarId).style.visibility = 'hidden';
-			executeUserDefinedActionsAfterUploadFinished(customActionAfterCounterReset);
+			jQuery('#' + progressBarId).hide('normal', function() {
+				var parentContainer = jQuery('#' + progressBarId).parent();
+				jQuery('#' + progressBarId).remove();
+				
+				jQuery(parentContainer).hide('fast', function() {
+					jQuery(parentContainer).append('<span id=\''+progressBarId+'\' class=\'progressBar\' />');
+					jQuery('#' + progressBarId).progressBar(0, { showText: true});
+					executeUserDefinedActionsAfterUploadFinished(customActionAfterCounterReset);
+				});
+			});	
 		}
 	});
 }
@@ -224,16 +238,9 @@ function addFileInputForUpload(id, message, className, showProgressBar, addjQuer
 }
 
 FileUploadHelper.changeUploadPath = function(newUploadPath, className) {
-	var uploadPathInputs = $$('input.' + className);
-	if (uploadPathInputs == null || uploadPathInputs.length == 0) {
-		return false;
-	}
-	
-	var input = null;
-	for (var i = 0; i < uploadPathInputs.length; i++) {
-		input = $(uploadPathInputs[i]);
-		input.setProperty('value', newUploadPath);
-	}
+	jQuery.each(jQuery('input.' + className), function() {
+		jQuery(this).attr('value', newUploadPath);
+	});
 }
 
 FileUploadHelper.reRenderComponent = function(id) {
