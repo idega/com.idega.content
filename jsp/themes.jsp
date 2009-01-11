@@ -80,6 +80,9 @@
                			<t:htmlTag value="li" id="deleteThemeButton" forceId="true">
                				<t:outputText styleClass="deleteThemeTextStyle" onclick="deleteTheme();" title="#{localizedStrings['com.idega.content']['delete_theme']}" value="#{localizedStrings['com.idega.content']['delete_theme']}" />
                			</t:htmlTag>
+               			<t:htmlTag value="li" id="deleteThemesButton" forceId="true">
+               				<t:outputText styleClass="deleteThemeTextStyle" onclick="deleteAllThemes();" title="#{localizedStrings['com.idega.content']['delete_all_themes']}" value="#{localizedStrings['com.idega.content']['delete_all_themes']}" />
+               			</t:htmlTag>
                		</t:htmlTag>
 				</t:div>
 			</h:form>

@@ -51,6 +51,7 @@
       		<include method="setBuiltInStyle"/>
       		<include method="getPageAccessibilityProperties"/>
       		<include method="setPageAccessibilityProperty"/>
+      		<include method="deleteAllThemes" />
     	</create>
     	<convert converter="bean" match="com.idega.content.themes.helpers.bean.SimplifiedTheme" />
     	<convert converter="bean" match="com.idega.content.themes.helpers.bean.ThemeChange">

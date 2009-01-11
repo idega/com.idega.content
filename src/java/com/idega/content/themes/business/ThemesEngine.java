@@ -223,6 +223,8 @@ public interface ThemesEngine {
 	
 	public boolean deleteTheme(String themeId);
 	
+	public boolean deleteAllThemes();
+	
 	public String getPageIdByUri(String uri);
 	
 	public boolean setBuiltInStyle(String themeId, String builtInStyleId);

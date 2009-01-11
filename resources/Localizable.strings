@@ -92,6 +92,7 @@ current_version=Current version
 delete=Delete
 delete_page=Delete page
 delete_theme=Delete theme
+delete_all_themes=Delete all themes
 deleting=Deleting...
 deletion_failed=Deletion failed
 description=Description

@@ -1,6 +1,5 @@
 package com.idega.content.themes.business;
 
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.httpclient.HttpException;
 import org.apache.myfaces.custom.tree2.TreeNode;
 import org.apache.webdav.lib.WebdavResource;
 import org.directwebremoting.ScriptBuffer;
@@ -65,6 +63,7 @@ import com.idega.slide.business.IWSlideService;
 import com.idega.user.data.GroupBMPBean;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
@@ -2283,43 +2282,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		
 		return helper.getThemesService().getBuilderService().getRenderedComponent(CoreUtil.getIWContext(), siteInfo, false);
 	}
-	
-	public boolean deleteTheme(String themeId) {
-		Theme theme = helper.getTheme(themeId);
-		if (theme == null) {
-			return false;
-		}
-		
-		IWSlideService slide = helper.getSlideService(IWMainApplication.getDefaultIWApplicationContext());
-		if (slide == null) {
-			return false;
-		}
-		
-		WebdavResource resource = null;
-		try {
-			resource = slide.getWebdavResourceAuthenticatedAsRoot(theme.getLinkToSkeleton());
-		} catch (HttpException e) {
-			e.printStackTrace();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		if (resource == null) {
-			return false;
-		}
-		
-		boolean deleted = false;
-		try {
-			deleted = resource.deleteMethod();
-		} catch (HttpException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return deleted;
-	}
 
 	public boolean setBuiltInStyle(String themeId, String builtInStyleId) {
 		try {
@@ -2415,5 +2377,75 @@ public class ThemesEngineBean implements ThemesEngine {
 	@Autowired
 	public void setThemesPropertiesExtractor(ThemesPropertiesExtractor themesPropertiesExtractor) {
 		this.themesPropertiesExtractor = themesPropertiesExtractor;
+	}
+
+	private IWContext getContextAndCheckRights() {
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return null;
+		}
+		
+		if (iwc.isSuperAdmin()) {
+			return iwc;
+		}
+		
+		return iwc.hasRole(StandardRoles.ROLE_KEY_AUTHOR) || iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR) ? iwc : null;
+	}
+	
+	public boolean deleteAllThemes() {
+		IWContext iwc = getContextAndCheckRights();
+		if (iwc == null) {
+			return false;
+		}
+		
+		List<Theme> themes = helper.getAvailableThemes();
+		if (ListUtil.isEmpty(themes)) {
+			return false;
+		}
+		IWSlideService slide = helper.getSlideService(IWMainApplication.getDefaultIWApplicationContext());
+		for (Theme theme: themes) {
+			if (!deleteTheme(theme, slide)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	public boolean deleteTheme(String themeId) {
+		IWContext iwc = getContextAndCheckRights();
+		if (iwc == null) {
+			return false;
+		}
+		
+		Theme theme = helper.getTheme(themeId);
+		IWSlideService slide = helper.getSlideService(IWMainApplication.getDefaultIWApplicationContext());
+		
+		return deleteTheme(theme, slide);
+	}
+	
+	private boolean deleteTheme(Theme theme, IWSlideService slide) {
+		if (theme == null || slide == null) {
+			return false;
+		}
+		
+		WebdavResource resource = null;
+		try {
+			resource = slide.getWebdavResourceAuthenticatedAsRoot(theme.getLinkToSkeleton());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (resource == null) {
+			return false;
+		}
+		
+		boolean deleted = false;
+		try {
+			deleted = resource.deleteMethod();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return deleted;
 	}
 }

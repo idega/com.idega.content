@@ -402,7 +402,7 @@ function getThemesCallback(themes, needScrollToDefaultTheme) {
             		onContextMenu: function(e) {
             			var event = new Event(e);
             			var themeId = event.target.getProperty('id');
-            			$('deleteThemeButton').setProperty('themeid', themeId);
+            			jQuery('#deleteThemeButton').attr('themeid', themeId);
             			return true;
             		}
             	});
@@ -996,7 +996,7 @@ function switchLoadingMessagesForTheme() {
 }
 
 function deleteTheme() {
-	var themeId = $('deleteThemeButton').getProperty('themeid');
+	var themeId = jQuery('#deleteThemeButton').attr('themeid');
 	
 	var confirmed = window.confirm(ARE_YOU_SURE_TEXT);
 	
@@ -1008,6 +1008,31 @@ function deleteTheme() {
 	
 	showLoadingMessage(DELETING_TEXT);
 	ThemesEngine.deleteTheme(themeId, {
+		callback: function(result) {
+			closeAllLoadingMessages();
+			
+			if (!result) {
+				alert(THEME_CAN_NOT_BE_DELETED);
+				return false;
+			}
+			
+			getThemes(null, true, true);
+			return true;
+		}
+	});
+}
+
+function deleteAllThemes() {
+	var confirmed = window.confirm(ARE_YOU_SURE_TEXT);
+	
+	hideContextMenu();
+	
+	if (!confirmed) {
+		return false;
+	}
+	
+	showLoadingMessage(DELETING_TEXT);
+	ThemesEngine.deleteAllThemes({
 		callback: function(result) {
 			closeAllLoadingMessages();
 			
