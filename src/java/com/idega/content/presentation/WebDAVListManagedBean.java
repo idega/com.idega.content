@@ -706,4 +706,12 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		onFileClickEventName = event;
 	}
 
+	public boolean isUseStartPathIfAvailable() {
+		return useStartPathIfAvailable;
+	}
+
+	public void setUseStartPathIfAvailable(Boolean useStartPathIfAvailable) {
+		this.useStartPathIfAvailable = useStartPathIfAvailable == null ? Boolean.TRUE : useStartPathIfAvailable;
+	}
+
 }

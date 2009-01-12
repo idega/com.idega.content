@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVDocumentDeleter.java,v 1.11 2008/06/13 06:34:14 valdas Exp $
+ * $Id: WebDAVDocumentDeleter.java,v 1.12 2009/01/12 14:44:57 valdas Exp $
  * Created on 30.12.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -30,16 +30,17 @@ import org.apache.commons.httpclient.HttpException;
 import com.idega.content.bean.ContentPathBean;
 import com.idega.presentation.IWContext;
 import com.idega.slide.util.WebdavExtendedResource;
+import com.idega.util.StringUtil;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFUtil;
 
 
 /**
  * 
- *  Last modified: $Date: 2008/06/13 06:34:14 $ by $Author: valdas $
+ *  Last modified: $Date: 2009/01/12 14:44:57 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class WebDAVDocumentDeleter extends ContentBlock implements ActionListener {
 
@@ -53,8 +54,10 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	private List<UIComponent> WFContainerLines = null;
 	private HtmlForm form = null;
 	
+	@Override
 	protected void initializeComponent(FacesContext context) {
-		String pathToUse = IWContext.getIWContext(context).getParameter(PARAMETER_PATH);
+		IWContext iwc = IWContext.getIWContext(context);
+		String pathToUse = iwc.getParameter(PARAMETER_PATH);
 		Boolean deleted = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getDeleted");
 		WFContainerLines = new ArrayList<UIComponent>();
 		if (deleted == null) {
@@ -63,6 +66,9 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 				clickedPath = pathToUse;
 			} else {
 				clickedPath =(String) WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "getClickedFilePath");
+			}
+			if (StringUtil.isEmpty(clickedPath)) {
+				clickedPath = iwc.getParameter(ContentViewer.PATH_TO_DELETE);
 			}
 			WebdavExtendedResource resource = null;
 			try {
@@ -251,6 +257,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 		this.useLinkAsSubmit = useLinkAsSubmit;
 	}
 	
+	@Override
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[4];
 		values[0] = super.saveState(ctx);
@@ -260,6 +267,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 		return values;
 	}
 
+	@Override
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[]) state;
 		super.restoreState(ctx, values[0]);

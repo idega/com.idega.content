@@ -10,7 +10,6 @@ import java.util.Vector;
 
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIParameter;
-import javax.faces.component.html.HtmlCommandLink;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
@@ -26,7 +25,9 @@ import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.IWSlideConstants;
 import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
 import com.idega.util.ListUtil;
+import com.idega.util.StringUtil;
 import com.idega.webface.WFBlock;
 import com.idega.webface.WFTitlebar;
 import com.idega.webface.WFToolbar;
@@ -42,6 +43,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	
 	public static final String PARAMETER_ACTION = "iw_content_action";
 	public static final String PARAMETER_CONTENT_RESOURCE = "iw_content_rs_url";
+	private static final String PARAMETER_CURRENT_PATH = "current_path_in_slide_for_documents";
 	
 	public static final String ACTION_LIST = "ac_list";
 	public static final String ACTION_FILE_DETAILS = "ac_file_details";
@@ -279,6 +281,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		return null;
 	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public void decode(FacesContext context) {
 		//TODO USE DECODE, DOES NOT WORK BECAUSE IT IS NEVER CALLED!
@@ -354,6 +357,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		return false;
 	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public void encodeBegin(FacesContext context) throws IOException {
 		if (this.useUserHomeFolder) {
@@ -407,7 +411,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		
 		Boolean fileSelected = (Boolean) WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "getIsClickedFile");
 
-		String tmp = (String) context.getExternalContext().getRequestParameterMap().get(PARAMETER_ROOT_FOLDER);
+		String tmp = context.getExternalContext().getRequestParameterMap().get(PARAMETER_ROOT_FOLDER);
 		if (tmp != null) {
 			IWUserContext iwuc = IWContext.getInstance();			
 			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(iwuc, IWSlideSession.class);
@@ -460,6 +464,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		super.encodeBegin(context);
 	}
 	
+	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
 		super.encodeChildren(context);
 
@@ -512,7 +517,6 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		}
 	}
 		
-	@SuppressWarnings("unchecked")
 	public WFToolbar getToolbar(String baseId) {
 		WFToolbar bar = new WFToolbar();
 		bar.setId(baseId+"_toolbar");
@@ -545,6 +549,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		
 		WFToolbarButton newFolder = new WFToolbarButton();
 		newFolder.getAttributes().put(PARAMETER_ACTION, ACTION_NEW_FOLDER);
+		newFolder.getAttributes().put(PARAMETER_CURRENT_PATH, currentFolderPath);
 		newFolder.setId(baseId+"_btnNewFolder");
 		newFolder.setStyleClass("content_viewer_new_folder");
 		newFolder.setToolTip(getBundle().getLocalizedString("create_a_folder"));
@@ -570,10 +575,11 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		return bar;
 	}
 
-	@SuppressWarnings("unchecked")
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
 		Object source = actionEvent.getSource();
 		if (source instanceof WFToolbarButton) {
+			maintainPathParameter(((WFToolbarButton) source).getAttributes(), PARAMETER_CURRENT_PATH);
+			
 			WFToolbarButton bSource = (WFToolbarButton) source;
 			String action = (String) bSource.getAttributes().get(PARAMETER_ACTION);
 			if (action != null) {
@@ -592,33 +598,72 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 					}
 				}
 			}
-			maintainPath(true);
-		} else if (source instanceof HtmlCommandLink){
-			String action = (String) ((HtmlCommandLink)source).getAttributes().get(PARAMETER_ACTION);
+		} else if (source instanceof UIComponent){
+			String action = (String) ((UIComponent) source).getAttributes().get(PARAMETER_ACTION);
 			if (ACTION_DELETE.equals(action)) {
-				List children = ((HtmlCommandLink)source).getChildren();
-				Iterator iter = children.iterator();
-				String path = "unknown";
-				while (iter.hasNext()) {
-					Object obj = iter.next();
-					if ((obj instanceof UIParameter)) {
-						if (PATH_TO_DELETE.equals(((UIParameter) obj).getName())) {
-							path = (String) ((UIParameter) obj).getValue();
-							WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setClickedFilePath", path);
-							String currentPath = null;
-							if (path.indexOf(CoreConstants.SLASH) != -1) {
-								currentPath = path.substring(0, path.lastIndexOf(CoreConstants.SLASH));
-							}
-							if (currentPath != null) {
-								WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", currentPath);	//	Setting current path to reload
-							}
-						}
-					}
-				}
-				setRenderFlags(action);
+				maintainPathParameter(((UIComponent) source).getAttributes(), PATH_TO_DELETE, true);
+			} else if (ACTION_NEW_FOLDER.equals(action)) {
+				maintainPathParameter(((UIComponent) source).getAttributes(), WebDAVFolderCreation.PARAMETER_RESOURCE_PATH);
 			}
-			maintainPath(true);
+			setRenderFlags(action);
 		}
+		
+		maintainPath(true);
+	}
+	
+	private static final void maintainPathParameter(Map<String, Object> parameters, String parameterName, boolean markClickedFile) {
+		if (parameters == null || StringUtil.isEmpty(parameterName)) {
+			return;
+		}
+		
+		String pathToMaintain = null;
+		
+		String key = null;
+		boolean parameterFound = false;
+		for (Iterator<String> paramsIter = parameters.keySet().iterator(); (!parameterFound && paramsIter.hasNext());) {
+			key = paramsIter.next();
+			
+			if (parameterName.equals(key)) {
+				Object o = parameters.get(key);
+				
+				if (o instanceof String) {
+					pathToMaintain = o.toString();
+				} else if (o instanceof UIParameter) {
+					pathToMaintain = ((UIParameter) o).getValue().toString();
+				}
+
+				if (!StringUtil.isEmpty(pathToMaintain)) {
+					parameterFound = true;
+					
+					
+				}
+			}
+		}
+		
+		if (!parameterFound) {
+			IWContext iwc = CoreUtil.getIWContext();
+			if (iwc.isParameterSet(parameterName)) {
+				pathToMaintain = iwc.getParameter(parameterName);
+				parameterFound = true;
+			}
+		}
+		
+		if (parameterFound) {
+			if (markClickedFile) {
+				WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setClickedFilePath", pathToMaintain);
+				
+				if (pathToMaintain.indexOf(CoreConstants.SLASH) != -1) {
+					pathToMaintain = pathToMaintain.substring(0, pathToMaintain.lastIndexOf(CoreConstants.SLASH));
+				}
+			}
+			WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setWebDAVPath", pathToMaintain);
+			WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setUseStartPathIfAvailable", Boolean.FALSE);
+			WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", pathToMaintain);
+		}
+	}
+	
+	protected static final void maintainPathParameter(Map<String, Object> parameters, String parameterName) {
+		maintainPathParameter(parameters, parameterName, false);
 	}
 	
 	protected void maintainPath(boolean maintain) {
@@ -682,6 +727,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		}
 	}
 	
+	@Override
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[26];
 		values[0] = super.saveState(ctx);
@@ -714,6 +760,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		return values;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[]) state;
@@ -777,6 +824,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		this.currentFolderPath = currentFolderPath;
 	}
 	
+	@Override
 	public void setCurrentResourcePath(String resource) {
 		super.setCurrentResourcePath(resource);
 		int index = resource.lastIndexOf("/");
@@ -797,6 +845,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	/**
 	 * @return Returns the current resource path.
 	 */
+	@Override
 	public String getCurrentResourcePath() {
 		if (super.currentResourcePath != null) {
 			return super.currentResourcePath;
