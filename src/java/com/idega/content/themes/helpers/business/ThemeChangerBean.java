@@ -48,6 +48,7 @@ import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.IOUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
@@ -152,7 +153,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			e.printStackTrace();
 			return false;
 		}
-		if (content == null || CoreConstants.EMPTY.equals(content)) {
+		if (StringUtil.isEmpty(content)) {
 			return false;
 		}
 		
@@ -161,7 +162,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		for (int i = 0; i < THEME_HEAD_VARIABLES.size(); i++) {
 			variable = THEME_HEAD_VARIABLES.get(i);
 			value = getThemeValueByVariable(variable);
-			
+
 			content = StringHandler.replace(content, variable, value);
 		}
 		
@@ -195,7 +196,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 		
-		Document doc = helper.getXMLDocument(new StringBuffer(helper.getFullWebRoot()).append(skeleton).toString(), true);
+		Document doc = helper.getXMLDocument(new StringBuffer(helper.getFullWebRoot()).append(skeleton).toString(), true, false);
 		if (doc == null) {
 			return false;
 		}
@@ -486,7 +487,7 @@ public class ThemeChangerBean implements ThemeChanger {
 				e.printStackTrace();
 				return false;
 			} finally {
-				helper.closeInputStream(stream);
+				IOUtil.closeInputStream(stream);
 			}
 		}
 		
@@ -563,7 +564,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		scanner.setLinkToTheme(linkToTheme);
 		scanner.scanFile();
 		
-		helper.closeInputStream(is);
+		IOUtil.closeInputStream(is);
 		helper.closeInputStreamReader(isr);
 		helper.closeBufferedReader(buf);
 		
@@ -1811,7 +1812,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			e.printStackTrace();
 			return false;
 		} finally {
-			helper.closeInputStream(is);
+			IOUtil.closeInputStream(is);
 		}
 		theme.setLocked(false);
 		
@@ -2147,18 +2148,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 		
-		InputStream is = helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(linkToTheme).toString());
-		if (is == null) {
-			return false;
-		}
-		Document themeDoc = null; 
-		try {
-			themeDoc = helper.getXMLDocument(is);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			helper.closeInputStream(is);
-		}
+		Document themeDoc = helper.getXMLDocument(new StringBuffer(helper.getFullWebRoot()).append(linkToTheme).toString(), false, false); 
 		if (themeDoc == null) {
 			return false;
 		}

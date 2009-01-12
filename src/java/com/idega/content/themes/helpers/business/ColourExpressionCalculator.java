@@ -22,16 +22,17 @@ import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
 import com.idega.core.search.business.SearchResult;
 import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
+import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 
 /**
  * @author <a href="mailto:valdas@idega.com">Valdas Žemaitis</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  *
  * Calculates color value (hex value) from given expression
  *
- * Last modified: $Date: 2008/10/23 06:03:44 $ by $Author: laddi $
+ * Last modified: $Date: 2009/01/12 05:57:00 $ by $Author: valdas $
  */
 
 @Service
@@ -136,7 +137,7 @@ public class ColourExpressionCalculator {
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, "Error while reading content from stream: " + sourceLink, e);
 			} finally {
-				helper.closeInputStream(stream);
+				IOUtil.closeInputStream(stream);
 			}
 			if (content == null) {
 				logger.log(Level.WARNING, "No content in CSS file: " + sourceLink);

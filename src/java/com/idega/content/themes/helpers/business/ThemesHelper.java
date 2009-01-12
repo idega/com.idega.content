@@ -9,7 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -76,6 +75,7 @@ import com.idega.servlet.filter.IWBundleResourceFilter;
 import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.IOUtil;
 import com.idega.util.StringHandler;
 import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
@@ -535,7 +535,7 @@ public class ThemesHelper implements Singleton {
 		return getXMLDocument(url, false, false);
 	}
 	
-	private Document getXMLDocument(String url, boolean cleanWithHtmlCleaner, boolean useLog) {
+	private Document getXMLDocument(String url, boolean cleanWithHtmlCleaner, boolean useLog, boolean omitComments) {
 		if (url == null) {
 			return null;
 		}
@@ -543,7 +543,7 @@ public class ThemesHelper implements Singleton {
 		InputStream stream = getInputStream(url, useLog);
 		
 		if (stream != null && cleanWithHtmlCleaner) {
-			String content = getThemesService().getBuilderService().getCleanedHtmlContent(stream, false, false, true);
+			String content = getThemesService().getBuilderService().getCleanedHtmlContent(stream, false, false, omitComments);
 			if (content == null) {
 				return null;
 			}
@@ -559,14 +559,14 @@ public class ThemesHelper implements Singleton {
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
-			closeInputStream(stream);
+			IOUtil.closeInputStream(stream);
 		}
 		
 		return null;
 	}
 	
-	public Document getXMLDocument(String url, boolean cleanWithHtmlCleaner) {
-		return getXMLDocument(url, cleanWithHtmlCleaner, false);
+	public Document getXMLDocument(String url, boolean cleanWithHtmlCleaner, boolean omitComments) {
+		return getXMLDocument(url, cleanWithHtmlCleaner, false, omitComments);
 	}
 	
 	public Document getXMLDocument(InputStream stream) throws Exception {
@@ -604,7 +604,7 @@ public class ThemesHelper implements Singleton {
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
-			closeInputStream(stream);
+			IOUtil.closeInputStream(stream);
 			reader.close();
 		}
 			
@@ -744,30 +744,6 @@ public class ThemesHelper implements Singleton {
 	
 	protected InputStream getInputStream(String link) {
 		return getInputStream(link, false);
-	}
-	
-	public boolean closeInputStream(InputStream is) {
-		if (is == null) {
-			return true;
-		}
-		
-		try {
-			is.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-		return true;
-	}
-	
-	protected boolean closeOutputStream(OutputStream os) {
-		try {
-			os.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-		return true;
 	}
 	
 	public String encode(String value, boolean fullyEncode) {
@@ -1732,7 +1708,7 @@ public class ThemesHelper implements Singleton {
 		if (stream == null) {
 			return false;
 		}
-		closeInputStream(stream);
+		IOUtil.closeInputStream(stream);
 		return true;
 	}
 	
@@ -1859,7 +1835,7 @@ public class ThemesHelper implements Singleton {
 				e.printStackTrace();
 				return false;
 			} finally {
-				closeInputStream(stream);
+				IOUtil.closeInputStream(stream);
 			}
 		}
 		
