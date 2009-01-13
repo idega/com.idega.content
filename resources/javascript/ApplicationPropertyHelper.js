@@ -172,7 +172,7 @@ function mainSaveSiteInfo(component, needsReload) {
 	}
 	
 	showLoadingMessage(SAVING_SITE_INFO_VALUE_MESSAGE_TEXT);
-	ThemesEngine.saveSiteInfoValue(SITE_INFO_KEYWORD_FROM_BOX, value, {
+	LucidEngine.saveSiteInfoValue(SITE_INFO_KEYWORD_FROM_BOX, value, {
 		callback: function(result) {
 			closeAllLoadingMessages();
 			showSiteInfoValue();

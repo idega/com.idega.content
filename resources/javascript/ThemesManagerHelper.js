@@ -1,3 +1,5 @@
+if (ThemesManagerHelper == null) var ThemesManagerHelper = {};
+
 var THEME_ID = null;
 var THEME_COLOUR_VARIATION_VARIABLE = null;
 var THEME_COLOUR_VARIATION_GROUP_NAME = null;
@@ -1067,4 +1069,23 @@ function setBuiltInStyle(themeId, builtInStyleId) {
 
 function isChangeThemeImmediateyl() {
 	return true;//jQuery('#changeVariationsImmediately').attr('checked');
+}
+
+ThemesManagerHelper.prepareThemesForUsageInLucid = function () {
+	LucidEngine.getStartInfo(false, {
+		callback: function(info) {
+			setLocalizedTextsForThemes(info.localizedTexts);
+			
+			initializeThemes();
+			roundThemesSliderCorners();
+			
+			themeColourPicker = new MooRainbow('myRainbow', {
+				imgPath: info.mooRainbowImage,
+				onComplete: function(color) {
+					addThemeColorChange(color);
+				},
+				centerPosition: true
+			});
+		}
+	});
 }

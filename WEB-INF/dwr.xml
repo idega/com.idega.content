@@ -6,51 +6,21 @@
 		<create creator="jsf" javascript="ThemesEngine">
 			<param name="managedBeanName" value="themesEngine" />
       		<param name="class" value="com.idega.content.themes.business.ThemesEngineBean" />
+      		
       		<include method="getThemes"/>
       		<include method="getTheme"/>
       		<include method="getThemeStyleVariations"/>
       		<include method="changeTheme"/>
       		<include method="saveTheme"/>
       		<include method="setSelectedStyle"/>
-      		<include method="changePageUri"/>
-      		<include method="savePageInfo"/>
-      		<include method="getPageInfoValues"/>
-      		<include method="getPageInfoElements"/>
       		<include method="restoreTheme"/>
-      		<include method="getSiteInfoElements"/>
-      		<include method="getSiteInfoValues"/>
-      		<include method="saveSiteInfoValue"/>
-      		<include method="saveSiteInfo"/>
-      		<include method="createPage"/>
-      		<include method="deletePage"/>
-      		<include method="deletePageAndDecrease"/>
-      		<include method="getPageId"/>
-      		<include method="setPageId"/>
-      		<include method="movePage"/>
-      		<include method="getPathToImageFolder"/>
-      		<include method="isStartPage"/>
-      		<include method="setAsStartPage"/>
       		<include method="applyMultipleChangesToTheme"/>
-      		<include method="getLocalizedText"/>
-      		<include method="startBuilderApplication"/>
       		<include method="reloadThemeProperties"/>
-      		<include method="canUserActAsBuilderUser"/>
-      		<include method="getPageUri"/>
-      		<include method="changePageName"/>
-      		<include method="deleteArticlesFromDeletedPages"/>
-      		<include method="deleteArticle"/>
       		<include method="createChildTemplateForThisTemplate"/>
-      		<include method="isUserContentEditor"/>
-      		<include method="getRenderedPageInfo"/>
-      		<include method="changePageUriAfterPageWasMoved"/>
       		<include method="getUpdatedSiteTree"/>
       		<include method="getUpdatedSiteTemplatesTree"/>
-      		<include method="getReRenderedSiteInfo"/>
-      		<include method="deleteTheme"/>
-      		<include method="getPageIdByUri"/>
       		<include method="setBuiltInStyle"/>
-      		<include method="getPageAccessibilityProperties"/>
-      		<include method="setPageAccessibilityProperty"/>
+      		<include method="deleteTheme"/>
       		<include method="deleteAllThemes" />
     	</create>
     	<convert converter="bean" match="com.idega.content.themes.helpers.bean.SimplifiedTheme" />
@@ -78,11 +48,44 @@
 		<create creator="jsf" javascript="LucidEngine">
 			<param name="managedBeanName" value="lucidEngine" />
       		<param name="class" value="com.idega.content.lucid.business.LucidEngineImpl" />
+      		
       		<include method="getPermissionWindowResources"/>
       		<include method="getPropertiesWindowResources"/>
       		<include method="setLocale"/>
       		<include method="isSuperAdmin"/>
+      		<include method="isContentEditor"/>
+      		<include method="changePageUri"/>
+      		<include method="savePageInfo"/>
+      		<include method="getPageInfoValues"/>
+      		<include method="getPageInfoElements"/>
+      		<include method="getSiteInfoElements"/>
+      		<include method="getSiteInfoValues"/>
+      		<include method="saveSiteInfoValue"/>
+      		<include method="saveSiteInfo"/>
+      		<include method="createPage"/>
+      		<include method="deletePage"/>
+      		<include method="deletePageAndDecrease"/>
+      		<include method="getPageId"/>
+      		<include method="setPageId"/>
+      		<include method="movePage"/>
+      		<include method="getPathToImageFolder"/>
+      		<include method="isStartPage"/>
+      		<include method="setAsStartPage"/>
+      		<include method="canUserActAsBuilderUser"/>
+      		<include method="getPageUri"/>
+      		<include method="changePageName"/>
+      		<include method="deleteArticlesFromDeletedPages"/>
+      		<include method="deleteArticle"/>
+      		<include method="getRenderedPageInfo"/>
+      		<include method="changePageUriAfterPageWasMoved"/>
+      		<include method="getReRenderedSiteInfo"/>
+      		<include method="deleteTheme"/>
+      		<include method="getPageIdByUri"/>
+      		<include method="getPageAccessibilityProperties"/>
+      		<include method="setPageAccessibilityProperty"/>
+      		<include method="getStartInfo"/>
       	</create>
+      	<convert converter="bean" match="com.idega.content.lucid.bean.LucidApplicationInfo"/>
 	</allow>
   
 	<signatures>
@@ -95,9 +98,13 @@
   			import com.idega.content.themes.helpers.bean.ThemeChange;
 			import com.idega.content.themes.helpers.bean.TreeNodeStructure;
 			
+			import com.idega.content.lucid.bean.LucidApplicationInfo;
+			
   			ThemesEngine.applyMultipleChangesToTheme(String, List<ThemeChange>, String);
-  			ThemesEngine.createPage(List<TreeNodeStructure>, Boolean, String, List<String>);
-  			List<PageAccessibilityProperty> ThemesEngine.getPageAccessibilityProperties(String);
+  		
+  			LucidEngine.createPage(List<TreeNodeStructure>, Boolean, String, List<String>);
+  			List<PageAccessibilityProperty> LucidEngine.getPageAccessibilityProperties(String);
+  			LucidApplicationInfo LucidEngine.getStartInfo(Boolean);
   		]]>
 	</signatures>
 </dwr>

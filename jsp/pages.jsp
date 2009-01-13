@@ -18,19 +18,7 @@ version="1.2">
                 		window.addEvent('domready', function() {
                 			errorHandlerInLucid();
 						});
-						window.addEvent('domready', function() {
-							ThemesEngine.isUserContentEditor(markIfUserIsContentEditor);
-						});
-						window.addEvent('domready', enableReverseAjaxInThemes);
-                		window.addEvent('domready', startBuilderApplication);
-                		window.addEvent('domready', getLocalizedTextForThemes);
-                		window.addEvent('domready', initializePages);
-                		window.addEvent('domready', registerPageInfoActions);
-                		window.addEvent('domready', initialiazeSiteManager);
-                		window.addEvent('domready', getPathToImageFolder);
- 	              		window.addEvent('domready', registerSiteActions);
- 	              		window.addEvent('domready', createAccordionForLucid);
- 	              		window.addEvent('domready', registerActionsForTemplatesInLucid);
+						window.addEvent('domready', LucidHelper.startLucidApplication);
  	              		window.addEvent('resize', controlLucidAppWindow);
                 	</script>
                 </f:verbatim>
@@ -52,11 +40,6 @@ version="1.2">
                 		<t:commandLink id="newPagesButton" forceId="true" styleClass="newPagesButtonStyleClass" title="#{localizedStrings['com.idega.content']['new_pages']}">
 							<t:outputText value="#{localizedStrings['com.idega.content']['new_pages']}" styleClass="innerSpan"/>
                 		</t:commandLink>
-                		<!-- 
-	                		<t:commandLink rendered="#{lucidEngine.contentEditor}" id="pagePropertiesButton" forceId="true" title="#{localizedStrings['com.idega.content']['lucid.page_properties']}" styleClass="pagePropertiesButtonStyleClass">
-								<t:outputText value="#{localizedStrings['com.idega.content']['lucid.page_properties']}" styleClass="innerSpan"/>
-	                		</t:commandLink>
-	                	 -->
 						<t:commandLink rendered="#{lucidEngine.contentEditor}" id="pagePermissionsButton" forceId="true" title="#{localizedStrings['com.idega.content']['lucid.page_permissions']}" styleClass="pagePermissionsButtonStyleClass">
 							<t:outputText value="#{localizedStrings['com.idega.content']['lucid.page_permissions']}" styleClass="innerSpan"/>
 						</t:commandLink>

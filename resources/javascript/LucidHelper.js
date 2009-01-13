@@ -44,7 +44,7 @@ function savePageInfoWithRadioButtonValue(id) {
 function savePageInfo() {
 	showLoadingMessage(getThemeSavingText());
 	if (KEYWORDS == null) {
-		ThemesEngine.getPageInfoElements(getPageInfoElementsCallback);
+		LucidEngine.getPageInfoElements(getPageInfoElementsCallback);
 	}
 	else {
 		getPageInfoElementsCallback(KEYWORDS);
@@ -89,7 +89,7 @@ function getPageInfoElementsCallback(allKeywords) {
 			}
 		}
 	}
-	ThemesEngine.savePageInfo(pageId, keywords, values, {
+	LucidEngine.savePageInfo(pageId, keywords, values, {
 		callback: function(result) {
 			if (needReload) {
 				reloadPage();
@@ -160,7 +160,7 @@ function resizeFrame() {
 
 function getPageInfoValues() {
 	if (KEYWORDS == null) {
-		ThemesEngine.getPageInfoElements(getAvailableElements);
+		LucidEngine.getPageInfoElements(getAvailableElements);
 	}
 	else {
 		getAvailableElements(KEYWORDS);
@@ -175,7 +175,7 @@ function getAvailableElements(allKeywords) {
 	KEYWORDS = allKeywords;
 	
 	var pageId = getPageID();
-	ThemesEngine.getRenderedPageInfo(pageId, 'customizePage', 'pageInfoStyle_accordion', {
+	LucidEngine.getRenderedPageInfo(pageId, 'customizePage', 'pageInfoStyle_accordion', {
 		callback: function(component) {
 			var container = $('pageInfoToggle');
 			container.empty();
@@ -183,7 +183,7 @@ function getAvailableElements(allKeywords) {
 			insertNodesToContainer(component, container);
 			registerPageInfoActions();
 			
-			ThemesEngine.getPageInfoValues(pageId, allKeywords, showPageInfoValues);	
+			LucidEngine.getPageInfoValues(pageId, allKeywords, showPageInfoValues);	
 		}
 	});
 }
@@ -221,7 +221,7 @@ function showPageInfoValues(values) {
 }
 
 function isStartPage(pageID) {
-	ThemesEngine.isStartPage(pageID, isStartPageCallback);
+	LucidEngine.isStartPage(pageID, isStartPageCallback);
 }
 
 function isStartPageCallback(isStart) {
@@ -253,10 +253,8 @@ function managePageInfoComponents(e) {
 
 function initializePages() {
 	initScript(true, false, false);
-	getGlobalPageId();
 
 	resizeFrame();
-	isStartPage(getPageID());
 	checkIfNotEmptySiteTree(ALL_CURRENT_SITE_STRUCTURE_TREE_ID);
 	document.addEvent('click', function(e) {
 		e = new Event(e);
@@ -265,12 +263,6 @@ function initializePages() {
 	
 	resizeTreeContainerInThemes(RESERVED_HEIGHT_FOR_PAGES);
 	resizeNewPageContainers(150);
-	
-	BuilderService.getClassNameForSourceView({
-		callback: function(className) {
-			IB_SOURCE_VIEW_CLASS = className;
-		}
-	});
 }
 
 function registerPageInfoActions() {
@@ -651,7 +643,7 @@ function analyzeAndMakePageAsStartPage() {
 	var elementId = getFixedPageIdFromElementId($('makePageStartPageButtonCtxMn').getProperty('pageid'));
 	
 	showLoadingMessage(getChangingStructureText());
-	ThemesEngine.setAsStartPage(elementId, {
+	LucidEngine.setAsStartPage(elementId, {
 		callback: function(result) {
 			closeAllLoadingMessages();
 		}
@@ -672,7 +664,7 @@ function setPageAccessibilityProperty(id) {
 	var columnName = clickedElement.getProperty('pp_column');
 	
 	showLoadingMessage(SAVING_THEME);
-	ThemesEngine.setPageAccessibilityProperty(pageId, code, value, columnName, {
+	LucidEngine.setPageAccessibilityProperty(pageId, code, value, columnName, {
 		callback: function(result) {
 			closeAllLoadingMessages();
 
@@ -685,3 +677,36 @@ function setPageAccessibilityProperty(id) {
 		}
 	});
 }
+
+LucidHelper.startLucidApplication = function() {
+	LucidEngine.getStartInfo(true, {
+		callback: function(info) {
+			LucidHelper.setLucidStartInfo(info);
+
+			enableReverseAjaxInThemes();
+			initializePages();
+			registerPageInfoActions();
+			initialiazeSiteManager();
+			registerSiteActions();
+			createAccordionForLucid();
+			registerActionsForTemplatesInLucid();
+		}
+	});
+}
+
+LucidHelper.applicationInfo = null;
+LucidHelper.setLucidStartInfo = function(info) {
+	LucidHelper.applicationInfo = info;
+	
+	setLocalizedTextsForThemes(LucidHelper.applicationInfo.localizedTexts);
+	
+	KEYWORDS = LucidHelper.applicationInfo.pageInfoElements;
+	IB_SOURCE_VIEW_CLASS = LucidHelper.applicationInfo.classNameForSourceView;
+	
+	markIfUserIsContentEditor(LucidHelper.applicationInfo.contentEditor);
+	isStartPageCallback(LucidHelper.applicationInfo.startPage);
+	
+	setGlobalPageId(LucidHelper.applicationInfo.pageId, false, LucidHelper.applicationInfo.pageUri);
+	setFolderPath(LucidHelper.applicationInfo.pathToImageFolder);
+}
+

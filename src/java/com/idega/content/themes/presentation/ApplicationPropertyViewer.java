@@ -154,7 +154,7 @@ public class ApplicationPropertyViewer extends Block {
 		//	Adding script files
 		List<String> scripts = new ArrayList<String>();
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
-		scripts.add("/dwr/interface/ThemesEngine.js");
+		scripts.add("/dwr/interface/LucidEngine.js");
 		scripts.add("/dwr/interface/AdminToolbarSession.js");
 		scripts.add(bundle.getVirtualPathWithFileNameString("javascript/ApplicationPropertyHelper.js"));
 		try {

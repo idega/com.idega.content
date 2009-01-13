@@ -4,8 +4,10 @@ import java.util.List;
 
 import javax.faces.component.UIComponent;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.idega.content.business.ContentUtil;
-import com.idega.content.themes.business.ThemesEngine;
+import com.idega.content.lucid.business.LucidEngine;
 import com.idega.content.themes.helpers.bean.Setting;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
@@ -22,6 +24,7 @@ import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextInput;
 import com.idega.util.CoreConstants;
+import com.idega.util.expression.ELUtil;
 
 public class SiteInfo extends Block {
 	
@@ -35,8 +38,17 @@ public class SiteInfo extends Block {
 	
 	private String locale = null;
 	
+	@Autowired
+	private LucidEngine lucidEngine;
+	
 	public SiteInfo() {
 		super();
+		
+		try {
+			ELUtil.getInstance().autowire(this);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
@@ -64,12 +76,7 @@ public class SiteInfo extends Block {
 		if (settings == null) {
 			return;
 		}
-		if (locale == null) {
-			return;
-		}
-
-		ThemesEngine engine = ThemesHelper.getInstance().getThemesEngine();
-		if (engine == null) {
+		if (locale == null || lucidEngine == null) {
 			return;
 		}
 		
@@ -86,7 +93,7 @@ public class SiteInfo extends Block {
 					regionValue.setOnKeyPress(keyPressAction);
 				}
 				regionValue.setId(new StringBuilder("id").append(setting.getCode()).toString());
-				regionValue.setValue(engine.getSiteInfoValue(setting.getCode(), locale, iwc.getApplicationSettings(), domain));
+				regionValue.setValue(lucidEngine.getSiteInfoValue(setting.getCode(), locale, iwc.getApplicationSettings(), domain));
 				
 				formItem.add(getLabel(iwrb.getLocalizedString(new StringBuilder("site_info.").append(setting.getCode()).toString(), setting.getLabel()),
 																															regionValue));
@@ -150,7 +157,7 @@ public class SiteInfo extends Block {
 		}
 		
 		try {
-			ThemesHelper.getInstance().getThemesEngine().saveSiteInfo(locale, keywords, values);
+			lucidEngine.saveSiteInfo(locale, keywords, values);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -159,6 +166,14 @@ public class SiteInfo extends Block {
 	protected Label getLabel(String text, InterfaceObject component) {
 		Label label = new Label(text, component);
 		return label;
+	}
+
+	public LucidEngine getLucidEngine() {
+		return lucidEngine;
+	}
+
+	public void setLucidEngine(LucidEngine lucidEngine) {
+		this.lucidEngine = lucidEngine;
 	}
 	
 }

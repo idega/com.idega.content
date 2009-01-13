@@ -50,9 +50,12 @@ function getPageID() {
 	return PAGE_ID;
 }
 
-function setPageID(ID) {
+function setPageID(ID, callLucidEngine) {
 	PAGE_ID = ID;
-	ThemesEngine.setPageId(ID);
+	
+	if (callLucidEngine) {
+		LucidEngine.setPageId(ID);
+	}
 }
 
 function nothingToDo(parameter) {
@@ -60,16 +63,16 @@ function nothingToDo(parameter) {
 
 function getGlobalPageId() {
 	if (getPageID() == null) {
-		ThemesEngine.getPageId(setGlobalPageId);
+		setGlobalPageId(LucidHelper.applicationInfo.pageId);
 	}
 	else {
 		return getPageID();
 	}
 }
 
-function setGlobalPageId(ID) {
-	setPageID(ID);
-	getPrewUrl(ID);
+function setGlobalPageId(ID, callLucidEngine, uri) {
+	setPageID(ID, callLucidEngine);
+	getPrewUrl(ID, uri);
 	
 	boldCurrentTreeElementWithPageId(ID);
 	getPageInfoValues();
@@ -304,11 +307,7 @@ var INSUFFICIENT_RIGHTS_FOR_ACTION_IN_LUCID = 'Sorry, you have insufficient righ
 var THEME_CAN_NOT_BE_DELETED = 'Sorry, selected theme can not be deleted.';
 var ERROR_OCCURRED_IN_LUCID = 'Oops! Out of cheese error! Please reboot the Universe and try again...or the page.';
 
-function getLocalizedTextForThemes() {
-	ThemesEngine.getLocalizedText(getLocalizedTextForThemesCallback);
-}
-
-function getLocalizedTextForThemesCallback(list) {
+function setLocalizedTextsForThemes(list) {
 	if (list == null) {
 		return false;
 	}
@@ -354,7 +353,6 @@ function getLocalizedTextForThemesCallback(list) {
 	INSUFFICIENT_RIGHTS_FOR_ACTION_IN_LUCID = list[35];
 	THEME_CAN_NOT_BE_DELETED = list[36];
 	ERROR_OCCURRED_IN_LUCID = list[37];
-	
 }
 
 function getUploadingThemeText() {
@@ -501,11 +499,10 @@ function setNewStyleForSelectedElement(id, newClassName) {
 function boldCurrentTreeElement() {
 	var pageId = getPageID();
 	if (pageId == null) {
-		ThemesEngine.getPageId(boldCurrentTreeElementWithPageId);
+		pageId = LucidHelper.applicationInfo.pageId;
 	}
-	else {
-		boldCurrentTreeElementWithPageId(pageId);
-	}
+	
+	boldCurrentTreeElementWithPageId(pageId);
 }
 
 function boldCurrentTreeElementWithPageId(pageId) {
@@ -553,15 +550,7 @@ function boldSelectedTreeElement(element) {
 	$(element).setStyle('font-weight', 'bold');
 }
 
-function startBuilderApplication() {
-	ThemesEngine.startBuilderApplication(startBuilderApplicationCallback);
-}
-
-function startBuilderApplicationCallback(result) {
-}
-
 function roundThemesSliderCorners() {
-	//$('themesSliderContainer').makeRounded({radius: 30});
 }
 
 function registerActionsForSiteTree() {
@@ -613,7 +602,7 @@ function doContextMenuChangesForLucid(e) {
 	if (pageId == null) {
 		return false;
 	}
-	ThemesEngine.getPageAccessibilityProperties(pageId, {
+	LucidEngine.getPageAccessibilityProperties(pageId, {
 		callback: function(properties) {
 			if (properties == null) {
 				alert('Menu can not be displayed: did not receive page properties!');

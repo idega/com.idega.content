@@ -335,7 +335,7 @@ function setTemplateForPageOrPages(isPage, type) {
 		return false;
 	}
 
-	ThemesEngine.getPageIdByUri(window.location.pathname, {
+	LucidEngine.getPageIdByUri(window.location.pathname, {
 		callback: function(id) {
 			setTemplateForPageOrPagesWithPageId(id, type);
 		}

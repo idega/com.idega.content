@@ -13,6 +13,7 @@ import org.apache.slide.event.ContentEvent;
 
 import com.idega.business.IBOServiceBean;
 import com.idega.content.business.ContentConstants;
+import com.idega.content.lucid.business.LucidEngine;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
@@ -29,6 +30,7 @@ import com.idega.slide.business.IWContentEvent;
 import com.idega.slide.business.IWSlideChangeListener;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.expression.ELUtil;
 
 public class ThemesServiceBean extends IBOServiceBean implements ThemesService, IWSlideChangeListener{
 
@@ -67,8 +69,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			}
 		}
 		else {
-			if (!ThemesHelper.getInstance().isCreatedManually(uri) && ThemesHelper.getInstance().isCorrectThemeTemplateFile(uri, ThemesConstants.THEME_SKELETONS_FILTER) &&
-					isNewTheme(uri)) {
+			if (!ThemesHelper.getInstance().isCreatedManually(uri) && ThemesHelper.getInstance().isCorrectThemeTemplateFile(uri,
+					ThemesConstants.THEME_SKELETONS_FILTER) && isNewTheme(uri)) {
 				try {
 					ThemesHelper.getInstance().getThemesLoader().loadTheme(uri, ThemesHelper.getInstance().urlEncode(uri), true, false);
 				} catch (Exception e) {
@@ -204,8 +206,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			return false;
 		}
 		
-		ThemesEngine themesEngine = ThemesHelper.getInstance().getThemesEngine();
-		if (themesEngine == null) {
+		LucidEngine lucidEngine = ELUtil.getInstance().getBean(LucidEngine.SPRING_BEAN_IDENTIFIER);
+		if (lucidEngine == null) {
 			return false;
 		}
 		
@@ -222,14 +224,15 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		String parentId = builder.getTopLevelTemplateId(builder.getTopLevelTemplates(iwc));
 		if (parentId == null || ThemesConstants.MINUS_ONE.equals(parentId)) {
 			//	No Top Level Template
-			parentId = themesEngine.createRootTemplate(domain, builder, domainID, builder.getIBXMLFormat());
-			themesEngine.initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
+			parentId = lucidEngine.createRootTemplate(domain, builder, domainID, builder.getIBXMLFormat());
+			lucidEngine.initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
 		}
 		String name = ThemesHelper.getInstance().getPreparedThemeNameToUseInRepository(theme);
 		
 		String suffix = getSuffixForTemplate(theme.getName());
 		String templateName = suffix == null ? theme.getName() : new StringBuilder(theme.getName()).append(suffix).toString();
-		String uri = new StringBuilder(ThemesConstants.THEMES).append(name).append(suffix == null?CoreConstants.EMPTY : suffix).append(ContentConstants.SLASH).toString();
+		String uri = new StringBuilder(ThemesConstants.THEMES).append(name).append(suffix == null ? CoreConstants.EMPTY : suffix)
+						.append(ContentConstants.SLASH).toString();
 		id = createIBPage(parentId, templateName, builder.getTemplateKey(), null, uri, null, domainID, builder.getHTMLTemplateKey(), null);
 		if (id == -1) {
 			return false;
@@ -237,7 +240,11 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		theme.setIBPageID(id);
 		
 		if (updatePageWebDav(theme.getIBPageID(), CoreConstants.WEBDAV_SERVLET_URI + theme.getLinkToSkeleton())) {
-			themesEngine.updateSiteTemplatesTree(iwc, true);
+			ThemesEngine themesEngine = ThemesHelper.getInstance().getThemesEngine();
+			if (themesEngine != null) {
+				themesEngine.updateSiteTemplatesTree(iwc, true);
+			}
+			
 			return true;
 		}
 		
@@ -389,19 +396,6 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	}
 	
 	public ICDomain getDomain() {
-		/*ICDomainHome domainHome = null;
-		try {
-			domainHome = (ICDomainHome) IDOLookup.getHome(ICDomain.class);
-		} catch (IDOLookupException e) {
-			log.error(e);
-			return null;
-		}
-		try {
-			return domainHome.findFirstDomain();
-		} catch (FinderException e) {
-			log.error(e);
-			return null;
-		}*/
 		return IWApplicationContextFactory.getCurrentIWApplicationContext().getDomain();
 	}
 	

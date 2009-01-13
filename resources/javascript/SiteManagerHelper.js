@@ -28,7 +28,7 @@ function getValues(object) {
 		setLanguageForSiteInfo(object);
 	}
 	if (SITE_INFO_KEYWORDS == null) {
-		ThemesEngine.getSiteInfoElements(getSiteInfoElementsCallback);
+		LucidEngine.getSiteInfoElements(getSiteInfoElementsCallback);
 	}
 	else {
 		getSiteInfoElementsCallback(SITE_INFO_KEYWORDS);
@@ -38,7 +38,7 @@ function getValues(object) {
 function getSiteInfoElementsCallback(keywords) {
 	SITE_INFO_KEYWORDS = keywords;
 	if (SITE_INFO_LANGUAGE != null && SITE_INFO_KEYWORDS != null) {
-		ThemesEngine.getSiteInfoValues(SITE_INFO_KEYWORDS, SITE_INFO_LANGUAGE, getSiteInfoValuesCallback);
+		LucidEngine.getSiteInfoValues(SITE_INFO_KEYWORDS, SITE_INFO_LANGUAGE, getSiteInfoValuesCallback);
 	}
 }
 
@@ -62,7 +62,7 @@ function getSiteInfoValuesCallback(values) {
 function saveSiteInfo() {
 	showLoadingMessage(getThemeSavingText());
 	if (SITE_INFO_KEYWORDS == null) {
-		ThemesEngine.getSiteInfoElements(proceedSaving);
+		LucidEngine.getSiteInfoElements(proceedSaving);
 	}
 	else {
 		proceedSaving(SITE_INFO_KEYWORDS);
@@ -124,7 +124,7 @@ function proceedSaving(keywords) {
 			}
 		}
 	}
-	ThemesEngine.saveSiteInfo(SITE_INFO_LANGUAGE, SITE_INFO_KEYWORDS, values, saveSiteInfoCallback);
+	LucidEngine.saveSiteInfo(SITE_INFO_LANGUAGE, SITE_INFO_KEYWORDS, values, saveSiteInfoCallback);
 	return false;
 }
 
@@ -136,26 +136,6 @@ function saveSiteInfoCallback(result) {
 }
 
 function initialiazeSiteManager() {
-	/*setIsSiteMap(true);
-	setNeedRedirect(false);
-	setActiveLanguage();
-	
-	resizeTreeContainerInThemes(RESERVED_HEIGHT_FOR_SITE);
-	
-	checkIfNotEmptySiteTree(ALL_CURRENT_SITE_STRUCTURE_TREE_ID);
-
-	var width = getTotalWidth() - 462;
-	if (width > 0) {
-		var pagesTemplatesContainer = $('pagesTypesContainer');
-		if (pagesTemplatesContainer) {
-			pagesTemplatesContainer.setStyle('width', width + 'px');
-		}
-		
-		var siteTemplatesContainer = $('siteTemplatesContainer');
-		if (siteTemplatesContainer) {
-			siteTemplatesContainer.setStyle('width', width + 'px');
-		}
-	}*/
 }
 
 function registerSiteActions() {

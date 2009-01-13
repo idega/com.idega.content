@@ -817,7 +817,7 @@
 				tempFloatingContainer.setProperty('id', 'rootTemporary');
 			}
 			showLoadingMessage(CREATING_TEXT);
-			ThemesEngine.createPage(nodes, isFirst, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
+			LucidEngine.createPage(nodes, isFirst, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
 		},
 		getNewRootId : function(id) {
 			closeAllLoadingMessages();
@@ -1348,7 +1348,7 @@
 			var nodes = JSTreeObj.getStructure('floatingContainer'+JSTreeObj.dragNode_source.id, newParentNodeId, numberInLevel);			
 			document.getElementById('floatingContainer'+JSTreeObj.dragNode_source.id).id = 'rootTemporary';				
 			showLoadingMessage(CREATING_TEXT);
-			ThemesEngine.createPage(nodes, false, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
+			LucidEngine.createPage(nodes, false, numberInLevel, followingNodes, JSTreeObj.getNewRootId);
 		},
 		getStructure : function(rootId, parentId, numberInLevel){
 			var newTreeNodes = new Array();
@@ -1735,10 +1735,10 @@
 			var changeNameId = editObj.id.replace(/[^0-9]/g, '');
 			
 			showLoadingMessage(CHANGING_THEME);
-			ThemesEngine.changePageName(changeNameId, newSitePageName, executeActionsAfterSiteTreeInLucidWasChanged);
+			LucidEngine.changePageName(changeNameId, newSitePageName, executeActionsAfterSiteTreeInLucidWasChanged);
 
 			changePageTitleInPageInfo(newSitePageName);
-			ThemesEngine.changePageUri(changeNameId, newSitePageName, true, changePageTitleCallback);
+			LucidEngine.changePageUri(changeNameId, newSitePageName, true, changePageTitleCallback);
 		
 			if (!IE) {
 				registerActionsOnSiteTreeElement($(editEl));
@@ -1763,10 +1763,6 @@
 		this.nodeName = nodeName;
 		this.pageType = pageType;
 		this.templateFile = templateFile;
-	}	
-	
-	function getPathToImageFolder() {
-		ThemesEngine.getPathToImageFolder(setFolderPath);	
 	}
 	
 	function setFolderPath(path){

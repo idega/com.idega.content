@@ -13,7 +13,7 @@ function saveMyTree(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncreas
 		numberInLevel = 0;
 	}
 
-	ThemesEngine.movePage(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncrease, nodesToDecrease, {
+	LucidEngine.movePage(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncrease, nodesToDecrease, {
 		callback: function(result) {
 			closeAllLoadingMessages();
 			if (result) {
@@ -43,13 +43,13 @@ function deletePage(pageId, followingNodes, nodeBeingDeletedId) {
 		setPageID(null);
 		RELOAD_PAGE = true;
 		
-		ThemesEngine.deletePageAndDecrease(pageId, true, followingNodes, {
+		LucidEngine.deletePageAndDecrease(pageId, true, followingNodes, {
 			callback: function(result) {
 				if (!result) {
 					executeActionsAfterSiteTreeInLucidWasChanged(result);
 				}
 				
-				ThemesEngine.deleteArticlesFromDeletedPages(pageId, {
+				LucidEngine.deleteArticlesFromDeletedPages(pageId, {
 					callbcak: function(deletedArticlesResult) {
 					}
 				});
@@ -136,7 +136,7 @@ function getPageUriByCheckedId() {
 		getPrewUrl(currentId);
 	}
 	else {
-		ThemesEngine.getPageIdByUri(uri, {
+		LucidEngine.getPageIdByUri(uri, {
 			callback: function(id) {
 				if (id != null) {
 					PAGE_ID_FROM_FRAME = id;
@@ -157,7 +157,7 @@ function getPageUriByCheckedId() {
 	}
 }
 						
-function getPrewUrl(nodeID) {
+function getPrewUrl(nodeID, uri) {
 	if (WORKING_WITH_TEMPLATE) {
 		if (nodeID != TEMPLATE_ID) {
 			nodeID = TEMPLATE_ID;
@@ -165,13 +165,14 @@ function getPrewUrl(nodeID) {
 		}		
 	}
 	
-	ThemesEngine.getPageUri(nodeID, {
-		callback: function(uri) {
-			ThemesEngine.canUserActAsBuilderUser({
-				callback: function(rights) {
-					setFrameUrlForLucidApplication(uri, nodeID, rights);
-				}
-			});
-		}
-	});
+	if (uri) {
+		setFrameUrlForLucidApplication(uri, nodeID, LucidHelper.applicationInfo.canActAsBuilderUser);
+	}
+	else {
+		LucidEngine.getPageUri(nodeID, {
+			callback: function(uri) {
+				setFrameUrlForLucidApplication(uri, nodeID, LucidHelper.applicationInfo.canActAsBuilderUser);
+			}
+		});
+	}
 }

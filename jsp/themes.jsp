@@ -15,18 +15,7 @@
 						window.addEvent('domready', function() {
                 			errorHandlerInLucid();
 						});
-						window.addEvent('domready', getLocalizedTextForThemes);
-						window.addEvent('domready', initializeThemes);
-						window.addEvent('domready', roundThemesSliderCorners);
-						window.addEvent('domready', function() {
-							themeColourPicker = new MooRainbow('myRainbow', {
-								imgPath: '/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/moorainbow/1.1/images/',
-								onComplete: function(color) {
-									addThemeColorChange(color);
-								},
-								centerPosition: true
-							});
-						});
+						window.addEvent('domready', ThemesManagerHelper.prepareThemesForUsageInLucid);
 					</script>
 				</jsf:verbatim>
 
