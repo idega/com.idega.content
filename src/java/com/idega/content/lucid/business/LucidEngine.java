@@ -105,7 +105,6 @@ public interface LucidEngine extends Serializable {
 	public List<PageAccessibilityProperty> getPageAccessibilityProperties(String pageKey);
 	
 	public boolean setPageAccessibilityProperty(String pageKey, String code, String value, String columnName);
-	
 	/** END from ThemesEngine **/
 	
 	public LucidApplicationInfo getStartInfo(Boolean fullInfo);

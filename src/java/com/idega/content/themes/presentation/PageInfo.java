@@ -1,6 +1,6 @@
 package com.idega.content.themes.presentation;
 
-import java.util.Iterator;
+import java.util.List;
 
 import javax.faces.context.FacesContext;
 
@@ -40,9 +40,8 @@ public class PageInfo extends ContentBlock {
 		}
 		
 		ThemesHelper.getInstance().loadPageSettings(ThemesHelper.getInstance().getWebRootWithoutContent() + ThemesConstants.PAGE_SETTINGS);
-		Iterator<Setting> pageSettings = ThemesHelper.getInstance().getPageSettings().values().iterator();
-		Setting s = null;
-
+		List<Setting> pageSettings = ThemesHelper.getInstance().getPageSettings();
+		
 		Layer layer = new Layer();
 		layer.setStyleClass("webfaceFormSection");
 		pageInfo.add(layer);
@@ -51,9 +50,7 @@ public class PageInfo extends ContentBlock {
 		
 		IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
 		boolean enableInput = true;
-		for (Iterator<Setting> it = pageSettings; it.hasNext();) {
-			s = it.next();
-			
+		for (Setting s: pageSettings) {
 			enableInput = canInputBeEnabled(iwc, s.getCode());
 			Layer container = new Layer();
 			container.setStyleClass("webfaceFormItem");

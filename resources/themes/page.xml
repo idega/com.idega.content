@@ -9,18 +9,18 @@
 		<method>:method:1:implied:void:setTitle:java.lang.String:</method>
 	</key>
 	<key>
-		<code>searchKeywords</code>
-		<label>Search Keywords</label>
-		<defaultValue>keywords</defaultValue>
-		<type>metatext</type>
-		<method>:method:1:implied:void:setMetaTag:java.lang.String:java.lang.String:</method>
-	</key>
-	<key>
 		<code>pageDescription</code>
 		<label>Page Description</label>
 		<defaultValue></defaultValue>
 		<type>metatext</type>
 		<method>:method:1:implied:void:setDescriptionMetaTag:java.lang.String:</method>
+	</key>
+		<key>
+		<code>pageUri</code>
+		<label>Page URI</label>
+		<defaultValue></defaultValue>
+		<type></type>
+		<method></method>
 	</key>
 	<key>
 		<code>javascript</code>
@@ -37,11 +37,11 @@
 		<method>:method:1:implied:void:addStyleSheetURL:java.lang.String:</method>
 	</key>
 	<key>
-		<code>pageUri</code>
-		<label>Page URI</label>
-		<defaultValue></defaultValue>
-		<type></type>
-		<method></method>
+		<code>searchKeywords</code>
+		<label>Search Keywords</label>
+		<defaultValue>keywords</defaultValue>
+		<type>metatext</type>
+		<method>:method:1:implied:void:setMetaTag:java.lang.String:java.lang.String:</method>
 	</key>
 	<key>
 		<code>hidePageInMenu</code>
@@ -60,6 +60,13 @@
 	<key>
 		<code>setPageLocked</code>
 		<label>Locked Page</label>
+		<defaultValue></defaultValue>
+		<type>boolean</type>
+		<method></method>
+	</key>
+	<key>
+		<code>setCategoryPage</code>
+		<label>Category Page</label>
 		<defaultValue></defaultValue>
 		<type>boolean</type>
 		<method></method>

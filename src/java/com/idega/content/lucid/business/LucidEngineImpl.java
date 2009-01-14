@@ -55,6 +55,7 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.servlet.filter.IWWelcomeFilter;
 import com.idega.user.data.GroupBMPBean;
+import com.idega.util.ArrayUtil;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.ListUtil;
@@ -418,62 +419,69 @@ public class LucidEngineImpl implements LucidEngine {
 			return null;
 		}
 		String changedPageUri = null;
-		Setting s = null;
-		Map <String, Setting> map = getThemesEngine().getThemesHelper().getPageSettings();
+		
+		List<Setting> settings = getThemesEngine().getThemesHelper().getPageSettings();
+		if (ListUtil.isEmpty(settings)) {
+			return null;
+		}
+		
+		int index = 0;
+		String currentValue = null;
 		String[] currentValues = null;
 		String[] newValues = null;
 		boolean changedPageTitle = false;
 		boolean needSetValue = true;
-		for (int i = 0; i < keywords.length; i++) {
+		for (Setting s: settings) {
 			needSetValue = true;
-			s = map.get(keywords[i]);
-			if (s != null) {
-				currentValues = getThemesEngine().getThemesHelper().getThemesService().getBuilderService().getPropertyValues(appl, pageKey, ThemesConstants.MINUS_ONE,
-						s.getMethod(), null, true);
-				if (ThemesConstants.EMPTY.equals(values[i]) || values[i] == null) {
-					if (currentValues != null) {
-						getThemesEngine().getThemesHelper().getThemesService().getBuilderService().removeProperty(appl, pageKey, ThemesConstants.MINUS_ONE,
-								s.getMethod(), currentValues);
+			currentValue = values[index];
+			
+			currentValues = getThemesEngine().getThemesHelper().getThemesService().getBuilderService().getPropertyValues(appl, pageKey, ThemesConstants.MINUS_ONE,
+					s.getMethod(), null, true);
+			if (StringUtil.isEmpty(currentValue)) {
+				if (currentValues != null) {
+					getThemesEngine().getThemesHelper().getThemesService().getBuilderService().removeProperty(appl, pageKey, ThemesConstants.MINUS_ONE,
+							s.getMethod(), currentValues);
+				}
+			}
+			else {
+				if (s.getCode().equals(PAGE_URI)) {
+					if (!changedPageTitle) {
+						changedPageUri = setPageUri(pageKey, currentValue);	//	Setting user's uri
 					}
 				}
+				else if (ContentConstants.HIDE_MENU_IN_PAGE.equals(s.getCode())) {
+					setValueForPage(pageKey, currentValue, ICPageBMPBean.HIDE_PAGE_IN_MENU);
+				}
+				else if (ContentConstants.PUBLISH_PAGE_IN_LUCID_CODE.equals(s.getCode())) {
+					setValueForPage(pageKey, currentValue, ICPageBMPBean.PAGE_IS_PUBLISHED);
+				}
+				else if (ContentConstants.SET_PAGE_LOCKED_IN_LUCID_CODE.equals(s.getCode())) {
+					setPageAvailability(iwc, pageKey, currentValue);
+					setValueForPage(pageKey, currentValue, ICPageBMPBean.PAGE_IS_LOCKED);
+				}
+				else if (ContentConstants.PAGE_IS_CATEGORY_TYPE.equals(s.getCode())) {
+					setValueForPage(pageKey, currentValue, ICPageBMPBean.IS_CATEGORY, false);
+				}
 				else {
-					if (s.getCode().equals(PAGE_URI)) {
-						if (!changedPageTitle) {
-							changedPageUri = setPageUri(pageKey, values[i]);	//	Setting user's uri
-						}
+					newValues = getThemesEngine().getThemesHelper().getPageValues(s, currentValue);
+					if (newValues == null) {
+						needSetValue = false;
 					}
-					else if (ContentConstants.HIDE_MENU_IN_PAGE.equals(s.getCode())) {
-						setValueForPage(pageKey, values[i], ICPageBMPBean.HIDE_PAGE_IN_MENU);
+					if (Arrays.deepEquals(newValues, currentValues)) {
+						needSetValue = false;
 					}
-					else if (ContentConstants.PUBLISH_PAGE_IN_LUCID_CODE.equals(s.getCode())) {
-						setValueForPage(pageKey, values[i], ICPageBMPBean.PAGE_IS_PUBLISHED);
-					}
-					else if (ContentConstants.SET_PAGE_LOCKED_IN_LUCID_CODE.equals(s.getCode())) {
-						setPageAvailability(iwc, pageKey, values[i]);
-						setValueForPage(pageKey, values[i], ICPageBMPBean.PAGE_IS_LOCKED);
-					}
-					else if (ContentConstants.PAGE_IS_CATEGORY_TYPE.equals(s.getCode())) {
-						setValueForPage(pageKey, values[i], ICPageBMPBean.IS_CATEGORY, false);
-					}
-					else {
-						newValues = getThemesEngine().getThemesHelper().getPageValues(s, values[i]);
-						if (newValues == null) {
-							needSetValue = false;
-						}
-						if (Arrays.deepEquals(newValues, currentValues)) {
-							needSetValue = false;
-						}
-						if (needSetValue) {
-							getThemesEngine().getThemesHelper().getThemesService().getBuilderService().setProperty(pageKey, ThemesConstants.MINUS_ONE, s.getMethod(),
-									newValues, appl);
-							if (s.getCode().equals(PAGE_TITLE)) {
-								changedPageTitle = changePageName(Integer.valueOf(pageKey).intValue(), values[i], iwc);
-								changedPageUri = changePageUri(pageKey, values[i], true);	//	Changing uri by new name
-							}
+					if (needSetValue) {
+						getThemesEngine().getThemesHelper().getThemesService().getBuilderService().setProperty(pageKey, ThemesConstants.MINUS_ONE, s.getMethod(),
+								newValues, appl);
+						if (s.getCode().equals(PAGE_TITLE)) {
+							changedPageTitle = changePageName(Integer.valueOf(pageKey).intValue(), currentValue, iwc);
+							changedPageUri = changePageUri(pageKey, currentValue, true);	//	Changing uri by new name
 						}
 					}
 				}
 			}
+				
+			index++;
 		}
 		
 		if (changedPageUri != null) {
@@ -498,55 +506,58 @@ public class LucidEngineImpl implements LucidEngine {
 		if (appl == null) {
 			return null;
 		}
-		Setting s = null;
-		Map <String, Setting> map = getThemesEngine().getThemesHelper().getPageSettings();
-		String[] values = new String[keywords.length];
+		List<Setting> settings = getThemesEngine().getThemesHelper().getPageSettings();
+		if (ListUtil.isEmpty(settings)) {
+			return null;
+		}
+			
+		List<String> values = new ArrayList<String>(keywords.length);
 		String[] propValues = null;
 		StringBuffer value = null;
 		ICPage page = getThemesEngine().getThemesHelper().getThemesService().getICPage(pageKey);
-		for (int i = 0; i < keywords.length; i++) {
-			s = map.get(keywords[i]);
+		for (Setting s: settings) {
 			value = new StringBuffer();
-			if (s != null) {
-				propValues = getThemesEngine().getThemesHelper().getThemesService().getBuilderService().getPropertyValues(appl, pageKey, ThemesConstants.MINUS_ONE,
-						s.getMethod(), null, true);
-				if (propValues != null) {
-					for (int j = 0; j < propValues.length; j++) {
-						if (!s.getDefaultValue().equals(propValues[j])) {
-							value.append(propValues[j]);
-							if (j + 1 < propValues.length) {
-								value.append(ThemesConstants.COMMA);
-							}
+			
+			propValues = getThemesEngine().getThemesHelper().getThemesService().getBuilderService().getPropertyValues(appl, pageKey, ThemesConstants.MINUS_ONE,
+					s.getMethod(), null, true);
+			if (propValues != null) {
+				for (int j = 0; j < propValues.length; j++) {
+					if (!s.getDefaultValue().equals(propValues[j])) {
+						value.append(propValues[j]);
+						if (j + 1 < propValues.length) {
+							value.append(ThemesConstants.COMMA);
 						}
-					}
-				}
-				else {
-					if (s.getCode().equals(PAGE_URI)) {
-						if (page != null) {
-							value.append(page.getDefaultPageURI());
-						}
-					}
-					if (ContentConstants.HIDE_MENU_IN_PAGE.equals(s.getCode())) {
-						value.append(page.isHidePageInMenu());
-					}
-					if (ContentConstants.PUBLISH_PAGE_IN_LUCID_CODE.equals(s.getCode())) {
-						value.append(page.isPublished());
-					}
-					if (ContentConstants.SET_PAGE_LOCKED_IN_LUCID_CODE.equals(s.getCode())) {
-						value.append(page.isLocked());
-					}
-					if (ContentConstants.PAGE_IS_CATEGORY_TYPE.equals(s.getCode())) {
-						value.append(page.isCategory());
 					}
 				}
 			}
-			values[i] = value.toString();
+			else {
+				if (s.getCode().equals(PAGE_URI)) {
+					if (page != null) {
+						value.append(page.getDefaultPageURI());
+					}
+				}
+				if (ContentConstants.HIDE_MENU_IN_PAGE.equals(s.getCode())) {
+					value.append(page.isHidePageInMenu());
+				}
+				if (ContentConstants.PUBLISH_PAGE_IN_LUCID_CODE.equals(s.getCode())) {
+					value.append(page.isPublished());
+				}
+				if (ContentConstants.SET_PAGE_LOCKED_IN_LUCID_CODE.equals(s.getCode())) {
+					value.append(page.isLocked());
+				}
+				if (ContentConstants.PAGE_IS_CATEGORY_TYPE.equals(s.getCode())) {
+					value.append(page.isCategory());
+				}
+			}
+				
+			values.add(value.toString());
 		}
-		return values;
+		
+		return ArrayUtil.convertListToArray(values);
 	}
 	
 	public String[] getPageInfoElements() {
-		Collection <Setting> c = getThemesEngine().getThemesHelper().getPageSettings().values();
+		Collection<Setting> c = getThemesEngine().getThemesHelper().getPageSettings();
 		if (c == null) {
 			return null;
 		}

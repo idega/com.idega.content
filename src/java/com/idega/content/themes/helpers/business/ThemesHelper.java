@@ -94,7 +94,7 @@ public class ThemesHelper implements Singleton {
 	private ThemesEngine themesEngine = null;
 	
 	private Map<String, Theme> themes = null;
-	private Map<String, Setting> pageSettings = null;
+	private List<Setting> pageSettings = null;
 	private List<Setting> themeSettings = null;
 	private List<String> moduleIds = null;
 	private List<String> themeQueue = null;
@@ -123,8 +123,8 @@ public class ThemesHelper implements Singleton {
 	
 	private ThemesHelper(boolean canUseSlide) {
 		themes = new HashMap <String, Theme> ();
-		pageSettings = new HashMap <String, Setting> ();
 		
+		pageSettings = Collections.synchronizedList(new ArrayList<Setting>());
 		themeSettings = Collections.synchronizedList(new ArrayList<Setting>());
 		
 		themeQueue = new ArrayList <String> ();
@@ -635,7 +635,7 @@ public class ThemesHelper implements Singleton {
 		themes.remove(themeKey);
 	}
 
-	protected Map <String, Theme> getThemes() {
+	protected Map<String, Theme> getThemes() {
 		return themes;
 	}
 	
@@ -643,7 +643,7 @@ public class ThemesHelper implements Singleton {
 		return themeSettings;
 	}
 	
-	public Map <String, Setting> getPageSettings() {
+	public List<Setting> getPageSettings() {
 		return pageSettings;
 	}
 	
@@ -653,7 +653,7 @@ public class ThemesHelper implements Singleton {
 		}
 		
 		try {
-			loadSettings(null, themeSettings, getXMLDocument(stream));
+			loadSettings(themeSettings, getXMLDocument(stream));
 			loadedThemeSettings = true;
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -665,12 +665,12 @@ public class ThemesHelper implements Singleton {
 		if (loadedPageSettings) {
 			return;
 		}
-		loadSettings(pageSettings, null, getXMLDocument(url));
+		loadSettings(pageSettings, getXMLDocument(url));
 		loadedPageSettings = true;
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void loadSettings(Map<String, Setting> settingsInMap, List<Setting> settingsInList, Document doc) {
+	private void loadSettings(List<Setting> settings, Document doc) {
 		if (doc == null) {
 			return;
 		}
@@ -694,12 +694,7 @@ public class ThemesHelper implements Singleton {
 			setting.setType(key.getChildTextNormalize(ThemesConstants.SETTING_TYPE));
 			setting.setMethod(key.getChildTextNormalize(ThemesConstants.SETTING_METHOD));
 			
-			if (settingsInList == null) {
-				settingsInMap.put(setting.getCode(), setting);
-			}
-			else {
-				settingsInList.add(setting);
-			}
+			settings.add(setting);
 		}
 	}
 
