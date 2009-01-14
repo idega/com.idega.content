@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVCategories.java,v 1.34 2009/01/09 14:16:54 valdas Exp $
+ * $Id: WebDAVCategories.java,v 1.35 2009/01/14 10:43:19 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -57,10 +57,10 @@ import com.idega.webface.WFResourceUtil;
  * select them accordingly.<br>
  * Also allows for adding categories if needed
  * </p>
- *  Last modified: $Date: 2009/01/09 14:16:54 $ by $Author: valdas $
+ *  Last modified: $Date: 2009/01/14 10:43:19 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>
- * @version $Revision: 1.34 $
+ * @version $Revision: 1.35 $
  */
 public class WebDAVCategories extends IWBaseComponent implements ManagedContentBeans, ActionListener{
 	//Constants
@@ -159,7 +159,7 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	
 	private List<ContentCategory> getSortedCategories(List<ContentCategory> categories, Locale locale) {
 		if (ListUtil.isEmpty(categories)) {
-			return null;
+			return categories;
 		}
 		
 		Collections.sort(categories, new ContentCategoryComparator(locale));
@@ -183,6 +183,10 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 		List<ContentCategory> allCategories = new ArrayList<ContentCategory>(selectedCategories);
 		allCategories.addAll(notSelectedCategories);
 		allCategories =	getSortedCategories(allCategories, locale);
+		if (ListUtil.isEmpty(allCategories)) {
+			return categoriesTable;
+		}
+		
 		for (ContentCategory category: allCategories) {
 			HtmlSelectBooleanCheckbox categoryCheckBox = (HtmlSelectBooleanCheckbox) iwc.getApplication().createComponent(HtmlSelectBooleanCheckbox.COMPONENT_TYPE);
 			categoryCheckBox.setId(getCategoryKey(category));

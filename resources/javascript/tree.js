@@ -6,7 +6,7 @@ var PAGE_ID_FROM_FRAME = null;
 
 function saveMyTree(newParentNodeId, sourceNodeId, numberInLevel, nodesToIncrease, nodesToDecrease) {
 	showLoadingMessage(getMovingText());
-	setPageID(sourceNodeId);
+	setPageID(sourceNodeId, true);
 	REFRESH_PAGE_INFO = !isSiteMap();
 
 	if (numberInLevel == null) {
@@ -40,7 +40,7 @@ function deletePage(pageId, followingNodes, nodeBeingDeletedId) {
 	var wantToDelete = confirm(getAreYouSureText());
 	if (wantToDelete) {
 		showLoadingMessage(getDeletingText());
-		setPageID(null);
+		setPageID(null, true);
 		RELOAD_PAGE = true;
 		
 		LucidEngine.deletePageAndDecrease(pageId, true, followingNodes, {

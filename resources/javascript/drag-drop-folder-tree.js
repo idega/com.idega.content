@@ -858,7 +858,7 @@
 			}
 			
 			var lastID = id[id.length - 1];
-			setPageID(lastID);
+			setPageID(lastID, true);
 			getPrewUrl(lastID);
 			isChangingSiteMap();
 			registerActionsForSiteTree();
@@ -1408,7 +1408,7 @@
 				}
 			}
 			var lastID = id[id.length - 1];
-			setPageID(lastID);
+			setPageID(lastID, true);
 			getPrewUrl(lastID);
 			isChangingSiteMap();
 		},

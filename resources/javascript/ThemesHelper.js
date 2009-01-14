@@ -511,7 +511,7 @@ function boldCurrentTreeElementWithPageId(pageId) {
 	}
 	
 	if (getPageID() == null) {
-		setPageID(pageId);
+		setPageID(pageId, false);
 	}
 	
 	var liElement = $(pageId);
@@ -790,7 +790,7 @@ function executeOnClick(id) {
 	
 	var newPageId = element.parentNode.id;
 	boldSelectedTreeElement(element);
-	setPageID(newPageId);
+	setPageID(newPageId, true);
 	if (!IS_SITE_MAP) {
 		getPrewUrl(newPageId);
 		getPageInfoValues();
