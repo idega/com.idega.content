@@ -461,6 +461,7 @@ public class LucidEngineImpl implements LucidEngine {
 				}
 				else if (ContentConstants.PAGE_IS_CATEGORY_TYPE.equals(s.getCode())) {
 					setValueForPage(pageKey, currentValue, ICPageBMPBean.IS_CATEGORY, false);
+					getBuilderService().clearAllCaches();
 				}
 				else {
 					newValues = getThemesEngine().getThemesHelper().getPageValues(s, currentValue);
