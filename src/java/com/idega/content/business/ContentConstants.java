@@ -66,6 +66,7 @@ public class ContentConstants {
 	public static final String HIDE_MENU_IN_PAGE = "hidePageInMenu";
 	public static final String PUBLISH_PAGE_IN_LUCID_CODE = "setPagePublished";
 	public static final String SET_PAGE_LOCKED_IN_LUCID_CODE = "setPageLocked";
+	public static final String PAGE_IS_CATEGORY_TYPE = "setCategoryPage";
 	
 	public static final String ARTICLE_CATEGORIES_VIEWER_BLOCK_CACHE_KEY = "articleCategoriesViewerBlockCacheKey";
 	
