@@ -8,7 +8,7 @@
         xmlns:t="http://myfaces.apache.org/tomahawk" version="1.2">
 <jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 	<jsf:view>
-        <ws:page id="themeManager" javascripturls="#{lucidEngine.getJavaScriptResourcesForThemes()}" stylesheeturls="#{lucidEngine.getStyleSheetResourcesForThemes()}">
+        <ws:page id="themeManager" javascripturls="#{lucidEngine.javaScriptResourcesForThemes}" stylesheeturls="#{lucidEngine.styleSheetResourcesForThemes}">
 			<h:form id="uploadForm" enctype="multipart/form-data">
 				<jsf:verbatim>
 					<script type="text/javascript">

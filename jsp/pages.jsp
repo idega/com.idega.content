@@ -11,7 +11,7 @@
 version="1.2">
 	<jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 	<f:view>
-		<ws:page id="pages" javascripturls="#{lucidEngine.getJavaScriptResources()}" stylesheeturls="#{lucidEngine.getStyleSheetResources()}">
+		<ws:page id="pages" javascripturls="#{lucidEngine.javaScriptResources}" stylesheeturls="#{lucidEngine.styleSheetResources}">
 			<h:form id="pagesForm" onsubmit="return false;">
 				<f:verbatim>
                 	<script type="text/javascript">
