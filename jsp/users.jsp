@@ -17,6 +17,7 @@
 						<bu:property name=":method:1:implied:void:setAllFieldsEditable:boolean:" value="Y" type="java.lang.String" />
 						<bu:property name=":method:1:implied:void:setAddGroupCreateButton:boolean:" value="Y" type="java.lang.String" />
 						<bu:property name=":method:1:implied:void:setAddGroupEditButton:boolean:" value="Y" type="java.lang.String" />
+						<bu:property name=":method:1:implied:void:setAllowEnableDisableAccount:boolean:" value="Y" type="java.lang.String" />
 					</bu:module>
 				</wf:wfblock>
 			</h:form>
