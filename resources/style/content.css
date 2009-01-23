@@ -522,22 +522,18 @@ html>body .themesSlider {
 	*/
 }
 
-.newPageContainerStyle {
+.newPageContainerStyle, .newPagesContainerStyle {
 	position: absolute;
-	bottom: 40px;
+	top: 4px;
 	width: auto;
-	z-index: 5;
-	background-color: #fff;
-	border: 3px solid #a1a1a1;
-}
-
-.newPagesContainerStyle {
-	position: absolute;
-	bottom: 40px;
-	width: auto;
-	z-index: 5;
-	background-color: #fff;
-	border: 3px solid #a1a1a1;
+	z-index: 100;
+	background: url(images/popup-back.png);
+	border: 3px solid #333;
+	margin-left: 15px;
+	border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	padding: 8px;
 }
 
 #div_id_new_page_tree ul {
@@ -1119,7 +1115,7 @@ ul#page_tree_div li a, ul#rootUl li a {
 	margin-left: 5px;
 	line-height: 22px;
 	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
-	color: #3d3d3d
+	color: #3d3d3d;
 }
 
 ul#page_tree_div li ul, ul#rootUl li ul {
@@ -1161,12 +1157,11 @@ ul#page_tree_div li ul, ul#rootUl li ul {
 }
 
 .accordionHeading {
-	border-bottom: 1px #bdbdbd solid;
-	background: url(images/popup_top_background.gif) top left repeat-x #04262d;
-	line-height: 20px;
+	line-height: 26px;
 	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
-	color: #fff;
 	padding: 0 6px;
+	color: #fff;
+	font-size: 20px;
 	font-weight: bold;
 	display: block;
 }
@@ -1177,8 +1172,9 @@ ul#page_tree_div li ul, ul#rootUl li ul {
 
 .closeNewPageOrPagesStyle {
 	cursor: pointer;
-	float: right;
-	margin-top: 2px;
+	position: absolute;
+	right: -8px;
+	top: -8px;
 }
 
 .disabledButtonInPages {
@@ -1478,6 +1474,15 @@ iframe.contentItemEditorFrameStyle {
 
 #pageTemplatesStretcher, #site_templates {
 	overflow: auto;
+	margin-top: 8px;
+}
+
+#site_templates {
+	border: 1px #666 solid;
+}
+
+#pageTemplatesStretcher ul#page_tree_div li a {
+	color: #fff;
 }
 
 div.lucidLocaleChooserContainerStyle {
