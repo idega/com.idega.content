@@ -78,6 +78,7 @@ public class ThemesSliderViewer extends Block {
 					
 					CoreConstants.DWR_ENGINE_SCRIPT,
 					"/dwr/interface/ThemesEngine.js",
+					"/dwr/interface/LucidEngine.js",
 					
 					bundle.getVirtualPathWithFileNameString("javascript/ThemesHelper.js"),
 					bundle.getVirtualPathWithFileNameString("javascript/ThemesManagerHelper.js"),
