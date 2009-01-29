@@ -281,9 +281,6 @@ public class CssScanner implements ResourceScanner {
 		if (line.indexOf(urlExpressionStart) == -1) {
 			return line;
 		}
-		if (line.indexOf(COMMENT_BEGIN) != -1 || line.indexOf(COMMENT_END) != -1) {
-			return line;
-		}
 		if (line.indexOf(IWBundleResourceFilter.BUNDLES_STANDARD_DIR) != -1) {
 			return line;
 		}
