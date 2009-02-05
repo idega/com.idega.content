@@ -288,11 +288,18 @@ public class CssScanner implements ResourceScanner {
 		line = line.replaceAll(CoreConstants.QOUTE_SINGLE_MARK, CoreConstants.EMPTY);
 		line = line.replaceAll(CoreConstants.QOUTE_MARK, CoreConstants.EMPTY);
 		
-		int startIndex = line.indexOf(urlExpressionStart);
+		int startIndex = line.indexOf(urlExpressionStart) + urlExpressionStart.length();
 		int endIndex = line.indexOf(")");
-		String urlExpression = line.substring(startIndex + urlExpressionStart.length(), endIndex);
-		String originalExpression = urlExpression;
+		String urlExpression = null;
+		if (startIndex != -1 && endIndex != -1 && startIndex <= endIndex) {
+			urlExpression = line.substring(startIndex, endIndex);
+			
+		}
+		if (urlExpression == null) {
+			return line;
+		}
 		
+		String originalExpression = urlExpression;
 		String urlReplacement = null;
 		
 		int levelsUp = 0;
