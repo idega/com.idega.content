@@ -4,6 +4,8 @@ var UPLOADING_FILE_PROGRESS_BOX_TEXT = 'Uploading file';
 var UPLOADING_FILE_PLEASE_WAIT_PROGRESS_BOX_TEXT = 'completed, please wait...';
 var UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT = 'Upload was successfully finished.';
 
+FileUploadHelper.uploadedFiles = null;
+
 FileUploadHelper.uploadFiles = function(id, message, showProgressBar, showMessage, zipFile, invalidTypeMessage, formId, progressBarId, localization, actionAfterUpload,
 						actionAfterCounterReset, uploadId) {
 	if (localization != null) {
@@ -45,6 +47,11 @@ FileUploadHelper.uploadFiles = function(id, message, showProgressBar, showMessag
 		upload: function(o) {
 			closeAllLoadingMessages();
 			
+			FileUploadHelper.uploadedFiles = files;
+			
+			executeUserDefinedActionsAfterUploadFinished(actionAfterUpload);
+			
+			FileUploadHelper.uploadedFiles = null;
 			var inputsToRemove = new Array();
 			for (var i = 0; i < inputs.length; i++) {
 				inputs[i].setAttribute('value', '');
@@ -60,8 +67,6 @@ FileUploadHelper.uploadFiles = function(id, message, showProgressBar, showMessag
 					input.parent().remove();
 				})
 			});
-			
-			executeUserDefinedActionsAfterUploadFinished(actionAfterUpload);
 		}
 	};
 	
