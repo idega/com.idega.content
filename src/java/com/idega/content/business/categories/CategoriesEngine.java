@@ -21,5 +21,7 @@ public interface CategoriesEngine {
 	public boolean renameCategory(String id, String locale, String newName);
 	
 	public Document addCategory(String name, String locale);
+	
+	public boolean deleteCategory(String id);
 
 }

@@ -474,7 +474,7 @@ LucidHelper.reloadFrame = function() {
 }
 
 LucidHelper.setSelectedLocale = function() {
-	var locale = DWRUtil.getValue('lucidLocaleSwitcher');
+	var locale = dwr.util.getValue('lucidLocaleSwitcher');
 	if (locale == null || locale == '' || locale == '-1') {
 		return false;
 	}

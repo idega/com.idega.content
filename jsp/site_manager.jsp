@@ -27,7 +27,7 @@
 							var errorHanlder = function() {
 								reloadPage();
 							}
-							DWREngine.setErrorHandler(errorHanlder);
+							dwr.engine.setErrorHandler(errorHanlder);
 						});
                 		window.addEvent('domready', startBuilderApplication);
                 		window.addEvent('domready', getGlobalPageId);

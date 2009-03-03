@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	xmlns:dwr="http://www.directwebremoting.org/schema/spring-dwr"
+	xmlns:aop="http://www.springframework.org/schema/aop"
 	
-	<bean id="content.CategoriesEngineBean" class="com.idega.content.business.categories.CategoriesEngineBean" scope="session" />
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+						http://www.directwebremoting.org/schema/spring-dwr
+						http://www.directwebremoting.org/schema/spring-dwr-3.0.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
 	
-	<bean id="fileUploader" class="com.idega.content.upload.business.FileUploaderBean" scope="session"></bean>
-	<bean id="fileUploadProgressListener" class="com.idega.content.upload.business.FileUploadProgressListenerBean" scope="session"></bean>
+	<dwr:configuration />
+
+	<bean id="content.CategoriesEngineBean" class="com.idega.content.business.categories.CategoriesEngineBean" scope="session">
+		<dwr:remote javascript="CategoriesEngine" />
+		<aop:scoped-proxy />
+	</bean>
+	
+	<bean id="fileUploader" class="com.idega.content.upload.business.FileUploaderBean" scope="session">
+		<dwr:remote javascript="FileUploader" />
+		<aop:scoped-proxy />
+	</bean>
+	<bean id="fileUploadProgressListener" class="com.idega.content.upload.business.FileUploadProgressListenerBean" scope="session">
+		<dwr:remote javascript="FileUploadListener" />
+		<aop:scoped-proxy />
+	</bean>
 
 </beans>

@@ -818,7 +818,7 @@ function enableReverseAjaxInThemes() {
 function setReverseAjaxInThemes() {
 	if (!SET_REVERSE_AJAX_IN_THEMES) {
 		SET_REVERSE_AJAX_IN_THEMES = true;
-		DWREngine.setActiveReverseAjax(true);
+		dwr.engine.setActiveReverseAjax(true);
 	}
 	if (ENABLE_REVERSE_AJAX_TIME_OUT_ID_IN_THEMES != 0) {
 		window.clearTimeout(ENABLE_REVERSE_AJAX_TIME_OUT_ID_IN_THEMES);
@@ -1010,5 +1010,5 @@ function errorHandlerInLucid() {
 			reloadPage();
 		}
 	}
-	DWREngine.setErrorHandler(errorHanlder);
+	dwr.engine.setErrorHandler(errorHanlder);
 }

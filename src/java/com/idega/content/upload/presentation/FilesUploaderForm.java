@@ -124,7 +124,7 @@ public class FilesUploaderForm extends Block {
 			}
 		}
 		
-		StringBuilder action = new StringBuilder("FileUploadHelper.changeUploadPath(DWRUtil.getValue('").append(folders.getId()).append("'), '")
+		StringBuilder action = new StringBuilder("FileUploadHelper.changeUploadPath(dwr.util.getValue('").append(folders.getId()).append("'), '")
 								.append(ContentConstants.UPLOADER_PATH).append("');");
 		folders.setOnChange(FileUploadViewer.getActionToLoadFilesAndExecuteCustomAction(action.toString(), true, true));
 		

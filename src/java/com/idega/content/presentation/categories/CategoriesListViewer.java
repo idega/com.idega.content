@@ -147,7 +147,7 @@ public class CategoriesListViewer extends Block {
 	private UIComponent getCategoryNameCellContent(String name, String id, IWResourceBundle iwrb, String language) {
 		Text container = new Text(name);
 		addAttributes(container, id, "changeCategoryNameLabelStyle", language);
-		container.setToolTip(iwrb.getLocalizedString("change_category_name", "Click to change name"));
+		container.setTitle(iwrb.getLocalizedString("change_category_name", "Click to change name"));
 		return container;
 	}
 	

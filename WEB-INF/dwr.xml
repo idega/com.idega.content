@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE dwr PUBLIC "-//GetAhead Limited//DTD Direct Web Remoting 2.0//EN" "http://www.getahead.ltd.uk/dwr//dwr20.dtd">
+<!DOCTYPE dwr PUBLIC "-//GetAhead Limited//DTD Direct Web Remoting 3.0//EN" "http://getahead.org/dwr//dwr30.dtd">
 
 <dwr>
 	<allow>
-		<create creator="jsf" javascript="ThemesEngine">
-			<param name="managedBeanName" value="themesEngine" />
-      		<param name="class" value="com.idega.content.themes.business.ThemesEngineBean" />
-      		
+		<create creator="spring" javascript="ThemesEngine">
+			<param name="beanName" value="themesEngine" />
       		<include method="getThemes"/>
       		<include method="getTheme"/>
       		<include method="getThemeStyleVariations"/>
@@ -30,25 +28,30 @@
     	<convert converter="bean" match="com.idega.content.themes.helpers.bean.TreeNodeStructure" />
     	<convert converter="bean" match="com.idega.content.themes.helpers.bean.PageAccessibilityProperty"/>
     	
-    	<create creator="jsf" javascript="CategoriesEngine">
-	    	<param name="managedBeanName" value="content.CategoriesEngineBean" />
-	    	<param name="class" value="com.idega.content.business.categories.CategoriesEngineBean" />
+    	<create creator="spring" javascript="CategoriesEngine">
+	    	<param name="beanName" value="content.CategoriesEngineBean" />
+	    	<include method="getInfo"/>
+			<include method="getCategoriesList"/>
+			<include method="manageCategoryUsage"/>
+			<include method="renameCategory"/>
+			<include method="addCategory"/>
+			<include method="deleteCategory"/>
     	</create>
     	
-    	<create creator="jsf" javascript="FileUploader">
-    		<param name="managedBeanName" value="fileUploader" />
-    		<param name="class" value="com.idega.content.upload.business.FileUploaderBean"/>
+    	<create creator="spring" javascript="FileUploader">
+    		<param name="beanName" value="fileUploader" />
+    		<include method="getRenderedFileInput"/>
+    		<include method="getRenderedComponent"/>
 		</create>
 		
-		<create creator="jsf" javascript="FileUploadListener">
-    		<param name="managedBeanName" value="fileUploadProgressListener" />
-    		<param name="class" value="com.idega.content.upload.business.FileUploadProgressListenerBean"/>
+		<create creator="spring" javascript="FileUploadListener">
+    		<param name="beanName" value="fileUploadProgressListener" />
+    		<include method="resetFileUploaderCounters"/>
+    		<include method="getFileUploadStatus"/>
 		</create>
 		
-		<create creator="jsf" javascript="LucidEngine">
-			<param name="managedBeanName" value="lucidEngine" />
-      		<param name="class" value="com.idega.content.lucid.business.LucidEngineImpl" />
-      		
+		<create creator="spring" javascript="LucidEngine">
+			<param name="beanName" value="lucidEngine" />
       		<include method="getPermissionWindowResources"/>
       		<include method="getPropertiesWindowResources"/>
       		<include method="setLocale"/>

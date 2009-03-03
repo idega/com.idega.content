@@ -26,7 +26,7 @@
         					var errorHanlder = function() {
 								reloadPage();
 							}
-							DWREngine.setErrorHandler(errorHanlder);
+        					dwr.engine.setErrorHandler(errorHanlder);
         				
         					getInfoForCategories();
         					initializeContentCategoriesActions();
