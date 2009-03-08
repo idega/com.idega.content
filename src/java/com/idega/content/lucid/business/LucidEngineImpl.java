@@ -676,7 +676,9 @@ public class LucidEngineImpl implements LucidEngine {
 				if (domain != null) {
 					if (keyword.indexOf(ThemesConstants.DOMAIN_NAME) != -1) {
 						domain.setDomainName(value);
+						domain.setName(value);
 						cachedDomain.setDomainName(value);
+						cachedDomain.setName(value);
 					}
 					if (keyword.indexOf(ThemesConstants.DOMAIN_SERVER_NAME) != -1) {
 						domain.setServerName(value);
