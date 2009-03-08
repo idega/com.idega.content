@@ -304,6 +304,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	
 	private boolean uploadTheme(Document doc, Theme theme) {
 		checkCssFiles(doc, theme.getLinkToBase());
+		checkScriptTags(doc);
 		
 		return uploadTheme(out.outputString(doc), theme, true);
 	}
@@ -640,8 +641,9 @@ public class ThemeChangerBean implements ThemeChanger {
 			
 			content = StringHandler.replace(content, LESS_CODE, LESS_CODE_REPLACEMENT);
 			content = StringHandler.replace(content, MORE_CODE, MORE_CODE_REPLACEMENT);
+			content = StringHandler.replace(content, "xml:space=\"preserve\"", CoreConstants.EMPTY);
 		}
-		
+
 		theme.setLocked(true);
 		try {
 			if (!helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(linkToBase, fileName, content, null, true)) {
@@ -693,7 +695,23 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @return boolean
 	 */
 	public boolean uploadDocument(Document doc, String linkToBase, String fileName, Theme theme, boolean isTheme) {
+		checkScriptTags(doc);
+		
 		return uploadDocument(out.outputString(doc), linkToBase, fileName, theme, isTheme, false);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void checkScriptTags(Document doc) {
+		List<Element> scripts = getNodesByXpath(doc.getRootElement().getChild("body", namespace), "//" + ThemesConstants.NAMESPACE_ID + ":script");
+		if (ListUtil.isEmpty(scripts)) {
+			return;
+		}
+		
+		for (Element script: scripts) {
+			if (ListUtil.isEmpty(script.getContent())) {
+				script.addContent(getComment("IdegaWeb"));
+			}
+		}
 	}
 	
 	/**
