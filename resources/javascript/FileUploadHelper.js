@@ -78,6 +78,7 @@ FileUploadHelper.uploadFiles = function(id, message, showProgressBar, showMessag
 			if (showProgressBar) {
 				jQuery('#' + progressBarId).parent().hide('fast', function() {
 					jQuery('#' + progressBarId).progressBar(0, { showText: true});
+					jQuery('#' + progressBarId).css('display', 'block');
 					showUploadInfoInProgressBar(progressBarId, actionAfterCounterReset);
 				});
 			}
@@ -126,7 +127,7 @@ function resetFileUploaderCounterAfterTimeOut(progressBarId, customActionAfterCo
 				jQuery('#' + progressBarId).remove();
 				
 				jQuery(parentContainer).hide('fast', function() {
-					jQuery(parentContainer).append('<span id=\''+progressBarId+'\' class=\'progressBar\' />');
+					jQuery(parentContainer).append('<span id=\''+progressBarId+'\' class=\'progressBar\' style=\'display: none;\'/>');
 					jQuery('#' + progressBarId).progressBar(0, { showText: true});
 					executeUserDefinedActionsAfterUploadFinished(customActionAfterCounterReset);
 				});
