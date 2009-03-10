@@ -3,11 +3,11 @@
   <parent>
     <artifactId>com.idega.block.platform</artifactId>
     <groupId>com.idega.block.platform</groupId>
-    <version>4.1.1</version>
+    <version>4.1.2-SNAPSHOT</version>
   </parent>
   <groupId>com.idega.block.platform</groupId>
   <artifactId>com.idega.content</artifactId>
-  <version>4.1.1</version>
+  <version>4.1.2-SNAPSHOT</version>
   <name>idegaWeb Content</name>
   <description>idegaWeb is the new ContentManagement System and Framework</description>
   <inceptionYear>2004</inceptionYear>
@@ -20,7 +20,6 @@
     <connection>scm:cvs:ext:idegaweb@code.idega.com:/idega/cvs:com.idega.block.platform/com.idega.content/</connection>
     <developerConnection>scm:cvs:ext:idegaweb@code.idega.com:/idega/cvs:com.idega.block.platform/com.idega.content/</developerConnection>
     -->
-    <tag>com_idega_block_platform-4_1_1</tag>
   </scm>
 
   <developers>
