@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.46 2009/01/06 05:51:14 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.47 2009/03/11 09:38:41 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -9,9 +9,7 @@
  */
 package com.idega.content;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -21,7 +19,6 @@ import com.idega.block.rss.business.RSSProducerRegistry;
 import com.idega.builder.business.BuilderLogicWrapper;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
-import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentIWActionURIHandler;
 import com.idega.content.business.ContentRSSProducer;
 import com.idega.content.themes.business.TemplatesLoader;
@@ -32,24 +29,25 @@ import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.view.ContentViewManager;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.uri.IWActionURIManager;
-import com.idega.idegaweb.DefaultIWBundle;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWBundleStartable;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
+import com.idega.servlet.filter.IWBundleResourceFilter;
 import com.idega.slide.business.IWSlideService;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.data.Group;
+import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.expression.ELUtil;
 
 /**
  * 
- *  Last modified: $Date: 2009/01/06 05:51:14 $ by $Author: valdas $
+ *  Last modified: $Date: 2009/03/11 09:38:41 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.46 $
+ * @version $Revision: 1.47 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	
@@ -61,14 +59,14 @@ public class IWBundleStarter implements IWBundleStartable{
 	}
 
 	public void start(IWBundle starterBundle) {
+		ThemesConstants.initializeThemeConstants();
+		
 		addIWActionURIHandlers();
 		addRSSProducers(starterBundle);
 		addContentRoleGroups(starterBundle.getApplication().getIWApplicationContext());
 		
 		ContentViewManager cViewManager = ContentViewManager.getInstance(starterBundle.getApplication());
 		cViewManager.initializeStandardNodes(starterBundle);
-		//GlobalIncludeManager.getInstance().addBundleStyleSheet(ContentConstants.IW_BUNDLE_IDENTIFIER, "/style/content.css");
-		
 		
 		IWApplicationContext iwac = starterBundle.getApplication().getIWApplicationContext();
 	    try {
@@ -136,17 +134,13 @@ public class IWBundleStarter implements IWBundleStartable{
 	
 	private void loadThemeValues(IWBundle bundle) {
 		InputStream stream = null;
+		IWMainApplication app = bundle.getApplication();
 		try {
-			String sBundlesDirectory = System.getProperty(DefaultIWBundle.SYSTEM_BUNDLES_RESOURCE_DIR);
-			if (sBundlesDirectory != null) {
-				String filePath = sBundlesDirectory + File.separator + ContentConstants.IW_BUNDLE_IDENTIFIER + File.separator + ThemesConstants.THEME_SETTINGS;
-				stream = new FileInputStream(filePath);
-			}
-			else {
-				stream = bundle.getResourceInputStream(ThemesConstants.THEME_SETTINGS);
-			}
-		} catch (IOException e) {
+			stream = new FileInputStream(IWBundleResourceFilter.copyResourceFromJarToWebapp(app, bundle.getResourcesPath() + "/themes/theme.xml"));
+		} catch(Exception e) {
 			e.printStackTrace();
+		}
+		if (stream == null) {
 			return;
 		}
 		
@@ -156,7 +150,7 @@ public class IWBundleStarter implements IWBundleStartable{
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
-			closeInputStream(stream);
+			IOUtil.closeInputStream(stream);
 		}
 		
 		List<Setting> settings = helper.getThemeSettings();
@@ -169,18 +163,6 @@ public class IWBundleStarter implements IWBundleStartable{
 			if (applicationSettings.getProperty(key) == null) { // Not overriding existing values
 				applicationSettings.setProperty(key, setting.getDefaultValue());
 			}
-		}
-	}
-	
-	private void closeInputStream(InputStream is) {
-		if (is == null) {
-			return;
-		}
-		
-		try {
-			is.close();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 	

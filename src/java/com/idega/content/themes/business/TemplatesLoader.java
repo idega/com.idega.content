@@ -1,7 +1,6 @@
 package com.idega.content.themes.business;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,6 +28,7 @@ import com.idega.idegaweb.IWModuleLoader;
 import com.idega.idegaweb.JarLoader;
 import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
+import com.idega.util.IOUtil;
 
 /**
  * A utility class to find page types and site templates from bundles and slide
@@ -83,7 +83,7 @@ public class TemplatesLoader implements JarLoader {
 			catch (Exception e) {
 				e.printStackTrace();
 			} finally {
-				closeInputStream(stream);
+				IOUtil.closeInputStream(stream);
 			}
 		}
 		
@@ -96,21 +96,9 @@ public class TemplatesLoader implements JarLoader {
 			catch (Exception e) {
 				e.printStackTrace();
 			} finally {
-				closeInputStream(stream);
+				IOUtil.closeInputStream(stream);
 			}
 		}		
-	}
-	
-	private void closeInputStream(InputStream is) {
-		if (is == null) {
-			return;
-		}
-		
-		try {
-			is.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**

@@ -5,9 +5,12 @@ import java.util.Collections;
 import java.util.List;
 
 import com.idega.content.business.ContentConstants;
+import com.idega.content.business.ContentUtil;
 import com.idega.util.CoreConstants;
 
 public class ThemesConstants {
+	
+	private static boolean INITIALIZED;
 	
 	public static final String IDEGA_THEME = "idega_theme";
 	
@@ -18,10 +21,9 @@ public class ThemesConstants {
 	
 	public static final String XML_EXTENSION = "xml";
 	
-	//private static final String BASE_ROOT_APPL = ContentUtil.getBundle().getResourcesPath();
-	private static final String BASE_ROOT_APPL = "/idegaweb/bundles/com.idega.content.bundle/resources";
+	private static String CONTENT_BUNDLE_RESOURCES = null;
 	
-	protected static final String BASE_THEME_IMAGES = BASE_ROOT_APPL + "/images/themes/";
+	protected static String BASE_THEME_IMAGES = null;
 	
 	protected static final String NAMESPACE = "http://www.w3.org/1999/xhtml";
 	protected static final String NAMESPACE_ID = "xmlns";
@@ -167,9 +169,6 @@ public class ThemesConstants {
 	
 	protected static final String DEFAULT_MIME_TYPE = "image/";
 	
-	protected static final String PAGES_PATH_APPL = BASE_ROOT_APPL + "/pages/";
-	protected static final String ARTICLE_PATH_APPL = BASE_ROOT_APPL + "/themes/" + IDEGA_THEME + "_article." + XML_EXTENSION;
-	
 	public static final String THEMES = "/themes/";
 	
 	public static final String THEMES_PROPERTY_START = "theme.";
@@ -184,8 +183,7 @@ public class ThemesConstants {
 	public static final String SEMICOLON = CoreConstants.SEMICOLON;
 	public static final String COMMA = CoreConstants.COMMA;
 	
-	public static final String THEME_SETTINGS = "resources/themes/theme.xml";
-	public static final String PAGE_SETTINGS = BASE_ROOT_APPL + "/themes/page.xml";
+	public static String PAGE_SETTINGS = null;
 	
 	public static final String LAST_USED_THEME = "theme.last_used.ibpage_id";
 	
@@ -212,4 +210,22 @@ public class ThemesConstants {
 	
 	public static final String THEME_PREDEFINED_STYLE_CONFIG_FILE = ".rwstyle";
 	public static final String DEFAULT_THEME_STYLE_ID = "defaultThemeStyleId";
+	
+	private static String getContentBundleResourcesUri() {
+		if (CONTENT_BUNDLE_RESOURCES == null) {
+			CONTENT_BUNDLE_RESOURCES = ContentUtil.getBundle().getResourcesPath();
+		}
+		return CONTENT_BUNDLE_RESOURCES;
+	}
+	
+	public static void initializeThemeConstants() {
+		if (INITIALIZED) {
+			return;
+		}
+		
+		BASE_THEME_IMAGES = getContentBundleResourcesUri() + "/images/themes/";
+		PAGE_SETTINGS = getContentBundleResourcesUri() + "/themes/page.xml";
+		
+		INITIALIZED = true;
+	}
 }
