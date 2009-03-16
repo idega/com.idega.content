@@ -49,10 +49,7 @@ function deletePage(pageId, followingNodes, nodeBeingDeletedId) {
 					executeActionsAfterSiteTreeInLucidWasChanged(result);
 				}
 				
-				LucidEngine.deleteArticlesFromDeletedPages(pageId, {
-					callbcak: function(deletedArticlesResult) {
-					}
-				});
+				LucidEngine.deleteArticlesFromDeletedPages(pageId);
 				executeActionsAfterSiteTreeInLucidWasChanged(result);
 			}
 		});
