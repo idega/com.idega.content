@@ -50,18 +50,26 @@ public class FileUploadViewer extends IWBaseComponent {
 		Object values[] = (Object[]) state;
 		super.restoreState(context, values[0]);
 		
-		this.actionAfterUpload = values[1] == null ? null : values[1].toString();
+		this.actionAfterUpload = values[1] == null ? null : values[1]
+		        .toString();
 		this.uploadPath = values[2] == null ? null : values[2].toString();
 		
 		this.zipFile = values[3] == null ? Boolean.FALSE : (Boolean) values[3];
-		this.extractContent = values[4] == null ? Boolean.FALSE : (Boolean) values[4];
-		this.themePack = values[5] == null ? Boolean.FALSE : (Boolean) values[5];
-		this.showProgressBar = values[6] == null ? Boolean.TRUE : (Boolean) values[6];
-		this.showLoadingMessage = values[7] == null ? Boolean.FALSE : (Boolean) values[7];
-		this.allowMultipleFiles = values[8] == null ? Boolean.FALSE : (Boolean) values[8];
-		this.autoAddFileInput = values[9] == null ? Boolean.FALSE : (Boolean) values[9];
+		this.extractContent = values[4] == null ? Boolean.FALSE
+		        : (Boolean) values[4];
+		this.themePack = values[5] == null ? Boolean.FALSE
+		        : (Boolean) values[5];
+		this.showProgressBar = values[6] == null ? Boolean.TRUE
+		        : (Boolean) values[6];
+		this.showLoadingMessage = values[7] == null ? Boolean.FALSE
+		        : (Boolean) values[7];
+		this.allowMultipleFiles = values[8] == null ? Boolean.FALSE
+		        : (Boolean) values[8];
+		this.autoAddFileInput = values[9] == null ? Boolean.FALSE
+		        : (Boolean) values[9];
 		
-		this.componentToRerenderId = values[10] == null ? null : values[10].toString();
+		this.componentToRerenderId = values[10] == null ? null : values[10]
+		        .toString();
 	}
 	
 	@Override
@@ -90,7 +98,8 @@ public class FileUploadViewer extends IWBaseComponent {
 		IWContext iwc = IWContext.getIWContext(context);
 		FileUploader uploader = null;
 		try {
-			uploader = WFUtil.getBeanInstance(context, FileUploader.SPRING_BEAN_IDENTIFIER);
+			uploader = WFUtil.getBeanInstance(context,
+			    FileUploader.SPRING_BEAN_IDENTIFIER);
 			uploader.initializeUploader(iwc);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -103,7 +112,8 @@ public class FileUploadViewer extends IWBaseComponent {
 			extractContent = true;
 		}
 		
-		IWBundle bundle = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER);
+		IWBundle bundle = iwc.getIWMainApplication().getBundle(
+		    ContentConstants.IW_BUNDLE_IDENTIFIER);
 		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
 		
 		Layer container = new Layer();
@@ -121,37 +131,56 @@ public class FileUploadViewer extends IWBaseComponent {
 			formId = form.getId();
 		}
 		
-		HiddenInput path = new HiddenInput(ContentConstants.UPLOADER_PATH, uploadPath);
+		HiddenInput path = new HiddenInput(ContentConstants.UPLOADER_PATH,
+		        getUploadPath(iwc));
 		path.setStyleClass(ContentConstants.UPLOADER_PATH);
 		mainContainer.add(path);
-		HiddenInput zipFileValue = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_ZIP_FILE, String.valueOf(zipFile));
+		HiddenInput zipFileValue = new HiddenInput(
+		        ContentConstants.UPLOADER_UPLOAD_ZIP_FILE, String
+		                .valueOf(zipFile));
 		mainContainer.add(zipFileValue);
-		HiddenInput themePackValue = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_THEME_PACK, String.valueOf(themePack));
+		HiddenInput themePackValue = new HiddenInput(
+		        ContentConstants.UPLOADER_UPLOAD_THEME_PACK, String
+		                .valueOf(themePack));
 		mainContainer.add(themePackValue);
-		HiddenInput extractContentValue = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE, String.valueOf(extractContent));
+		HiddenInput extractContentValue = new HiddenInput(
+		        ContentConstants.UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE, String
+		                .valueOf(extractContent));
 		mainContainer.add(extractContentValue);
 		String uploadId = getGeneratedUploadId();
-		HiddenInput uploadIdInput = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_IDENTIFIER, uploadId);
+		HiddenInput uploadIdInput = new HiddenInput(
+		        ContentConstants.UPLOADER_UPLOAD_IDENTIFIER, uploadId);
 		mainContainer.add(uploadIdInput);
 		
 		Layer fileInputs = new Layer();
 		String id = fileInputs.getId();
 		fileInputs.setStyleClass("fileUploadInputsContainerStyle");
-		//	Not adding 'remove' image - at least one file input should remain
-		fileInputs.add(uploader.getFileInput(iwc, id, false, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId), isAutoAddFileInput()));	
+		// Not adding 'remove' image - at least one file input should remain
+		fileInputs.add(uploader.getFileInput(iwc, id, false,
+		    isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId),
+		    isAutoAddFileInput()));
 		mainContainer.add(fileInputs);
 		
 		Layer buttonsContainer = new Layer();
 		buttonsContainer.setStyleClass("fileUploadButtonsContainerStyle");
+		
+		System.out.println("____ALLLOW=" + allowMultipleFiles);
 		if (allowMultipleFiles) {
-			GenericButton addFileInput = new GenericButton(iwrb.getLocalizedString("add_file", "Add file"));
-			addFileInput.setOnClick(getActionToLoadFilesAndExecuteCustomAction(uploader.getAddFileInputJavaScriptAction(id, iwrb, isShowProgressBar(),
-					!StringUtil.isEmpty(componentToRerenderId), isAutoAddFileInput()), isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId)));
+			GenericButton addFileInput = new GenericButton(iwrb
+			        .getLocalizedString("add_file", "Add file"));
+			addFileInput.setOnClick(getActionToLoadFilesAndExecuteCustomAction(
+			    uploader.getAddFileInputJavaScriptAction(id, iwrb,
+			        isShowProgressBar(), !StringUtil
+			                .isEmpty(componentToRerenderId),
+			        isAutoAddFileInput()), isShowProgressBar(), !StringUtil
+			            .isEmpty(componentToRerenderId)));
 			buttonsContainer.add(addFileInput);
 		}
 		
-		String uploadingFile = iwrb.getLocalizedString("uploading_file", "Uploading file");
-		String uploadStatus = iwrb.getLocalizedString("completed_please_wait", "completed, please wait...");
+		String uploadingFile = iwrb.getLocalizedString("uploading_file",
+		    "Uploading file");
+		String uploadStatus = iwrb.getLocalizedString("completed_please_wait",
+		    "completed, please wait...");
 		
 		Layer progressBarBox = new Layer();
 		Span progressBar = new Span();
@@ -163,11 +192,18 @@ public class FileUploadViewer extends IWBaseComponent {
 		List<String> localization = new ArrayList<String>(3);
 		localization.add(uploadingFile);
 		localization.add(uploadStatus);
-		localization.add(iwrb.getLocalizedString("upload_was_successfully_finished", "Upload was successfully finished."));
+		localization.add(iwrb.getLocalizedString(
+		    "upload_was_successfully_finished",
+		    "Upload was successfully finished."));
 		
-		String inavlidTypeMessage = iwrb.getLocalizedString("incorrect_file_type", "Unsupported file type! Only zip files allowed");
-		GenericButton upload = new GenericButton(iwrb.getLocalizedString("upload", "Upload"));
-		upload.setOnClick(getAction(id, iwrb.getLocalizedString("uploading", "Uploading..."), inavlidTypeMessage, progressBarId, localization, uploadId));
+		String inavlidTypeMessage = iwrb.getLocalizedString(
+		    "incorrect_file_type",
+		    "Unsupported file type! Only zip files allowed");
+		GenericButton upload = new GenericButton(iwrb.getLocalizedString(
+		    "upload", "Upload"));
+		upload.setOnClick(getAction(id, iwrb.getLocalizedString("uploading",
+		    "Uploading..."), inavlidTypeMessage, progressBarId, localization,
+		    uploadId));
 		buttonsContainer.add(upload);
 		
 		mainContainer.add(buttonsContainer);
@@ -175,7 +211,9 @@ public class FileUploadViewer extends IWBaseComponent {
 	
 	private String getGeneratedUploadId() {
 		Random random = new Random();
-		return new StringBuilder("uploadId").append(System.currentTimeMillis()).append("_").append(random.nextInt(Integer.MAX_VALUE)).toString();
+		return new StringBuilder("uploadId").append(System.currentTimeMillis())
+		        .append("_").append(random.nextInt(Integer.MAX_VALUE))
+		        .toString();
 	}
 	
 	@Override
@@ -183,10 +221,16 @@ public class FileUploadViewer extends IWBaseComponent {
 		super.encodeBegin(context);
 	}
 	
-	private String getAction(String id, String loadingMessage, String invalidTypeMessage, String progressBarId, List<String> localization, String uploadId) {
-		StringBuffer action = new StringBuffer("FileUploadHelper.uploadFiles('").append(id).append("', '").append(loadingMessage).append("', ")
-			.append(showProgressBar).append(", ").append(showLoadingMessage).append(", ").append(zipFile).append(", '").append(invalidTypeMessage).append("', '")
-			.append(formId).append("', '").append(progressBarId).append("', ");
+	private String getAction(String id, String loadingMessage,
+	        String invalidTypeMessage, String progressBarId,
+	        List<String> localization, String uploadId) {
+		StringBuffer action = new StringBuffer("FileUploadHelper.uploadFiles('")
+		        .append(id).append("', '").append(loadingMessage).append("', ")
+		        .append(showProgressBar).append(", ")
+		        .append(showLoadingMessage).append(", ").append(zipFile)
+		        .append(", '").append(invalidTypeMessage).append("', '")
+		        .append(formId).append("', '").append(progressBarId).append(
+		            "', ");
 		
 		action.append("['");
 		for (int i = 0; i < localization.size(); i++) {
@@ -206,7 +250,8 @@ public class FileUploadViewer extends IWBaseComponent {
 		
 		action.append(");");
 		
-		return getActionToLoadFilesAndExecuteCustomAction(action.toString(), isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId));
+		return getActionToLoadFilesAndExecuteCustomAction(action.toString(),
+		    isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId));
 	}
 	
 	private String getJavaScriptAction(String action) {
@@ -234,10 +279,13 @@ public class FileUploadViewer extends IWBaseComponent {
 		return script.toString();
 	}
 	
-	public static final String getActionToLoadFilesAndExecuteCustomAction(String customAction, boolean showProgressBar, boolean addjQuery) {
-		Web2Business web2 = ELUtil.getInstance().getBean(Web2Business.SPRING_BEAN_IDENTIFIER);
+	public static final String getActionToLoadFilesAndExecuteCustomAction(
+	        String customAction, boolean showProgressBar, boolean addjQuery) {
+		Web2Business web2 = ELUtil.getInstance().getBean(
+		    Web2Business.SPRING_BEAN_IDENTIFIER);
 		List<String> scripts = new ArrayList<String>();
-		scripts.add(ContentUtil.getBundle().getVirtualPathWithFileNameString("javascript/FileUploadHelper.js"));
+		scripts.add(ContentUtil.getBundle().getVirtualPathWithFileNameString(
+		    "javascript/FileUploadHelper.js"));
 		scripts.add(web2.getBundleURIToYUIScript());
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
 		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
@@ -247,18 +295,22 @@ public class FileUploadViewer extends IWBaseComponent {
 			scripts.add(web2.getBundleURIToJQueryLib());
 		}
 		if (showProgressBar) {
-			scripts.add(web2.getBundleURIToJQueryPlugin(JQueryPlugin.PROGRESS_BAR));
+			scripts.add(web2
+			        .getBundleURIToJQueryPlugin(JQueryPlugin.PROGRESS_BAR));
 		}
 		
-		return PresentationUtil.getJavaScriptLinesLoadedLazily(scripts, customAction);
+		return PresentationUtil.getJavaScriptLinesLoadedLazily(scripts,
+		    customAction);
 	}
-
+	
 	public String getActionAfterUpload() {
 		if (StringUtil.isEmpty(componentToRerenderId)) {
 			return actionAfterUpload;
 		}
 		
-		String reRenderAction = new StringBuilder("FileUploadHelper.reRenderComponent('").append(componentToRerenderId).append("');").toString();
+		String reRenderAction = new StringBuilder(
+		        "FileUploadHelper.reRenderComponent('").append(
+		    componentToRerenderId).append("');").toString();
 		if (StringUtil.isEmpty(actionAfterUpload)) {
 			return reRenderAction;
 		}
@@ -268,97 +320,110 @@ public class FileUploadViewer extends IWBaseComponent {
 		}
 		return actionAfterUpload + reRenderAction;
 	}
-
+	
 	public void setActionAfterUpload(String actionAfterUpload) {
 		this.actionAfterUpload = actionAfterUpload;
 	}
-
+	
 	public String getUploadPath() {
 		return uploadPath;
 	}
-
+	
+	public String getUploadPath(FacesContext ctx) {
+		
+		String uploadPath = getExpressionValue(ctx, "uploadPath");
+		
+		if (uploadPath != null)
+			this.uploadPath = uploadPath;
+		
+		return uploadPath;
+	}
+	
 	public void setUploadPath(String uploadPath) {
 		this.uploadPath = uploadPath;
 	}
-
+	
 	public boolean isZipFile() {
 		return zipFile;
 	}
-
+	
 	public void setZipFile(boolean zipFile) {
 		this.zipFile = zipFile;
 	}
-
+	
 	public boolean isExtractContent() {
 		return extractContent;
 	}
-
+	
 	public void setExtractContent(boolean extractContent) {
 		this.extractContent = extractContent;
 	}
-
+	
 	public boolean isThemePack() {
 		return themePack;
 	}
-
+	
 	public void setThemePack(boolean themePack) {
 		this.themePack = themePack;
 	}
-
+	
 	public boolean isShowProgressBar() {
 		return showProgressBar;
 	}
-
+	
 	public void setShowProgressBar(boolean showProgressBar) {
 		this.showProgressBar = showProgressBar;
 	}
-
+	
 	public boolean isShowLoadingMessage() {
 		return showLoadingMessage;
 	}
-
+	
 	public void setShowLoadingMessage(boolean showLoadingMessage) {
 		this.showLoadingMessage = showLoadingMessage;
 	}
-
+	
 	public boolean isAllowMultipleFiles() {
+		
+		System.out.println("allow=" + allowMultipleFiles);
 		return allowMultipleFiles;
 	}
-
+	
 	public void setAllowMultipleFiles(boolean allowMultipleFiles) {
+		System.out.println("__________setallow");
 		this.allowMultipleFiles = allowMultipleFiles;
 	}
-
+	
 	public String getFormId() {
 		return formId;
 	}
-
+	
 	public void setFormId(String formId) {
 		this.formId = formId;
 	}
-
+	
 	public String getActionAfterCounterReset() {
 		return actionAfterCounterReset;
 	}
-
+	
 	public void setActionAfterCounterReset(String actionAfterCounterReset) {
 		this.actionAfterCounterReset = actionAfterCounterReset;
 	}
-
+	
 	public boolean isAutoAddFileInput() {
 		return autoAddFileInput;
 	}
-
+	
 	public void setAutoAddFileInput(boolean autoAddFileInput) {
 		this.autoAddFileInput = autoAddFileInput;
 	}
-
+	
 	public String getComponentToRerenderId() {
 		return componentToRerenderId;
 	}
-
+	
 	public void setComponentToRerenderId(String componentToRerenderId) {
 		this.componentToRerenderId = componentToRerenderId;
 	}
-
+	
 }
