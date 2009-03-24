@@ -164,7 +164,6 @@ public class FileUploadViewer extends IWBaseComponent {
 		Layer buttonsContainer = new Layer();
 		buttonsContainer.setStyleClass("fileUploadButtonsContainerStyle");
 		
-		System.out.println("____ALLLOW=" + allowMultipleFiles);
 		if (allowMultipleFiles) {
 			GenericButton addFileInput = new GenericButton(iwrb
 			        .getLocalizedString("add_file", "Add file"));
@@ -384,13 +383,10 @@ public class FileUploadViewer extends IWBaseComponent {
 	}
 	
 	public boolean isAllowMultipleFiles() {
-		
-		System.out.println("allow=" + allowMultipleFiles);
 		return allowMultipleFiles;
 	}
 	
 	public void setAllowMultipleFiles(boolean allowMultipleFiles) {
-		System.out.println("__________setallow");
 		this.allowMultipleFiles = allowMultipleFiles;
 	}
 	
