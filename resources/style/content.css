@@ -343,7 +343,7 @@ html>body .themesSlider {
 	position: fixed;
 	width: 147px;
 	height: 110px;
-	z-index: 9999;
+	z-index: 99999;
 	clear: both;
 	margin-top: 40px;
 	bottom: 55px;
