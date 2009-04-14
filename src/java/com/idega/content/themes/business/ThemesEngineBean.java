@@ -36,7 +36,7 @@ import com.idega.core.builder.data.ICPage;
 import com.idega.core.cache.IWCacheManager2;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.search.business.SearchResult;
-import com.idega.dwr.business.ScriptCaller;
+import com.idega.dwr.reverse.ScriptCaller;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
