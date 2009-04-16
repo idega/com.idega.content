@@ -1,16 +1,11 @@
 package com.idega.content.upload.presentation.handler;
 
-import java.rmi.RemoteException;
 import java.util.List;
 
-import com.idega.builder.bean.AdvancedProperty;
 import com.idega.core.builder.presentation.ICPropertyHandler;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.PresentationObject;
 import com.idega.presentation.ui.TextInput;
-import com.idega.slide.business.IWSlideService;
-import com.idega.util.CoreConstants;
-import com.idega.util.ListUtil;
 
 public class RepositoryPathChooser implements ICPropertyHandler {
 
@@ -58,43 +53,43 @@ public class RepositoryPathChooser implements ICPropertyHandler {
 		return repositoryPaths;*/
 	}
 	
-	@SuppressWarnings("unchecked")
-	private List<AdvancedProperty> getAllPaths(IWSlideService slideService, List<String> slidePaths, List<AdvancedProperty> allPaths, int level) {
-		if (slideService == null || ListUtil.isEmpty(slidePaths)) {
-			return null;
-		}
-		
-		String value = null;
-		StringBuilder name = null;
-		List<AdvancedProperty> childPaths = null;
-		for (String path: slidePaths) {
-			value = path;
-			
-			if (value.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
-				value = value.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
-			}
-			
-			name = new StringBuilder();
-			for (int i = 0; i < level; i++) {
-				name.append(CoreConstants.MINUS);
-			}
-			name.append(value);
-			
-			allPaths.add(new AdvancedProperty(name.toString(), value));
-			
-			childPaths = null;
-			try {
-				childPaths = getAllPaths(slideService, slideService.getChildFolderPaths(path), allPaths, level++);
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-			if (!ListUtil.isEmpty(childPaths)) {
-				allPaths.addAll(childPaths);
-			}
-		}
-		
-		return allPaths;
-	}
+//	@SuppressWarnings("unchecked")
+//	private List<AdvancedProperty> getAllPaths(IWSlideService slideService, List<String> slidePaths, List<AdvancedProperty> allPaths, int level) {
+//		if (slideService == null || ListUtil.isEmpty(slidePaths)) {
+//			return null;
+//		}
+//		
+//		String value = null;
+//		StringBuilder name = null;
+//		List<AdvancedProperty> childPaths = null;
+//		for (String path: slidePaths) {
+//			value = path;
+//			
+//			if (value.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
+//				value = value.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
+//			}
+//			
+//			name = new StringBuilder();
+//			for (int i = 0; i < level; i++) {
+//				name.append(CoreConstants.MINUS);
+//			}
+//			name.append(value);
+//			
+//			allPaths.add(new AdvancedProperty(name.toString(), value));
+//			
+//			childPaths = null;
+//			try {
+//				childPaths = getAllPaths(slideService, slideService.getChildFolderPaths(path), allPaths, level++);
+//			} catch (RemoteException e) {
+//				e.printStackTrace();
+//			}
+//			if (!ListUtil.isEmpty(childPaths)) {
+//				allPaths.addAll(childPaths);
+//			}
+//		}
+//		
+//		return allPaths;
+//	}
 
 	public void onUpdate(String[] values, IWContext iwc) {
 	}

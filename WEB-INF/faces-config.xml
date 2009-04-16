@@ -367,6 +367,21 @@
 			<property-name>formId</property-name>
 			<property-class>java.lang.String</property-class>
 		</property>
+		<property>
+			<display-name>Component UUID to render</display-name>
+			<property-name>componentToRerenderId</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
+			<display-name>Auto upload file?</display-name>
+			<property-name>autoUpload</property-name>
+			<property-class>boolean</property-class>
+		</property>
+		<property>
+			<display-name>Show uploaded files?</display-name>
+			<property-name>showUploadedFiles</property-name>
+			<property-class>boolean</property-class>
+		</property>
 		<component-extension>
 			<idegaweb-info>
 				<builder-visible>true</builder-visible>

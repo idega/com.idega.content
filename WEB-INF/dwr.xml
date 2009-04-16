@@ -40,8 +40,10 @@
     	
     	<create creator="spring" javascript="FileUploader">
     		<param name="beanName" value="fileUploader" />
-    		<include method="getRenderedFileInput"/>
-    		<include method="getRenderedComponent"/>
+    		<include method="getRenderedFileInput" />
+    		<include method="getRenderedComponent" />
+    		<include method="getUploadedFilesList" />
+    		<include method="deleteFile" />
 		</create>
 		
 		<create creator="spring" javascript="FileUploadListener">

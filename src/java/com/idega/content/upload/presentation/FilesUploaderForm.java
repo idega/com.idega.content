@@ -4,9 +4,12 @@ import java.io.File;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentConstants;
+import com.idega.content.upload.business.FileUploader;
 import com.idega.presentation.Block;
 import com.idega.presentation.CSSSpacer;
 import com.idega.presentation.IWContext;
@@ -19,8 +22,12 @@ import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
 
 public class FilesUploaderForm extends Block {
+	
+	@Autowired
+	private FileUploader fileUploader;
 	
 	private String parentPath = null;
 	
@@ -29,6 +36,8 @@ public class FilesUploaderForm extends Block {
 	
 	@Override
 	public void main(IWContext iwc) {
+		ELUtil.getInstance().autowire(this);
+		
 		Layer container = new Layer();
 		add(container);
 		container.setStyleClass("filesUploaderFormStyle");
@@ -126,7 +135,7 @@ public class FilesUploaderForm extends Block {
 		
 		StringBuilder action = new StringBuilder("FileUploadHelper.changeUploadPath(dwr.util.getValue('").append(folders.getId()).append("'), '")
 								.append(ContentConstants.UPLOADER_PATH).append("');");
-		folders.setOnChange(FileUploadViewer.getActionToLoadFilesAndExecuteCustomAction(action.toString(), true, true));
+		folders.setOnChange(getFileUploader().getActionToLoadFilesAndExecuteCustomAction(action.toString(), true, true));
 		
 		return folders;
 	}
@@ -143,4 +152,13 @@ public class FilesUploaderForm extends Block {
 	public String getBundleIdentifier() {
 		return ContentConstants.IW_BUNDLE_IDENTIFIER;
 	}
+
+	public FileUploader getFileUploader() {
+		return fileUploader;
+	}
+
+	public void setFileUploader(FileUploader fileUploader) {
+		this.fileUploader = fileUploader;
+	}
+	
 }

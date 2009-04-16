@@ -1,17 +1,18 @@
 package com.idega.content.upload.presentation;
 
 import javax.faces.component.UIComponent;
-import javax.faces.webapp.UIComponentTag;
+import javax.faces.webapp.UIComponentELTag;
 
 import com.idega.util.CoreConstants;
 import com.idega.webface.WFUtil;
 
-public class FileUploadViewerTag extends UIComponentTag {
+public class FileUploadViewerTag extends UIComponentELTag {
 	
 	private String actionAfterUpload = null;
 	private String actionAfterCounterReset = null;
 	private String uploadPath = CoreConstants.PUBLIC_PATH;
 	private String formId = null;
+	private String componentToRerenderId = null;
 	
 	private boolean zipFile = false;
 	private boolean extractContent = false;
@@ -20,7 +21,9 @@ public class FileUploadViewerTag extends UIComponentTag {
 	private boolean showLoadingMessage = true;
 	private boolean allowMultipleFiles = false;
 	private boolean autoAddFileInput = true;
-
+	private boolean autoUpload;
+	private boolean showUploadedFiles;
+	
 	@Override
 	public String getComponentType() {
 		return FileUploadViewer.class.getSimpleName();
@@ -56,6 +59,7 @@ public class FileUploadViewerTag extends UIComponentTag {
 		this.actionAfterUpload = null;
 		this.actionAfterCounterReset = null;
 		this.uploadPath = CoreConstants.PUBLIC_PATH;
+		this.componentToRerenderId = null;
 		
 		this.zipFile = false;
 		this.extractContent = false;
@@ -64,6 +68,8 @@ public class FileUploadViewerTag extends UIComponentTag {
 		this.showLoadingMessage = true;
 		this.allowMultipleFiles = false;
 		this.autoAddFileInput = false;
+		this.autoUpload = false;
+		this.showUploadedFiles = false;
 	}
 	
 	public String getActionAfterUpload() {
@@ -160,6 +166,30 @@ public class FileUploadViewerTag extends UIComponentTag {
 
 	public void setAutoAddFileInput(boolean autoAddFileInput) {
 		this.autoAddFileInput = autoAddFileInput;
+	}
+
+	public String getComponentToRerenderId() {
+		return componentToRerenderId;
+	}
+
+	public void setComponentToRerenderId(String componentToRerenderId) {
+		this.componentToRerenderId = componentToRerenderId;
+	}
+
+	public boolean isAutoUpload() {
+		return autoUpload;
+	}
+
+	public void setAutoUpload(boolean autoUpload) {
+		this.autoUpload = autoUpload;
+	}
+
+	public boolean isShowUploadedFiles() {
+		return showUploadedFiles;
+	}
+
+	public void setShowUploadedFiles(boolean showUploadedFiles) {
+		this.showUploadedFiles = showUploadedFiles;
 	}
 	
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.content.business.ContentConstants;
+import com.idega.content.business.ContentUtil;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.presentation.Block;
 import com.idega.presentation.IWContext;
@@ -27,7 +28,7 @@ public class FilesUploader extends Block {
 	
 	@Override
 	public void main(IWContext iwc) {
-		PresentationUtil.addStyleSheetToHeader(iwc, iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("style/filesUploader.css"));
+		PresentationUtil.addStyleSheetToHeader(iwc, ContentUtil.getBundle().getVirtualPathWithFileNameString("style/filesUploader.css"));
 		
 		Layer container = new Layer();
 		add(container);
