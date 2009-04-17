@@ -175,27 +175,29 @@ FileUploadHelper.getRealUploadedFile = function(file) {
 }
 
 FileUploadHelper.removeAllUploadedFiles = function() {
-	if (FileUploadHelper.allUploadedFiles == null) {
+	if (FileUploadHelper.allUploadedFiles == null || FileUploadHelper.allUploadedFiles.length == 0) {
 		return;
 	}
 	
-	FileUploader.deleteFiles(FileUploadHelper.allUploadedFiles, {
-		callback: function(result) {
-			if (result == null) {
-				return;
+	LazyLoader.loadMultiple(['/dwr/engine.js', '/dwr/interface/FileUploader.js'], function() {
+		FileUploader.deleteFiles(FileUploadHelper.allUploadedFiles, {
+			callback: function(result) {
+				if (result == null) {
+					return;
+				}
+				
+				if (result.id == 'false') {
+					humanMsg.displayMsg(result.value);
+					return;
+				}
+				
+				jQuery('div.fileUploadViewerUploadedFilesContainerStyle').hide('fast', function() {
+					jQuery('div.fileUploadViewerUploadedFilesContainerStyle').remove();
+				});
+				FileUploadHelper.allUploadedFiles = [];
 			}
-			
-			if (result.id == 'false') {
-				humanMsg.displayMsg(result.value);
-				return;
-			}
-			
-			jQuery('div.fileUploadViewerUploadedFilesContainerStyle').hide('fast', function() {
-				jQuery('div.fileUploadViewerUploadedFilesContainerStyle').remove();
-			});
-			FileUploadHelper.allUploadedFiles = [];
-		}
-	});
+		});
+	}, null);
 }
 
 function showUploadInfoInProgressBar(progressBarId, actionAfterCounterReset) {
