@@ -174,6 +174,30 @@ FileUploadHelper.getRealUploadedFile = function(file) {
 	return uploadPath + file;
 }
 
+FileUploadHelper.removeAllUploadedFiles = function() {
+	if (FileUploadHelper.allUploadedFiles == null) {
+		return;
+	}
+	
+	FileUploader.deleteFiles(FileUploadHelper.allUploadedFiles, {
+		callback: function(result) {
+			if (result == null) {
+				return;
+			}
+			
+			if (result.id == 'false') {
+				humanMsg.displayMsg(result.value);
+				return;
+			}
+			
+			jQuery('div.fileUploadViewerUploadedFilesContainerStyle').hide('fast', function() {
+				jQuery('div.fileUploadViewerUploadedFilesContainerStyle').remove();
+			});
+			FileUploadHelper.allUploadedFiles = [];
+		}
+	});
+}
+
 function showUploadInfoInProgressBar(progressBarId, actionAfterCounterReset) {
 	jQuery('#' + progressBarId).parent().show('normal', function() {
 		fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset);

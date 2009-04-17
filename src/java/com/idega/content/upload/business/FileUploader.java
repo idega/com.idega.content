@@ -63,4 +63,6 @@ public interface FileUploader {
 	public String getUploadedFilesList(List<String> files, String uploadPath);
 	
 	public AdvancedProperty deleteFile(String fileInSlide);
+	
+	public AdvancedProperty deleteFiles(List<String> filesInSlide);
 }

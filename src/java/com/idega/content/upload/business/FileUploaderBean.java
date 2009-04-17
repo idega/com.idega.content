@@ -422,10 +422,13 @@ public class FileUploaderBean implements FileUploader {
 	}
 
 	public AdvancedProperty deleteFile(String fileInSlide) {
+		return deleteFile(CoreUtil.getIWContext(), fileInSlide);
+	}
+	
+	private AdvancedProperty deleteFile(IWContext iwc, String fileInSlide) {
 		String errorMessage = "Sorry, file can not be deleted!";
 		AdvancedProperty result = new AdvancedProperty(Boolean.FALSE.toString(), errorMessage);
 		
-		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return result;
 		}
@@ -525,6 +528,21 @@ public class FileUploaderBean implements FileUploader {
 
 	public void setBuilderLogicWrapper(BuilderLogicWrapper builderLogicWrapper) {
 		this.builderLogicWrapper = builderLogicWrapper;
+	}
+
+	public AdvancedProperty deleteFiles(List<String> filesInSlide) {
+		if (ListUtil.isEmpty(filesInSlide)) {
+			return null;
+		}
+		
+		IWContext iwc = CoreUtil.getIWContext();
+		
+		AdvancedProperty result = null;
+		for (String fileInSlide: filesInSlide) {
+			result = deleteFile(iwc, fileInSlide);
+		}
+		
+		return result;
 	}
 	
 }

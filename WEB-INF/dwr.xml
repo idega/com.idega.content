@@ -44,6 +44,7 @@
     		<include method="getRenderedComponent" />
     		<include method="getUploadedFilesList" />
     		<include method="deleteFile" />
+    		<include method="deleteFiles" />
 		</create>
 		
 		<create creator="spring" javascript="FileUploadListener">
