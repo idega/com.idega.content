@@ -106,11 +106,17 @@
 			
 			import com.idega.content.lucid.bean.LucidApplicationInfo;
 			
+			import com.idega.builder.bean.AdvancedProperty;
+			
   			ThemesEngine.applyMultipleChangesToTheme(String, List<ThemeChange>, String);
   		
   			LucidEngine.createPage(List<TreeNodeStructure>, Boolean, String, List<String>);
   			List<PageAccessibilityProperty> LucidEngine.getPageAccessibilityProperties(String);
   			LucidApplicationInfo LucidEngine.getStartInfo(Boolean);
+  			
+  			FileUploader.getUploadedFilesList(List<String>, String);
+  			AdvancedProperty FileUploader.deleteFile(String);
+  			AdvancedProperty FileUploader.deleteFiles(List<String>);
   		]]>
 	</signatures>
 </dwr>
