@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import com.idega.block.web2.business.JQuery;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.block.web2.business.Web2BusinessBean;
 import com.idega.builder.bean.AdvancedProperty;
@@ -81,6 +82,9 @@ public class LucidEngineImpl implements LucidEngine {
 	private Web2Business web2;
 	
 	@Autowired
+	private JQuery jQuery;
+	
+	@Autowired
 	private BuilderLogicWrapper builderLogic;
 	
 	@Autowired
@@ -100,7 +104,7 @@ public class LucidEngineImpl implements LucidEngine {
 		}
 		
 		//	jQuery
-		js.append(web2.getBundleURIToJQueryLib()).append(CoreConstants.COMMA);
+		js.append(jQuery.getBundleURIToJQueryLib()).append(CoreConstants.COMMA);
 		js.append(web2.getBundleUriToContextMenuScript()).append(CoreConstants.COMMA);
 		
 		//	Helpers
@@ -127,7 +131,7 @@ public class LucidEngineImpl implements LucidEngine {
 		js.append(web2.getBundleUriToMooRainbowScript()).append(CoreConstants.COMMA);
 		
 		//	jQuery
-		js.append(web2.getBundleURIToJQueryLib()).append(CoreConstants.COMMA);
+		js.append(jQuery.getBundleURIToJQueryLib()).append(CoreConstants.COMMA);
 		js.append(web2.getBundleUriToContextMenuScript()).append(CoreConstants.COMMA);
 		
 		//	DWR
@@ -176,7 +180,7 @@ public class LucidEngineImpl implements LucidEngine {
 		} catch (RemoteException e) {
 			LOGGER.log(Level.WARNING, "Error getting URI to Thickbox style", e);
 		}
-		resources.add(web2.getBundleURIToJQueryLib());
+		resources.add(jQuery.getBundleURIToJQueryLib());
 		try {
 			resources.add(web2.getThickboxScriptFilePath());
 		} catch (RemoteException e) {
@@ -1939,6 +1943,14 @@ public class LucidEngineImpl implements LucidEngine {
 		}
 		
 		return info;
+	}
+
+	public JQuery getJQuery() {
+		return jQuery;
+	}
+
+	public void setJQuery(JQuery query) {
+		jQuery = query;
 	}
 
 }
