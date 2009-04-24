@@ -25,7 +25,6 @@ public class ThemesConstants {
 	
 	protected static String BASE_THEME_IMAGES = null;
 	
-	protected static final String NAMESPACE = "http://www.w3.org/1999/xhtml";
 	protected static final String NAMESPACE_ID = "xmlns";
 	
 	protected static final String PLUS = "+";

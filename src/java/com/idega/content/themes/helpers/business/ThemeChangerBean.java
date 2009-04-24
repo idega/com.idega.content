@@ -121,7 +121,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final List<String> REGULAR_EXORESSIONS_FOR_NEEDLESS_STUFF = Collections.unmodifiableList(Arrays.asList(_REGULAR_EXORESSIONS_FOR_NEEDLESS_STUFF));
 	
 	private ThemesHelper helper = null;
-	private Namespace namespace = Namespace.getNamespace(ThemesConstants.NAMESPACE);
+	private Namespace namespace = Namespace.getNamespace(CoreConstants.XHTML_NAMESPACE);
 	private XMLOutputter out = null;
 	private ColourExpressionCalculator colourCalculator = null;
 	
@@ -949,7 +949,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		JDOMXPath xp = null;
 		try {
 			xp = new JDOMXPath(expression);
-			xp.addNamespace(ThemesConstants.NAMESPACE_ID, ThemesConstants.NAMESPACE);
+			xp.addNamespace(ThemesConstants.NAMESPACE_ID, CoreConstants.XHTML_NAMESPACE);
 			return xp.selectNodes(container);
 		} catch (JaxenException e) {
 			e.printStackTrace();
