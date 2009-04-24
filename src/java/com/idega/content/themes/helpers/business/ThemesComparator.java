@@ -8,16 +8,17 @@ import com.idega.content.themes.helpers.bean.Theme;
 
 public class ThemesComparator implements Comparator<Theme> {
 	
-	private Locale locale = null;
+	private Locale locale;
+	private Collator collator;
 	
 	public ThemesComparator(Locale locale) {
 		this.locale = locale;
+		
+		collator = this.locale == null ? Collator.getInstance() : Collator.getInstance(this.locale);
 	}
 
 	public int compare(Theme theme1, Theme theme2) {
-		Collator collator = locale == null ? Collator.getInstance() : Collator.getInstance(locale);
-		
-		return collator.compare(theme1.getName(), theme2.getName());
+		return collator.compare(theme1.getName().toLowerCase(locale), theme2.getName().toLowerCase(locale));
 	}
 
 }
