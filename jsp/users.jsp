@@ -11,7 +11,7 @@
 
     <f:view>
     	<ws:page id="simpleUserApplication" stylesheeturls="/idegaweb/bundles/com.idega.content.bundle/resources/style/content.css">							
-			<h:form id="simpleUserApplicationForm">
+			<h:form id="simpleUserApplicationForm" onsubmit="return false;">
 				<wf:wfblock id="simpleUserApplicationBlock" title="#{localizedStrings['com.idega.content']['users']}">
 					<bu:module id="simpleUserApplicationModule" componentClass="com.idega.user.app.SimpleUserApp">
 						<bu:property name=":method:1:implied:void:setAllFieldsEditable:boolean:" value="Y" type="java.lang.String" />
