@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
+import com.idega.business.IBOLookup;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.core.builder.business.BuilderService;
@@ -17,14 +18,18 @@ import com.idega.presentation.Span;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
+import com.idega.slide.business.IWSlideSession;
+import com.idega.user.data.User;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
 public class FilesUploader extends Block {
 
-	private String parentPath = null;
-	private String componentToRerenderId = null;
+	private boolean resolvePathFromUser;
+	
+	private String parentPath;
+	private String componentToRerenderId;
 	
 	@Override
 	public void main(IWContext iwc) {
@@ -33,6 +38,8 @@ public class FilesUploader extends Block {
 		Layer container = new Layer();
 		add(container);
 		container.setStyleClass("filesUploaderContainerStyle");
+		
+		resolvePath(iwc);
 		
 		if (StringUtil.isEmpty(parentPath)) {
 			container.add(new Heading1(getResourceBundle(iwc).getLocalizedString("unkown_parent_path", "Provide parent path!")));
@@ -48,6 +55,33 @@ public class FilesUploader extends Block {
 						.toString());
 		
 		addResources(iwc, true);
+	}
+	
+	private void resolvePath(IWContext iwc) {
+		if (!resolvePathFromUser) {
+			return;
+		}
+		
+		if (!iwc.isLoggedOn()) {
+			return;
+		}
+		
+		User currentUser = iwc.getCurrentUser();
+		if (currentUser == null) {
+			return;
+		}
+		
+		String userPath = null;
+		try {
+			IWSlideSession slideSession = (IWSlideSession) IBOLookup.getSessionInstance(iwc, IWSlideSession.class);
+			userPath = slideSession.getUserHomeFolder();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		if (StringUtil.isEmpty(userPath)) {
+			return;
+		}
+		parentPath = userPath;
 	}
 	
 	private String getUriToComponent(IWContext iwc) {
@@ -95,6 +129,14 @@ public class FilesUploader extends Block {
 
 	public void setComponentToRerenderId(String componentToRerenderId) {
 		this.componentToRerenderId = componentToRerenderId;
+	}
+
+	public boolean isResolvePathFromUser() {
+		return resolvePathFromUser;
+	}
+
+	public void setResolvePathFromUser(boolean resolvePathFromUser) {
+		this.resolvePathFromUser = resolvePathFromUser;
 	}
 
 	@Override
