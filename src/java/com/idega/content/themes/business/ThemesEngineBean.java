@@ -622,7 +622,7 @@ public class ThemesEngineBean implements ThemesEngine {
 			return null;
 		}
 		
-		SiteTreeViewer tree = new SiteTreeViewer();
+		SiteTreeViewer tree = (SiteTreeViewer) iwc.getApplication().createComponent(SiteTreeViewer.COMPONENT_TYPE);
 		Object o = WFUtil.getValue("pageCreationBean", "pageSelectorTopNode");
 		if (o instanceof TreeNode) {
 			tree.setRootNode((TreeNode) o);

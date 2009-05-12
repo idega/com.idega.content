@@ -1,9 +1,9 @@
 package com.idega.content.themes.presentation;
 
 import javax.faces.component.UIComponent;
-import javax.faces.webapp.UIComponentTag;
+import javax.faces.webapp.UIComponentELTag;
 
-public class ThemesSliderViewerTag extends UIComponentTag {
+public class ThemesSliderViewerTag extends UIComponentELTag {
 
 	private String mainId = "themesSliderContainer";
 	private String mainStyleClass = "themesSlider";
@@ -20,6 +20,7 @@ public class ThemesSliderViewerTag extends UIComponentTag {
 		return null;
 	}
 	
+	@Override
 	protected void setProperties(UIComponent component) {
 		if (component instanceof ThemesSliderViewer) {
 			super.setProperties(component);

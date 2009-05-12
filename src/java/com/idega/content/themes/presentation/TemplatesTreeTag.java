@@ -1,9 +1,9 @@
 package com.idega.content.themes.presentation;
 
 import javax.faces.component.UIComponent;
-import javax.faces.webapp.UIComponentTag;
+import javax.faces.webapp.UIComponentELTag;
 
-public class TemplatesTreeTag extends UIComponentTag {
+public class TemplatesTreeTag extends UIComponentELTag {
 
 	@Override
 	public String getComponentType() {

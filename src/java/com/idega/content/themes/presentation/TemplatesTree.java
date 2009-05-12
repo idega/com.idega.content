@@ -66,7 +66,7 @@ public class TemplatesTree extends Block {
 		container.add(buttons);
 		GenericButton createTemplate = new GenericButton("createChildTemplate", iwrb.getLocalizedString("create_child_template", "Create child template"));
 		createTemplate.setStyleClass("createChildTemplateForCurrentTemplateButtonInLucidStyle");
-		createTemplate.setToolTip(iwrb.getLocalizedString("create_child_template_for_current_template", "Create child template for current template"));
+		createTemplate.setTitle(iwrb.getLocalizedString("create_child_template_for_current_template", "Create child template for current template"));
 		buttons.add(createTemplate);
 	}
 	

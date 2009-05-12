@@ -13,6 +13,8 @@ import com.idega.webface.WFUtil;
 
 public class SiteTreeViewer extends Block {
 	
+	public static String COMPONENT_TYPE = "SiteTreeViewer";
+	
 	private TreeNode rootNode = null;
 	
 	private String linkStyleClass = "pageTreeNames";
@@ -26,6 +28,7 @@ public class SiteTreeViewer extends Block {
 	private boolean showLines = false;
 	private boolean addStyleClassForLink = true;
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void main(IWContext iwc) {
 		if (rootNode == null) {
@@ -45,8 +48,9 @@ public class SiteTreeViewer extends Block {
 	    if (addStyleClassForLink) {
 	    	link.setStyleClass(linkStyleClass);
 	    }
-	    HtmlOutputText text = new HtmlOutputText();		    
-	    text.setValueBinding("value", WFUtil.createValueBinding(new StringBuffer("#{").append(varName).append(".description}").toString()));
+	    HtmlOutputText text = new HtmlOutputText();
+	    text.setValueExpression("value", WFUtil.createValueExpression(iwc.getELContext(),
+	    		new StringBuilder("#{").append(varName).append(".description}").toString(), String.class));
 	    
 	    link.getChildren().add(text);
 	    

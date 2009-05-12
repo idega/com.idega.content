@@ -105,6 +105,7 @@ public class TemplatesLoader implements JarLoader {
 	 * A generic way to add page types from an xml Document
 	 * @param pageDocument
 	 */
+	@SuppressWarnings("unchecked")
 	public void addPageTypesFromDocument(Document pageDocument) {
 		Element root = pageDocument.getRootElement();		
 		Collection<Element> siteRoot = root.getChildren();
@@ -133,6 +134,7 @@ public class TemplatesLoader implements JarLoader {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void addSiteTemplatesFromDocument(Document siteTemplateDocument) {
 		SortedMap <String, SiteTemplate> siteMap = null;
 		Map siteTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(SITE_TEMPLATES_CACHE_KEY);
@@ -185,14 +187,14 @@ public class TemplatesLoader implements JarLoader {
 		
 		if (templateFile != null)
 			currNode.setTemplateFile(templateFile);
-		Iterator it = (currElement.getChildren()).iterator();
-		while(it.hasNext()){
-			currNode.addChild(getNode((Element)it.next()));
+		for (Object child: currElement.getChildren()) {
+			currNode.addChild(getNode((Element)child));
 		}
 		
 		return currNode;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Map<String, PageTemplate> getPageTemplates() {
 		Map pageTemplates = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
 		
@@ -222,6 +224,7 @@ public class TemplatesLoader implements JarLoader {
 		return (Map <String, PageTemplate>)pageTemplates.get(ContentConstants.PAGES_MAP_KEY);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public SortedMap<String, SiteTemplate> getSiteTemplates() {
 		Map siteTemplates = IWCacheManager2.getInstance(iwma).getCache(TemplatesLoader.SITE_TEMPLATES_CACHE_KEY);
 
@@ -282,6 +285,7 @@ public class TemplatesLoader implements JarLoader {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Map<String, PageTemplate> getPageMap(){
 		Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
 		Map<String, PageTemplate> pageMap = null;

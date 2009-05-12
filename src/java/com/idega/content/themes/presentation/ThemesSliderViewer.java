@@ -3,6 +3,9 @@ package com.idega.content.themes.presentation;
 import java.rmi.RemoteException;
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.idega.block.web2.business.JQuery;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.content.business.ContentConstants;
 import com.idega.idegaweb.IWBundle;
@@ -26,8 +29,15 @@ public class ThemesSliderViewer extends Block {
 	
 	private String initAction;
 	
+	@Autowired
+	private Web2Business web2;
+	@Autowired
+	private JQuery jQuery;
+	
 	@Override
 	public void main(IWContext iwc) {
+		ELUtil.getInstance().autowire(this);
+		
 		IWBundle bundle = getBundle(iwc);
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		
@@ -67,13 +77,12 @@ public class ThemesSliderViewer extends Block {
 		container.add(rightScroller);
 		
 		//	Resources
-		Web2Business web2 = ELUtil.getInstance().getBean(Web2Business.SPRING_BEAN_IDENTIFIER);
 		try {
 			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
 					web2.getBundleURIToMootoolsLib(),
 					web2.getReflectionForMootoolsScriptFilePath(),
 					
-					web2.getBundleURIToJQueryLib(),
+					jQuery.getBundleURIToJQueryLib(),
 					web2.getBundleUriToContextMenuScript(),
 					
 					CoreConstants.DWR_ENGINE_SCRIPT,

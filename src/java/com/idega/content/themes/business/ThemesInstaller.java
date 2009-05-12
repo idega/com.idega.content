@@ -6,7 +6,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainSlideStartedEvent;
 
 /**
@@ -37,13 +36,13 @@ public class ThemesInstaller implements ApplicationListener {
 	}
 	
 	private synchronized boolean installOrActivateThemes(IWMainSlideStartedEvent event) {
-		IWMainApplication iwma = event.getIWMA();
+//		IWMainApplication iwma = event.getIWMA();
 //		Thread themesInstaller = new Thread(new ThemesInstallerRunner(getThemesEngine(), iwma));
 //		themesInstaller.start();
 		return true;
 	}
 	
-	private class ThemesInstallerRunner implements Runnable {
+	/*private class ThemesInstallerRunner implements Runnable {
 		private IWMainApplication iwma = null;
 		private ThemesEngine themesEngine = null;
 		
@@ -116,7 +115,7 @@ public class ThemesInstaller implements ApplicationListener {
 				e.printStackTrace();
 			} finally {
 				helper.closeInputStream(stream);
-			}*/
+			}
 		}
 		
 		private boolean activateThemes() {
@@ -126,7 +125,7 @@ public class ThemesInstaller implements ApplicationListener {
 			
 			return themesEngine.getThemes() == null ? false : true;
 		}
-	}
+	}*/
 
 	public ThemesEngine getThemesEngine() {
 		return themesEngine;

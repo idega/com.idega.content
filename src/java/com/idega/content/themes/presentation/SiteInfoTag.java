@@ -1,9 +1,9 @@
 package com.idega.content.themes.presentation;
 
 import javax.faces.component.UIComponent;
-import javax.faces.webapp.UIComponentTag;
+import javax.faces.webapp.UIComponentELTag;
 
-public class SiteInfoTag extends UIComponentTag {
+public class SiteInfoTag extends UIComponentELTag {
 
 	private String styleClass;
 	
@@ -17,6 +17,7 @@ public class SiteInfoTag extends UIComponentTag {
 		return null;
 	}
 	
+	@Override
 	protected void setProperties(UIComponent component) {
 		if (component instanceof SiteInfoJsf) {
 			super.setProperties(component);
@@ -33,6 +34,7 @@ public class SiteInfoTag extends UIComponentTag {
 		this.styleClass = styleClass;
 	}
 	
+	@Override
 	public void release() {   
 		super.release();
 		styleClass = null;

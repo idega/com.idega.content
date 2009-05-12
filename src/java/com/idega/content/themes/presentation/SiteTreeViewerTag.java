@@ -1,17 +1,17 @@
 package com.idega.content.themes.presentation;
 
+import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
-import javax.faces.el.ValueBinding;
-import javax.faces.webapp.UIComponentTag;
-
+import javax.faces.webapp.UIComponentELTag;
 import org.apache.myfaces.custom.tree2.TreeNode;
 
 import com.idega.presentation.IWContext;
 import com.idega.util.CoreUtil;
 import com.idega.webface.IWTree;
+import com.idega.webface.WFUtil;
 
-public class SiteTreeViewerTag extends UIComponentTag {
-
+public class SiteTreeViewerTag extends UIComponentELTag {
+	
 	private TreeNode rootNode = null;
 
 	private String rootNodeExpression = null;
@@ -28,7 +28,7 @@ public class SiteTreeViewerTag extends UIComponentTag {
 	
 	@Override
 	public String getComponentType() {
-		return "SiteTreeViewer";
+		return SiteTreeViewer.COMPONENT_TYPE;
 	}
 
 	@Override
@@ -36,6 +36,7 @@ public class SiteTreeViewerTag extends UIComponentTag {
 		return null;
 	}
 	
+	@Override
 	protected void setProperties(UIComponent component) {
 		if (component instanceof SiteTreeViewer) {
 			if (rootNodeExpression == null) {
@@ -47,8 +48,9 @@ public class SiteTreeViewerTag extends UIComponentTag {
 			if (iwc == null) {
 				return;
 			}
-			ValueBinding vb = iwc.getIWMainApplication().createValueBinding(rootNodeExpression);
-			o = vb.getValue(iwc);
+			
+			ValueExpression ve = WFUtil.createValueExpression(getELContext(), rootNodeExpression, TreeNode.class);
+			o = ve.getValue(getELContext());
 			if (!(o instanceof TreeNode)) {
 				new IllegalArgumentException("Provide root node");
 			}
@@ -94,6 +96,7 @@ public class SiteTreeViewerTag extends UIComponentTag {
 		this.iwTreeId = iwTreeId;
 	}
 
+	@Override
 	public String getFacetName() {
 		return facetName;
 	}
