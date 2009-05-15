@@ -278,7 +278,7 @@ public class TemplatesLoader implements JarLoader {
 	
 	protected IWSlideService getIWSlideService(){
 		try {
-			return (IWSlideService) IBOLookup.getServiceInstance(iwma.getIWApplicationContext(), IWSlideService.class);
+			return IBOLookup.getServiceInstance(iwma.getIWApplicationContext(), IWSlideService.class);
 		} catch (IBOLookupException e) {
 			e.printStackTrace();
 			return null;

@@ -1,5 +1,5 @@
 /*
- * $Id: MetadataListManagedBean.java,v 1.14 2006/04/09 12:01:55 laddi Exp $
+ * $Id: MetadataListManagedBean.java,v 1.15 2009/05/15 07:23:54 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -38,12 +38,12 @@ import com.idega.webface.bean.WFListBean;
 
 /**
  * 
- * Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
+ * Last modified: $Date: 2009/05/15 07:23:54 $ by $Author: valdas $
  * Displays all the metadata types and values for the specified resource
  * Typically followed by WebDavMetadata in presentation to enable addeing metadata
  *
  * @author Joakim Johnson
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class MetadataListManagedBean extends AbstractWFEditableListManagedBean implements WFListBean, ActionListener {
 
@@ -75,8 +75,8 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 
 		try {
 			IWContext iwc = IWContext.getInstance();
-			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+			IWSlideSession session = IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+			IWSlideService service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 	
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 
@@ -109,6 +109,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	/* (non-Javadoc)
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getData()
 	 */
+	@Override
 	public WFEditableListDataBean[] getData() {
 		MetadataValueBean[] ret = new MetadataValueBean[0];
 		if(this.resourcePath!=null) {
@@ -135,6 +136,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	/* (non-Javadoc)
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getNumberOfColumns()
 	 */
+	@Override
 	public int getNumberOfColumns() {
 		return this.componentIDToken.length;
 	}
@@ -143,6 +145,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getUIComponent(java.lang.String, int)
 	 * Returns the UIComponent for the specific object (one for each row) and row
 	 */
+	@Override
 	public UIComponent getUIComponent(String var, int columnIndex) {
 		int index = columnIndex;
 		UIComponent component = null;
@@ -218,6 +221,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	/* (non-Javadoc)
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getHeader(int)
 	 */
+	@Override
 	public UIComponent getHeader(int columnIndex) {
 		if(columnIndex==2){
 			return WFUtil.getText("");

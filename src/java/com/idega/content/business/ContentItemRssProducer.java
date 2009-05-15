@@ -141,7 +141,7 @@ public class ContentItemRssProducer  extends RSSAbstractProducer implements RSSP
 		Date now = new Date();
 		long time = now.getTime();
 		try {
-			rss = (RSSBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(),
+			rss = IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(),
 					RSSBusiness.class);
 		} catch (IBOLookupException e1) {
 			// TODO Auto-generated catch block

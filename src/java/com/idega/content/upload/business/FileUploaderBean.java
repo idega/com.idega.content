@@ -258,7 +258,7 @@ public class FileUploaderBean implements FileUploader {
 	private IWSlideService getSlideService(IWContext iwc) {
 		if (slide == null) {
 			try {
-				slide = (IWSlideService) IBOLookup.getServiceInstance(iwc, IWSlideService.class);
+				slide = IBOLookup.getServiceInstance(iwc, IWSlideService.class);
 			} catch (IBOLookupException e) {
 				e.printStackTrace();
 				return null;

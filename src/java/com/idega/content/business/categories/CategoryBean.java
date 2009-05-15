@@ -1,5 +1,5 @@
 /*
- * $Id: CategoryBean.java,v 1.9 2009/01/09 10:15:11 valdas Exp $
+ * $Id: CategoryBean.java,v 1.10 2009/05/15 07:23:54 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -58,10 +58,10 @@ import com.idega.util.StringHandler;
  * Class for manipulating Categories that are stored in slide.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
- *  Last modified: $Date: 2009/01/09 10:15:11 $ by $Author: valdas $
+ *  Last modified: $Date: 2009/05/15 07:23:54 $ by $Author: valdas $
  * 
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class CategoryBean {
 	private static final Log log = LogFactory.getLog(CategoryBean.class);
@@ -122,8 +122,8 @@ public class CategoryBean {
 			
 			try {
 				IWContext iwc = IWContext.getInstance();
-				session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-				service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+				session = IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+				service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 	
 				updateCategoriesOnFiles(CATEGORY_CONFIG_PATH);
 	
@@ -216,7 +216,7 @@ public class CategoryBean {
 
 	public IWSlideService getSlideService() {
 		try {
-			return (IWSlideService)IBOLookup.getServiceInstance(this.iwma.getIWApplicationContext(),IWSlideService.class);
+			return IBOLookup.getServiceInstance(this.iwma.getIWApplicationContext(),IWSlideService.class);
 		}
 		catch (IBOLookupException e) {
 			throw new RuntimeException("Error getting IWSlideService");

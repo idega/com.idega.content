@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVFilePermissionsManagedBean.java,v 1.8 2006/04/09 12:01:54 laddi Exp $ Created
+ * $Id: WebDAVFilePermissionsManagedBean.java,v 1.9 2009/05/15 07:23:54 valdas Exp $ Created
  * on 29.12.2004
  * 
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -32,10 +32,10 @@ import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
  * 
- * Last modified: $Date: 2006/04/09 12:01:54 $ by $Author: laddi $
+ * Last modified: $Date: 2009/05/15 07:23:54 $ by $Author: valdas $
  * 
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListManagedBean {
 
@@ -72,7 +72,7 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 		IWContext iwc = IWContext.getInstance();
 		this._resourcePath = path;
 		try {
-			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+			IWSlideService service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 			this._resourcePath = service.getPath(path);
 		}
 		catch (IBOLookupException e) {
@@ -88,6 +88,7 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 	 * 
 	 * @see com.idega.webface.bean.WFPropertyMatrixManagedBean#getData()
 	 */
+	@Override
 	public WFEditableListDataBean[] getData() {
 		IWContext iwc = IWContext.getInstance();
 		try {
@@ -198,11 +199,13 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 	/* (non-Javadoc)
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getNumberOfColumns()
 	 */
+	@Override
 	public int getNumberOfColumns() {
 		return 6;
 	}
 
 
+	@Override
 	public UIComponent getUIComponent(String var, int columnIndex) {
 		int index = columnIndex;
 		UIComponent component = null;
@@ -227,6 +230,7 @@ public class WebDAVFilePermissionsManagedBean extends AbstractWFEditableListMana
 	/* (non-Javadoc)
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getHeader(int)
 	 */
+	@Override
 	public UIComponent getHeader(int columnIndex) {
 		return ContentBlock.getBundle().getLocalizedText(this.localizationKey[columnIndex]);
 	}

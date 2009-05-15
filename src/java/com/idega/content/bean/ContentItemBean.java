@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.47 2009/01/06 15:17:24 tryggvil Exp $
+ * $Id: ContentItemBean.java,v 1.48 2009/05/15 07:23:54 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -57,10 +57,10 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2009/01/06 15:17:24 $ by $Author: tryggvil $
+ *  Last modified: $Date: 2009/05/15 07:23:54 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.47 $
+ * @version $Revision: 1.48 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
 	
@@ -663,7 +663,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	 */
 	protected IWSlideService getIWSlideService(IWUserContext iwuc) {
 		try {
-			IWSlideService slideService = (IWSlideService) IBOLookup.getServiceInstance(iwuc.getApplicationContext(),IWSlideService.class);
+			IWSlideService slideService = IBOLookup.getServiceInstance(iwuc.getApplicationContext(),IWSlideService.class);
 			return slideService;
 		}
 		catch (IBOLookupException e) {

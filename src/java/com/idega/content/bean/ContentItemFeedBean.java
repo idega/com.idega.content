@@ -45,7 +45,7 @@ public class ContentItemFeedBean implements Serializable {
 				iwc = CoreUtil.getIWContext();
 			}
 			try {
-				rss = (RSSBusiness) IBOLookup.getServiceInstance(iwc, RSSBusiness.class);
+				rss = IBOLookup.getServiceInstance(iwc, RSSBusiness.class);
 			} catch (IBOLookupException e) {
 				e.printStackTrace();
 			}

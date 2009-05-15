@@ -196,7 +196,7 @@ public class ThemesHelper implements Singleton {
 				if (iwac == null) {
 					iwac = CoreUtil.getIWContext();
 				}
-				service = (IWSlideService) IBOLookup.getServiceInstance(iwac, IWSlideService.class);
+				service = IBOLookup.getServiceInstance(iwac, IWSlideService.class);
 			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
@@ -835,7 +835,7 @@ public class ThemesHelper implements Singleton {
 	public ThemesService getThemesService() {
 		if (themesService == null) {
 			try {
-				themesService = (ThemesService) IBOLookup.getServiceInstance(CoreUtil.getIWContext(), ThemesService.class);
+				themesService = IBOLookup.getServiceInstance(CoreUtil.getIWContext(), ThemesService.class);
 			} catch (IBOLookupException e) {
 				e.printStackTrace();
 			}

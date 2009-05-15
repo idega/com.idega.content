@@ -1,5 +1,5 @@
 /*
- * $Id: ContentSearch.java,v 1.41 2008/05/16 14:57:13 valdas Exp $ Created on Jan
+ * $Id: ContentSearch.java,v 1.42 2009/05/15 07:23:54 valdas Exp $ Created on Jan
  * 17, 2005
  * 
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -74,7 +74,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * 
- * Last modified: $Date: 2008/05/16 14:57:13 $ by $Author: valdas $ This class
+ * Last modified: $Date: 2009/05/15 07:23:54 $ by $Author: valdas $ This class
  * implements the Searchplugin interface and can therefore be used in a Search
  * block (com.idega.core.search)<br>
  * for searching contents and properties (metadata) of the files in the iwfile
@@ -84,7 +84,7 @@ import com.idega.util.IWTimestamp;
  * TODO Load the dasl searches from files! (only once?)
  * 
  * @author <a href="mailto:eiki@idega.com">Eirikur S. Hrafnsson</a>
- * @version $Revision: 1.41 $
+ * @version $Revision: 1.42 $
  */
 public class ContentSearch extends Object implements SearchPlugin{
 
@@ -208,7 +208,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 */
 	public boolean initialize(IWMainApplication iwma) {
 		try {
-			IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(iwma.getIWApplicationContext(),
+			IWSlideService service = IBOLookup.getServiceInstance(iwma.getIWApplicationContext(),
 					IWSlideService.class);
 			this.httpURL = service.getWebdavServerURL();
 		}
@@ -244,7 +244,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 		searcher.setSearchQuery(searchQuery);
 		try {
 			Credentials hostCredentials = null;
-			IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(),IWSlideService.class);
+			IWSlideService service = IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(),IWSlideService.class);
 					
 			if (isUsingRootAccessForSearch()) {
 				hostCredentials = service.getRootUserCredentials();

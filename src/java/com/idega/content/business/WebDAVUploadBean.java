@@ -99,8 +99,8 @@ public class WebDAVUploadBean implements Serializable{
 			this.uploadFilePath = tempUploadFolderPath;
 		}
 		
-		IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-		IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+		IWSlideSession session = IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+		IWSlideService service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 	
 		WebdavRootResource rootResource = session.getWebdavRootResource();
 		String filePath = service.getWebdavServerURI()+getUploadFilePath();
@@ -299,7 +299,7 @@ public class WebDAVUploadBean implements Serializable{
 	private boolean uploadZipFile(boolean uploadingTheme) throws IOException {
 		IWSlideService service = null;
 		try {
-			service = (IWSlideService) IBOLookup.getServiceInstance(IWContext.getInstance(), IWSlideService.class);
+			service = IBOLookup.getServiceInstance(IWContext.getInstance(), IWSlideService.class);
 		} catch (IBOLookupException e) {
 			log.info("Unable to get IWSlideServiceBean instance.");
 			log.error(e);

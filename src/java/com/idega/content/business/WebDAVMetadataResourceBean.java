@@ -1,5 +1,5 @@
 /*
- * $Id: WebDAVMetadataResourceBean.java,v 1.15 2008/05/16 14:58:43 valdas Exp $
+ * $Id: WebDAVMetadataResourceBean.java,v 1.16 2009/05/15 07:23:54 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -35,10 +35,10 @@ import com.idega.util.CoreUtil;
 /**
  * A resource bean that holds metadata info for the selected resouce
  * 
- * Last modified: $Date: 2008/05/16 14:58:43 $ by $Author: valdas $
+ * Last modified: $Date: 2009/05/15 07:23:54 $ by $Author: valdas $
  *
  * @author Joakim Johnson
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
 public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAVMetadataResource {
 
@@ -113,8 +113,8 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 		this.metadataBeans = new ArrayList();
 	
 		IWContext iwc = IWContext.getInstance();
-		IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-		IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+		IWSlideSession session = IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+		IWSlideService service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 
 		WebdavRootResource rootResource = session.getWebdavRootResource();
 
@@ -167,8 +167,8 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 		
 		String filePath = resourcePath;
 		try {
-			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-			IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+			IWSlideSession session = IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+			IWSlideService service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 	
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 	
@@ -219,8 +219,8 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 
 	public void setCategories(String resourcePath, String categories, boolean setOnParent) throws IOException {
 		IWContext iwc = IWContext.getInstance();
-		IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-		IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+		IWSlideSession session = IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+		IWSlideService service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 
 		String filePath = resourcePath;
 		String serverURI = service.getWebdavServerURI();
@@ -242,8 +242,8 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 
 	public void setMetadata(String resourcePath, String type, String val) throws IOException {
 		IWContext iwc = IWContext.getInstance();
-		IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-		IWSlideService service = (IWSlideService)IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+		IWSlideSession session = IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+		IWSlideService service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 
 		WebdavRootResource rootResource = session.getWebdavRootResource();
 

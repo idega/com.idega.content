@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.47 2009/03/11 09:38:41 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.48 2009/05/15 07:23:54 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -44,10 +44,10 @@ import com.idega.util.expression.ELUtil;
 
 /**
  * 
- *  Last modified: $Date: 2009/03/11 09:38:41 $ by $Author: valdas $
+ *  Last modified: $Date: 2009/05/15 07:23:54 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.47 $
+ * @version $Revision: 1.48 $
  */
 public class IWBundleStarter implements IWBundleStartable{
 	
@@ -70,7 +70,7 @@ public class IWBundleStarter implements IWBundleStartable{
 		
 		IWApplicationContext iwac = starterBundle.getApplication().getIWApplicationContext();
 	    try {
-	    	IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(iwac,IWSlideService.class);
+	    	IWSlideService service = IBOLookup.getServiceInstance(iwac,IWSlideService.class);
 	        service.addIWSlideChangeListeners((ThemesService) IBOLookup.getServiceInstance(iwac, ThemesService.class));
 	    } catch (Exception e) {
 	    	e.printStackTrace();
@@ -90,7 +90,7 @@ public class IWBundleStarter implements IWBundleStartable{
 	protected void addContentRoleGroups(IWApplicationContext iwac) {
 		boolean clearCache = false;
 		try {
-			GroupBusiness groupBiz = (GroupBusiness) IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
+			GroupBusiness groupBiz = IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
 			
 			@SuppressWarnings("unchecked")
 			Collection<Group> editorGroups = groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_EDITOR);
@@ -176,7 +176,7 @@ public class IWBundleStarter implements IWBundleStartable{
 		
 		 IWApplicationContext iwac = starterBundle.getApplication().getIWApplicationContext();
 	        try {
-	            IWSlideService service = (IWSlideService) IBOLookup.getServiceInstance(iwac,IWSlideService.class);
+	            IWSlideService service = IBOLookup.getServiceInstance(iwac,IWSlideService.class);
 	            service.addIWSlideChangeListeners(contentProducer);
 	            
 	        } catch (IBOLookupException e) {
