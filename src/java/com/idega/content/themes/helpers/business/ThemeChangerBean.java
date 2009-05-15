@@ -793,10 +793,14 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		if (a != null) {
 			String fixedValue = fixValue(a.getValue(), linkToBase);
-			if (!fixedValue.startsWith(linkToBase)) {
+			if (!isELExpression(fixedValue) && !fixedValue.startsWith(linkToBase)) {
 				a.setValue(new StringBuffer(linkToBase).append(fixedValue).toString()); // Fixing attribute's value
 			}
 		}
+	}
+	
+	private boolean isELExpression(String expression) {
+		return StringUtil.isEmpty(expression) ? false : expression.startsWith("#{") && expression.endsWith("}");
 	}
 	
 	/**
@@ -1272,6 +1276,10 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @return String
 	 */
 	private String fixValue(String value, String linkToBase) {
+		if (isELExpression(value)) {
+			return value;
+		}
+		
 		value = getFixedDocumentContent(value);
 		
 		String replace = CoreConstants.EMPTY;
