@@ -99,6 +99,7 @@ public class ThemesConstants {
 	protected static final String OBJECT_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":object";
 	protected static final String PARAM_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":param";
 	protected static final String LINK_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":link";
+	protected static final String EMBED_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":embed";
 	
 	// Strings used extracting theme properties
 	protected static final String TAG_DICT = "dict";

@@ -118,7 +118,8 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final List<String> THEME_HEAD_VARIABLES = Collections.unmodifiableList(Arrays.asList(_THEME_HEAD_VARIABLES));
 	
 	private static final String[] _REGULAR_EXORESSIONS_FOR_NEEDLESS_STUFF = new String[] {/*" xmlns.+\"", */"..<?doc.+?>"};
-	private static final List<String> REGULAR_EXORESSIONS_FOR_NEEDLESS_STUFF = Collections.unmodifiableList(Arrays.asList(_REGULAR_EXORESSIONS_FOR_NEEDLESS_STUFF));
+	private static final List<String> REGULAR_EXORESSIONS_FOR_NEEDLESS_STUFF = Collections.unmodifiableList(Arrays.asList(
+			_REGULAR_EXORESSIONS_FOR_NEEDLESS_STUFF));
 	
 	private ThemesHelper helper = null;
 	private Namespace namespace = Namespace.getNamespace(CoreConstants.XHTML_NAMESPACE);
@@ -700,7 +701,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		return uploadDocument(out.outputString(doc), linkToBase, fileName, theme, isTheme, false);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void checkScriptTags(Document doc) {
 		List<Element> scripts = getNodesByXpath(doc.getRootElement().getChild("body", namespace), "//" + ThemesConstants.NAMESPACE_ID + ":script");
 		if (ListUtil.isEmpty(scripts)) {
@@ -810,7 +810,8 @@ public class ThemeChangerBean implements ThemeChanger {
 	 */
 	private Collection<Content> getCommentsCollection(String commentValue) {
 		Collection<Content> c = new ArrayList<Content>();
-		c.add(new Comment(new StringBuffer(ThemesConstants.TEMPLATE_REGION_BEGIN).append(commentValue).append(ThemesConstants.TEMPLATE_REGION_MIDDLE).toString()));		
+		c.add(new Comment(new StringBuffer(ThemesConstants.TEMPLATE_REGION_BEGIN).append(commentValue).append(ThemesConstants.TEMPLATE_REGION_MIDDLE)
+				.toString()));		
 		c.add(new Comment(ThemesConstants.TEMPLATE_REGION_END));
 		return c;
 	}
@@ -869,45 +870,20 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 		
-		Object o = null;
-		Element e = null;
-		
 		//	DIVs
-		List divs = getNodesByXpath(body, ThemesConstants.DIV_TAG_INSTRUCTION);
-		if (divs == null) {
-			return false;
-		}
-		for (Iterator it = divs.iterator(); it.hasNext(); ) {
-			o = it.next();
-			if (o instanceof Element) {
-				addRegion((Element) o);
+		List<Element> divs = getNodesByXpath(body, ThemesConstants.DIV_TAG_INSTRUCTION);
+		if (!ListUtil.isEmpty(divs)) {
+			for (Element div: divs) {
+				addRegion(div);
 			}
 		}
 		
 		//	OBJECTs
-		o = null;
-		List objects = getNodesByXpath(body, ThemesConstants.OBJECT_TAG_INSTRUCTION);
-		if (objects != null) {
-			for (int i = 0; i < objects.size(); i++) {
-				o = objects.get(i);
-				if (o instanceof Element) {
-					fixTag((Element) o, "data", linkToBase);
-				}
-			}
-			
-		}
-		
+		fixTag(body, ThemesConstants.OBJECT_TAG_INSTRUCTION, "data", linkToBase);
 		//	PARAMs
-		o = null;
-		List params = getNodesByXpath(body, ThemesConstants.PARAM_TAG_INSTRUCTION);
-		if (params != null) {
-			for (int i = 0; i < params.size(); i++) {
-				o = params.get(i);
-				if (o instanceof Element) {
-					fixTag((Element) o, "value", linkToBase);
-				}
-			}
-		}
+		fixTag(body, ThemesConstants.PARAM_TAG_INSTRUCTION, "value", linkToBase);
+		//	EMBEDs
+		fixTag(body, ThemesConstants.EMBED_TAG_INSTRUCTION, "src", linkToBase);
 		
 		List<Text> needlessText = new ArrayList<Text>();
 		List content = body.getContent();
@@ -915,8 +891,8 @@ public class ThemeChangerBean implements ThemeChanger {
 			return true;
 		}
 		
-		o = null;
-		e = null;
+		Object o = null;
+		Element e = null;
 		for (int i = 0; i < content.size(); i++) {
 			o = content.get(i);
 			if (o instanceof Text) {	// Finding Text elements - they are needless
@@ -925,10 +901,9 @@ public class ThemeChangerBean implements ThemeChanger {
 			else {
 				if (o instanceof Element) {
 					e = (Element) o;
-					if (ELEMENT_LINK_NAME.equals(e.getName())) {	//	Fixing <link>
+					if (ELEMENT_LINK_NAME.equals(e.getName())) {			//	Fixing <link>
 						fixDocumentElement(e, linkToBase);
-					}
-					if (ELEMENT_SCRIPT_NAME.equals(e.getName())) {	//	<script> tags needs advanced handling
+					} else if (ELEMENT_SCRIPT_NAME.equals(e.getName())) {	//	<script> tags needs advanced handling
 						fixDocumentElement(e, linkToBase);
 						if (!hasElementChildren(e, true)) {
 							e.addContent(getComment(IDEGA_COMMENT));
@@ -945,7 +920,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private List getNodesByXpath(Element container, String expression) {
+	private List<Element> getNodesByXpath(Element container, String expression) {
 		if (container == null || expression == null) {
 			return null;
 		}
@@ -962,26 +937,30 @@ public class ThemeChangerBean implements ThemeChanger {
 		return null;
 	}
 	
-	private boolean fixTag(Element e, String attributeName, String linkToBase) {
-		if (e == null || attributeName == null || linkToBase == null) {
+	private boolean fixTag(Element container, String expression, String attributeName, String linkToBase) {
+		if (container == null || expression == null || attributeName == null || linkToBase == null) {
 			return false;
 		}
 		
-		Attribute a = e.getAttribute(attributeName, namespace);
-		if (a == null) {
-			a = e.getAttribute(attributeName);
-		}
-		if (a == null) {
+		List<Element> elements = getNodesByXpath(container, expression);
+		if (ListUtil.isEmpty(elements)) {
 			return false;
 		}
 		
-		String dataValue = a.getValue();
-		if (dataValue == null) {
-			return true;	//	Nothing to be fixed
+		for (Element e: elements) {
+			Attribute a = e.getAttribute(attributeName, namespace);
+			if (a == null) {
+				a = e.getAttribute(attributeName);
+			}
+			
+			if (a != null) {
+				String dataValue = a.getValue();
+				if (dataValue != null) {	
+					dataValue = getFixedAttributeValue(dataValue, linkToBase);
+					a.setValue(dataValue);
+				}
+			}
 		}
-				
-		dataValue = getFixedAttributeValue(dataValue, linkToBase);
-		a.setValue(dataValue);
 		
 		return true;
 	}
@@ -991,32 +970,22 @@ public class ThemeChangerBean implements ThemeChanger {
 			return null;
 		}
 		
-		boolean madeChanges = false;
-		
 		if (value.indexOf(ThemesConstants.USELESS_PATHTO_ELEMENT) != -1) {
 			value = StringHandler.replace(value, ThemesConstants.USELESS_PATHTO_ELEMENT, CoreConstants.EMPTY);
-			
-			madeChanges = true;
 		}
 		
 		int index = value.indexOf(")");
 		if (index != -1) {
 			value = value.substring(0, index);
-			
-			madeChanges = true;
 		}
 		
 		index = value.indexOf("?");
 		if (index != -1) {
 			value = value.substring(0, index);
-			
-			madeChanges = true;
 		}
 		
-		if (madeChanges) {
-			if (!value.startsWith(linkToBase)) {
-				value = new StringBuffer(linkToBase).append(value).toString();
-			}
+		if (!value.startsWith(linkToBase)) {
+			value = new StringBuffer(linkToBase).append(value).toString();
 		}
 		
 		return value;
