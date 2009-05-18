@@ -6,11 +6,13 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.ejb.FinderException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.slide.event.ContentEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.idega.builder.business.BuilderLogicWrapper;
 import com.idega.business.IBOServiceBean;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.lucid.business.LucidEngine;
@@ -19,7 +21,6 @@ import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.builder.business.BuilderService;
-import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.builder.data.ICPageHome;
@@ -36,12 +37,15 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 
 	private static final long serialVersionUID = -1765120426660957585L;
 	
-	private volatile BuilderService builder = null;
+	private static final Logger LOGGER = Logger.getLogger(ThemesServiceBean.class.getName());
+	
+	@Autowired
+	private BuilderLogicWrapper builderLogicWrapper;
 
 	public void onSlideChange(IWContentEvent idegaWebContentEvent) {
 		String uri = idegaWebContentEvent.getContentEvent().getUri();
-		if (uri.indexOf(ThemesConstants.THEMES_PATH) == -1) {	// If not processing theme
-			return;
+		if (uri.indexOf(ThemesConstants.THEMES_PATH) == -1) {
+			return;	// If not processing theme
 		}
 		if (ContentEvent.REMOVE.equals(idegaWebContentEvent.getMethod())) {
 			if (ThemesHelper.getInstance(false).isCorrectThemeTemplateFile(uri, ThemesConstants.THEME_SKELETONS_FILTER)) {
@@ -74,7 +78,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 				try {
 					ThemesHelper.getInstance().getThemesLoader().loadTheme(uri, ThemesHelper.getInstance().urlEncode(uri), true, false);
 				} catch (Exception e) {
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Error loading theme: " + uri, e);
 				}
 			}
 			if (uri.endsWith(ThemesConstants.THEME_PREDEFINED_STYLE_CONFIG_FILE)) {
@@ -103,8 +107,6 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 
 		IWContext iwc = CoreUtil.getIWContext();
 		
-		getBuilderService();
-		
 		Map tree = null;
 		ICDomain domain = null;
 		int userId = 1;
@@ -113,17 +115,17 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			try {
 				userId = Integer.valueOf(getAccessController().getAdministratorUser().getId());	//	Using default user
 			} catch(Exception e) {
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING, "Error getting user id", e);
 			}
 			try {
-				tree = builder.getTree(getIWApplicationContext());
+				tree = getBuilderService().getTree(getIWApplicationContext());
 			} catch(Exception e) {
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING, "Error getting tree", e);
 			}
 		}
 		else {
 			userId = iwc.getCurrentUserId();
-			tree = builder.getTree(iwc);
+			tree = getBuilderService().getTree(iwc);
 			domain = iwc.getDomain();
 			
 			if (pageKey.equals(ThemesHelper.getInstance().getLastVisitedPage())) {
@@ -134,8 +136,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		if (markPagesForDeletingArticles) {
 			markPagesForDeletingArticles(pageKey, iwc);
 		}
-		boolean result = builder.deletePage(pageKey, deleteChildren, tree, userId, domain);
-		log("IBPage (id=" + pageKey + ") was deleted successfully: " + result);
+		boolean result = getBuilderService().deletePage(pageKey, deleteChildren, tree, userId, domain);
+		LOGGER.info("IBPage (id=" + pageKey + ") was deleted successfully: " + result);
 		
 		if (domain != null) {
 			try {
@@ -144,11 +146,11 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 					domain.store();
 				}
 			} catch (NumberFormatException e) {
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING, "Error converting to number: " + pageKey, e);
 			}
 			
 			if (clearCache) {
-				builder.clearAllCachedPages();
+				getBuilderService().clearAllCachedPages();
 			}
 		}
 		
@@ -218,13 +220,11 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		domainID = domain.getID();
 		
-		getBuilderService();
-		
 		//	Creating IBPage (template) for theme
-		String parentId = builder.getTopLevelTemplateId(builder.getTopLevelTemplates(iwc));
+		String parentId = getBuilderService().getTopLevelTemplateId(getBuilderService().getTopLevelTemplates(iwc));
 		if (parentId == null || ThemesConstants.MINUS_ONE.equals(parentId)) {
 			//	No Top Level Template
-			parentId = lucidEngine.createRootTemplate(domain, builder, domainID, builder.getIBXMLFormat());
+			parentId = lucidEngine.createRootTemplate(domain, getBuilderService(), domainID, getBuilderService().getIBXMLFormat());
 			lucidEngine.initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
 		}
 		String name = ThemesHelper.getInstance().getPreparedThemeNameToUseInRepository(theme);
@@ -233,7 +233,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		String templateName = suffix == null ? theme.getName() : new StringBuilder(theme.getName()).append(suffix).toString();
 		String uri = new StringBuilder(ThemesConstants.THEMES).append(name).append(suffix == null ? CoreConstants.EMPTY : suffix)
 						.append(ContentConstants.SLASH).toString();
-		id = createIBPage(parentId, templateName, builder.getTemplateKey(), null, uri, null, domainID, builder.getHTMLTemplateKey(), null);
+		id = createIBPage(parentId, templateName, getBuilderService().getTemplateKey(), null, uri, null, domainID, getBuilderService().getHTMLTemplateKey(), null);
 		if (id == -1) {
 			return false;
 		}
@@ -258,7 +258,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		try {
 			templates = getICPageHome().findAllByName(name, true);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error getting templates", e);
 			return null;
 		}
 		
@@ -270,7 +270,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			try {
 				templates = getICPageHome().findAllByName(queryName, true);
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING, "Error getting template", e);
 				return null;
 			}
 		}
@@ -310,14 +310,12 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			return -1;
 		}
 		
-		getBuilderService();
-		
-		Map tree = builder.getTree(iwc);
+		Map tree = getBuilderService().getTree(iwc);
 		if (tree == null) {
 			return -1;
 		}
 		
-		if (builder.getPageKey().equals(type)) {
+		if (getBuilderService().getPageKey().equals(type)) {
 			if (templateId == null) {
 				templateId = ThemesHelper.getInstance().getLastUsedTheme();
 			}
@@ -331,7 +329,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			}
 		}
 		
-		int pageId = builder.createNewPage(parentId, name, type, templateId, pageUri, tree, iwc, subType, domainId, format, sourceMarkup, treeOrder);
+		int pageId = getBuilderService().createNewPage(parentId, name, type, templateId, pageUri, tree, iwc, subType, domainId, format, sourceMarkup, treeOrder);
 		
 		if (iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR)) {
 			ICPage createdPage = getICPage(pageId);
@@ -357,14 +355,10 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	}
 	
 	public BuilderService getBuilderService() {
-		if (builder == null) {
-			try {
-				builder = BuilderServiceFactory.getBuilderService(getIWApplicationContext());
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
+		if (builderLogicWrapper == null) {
+			ELUtil.getInstance().autowire(this);
 		}
-		return builder;
+		return builderLogicWrapper.getBuilderService(getIWApplicationContext());
 	}
 	
 	public ICPage getICPage(String pageKey) {
@@ -375,7 +369,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		try {
 			id = Integer.valueOf(pageKey);
 		} catch (NumberFormatException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error converting number", e);
 			return null;
 		}
 		return getICPage(id);
@@ -385,11 +379,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		ICPage page = null;
 		try {
 			page = getICPageHome().findByPrimaryKey(id);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-			return null;
-		} catch (FinderException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Error getting page by id: " + id, e);
 			return null;
 		}
 		return page;
@@ -401,11 +392,6 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	
 	public String createChildTemplateForThisTemplate(String parentTemplateKey) {
 		if (parentTemplateKey == null) {
-			return null;
-		}
-		
-		BuilderService builder = getBuilderService();
-		if (builder == null) {
 			return null;
 		}
 		
@@ -429,10 +415,10 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		
 		int templateId = -1;
 		try {
-			templateId = createIBPage(parentTemplateKey, name, builder.getTemplateKey(), parentTemplateKey, null, null, domain.getID(), builder.getIBXMLFormat(), null,
-					null);
+			templateId = createIBPage(parentTemplateKey, name, getBuilderService().getTemplateKey(), parentTemplateKey, null, null, domain.getID(),
+					getBuilderService().getIBXMLFormat(), null, null);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error creating template: " + name, e);
 		}
 		
 		if (templateId == -1) {
