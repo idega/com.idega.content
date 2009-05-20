@@ -1,8 +1,6 @@
 package com.idega.content.themes.helpers.business;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.logging.Level;
@@ -30,7 +28,6 @@ public class CssScanner implements ResourceScanner {
 	
 	public static final String SPRING_BEAN_IDENTIFIER = "cssScanner";
 	
-	private BufferedReader readerBuffer = null;
 	private StringBuffer resultBuffer = null;
 	
 	private String linkToTheme = null;
@@ -48,32 +45,22 @@ public class CssScanner implements ResourceScanner {
 	private static final String CLOSER = "}";
 	private static final String UTF_8_DECLARATION = "@charset \"UTF-8\";";
 	
-	public void scanFile() {
-		if (readerBuffer == null) {
-			return;
-		}
-		
+	public void scanFile(List<String> fileLines) {
+		openers = 0;
+		closers = 0;
+		needToReplace = false;
 		resultBuffer = new StringBuffer();
-		String line;
+		
 		String changedLine = null;
-		try {
-			while ((line = readerBuffer.readLine()) != null) {
-				changedLine = line;
-				changedLine = scanLine(line);
-				resultBuffer.append(changedLine).append(ThemesConstants.NEW_LINE);
-				
-				if (!line.equals(changedLine)) {	// If line was modified
-					needToReplace = true;
-				}
+		for (String line: fileLines) {
+			changedLine = line;
+			changedLine = scanLine(line);
+			resultBuffer.append(changedLine).append(ThemesConstants.NEW_LINE);
+			
+			if (!line.equals(changedLine)) {	// If line was modified
+				needToReplace = true;
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
 		}
-	}
-
-	public void setReaderBuffer(BufferedReader readerBuffer) {
-		this.readerBuffer = readerBuffer;
 	}
 
 	public void setLinkToTheme(String linkToTheme) {

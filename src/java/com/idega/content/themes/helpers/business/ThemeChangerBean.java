@@ -1,8 +1,6 @@
 package com.idega.content.themes.helpers.business;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -32,6 +30,7 @@ import org.jdom.Text;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -56,7 +55,7 @@ import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.util.resources.ResourceScanner;
 
-@Scope("singleton")
+@Scope(BeanDefinition.SCOPE_SINGLETON)
 @Service(ThemeChanger.SPRING_BEAN_IDENTIFIER)
 public class ThemeChangerBean implements ThemeChanger {
 
@@ -559,16 +558,16 @@ public class ThemeChangerBean implements ThemeChanger {
 			}
 			return false;
 		}
-		InputStreamReader isr = new InputStreamReader(is);
-		BufferedReader buf = new BufferedReader(isr);
-		ResourceScanner scanner = ELUtil.getInstance().getBean(CssScanner.SPRING_BEAN_IDENTIFIER);
-		scanner.setReaderBuffer(buf);
-		scanner.setLinkToTheme(linkToTheme);
-		scanner.scanFile();
 		
-		IOUtil.closeInputStream(is);
-		helper.closeInputStreamReader(isr);
-		helper.closeBufferedReader(buf);
+		ResourceScanner scanner = ELUtil.getInstance().getBean(CssScanner.SPRING_BEAN_IDENTIFIER);
+		scanner.setLinkToTheme(linkToTheme);
+		try {
+			scanner.scanFile(StringUtil.getLinesFromString(StringHandler.getContentFromInputStream(is)));
+		} catch(Exception e) {
+			logger.log(Level.WARNING, "Error while scanning CSS file: " + linkToStyle, e);
+		} finally {
+			IOUtil.closeInputStream(is);
+		}
 		
 		StringBuffer result = scanner.getResultBuffer();
 		if (result == null) {
