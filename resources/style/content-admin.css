@@ -5,7 +5,7 @@ div.content_item_toolbar {
 
 ul.content_item_toolbar {
 	border: 1px #fff solid;
-	list-style: none;
+	list-style: none !important;
 	margin: 0;
 	padding: 0;
 	float: left;
@@ -13,7 +13,7 @@ ul.content_item_toolbar {
 	border-radius: 3px;
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
-	padding: 0;
+	padding: 0 !important;
 }
 
 .content_item_toolbar li {
