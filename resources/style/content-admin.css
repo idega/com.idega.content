@@ -106,13 +106,13 @@ html>body .blog-entry, html>body .article_item {
 
 iframe.contentItemEditorFrameStyle {
 	bottom: 0;
-	height: 100%;
+	height: auto;
 	left: 0;
 	padding: 0;
 	position: absolute;
 	right: 0;
-	top: 25px;
-	width: 100%;
+	top: 0;
+	width: auto;
 }
 
 div#mb_bottom #mb_caption {
