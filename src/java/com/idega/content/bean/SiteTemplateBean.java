@@ -14,13 +14,16 @@ import org.apache.myfaces.custom.tree2.TreeNode;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.business.TemplatesLoader;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.tree.PageTemplate;
 import com.idega.content.tree.TemplateComparator;
 import com.idega.core.data.IWTreeNode;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFTreeNode;
 
 public class SiteTemplateBean {
@@ -28,9 +31,15 @@ public class SiteTemplateBean {
 	
 	TreeNode siteTree = null;
 	TreeNode pageTree = null;
+	
 	String path = null;
+	
 	Document siteDocument = null;
+	
 	private Map <String, PageTemplate> pageMap = null;
+	
+	@Autowired
+	private ThemesHelper themesHelper;
 	
 	public SiteTemplateBean() {
 		super();
@@ -62,7 +71,7 @@ public class SiteTemplateBean {
 	}
 
 	public String getPath() {
-		return ThemesHelper.getInstance().getWebRootWithoutContent() + "/idegaweb/bundles/com.idega.content.bundle/resources/templates/site-templates.xml";
+		return getThemesHelper().getWebRootWithoutContent() + ContentUtil.getBundle().getVirtualPathWithFileNameString("templates/site-templates.xml");
 	}
 
 	public void setPath(String path) {
@@ -90,5 +99,17 @@ public class SiteTemplateBean {
 			return null;
 		}
 		return document;
-	}	
+	}
+
+	public ThemesHelper getThemesHelper() {
+		if (themesHelper == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		return themesHelper;
+	}
+
+	public void setThemesHelper(ThemesHelper themesHelper) {
+		this.themesHelper = themesHelper;
+	}
+	
 }

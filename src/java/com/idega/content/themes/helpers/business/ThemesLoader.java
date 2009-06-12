@@ -2,21 +2,18 @@ package com.idega.content.themes.helpers.business;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.util.CoreConstants;
+import com.idega.util.expression.ELUtil;
 
 public class ThemesLoader {
 	
-	private Theme theme = null;
-	private ThemesHelper helper = null;
+	private Theme theme;
 	
-	public ThemesLoader(ThemesHelper helper) {
-		this.helper = helper;
-	}
-	
-	public ThemesLoader() {
-		this(ThemesHelper.getInstance(false));
-	}
+	@Autowired
+	private ThemesHelper helper;
 	
 	public boolean loadTheme(String originalUri, String encodedUri, boolean newTheme, boolean manuallyCreated) {
 		if (encodedUri == null || originalUri == null) {
@@ -43,7 +40,7 @@ public class ThemesLoader {
 		}
 		boolean result = true;
 		for (int i = 0; (i < skeletons.size() && result); i++) {
-			result = loadTheme(helper.decodeUrl(skeletons.get(i)), skeletons.get(i), newThemes, manuallyCreated);
+			result = loadTheme(getThemesHelper().decodeUrl(skeletons.get(i)), skeletons.get(i), newThemes, manuallyCreated);
 		}
 		return result;
 	}
@@ -59,13 +56,13 @@ public class ThemesLoader {
 		if (theme == null) {
 			return false;
 		}
-		List<Theme> themes = helper.getAvailableThemes();
+		List<Theme> themes = getThemesHelper().getAvailableThemes();
 		if (themes == null) {
 			return false;
 		}
 		
 		if (!themes.contains(theme)) {
-			helper.addTheme(theme);
+			getThemesHelper().addTheme(theme);
 		}
 		
 		theme = null;
@@ -79,19 +76,19 @@ public class ThemesLoader {
 			return uri;
 		}
 		index += CoreConstants.WEBDAV_SERVLET_URI.length();
-		return helper.extractValueFromString(uri, index, uri.length());
+		return getThemesHelper().extractValueFromString(uri, index, uri.length());
 	}
 	
 	protected synchronized String createNewTheme(String originalUri, String encodedUri, boolean newTheme, boolean manuallyCreated) {
-		helper.addUriToTheme(originalUri);
+		getThemesHelper().addUriToTheme(originalUri);
 		
 		initTheme(newTheme);
 		
 		String themeKey = theme.getId();
 		
 		theme.setLinkToSkeleton(encodedUri);
-		theme.setLinkToBase(helper.getLinkToBase(encodedUri));
-		theme.setLinkToBaseAsItIs(helper.getLinkToBase(originalUri));
+		theme.setLinkToBase(getThemesHelper().getLinkToBase(encodedUri));
+		theme.setLinkToBaseAsItIs(getThemesHelper().getLinkToBase(originalUri));
 		
 		if (manuallyCreated) {
 			theme.setLoading(false);
@@ -105,11 +102,18 @@ public class ThemesLoader {
 	}
 	
 	private String getThemeId() {
-		String id = String.valueOf(helper.getRandomNumber(Integer.MAX_VALUE));
-		while (helper.getTheme(id) != null) { // Checking if exists Theme with the same ID
-			id = String.valueOf(helper.getRandomNumber(Integer.MAX_VALUE));
+		String id = String.valueOf(getThemesHelper().getRandomNumber(Integer.MAX_VALUE));
+		while (getThemesHelper().getTheme(id) != null) { // Checking if exists Theme with the same ID
+			id = String.valueOf(getThemesHelper().getRandomNumber(Integer.MAX_VALUE));
 		}
 		return id;
+	}
+	
+	private ThemesHelper getThemesHelper() {
+		if (helper == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		return helper;
 	}
 
 }

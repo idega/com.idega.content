@@ -40,6 +40,8 @@ public class SiteInfo extends Block {
 	
 	@Autowired
 	private LucidEngine lucidEngine;
+	@Autowired
+	private ThemesHelper themesHelper;
 	
 	public SiteInfo() {
 		super();
@@ -65,14 +67,14 @@ public class SiteInfo extends Block {
 			locales.setOnChange(onChnageAction);
 		}
 		if (locale == null) {
-			locale = ThemesHelper.getInstance().getCurrentLanguage(iwc);
+			locale = themesHelper.getCurrentLanguage(iwc);
 			locales.setSelectedElement(locale);
 		}
 		return locales;
 	}
 	
 	protected void createContents(UIComponent layer, IWContext iwc, boolean boldText, boolean addKeyPressAction) {
-		List<Setting> settings = ThemesHelper.getInstance().getThemeSettings();
+		List<Setting> settings = themesHelper.getThemeSettings();
 		if (settings == null) {
 			return;
 		}
@@ -113,7 +115,7 @@ public class SiteInfo extends Block {
 		layer.setStyleClass("webfaceFormSection");
 		form.add(layer);
 		
-		doBusiness(iwc, ThemesHelper.getInstance().getThemeSettings());
+		doBusiness(iwc, themesHelper.getThemeSettings());
 		
 		DropdownMenu locales = getLocales(iwc, true, null);
 		createContents(layer, iwc, true, false);
@@ -174,6 +176,14 @@ public class SiteInfo extends Block {
 
 	public void setLucidEngine(LucidEngine lucidEngine) {
 		this.lucidEngine = lucidEngine;
+	}
+
+	public ThemesHelper getThemesHelper() {
+		return themesHelper;
+	}
+
+	public void setThemesHelper(ThemesHelper themesHelper) {
+		this.themesHelper = themesHelper;
 	}
 	
 }

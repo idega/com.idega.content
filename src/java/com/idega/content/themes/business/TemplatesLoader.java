@@ -14,6 +14,7 @@ import java.util.jar.JarFile;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -29,6 +30,8 @@ import com.idega.idegaweb.JarLoader;
 import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.IOUtil;
+import com.idega.util.expression.ELUtil;
+import com.idega.util.xml.XmlUtil;
 
 /**
  * A utility class to find page types and site templates from bundles and slide
@@ -45,12 +48,13 @@ public class TemplatesLoader implements JarLoader {
 	private static final String TEMPLATES_LOADER_APPLICATION_ATTIBUTE = "TemplatesLoader";
 	
 	private IWMainApplication iwma = null;
-	private ThemesHelper themesHelper = null;
+	
+	@Autowired
+	private ThemesHelper themesHelper;
 	
 	private TemplatesLoader(IWMainApplication iwma) {
 		super();
 		this.iwma = iwma;
-		this.themesHelper = ThemesHelper.getInstance(false);
 	}
 	
 	public static TemplatesLoader getInstance(IWMainApplication iwma){
@@ -77,7 +81,7 @@ public class TemplatesLoader implements JarLoader {
 		if (pageTemplatesEntry != null) {
 			try {
 				stream = jarFile.getInputStream(pageTemplatesEntry);
-				Document pageDocument = themesHelper.getXMLDocument(stream);
+				Document pageDocument = XmlUtil.getJDOMXMLDocument(stream);
 				addPageTypesFromDocument(pageDocument);				
 			}
 			catch (Exception e) {
@@ -90,7 +94,7 @@ public class TemplatesLoader implements JarLoader {
 		if (siteTemplatesEntry != null) {
 			try {
 				stream = jarFile.getInputStream(siteTemplatesEntry);
-				Document pageDocument = themesHelper.getXMLDocument(stream);
+				Document pageDocument = XmlUtil.getJDOMXMLDocument(stream);
 				addSiteTemplatesFromDocument(pageDocument);
 			}
 			catch (Exception e) {
@@ -206,7 +210,7 @@ public class TemplatesLoader implements JarLoader {
 
 		String templatesFolder = getSlideTemplatesFolderURI();
 	
-		Collection<SearchResult> results = themesHelper.search(PAGE_TEMPLATES_XML_FILE_NAME, templatesFolder);
+		Collection<SearchResult> results = getThemesHelper().search(PAGE_TEMPLATES_XML_FILE_NAME, templatesFolder);
 		
 		if (results == null) {
 			return (Map <String, PageTemplate>)pageTemplates.get(ContentConstants.PAGES_MAP_KEY);
@@ -235,7 +239,7 @@ public class TemplatesLoader implements JarLoader {
 		//	Load from slide	
 		String templatesFolder = getSlideTemplatesFolderURI();
 	
-		Collection<SearchResult> results = themesHelper.search(SITE_TEMPLATES_XML_FILE_NAME, templatesFolder);
+		Collection<SearchResult> results = getThemesHelper().search(SITE_TEMPLATES_XML_FILE_NAME, templatesFolder);
 		if (results == null) {
 			return (SortedMap <String, SiteTemplate>)siteTemplates.get(ContentConstants.SITE_MAP_KEY);
 		}
@@ -273,7 +277,7 @@ public class TemplatesLoader implements JarLoader {
 		
 		String uri = result.getSearchResultURI();
 		//	TODO fetch in authenticated manner httpclient? getmethod, or by slide api
-		return themesHelper.getXMLDocument(new StringBuffer(serverName).append(uri.substring(1)).toString());
+		return getThemesHelper().getXMLDocument(new StringBuffer(serverName).append(uri.substring(1)).toString());
 	}
 	
 	protected IWSlideService getIWSlideService(){
@@ -298,4 +302,16 @@ public class TemplatesLoader implements JarLoader {
 		}	
 		return pageMap;
 	}
+
+	public ThemesHelper getThemesHelper() {
+		if (themesHelper == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		return themesHelper;
+	}
+
+	public void setThemesHelper(ThemesHelper themesHelper) {
+		this.themesHelper = themesHelper;
+	}
+	
 }

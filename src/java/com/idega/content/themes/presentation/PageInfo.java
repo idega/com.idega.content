@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.faces.context.FacesContext;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.presentation.ContentBlock;
@@ -21,6 +23,7 @@ import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.RadioButton;
 import com.idega.presentation.ui.TextInput;
 import com.idega.util.CoreConstants;
+import com.idega.util.expression.ELUtil;
 
 public class PageInfo extends ContentBlock {
 
@@ -30,8 +33,12 @@ public class PageInfo extends ContentBlock {
 	private Boolean hasEditorRole = null;
 	private Boolean pageIsPublished = null;
 
+	@Autowired
+	private ThemesHelper themesHelper;
+	
 	@Override
 	protected void initializeComponent(FacesContext context) {
+		ELUtil.getInstance().autowire(this);
 		IWContext iwc = IWContext.getIWContext(context);
 
 		Layer pageInfo = new Layer();
@@ -39,8 +46,8 @@ public class PageInfo extends ContentBlock {
 			pageInfo.setStyleClass(getStyleClass());
 		}
 		
-		ThemesHelper.getInstance().loadPageSettings(ThemesHelper.getInstance().getWebRootWithoutContent() + ThemesConstants.PAGE_SETTINGS);
-		List<Setting> pageSettings = ThemesHelper.getInstance().getPageSettings();
+		themesHelper.loadPageSettings(themesHelper.getWebRootWithoutContent() + ThemesConstants.PAGE_SETTINGS);
+		List<Setting> pageSettings = themesHelper.getPageSettings();
 		
 		Layer layer = new Layer();
 		layer.setStyleClass("webfaceFormSection");
@@ -147,7 +154,7 @@ public class PageInfo extends ContentBlock {
 			return false;
 		}
 		
-		ICPage page = ThemesHelper.getInstance(false).getThemesService().getICPage(pageKey);
+		ICPage page = themesHelper.getThemesService().getICPage(pageKey);
 		
 		return page == null ? true : page.isPublished();
 	}

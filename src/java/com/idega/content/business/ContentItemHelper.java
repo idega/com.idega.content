@@ -5,8 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.content.themes.business.ThemesService;
-import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.core.builder.data.ICPage;
@@ -49,10 +50,17 @@ public class ContentItemHelper {
 		if (propertyValue == null) {
 			return getDefaultPageUrlByArticleResourcePath();
 		}
-		ThemesService themesService = ThemesHelper.getInstance().getThemesService();
+		
+		ThemesService themesService = null;
+		try {
+			themesService = IBOLookup.getServiceInstance(iwc, ThemesService.class);
+		} catch (IBOLookupException e) {
+			e.printStackTrace();
+		}
 		if (themesService == null) {
 			return getDefaultPageUrlByArticleResourcePath();
 		}
+		
 		ICPage page = null;
 		for (Iterator it = tree.values().iterator(); it.hasNext();) {
 			o = it.next();

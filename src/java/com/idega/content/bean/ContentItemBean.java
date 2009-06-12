@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.48 2009/05/15 07:23:54 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.49 2009/06/12 10:52:36 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -32,6 +32,7 @@ import javax.jcr.ValueFormatException;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.util.WebdavStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -57,12 +58,14 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2009/05/15 07:23:54 $ by $Author: valdas $
+ *  Last modified: $Date: 2009/06/12 10:52:36 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.48 $
+ * @version $Revision: 1.49 $
  */
-public abstract class ContentItemBean implements Serializable, ContentItem{//,ICFile {
+public abstract class ContentItemBean implements Serializable, ContentItem {
+
+	private static final long serialVersionUID = -1620171698501618358L;
 	
     public static final String DISPLAYNAME = "displayname";
     public static final String GETCONTENTLANGUAGE = "getcontentlanguage";
@@ -78,6 +81,9 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
     public static final String SUPPORTEDLOCK = "supportedlock";
     public static final String LOCKDISCOVERY = "lockdiscovery";
 	
+    @Autowired
+    private ThemesHelper themesHelper;
+    
 	private Locale _locale = null;
 	private String _name = null;
 	private String _description = null;
@@ -799,9 +805,14 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 	public String getFeedEntryAsXML(IWContext iwc, String feedTitle, String feedDescription, String title, String description,
 			String body, String author, List<String> categories, String source, String comment, String moduleClass,
 			String linkToComments) {
+		
+		if (themesHelper == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		
 		Timestamp published = getPublishedDate();
 		Timestamp updated = getLastModifiedDate();
-		String server = ThemesHelper.getInstance().getFullServerName(iwc);
+		String server = themesHelper.getFullServerName(iwc);
 		StringBuffer articleURL = new StringBuffer(server);
 		ContentItemHelper helper = new ContentItemHelper(getResourcePath());
 		String pageUri = helper.getPageUrlByArticleResourcePath(iwc, moduleClass);
@@ -825,7 +836,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem{//,IC
 		}
 		
 		if (linkToComments == null) {
-			linkToComments = ThemesHelper.getInstance().getArticleCommentLink(iwc, pageUri);
+			linkToComments = themesHelper.getArticleCommentLink(iwc, pageUri);
 		}
 
 		description = getFixedDescription(description);

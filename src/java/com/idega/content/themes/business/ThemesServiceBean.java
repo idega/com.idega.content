@@ -19,6 +19,7 @@ import com.idega.content.lucid.business.LucidEngine;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
+import com.idega.content.themes.helpers.business.ThemesLoader;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.data.ICDomain;
@@ -33,7 +34,7 @@ import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.expression.ELUtil;
 
-public class ThemesServiceBean extends IBOServiceBean implements ThemesService, IWSlideChangeListener{
+public class ThemesServiceBean extends IBOServiceBean implements ThemesService, IWSlideChangeListener {
 
 	private static final long serialVersionUID = -1765120426660957585L;
 	
@@ -42,14 +43,20 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	@Autowired
 	private BuilderLogicWrapper builderLogicWrapper;
 
+	@Autowired
+	private ThemesHelper themesHelper;
+	
+	@Autowired
+	private ThemesEngine themesEngine;
+	
 	public void onSlideChange(IWContentEvent idegaWebContentEvent) {
 		String uri = idegaWebContentEvent.getContentEvent().getUri();
 		if (uri.indexOf(ThemesConstants.THEMES_PATH) == -1) {
 			return;	// If not processing theme
 		}
 		if (ContentEvent.REMOVE.equals(idegaWebContentEvent.getMethod())) {
-			if (ThemesHelper.getInstance(false).isCorrectThemeTemplateFile(uri, ThemesConstants.THEME_SKELETONS_FILTER)) {
-				Collection<Theme> themes = ThemesHelper.getInstance(false).getAllThemes();
+			if (getThemesHelper().isCorrectThemeTemplateFile(uri, ThemesConstants.THEME_SKELETONS_FILTER)) {
+				Collection<Theme> themes = getThemesHelper().getAllThemes();
 				if (themes == null) {
 					return;
 				}
@@ -57,32 +64,33 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 				Theme theme = null;
 				for (Iterator<Theme> it = themes.iterator(); (it.hasNext() && !foundTheme);) {
 					theme = it.next();
-					if (uri.equals(ThemesHelper.getInstance(false).decodeUrl(theme.getLinkToSkeleton()))) {
+					if (uri.equals(getThemesHelper().decodeUrl(theme.getLinkToSkeleton()))) {
 						foundTheme = true;
 					}
 				}
 				if (foundTheme && !theme.isLocked()) {
-					ThemesHelper.getInstance(false).removeLastUsedTheme(String.valueOf(theme.getIBPageID()));
+					getThemesHelper().removeLastUsedTheme(String.valueOf(theme.getIBPageID()));
 					int pageId = theme.getIBPageID();
 					
 					String themeID = theme.getId();
-					ThemesHelper.getInstance(false).removeTheme(uri, themeID);
+					getThemesHelper().removeTheme(uri, themeID);
 					
 					deleteTemplate(pageId);
 				}
 			}
 		}
 		else {
-			if (!ThemesHelper.getInstance().isCreatedManually(uri) && ThemesHelper.getInstance().isCorrectThemeTemplateFile(uri,
+			if (!getThemesHelper().isCreatedManually(uri) && getThemesHelper().isCorrectThemeTemplateFile(uri,
 					ThemesConstants.THEME_SKELETONS_FILTER) && isNewTheme(uri)) {
 				try {
-					ThemesHelper.getInstance().getThemesLoader().loadTheme(uri, ThemesHelper.getInstance().urlEncode(uri), true, false);
+					ThemesLoader loader = new ThemesLoader();
+					loader.loadTheme(uri, getThemesHelper().urlEncode(uri), true, false);
 				} catch (Exception e) {
 					LOGGER.log(Level.WARNING, "Error loading theme: " + uri, e);
 				}
 			}
 			if (uri.endsWith(ThemesConstants.THEME_PREDEFINED_STYLE_CONFIG_FILE)) {
-				ThemesHelper.getInstance().addPredefinedThemeStyle(uri);
+				getThemesHelper().addPredefinedThemeStyle(uri);
 			}
 		}
 	}
@@ -128,8 +136,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			tree = getBuilderService().getTree(iwc);
 			domain = iwc.getDomain();
 			
-			if (pageKey.equals(ThemesHelper.getInstance().getLastVisitedPage())) {
-				ThemesHelper.getInstance().setLastVisitedPage(null);
+			if (pageKey.equals(getThemesHelper().getLastVisitedPage())) {
+				getThemesHelper().setLastVisitedPage(null);
 			}
 		}
 		
@@ -227,7 +235,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			parentId = lucidEngine.createRootTemplate(domain, getBuilderService(), domainID, getBuilderService().getIBXMLFormat());
 			lucidEngine.initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
 		}
-		String name = ThemesHelper.getInstance().getPreparedThemeNameToUseInRepository(theme);
+		String name = getThemesHelper().getPreparedThemeNameToUseInRepository(theme);
 		
 		String suffix = getSuffixForTemplate(theme.getName());
 		String templateName = suffix == null ? theme.getName() : new StringBuilder(theme.getName()).append(suffix).toString();
@@ -240,7 +248,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		theme.setIBPageID(id);
 		
 		if (updatePageWebDav(theme.getIBPageID(), CoreConstants.WEBDAV_SERVLET_URI + theme.getLinkToSkeleton())) {
-			ThemesEngine themesEngine = ThemesHelper.getInstance().getThemesEngine();
+			ThemesEngine themesEngine = getThemesEngine();
 			if (themesEngine != null) {
 				themesEngine.updateSiteTemplatesTree(iwc, true);
 			}
@@ -317,7 +325,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		
 		if (getBuilderService().getPageKey().equals(type)) {
 			if (templateId == null) {
-				templateId = ThemesHelper.getInstance().getLastUsedTheme();
+				templateId = getThemesHelper().getLastUsedTheme();
 			}
 		}
 		
@@ -343,7 +351,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	}
 	
 	private boolean isNewTheme(String uri) {
-		if (ThemesHelper.getInstance().existTheme(uri)) {
+		if (getThemesHelper().existTheme(uri)) {
 			return false;
 		}
 		return true;
@@ -426,5 +434,27 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		
 		return String.valueOf(templateId);
+	}
+
+	public ThemesHelper getThemesHelper() {
+		if (themesHelper == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		return themesHelper;
+	}
+
+	public void setThemesHelper(ThemesHelper themesHelper) {
+		this.themesHelper = themesHelper;
+	}
+
+	public ThemesEngine getThemesEngine() {
+		if (themesEngine == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		return themesEngine;
+	}
+
+	public void setThemesEngine(ThemesEngine themesEngine) {
+		this.themesEngine = themesEngine;
 	}
 }

@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -28,15 +30,15 @@ import com.idega.util.StringHandler;
 
 /**
  * @author <a href="mailto:valdas@idega.com">Valdas Žemaitis</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  *
  * Calculates color value (hex value) from given expression
  *
- * Last modified: $Date: 2009/01/12 05:57:00 $ by $Author: valdas $
+ * Last modified: $Date: 2009/06/12 10:52:36 $ by $Author: valdas $
  */
 
 @Service
-@Scope("singleton")
+@Scope(BeanDefinition.SCOPE_SINGLETON)
 public class ColourExpressionCalculator {
 	
 	private static final Logger logger = Logger.getLogger(ColourExpressionCalculator.class.getName());
@@ -55,13 +57,15 @@ public class ColourExpressionCalculator {
 	
 	private static final Map<String, Integer> HEX_TO_DEC_NUMBERS_CACHE = new HashMap<String, Integer>();
 	
-	private ThemesHelper helper = null;
+	@Autowired
+	private ThemesHelper helper;
+	@Autowired
+	private ThemeChanger themeChanger;
+	
 	private Interpreter mathInterpreter = null;
 	
 	public ColourExpressionCalculator() {
 		mathInterpreter = new bsh.Interpreter();
-		
-		helper = ThemesHelper.getInstance();
 	}
 
 	private List<String> getOriginalColourFilesBySearch(Theme theme) {
@@ -70,7 +74,7 @@ public class ColourExpressionCalculator {
 			searchScope = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(searchScope).toString();
 		}
 		
-		List<SearchResult> searchResults = helper.search("*_original.css", searchScope);
+		List<SearchResult> searchResults = getHelper().search("*_original.css", searchScope);
 		if (searchResults == null || searchResults.isEmpty()) {
 			return null;
 		}
@@ -102,7 +106,7 @@ public class ColourExpressionCalculator {
 			return false;
 		}
 		
-		IWSlideService slide = helper.getSlideService();
+		IWSlideService slide = getHelper().getSlideService();
 		if (slide == null) {
 			return false;
 		}
@@ -111,7 +115,7 @@ public class ColourExpressionCalculator {
 		
 		String file = null;
 		String originalColourFile = null;
-		String webRoot = helper.getFullWebRoot();
+		String webRoot = getHelper().getFullWebRoot();
 		String sourceLink = null;
 		InputStream stream = null;
 		String key = null;
@@ -125,7 +129,7 @@ public class ColourExpressionCalculator {
 			}
 			
 			sourceLink = new StringBuffer(webRoot).append(theme.getLinkToBase()).append(originalColourFile).toString();
-			stream = helper.getInputStream(sourceLink);
+			stream = getHelper().getInputStream(sourceLink);
 			if (stream == null) {
 				logger.log(Level.WARNING, "Can't read CSS file from: " + sourceLink);
 				continue;
@@ -227,7 +231,7 @@ public class ColourExpressionCalculator {
 			styleValue = theme.getStyleVariableValue(variable);
 			if (styleValue == null) {
 				try {
-					colourVariation = helper.getThemeChanger().getColorGroupMember(theme, variable);
+					colourVariation = getThemeChanger().getColorGroupMember(theme, variable);
 				} catch (Exception e) {
 					logger.log(Level.SEVERE, "Error while getting colour variation", e);
 				}
@@ -777,4 +781,21 @@ public class ColourExpressionCalculator {
 		
 		return index;
 	}
+
+	public ThemesHelper getHelper() {
+		return helper;
+	}
+
+	public void setHelper(ThemesHelper helper) {
+		this.helper = helper;
+	}
+
+	public ThemeChanger getThemeChanger() {
+		return themeChanger;
+	}
+
+	public void setThemeChanger(ThemeChanger themeChanger) {
+		this.themeChanger = themeChanger;
+	}
+	
 }

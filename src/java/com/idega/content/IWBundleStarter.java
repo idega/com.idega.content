@@ -1,5 +1,5 @@
 /*
- * $Id: IWBundleStarter.java,v 1.48 2009/05/15 07:23:54 valdas Exp $
+ * $Id: IWBundleStarter.java,v 1.49 2009/06/12 10:52:36 valdas Exp $
  * Created on 3.11.2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.rss.business.RSSProducerRegistry;
 import com.idega.builder.business.BuilderLogicWrapper;
@@ -44,12 +46,15 @@ import com.idega.util.expression.ELUtil;
 
 /**
  * 
- *  Last modified: $Date: 2009/05/15 07:23:54 $ by $Author: valdas $
+ *  Last modified: $Date: 2009/06/12 10:52:36 $ by $Author: valdas $
  * 
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
- * @version $Revision: 1.48 $
+ * @version $Revision: 1.49 $
  */
 public class IWBundleStarter implements IWBundleStartable{
+	
+	@Autowired
+	private ThemesHelper themesHelper;
 	
 	/**
 	 * 
@@ -144,16 +149,18 @@ public class IWBundleStarter implements IWBundleStartable{
 			return;
 		}
 		
-		ThemesHelper helper = ThemesHelper.getInstance(false);
+		if (themesHelper == null) {
+			ELUtil.getInstance().autowire(this);
+		}
 		try {
-			helper.loadThemeSettings(stream);
+			themesHelper.loadThemeSettings(stream);
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
 			IOUtil.closeInputStream(stream);
 		}
 		
-		List<Setting> settings = helper.getThemeSettings();
+		List<Setting> settings = themesHelper.getThemeSettings();
 		if (ListUtil.isEmpty(settings)) {
 			return;
 		}

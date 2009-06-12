@@ -9,13 +9,13 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
 import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.webdav.lib.WebdavResources;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.rss.business.RSSAbstractProducer;
 import com.idega.block.rss.business.RSSBusiness;
@@ -34,6 +34,7 @@ import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.FileUtil;
+import com.idega.util.expression.ELUtil;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -41,99 +42,64 @@ import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndFeedImpl;
 
-public class ContentItemRssProducer  extends RSSAbstractProducer implements RSSProducer, IWSlideChangeListener{
+public class ContentItemRssProducer extends RSSAbstractProducer implements RSSProducer, IWSlideChangeListener {
 	
 	protected static final String ARTICLE_SEARCH_KEY = "*.xml*";
 	public static final String RSS_FOLDER_NAME = "rss";
 	public static final String RSS_FILE_NAME = "feed.xml";
 
-	public static final String PATH = CoreConstants.WEBDAV_SERVLET_URI + ContentUtil.getContentBaseFolderPath() + "/article/";//"/files/cms/article";
-	private static Log log = LogFactory.getLog(ContentItemRssProducer.class);
+	public static final String PATH = CoreConstants.WEBDAV_SERVLET_URI + ContentUtil.getContentBaseFolderPath() + "/article/";
+	private static Logger LOGGER = Logger.getLogger(ContentItemRssProducer.class.getName());
+	
+	@Autowired
+	private ThemesHelper themesHelper;
 	
 	public ContentItemRssProducer() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 	
-//	public void handleRSSRequest(RSSRequest rssRequest) throws IOException {
-//		
-//		String uri = fixURI(rssRequest);		
-//		
-//		String feedFile = uri+RSS_FOLDER_NAME+"/"+RSS_FILE_NAME;
-//		String realURI = "/article"+feedFile;
-//		try {
-//			if(this.isAFolderInSlide(uri,rssRequest)){
-//				if(this.existsInSlide(feedFile,rssRequest) && rssFileURIsCacheMap.containsKey(uri)){
-//					this.dispatch(realURI, rssRequest);
-//				}	
-//				else{
-//					try {
-//						createRSSFile(rssRequest, uri);
-//						rssFileURIsCacheMap.put(uri,realURI);
-//						this.dispatch("/article"+feedFile, rssRequest);
-//					} catch (Exception e) {
-//						throw new IOException(e.getMessage());
-//					}
-//				}
-//			}
-//			else{}
-//		} catch (ServletException e) {
-//			e.printStackTrace();
-//		}
-//	}	
 	@Override
 	public void handleRSSRequest(RSSRequest rssRequest) throws IOException {
-		// TODO Auto-generated method stub
-		
 		String uri = fixURI(rssRequest);
 		
-//		if (existsInSlide(rssRequest.getURI(), rssRequest) == true){
 		if(this.isAFolderInSlide(uri,rssRequest)){
 			try {
 				dispatch(rssRequest.getURI(), rssRequest);
 			} catch (ServletException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		else{
 			//create a file and dispatch the request to it
-//			createRSSFile(rssRequest, uri);
 			searchForArticles();
 			try {
 				dispatch(rssRequest.getURI(), rssRequest);
 			} catch (ServletException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
 		}
 	}
 	public void searchForArticles() {
-//	public void createRSSFile(RSSRequest rssRequest, String fixedUri) {
 		IWContext iwc = CoreUtil.getIWContext();
-		System.out.println("Context: " + iwc);
-		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
-		
-//System.out.println("Search path: " + PATH);
-		Collection results = search.doSimpleDASLSearch(ARTICLE_SEARCH_KEY, PATH);
-//		search.
-		if (results == null) {
-			log.error("ContentSearch.doSimpleDASLSearch returned results Collection, which is null: " + results);
+		if (iwc == null) {
+			LOGGER.warning("Unable to search for articles, IWContext is null");
 			return;
 		}
-		Iterator it = results.iterator();
-		List <String> urisToArticles = new ArrayList<String>();
+		
+		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
+		
+		Collection<SearchResult> results = search.doSimpleDASLSearch(ARTICLE_SEARCH_KEY, PATH);
+
+		if (results == null) {
+			LOGGER.warning("ContentSearch.doSimpleDASLSearch returned results Collection, which is null: " + results);
+			return;
+		}
+		List<String> urisToArticles = new ArrayList<String>();
 		String uri = null;
-		Object o = null;
-		while (it.hasNext()) {
-			o = it.next();
-			if (o instanceof SearchResult) {
-				uri = ((SearchResult) o).getSearchResultURI();
-//				if (isCorrectFile(uri)) {
-				urisToArticles.add(uri);
-//				}
-			}
+		for (SearchResult result: results) {
+			uri = result.getSearchResultURI();
+			urisToArticles.add(uri);
 		}
 		
 		RSSBusiness rss = null;
@@ -141,18 +107,16 @@ public class ContentItemRssProducer  extends RSSAbstractProducer implements RSSP
 		Date now = new Date();
 		long time = now.getTime();
 		try {
-			rss = IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(),
-					RSSBusiness.class);
+			rss = IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), RSSBusiness.class);
 		} catch (IBOLookupException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		SyndFeed allArticles = rss.createNewFeed("title", ThemesHelper.getInstance().getWebRootWithoutContent(), "description", "atom_1.0", "language", new Timestamp(time));
+		SyndFeed allArticles = rss.createNewFeed("title", getThemesHelper().getWebRootWithoutContent(), "description", "atom_1.0", "language",
+				new Timestamp(time));
 			
 		List<SyndEntry> allEntries = new ArrayList<SyndEntry>();
 		for (int i = 0; i < urisToArticles.size(); i++) {
-			articleFeed = rss.getFeed(ThemesHelper.getInstance().getWebRootWithoutContent() + urisToArticles.get(i));
-
+			articleFeed = rss.getFeed(getThemesHelper().getWebRootWithoutContent() + urisToArticles.get(i));
 
 			for (Iterator iter = articleFeed.getEntries().iterator(); iter.hasNext();) {
 				SyndEntry element = (SyndEntry) iter.next();
@@ -169,17 +133,15 @@ public class ContentItemRssProducer  extends RSSAbstractProducer implements RSSP
 			e.printStackTrace();
 		}
 		
-		IWSlideService service = ThemesHelper.getInstance().getSlideService(null);
 		try {
+			IWSlideService service = IBOLookup.getServiceInstance(iwc, IWSlideService.class);
 			service.uploadFileAndCreateFoldersFromStringAsRoot("/files/cms/rss/all_articles/", "feed.xml", allArticlesContent, "text/xml", true);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public void onSlideChange(IWContentEvent contentEvent) {
-		// TODO Auto-generated method stub		
 	}	
 	
 	/**
@@ -273,4 +235,16 @@ public class ContentItemRssProducer  extends RSSAbstractProducer implements RSSP
 		//deletes the previous version
 		this.getIWSlideService(rssRequest).uploadFileAndCreateFoldersFromStringAsRoot(uri+RSS_FOLDER_NAME+"/", RSS_FILE_NAME, feedXML,this.getRSSContentType(),true);
 	}
+
+	public ThemesHelper getThemesHelper() {
+		if (themesHelper == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		return themesHelper;
+	}
+
+	public void setThemesHelper(ThemesHelper themesHelper) {
+		this.themesHelper = themesHelper;
+	}
+
 }

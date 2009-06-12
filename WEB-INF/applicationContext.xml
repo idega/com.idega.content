@@ -24,5 +24,7 @@
 		<dwr:remote javascript="FileUploadListener" />
 		<aop:scoped-proxy />
 	</bean>
+	
+	<bean id="themesHelper" class="com.idega.content.themes.helpers.business.impl.ThemesHelperImpl" scope="singleton" />
 
 </beans>

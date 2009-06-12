@@ -1,7 +1,6 @@
 package com.idega.content.themes.presentation;
 
 import com.idega.content.business.ContentUtil;
-import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.ui.DropdownMenu;
@@ -51,7 +50,7 @@ public class SiteInfoJsf extends SiteInfo {
 		
 		add(siteInfo);
 		
-		doBusiness(iwc, ThemesHelper.getInstance().getThemeSettings());
+		doBusiness(iwc, getThemesHelper().getThemeSettings());
 	}
 
 	@Override

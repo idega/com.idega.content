@@ -18,8 +18,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jaxen.JaxenException;
-import org.jaxen.jdom.JDOMXPath;
 import org.jdom.Attribute;
 import org.jdom.Comment;
 import org.jdom.Content;
@@ -27,8 +25,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.Text;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -37,6 +33,7 @@ import org.springframework.stereotype.Service;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
+import com.idega.content.themes.business.ThemesEngine;
 import com.idega.content.themes.helpers.bean.BuiltInThemeStyle;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeChange;
@@ -54,12 +51,13 @@ import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.util.resources.ResourceScanner;
+import com.idega.util.xml.XmlUtil;
 
 @Scope(BeanDefinition.SCOPE_SINGLETON)
 @Service(ThemeChanger.SPRING_BEAN_IDENTIFIER)
 public class ThemeChangerBean implements ThemeChanger {
 
-	private static final Logger logger = Logger.getLogger(ThemeChangerBean.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(ThemeChangerBean.class.getName());
 	
 	// These are defaults in RapidWeaver, we are using its to generate good preview
 	private static final String IMAGE_START = "<img class=\"imageStyle\" src=";
@@ -86,8 +84,6 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final String TAG_ATTRIBUTE_VALUE_SCREEN = "screen";
 	
 	//	HTML codes
-	private static final String NO_BREAK_STRING = "&nbsp;";
-	private static final String COPY_AND_SPACE = "&copy;" + NO_BREAK_STRING;
 	private static final String LESS_CODE = "&lt;";
 	private static final String LESS_CODE_REPLACEMENT = "\n<";
 	private static final String MORE_CODE = "&gt;";
@@ -120,17 +116,13 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final List<String> REGULAR_EXORESSIONS_FOR_NEEDLESS_STUFF = Collections.unmodifiableList(Arrays.asList(
 			_REGULAR_EXORESSIONS_FOR_NEEDLESS_STUFF));
 	
-	private ThemesHelper helper = null;
-	private Namespace namespace = Namespace.getNamespace(CoreConstants.XHTML_NAMESPACE);
-	private XMLOutputter out = null;
-	private ColourExpressionCalculator colourCalculator = null;
+	@Autowired
+	private ThemesHelper helper;
+	@Autowired
+	private ThemesPropertiesExtractor themesPropertiesExtractor;
 	
-	public ThemeChangerBean() {
-		out = new XMLOutputter();
-		out.setFormat(Format.getPrettyFormat());
-		
-		helper = ThemesHelper.getInstance();
-	}
+	private Namespace namespace = Namespace.getNamespace(XmlUtil.XHTML_NAMESPACE);
+	private ColourExpressionCalculator colourCalculator = null;
 	
 	public ColourExpressionCalculator getColourCalculator() {
 		return colourCalculator;
@@ -193,16 +185,22 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		if (!prepareHeadContent(theme, skeleton)) {
+			LOGGER.log(Level.WARNING, "Theme's <head> content was not prepared for the usage!");
 			return false;
 		}
 		
 		Document doc = helper.getXMLDocument(new StringBuffer(helper.getFullWebRoot()).append(skeleton).toString(), true, false);
 		if (doc == null) {
+			LOGGER.log(Level.WARNING, "Document was not created from: " + skeleton);
 			return false;
 		}
 		
 		Element root = doc.getRootElement();
-		Element head = root.getChild(HTML_HEAD, namespace);
+		Element head = getChild(root, HTML_HEAD);//root.getChild(HTML_HEAD, namespace);
+		if (head == null) {
+			LOGGER.log(Level.WARNING, "Tag <head> was not found in document!");
+			return false;
+		}
 		
 		String path = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase()).toString();
 		
@@ -212,7 +210,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		// Adding Builder page regions
-		if (!proceedBodyContent(path, root.getChild(HTML_BODY, namespace))) {
+		if (!proceedBodyContent(path, getChild(root, HTML_BODY)/*root.getChild(HTML_BODY, namespace)*/)) {
 			return false;
 		}
 		
@@ -222,6 +220,43 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		return uploadTheme(doc, theme);
+	}
+	
+	private Element getChild(Element parent, String name) {
+		if (parent == null || name == null) {
+			return null;
+		}
+		
+		Element e = parent.getChild(name, namespace);
+		if (e == null) {
+			e = parent.getChild(name);
+		}
+		return e;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<Element> getChildren(Element parent, String name) {
+		if (parent == null || name == null) {
+			return null;
+		}
+		
+		List<Element> children = parent.getChildren(name, namespace);
+		if (ListUtil.isEmpty(children)) {
+			children = parent.getChildren(name);
+		}
+		return children;
+	}
+	
+	private Attribute getAttribute(Element element, String name) {
+		if (element == null || name == null) {
+			return null;
+		}
+		
+		Attribute a = element.getAttribute(name, namespace);
+		if (a == null) {
+			a = element.getAttribute(name);
+		}
+		return a;
 	}
 	
 	/**
@@ -306,7 +341,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		checkCssFiles(doc, theme.getLinkToBase());
 		checkScriptTags(doc);
 		
-		return uploadTheme(out.outputString(doc), theme, true);
+		return uploadTheme(XmlUtil.getPrettyJDOMDocument(doc), theme, true);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -320,7 +355,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 			
-		List links = getNodesByXpath(root, ThemesConstants.LINK_TAG_INSTRUCTION);
+		List links = XmlUtil.getElementsByXPath(root, ThemesConstants.LINK_TAG_INSTRUCTION, root.getNamespace());
 		if (links == null) {
 			return true;
 		}
@@ -554,7 +589,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		InputStream is = helper.getInputStream(fullLink);
 		if (is == null) {
 			if (!standardFiles) {
-				logger.log(Level.WARNING, new StringBuilder("Can't get CSS file: '").append(linkToStyle).append("' from Theme pack!").toString());
+				LOGGER.log(Level.WARNING, new StringBuilder("Can't get CSS file: '").append(linkToStyle).append("' from Theme pack!").toString());
 			}
 			return false;
 		}
@@ -564,7 +599,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		try {
 			scanner.scanFile(StringUtil.getLinesFromString(StringHandler.getContentFromInputStream(is)));
 		} catch(Exception e) {
-			logger.log(Level.WARNING, "Error while scanning CSS file: " + linkToStyle, e);
+			LOGGER.log(Level.WARNING, "Error while scanning CSS file: " + linkToStyle, e);
 		} finally {
 			IOUtil.closeInputStream(is);
 		}
@@ -697,11 +732,12 @@ public class ThemeChangerBean implements ThemeChanger {
 	public boolean uploadDocument(Document doc, String linkToBase, String fileName, Theme theme, boolean isTheme) {
 		checkScriptTags(doc);
 		
-		return uploadDocument(out.outputString(doc), linkToBase, fileName, theme, isTheme, false);
+		return uploadDocument(XmlUtil.getPrettyJDOMDocument(doc), linkToBase, fileName, theme, isTheme, false);
 	}
 	
 	private void checkScriptTags(Document doc) {
-		List<Element> scripts = getNodesByXpath(doc.getRootElement().getChild("body", namespace), "//" + ThemesConstants.NAMESPACE_ID + ":script");
+		Element root = doc.getRootElement();
+		List<Element> scripts =  XmlUtil.getElementsByXPath(getChild(root, HTML_BODY), "script", root.getNamespace());
 		if (ListUtil.isEmpty(scripts)) {
 			return;
 		}
@@ -786,9 +822,9 @@ public class ThemeChangerBean implements ThemeChanger {
 		if (!needAddRegion(ThemesConstants.REGIONS, e.getTextNormalize())) {
 			e.setText(fixValue(e.getTextNormalize(), linkToBase));
 		}
-		a = e.getAttribute(ThemesConstants.TAG_ATTRIBUTE_HREF);
+		a = getAttribute(e, ThemesConstants.TAG_ATTRIBUTE_HREF);
 		if (a == null) {
-			a = e.getAttribute(ThemesConstants.TAG_ATTRIBUTE_SRC);
+			a = getAttribute(e, ThemesConstants.TAG_ATTRIBUTE_SRC);
 		}
 		if (a != null) {
 			String fixedValue = fixValue(a.getValue(), linkToBase);
@@ -819,14 +855,14 @@ public class ThemeChangerBean implements ThemeChanger {
 		Collection <Element> c = new ArrayList <Element> ();
 		
 		//	Region
-		Element region = new Element("div", namespace);
+		Element region = new Element("div");
 		String regionName = "idegaThemeExpandRegion";
 		region.setAttribute("id", regionName);
 		Collection<Content> regionContent = new ArrayList<Content>();
 		regionContent.addAll(getCommentsCollection(regionName));
 
 		//	Expander
-		Element expander = new Element("div", namespace);
+		Element expander = new Element("div");
 		expander.setText("idegaTheme");
 		expander.setAttribute("style", new StringBuffer("height:").append(THEME_HEIGHT).append("px;visibility:hidden").toString());
 		regionContent.add(expander);
@@ -870,7 +906,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		//	DIVs
-		List<Element> divs = getNodesByXpath(body, ThemesConstants.DIV_TAG_INSTRUCTION);
+		List<Element> divs = XmlUtil.getElementsByXPath(body, ThemesConstants.DIV_TAG_INSTRUCTION, body.getNamespace());
 		if (!ListUtil.isEmpty(divs)) {
 			for (Element div: divs) {
 				addRegion(div);
@@ -918,39 +954,18 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 	
-	@SuppressWarnings("unchecked")
-	private List<Element> getNodesByXpath(Element container, String expression) {
-		if (container == null || expression == null) {
-			return null;
-		}
-		
-		JDOMXPath xp = null;
-		try {
-			xp = new JDOMXPath(expression);
-			xp.addNamespace(ThemesConstants.NAMESPACE_ID, CoreConstants.XHTML_NAMESPACE);
-			return xp.selectNodes(container);
-		} catch (JaxenException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-	
 	private boolean fixTag(Element container, String expression, String attributeName, String linkToBase) {
 		if (container == null || expression == null || attributeName == null || linkToBase == null) {
 			return false;
 		}
 		
-		List<Element> elements = getNodesByXpath(container, expression);
+		List<Element> elements = XmlUtil.getElementsByXPath(container, expression, container.getNamespace());
 		if (ListUtil.isEmpty(elements)) {
 			return false;
 		}
 		
 		for (Element e: elements) {
-			Attribute a = e.getAttribute(attributeName, namespace);
-			if (a == null) {
-				a = e.getAttribute(attributeName);
-			}
+			Attribute a = getAttribute(e, attributeName);
 			
 			if (a != null) {
 				String dataValue = a.getValue();
@@ -1012,8 +1027,8 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 	
 	private String getBreadCrumbContent() {
-		return new StringBuffer("<a href=\"javascript:void(0)\">").append(TOOLBAR_NAV_MENU[0]).append("</a>").append(NO_BREAK_STRING).append(NO_BREAK_STRING)
-				.toString();
+		return new StringBuffer("<a href=\"javascript:void(0)\">").append(TOOLBAR_NAV_MENU[0]).append("</a>").append(CoreConstants.SPACE)
+			.append(CoreConstants.SPACE).toString();
 	}
 	
 	private String getToolBarContent() {
@@ -1086,7 +1101,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		content.append("<div class=\"content_item_comments_style\">")
 					.append("<div>")
 						.append("<a href=\"javascript:void(0)\">Comments(").append(helper.getRandomNumber(20)).append(")</a>")
-						.append("&nbsp;")
+						.append(" ")
 						.append("<a href=\"javascript:void(0)\">")
 							.append("<img title=\"Atom feed\" src=\"").append(ContentUtil.getBundle().getVirtualPathWithFileNameString("images/feed.png"))
 								.append("\" name=\"Atom feed\" alt=\"\"/>")
@@ -1137,7 +1152,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		String propertyValue = getApplicationSettings().getProperty(key.toString(), defaultValue);
 		if (value.equals(FOOTER)) {
-			region.append(COPY_AND_SPACE).append(getBasicReplace(null, propertyValue, null));
+			region.append(getBasicReplace(null, propertyValue, null));
 			
 			region.append(ThemesConstants.COMMENT_BEGIN).append(ThemesConstants.TEMPLATE_REGION_END);
 			region.append(ThemesConstants.COMMENT_END);
@@ -1340,7 +1355,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 		
-		List<Element> headings = e.getChildren(heading, namespace);
+		List<Element> headings = getChildren(e, heading);
 		if (ListUtil.isEmpty(headings)) {
 			return false;
 		}
@@ -1351,7 +1366,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		for (Element headingElement: headings) {
 			String text = headingElement.getTextNormalize();
 			if (!StringUtil.isEmpty(text) && text.indexOf(headingKeyword) != -1) {
-				Attribute id = headingElement.getAttribute("id");
+				Attribute id = getAttribute(headingElement, "id");
 				if (id == null) {
 					id = new Attribute("id", headingKeyword);
 					headingElement.setAttribute(id);
@@ -1388,7 +1403,13 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 	
 	private boolean clearThemeVariationsFromCache(String themeID) {
-		return helper.clearVariationFromCache(themeID);
+		try {
+			ThemesEngine themesEngine = ELUtil.getInstance().getBean(ThemesEngine.SPRING_BEAN_IDENTIFIER);
+			return themesEngine.clearVariationFromCache(themeID);
+		} catch(Exception e) {
+			LOGGER.log(Level.WARNING, "Error clearing cache for theme: " + themeID, e);
+			return false;
+		}
 	}
 	
 	/**
@@ -1492,7 +1513,7 @@ public class ThemeChangerBean implements ThemeChanger {
 				return null;
 			}
 			String linkToBase = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase()).toString();
-			if (!changeThemeStyle(linkToBase, root.getChild(HTML_HEAD, namespace), oldStyle, newStyle)) {
+			if (!changeThemeStyle(linkToBase, getChild(root, HTML_HEAD), oldStyle, newStyle)) {
 				return null;
 			}
 		}
@@ -1583,7 +1604,6 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param newStyle
 	 * @return boolean
 	 */
-	@SuppressWarnings("unchecked")
 	private boolean changeThemeStyle(String linkToBase, Element head, ThemeStyleGroupMember oldStyle, ThemeStyleGroupMember newStyle) {
 		if (oldStyle != null && newStyle != null) {
 			if (oldStyle == newStyle) {
@@ -1595,13 +1615,13 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 		
-		List<Element> styles = head.getChildren(ThemesConstants.ELEMENT_LINK, namespace);
+		List<Element> styles = getChildren(head, ThemesConstants.ELEMENT_LINK);
 		if (styles == null) {
 			return false;
 		}
 		
 		int index = 4;
-		List <Element> uselessStyles = new ArrayList <Element> ();
+		List<Element> uselessStyles = new ArrayList<Element>();
 		
 		if (oldStyle != null) {
 			if (oldStyle.getStyleFiles() == null) {
@@ -1656,7 +1676,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			attributes = getBasicAttributesList();			
 			attributes.add(new Attribute(ThemesConstants.TAG_ATTRIBUTE_HREF, new StringBuffer(linkToBase).append(newStyle.getStyleFiles().get(i)).toString()));
 
-			newStyleHref = new Element(ThemesConstants.ELEMENT_LINK, namespace);
+			newStyleHref = new Element(ThemesConstants.ELEMENT_LINK);
 			newStyleHref.setAttributes(attributes);
 			newStyleElements.add(newStyleHref);
 		}
@@ -1778,7 +1798,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		if (isNewName(themeName, theme)) {
-			logger.log(Level.INFO, "Creating new theme: " + themeName);
+			LOGGER.log(Level.INFO, "Creating new theme: " + themeName);
 			return createNewTheme(theme, themeName);
 		}
 		
@@ -1930,7 +1950,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 		
-		Element header = root.getChild(HTML_HEAD, namespace);
+		Element header = getChild(root, HTML_HEAD);
 		if (header == null) {
 			return false;
 		}
@@ -1944,9 +1964,9 @@ public class ThemeChangerBean implements ThemeChanger {
 			for (int j = 0; j < children.size(); j++) {
 				child = children.get(j);	
 				if (ELEMENT_LINK_NAME.equals(child.getName())) {
-					Attribute type = child.getAttribute(ThemesConstants.TAG_ATTRIBUTE_TYPE);
+					Attribute type = getAttribute(child, ThemesConstants.TAG_ATTRIBUTE_TYPE);
 					if (type != null && TAG_ATTRIBUTE_VALUE_CSS.equals(type.getValue())) {
-						Attribute styleLink = child.getAttribute(ThemesConstants.TAG_ATTRIBUTE_HREF);
+						Attribute styleLink = getAttribute(child, ThemesConstants.TAG_ATTRIBUTE_HREF);
 						if (styleLink != null) {
 							String styleHref = styleLink.getValue();
 							if (styleHref != null && !isDefaultStyle(styleHref, theme) && !isColorVariation(theme.getColourFiles(), styleHref)) {
@@ -2115,7 +2135,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 		
-		Element head = html.getChild(HTML_HEAD, namespace);
+		Element head = getChild(html, HTML_HEAD);
 		if (head == null) {
 			return false;
 		}
@@ -2189,7 +2209,8 @@ public class ThemeChangerBean implements ThemeChanger {
 		String tempLink = new StringBuffer(decodedLinkToBase).append(themeName).toString();
 		String themeKey = null;
 		try {
-			themeKey = helper.getThemesLoader().createNewTheme(tempLink, new StringBuffer(linkToBase).append(helper.encode(themeName, true)).toString(), true, true);
+			ThemesLoader loader = new ThemesLoader();
+			themeKey = loader.createNewTheme(tempLink, new StringBuffer(linkToBase).append(helper.encode(themeName, true)).toString(), true, true);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -2288,10 +2309,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 	
-	public XMLOutputter getXMLOutputter() {
-		return out;
-	}
-	
 	private Document getThemeDocument(String themeID) {
 		if (themeID == null) {
 			return null;
@@ -2377,11 +2394,11 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 
 		List<ThemeChange> enabledStyles = getEnabledStylesAsThemeChanges(theme);				//	Getting current state
-		helper.clearVariationFromCache(themeId);												//	Clearing cache
+		clearThemeVariationsFromCache(themeId);													//	Clearing cache
 		theme.clearProperties();																//	Clearing properties
 		try {
 			//	Extracting new properties (also setting default state)
-			helper.getThemesPropertiesExtractor().prepareTheme(checkConfig, theme, null, null, null);
+			themesPropertiesExtractor.prepareTheme(checkConfig, theme, null, null, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

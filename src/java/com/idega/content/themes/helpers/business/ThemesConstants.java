@@ -23,30 +23,28 @@ public class ThemesConstants {
 	
 	private static String CONTENT_BUNDLE_RESOURCES = null;
 	
-	protected static String BASE_THEME_IMAGES = null;
+	public static String BASE_THEME_IMAGES = null;
 	
-	protected static final String NAMESPACE_ID = "xmlns";
+	public static final String PLUS = "+";
+	public static final String SPACE_ENCODED = "%20";
+	public static final String SINGLE_QUOTE = "\"";
 	
-	protected static final String PLUS = "+";
-	protected static final String SPACE_ENCODED = "%20";
-	protected static final String SINGLE_QUOTE = "\"";
+	public static final String THEME_PREVIEW = "_theme_preview";
+	public static final String THEME_SMALL_PREVIEW = "_small" + THEME_PREVIEW;
+	public static final String DRAFT_PREVIEW = "_draft_preview";
 	
-	protected static final String THEME_PREVIEW = "_theme_preview";
-	protected static final String THEME_SMALL_PREVIEW = "_small" + THEME_PREVIEW;
-	protected static final String DRAFT_PREVIEW = "_draft_preview";
-	
-	protected static final String THEME_SEARCH_KEY = "*.htm*";
+	public static final String THEME_SEARCH_KEY = "*.htm*";
 	public static final String THEME_PROPERTIES_FILE_END = ".plist";
-	protected static final String THEME_PROPERTIES_FILE = "Theme" + THEME_PROPERTIES_FILE_END;
+	public static final String THEME_PROPERTIES_FILE = "Theme" + THEME_PROPERTIES_FILE_END;
 	public static final String IDEGA_THEME_INFO = CoreConstants.UNDER + IDEGA_THEME + CoreConstants.DOT + XML_EXTENSION;
 	
 	public static final String ARTICLE_TITLE = "Article";
 	
-	protected static final String USELESS_PATHTO_ELEMENT = "%pathto(";
-	protected static final String USELESS_DATA_ELEMENT = "![CDATA[";
+	public static final String USELESS_PATHTO_ELEMENT = "%pathto(";
+	public static final String USELESS_DATA_ELEMENT = "![CDATA[";
 	
 	private static final String[] _REGIONS_NEEDED_TO_CREATE = new String[] {PLUGIN_SIDEBAR};
-	protected static final List <String> REGIONS_NEEDED_TO_CREATE = Collections.unmodifiableList(Arrays.asList(_REGIONS_NEEDED_TO_CREATE));
+	public static final List <String> REGIONS_NEEDED_TO_CREATE = Collections.unmodifiableList(Arrays.asList(_REGIONS_NEEDED_TO_CREATE));
 	
 	private static final String[] _FIRST_SENTENCES_OF_DUMMY_ARTICLES = new String[] {"Lorem ipsum dolor sit amet, consectetuer adipiscing elit."};
 	public static final List<String> FIRST_SENTENCES_OF_DUMMY_ARTICLES = Collections.unmodifiableList(Arrays.asList(_FIRST_SENTENCES_OF_DUMMY_ARTICLES));
@@ -55,119 +53,119 @@ public class ThemesConstants {
 	public static final List <String> DUMMY_ARTICLES = Collections.unmodifiableList(Arrays.asList(_DUMMY_ARTICLES));
 	
 	private static final String[] _THEME_IMAGES = new String[] {"eagle.jpg", "grapes.jpg", "rocks.jpg", "ship.jpg", "sky.jpg"};
-	protected static final List <String> THEME_IMAGES = Collections.unmodifiableList(Arrays.asList(_THEME_IMAGES));
+	public static final List <String> THEME_IMAGES = Collections.unmodifiableList(Arrays.asList(_THEME_IMAGES));
 	
 	private static final String[] _IMAGE_POSITIONS = new String[] {"left", "right"};
-	protected static final List <String> IMAGE_POSITIONS = Collections.unmodifiableList(Arrays.asList(_IMAGE_POSITIONS));
+	public static final List <String> IMAGE_POSITIONS = Collections.unmodifiableList(Arrays.asList(_IMAGE_POSITIONS));
 	
 	private static final String[] _THEME_SKELETONS_FILTER = new String[] {"htm", "html", "xhtml", "ibxml", "jsp"};
 	public static final List <String> THEME_SKELETONS_FILTER = Collections.unmodifiableList(Arrays.asList(_THEME_SKELETONS_FILTER));
 	
 	private static final String[] _THEME_PROPERTIES_FILES = new String[] {THEME_PROPERTIES_FILE, IDEGA_THEME_INFO, "theme" + THEME_PROPERTIES_FILE_END};
-	protected static final List <String> THEME_PROPERTIES_FILES = Collections.unmodifiableList(Arrays.asList(_THEME_PROPERTIES_FILES));
+	public static final List <String> THEME_PROPERTIES_FILES = Collections.unmodifiableList(Arrays.asList(_THEME_PROPERTIES_FILES));
 	
 	private static final String[] _USELESS_CONTENT = new String[] {")%", " xml:space=\"preserve\"", "&lt;" + USELESS_DATA_ELEMENT, "]]&amp;amp;", " xmlns=\"\"",
 		" profile=\"\""};
-	protected static final List <String> USELESS_CONTENT = Collections.unmodifiableList(Arrays.asList(_USELESS_CONTENT));
+	public static final List <String> USELESS_CONTENT = Collections.unmodifiableList(Arrays.asList(_USELESS_CONTENT));
 	
 	private static final String[] _REGIONS = new String[] {"%logo%", "%content%", "%toolbar%", "%sidebar_title%", "%sidebar%", "%plugin_sidebar%", "%breadcrumb%",
 		"%footer%", "%site_title%", "%site_slogan%"};
-	protected static final List <String> REGIONS = Collections.unmodifiableList(Arrays.asList(_REGIONS));
+	public static final List <String> REGIONS = Collections.unmodifiableList(Arrays.asList(_REGIONS));
 	
 	private static final String[] _BASIC_IDS_FOR_REGIONS = new String[] {"pageHeader", "contentContainer", "sidebarContainer", "sideContent"};
-	protected static final List <String> BASIC_IDS_FOR_REGIONS = Collections.unmodifiableList(Arrays.asList(_BASIC_IDS_FOR_REGIONS));
+	public static final List <String> BASIC_IDS_FOR_REGIONS = Collections.unmodifiableList(Arrays.asList(_BASIC_IDS_FOR_REGIONS));
 	
 	private static final String[] _DOCUMENT_PUBLIC_IDS = new String[] {"Apple Computer", "DTD XHTML 1.0 Strict"};
-	protected static final List <String> DOCUMENT_PUBLIC_IDS = Collections.unmodifiableList(Arrays.asList(_DOCUMENT_PUBLIC_IDS));
+	public static final List <String> DOCUMENT_PUBLIC_IDS = Collections.unmodifiableList(Arrays.asList(_DOCUMENT_PUBLIC_IDS));
 	
 	private static final String[] _DOCUMENT_SYSTEM_IDS = new String[] {"PropertyList", "xhtml1-strict.dtd"};
-	protected static final List <String> DOCUMENT_SYSTEM_IDS = Collections.unmodifiableList(Arrays.asList(_DOCUMENT_SYSTEM_IDS));
+	public static final List <String> DOCUMENT_SYSTEM_IDS = Collections.unmodifiableList(Arrays.asList(_DOCUMENT_SYSTEM_IDS));
 
 	private static final String[] _DEFAULT_STYLE_FILES = new String[] {"styles.css", "handheld.css", "print.css"};
-	protected static final List <String> DEFAULT_STYLE_FILES = Collections.unmodifiableList(Arrays.asList(_DEFAULT_STYLE_FILES));
+	public static final List <String> DEFAULT_STYLE_FILES = Collections.unmodifiableList(Arrays.asList(_DEFAULT_STYLE_FILES));
 	
-	protected static final String COMMENT_BEGIN = "<!--";
-	protected static final String COMMENT_END = "-->";
-	protected static final String TEMPLATE_REGION_BEGIN = " TemplateBeginEditable name=\"";
-	protected static final String TEMPLATE_REGION_MIDDLE = "\" ";
-	protected static final String TEMPLATE_REGION_END = " TemplateEndEditable ";
+	public static final String COMMENT_BEGIN = "<!--";
+	public static final String COMMENT_END = "-->";
+	public static final String TEMPLATE_REGION_BEGIN = " TemplateBeginEditable name=\"";
+	public static final String TEMPLATE_REGION_MIDDLE = "\" ";
+	public static final String TEMPLATE_REGION_END = " TemplateEndEditable ";
 	
 	public static final String SITE_TITLE = "site_title";
 	public static final String SITE_SLOGAN = "site_slogan";
 	
-	protected static final String DIV_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":div";
-	protected static final String OBJECT_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":object";
-	protected static final String PARAM_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":param";
-	protected static final String LINK_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":link";
-	protected static final String EMBED_TAG_INSTRUCTION = "//" + NAMESPACE_ID + ":embed";
+	public static final String DIV_TAG_INSTRUCTION = "div";
+	public static final String OBJECT_TAG_INSTRUCTION = "object";
+	public static final String PARAM_TAG_INSTRUCTION = "param";
+	public static final String LINK_TAG_INSTRUCTION = "link";
+	public static final String EMBED_TAG_INSTRUCTION = "embed";
 	
 	// Strings used extracting theme properties
-	protected static final String TAG_DICT = "dict";
-	protected static final String TAG_ARRAY = "array";
-	protected static final String TAG_STRING = "string";
-	protected static final String TAG_NAME = "Name";
-	protected static final String TAG_DEFAULT_COLOUR = "DefaultColour";
-	protected static final String TAG_TAG = "Tag";
-	protected static final String TAG_TYPE = "Type";
-	protected static final String TAG_ENABLED = "Enabled";
-	protected static final String TAG_FILES = "Files";
-	protected static final String TAG_TRUE = "true";
+	public static final String TAG_DICT = "dict";
+	public static final String TAG_ARRAY = "array";
+	public static final String TAG_STRING = "string";
+	public static final String TAG_NAME = "Name";
+	public static final String TAG_DEFAULT_COLOUR = "DefaultColour";
+	public static final String TAG_TAG = "Tag";
+	public static final String TAG_TYPE = "Type";
+	public static final String TAG_ENABLED = "Enabled";
+	public static final String TAG_FILES = "Files";
+	public static final String TAG_TRUE = "true";
 
-	protected static final String RW_THEME_IMAGE = "RWThemeImage";
-	protected static final String RW_THEME_NAME = "RWThemeName";
-	protected static final String RW_STYLE_VARIATIONS = "RWStyleVariations";
-	protected static final String RW_COLOUR_TAG_FILES = "RWColourTagCSSFiles";
-	protected static final String RW_GROUP_NAME = "GroupName";
-	protected static final String RW_SELECTION_LIMIT = "GroupSelectionLimit";
-	protected static final String RW_GROUP_MEMBERS = "GroupMembers";
+	public static final String RW_THEME_IMAGE = "RWThemeImage";
+	public static final String RW_THEME_NAME = "RWThemeName";
+	public static final String RW_STYLE_VARIATIONS = "RWStyleVariations";
+	public static final String RW_COLOUR_TAG_FILES = "RWColourTagCSSFiles";
+	public static final String RW_GROUP_NAME = "GroupName";
+	public static final String RW_SELECTION_LIMIT = "GroupSelectionLimit";
+	public static final String RW_GROUP_MEMBERS = "GroupMembers";
 	
-	protected static final String RW_STYLE_VARIATION_TYPE_COLOUR = "Colour";
+	public static final String RW_STYLE_VARIATION_TYPE_COLOUR = "Colour";
 	
-	protected static final String DRAFT = "_idega_draft.html";
-	protected static final String THEME = "_" + IDEGA_THEME + ".html";
+	public static final String DRAFT = "_idega_draft.html";
+	public static final String THEME = "_" + IDEGA_THEME + ".html";
 	
-	protected static final String ELEMENT_LINK = "link";
-	protected static final String TAG_ATTRIBUTE_HREF = "href";
-	protected static final String TAG_ATTRIBUTE_SRC = "src";
-	protected static final String TAG_ATTRIBUTE_ID = "id";
-	protected static final String TAG_ATTRIBUTE_TYPE = "type";
+	public static final String ELEMENT_LINK = "link";
+	public static final String TAG_ATTRIBUTE_HREF = "href";
+	public static final String TAG_ATTRIBUTE_SRC = "src";
+	public static final String TAG_ATTRIBUTE_ID = "id";
+	public static final String TAG_ATTRIBUTE_TYPE = "type";
 	
-	protected static final String SETTING_CODE = "code";
-	protected static final String SETTING_LABEL = "label";
-	protected static final String SETTING_DEFAULT_VALUE = "defaultValue";
-	protected static final String SETTING_TYPE = "type";
-	protected static final String SETTING_METHOD = "method";
+	public static final String SETTING_CODE = "code";
+	public static final String SETTING_LABEL = "label";
+	public static final String SETTING_DEFAULT_VALUE = "defaultValue";
+	public static final String SETTING_TYPE = "type";
+	public static final String SETTING_METHOD = "method";
 	
-	protected static final String CON_THEME = "theme";
-	protected static final String CON_NAME = "name";
-	protected static final String CON_STYLES = "styles";
-	protected static final String CON_STYLE = "style";
-	protected static final String CON_GROUP = "group";
-	protected static final String CON_VARIATION = "variation";
-	protected static final String CON_VALUE = "value";
-	protected static final String CON_COLOR = "color";
-	protected static final String CON_VARIABLE = "variable";
-	protected static final String CON_PREVIEW = "preview";
-	protected static final String CON_SMALL_PREVIEW = "small-preview";
-	protected static final String CON_PAGE_ID = "page-id";
-	protected static final String CON_EXTRA_REGIONS = "extra-regions";
-	protected static final String CON_EXTRA_REGION = "extra-region";
-	protected static final String CON_ATT_EXTRA_REGION_PARENT = "extra-region-parent";
-	protected static final String CON_URI_OF_CURRENT_BUILT_IN_STYLE = "uri-of-current-built-in-style";
-	protected static final String CON_COLOUR_FILES = "colour-files";
-	protected static final String CON_COLOUR_FILES_ORIGINAL = "colour-files-original";
-	protected static final String CON_COLOUR_FILE = "colour-file";
+	public static final String CON_THEME = "theme";
+	public static final String CON_NAME = "name";
+	public static final String CON_STYLES = "styles";
+	public static final String CON_STYLE = "style";
+	public static final String CON_GROUP = "group";
+	public static final String CON_VARIATION = "variation";
+	public static final String CON_VALUE = "value";
+	public static final String CON_COLOR = "color";
+	public static final String CON_VARIABLE = "variable";
+	public static final String CON_PREVIEW = "preview";
+	public static final String CON_SMALL_PREVIEW = "small-preview";
+	public static final String CON_PAGE_ID = "page-id";
+	public static final String CON_EXTRA_REGIONS = "extra-regions";
+	public static final String CON_EXTRA_REGION = "extra-region";
+	public static final String CON_ATT_EXTRA_REGION_PARENT = "extra-region-parent";
+	public static final String CON_URI_OF_CURRENT_BUILT_IN_STYLE = "uri-of-current-built-in-style";
+	public static final String CON_COLOUR_FILES = "colour-files";
+	public static final String CON_COLOUR_FILES_ORIGINAL = "colour-files-original";
+	public static final String CON_COLOUR_FILE = "colour-file";
 	
-	protected static final int SMALL_PREVIEW_WIDTH = 149;
-	protected static final int SMALL_PREVIEW_HEIGHT = 112;
+	public static final int SMALL_PREVIEW_WIDTH = 149;
+	public static final int SMALL_PREVIEW_HEIGHT = 112;
 	
-	protected static final int PREVIEW_WIDTH = 1024;
-	protected static final int PREVIEW_HEIGHT = 768;
+	public static final int PREVIEW_WIDTH = 1024;
+	public static final int PREVIEW_HEIGHT = 768;
 	
-	protected static final int REDUCED_PREVIEW_WIDTH = 580;
-	protected static final int REDUCED_PREVIEW_HEIGHT = 435;
+	public static final int REDUCED_PREVIEW_WIDTH = 580;
+	public static final int REDUCED_PREVIEW_HEIGHT = 435;
 	
-	protected static final String DEFAULT_MIME_TYPE = "image/";
+	public static final String DEFAULT_MIME_TYPE = "image/";
 	
 	public static final String THEMES = "/themes/";
 	
@@ -195,18 +193,18 @@ public class ThemesConstants {
 	
 	public static final String DEFAULT_DOMAIN_NAME = "Default Site";
 	
-	protected static final String DOCUMENT_HEADER = "<?xml version='1.0' encoding='"+CoreConstants.ENCODING_UTF8+"'?>";
+	public static final String DOCUMENT_HEADER = "<?xml version='1.0' encoding='"+CoreConstants.ENCODING_UTF8+"'?>";
 	
 	public static final String ADD_FOR_PROPERTY_CHANGE = "_changeProperty";
 	
-	protected static final String NEW_LINE = "\n";
+	public static final String NEW_LINE = "\n";
 	
 	public static final String THEME_STYLE_VARIATIONS_CACHE_KEY = "theme_style_variations_block";
 	
 	public static final String THEME_ID_APPLICATION_ATTRIBUTE = "theme_id_application_attribute";
 
-	protected static final Boolean IS_THEME_PREVIEW_JPG = Boolean.TRUE;
-	protected static final Float THEME_PREVIEW_QUALITY = new Float(1f);
+	public static final Boolean IS_THEME_PREVIEW_JPG = Boolean.TRUE;
+	public static final Float THEME_PREVIEW_QUALITY = new Float(1f);
 	
 	public static final String THEME_PREDEFINED_STYLE_CONFIG_FILE = ".rwstyle";
 	public static final String DEFAULT_THEME_STYLE_ID = "defaultThemeStyleId";

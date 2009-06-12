@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import javax.faces.context.FacesContext;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.idega.block.web2.business.Web2Business;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
@@ -24,6 +26,7 @@ import com.idega.util.CoreConstants;
 import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
 
 /**
@@ -42,12 +45,17 @@ public class ApplicationPropertyViewer extends Block {
 	
 	private String applicationPropertyKey = null;
 	
+	@Autowired
+	private ThemesHelper themesHelper;
+	
 	public ApplicationPropertyViewer() {
 		setUseBuilderObjectControl(false);	//	We don't need 'wrappers' in Builder for this PO
 	}
 	
 	@Override
 	public void main(IWContext iwc) {
+		ELUtil.getInstance().autowire(this);
+		
 		if (applicationPropertyKey == null) {
 			return;
 		}
@@ -59,7 +67,7 @@ public class ApplicationPropertyViewer extends Block {
 		}
 		
 		String value = null;
-		String language = ThemesHelper.getInstance().getCurrentLanguage(iwc);
+		String language = themesHelper.getCurrentLanguage(iwc);
 		
 		key = new StringBuffer(applicationPropertyKey).append(CoreConstants.DOT).append(language).toString();
 		value = iwc.getApplicationSettings().getProperty(key);
@@ -163,9 +171,9 @@ public class ApplicationPropertyViewer extends Block {
 			e.printStackTrace();
 		}
 		
-		String property = ThemesHelper.getInstance().extractValueFromString(key, key.indexOf(CoreConstants.DOT) + 1, key.lastIndexOf(CoreConstants.DOT));
+		String property = themesHelper.extractValueFromString(key, key.indexOf(CoreConstants.DOT) + 1, key.lastIndexOf(CoreConstants.DOT));
 		
-		List<Setting> settings = ThemesHelper.getInstance().getThemeSettings();
+		List<Setting> settings = themesHelper.getThemeSettings();
 		Setting s = getSetting(settings, settingKey);
 		String title = ContentConstants.EMPTY;
 		if (s != null) {

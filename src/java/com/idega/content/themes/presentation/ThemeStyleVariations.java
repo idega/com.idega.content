@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.faces.component.UIComponent;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.bean.ThemesManagerBean;
 import com.idega.content.themes.helpers.bean.BuiltInThemeStyle;
@@ -25,6 +27,7 @@ import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.GenericInput;
 import com.idega.presentation.ui.RadioButton;
+import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
 
 public class ThemeStyleVariations extends Block {
@@ -41,7 +44,8 @@ public class ThemeStyleVariations extends Block {
 	
 	private static final String COLOUR_CHOOSER_ACTION = "showColorChooser(";
 	
-	private ThemesHelper helper = ThemesHelper.getInstance();
+	@Autowired
+	private ThemesHelper helper;
 	
 	public ThemeStyleVariations() {
 		setCacheable(getCacheKey());
@@ -59,7 +63,7 @@ public class ThemeStyleVariations extends Block {
 			return cacheStatePrefix;
 		}
 		String cacheKey = new StringBuffer(cacheStatePrefix).append(themeID).toString();
-		Theme theme = helper.getTheme(themeID);
+		Theme theme = getHelper().getTheme(themeID);
 		if (theme != null) {
 			theme.addStyleVariationsCacheKey(new StringBuffer(getCacheKey()).append(cacheKey).toString());
 		}
@@ -74,8 +78,9 @@ public class ThemeStyleVariations extends Block {
 		return themeID.toString();
 	}
 	
+	@Override
 	public void main(IWContext iwc) throws Exception {
-		Theme theme = helper.getTheme(getThemeId());
+		Theme theme = getHelper().getTheme(getThemeId());
 		if (theme == null) {
 			return;
 		}
@@ -280,15 +285,27 @@ public class ThemeStyleVariations extends Block {
 		}
 		
 		for (int i = 0; i < files.size(); i++) {
-			if (!helper.existFileInSlide(new StringBuffer(linkToBase).append(files.get(i)).toString())) {
+			if (!getHelper().existFileInSlide(new StringBuffer(linkToBase).append(files.get(i)).toString())) {
 				return false;
 			}
 		}
 		return true;
 	}
 	
+	@Override
 	public String getBundleIdentifier()	{
 		return ContentConstants.IW_BUNDLE_IDENTIFIER;
+	}
+
+	public ThemesHelper getHelper() {
+		if (helper == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		return helper;
+	}
+
+	public void setHelper(ThemesHelper helper) {
+		this.helper = helper;
 	}
 
 }

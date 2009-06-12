@@ -13,6 +13,7 @@ import org.directwebremoting.ScriptBuffer;
 import org.directwebremoting.WebContextFactory;
 import org.jdom.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,7 @@ import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 import com.idega.webface.WFUtil;
 
-@Scope("singleton")
+@Scope(BeanDefinition.SCOPE_SINGLETON)
 @Service(ThemesEngine.SPRING_BEAN_IDENTIFIER)
 public class ThemesEngineBean implements ThemesEngine {
 
@@ -54,15 +55,12 @@ public class ThemesEngineBean implements ThemesEngine {
 	
 	public static final String ARTICLE_VIEWER_TEMPLATE_KEY = "article_viewer_page_key";
 	
+	@Autowired
 	private ThemesHelper helper;
+	@Autowired
 	private ThemeChanger themeChanger;
+	@Autowired
 	private ThemesPropertiesExtractor themesPropertiesExtractor;
-	
-	public ThemesEngineBean() {
-		System.out.println("Creating Themes");
-		
-		helper = ThemesHelper.getInstance(false);
-	}
 
 	/**
 	 * Returns info about themes in Slide
@@ -715,7 +713,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		return themeChanger;
 	}
 
-	@Autowired
 	public void setThemeChanger(ThemeChanger themeChanger) {
 		this.themeChanger = themeChanger;
 	}
@@ -724,9 +721,16 @@ public class ThemesEngineBean implements ThemesEngine {
 		return themesPropertiesExtractor;
 	}
 
-	@Autowired
 	public void setThemesPropertiesExtractor(ThemesPropertiesExtractor themesPropertiesExtractor) {
 		this.themesPropertiesExtractor = themesPropertiesExtractor;
+	}
+
+	public ThemesHelper getHelper() {
+		return helper;
+	}
+
+	public void setHelper(ThemesHelper helper) {
+		this.helper = helper;
 	}
 
 	public IWContext getContextAndCheckRights() {
@@ -799,7 +803,39 @@ public class ThemesEngineBean implements ThemesEngine {
 		return deleted;
 	}
 	
-	public ThemesHelper getThemesHelper() {
-		return this.helper;
+	public boolean clearVariationFromCache(String themeID) {
+		if (themeID == null) {
+			return false;
+		}
+		Theme theme = helper.getTheme(themeID);
+		if (theme == null) {
+			return false;
+		}
+		List<String> keys = theme.getStyleVariationsCacheKeys();
+		if (keys == null) {
+			return false;
+		}
+		IWContext iwc = getContextAndCheckRights();
+		if (iwc == null) {
+			return false;
+		}
+		
+		//	Removing Block from cache
+		for (int i = 0; i < keys.size(); i++) {
+			helper.getThemesService().getBuilderService().removeBlockObjectFromCache(iwc, keys.get(i));
+		}
+		
+		//	Removing cache keys
+		theme.clearStyleVariationsCacheKeys();
+		
+		//	Removing rendered variations from cache
+		try {
+			clearVariationFromCache(themeID, iwc);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
 	}
 }

@@ -9,7 +9,6 @@ import com.idega.builder.bean.AdvancedProperty;
 import com.idega.content.themes.helpers.bean.SimplifiedTheme;
 import com.idega.content.themes.helpers.bean.ThemeChange;
 import com.idega.content.themes.helpers.business.ThemeChanger;
-import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.themes.helpers.business.ThemesPropertiesExtractor;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.presentation.IWContext;
@@ -86,8 +85,6 @@ public interface ThemesEngine {
 	
 	public ThemesPropertiesExtractor getThemesPropertiesExtractor();
 	
-	public ThemesHelper getThemesHelper();
-	
 	public IWContext getContextAndCheckRights();
 	
 	public void updateSiteTree(boolean useThreads);
@@ -99,4 +96,6 @@ public interface ThemesEngine {
 	public void setLastUsedTemplate(String pageKey, String templateKey);
 	
 	public boolean addExtraRegionToPage(String pageKey, AdvancedProperty region, BuilderService service);
+	
+	public boolean clearVariationFromCache(String themeID);
 }

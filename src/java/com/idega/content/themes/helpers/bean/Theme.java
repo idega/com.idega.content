@@ -5,7 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.idega.builder.bean.AdvancedProperty;
+import com.idega.content.themes.helpers.business.ThemeChanger;
+import com.idega.util.expression.ELUtil;
 
 public class Theme {
 	
@@ -38,6 +42,9 @@ public class Theme {
 	private Map<String, String> styleVariables = null;
 	
 	private int templateId = -1;
+	
+	@Autowired
+	private ThemeChanger themeChanger;
 
 	public Theme(String id) {
 		this.styleGroupsNames = new ArrayList<String>();
@@ -332,4 +339,24 @@ public class Theme {
 		this.currentlyUsedBuiltInStyleUri = currentlyUsedBuiltInStyleUri;
 	}
 	
+	public List<ThemeStyleGroupMember> getEnabledStyles() {
+		try {
+			return getThemeChanger().getEnabledStyles(this);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public ThemeChanger getThemeChanger() {
+		if (themeChanger == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		return themeChanger;
+	}
+
+	public void setThemeChanger(ThemeChanger themeChanger) {
+		this.themeChanger = themeChanger;
+	}
+		
 }

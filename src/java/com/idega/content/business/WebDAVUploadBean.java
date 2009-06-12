@@ -4,6 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipInputStream;
 
 import javax.faces.component.UIComponent;
@@ -11,10 +13,9 @@ import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.event.ActionEvent;
 
 import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.myfaces.custom.fileupload.UploadedFile;
 import org.apache.webdav.lib.PropertyName;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -28,12 +29,14 @@ import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavRootResource;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
 
 public class WebDAVUploadBean implements Serializable{
 
 	private static final long serialVersionUID = -1760819218959402747L;
-	private static final Log log = LogFactory.getLog(WebDAVUploadBean.class);
+	private static final Logger LOGGER = Logger.getLogger(WebDAVUploadBean.class.getName());
+	
 	private static String DEFAULT_PATH = "/files/";
 	private UploadedFile uploadFile;
 	private String name = "";
@@ -44,6 +47,9 @@ public class WebDAVUploadBean implements Serializable{
 	private Boolean uploadSuccessful = null;
 	private String uploadMessage = null;
 	private String redirectOnSuccessURI = null;
+	
+	@Autowired
+	private ThemesHelper themesHelper;
 	
 	public UploadedFile getUploadFile() {
 		return this.uploadFile;
@@ -146,7 +152,7 @@ public class WebDAVUploadBean implements Serializable{
 			closeInputStream(stream);
 		}
 		
-		log.info("Uploading file success: " + uploadFileSuccess);
+		LOGGER.info("Uploading file success: " + uploadFileSuccess);
 		
 		WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", uploadFilePath);	//	Setting current path to reload
 		//	Always refreshing/keeping status
@@ -168,7 +174,7 @@ public class WebDAVUploadBean implements Serializable{
 		else{
 			uploadSuccessful = Boolean.FALSE;
 			uploadMessage = rootResource.getStatusMessage();
-			log.error("Error code: " + rootResource.getStatusMessage() + ", message: " + uploadMessage);
+			LOGGER.warning("Error code: " + rootResource.getStatusMessage() + ", message: " + uploadMessage);
 			return uploadFailed;
 		}
 		
@@ -260,7 +266,7 @@ public class WebDAVUploadBean implements Serializable{
 		if (canUploadZipFile()) {
 			return uploadZipFile(isBeingUploadedTheme(event));
 		}		
-		log.info("Unable to upload zip file's contents");
+		LOGGER.info("Unable to upload zip file's contents");
 		return false;
 	}
 	
@@ -284,13 +290,13 @@ public class WebDAVUploadBean implements Serializable{
 		// Got a file to upload?
 		boolean result = uploadFile == null ? false : true;
 		if (!result) {
-			log.error("No file to upload");
+			LOGGER.warning("No file to upload");
 			return result;
 		}
 		// Is it a *.zip file?
 		result = uploadFile.getName().toLowerCase().endsWith(".zip");
 		if (!result) {
-			log.error("Only zip file accepting!");
+			LOGGER.warning("Only zip file accepting!");
 			return result;
 		}
 		return result;
@@ -301,8 +307,7 @@ public class WebDAVUploadBean implements Serializable{
 		try {
 			service = IBOLookup.getServiceInstance(IWContext.getInstance(), IWSlideService.class);
 		} catch (IBOLookupException e) {
-			log.info("Unable to get IWSlideServiceBean instance.");
-			log.error(e);
+			LOGGER.log(Level.WARNING, "Unable to get IWSlideServiceBean instance.", e);
 			return false;
 		}
 		
@@ -319,7 +324,7 @@ public class WebDAVUploadBean implements Serializable{
 				uploadFileName = getUploadFileName();
 			}
 			if (!uploadFileName.equals(CoreConstants.EMPTY)) {
-				uploadFilePath = ThemesHelper.getInstance(false).changeFileUploadPath(getUploadFilePath() + uploadFileName);
+				uploadFilePath = getThemesHelper().changeFileUploadPath(getUploadFilePath() + uploadFileName);
 			}
 		}
 		String path = getUploadFilePath();
@@ -343,10 +348,10 @@ public class WebDAVUploadBean implements Serializable{
 		}
 		
 		if (uploadingTheme) {
-			ThemesHelper.getInstance(false).removeThemeFromQueue(path);
+			getThemesHelper().removeThemeFromQueue(path);
 		}
 		
-		log.info(resultInfo);
+		LOGGER.info(resultInfo);
 		return result;
 	}
 	
@@ -388,6 +393,17 @@ public class WebDAVUploadBean implements Serializable{
 		}
 		
 		return name;
+	}
+
+	public ThemesHelper getThemesHelper() {
+		if (themesHelper == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		return themesHelper;
+	}
+
+	public void setThemesHelper(ThemesHelper themesHelper) {
+		this.themesHelper = themesHelper;
 	}
 
 }

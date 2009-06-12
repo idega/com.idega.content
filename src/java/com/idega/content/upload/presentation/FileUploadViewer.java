@@ -57,6 +57,9 @@ public class FileUploadViewer extends IWBaseComponent {
 	@Autowired
 	private Web2Business web2;
 	
+	@Autowired
+	private ThemesHelper themesHelper;
+	
 	@Override
 	public void restoreState(FacesContext context, Object state) {
 		Object values[] = (Object[]) state;
@@ -116,7 +119,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		}
 		
 		if (themePack) {
-			ThemesHelper.getInstance(false).getSlideService(iwc);
+			themesHelper.getSlideService(iwc);
 			zipFile = true;
 			extractContent = true;
 		}

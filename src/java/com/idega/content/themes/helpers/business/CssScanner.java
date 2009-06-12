@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.httpclient.URIException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +45,9 @@ public class CssScanner implements ResourceScanner {
 	private static final String OPENER = "{";
 	private static final String CLOSER = "}";
 	private static final String UTF_8_DECLARATION = "@charset \"UTF-8\";";
+	
+	@Autowired
+	private ThemesHelper themesHelper;
 	
 	public void scanFile(List<String> fileLines) {
 		openers = 0;
@@ -93,7 +97,7 @@ public class CssScanner implements ResourceScanner {
 			
 			path = new StringBuffer(linkToTheme).append(urlValueInCss).toString();
 			try {
-				f = ThemesHelper.getInstance().getSlideService().getFile(path);
+				f = getThemesHelper().getSlideService().getFile(path);
 			} catch (URIException e) {
 				e.printStackTrace();
 			} catch (RemoteException e) {
@@ -141,7 +145,7 @@ public class CssScanner implements ResourceScanner {
 			int index = StringHandler.getNotHexValueIndexInHexValue(color);
 			String letterToReplace = null;
 			while (index >= 0) {
-				letterToReplace = CoreConstants.HEXIDECIMAL_LETTERS.get(ThemesHelper.getInstance().getRandomNumber(CoreConstants.HEXIDECIMAL_LETTERS.size()));
+				letterToReplace = CoreConstants.HEXIDECIMAL_LETTERS.get(getThemesHelper().getRandomNumber(CoreConstants.HEXIDECIMAL_LETTERS.size()));
 				if (index == color.length() - 1) {
 					color = color.replace(color.substring(index), letterToReplace);
 				}
@@ -322,6 +326,14 @@ public class CssScanner implements ResourceScanner {
 		
 		line = line.replace(originalExpression, urlReplacement);
 		return line;
+	}
+
+	public ThemesHelper getThemesHelper() {
+		return themesHelper;
+	}
+
+	public void setThemesHelper(ThemesHelper themesHelper) {
+		this.themesHelper = themesHelper;
 	}
 
 }

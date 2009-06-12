@@ -17,6 +17,7 @@ import javax.faces.model.SelectItem;
 
 import org.jdom.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,7 @@ import com.idega.content.themes.helpers.bean.Setting;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.TreeNodeStructure;
 import com.idega.content.themes.helpers.business.ThemesConstants;
+import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.themes.presentation.PageInfo;
 import com.idega.content.themes.presentation.SiteInfo;
 import com.idega.core.accesscontrol.business.AccessController;
@@ -64,7 +66,7 @@ import com.idega.util.LocaleUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
-@Scope("singleton")
+@Scope(BeanDefinition.SCOPE_SINGLETON)
 @Service(LucidEngine.SPRING_BEAN_IDENTIFIER)
 public class LucidEngineImpl implements LucidEngine {
 
@@ -89,6 +91,9 @@ public class LucidEngineImpl implements LucidEngine {
 	
 	@Autowired
 	private ThemesEngine themesEngine;
+	
+	@Autowired
+	private ThemesHelper themesHelper;
 	
 	public String getJavaScriptResources() {
 		//	DWR
@@ -301,14 +306,6 @@ public class LucidEngineImpl implements LucidEngine {
 		return String.valueOf(-1);
 	}
 	
-	public ThemesEngine getThemesEngine() {
-		return themesEngine;
-	}
-
-	public void setThemesEngine(ThemesEngine themesEngine) {
-		this.themesEngine = themesEngine;
-	}
-	
 	public String changePageUri(String pageKey, String pageUri, boolean needSetPageTitle) {
 		if (pageKey == null || pageUri == null) {
 			return null;
@@ -317,7 +314,7 @@ public class LucidEngineImpl implements LucidEngine {
 			return null;
 		}
 		
-		ICPage page = getThemesEngine().getThemesHelper().getThemesService().getICPage(pageKey);
+		ICPage page = getThemesHelper().getThemesService().getICPage(pageKey);
 		if (page == null) {
 			return null;
 		}
@@ -351,7 +348,7 @@ public class LucidEngineImpl implements LucidEngine {
 			parentId = parentNode.getId();
 		}
 		
-		if (getThemesEngine().getThemesHelper().getThemesService().getBuilderService().changePageUriByTitle(parentId, page, pageUri, domain.getID())) {
+		if (getThemesHelper().getThemesService().getBuilderService().changePageUriByTitle(parentId, page, pageUri, domain.getID())) {
 			setNewLinkInArticleFile(page.getId(), CoreConstants.getArticleItemViewerClass().getName(), page.getDefaultPageURI());
 			return page.getDefaultPageURI();
 		}
@@ -388,7 +385,7 @@ public class LucidEngineImpl implements LucidEngine {
 		if (locales == null) {
 			return false;
 		}
-		StringBuffer link = new StringBuffer(getThemesEngine().getThemesHelper().getFullWebRoot()).append(linkToArticle[0]);
+		StringBuffer link = new StringBuffer(getThemesHelper().getFullWebRoot()).append(linkToArticle[0]);
 		if (!link.toString().endsWith(ContentConstants.SLASH)) {
 			link.append(ContentConstants.SLASH);
 		}
@@ -397,7 +394,7 @@ public class LucidEngineImpl implements LucidEngine {
 		for (int i = 0; i < locales.size(); i++) {
 			l = locales.get(i);
 			if (l.getLanguage() != null) {
-				result = getThemesEngine().getThemesHelper().setNewLinkInArticleFile(iwc, link.toString(), l.getLanguage(), linkToArticle[0], pageUri);
+				result = getThemesHelper().setNewLinkInArticleFile(iwc, link.toString(), l.getLanguage(), linkToArticle[0], pageUri);
 			}
 		}
 		
@@ -424,7 +421,7 @@ public class LucidEngineImpl implements LucidEngine {
 		}
 		String changedPageUri = null;
 		
-		List<Setting> settings = getThemesEngine().getThemesHelper().getPageSettings();
+		List<Setting> settings = getThemesHelper().getPageSettings();
 		if (ListUtil.isEmpty(settings)) {
 			return null;
 		}
@@ -439,11 +436,11 @@ public class LucidEngineImpl implements LucidEngine {
 			needSetValue = true;
 			currentValue = values[index];
 			
-			currentValues = getThemesEngine().getThemesHelper().getThemesService().getBuilderService().getPropertyValues(appl, pageKey, ThemesConstants.MINUS_ONE,
+			currentValues = getThemesHelper().getThemesService().getBuilderService().getPropertyValues(appl, pageKey, ThemesConstants.MINUS_ONE,
 					s.getMethod(), null, true);
 			if (StringUtil.isEmpty(currentValue)) {
 				if (currentValues != null) {
-					getThemesEngine().getThemesHelper().getThemesService().getBuilderService().removeProperty(appl, pageKey, ThemesConstants.MINUS_ONE,
+					getThemesHelper().getThemesService().getBuilderService().removeProperty(appl, pageKey, ThemesConstants.MINUS_ONE,
 							s.getMethod(), currentValues);
 				}
 			}
@@ -468,7 +465,7 @@ public class LucidEngineImpl implements LucidEngine {
 					getBuilderService().clearAllCaches();
 				}
 				else {
-					newValues = getThemesEngine().getThemesHelper().getPageValues(s, currentValue);
+					newValues = getThemesHelper().getPageValues(s, currentValue);
 					if (newValues == null) {
 						needSetValue = false;
 					}
@@ -476,7 +473,7 @@ public class LucidEngineImpl implements LucidEngine {
 						needSetValue = false;
 					}
 					if (needSetValue) {
-						getThemesEngine().getThemesHelper().getThemesService().getBuilderService().setProperty(pageKey, ThemesConstants.MINUS_ONE, s.getMethod(),
+						getThemesHelper().getThemesService().getBuilderService().setProperty(pageKey, ThemesConstants.MINUS_ONE, s.getMethod(),
 								newValues, appl);
 						if (s.getCode().equals(PAGE_TITLE)) {
 							changedPageTitle = changePageName(Integer.valueOf(pageKey).intValue(), currentValue, iwc);
@@ -511,7 +508,7 @@ public class LucidEngineImpl implements LucidEngine {
 		if (appl == null) {
 			return null;
 		}
-		List<Setting> settings = getThemesEngine().getThemesHelper().getPageSettings();
+		List<Setting> settings = getThemesHelper().getPageSettings();
 		if (ListUtil.isEmpty(settings)) {
 			return null;
 		}
@@ -519,11 +516,11 @@ public class LucidEngineImpl implements LucidEngine {
 		List<String> values = new ArrayList<String>(keywords.length);
 		String[] propValues = null;
 		StringBuffer value = null;
-		ICPage page = getThemesEngine().getThemesHelper().getThemesService().getICPage(pageKey);
+		ICPage page = getThemesHelper().getThemesService().getICPage(pageKey);
 		for (Setting s: settings) {
 			value = new StringBuffer();
 			
-			propValues = getThemesEngine().getThemesHelper().getThemesService().getBuilderService().getPropertyValues(appl, pageKey, ThemesConstants.MINUS_ONE,
+			propValues = getThemesHelper().getThemesService().getBuilderService().getPropertyValues(appl, pageKey, ThemesConstants.MINUS_ONE,
 					s.getMethod(), null, true);
 			if (propValues != null) {
 				for (int j = 0; j < propValues.length; j++) {
@@ -562,7 +559,7 @@ public class LucidEngineImpl implements LucidEngine {
 	}
 	
 	public String[] getPageInfoElements() {
-		Collection<Setting> c = getThemesEngine().getThemesHelper().getPageSettings();
+		Collection<Setting> c = getThemesHelper().getPageSettings();
 		if (c == null) {
 			return null;
 		}
@@ -570,7 +567,7 @@ public class LucidEngineImpl implements LucidEngine {
 	}
 	
 	public String[] getSiteInfoElements() {
-		Collection <Setting> c = getThemesEngine().getThemesHelper().getThemeSettings();
+		Collection <Setting> c = getThemesHelper().getThemeSettings();
 		if (c == null) {
 			return null;
 		}
@@ -581,7 +578,7 @@ public class LucidEngineImpl implements LucidEngine {
 		if (keywords == null || language == null) {
 			return null;
 		}
-		Collection <Setting> c = getThemesEngine().getThemesHelper().getThemeSettings();
+		Collection <Setting> c = getThemesHelper().getThemeSettings();
 		if (c == null) {
 			return null;
 		}
@@ -674,7 +671,7 @@ public class LucidEngineImpl implements LucidEngine {
 				return false;
 			}
 			if (domain == null) {
-				domain = getThemesEngine().getThemesHelper().getThemesService().getDomain();
+				domain = getThemesHelper().getThemesService().getDomain();
 			}
 			if (value != null && !ThemesConstants.EMPTY.equals(value)) {
 				if (domain != null) {
@@ -716,12 +713,12 @@ public class LucidEngineImpl implements LucidEngine {
 		if (iwc == null) {
 			return false;
 		}
-		String language = getThemesEngine().getThemesHelper().getCurrentLanguage(iwc);
+		String language = getThemesHelper().getCurrentLanguage(iwc);
 		if (language == null) {
 			return false;
 		}
 		language = CoreConstants.DOT + language;
-		keyword = getThemesEngine().getThemesHelper().extractValueFromString(keyword, 0, keyword.lastIndexOf(CoreConstants.UNDER));
+		keyword = getThemesHelper().extractValueFromString(keyword, 0, keyword.lastIndexOf(CoreConstants.UNDER));
 		
 		IWMainApplication appl = ContentUtil.getBundle().getApplication();
 		ICDomain cachedDomain = null;
@@ -773,7 +770,7 @@ public class LucidEngineImpl implements LucidEngine {
 		
 		BuilderService builder = getBuilderService();
 		
-		ICDomain domain = getThemesEngine().getThemesHelper().getThemesService().getDomain();
+		ICDomain domain = getThemesHelper().getThemesService().getDomain();
 		
 		int pageID = -1;
 		int domainID = -1;
@@ -812,7 +809,7 @@ public class LucidEngineImpl implements LucidEngine {
 			if (domain != null) {
 				if ((domain.getStartPage() == null) && (isTopLevelPage)) {
 					//	Marking page as top level page
-					domain.setIBPage(getThemesEngine().getThemesHelper().getThemesService().getICPage(pageID));
+					domain.setIBPage(getThemesHelper().getThemesService().getICPage(pageID));
 					domain.store();
 				}					
 			}
@@ -845,10 +842,10 @@ public class LucidEngineImpl implements LucidEngine {
 		builder.clearAllCachedPages();
 		
 		//	Setting template id for new page(s)
-		String lastUsedTemplate = getThemesEngine().getThemesHelper().getLastUsedTheme();
+		String lastUsedTemplate = getThemesHelper().getLastUsedTheme();
 		if (lastUsedTemplate != null && !CoreConstants.EMPTY.equals(lastUsedTemplate)) {
 			String createdPageKey = null;
-			Theme theme = getThemesEngine().getThemesHelper().getThemeByTemplateKey(lastUsedTemplate);
+			Theme theme = getThemesHelper().getThemeByTemplateKey(lastUsedTemplate);
 			for (int i = 0; i < createdPages.size(); i++) {
 				createdPageKey = createdPages.get(i);
 				
@@ -899,13 +896,13 @@ public class LucidEngineImpl implements LucidEngine {
 		if (ThemesConstants.EMPTY.equals(templateFile)) {
 			return false;
 		}
-		List<String> articlesPaths = getThemesEngine().getThemesHelper().createArticle(templateFile, pageID);
-		String uriToPage = getThemesEngine().getThemesHelper().loadPageToSlide(pageType, templateFile, articlesPaths, pageID);
+		List<String> articlesPaths = getThemesHelper().createArticle(templateFile, pageID);
+		String uriToPage = getThemesHelper().loadPageToSlide(pageType, templateFile, articlesPaths, pageID);
 		if (uriToPage == null) {
 			return false;
 		}
 		
-		return getThemesEngine().getThemesHelper().getThemesService().updatePageWebDav(pageID, uriToPage, clearCache);
+		return getThemesHelper().getThemesService().updatePageWebDav(pageID, uriToPage, clearCache);
 	}
 	
 	private int createPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format,
@@ -917,7 +914,7 @@ public class LucidEngineImpl implements LucidEngine {
 			}
 		}
 		try {
-			id = getThemesEngine().getThemesHelper().getThemesService().createIBPage(parentId, name, type, templateId, pageUri, subType, domainId, format,
+			id = getThemesHelper().getThemesService().createIBPage(parentId, name, type, templateId, pageUri, subType, domainId, format,
 					sourceMarkup, treeOrder);
 		} catch (RemoteException e) {
 			e.printStackTrace();
@@ -937,7 +934,7 @@ public class LucidEngineImpl implements LucidEngine {
 		
 		try {
 			changeNodesOrderInLevel(followingNodes, -1, null);	
-			getThemesEngine().getThemesHelper().getThemesService().deleteIBPage(pageId, deleteChildren, true);
+			getThemesHelper().getThemesService().deleteIBPage(pageId, deleteChildren, true);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			return false;
@@ -952,7 +949,7 @@ public class LucidEngineImpl implements LucidEngine {
 		if (pageID == null) {
 			return true;
 		}
-		ICPage page = getThemesEngine().getThemesHelper().getThemesService().getICPage(pageID);
+		ICPage page = getThemesHelper().getThemesService().getICPage(pageID);
 		if (page == null) {
 			return true;
 		}
@@ -973,7 +970,7 @@ public class LucidEngineImpl implements LucidEngine {
 	}
 	
 	public String getPageId() {
-		String id = getThemesEngine().getThemesHelper().getLastVisitedPage();
+		String id = getThemesHelper().getLastVisitedPage();
 		if (id != null) {
 			if (!ThemesConstants.MINUS_ONE.equals(id)) {
 				if (isPageDeleted(id)) {
@@ -990,7 +987,7 @@ public class LucidEngineImpl implements LucidEngine {
 		if (isPageDeleted(id)) {
 			return ThemesConstants.MINUS_ONE;
 		}
-		getThemesEngine().getThemesHelper().setLastVisitedPage(id);
+		getThemesHelper().setLastVisitedPage(id);
 		return id;
 	}
 	
@@ -998,7 +995,7 @@ public class LucidEngineImpl implements LucidEngine {
 		if (id == null) {
 			return false;
 		}
-		getThemesEngine().getThemesHelper().setLastVisitedPage(id);
+		getThemesHelper().setLastVisitedPage(id);
 		return true;
 	}
 	
@@ -1011,7 +1008,7 @@ public class LucidEngineImpl implements LucidEngine {
 		
 		BuilderService service = getBuilderService();
 		
-		ICPage page = getThemesEngine().getThemesHelper().getThemesService().getICPage(nodeId);
+		ICPage page = getThemesHelper().getThemesService().getICPage(nodeId);
 		page.setTreeOrder(numberInLevel);
 		page.store();
 		service.setTreeOrder(nodeId, numberInLevel);
@@ -1044,7 +1041,7 @@ public class LucidEngineImpl implements LucidEngine {
 	
 	public boolean isStartPage(String pageKey) {
 		if (pageKey == null) {
-			pageKey = getThemesEngine().getThemesHelper().getLastVisitedPage();
+			pageKey = getThemesHelper().getLastVisitedPage();
 		}
 		if (pageKey == null) {
 			return true;	//	Returning true to disable a button
@@ -1092,7 +1089,7 @@ public class LucidEngineImpl implements LucidEngine {
 			return false;
 		}
 		
-		ICPage newRootPage = getThemesEngine().getThemesHelper().getThemesService().getICPage(newRoot);
+		ICPage newRootPage = getThemesHelper().getThemesService().getICPage(newRoot);
 		if (newRootPage == null) {
 			return false;
 		}
@@ -1118,7 +1115,7 @@ public class LucidEngineImpl implements LucidEngine {
 		newRootPage.store();
 		
 		//	Changing old root page's properties
-		ICPage rootPage = getThemesEngine().getThemesHelper().getThemesService().getICPage(currentRoot);
+		ICPage rootPage = getThemesHelper().getThemesService().getICPage(currentRoot);
 		if (rootPage == null) {
 			return false;
 		}
@@ -1147,7 +1144,7 @@ public class LucidEngineImpl implements LucidEngine {
 	private int getRootPageId() {
 		int id = 1;
 		try {
-			id = getThemesEngine().getThemesHelper().getThemesService().getBuilderService().getRootPageId();
+			id = getThemesHelper().getThemesService().getBuilderService().getRootPageId();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;
@@ -1167,7 +1164,7 @@ public class LucidEngineImpl implements LucidEngine {
 		
 		builder.unlockRegion(String.valueOf(pageID), ThemesConstants.MINUS_ONE, null);
 
-		domain.setIBPage(getThemesEngine().getThemesHelper().getThemesService().getICPage(pageID));
+		domain.setIBPage(getThemesHelper().getThemesService().getICPage(pageID));
 		domain.store();
 		return true;
 	}
@@ -1183,7 +1180,7 @@ public class LucidEngineImpl implements LucidEngine {
 		
 		builder.unlockRegion(templateKey, ThemesConstants.MINUS_ONE, null);
 		
-		domain.setStartTemplate(getThemesEngine().getThemesHelper().getThemesService().getICPage(templateId));
+		domain.setStartTemplate(getThemesHelper().getThemesService().getICPage(templateId));
 		domain.store();
 		
 		createArticlePreviewTemplate(domainID, builder, format, templateId);
@@ -1248,7 +1245,7 @@ public class LucidEngineImpl implements LucidEngine {
 						e.printStackTrace();
 						return -1;
 					}
-					page = getThemesEngine().getThemesHelper().getThemesService().getICPage(id);
+					page = getThemesHelper().getThemesService().getICPage(id);
 					if (page != null) {
 						if (ARTICLE_VIEWER_SUBTYPE.equals(page.getSubType())) {
 							return id;
@@ -1282,7 +1279,7 @@ public class LucidEngineImpl implements LucidEngine {
 			return false;
 		}
 		if (service == null) {
-			service = getThemesEngine().getThemesHelper().getThemesService().getBuilderService();
+			service = getThemesHelper().getThemesService().getBuilderService();
 		}
 		if (service == null) {
 			return false;
@@ -1303,7 +1300,7 @@ public class LucidEngineImpl implements LucidEngine {
 			}
 			
 			if (id != -1) {
-				page = getThemesEngine().getThemesHelper().getThemesService().getICPage(nodeId);
+				page = getThemesHelper().getThemesService().getICPage(nodeId);
 				if (page != null) {
 					page.setTreeOrder(page.getTreeOrder() + orderChange);
 					service.changeTreeOrder(id, orderChange);
@@ -1357,8 +1354,8 @@ public class LucidEngineImpl implements LucidEngine {
 			List<String> increaseLevelOnTop = new ArrayList<String>();
 			for (Iterator iter = topLevelPages.iterator(); iter.hasNext();) {
 				element = (ICTreeNode) iter.next();
-				page = getThemesEngine().getThemesHelper().getThemesService().getICPage(element.getId());
-				newPage = getThemesEngine().getThemesHelper().getThemesService().getICPage(newRoot);
+				page = getThemesHelper().getThemesService().getICPage(element.getId());
+				newPage = getThemesHelper().getThemesService().getICPage(newRoot);
 				if (page != null && newPage != null) {
 					nodeOrder = page.getTreeOrder();
 					newRootOrder = newPage.getTreeOrder();
@@ -1373,7 +1370,7 @@ public class LucidEngineImpl implements LucidEngine {
 			//	Not top level page
 			for (Iterator iter = topLevelPages.iterator(); iter.hasNext();) {
 				element = (ICTreeNode) iter.next();
-				page = getThemesEngine().getThemesHelper().getThemesService().getICPage(element.getId());
+				page = getThemesHelper().getThemesService().getICPage(element.getId());
 				if (page != null) {
 					page.setTreeOrder(page.getTreeOrder()+1);
 					page.store();
@@ -1387,8 +1384,8 @@ public class LucidEngineImpl implements LucidEngine {
 			}
 			for (Iterator iter = siblings.iterator(); iter.hasNext();) {
 				element = (ICTreeNode) iter.next();
-				page = getThemesEngine().getThemesHelper().getThemesService().getICPage(element.getId());
-				newPage = getThemesEngine().getThemesHelper().getThemesService().getICPage(newRoot);
+				page = getThemesHelper().getThemesService().getICPage(element.getId());
+				newPage = getThemesHelper().getThemesService().getICPage(newRoot);
 				if (page != null && newPage != null) {
 					nodeOrder = page.getTreeOrder();
 					newRootOrder = newPage.getTreeOrder();
@@ -1481,7 +1478,7 @@ public class LucidEngineImpl implements LucidEngine {
 			return true;
 		}
 		
-		ICPage page = getThemesEngine().getThemesHelper().getThemesService().getICPage(iwc.getCurrentIBPageID());
+		ICPage page = getThemesHelper().getThemesService().getICPage(iwc.getCurrentIBPageID());
 		if (page == null) {
 			return false;
 		}
@@ -1644,7 +1641,7 @@ public class LucidEngineImpl implements LucidEngine {
 		pageInfo.setStyleClass(styleClass);
 		pageInfo.setId(id);
 		
-		return getThemesEngine().getThemesHelper().getThemesService().getBuilderService().getRenderedComponent(getThemesEngine().getContextAndCheckRights(),
+		return getThemesHelper().getThemesService().getBuilderService().getRenderedComponent(getThemesEngine().getContextAndCheckRights(),
 				pageInfo, false);
 	}
 	
@@ -1653,7 +1650,7 @@ public class LucidEngineImpl implements LucidEngine {
 		siteInfo.setId(id);
 		siteInfo.setStyleClass(styleClass);
 		
-		return getThemesEngine().getThemesHelper().getThemesService().getBuilderService().getRenderedComponent(getThemesEngine().getContextAndCheckRights(),
+		return getThemesHelper().getThemesService().getBuilderService().getRenderedComponent(getThemesEngine().getContextAndCheckRights(),
 				siteInfo, false);
 	}
 	
@@ -1664,7 +1661,7 @@ public class LucidEngineImpl implements LucidEngine {
 		
 		ICPage page = null;
 		try {
-			page = getThemesEngine().getThemesHelper().getThemesService().getICPage(pageKey);
+			page = getThemesHelper().getThemesService().getICPage(pageKey);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -1752,7 +1749,7 @@ public class LucidEngineImpl implements LucidEngine {
 		}
 		
 		String method = ":method:1:implied:void:setTitle:java.lang.String:";
-		return getThemesEngine().getThemesHelper().getThemesService().getBuilderService().setProperty(pageID, ThemesConstants.MINUS_ONE, method, new String[]{title},
+		return getThemesHelper().getThemesService().getBuilderService().setProperty(pageID, ThemesConstants.MINUS_ONE, method, new String[]{title},
 				appl);
 	}
 	
@@ -1765,7 +1762,7 @@ public class LucidEngineImpl implements LucidEngine {
 			return null;
 		}
 		
-		ICPage page = getThemesEngine().getThemesHelper().getThemesService().getICPage(pageKey);
+		ICPage page = getThemesHelper().getThemesService().getICPage(pageKey);
 		if (page == null) {
 			return null;
 		}
@@ -1793,7 +1790,7 @@ public class LucidEngineImpl implements LucidEngine {
 			return null;
 		}
 		
-		ICPage page = getThemesEngine().getThemesHelper().getThemesService().getICPage(pageKey);
+		ICPage page = getThemesHelper().getThemesService().getICPage(pageKey);
 		if (page == null) {
 			return null;
 		}
@@ -1848,7 +1845,7 @@ public class LucidEngineImpl implements LucidEngine {
 			return false;
 		}
 		
-		ICPage page = getThemesEngine().getThemesHelper().getThemesService().getICPage(pageKey);
+		ICPage page = getThemesHelper().getThemesService().getICPage(pageKey);
 		if (page == null) {
 			return false;
 		}
@@ -1880,7 +1877,7 @@ public class LucidEngineImpl implements LucidEngine {
 			return false;
 		}
 		
-		ICPage page = getThemesEngine().getThemesHelper().getThemesService().getICPage(pageKey);
+		ICPage page = getThemesHelper().getThemesService().getICPage(pageKey);
 		if (page == null) {
 			return false;
 		}
@@ -1951,6 +1948,22 @@ public class LucidEngineImpl implements LucidEngine {
 
 	public void setJQuery(JQuery query) {
 		jQuery = query;
+	}
+
+	public ThemesHelper getThemesHelper() {
+		return themesHelper;
+	}
+
+	public void setThemesHelper(ThemesHelper themesHelper) {
+		this.themesHelper = themesHelper;
+	}
+
+	public ThemesEngine getThemesEngine() {
+		return themesEngine;
+	}
+
+	public void setThemesEngine(ThemesEngine themesEngine) {
+		this.themesEngine = themesEngine;
 	}
 
 }
