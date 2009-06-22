@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemFieldBean.java,v 1.2 2006/04/09 12:01:55 laddi Exp $
+ * $Id: ContentItemFieldBean.java,v 1.3 2009/06/22 14:16:49 valdas Exp $
  *
  * Copyright (C) 2004 Idega. All Rights Reserved.
  *
@@ -14,13 +14,15 @@ import java.io.Serializable;
 /**
  * Bean for idegaWeb content item fields.   
  * <p>
- * Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
+ * Last modified: $Date: 2009/06/22 14:16:49 $ by $Author: valdas $
  *
  * @author Anders Lindman
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 
 public class ContentItemFieldBean implements Serializable, ContentItemField {
+	
+	private static final long serialVersionUID = 707754626900940615L;
 	
 	private int _contentItemFieldId = 0;
 	private int _versionId = 0;
