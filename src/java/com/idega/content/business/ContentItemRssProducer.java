@@ -15,8 +15,6 @@ import javax.servlet.ServletException;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.WebdavResources;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.idega.block.rss.business.RSSAbstractProducer;
 import com.idega.block.rss.business.RSSBusiness;
 import com.idega.block.rss.business.RSSProducer;
@@ -50,9 +48,6 @@ public class ContentItemRssProducer extends RSSAbstractProducer implements RSSPr
 
 	public static final String PATH = CoreConstants.WEBDAV_SERVLET_URI + ContentUtil.getContentBaseFolderPath() + "/article/";
 	private static Logger LOGGER = Logger.getLogger(ContentItemRssProducer.class.getName());
-	
-	@Autowired
-	private ThemesHelper themesHelper;
 	
 	public ContentItemRssProducer() {
 		super();
@@ -237,14 +232,7 @@ public class ContentItemRssProducer extends RSSAbstractProducer implements RSSPr
 	}
 
 	public ThemesHelper getThemesHelper() {
-		if (themesHelper == null) {
-			ELUtil.getInstance().autowire(this);
-		}
-		return themesHelper;
-	}
-
-	public void setThemesHelper(ThemesHelper themesHelper) {
-		this.themesHelper = themesHelper;
+		return ELUtil.getInstance().getBean(ThemesHelper.class);
 	}
 
 }

@@ -14,8 +14,6 @@ import org.apache.myfaces.custom.tree2.TreeNode;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.business.TemplatesLoader;
 import com.idega.content.themes.helpers.business.ThemesHelper;
@@ -37,9 +35,6 @@ public class SiteTemplateBean {
 	Document siteDocument = null;
 	
 	private Map <String, PageTemplate> pageMap = null;
-	
-	@Autowired
-	private ThemesHelper themesHelper;
 	
 	public SiteTemplateBean() {
 		super();
@@ -102,14 +97,6 @@ public class SiteTemplateBean {
 	}
 
 	public ThemesHelper getThemesHelper() {
-		if (themesHelper == null) {
-			ELUtil.getInstance().autowire(this);
-		}
-		return themesHelper;
+		return ELUtil.getInstance().getBean(ThemesHelper.class);
 	}
-
-	public void setThemesHelper(ThemesHelper themesHelper) {
-		this.themesHelper = themesHelper;
-	}
-	
 }

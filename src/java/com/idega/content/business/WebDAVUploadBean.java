@@ -15,8 +15,6 @@ import javax.faces.event.ActionEvent;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.myfaces.custom.fileupload.UploadedFile;
 import org.apache.webdav.lib.PropertyName;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.bean.ContentPathBean;
@@ -47,9 +45,6 @@ public class WebDAVUploadBean implements Serializable{
 	private Boolean uploadSuccessful = null;
 	private String uploadMessage = null;
 	private String redirectOnSuccessURI = null;
-	
-	@Autowired
-	private ThemesHelper themesHelper;
 	
 	public UploadedFile getUploadFile() {
 		return this.uploadFile;
@@ -396,14 +391,7 @@ public class WebDAVUploadBean implements Serializable{
 	}
 
 	public ThemesHelper getThemesHelper() {
-		if (themesHelper == null) {
-			ELUtil.getInstance().autowire(this);
-		}
-		return themesHelper;
-	}
-
-	public void setThemesHelper(ThemesHelper themesHelper) {
-		this.themesHelper = themesHelper;
+		return ELUtil.getInstance().getBean(ThemesHelper.class);
 	}
 
 }

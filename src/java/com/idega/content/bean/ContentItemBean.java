@@ -1,5 +1,5 @@
 /*
- * $Id: ContentItemBean.java,v 1.49 2009/06/12 10:52:36 valdas Exp $
+ * $Id: ContentItemBean.java,v 1.50 2009/06/22 14:17:17 valdas Exp $
  *
  * Copyright (C) 2004-2005 Idega. All Rights Reserved.
  *
@@ -32,8 +32,6 @@ import javax.jcr.ValueFormatException;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.util.WebdavStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentConstants;
@@ -58,10 +56,10 @@ import com.sun.syndication.io.impl.DateParser;
  * Base bean for "content items", i.e. resources that can be read from the WebDav store
  * and displayed as content.
  * </p>
- *  Last modified: $Date: 2009/06/12 10:52:36 $ by $Author: valdas $
+ *  Last modified: $Date: 2009/06/22 14:17:17 $ by $Author: valdas $
  * 
  * @author Anders Lindman,<a href="mailto:tryggvil@idega.com">tryggvil</a>
- * @version $Revision: 1.49 $
+ * @version $Revision: 1.50 $
  */
 public abstract class ContentItemBean implements Serializable, ContentItem {
 
@@ -80,9 +78,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
     public static final String ISCOLLECTION = "iscollection";
     public static final String SUPPORTEDLOCK = "supportedlock";
     public static final String LOCKDISCOVERY = "lockdiscovery";
-	
-    @Autowired
-    private ThemesHelper themesHelper;
     
 	private Locale _locale = null;
 	private String _name = null;
@@ -806,8 +801,11 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 			String body, String author, List<String> categories, String source, String comment, String moduleClass,
 			String linkToComments) {
 		
-		if (themesHelper == null) {
-			ELUtil.getInstance().autowire(this);
+		ThemesHelper themesHelper = null;
+		try {
+			themesHelper = ELUtil.getInstance().getBean(ThemesHelper.class);
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
 		
 		Timestamp published = getPublishedDate();
