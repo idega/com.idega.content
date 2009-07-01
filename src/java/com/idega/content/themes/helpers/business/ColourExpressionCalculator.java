@@ -97,7 +97,7 @@ public class ColourExpressionCalculator {
 		
 		List<String> originalColourFiles = theme.getOriginalColourFiles();
 		boolean addOriginalFile = false;
-		if (originalColourFiles == null || originalColourFiles.isEmpty()) {
+		if (ListUtil.isEmpty(originalColourFiles)) {
 			originalColourFiles = getOriginalColourFilesBySearch(theme);
 			addOriginalFile = true;
 		}
@@ -264,7 +264,7 @@ public class ColourExpressionCalculator {
 		String computedCSSValue = null;
 		List<String> searchTerm = new ArrayList<String>();
 		searchTerm.add(CoreConstants.PERCENT);
-		while (content.indexOf("%" + variable + "%") != -1) {
+		while (content.indexOf(variable) != -1) {
 			start = getStartIndexForCssVariable(content, variable, CoreConstants.PERCENT);
 			end = getEndIndexForCssVariable(content, variable, searchTerm, true, true);
 			if (!canSubstring(content, start, end)) {
@@ -722,12 +722,9 @@ public class ColourExpressionCalculator {
 	}
 	
 	private int getEndIndexForCssVariable(String content, String key, List<String> searchTerms, boolean checkIfContains, boolean increaseIndex) {
-		int index = content.indexOf("%" + key + "%");
+		int index = content.indexOf(key);
 		if (index == -1) {
 			return -1;
-		}
-		else {
-			index++;
 		}
 		
 		index += key.length();
@@ -761,12 +758,9 @@ public class ColourExpressionCalculator {
 	}
 	
 	private int getStartIndexForCssVariable(String content, String key, String searchTerm) {
-		int index = content.indexOf("%" + key + "%");
+		int index = content.indexOf(key);
 		if (index == -1) {
 			return -1;
-		}
-		else {
-			index++;
 		}
 		
 		boolean foundPercentMarkAtTheBegin = false;

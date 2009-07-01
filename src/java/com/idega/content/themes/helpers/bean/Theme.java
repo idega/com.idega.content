@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.content.themes.helpers.business.ThemeChanger;
+import com.idega.util.CoreConstants;
 import com.idega.util.expression.ELUtil;
 
 public class Theme {
@@ -260,6 +261,11 @@ public class Theme {
 	public void addStyleVariable(String variable, String value) {
 		if (variable == null || value == null) {
 			return;
+		}
+		
+		if (value.indexOf(CoreConstants.SPACE) != -1) {
+			String[] values = value.split(CoreConstants.SPACE);
+			value = values[0];
 		}
 		
 		styleVariables.put(variable, value);

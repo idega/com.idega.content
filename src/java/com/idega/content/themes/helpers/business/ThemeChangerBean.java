@@ -1623,30 +1623,29 @@ public class ThemeChangerBean implements ThemeChanger {
 		int index = 4;
 		List<Element> uselessStyles = new ArrayList<Element>();
 		
+		//	Will detect useless style and it's place in HTML document
 		if (oldStyle != null) {
-			if (oldStyle.getStyleFiles() == null) {
+			List<String> files = oldStyle.getStyleFiles();
+			if (ListUtil.isEmpty(files)) {
 				return false;
 			}
 			
-			Element style = null;
-			String attributeValue = null;
-			List <String> files = null;
-			for (int i = 0; i < styles.size(); i++) {
-				style = styles.get(i);
-				attributeValue = style.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_HREF);
-				if (attributeValue != null) {
-					files = oldStyle.getStyleFiles();
-					if (files != null) {
-						for (int j = 0; j < files.size(); j++) {
-							if (attributeValue.endsWith(files.get(j))) {
-								uselessStyles.add(style);
-								index = getElementIndex(head.getContent(), ThemesConstants.TAG_ATTRIBUTE_HREF, attributeValue);
-							}
-						}
+			//	While not all style elements checked AND not all useless styles collected
+			for (Iterator<Element> stylesIter = styles.iterator(); (stylesIter.hasNext() && uselessStyles.size() != files.size());) {
+				Element style = stylesIter.next();
+				
+				String attributeValue = style.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_HREF);
+				if (StringUtil.isEmpty(attributeValue)) {
+					continue;
+				}
+				
+				for (String cssUri: files) {
+					if (attributeValue.endsWith(cssUri)) {
+						uselessStyles.add(style);
+						index = getElementIndex(head.getContent(), ThemesConstants.TAG_ATTRIBUTE_HREF, attributeValue);
 					}
 				}
 			}
-			
 		}
 		
 		if (newStyle != null) {
@@ -1676,7 +1675,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			attributes = getBasicAttributesList();			
 			attributes.add(new Attribute(ThemesConstants.TAG_ATTRIBUTE_HREF, new StringBuffer(linkToBase).append(newStyle.getStyleFiles().get(i)).toString()));
 
-			newStyleHref = new Element(ThemesConstants.ELEMENT_LINK);
+			newStyleHref = new Element(ThemesConstants.ELEMENT_LINK, namespace);
 			newStyleHref.setAttributes(attributes);
 			newStyleElements.add(newStyleHref);
 		}
@@ -1688,7 +1687,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @return List
 	 */
 	private List <Attribute> getBasicAttributesList() {
-		List <Attribute> attributes = new ArrayList <Attribute> ();
+		List<Attribute> attributes = new ArrayList<Attribute> ();
 		attributes.add(new Attribute(TAG_ATTRIBUTE_REL, TAG_ATTRIBUTE_VALUE_STYLESHEET));
 		attributes.add(new Attribute(ThemesConstants.TAG_ATTRIBUTE_TYPE, TAG_ATTRIBUTE_VALUE_CSS));
 		attributes.add(new Attribute(TAG_ATTRIBUTE_MEDIA, TAG_ATTRIBUTE_VALUE_SCREEN));
@@ -2345,12 +2344,12 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		String changed = themeKey;
-		if (changes != null) {
-			ThemeChange change = null;
-			for (int i = 0; (i < changes.size() && changed != null); i++) {
-				change = changes.get(i);
-				changed = changeTheme(doc, theme, themeName, change, (i + 1) == changes.size());
-			}
+		if (ListUtil.isEmpty(changes)) {
+			return null;
+		}
+		
+		for (Iterator<ThemeChange> themeChangesIter = changes.iterator(); themeChangesIter.hasNext();) {
+			changed = changeTheme(doc, theme, themeName, themeChangesIter.next(), !themeChangesIter.hasNext());
 		}
 		
 		if (changed == null) {
