@@ -72,54 +72,38 @@ public class CssScanner implements ResourceScanner {
 	}
 
 	private boolean canUseURL(String line) {
-		boolean urlElementExists = true;
+		String urlExpressionStart = "url(";
 		
-		String urlStart = "url";
-		String[] urls = line.split(urlStart);
-		if (urls == null || urls.length < 2) {
-			return true;
+		int start = line.indexOf(urlExpressionStart);
+		int end = line.lastIndexOf(ContentConstants.BRACKET_CLOSING);
+		if (start < 0 || end < 0) {
+			return false;
 		}
+		
+		String urlExpression = line.substring(start + urlExpressionStart.length(), end);
+		urlExpression = StringHandler.replace(urlExpression, DIRECTORY_LEVEL_UP, ThemesConstants.EMPTY);
+		urlExpression = StringHandler.replace(urlExpression, "'", CoreConstants.EMPTY);
+		urlExpression = StringHandler.replace(urlExpression, "\"", CoreConstants.EMPTY);
+		String path = new StringBuffer(linkToTheme).append(urlExpression).toString();
 		
 		File f = null;
-		String urlValueInCss = null;
-		String path = null;
-		//	Zero element is not interesting...
-		for (int i = 1; (i < urls.length && urlElementExists); i++) {
-			urlValueInCss = urls[i];
-			f = null;
-			
-			int start = urlValueInCss.indexOf(ContentConstants.BRACKET_OPENING);
-			int end = urlValueInCss.lastIndexOf(ContentConstants.BRACKET_CLOSING);
-			urlValueInCss = urlValueInCss.substring(start + 1, end);
-			urlValueInCss = StringHandler.replace(urlValueInCss, DIRECTORY_LEVEL_UP, ThemesConstants.EMPTY);
-			urlValueInCss = StringHandler.replace(urlValueInCss, "'", CoreConstants.EMPTY);
-			urlValueInCss = StringHandler.replace(urlValueInCss, "\"", CoreConstants.EMPTY);
-			
-			path = new StringBuffer(linkToTheme).append(urlValueInCss).toString();
-			try {
-				f = getThemesHelper().getSlideService().getFile(path);
-			} catch (URIException e) {
-				e.printStackTrace();
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-			if (f == null) {
-				urlElementExists = false;
-			}
-			else {
-				try {
-					urlElementExists = f.exists();
-				} catch (Exception e) {
-					e.printStackTrace();
-					urlElementExists = false;
-				}
-			}
+		try {
+			f = getThemesHelper().getSlideService().getFile(path);
+		} catch (URIException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		if (f == null) {
+			return false;
 		}
 		
-		if (!urlElementExists) {
-			LOGGER.log(Level.WARNING, "File '" + path + "' does not exist in Theme's pack! Removing CSS expression: " + line);
-		}
-		return urlElementExists;
+		try {
+			return f.exists();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}				
 	}
 	
 	private String scanLine(String line) {
@@ -163,6 +147,7 @@ public class CssScanner implements ResourceScanner {
 				return line;
 			}
 			else {
+				LOGGER.log(Level.WARNING, "Removing CSS expression: '" + line + "' because this object was not found in theme's pack!");
 				return ThemesConstants.EMPTY;
 			}
 		}
