@@ -50,8 +50,8 @@
 									<t:inputText id="theme_name" forceId="true"></t:inputText>
 								</t:div>
 								<t:div styleClass="themeSaveAreaButtons">
-									<input id="themeSaveButton" type="button" onclick="saveTheme()" title="#{localizedStrings['com.idega.content']['save']}" value="#{localizedStrings['com.idega.content']['save']}"></input>
-									<input id="themeRestoreButton" type="button" onclick="restoreTheme()" title="#{localizedStrings['com.idega.content']['restore_theme_to_original_state']}" value="#{localizedStrings['com.idega.content']['restore_theme']}"></input>
+									<t:commandButton forceId="true" id="themeSaveButton" onclick="saveTheme(); return false;" title="#{localizedStrings['com.idega.content']['save']}" value="#{localizedStrings['com.idega.content']['save']}"></t:commandButton>
+									<t:commandButton forceId="true" id="themeRestoreButton" onclick="restoreTheme(); return false;" title="#{localizedStrings['com.idega.content']['restore_theme_to_original_state']}" value="#{localizedStrings['com.idega.content']['restore_theme']}"></t:commandButton>
 								</t:div>
 							</t:div>
 						</t:div>
