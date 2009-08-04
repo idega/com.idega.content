@@ -52,7 +52,7 @@ version="1.2">
 							</t:htmlTag>
 							<t:div id="sitemap" forceId="true" styleClass="element atStart">
 		 						<t:div id="site_tree_container" forceId="true">
-		 							<c:block_with_toolbar id="page_tree_div" addStartPageButton="true" styleClass="site_tree_container_site_accordion" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="/idegaweb/bundles/com.idega.content.bundle/resources/images/user-trash.png">
+		 							<c:block_with_toolbar id="page_tree_div" addStartPageButton="true" styleClass="site_tree_container_site_accordion" title="#{localizedStrings['com.idega.content']['current_site_structure']}" collapseAllValue="#{localizedStrings['com.idega.content']['collapse_all']}" expandAllValue="#{localizedStrings['com.idega.content']['expand_all']}" trashCanImage="#{iwResourceResolver['com.idega.content']['images/user-trash.png']}">
 										<wf12:iwtree value="#{pageCreationBean.pageSelectorTopNode}" id="current_structure_tree" var="node" varNodeToggler="t" clientSideToggle="true"	showRootNode="false">
 											<f:facet name="PageTreeNode">
 												<h:outputLink styleClass="pageTreeNames">
@@ -102,7 +102,7 @@ version="1.2">
 				<t:div id="newPageContainer" forceId="true" styleClass="newPageContainerStyle" style="display: none;">
 					<t:div id="pagesAccordion" forceId="true" styleClass="pagesAccordionStyle">
 						<t:htmlTag styleClass="accordionHeading" value="span">
-							<t:graphicImage id="closeNewPageContainer" forceId="true" url="/idegaweb/bundles/com.idega.content.bundle/resources/images/close_16.png" title="#{localizedStrings['com.idega.content']['close']}" styleClass="closeNewPageOrPagesStyle" />
+							<t:graphicImage id="closeNewPageContainer" forceId="true" url="#{iwResourceResolver['com.idega.content']['images/close_16.png']}" title="#{localizedStrings['com.idega.content']['close']}" alt="#{localizedStrings['com.idega.content']['close']}" styleClass="closeNewPageOrPagesStyle" />
 							<t:outputText value="#{localizedStrings['com.idega.content']['page_types']}" styleClass="title"> </t:outputText>
 						</t:htmlTag>
 						<t:div id="pageTemplatesStretcher" forceId="true" styleClass="element templatesContainer">
@@ -122,7 +122,7 @@ version="1.2">
 				<t:div id="newPagesContainer" forceId="true" styleClass="newPagesContainerStyle" style="display: none;">
 					<t:div id="templatesAccordion" forceId="true" styleClass="templatesAccordionStyle">
 						<t:htmlTag styleClass="accordionHeading" value="span">
-							<t:graphicImage id="closeNewPagesContainer" forceId="true" url="/idegaweb/bundles/com.idega.content.bundle/resources/images/close_16.png" title="#{localizedStrings['com.idega.content']['close']}" styleClass="closeNewPageOrPagesStyle" />
+							<t:graphicImage id="closeNewPagesContainer" forceId="true" url="#{iwResourceResolver['com.idega.content']['images/close_16.png']}" title="#{localizedStrings['com.idega.content']['close']}" alt="#{localizedStrings['com.idega.content']['close']}" styleClass="closeNewPageOrPagesStyle" />
 							<t:outputText value="#{localizedStrings['com.idega.content']['site_templates']}" styleClass="title"></t:outputText>
 						</t:htmlTag>
 						<c:siteTemplatesViewer id="siteTemplates"/>

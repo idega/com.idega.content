@@ -1,11 +1,11 @@
 package com.idega.content.presentation;
 
+import javax.el.ValueExpression;
 import javax.faces.context.FacesContext;
-import javax.faces.el.ValueBinding;
-
 import com.idega.presentation.Image;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Link;
+import com.idega.util.StringUtil;
 import com.idega.webface.WFBlock;
 import com.idega.webface.WFMenu;
 import com.idega.webface.WFUtil;
@@ -31,46 +31,30 @@ public class WFBlockWithToolbar extends WFBlock {
 	}
 
 	public void setToolbarForSiteMap() {
+		FacesContext fc = FacesContext.getCurrentInstance();
+		
 		String title = null;
-		ValueBinding vb = null;
 		
 		if (getToolbar() == null) {
 			WFMenu toolbar = new WFMenu();
 			this.setToolbar(toolbar);
 
-			if(WFUtil.isValueBinding(expandAllValue)){
-				vb = WFUtil.createValueBinding(expandAllValue);
-				expandAllValue = (String)(vb.getValue(FacesContext.getCurrentInstance()));
-			}
+			expandAllValue = getValueFromExpression(fc, expandAllValue);
 			Link expand = new Link(expandAllValue, "javascript:void(0)");
 			expand.setOnClick("if (treeObj != null) {treeObj.expandAll()}");
 			
-			if(WFUtil.isValueBinding(collapseAllValue)){
-				vb = WFUtil.createValueBinding(collapseAllValue);
-				collapseAllValue = (String)(vb.getValue(FacesContext.getCurrentInstance()));
-			}
-
-			if(WFUtil.isValueBinding("#{localizedStrings['com.idega.content']['drag_to_delete']}")){
-				vb = WFUtil.createValueBinding("#{localizedStrings['com.idega.content']['drag_to_delete']}");
-				title = (String)(vb.getValue(FacesContext.getCurrentInstance()));
-			}
-			
-			
+			collapseAllValue = getValueFromExpression(fc, collapseAllValue);
 			Link collapse = new Link(collapseAllValue, "javascript:void(0)");
-			collapse.setOnClick("if (treeObj != null) {treeObj.collapseAll()}");		
+			collapse.setOnClick("if (treeObj != null) {treeObj.collapseAll()}");	
+			
+			title = getValueFromExpression(fc, "#{localizedStrings['com.idega.content']['drag_to_delete']}");
 
 			Image recycleBinImage = new Image();
-			Table head = null;
-			if (isAddStartPageButton()) {
-				head = new Table(4, 1);
-			}
-			else {
-				head = new Table(3, 1);
-			}
-			
+			Table head = new Table(isAddStartPageButton() ? 4 : 3, 1);
+
 			recycleBinImage.setId("trash");
-			recycleBinImage.setToolTip(title);
-			recycleBinImage.setSrc(trashCanImage);
+			recycleBinImage.setTitle(title);
+			recycleBinImage.setSrc(getValueFromExpression(fc, trashCanImage));
 			recycleBinImage.setStyleClass("recycleBin");
 			recycleBinImage.setOnMouseOver("treeObj.mouseOverRecycleBin();");
 			recycleBinImage.setOnMouseOut("treeObj.mouseOutOfRecycleBin();");
@@ -81,6 +65,15 @@ public class WFBlockWithToolbar extends WFBlock {
 			
 			toolbar.setMenuHeader(head);			
 		}
+	}
+	
+	private String getValueFromExpression(FacesContext fc, String expression) {
+		if (StringUtil.isEmpty(expression) || !WFUtil.isValueBinding(expression)) {
+			return expression;
+		}
+	
+		ValueExpression ve = WFUtil.createValueExpression(fc.getELContext(), expression, String.class);
+		return ve == null ? expression : (String) ve.getValue(fc.getELContext());
 	}
 
 	public String getCollapseAllValue() {
