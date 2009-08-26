@@ -28,7 +28,7 @@ FileUploadHelper.setProperties = function(properties) {
 	FileUploadHelper.properties = properties;
 }
 
-FileUploadHelper.uploadFiles = function() {	
+FileUploadHelper.uploadFiles = function() {
 	var inputs = getInputsForUpload(FileUploadHelper.properties.id);
 	var files = getFilesValuesToUpload(inputs, FileUploadHelper.properties.zipFile, FileUploadHelper.properties.localizations.UPLOADING_FILE_INVALID_TYPE_MESSAGE);
 	if (files.length == 0) {
@@ -76,6 +76,7 @@ FileUploadHelper.uploadFiles = function() {
 			FileUploadHelper.uploadedFiles = null;
 			var inputsToRemove = new Array();
 			for (var i = 0; i < inputs.length; i++) {
+				jQuery(inputs[i]).attr('value', '');
 				inputs[i].setAttribute('value', '');
 				inputs[i].value = '';
 				
@@ -304,7 +305,11 @@ function removeFileInput(id, message) {
 }
 
 function getInputsForUpload(id) {
-	return getElementsByClassName(document.getElementById(id), 'input', 'fileUploadInputStyle');
+	var inputs = new Array();
+	jQuery.each(jQuery('input.fileUploadInputStyle', jQuery('#' + id)), function() {
+		inputs.push(this);
+	});
+	return inputs;
 }
 
 function getFilesValuesToUpload(inputs, zipFile, invalidTypeMessage) {
