@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.apache.myfaces.custom.tree2.TreeNode;
 import org.apache.webdav.lib.WebdavResource;
@@ -52,6 +53,8 @@ import com.idega.webface.WFUtil;
 public class ThemesEngineBean implements ThemesEngine {
 
 	private static final long serialVersionUID = 5875353284352953688L;
+	
+	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(ThemesEngineBean.class.getName());
 	
 	public static final String ARTICLE_VIEWER_TEMPLATE_KEY = "article_viewer_page_key";
 	
@@ -736,14 +739,16 @@ public class ThemesEngineBean implements ThemesEngine {
 	public IWContext getContextAndCheckRights() {
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
+			LOGGER.warning("Instance of " + IWContext.class + " is not set for the current thread!");
 			return null;
 		}
 		
-		if (iwc.isSuperAdmin()) {
+		if (iwc.isSuperAdmin() || (iwc.hasRole(StandardRoles.ROLE_KEY_AUTHOR) || iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR))) {
 			return iwc;
 		}
 		
-		return iwc.hasRole(StandardRoles.ROLE_KEY_AUTHOR) || iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR) ? iwc : null;
+		LOGGER.warning("Current user has no rights to work in Lucid!");
+		return null;
 	}
 	
 	public boolean deleteAllThemes() {
@@ -779,7 +784,12 @@ public class ThemesEngineBean implements ThemesEngine {
 	}
 	
 	private boolean deleteTheme(Theme theme, IWSlideService slide) {
-		if (theme == null || slide == null) {
+		if (slide == null) {
+			return false;
+		}
+		
+		if (theme == null) {
+			LOGGER.warning("Theme is unknown!");
 			return false;
 		}
 		
@@ -787,9 +797,10 @@ public class ThemesEngineBean implements ThemesEngine {
 		try {
 			resource = slide.getWebdavResourceAuthenticatedAsRoot(theme.getLinkToSkeleton());
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error loading resource: " + theme.getLinkToSkeleton(), e);
 		}
 		if (resource == null) {
+			LOGGER.warning("Resource '" + theme.getLinkToSkeleton() + "' was not loaded!");
 			return false;
 		}
 		
@@ -797,7 +808,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		try {
 			deleted = resource.deleteMethod();
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error deleting resource: " + theme.getLinkToSkeleton(), e);
 		}
 		
 		return deleted;
