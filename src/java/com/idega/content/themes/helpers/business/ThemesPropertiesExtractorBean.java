@@ -1,5 +1,6 @@
 package com.idega.content.themes.helpers.business;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -114,10 +115,14 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		searchName = new StringBuffer(searchName).append(ThemesConstants.IDEGA_THEME_INFO).toString();
 		for (int i = 0; i < configs.size(); i++) {
 			config = configs.get(i);
-			if (config.indexOf(theme.getLinkToBaseAsItIs()) != -1) {
-				if (config.endsWith(searchName)) {
-					return config;
+			try {
+				if (config.indexOf(theme.getLinkToBaseAsItIs()) != -1 || config.indexOf(URLEncoder.encode(theme.getLinkToBaseAsItIs(), CoreConstants.ENCODING_UTF8)) != -1) {
+					if (config.endsWith(searchName) || config.endsWith(URLEncoder.encode(searchName, CoreConstants.ENCODING_UTF8))) {
+						return config;
+					}
 				}
+			} catch (Exception e) {
+				LOGGER.log(Level.WARNING, "Error while encoding: " + searchName, e);
 			}
 		}
 		return null;
