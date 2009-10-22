@@ -54,15 +54,15 @@ public interface FileUploader {
 	
 	public String getUploadAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId);
+			String componentToRerenderId, boolean fakeFileDeletion);
 	
 	public String getPropertiesAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId);
+			String componentToRerenderId, boolean fakeFileDeletion);
 	
-	public String getUploadedFilesList(List<String> files, String uploadPath);
+	public String getUploadedFilesList(List<String> files, String uploadPath, boolean fakeFileDeletion);
 	
-	public AdvancedProperty deleteFile(String fileInSlide);
+	public AdvancedProperty deleteFile(String fileInSlide, boolean fakeFileDeletion);
 	
-	public AdvancedProperty deleteFiles(List<String> filesInSlide);
+	public AdvancedProperty deleteFiles(List<String> filesInSlide, boolean fakeFileDeletion);
 }

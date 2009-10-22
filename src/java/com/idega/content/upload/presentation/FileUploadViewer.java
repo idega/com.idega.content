@@ -47,6 +47,7 @@ public class FileUploadViewer extends IWBaseComponent {
 	private boolean autoAddFileInput = true;
 	private boolean autoUpload;
 	private boolean showUploadedFiles;
+	private boolean fakeFileDeletion;
 	
 	@Autowired
 	private FileUploader fileUploader;
@@ -187,7 +188,8 @@ public class FileUploadViewer extends IWBaseComponent {
 			upload.setStyleAttribute("display", "none");
 		}
 		upload.setOnClick(getFileUploader().getUploadAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(), isZipFile(),
-				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId()));
+				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId(),
+				isFakeFileDeletion()));
 		buttonsContainer.add(upload);
 		mainContainer.add(buttonsContainer);
 		
@@ -198,7 +200,8 @@ public class FileUploadViewer extends IWBaseComponent {
 				web2.getBundleUriToHumanizedMessagesScript()
 		));
 		String initAction = getFileUploader().getPropertiesAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(), isZipFile(),
-				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId());
+				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId(),
+				isFakeFileDeletion());
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			initAction = new StringBuilder("registerEvent(window, 'load', function() {").append(initAction).append("});").toString();
 		}
@@ -376,6 +379,14 @@ public class FileUploadViewer extends IWBaseComponent {
 
 	public void setWeb2(Web2Business web2) {
 		this.web2 = web2;
+	}
+
+	public boolean isFakeFileDeletion() {
+		return fakeFileDeletion;
+	}
+
+	public void setFakeFileDeletion(boolean fakeFileDeletion) {
+		this.fakeFileDeletion = fakeFileDeletion;
 	}
 	
 }

@@ -120,7 +120,8 @@ public class FileUploaderBean implements FileUploader {
 
 	public String getPropertiesAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId) {
+			String componentToRerenderId, boolean fakeFileDeletion) {
+		
 		IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
 		return new StringBuilder("FileUploadHelper.setProperties({id: '").append(id).append("', showProgressBar: ").append(showProgressBar)
 			.append(", showMessage: ").append(showLoadingMessage).append(", zipFile: ").append(zipFile).append(", formId: '").append(formId)
@@ -135,6 +136,7 @@ public class FileUploaderBean implements FileUploader {
 			.append("actionAfterUpload: ").append(getJavaScriptAction(actionAfterUpload))
 			.append(", actionAfterCounterReset: ").append(getJavaScriptAction(actionAfterCounterReset))
 			.append(", uploadId: '").append(uploadId).append("', autoUpload: ").append(autoUpload).append(", showUploadedFiles: ").append(showUploadedFiles)
+			.append(", fakeFileDeletion: ").append(fakeFileDeletion)
 		.append("});").toString();
 	}
 	
@@ -326,10 +328,11 @@ public class FileUploaderBean implements FileUploader {
 	
 	public String getUploadAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId) {
+			String componentToRerenderId, boolean fakeFileDeletion) {
 		
 		StringBuilder action = new StringBuilder(getPropertiesAction(iwc, id, progressBarId, uploadId, showProgressBar, showLoadingMessage, zipFile, formId,
-				actionAfterUpload, actionAfterCounterReset, autoUpload, showUploadedFiles, componentToRerenderId)).append("FileUploadHelper.uploadFiles();");
+				actionAfterUpload, actionAfterCounterReset, autoUpload, showUploadedFiles, componentToRerenderId, fakeFileDeletion))
+				.append("FileUploadHelper.uploadFiles();");
 		return getActionToLoadFilesAndExecuteCustomAction(action.toString(), showProgressBar, !StringUtil.isEmpty(componentToRerenderId));
 	}
 	
@@ -374,7 +377,7 @@ public class FileUploaderBean implements FileUploader {
 		jQuery = query;
 	}
 
-	public String getUploadedFilesList(List<String> files, String uploadPath) {
+	public String getUploadedFilesList(List<String> files, String uploadPath, boolean fakeFileDeletion) {
 		if (ListUtil.isEmpty(files) || StringUtil.isEmpty(uploadPath)) {
 			return null;
 		}
@@ -410,7 +413,8 @@ public class FileUploaderBean implements FileUploader {
 			
 			Image deleteFile = bundle.getImage("images/remove.png");
 			deleteFile.setOnClick(new StringBuilder("FileUploadHelper.deleteUploadedFile('").append(listItem.getId()).append("', '")
-					.append(fileInSlide.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY)).append("');").toString());
+					.append(fileInSlide.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY)).append("', ").append(fakeFileDeletion)
+					.append(");").toString());
 			deleteFile.setTitle(deleteFileTitle);
 			deleteFile.setStyleClass("fileUploaderDeleteFileButtonStyle");
 			listItem.add(deleteFile);
@@ -421,21 +425,21 @@ public class FileUploaderBean implements FileUploader {
 		return getBuilderService(iwc).getRenderedComponent(list, iwc, false);
 	}
 
-	public AdvancedProperty deleteFile(String fileInSlide) {
-		return deleteFile(CoreUtil.getIWContext(), fileInSlide);
+	public AdvancedProperty deleteFile(String fileInSlide, boolean fakeFileDeletion) {
+		return deleteFile(CoreUtil.getIWContext(), fileInSlide, fakeFileDeletion);
 	}
 	
-	private AdvancedProperty deleteFile(IWContext iwc, String fileInSlide) {
-		String errorMessage = "Sorry, file can not be deleted!";
-		AdvancedProperty result = new AdvancedProperty(Boolean.FALSE.toString(), errorMessage);
+	private AdvancedProperty deleteFile(IWContext iwc, String fileInSlide, boolean fakeFileDeletion) {
+		String message = fakeFileDeletion ? "File was successfully deleted" : "Sorry, file can not be deleted!" ;
+		AdvancedProperty result = new AdvancedProperty(fakeFileDeletion ? Boolean.TRUE.toString() : Boolean.FALSE.toString(), message);
 		
 		if (iwc == null) {
 			return result;
 		}
 		
 		IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
-		errorMessage = iwrb.getLocalizedString("file_uploader.unable_delete_file", errorMessage);
-		result.setValue(errorMessage);
+		message = iwrb.getLocalizedString(fakeFileDeletion ? "file_uploader.success_deleting_file" : "file_uploader.unable_delete_file", message);
+		result.setValue(message);
 		
 		if (StringUtil.isEmpty(fileInSlide)) {
 			return result;
@@ -530,7 +534,7 @@ public class FileUploaderBean implements FileUploader {
 		this.builderLogicWrapper = builderLogicWrapper;
 	}
 
-	public AdvancedProperty deleteFiles(List<String> filesInSlide) {
+	public AdvancedProperty deleteFiles(List<String> filesInSlide, boolean fakeFileDeletion) {
 		if (ListUtil.isEmpty(filesInSlide)) {
 			return null;
 		}
@@ -539,7 +543,7 @@ public class FileUploaderBean implements FileUploader {
 		
 		AdvancedProperty result = null;
 		for (String fileInSlide: filesInSlide) {
-			result = deleteFile(iwc, fileInSlide);
+			result = deleteFile(iwc, fileInSlide, fakeFileDeletion);
 		}
 		
 		return result;

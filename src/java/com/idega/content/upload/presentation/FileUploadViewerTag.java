@@ -23,6 +23,7 @@ public class FileUploadViewerTag extends UIComponentELTag {
 	private boolean autoAddFileInput = true;
 	private boolean autoUpload;
 	private boolean showUploadedFiles;
+	private boolean fakeFileDeletion;
 	
 	@Override
 	public String getComponentType() {
@@ -51,6 +52,7 @@ public class FileUploadViewerTag extends UIComponentELTag {
 			uploadViewer.setShowLoadingMessage(showLoadingMessage);
 			uploadViewer.setAllowMultipleFiles(allowMultipleFiles);
 			uploadViewer.setAutoAddFileInput(autoAddFileInput);
+			uploadViewer.setFakeFileDeletion(fakeFileDeletion);
 		}
 	}
 
@@ -70,6 +72,7 @@ public class FileUploadViewerTag extends UIComponentELTag {
 		this.autoAddFileInput = false;
 		this.autoUpload = false;
 		this.showUploadedFiles = false;
+		this.fakeFileDeletion = false;
 	}
 	
 	public String getActionAfterUpload() {
@@ -190,6 +193,14 @@ public class FileUploadViewerTag extends UIComponentELTag {
 
 	public void setShowUploadedFiles(boolean showUploadedFiles) {
 		this.showUploadedFiles = showUploadedFiles;
+	}
+
+	public boolean isFakeFileDeletion() {
+		return fakeFileDeletion;
+	}
+
+	public void setFakeFileDeletion(boolean fakeFileDeletion) {
+		this.fakeFileDeletion = fakeFileDeletion;
 	}
 	
 }

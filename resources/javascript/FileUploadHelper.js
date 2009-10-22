@@ -21,7 +21,8 @@ FileUploadHelper.properties = {
 	actionAfterCounterReset: null,
 	uploadId: null,
 	autoUpload: false,
-	showUploadedFiles: false
+	showUploadedFiles: false,
+	fakeFileDeletion: false
 }
 
 FileUploadHelper.setProperties = function(properties) {
@@ -70,7 +71,7 @@ FileUploadHelper.uploadFiles = function() {
 			executeUserDefinedActionsAfterUploadFinished(FileUploadHelper.properties.actionAfterUpload);
 			
 			if (FileUploadHelper.properties.showUploadedFiles) {
-				FileUploadHelper.showUploadedFiles();
+				FileUploadHelper.showUploadedFiles(FileUploadHelper.properties.fakeFileDeletion);
 			}
 			
 			FileUploadHelper.uploadedFiles = null;
@@ -110,7 +111,7 @@ FileUploadHelper.uploadFiles = function() {
 	});
 }
 
-FileUploadHelper.showUploadedFiles = function() {
+FileUploadHelper.showUploadedFiles = function(fakeFileDeletion) {
 	var filesList = jQuery('div.fileUploadViewerUploadedFilesContainerStyle');
 	if (filesList == null || filesList.length == 0) {
 		jQuery('div.fileUploadViewerMainLayerStyle').append('<div class=\'spacer\'/><div class=\'fileUploadViewerUploadedFilesContainerStyle\' />');
@@ -118,7 +119,7 @@ FileUploadHelper.showUploadedFiles = function() {
 	}
 	
 	var uploadPath = FileUploadHelper.getUploadPath();
-	FileUploader.getUploadedFilesList(FileUploadHelper.allUploadedFiles, uploadPath, {
+	FileUploader.getUploadedFilesList(FileUploadHelper.allUploadedFiles, uploadPath, fakeFileDeletion, {
 		callback: function(component) {
 			if (component == null) {
 				return;
@@ -131,8 +132,8 @@ FileUploadHelper.showUploadedFiles = function() {
 	});
 }
 
-FileUploadHelper.deleteUploadedFile = function(id, file) {
-	FileUploader.deleteFile(file, {
+FileUploadHelper.deleteUploadedFile = function(id, file, fakeFileDeletion) {
+	FileUploader.deleteFile(file, fakeFileDeletion, {
 		callback: function(result) {
 			if (result == null) {
 				return;
@@ -175,13 +176,13 @@ FileUploadHelper.getRealUploadedFile = function(file) {
 	return uploadPath + file;
 }
 
-FileUploadHelper.removeAllUploadedFiles = function() {
+FileUploadHelper.removeAllUploadedFiles = function(fakeFileDeletion) {
 	if (FileUploadHelper.allUploadedFiles == null || FileUploadHelper.allUploadedFiles.length == 0) {
 		return;
 	}
 	
 	LazyLoader.loadMultiple(['/dwr/engine.js', '/dwr/interface/FileUploader.js'], function() {
-		FileUploader.deleteFiles(FileUploadHelper.allUploadedFiles, {
+		FileUploader.deleteFiles(FileUploadHelper.allUploadedFiles, fakeFileDeletion, {
 			callback: function(result) {
 				if (result == null) {
 					return;

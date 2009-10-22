@@ -382,6 +382,11 @@
 			<property-name>showUploadedFiles</property-name>
 			<property-class>boolean</property-class>
 		</property>
+		<property>
+			<display-name>Fake file deletion if it fails?</display-name>
+			<property-name>fakeFileDeletion</property-name>
+			<property-class>boolean</property-class>
+		</property>
 		<component-extension>
 			<idegaweb-info>
 				<builder-visible>true</builder-visible>
