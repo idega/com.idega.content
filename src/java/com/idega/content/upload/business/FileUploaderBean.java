@@ -449,7 +449,15 @@ public class FileUploaderBean implements FileUploader {
 			fileInSlide = fileInSlide.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
 		}
 		
-		WebdavResource resource = getResource(iwc, fileInSlide);
+		WebdavResource resource = getResource(iwc, fileInSlide, false);
+		if (resource == null) {
+			if (fakeFileDeletion) {
+				resource = getResource(iwc, fileInSlide, true);
+			} else {
+				return result;
+			}
+		}
+		
 		if (resource == null) {
 			return result;
 		}
@@ -466,21 +474,29 @@ public class FileUploaderBean implements FileUploader {
 		return result;
 	}
 	
-	private WebdavResource getResource(IWContext iwc, String fileInSlide) {
+	private WebdavResource getResource(IWContext iwc, String fileInSlide, boolean authenticateAsRoot) {
 		IWSlideService slide = getSlideService(iwc);
 		if (slide == null) {
 			return null;
 		}
 		
-		UsernamePasswordCredentials crediantials = getUserCredentials(iwc, slide, fileInSlide);
-		if (crediantials == null) {
-			return null;
-		}
-		
-		try {
-			return slide.getWebdavResource(fileInSlide, crediantials);
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Error getting file: " + fileInSlide, e);
+		if (authenticateAsRoot) {
+			try {
+				return slide.getWebdavResourceAuthenticatedAsRoot(fileInSlide);
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, "Error getting file: '" + fileInSlide + "' authenticated as root", e);
+			}
+		} else {
+			UsernamePasswordCredentials crediantials = getUserCredentials(iwc, slide, fileInSlide);
+			if (crediantials == null) {
+				return null;
+			}
+			
+			try {
+				return slide.getWebdavResource(fileInSlide, crediantials);
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, "Error getting file: " + fileInSlide, e);
+			}
 		}
 		
 		return null;
