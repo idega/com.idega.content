@@ -60,9 +60,9 @@ public interface FileUploader {
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
 			String componentToRerenderId, boolean fakeFileDeletion);
 	
-	public String getUploadedFilesList(List<String> files, String uploadPath, boolean fakeFileDeletion);
+	public String getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion);
 	
-	public AdvancedProperty deleteFile(String fileInSlide, boolean fakeFileDeletion);
+	public AdvancedProperty deleteFile(String fileInSlide, Boolean fakeFileDeletion);
 	
-	public AdvancedProperty deleteFiles(List<String> filesInSlide, boolean fakeFileDeletion);
+	public AdvancedProperty deleteFiles(List<String> filesInSlide, Boolean fakeFileDeletion);
 }

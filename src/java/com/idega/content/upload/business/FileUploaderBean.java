@@ -377,7 +377,7 @@ public class FileUploaderBean implements FileUploader {
 		jQuery = query;
 	}
 
-	public String getUploadedFilesList(List<String> files, String uploadPath, boolean fakeFileDeletion) {
+	public String getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion) {
 		if (ListUtil.isEmpty(files) || StringUtil.isEmpty(uploadPath)) {
 			return null;
 		}
@@ -425,7 +425,7 @@ public class FileUploaderBean implements FileUploader {
 		return getBuilderService(iwc).getRenderedComponent(list, iwc, false);
 	}
 
-	public AdvancedProperty deleteFile(String fileInSlide, boolean fakeFileDeletion) {
+	public AdvancedProperty deleteFile(String fileInSlide, Boolean fakeFileDeletion) {
 		return deleteFile(CoreUtil.getIWContext(), fileInSlide, fakeFileDeletion);
 	}
 	
@@ -550,7 +550,7 @@ public class FileUploaderBean implements FileUploader {
 		this.builderLogicWrapper = builderLogicWrapper;
 	}
 
-	public AdvancedProperty deleteFiles(List<String> filesInSlide, boolean fakeFileDeletion) {
+	public AdvancedProperty deleteFiles(List<String> filesInSlide, Boolean fakeFileDeletion) {
 		if (ListUtil.isEmpty(filesInSlide)) {
 			return null;
 		}
