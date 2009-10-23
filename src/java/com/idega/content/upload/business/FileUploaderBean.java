@@ -382,6 +382,8 @@ public class FileUploaderBean implements FileUploader {
 			return null;
 		}
 		
+		fakeFileDeletion = fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion;
+		
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return null;
@@ -426,7 +428,7 @@ public class FileUploaderBean implements FileUploader {
 	}
 
 	public AdvancedProperty deleteFile(String fileInSlide, Boolean fakeFileDeletion) {
-		return deleteFile(CoreUtil.getIWContext(), fileInSlide, fakeFileDeletion);
+		return deleteFile(CoreUtil.getIWContext(), fileInSlide, fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion);
 	}
 	
 	private AdvancedProperty deleteFile(IWContext iwc, String fileInSlide, boolean fakeFileDeletion) {
@@ -449,15 +451,7 @@ public class FileUploaderBean implements FileUploader {
 			fileInSlide = fileInSlide.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
 		}
 		
-		WebdavResource resource = getResource(iwc, fileInSlide, false);
-		if (resource == null) {
-			if (fakeFileDeletion) {
-				resource = getResource(iwc, fileInSlide, true);
-			} else {
-				return result;
-			}
-		}
-		
+		WebdavResource resource = getResource(iwc, fileInSlide);
 		if (resource == null) {
 			return result;
 		}
@@ -474,29 +468,21 @@ public class FileUploaderBean implements FileUploader {
 		return result;
 	}
 	
-	private WebdavResource getResource(IWContext iwc, String fileInSlide, boolean authenticateAsRoot) {
+	private WebdavResource getResource(IWContext iwc, String fileInSlide) {
 		IWSlideService slide = getSlideService(iwc);
 		if (slide == null) {
 			return null;
 		}
 		
-		if (authenticateAsRoot) {
-			try {
-				return slide.getWebdavResourceAuthenticatedAsRoot(fileInSlide);
-			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, "Error getting file: '" + fileInSlide + "' authenticated as root", e);
-			}
-		} else {
-			UsernamePasswordCredentials crediantials = getUserCredentials(iwc, slide, fileInSlide);
-			if (crediantials == null) {
-				return null;
-			}
-			
-			try {
-				return slide.getWebdavResource(fileInSlide, crediantials);
-			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, "Error getting file: " + fileInSlide, e);
-			}
+		UsernamePasswordCredentials crediantials = getUserCredentials(iwc, slide, fileInSlide);
+		if (crediantials == null) {
+			return null;
+		}
+		
+		try {
+			return slide.getWebdavResource(fileInSlide, crediantials);
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Error getting file: " + fileInSlide, e);
 		}
 		
 		return null;
@@ -554,6 +540,8 @@ public class FileUploaderBean implements FileUploader {
 		if (ListUtil.isEmpty(filesInSlide)) {
 			return null;
 		}
+		
+		fakeFileDeletion = fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion;
 		
 		IWContext iwc = CoreUtil.getIWContext();
 		
