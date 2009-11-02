@@ -38,6 +38,7 @@ import com.idega.content.themes.helpers.bean.BuiltInThemeStyle;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeChange;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
+import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
@@ -80,7 +81,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	private static final String TAG_ATTRIBUTE_REL = "rel";
 	private static final String TAG_ATTRIBUTE_MEDIA = "media";
 	private static final String TAG_ATTRIBUTE_VALUE_STYLESHEET = "stylesheet";
-	private static final String TAG_ATTRIBUTE_VALUE_CSS = CoreConstants.CONTENT_TYPE_TEXT_CSS;
+	private static final String TAG_ATTRIBUTE_VALUE_CSS = MimeTypeUtil.MIME_TYPE_CSS;
 	private static final String TAG_ATTRIBUTE_VALUE_SCREEN = "screen";
 	
 	//	HTML codes
@@ -513,7 +514,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			
 			uploadName = helper.getThemeColourFileName(theme, null, file, setAsOriginalFiles);
 			try {
-				if (slide.uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBase(), uploadName, stream, CoreConstants.CONTENT_TYPE_TEXT_CSS, true)) {
+				if (slide.uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBase(), uploadName, stream, MimeTypeUtil.MIME_TYPE_CSS, true)) {
 					newColourFiles.add(uploadName);
 				}
 				else {
@@ -618,7 +619,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		// Uploading modified file
 		try {
 			if (helper.getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(helper.getLinkToBase(helper.decodeUrl(linkToStyle)),
-					helper.getFileNameWithExtension(linkToStyle), content, CoreConstants.CONTENT_TYPE_TEXT_CSS, true)) {
+					helper.getFileNameWithExtension(linkToStyle), content, MimeTypeUtil.MIME_TYPE_CSS, true)) {
 				return true;
 			}
 		} catch (RemoteException e) {

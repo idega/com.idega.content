@@ -21,6 +21,7 @@ import bsh.Interpreter;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
+import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.core.search.business.SearchResult;
 import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
@@ -161,7 +162,7 @@ public class ColourExpressionCalculator {
 			}
 			
 			try {
-				if (!(slide.uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBase(), file, content, CoreConstants.CONTENT_TYPE_TEXT_CSS, true))) {
+				if (!(slide.uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBase(), file, content, MimeTypeUtil.MIME_TYPE_CSS, true))) {
 					logger.log(Level.WARNING, "Error while writing file: " + file);
 					continue;
 				}
