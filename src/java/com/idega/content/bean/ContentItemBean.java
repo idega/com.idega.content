@@ -11,6 +11,7 @@ package com.idega.content.bean;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.sql.Timestamp;
@@ -31,6 +32,7 @@ import javax.jcr.Session;
 import javax.jcr.ValueFormatException;
 
 import org.apache.commons.httpclient.HttpException;
+import org.apache.webdav.lib.WebdavResource;
 import org.apache.webdav.lib.util.WebdavStatus;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -40,12 +42,14 @@ import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.content.RepositoryHelper;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.IWSlideConstants;
 import com.idega.slide.util.WebdavExtendedResource;
+import com.idega.slide.util.WebdavLocalResource;
 import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.expression.ELUtil;
@@ -370,7 +374,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		try {
 			IWSlideSession session = getIWSlideSession(iwuc);
 			
-			WebdavExtendedResource webdavResource = session.getWebdavResource(path);
+			WebdavExtendedResource webdavResource = session.getResource(path, Boolean.FALSE);
 			webdavResource.setProperties();
 			
 			//here I don't use the varible 'path' since it can actually be the URI
@@ -962,5 +966,14 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 
 	public ContentRepositoryMode getContentRepositoryMode(){
 		return (ContentRepositoryMode)ELUtil.getInstance().getBean(ContentRepositoryMode.SPRING_BEAN_IDENTIFIER);
+	}
+	
+	protected InputStream getStream(WebdavResource resource) throws IOException {
+		if (resource instanceof WebdavLocalResource) {
+			return ((WebdavLocalResource) resource).getMethodData();
+		}
+		
+		IWSlideService slideService = IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), IWSlideService.class);
+		return slideService.getInputStream(resource.getPath());
 	}
 }
