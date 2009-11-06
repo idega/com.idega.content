@@ -37,6 +37,7 @@ import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -622,7 +623,6 @@ public class ThemesHelperImpl implements ThemesHelper {
 			return null;
 		}
 		
-		InputStream stream = null;
 		if (uri.startsWith(IWBundleResourceFilter.BUNDLES_STANDARD_DIR)) {
 			File file = IWBundleResourceFilter.copyResourceFromJarToWebapp(IWMainApplication.getDefaultIWMainApplication(), uri);
 			if (file == null) {
@@ -633,7 +633,7 @@ public class ThemesHelperImpl implements ThemesHelper {
 			}
 			
 			try {
-				stream = new FileInputStream(file);
+				return new FileInputStream(file);
 			} catch (FileNotFoundException e) {
 				if (printError) {
 	        		e.printStackTrace();
@@ -642,18 +642,31 @@ public class ThemesHelperImpl implements ThemesHelper {
 			}
 		}
 		else {
-			try {
-				URL url = new URL(uri);
-				stream = url.openStream();
-			} catch(Exception e) {
-				if (printError) {
-	        		e.printStackTrace();
-	        		LOGGER.log(Level.WARNING, "Error getting URL: " + uri);
-	        	}
+			if (uri.indexOf(CoreConstants.WEBDAV_SERVLET_URI) == -1) {
+				try {
+					URL url = new URL(uri);
+					return url.openStream();
+				} catch(Exception e) {
+					if (printError) {
+						LOGGER.log(Level.WARNING, "Error getting InputStream from: " + uri, e);
+					}
+				}
+			} else {
+				String webServer = getFullWebRoot();
+				if (uri.startsWith(webServer)) {
+					uri = uri.replace(webServer, CoreConstants.EMPTY);
+				}
+				try {
+					return getSlideService().getInputStream(uri);
+				} catch (Exception e) {
+					if (printError) {
+						LOGGER.log(Level.WARNING, "Error getting InputStream from: " + uri, e);
+					}
+				}
 			}
 		}
 		
-		return stream;
+		return null;
 	}
 	
 	public InputStream getInputStream(String link) {
