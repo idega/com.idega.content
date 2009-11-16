@@ -1,12 +1,9 @@
 package com.idega.content.themes.helpers.business;
 
-import java.io.File;
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.httpclient.URIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -86,24 +83,12 @@ public class CssScanner implements ResourceScanner {
 		urlExpression = StringHandler.replace(urlExpression, "\"", CoreConstants.EMPTY);
 		String path = new StringBuffer(linkToTheme).append(urlExpression).toString();
 		
-		File f = null;
 		try {
-			f = getThemesHelper().getSlideService().getFile(path);
-		} catch (URIException e) {
-			e.printStackTrace();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		if (f == null) {
-			return false;
-		}
-		
-		try {
-			return f.exists();
+			return getThemesHelper().getSlideService().getExistence(path);
 		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}				
+			LOGGER.log(Level.WARNING, "Error checking if file '" + path + "' exists", e);
+		}
+		return false;
 	}
 	
 	private String scanLine(String line) {

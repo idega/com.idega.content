@@ -1614,20 +1614,15 @@ public class ThemesHelperImpl implements ThemesHelper {
 		if (path == null) {
 			return false;
 		}
-		InputStream stream = null;
-		StringBuffer url = null;
-		if (path.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
-			url = new StringBuffer(getWebRootWithoutContent());
+		
+		try {
+			return getSlideService().getExistence(path);
+		} catch (Exception e) {
+			if (printError) {
+				LOGGER.log(Level.WARNING, "Error checking if file '" + path + "' exists", e);
+			}
 		}
-		else {
-			url = new StringBuffer(getFullWebRoot());
-		}
-		stream = getInputStream(url.append(path).toString());
-		if (stream == null) {
-			return false;
-		}
-		IOUtil.closeInputStream(stream);
-		return true;
+		return false;
 	}
 	
 	public boolean existFileInSlide(String path) {
