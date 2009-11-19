@@ -39,8 +39,6 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 
 import com.idega.builder.bean.AdvancedProperty;
-import com.idega.business.IBOLookup;
-import com.idega.business.IBOLookupException;
 import com.idega.content.bean.ContentItemFeedBean;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentSearch;
@@ -56,6 +54,7 @@ import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.themes.helpers.business.ThemesLoader;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
+import com.idega.core.business.DefaultSpringBean;
 import com.idega.core.component.business.ICObjectBusiness;
 import com.idega.core.component.data.ICObject;
 import com.idega.core.component.data.ICObjectHome;
@@ -79,7 +78,7 @@ import com.idega.util.StringHandler;
 import com.idega.util.xml.XmlUtil;
 import com.idega.webface.WFUtil;
 
-public class ThemesHelperImpl implements ThemesHelper {
+public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper {
 	
 	private static Logger LOGGER = Logger.getLogger(ThemesHelperImpl.class.getName());
 	
@@ -156,7 +155,7 @@ public class ThemesHelperImpl implements ThemesHelper {
 				if (iwac == null) {
 					iwac = CoreUtil.getIWContext();
 				}
-				service = IBOLookup.getServiceInstance(iwac, IWSlideService.class);
+				service = getServiceInstance(iwac, IWSlideService.class);
 			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
@@ -767,8 +766,8 @@ public class ThemesHelperImpl implements ThemesHelper {
 	public ThemesService getThemesService() {
 		if (themesService == null) {
 			try {
-				themesService = IBOLookup.getServiceInstance(CoreUtil.getIWContext(), ThemesService.class);
-			} catch (IBOLookupException e) {
+				themesService = getServiceInstance(ThemesService.class);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -1682,14 +1681,14 @@ public class ThemesHelperImpl implements ThemesHelper {
 	 * @return true - success, false - failure
 	 */
 	public boolean generatePreviewsForTheme(Theme theme, boolean useDraft, boolean isJpg, float quality) {
-		StringBuilder url = new StringBuilder(getFullWebRoot()).append(useDraft ? theme.getLinkToDraft() : theme.getLinkToSkeleton());
+		String url = new StringBuilder(getFullWebRoot()).append(useDraft ? theme.getLinkToDraft() : theme.getLinkToSkeleton()).toString();
 		String smallPreviewName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).toString();
 		
 		List<Dimension> dimensions = Arrays.asList(new Dimension(ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT));
 	
 		ImageGenerator imageGenerator = getImageGenerator(null);
 		
-		List<BufferedImage> images = imageGenerator.generatePreviews(url.toString(), dimensions, isJpg, quality);
+		List<BufferedImage> images = imageGenerator.generatePreviews(url, dimensions, isJpg, quality);
 		if (images == null) {
 			return false;
 		}
