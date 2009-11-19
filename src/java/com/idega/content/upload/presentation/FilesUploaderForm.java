@@ -82,7 +82,6 @@ public class FilesUploaderForm extends Block {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private DropdownMenu getFolderChooser(IWContext iwc) {
 		DropdownMenu folders = new DropdownMenu();
 		
@@ -100,7 +99,7 @@ public class FilesUploaderForm extends Block {
 			parentPath = parentPath.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
 		}
 		
-		List<Object> paths = null;
+		List<String> paths = null;
 		try {
 			paths = slide.getChildFolderPaths(parentPath);
 		} catch (RemoteException e) {
@@ -115,7 +114,7 @@ public class FilesUploaderForm extends Block {
 		File file = null;
 		String pathString = null;
 		for (int i = 0; i < paths.size(); i++) {
-			pathString = paths.get(i).toString();
+			pathString = paths.get(i);
 			if (pathString.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
 				pathString = pathString.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
 			}
