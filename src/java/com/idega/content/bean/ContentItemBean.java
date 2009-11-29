@@ -49,7 +49,6 @@ import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.IWSlideConstants;
 import com.idega.slide.util.WebdavExtendedResource;
-import com.idega.slide.util.WebdavLocalResource;
 import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
 import com.idega.util.expression.ELUtil;
@@ -969,10 +968,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	}
 	
 	protected InputStream getStream(WebdavResource resource) throws IOException {
-		if (resource instanceof WebdavLocalResource) {
-			return ((WebdavLocalResource) resource).getMethodData();
-		}
-		
 		IWSlideService slideService = IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), IWSlideService.class);
 		return slideService.getInputStream(resource.getPath());
 	}
