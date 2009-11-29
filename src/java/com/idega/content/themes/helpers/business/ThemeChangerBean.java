@@ -586,11 +586,27 @@ public class ThemeChangerBean implements ThemeChanger {
 		if (linkToStyle.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
 			linkToStyle = linkToStyle.substring(linkToStyle.indexOf(CoreConstants.WEBDAV_SERVLET_URI) + CoreConstants.WEBDAV_SERVLET_URI.length());
 		}
+		
+		String errorMessage = new StringBuilder("Can't get CSS file: '").append(linkToStyle).append("' from Theme pack!").toString();
+		try {
+			if (!helper.getSlideService().getExistence(linkToStyle)) {
+				if (!standardFiles) {
+					LOGGER.warning(errorMessage);
+				}
+				return false;
+			}
+		} catch (Exception e) {
+			if (!standardFiles) {
+				LOGGER.warning(errorMessage);
+			}
+			return false;
+		}
+		
 		fullLink = new StringBuffer(helper.getFullWebRoot()).append(linkToStyle).toString();
 		InputStream is = helper.getInputStream(fullLink);
 		if (is == null) {
 			if (!standardFiles) {
-				LOGGER.log(Level.WARNING, new StringBuilder("Can't get CSS file: '").append(linkToStyle).append("' from Theme pack!").toString());
+				LOGGER.warning(errorMessage);
 			}
 			return false;
 		}

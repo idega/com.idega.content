@@ -1316,7 +1316,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			return null;
 		}
 		
-		Document doc = getXMLDocument(new StringBuffer(getWebRootWithoutContent()).append(templateFile).toString());
+		Document doc = getXMLDocument(templateFile);
 		List<Element> articleViewers = getArticleViewerElements(doc);
 		if (articleViewers == null) {
 			return null;

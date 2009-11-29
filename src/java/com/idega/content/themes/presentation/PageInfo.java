@@ -46,7 +46,7 @@ public class PageInfo extends ContentBlock {
 			pageInfo.setStyleClass(getStyleClass());
 		}
 		
-		themesHelper.loadPageSettings(themesHelper.getWebRootWithoutContent() + ThemesConstants.PAGE_SETTINGS);
+		themesHelper.loadPageSettings(ThemesConstants.PAGE_SETTINGS);
 		List<Setting> pageSettings = themesHelper.getPageSettings();
 		
 		Layer layer = new Layer();
