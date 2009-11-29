@@ -570,7 +570,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 				this.webDAVPath = this.rootPath;
 			}
 			if (ss.getExistence(this.webDAVPath)) {
-				data = getDirectoryListing(ss.getWebdavResource(this.webDAVPath), ss.getWebdavServerURI());
+				data = getDirectoryListing(ss.getResource(this.webDAVPath, false), ss.getWebdavServerURI());
 			} else {
 				data = new WebDAVBean[] { new WebDAVBean("Resource does not exist") };
 			}

@@ -58,7 +58,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 	public WebdavExtendedResource getWebdavExentededResource(String path) {
 		try {
 			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
-			return ss.getWebdavResource(path.replaceFirst(ss.getWebdavServerURI(), ""));
+			return ss.getResource(path.replaceFirst(ss.getWebdavServerURI(), ""), false);
 		} catch (IBOLookupException e) {
 			e.printStackTrace();
 		} catch (UnavailableIWContext e) {
@@ -158,7 +158,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 		}
 		try {
 			WebdavExtendedResource oldRes = this.resource;
-			WebdavExtendedResource newRes = getIWSlideSession().getWebdavResource(path);
+			WebdavExtendedResource newRes = getIWSlideSession().getResource(path, false);
 			if (oldRes == null || oldRes.getName().equals(newRes.getName())) {
 				if ((!useFolders() && !newRes.isCollection() ) || (useFolders() && newRes.isCollection())) {
 					this.resource = newRes;
