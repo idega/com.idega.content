@@ -35,9 +35,9 @@ public class WebDAVUploadBean implements Serializable{
 	private static final long serialVersionUID = -1760819218959402747L;
 	private static final Logger LOGGER = Logger.getLogger(WebDAVUploadBean.class.getName());
 	
-	private static String DEFAULT_PATH = "/files/";
+	private static String DEFAULT_PATH = CoreConstants.PATH_FILES_ROOT.concat(CoreConstants.SLASH);
 	private UploadedFile uploadFile;
-	private String name = "";
+	private String name = CoreConstants.EMPTY;
 	private String uploadFilePath = DEFAULT_PATH;
 	private String downloadPath = null;
 	private String imagePath = null;
@@ -71,8 +71,8 @@ public class WebDAVUploadBean implements Serializable{
 	}
 	
 	public String getUploadFilePath(){
-		if(!this.uploadFilePath.endsWith("/")){
-			this.uploadFilePath+="/";
+		if(!this.uploadFilePath.endsWith(CoreConstants.SLASH)){
+			this.uploadFilePath = this.uploadFilePath.concat(CoreConstants.SLASH);
 		}
 		return this.uploadFilePath;
 	}
@@ -261,7 +261,7 @@ public class WebDAVUploadBean implements Serializable{
 		if (canUploadZipFile()) {
 			return uploadZipFile(isBeingUploadedTheme(event));
 		}		
-		LOGGER.info("Unable to upload zip file's contents");
+		LOGGER.info("Unable to upload contents of zip file");
 		return false;
 	}
 	
@@ -328,11 +328,11 @@ public class WebDAVUploadBean implements Serializable{
 		try {
 			zipStream = new ZipInputStream(stream);
 			if (slide.uploadZipFileContents(zipStream, path)) {
-				resultInfo = "Success uploading zip file's contents";
+				resultInfo = "Success uploading contents of file: " + path;
 				result = true;
 			}
 			else {
-				resultInfo = "Unable to upload zip file's contents";
+				resultInfo = "Unable to upload contents of file: " + path;
 				result = false;
 			}
 		} catch(Exception e) {
