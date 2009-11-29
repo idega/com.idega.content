@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import org.apache.myfaces.custom.tree2.TreeNode;
-import org.apache.webdav.lib.WebdavResource;
 import org.directwebremoting.ScriptBuffer;
 import org.directwebremoting.WebContextFactory;
 import org.jdom.Document;
@@ -793,25 +792,17 @@ public class ThemesEngineBean implements ThemesEngine {
 			return false;
 		}
 		
-		WebdavResource resource = null;
+		String path = theme.getLinkToSkeleton();
 		try {
-			resource = slide.getWebdavResourceAuthenticatedAsRoot(theme.getLinkToSkeleton());
+			if (!getHelper().getSlideService().deleteAsRootUser(path)) {
+				LOGGER.warning("Unable to delete: " + path);
+				return false;
+			}
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Error loading resource: " + theme.getLinkToSkeleton(), e);
-		}
-		if (resource == null) {
-			LOGGER.warning("Resource '" + theme.getLinkToSkeleton() + "' was not loaded!");
+			LOGGER.log(Level.WARNING, "Unable to delete: " + path, e);
 			return false;
 		}
-		
-		boolean deleted = false;
-		try {
-			deleted = resource.deleteMethod();
-		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Error deleting resource: " + theme.getLinkToSkeleton(), e);
-		}
-		
-		return deleted;
+		return true;
 	}
 	
 	public boolean clearVariationFromCache(String themeID) {
