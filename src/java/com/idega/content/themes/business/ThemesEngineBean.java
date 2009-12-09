@@ -241,8 +241,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		return false;
 	}
 	
-	@SuppressWarnings("unchecked")
-	private Map getVariationsCache(IWContext iwc) {
+	private Map<String, String> getVariationsCache(IWContext iwc) {
 		IWCacheManager2 cache = IWCacheManager2.getInstance(iwc.getIWMainApplication());
 		if (cache == null) {
 			return null;
@@ -257,12 +256,11 @@ public class ThemesEngineBean implements ThemesEngine {
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void putVariationsToCache(String variations, IWContext iwc, String themeID) {
 		if (variations == null || iwc == null || themeID == null) {
 			return;
 		}
-		Map variationsCache = getVariationsCache(iwc);
+		Map<String, String> variationsCache = getVariationsCache(iwc);
 		if (variationsCache == null) {
 			return;
 		}
@@ -270,7 +268,6 @@ public class ThemesEngineBean implements ThemesEngine {
 		variationsCache.put(themeID, variations);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public boolean clearVariationFromCache(String themeID, IWContext iwc) {
 		if (themeID == null) {
 			return false;
@@ -281,28 +278,23 @@ public class ThemesEngineBean implements ThemesEngine {
 				return false;
 			}
 		}
-		Map variations = getVariationsCache(iwc);
+		Map<String, String> variations = getVariationsCache(iwc);
 		if (variations == null) {
 			return false;
 		}
-		Object removed = variations.remove(themeID);
+		String removed = variations.remove(themeID);
 		if (removed == null) {
 			return false;
 		}
 		return true;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private String getVariationsFromCache(String themeID, IWContext iwc) {
-		Map variations = getVariationsCache(iwc);
+		Map<String, String> variations = getVariationsCache(iwc);
 		if (variations == null) {
 			return null;
 		}
-		Object o = variations.get(themeID);
-		if (o instanceof String) {
-			return (String) o;
-		}
-		return null;
+		return variations.get(themeID);
 	}
 	
 	/**

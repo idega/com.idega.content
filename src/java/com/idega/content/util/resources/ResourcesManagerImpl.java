@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.idega.core.business.DefaultSpringBean;
-import com.idega.core.cache.IWCacheManager2;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.include.ExternalLink;
 import com.idega.idegaweb.include.JavaScriptLink;
@@ -252,20 +251,11 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		return (file == null || !file.exists()) ? null : uriToResources;
 	}
 	
-	@SuppressWarnings("unchecked")
-	private Map<String, String> getCache(String cacheName) {
-		try {
-			return IWCacheManager2.getInstance(IWMainApplication.getDefaultIWMainApplication()).getCache(cacheName);
-		} catch(Exception e) {
-			LOGGER.log(Level.WARNING, "Error getting cache!", e);
-		}
-		return null;
-	}
-	
 	private String getCachedResource(String cacheName, String resourceName) {
 		String prefix = getCachePrefix();
 		try {
-			return getCache(new StringBuilder().append(prefix).append(cacheName).toString()).get(resourceName);
+			Map<String, String> cache = getCache(new StringBuilder().append(prefix).append(cacheName).toString());
+			return cache.get(resourceName);
 		} catch(Exception e) {
 			LOGGER.log(Level.WARNING, "Error putting resource to cache: " + cacheName, e);
 		}

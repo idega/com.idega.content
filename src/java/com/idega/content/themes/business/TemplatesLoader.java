@@ -140,11 +140,11 @@ public class TemplatesLoader implements JarLoader {
 	
 	@SuppressWarnings("unchecked")
 	public void addSiteTemplatesFromDocument(Document siteTemplateDocument) {
-		SortedMap <String, SiteTemplate> siteMap = null;
-		Map siteTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(SITE_TEMPLATES_CACHE_KEY);
+		SortedMap<String, SiteTemplate> siteMap = null;
+		Map<String, SortedMap<String, SiteTemplate>> siteTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(SITE_TEMPLATES_CACHE_KEY);
 		
 		if (siteTemplatesFromCache.containsKey(ContentConstants.SITE_MAP_KEY)){
-			siteMap = (SortedMap <String, SiteTemplate>)siteTemplatesFromCache.get(ContentConstants.SITE_MAP_KEY);
+			siteMap = siteTemplatesFromCache.get(ContentConstants.SITE_MAP_KEY);
 		}
 		else {			
 			siteMap = Collections.synchronizedSortedMap(new TreeMap<String, SiteTemplate>());
@@ -198,9 +198,8 @@ public class TemplatesLoader implements JarLoader {
 		return currNode;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public Map<String, PageTemplate> getPageTemplates() {
-		Map pageTemplates = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
+		Map<String, Map<String, PageTemplate>> pageTemplates = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
 		
 		if (!pageTemplates.containsKey(ContentConstants.PAGES_MAP_KEY)) {
 		    loadTemplatesFromBundles();
@@ -213,7 +212,7 @@ public class TemplatesLoader implements JarLoader {
 		Collection<SearchResult> results = getThemesHelper().search(PAGE_TEMPLATES_XML_FILE_NAME, templatesFolder);
 		
 		if (results == null) {
-			return (Map <String, PageTemplate>)pageTemplates.get(ContentConstants.PAGES_MAP_KEY);
+			return pageTemplates.get(ContentConstants.PAGES_MAP_KEY);
 		}
 		
 		String serverURL = iwma.getIWApplicationContext().getDomain().getURL();
@@ -225,12 +224,11 @@ public class TemplatesLoader implements JarLoader {
 			}
 		}
 		
-		return (Map <String, PageTemplate>)pageTemplates.get(ContentConstants.PAGES_MAP_KEY);
+		return pageTemplates.get(ContentConstants.PAGES_MAP_KEY);
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	public SortedMap<String, SiteTemplate> getSiteTemplates() {
-		Map siteTemplates = IWCacheManager2.getInstance(iwma).getCache(TemplatesLoader.SITE_TEMPLATES_CACHE_KEY);
+		Map<String, SortedMap<String, SiteTemplate>> siteTemplates = IWCacheManager2.getInstance(iwma).getCache(TemplatesLoader.SITE_TEMPLATES_CACHE_KEY);
 
 		if (!siteTemplates.containsKey(ContentConstants.SITE_MAP_KEY)) {
 		    loadTemplatesFromBundles();
@@ -241,7 +239,7 @@ public class TemplatesLoader implements JarLoader {
 	
 		Collection<SearchResult> results = getThemesHelper().search(SITE_TEMPLATES_XML_FILE_NAME, templatesFolder);
 		if (results == null) {
-			return (SortedMap <String, SiteTemplate>)siteTemplates.get(ContentConstants.SITE_MAP_KEY);
+			return siteTemplates.get(ContentConstants.SITE_MAP_KEY);
 		}
 		
 		String serverURL = iwma.getIWApplicationContext().getDomain().getURL();
@@ -253,7 +251,7 @@ public class TemplatesLoader implements JarLoader {
 			}
 		}
 		
-		return (SortedMap <String, SiteTemplate>)siteTemplates.get(ContentConstants.SITE_MAP_KEY);
+		return siteTemplates.get(ContentConstants.SITE_MAP_KEY);
 	}
 
 	protected String getSlideTemplatesFolderURI() {
@@ -276,7 +274,7 @@ public class TemplatesLoader implements JarLoader {
 		}
 		
 		String uri = result.getSearchResultURI();
-		//	TODO fetch in authenticated manner httpclient? getmethod, or by slide api
+		//	Will try to use Slide API by default
 		return getThemesHelper().getXMLDocument(new StringBuffer(serverName).append(uri.substring(1)).toString());
 	}
 	
@@ -289,15 +287,14 @@ public class TemplatesLoader implements JarLoader {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public Map<String, PageTemplate> getPageMap(){
-		Map pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
+		Map<String, Map<String, PageTemplate>> pageTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(ContentConstants.PAGE_TYPES_CACHE_KEY);
 		Map<String, PageTemplate> pageMap = null;
 		if (pageTemplatesFromCache.containsKey(ContentConstants.PAGES_MAP_KEY)){
-			pageMap = (Map <String, PageTemplate>)pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
+			pageMap = pageTemplatesFromCache.get(ContentConstants.PAGES_MAP_KEY);
 		}
 		else {
-			pageMap = new HashMap <String, PageTemplate> ();
+			pageMap = new HashMap<String, PageTemplate>();
 			pageTemplatesFromCache.put(ContentConstants.PAGES_MAP_KEY, pageMap);
 		}	
 		return pageMap;
