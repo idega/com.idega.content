@@ -115,8 +115,8 @@ public class ContentItemHelper {
 		}
 		String propertyName = "showCommentsForAllUsers";
 		String propertyValue = "true";
-		for (int i = 0; i < moduleIds.size(); i++) {
-			boolean result = builder.isPropertyValueSet(pageKey, moduleIds.get(i), propertyName, propertyValue);
+		if (moduleIds.size() > 0) {
+			boolean result = builder.isPropertyValueSet(pageKey, moduleIds.get(0), propertyName, propertyValue);
 			System.out.println("founded result: " + result);
 			return result;
 		}
