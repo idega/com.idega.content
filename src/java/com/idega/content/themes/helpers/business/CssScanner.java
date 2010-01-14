@@ -223,7 +223,7 @@ public class CssScanner implements ResourceScanner {
 	}
 
 	public String getParsedContent(List<String> contentLines, String fileUri) {
-		if (ListUtil.isEmpty(contentLines) || StringUtil.isEmpty(fileUri)) {
+		if (ListUtil.isEmpty(contentLines) || fileUri == null) {
 			return null;
 		}
 		
@@ -272,7 +272,9 @@ public class CssScanner implements ResourceScanner {
 		}
 		
 		if (levelsUp == 0) {
-			urlReplacement = new StringBuilder(fileUri).append(urlExpression).toString();
+			if (!urlExpression.startsWith(fileUri)) {
+				urlReplacement = new StringBuilder(fileUri).append(urlExpression).toString();
+			}
 		}
 		else {
 			String[] resourceParts = fileUri.split(CoreConstants.SLASH);

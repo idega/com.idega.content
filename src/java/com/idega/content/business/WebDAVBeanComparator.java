@@ -9,11 +9,9 @@
  */
 package com.idega.content.business;
 
-import java.util.Comparator;
 import java.util.Locale;
 import com.idega.content.data.WebDAVBean;
 import com.idega.core.business.ICTreeNodeComparator;
-
 
 /**
  * 
@@ -22,7 +20,7 @@ import com.idega.core.business.ICTreeNodeComparator;
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
  * @version $Revision: 1.3 $
  */
-public class WebDAVBeanComparator extends ICTreeNodeComparator implements Comparator {
+public class WebDAVBeanComparator extends ICTreeNodeComparator {
 
 	public static final int SORT_BY_NAME = 1;
 	public static final int SORT_BY_SIZE = 2;
@@ -37,14 +35,14 @@ public class WebDAVBeanComparator extends ICTreeNodeComparator implements Compar
 	
 	public WebDAVBeanComparator(Locale locale, int sortBy, boolean desending) {
 		super(locale);
+		
 		this.sortBy = sortBy;
 		if (desending) {
 			this.multiplier = -1;
 		}
 	}
 	
-	public int compare(Object o1, Object o2) {
-		
+	public int compare(WebDAVBean o1, WebDAVBean o2) {
 		switch (this.sortBy) {
 			case SORT_BY_NAME :
 				return this.multiplier * super.compare(o1, o2);
@@ -55,14 +53,11 @@ public class WebDAVBeanComparator extends ICTreeNodeComparator implements Compar
 			default :
 				return 0;
 		}
-		
 	}
 	
-	public int sizeCompare(Object o1, Object o2) {
-		WebDAVBean b1 = (WebDAVBean) o1;
-		WebDAVBean b2 = (WebDAVBean) o2;
-		long b1Size = b1.getLengthLong();
-		long b2Size = b2.getLengthLong();
+	public int sizeCompare(WebDAVBean o1, WebDAVBean o2) {
+		long b1Size = o1.getLengthLong();
+		long b2Size = o2.getLengthLong();
 
 		if (b1Size < b2Size) {
 			return -1;
@@ -71,14 +66,11 @@ public class WebDAVBeanComparator extends ICTreeNodeComparator implements Compar
 		} else {
 			return 0;
 		}
-		
 	}
 	
-	public int modDateCompare(Object o1, Object o2) {
-		WebDAVBean b1 = (WebDAVBean) o1;
-		WebDAVBean b2 = (WebDAVBean) o2;
-		long s1 = b1.getModifiedDateLong();
-		long s2 = b2.getModifiedDateLong();
+	public int modDateCompare(WebDAVBean o1, WebDAVBean o2) {
+		long s1 = o1.getModifiedDateLong();
+		long s2 = o2.getModifiedDateLong();
 
 		if (s1 < s2) {
 			return -1;
@@ -88,5 +80,4 @@ public class WebDAVBeanComparator extends ICTreeNodeComparator implements Compar
 			return 0;
 		}
 	}
-
 }

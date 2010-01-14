@@ -322,6 +322,11 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		
 		InputStream input = getStreamFromRepository(resourceURI);
 		if (input == null) {
+			IWMainApplication iwma = IWMainApplication.getDefaultIWMainApplication();
+			input = iwma.getResourceAsStream(resourceURI);
+		}
+		
+		if (input == null) {
 			if (resourceURI.startsWith(CoreConstants.SLASH)) {
 				resourceURI = resourceURI.replaceFirst(CoreConstants.SLASH, CoreConstants.EMPTY);
 			}
