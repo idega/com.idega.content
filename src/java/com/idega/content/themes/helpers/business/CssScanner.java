@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.resources.ResourceScanner;
 
-@Scope("session")
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Service(CssScanner.SPRING_BEAN_IDENTIFIER)
 public class CssScanner implements ResourceScanner {
 	
@@ -153,13 +154,15 @@ public class CssScanner implements ResourceScanner {
 			}
 			
 			//	CSS: /*comment*/body { or: body {/*comment*/
-			if ((styleDefinitionBeginIndex > commentBeginIndex && styleDefinitionBeginIndex > commentEndIndex) || (styleDefinitionBeginIndex < commentBeginIndex && styleDefinitionBeginIndex < commentEndIndex)) {
+			if ((styleDefinitionBeginIndex > commentBeginIndex && styleDefinitionBeginIndex > commentEndIndex) ||
+					(styleDefinitionBeginIndex < commentBeginIndex && styleDefinitionBeginIndex < commentEndIndex)) {
 				openers++;
 				return line;
 			}
 			
 			// CSS: /*comment*/} or }/*comment*/
-			if ((styleDefinitionEndIndex > commentBeginIndex && styleDefinitionEndIndex > commentEndIndex) || (styleDefinitionEndIndex < commentBeginIndex && styleDefinitionEndIndex < commentEndIndex)) {
+			if ((styleDefinitionEndIndex > commentBeginIndex && styleDefinitionEndIndex > commentEndIndex) ||
+					(styleDefinitionEndIndex < commentBeginIndex && styleDefinitionEndIndex < commentEndIndex)) {
 				return finishCssLine(line);
 			}
 		}

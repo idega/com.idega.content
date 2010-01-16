@@ -25,7 +25,9 @@ import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.builder.data.ICPageHome;
+import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWApplicationContextFactory;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
 import com.idega.servlet.filter.BaseFilter;
 import com.idega.slide.business.IWContentEvent;
@@ -212,9 +214,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		
 		int id = -1;
 		IWContext iwc = CoreUtil.getIWContext();
-		if (iwc == null) {
-			return false;
-		}
+		IWApplicationContext iwac = iwc == null ? IWMainApplication.getDefaultIWApplicationContext() : iwc;
 		
 		LucidEngine lucidEngine = ELUtil.getInstance().getBean(LucidEngine.SPRING_BEAN_IDENTIFIER);
 		if (lucidEngine == null) {
@@ -222,14 +222,14 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		
 		int domainID = -1;
-		ICDomain domain = iwc.getDomain();
+		ICDomain domain = iwac.getDomain();
 		if (domain == null) {
 			return false;
 		}
 		domainID = domain.getID();
 		
 		//	Creating IBPage (template) for theme
-		String parentId = getBuilderService().getTopLevelTemplateId(getBuilderService().getTopLevelTemplates(iwc));
+		String parentId = getBuilderService().getTopLevelTemplateId(getBuilderService().getTopLevelTemplates(iwac));
 		if (parentId == null || ThemesConstants.MINUS_ONE.equals(parentId)) {
 			//	No Top Level Template
 			parentId = lucidEngine.createRootTemplate(domain, getBuilderService(), domainID, getBuilderService().getIBXMLFormat());
@@ -250,7 +250,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		if (updatePageWebDav(theme.getIBPageID(), CoreConstants.WEBDAV_SERVLET_URI + theme.getLinkToSkeleton())) {
 			ThemesEngine themesEngine = getThemesEngine();
 			if (themesEngine != null) {
-				themesEngine.updateSiteTemplatesTree(iwc, true);
+				themesEngine.updateSiteTemplatesTree(true);
 			}
 			
 			return true;
@@ -313,12 +313,11 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	@SuppressWarnings("unchecked")
 	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format,
 			String sourceMarkup, String treeOrder) {
+
 		IWContext iwc = CoreUtil.getIWContext();
-		if (iwc == null) {
-			return -1;
-		}
+		IWApplicationContext iwac = iwc == null ? IWMainApplication.getDefaultIWApplicationContext() : iwc;
 		
-		Map tree = getBuilderService().getTree(iwc);
+		Map tree = getBuilderService().getTree(iwac);
 		if (tree == null) {
 			return -1;
 		}
@@ -331,7 +330,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		
 		if (parentId == null && domainId == -1) { // Creating top level page
 			ICDomain domain = null;
-			domain = iwc.getDomain();
+			domain = iwac.getDomain();
 			if (domain != null) {
 				domainId = domain.getID();
 			}
@@ -339,7 +338,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		
 		int pageId = getBuilderService().createNewPage(parentId, name, type, templateId, pageUri, tree, iwc, subType, domainId, format, sourceMarkup, treeOrder);
 		
-		if (iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR)) {
+		if (iwc != null && iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR)) {
 			ICPage createdPage = getICPage(pageId);
 			if (createdPage != null) {
 				createdPage.setPublished(true);

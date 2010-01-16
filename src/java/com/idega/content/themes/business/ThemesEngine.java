@@ -67,7 +67,7 @@ public interface ThemesEngine {
 	 */
 	public String reloadThemeProperties(String themeKey);
 	
-	public void updateSiteTemplatesTree(IWContext iwc, boolean sendToAllSessions);
+	public void updateSiteTemplatesTree(boolean sendToAllSessions);
 	
 	public String createChildTemplateForThisTemplate(String parentTemplateKey);
 	

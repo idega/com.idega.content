@@ -20,6 +20,10 @@ public class ThemesLoader {
 			return false;
 		}
 
+		if (getThemesHelper().existTheme(originalUri) || getThemesHelper().existTheme(encodedUri)) {
+			return false;
+		}
+		
 		if (encodedUri.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
 			encodedUri = getUriWithoutContent(encodedUri);
 		}

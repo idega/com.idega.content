@@ -1,5 +1,6 @@
 package com.idega.content.themes.business;
 
+import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,10 +15,13 @@ import org.directwebremoting.WebContextFactory;
 import org.jdom.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.idega.builder.bean.AdvancedProperty;
+import com.idega.content.business.WebDAVUploadBean;
 import com.idega.content.themes.bean.ThemesManagerBean;
 import com.idega.content.themes.helpers.bean.SimplifiedTheme;
 import com.idega.content.themes.helpers.bean.Theme;
@@ -39,23 +43,27 @@ import com.idega.core.data.ICTreeNode;
 import com.idega.core.search.business.SearchResult;
 import com.idega.dwr.reverse.ScriptCaller;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.idegaweb.IWMainApplicationSettings;
+import com.idega.idegaweb.IWMainSlideStartedEvent;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 import com.idega.webface.WFUtil;
 
 @Scope(BeanDefinition.SCOPE_SINGLETON)
 @Service(ThemesEngine.SPRING_BEAN_IDENTIFIER)
-public class ThemesEngineBean implements ThemesEngine {
+public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 
 	private static final long serialVersionUID = 5875353284352953688L;
 	
 	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(ThemesEngineBean.class.getName());
 	
 	public static final String ARTICLE_VIEWER_TEMPLATE_KEY = "article_viewer_page_key";
+	private static final String DEFAULT_THEMES_INSTALLED_KEY = "default_themes_installed";
 	
 	@Autowired
 	private ThemesHelper helper;
@@ -68,7 +76,7 @@ public class ThemesEngineBean implements ThemesEngine {
 	 * Returns info about themes in Slide
 	 */
 	public List<SimplifiedTheme> getThemes() {
-		List <SimplifiedTheme> simpleThemes = new ArrayList<SimplifiedTheme>();
+		List<SimplifiedTheme> simpleThemes = new ArrayList<SimplifiedTheme>();
 		
 		List<String> pLists = null;
 		List<String> configs = null;
@@ -93,7 +101,7 @@ public class ThemesEngineBean implements ThemesEngine {
 
 		//	Checking if exist themes in system
 		Collection<Theme> themesCollection = helper.getAllThemes();
-		if (themesCollection == null || themesCollection.size() == 0) {
+		if (ListUtil.isEmpty(themesCollection) && (ListUtil.isEmpty(pLists) && ListUtil.isEmpty(configs))) {
 			return null;	// No themes in system
 		}
 		
@@ -101,17 +109,17 @@ public class ThemesEngineBean implements ThemesEngine {
 		try {
 			getThemesPropertiesExtractor().prepareThemes(pLists, configs, new ArrayList<String>(predefinedThemeStyles), false);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error preparing theme(s): plists: "+pLists+", configs: "+configs+", predefined styles: "+predefinedThemeStyles, e);
 			return null;
 		}
 		
-		List <Theme> themes = helper.getSortedThemes();
+		List<Theme> themes = helper.getSortedThemes();
 		if (themes == null) {
 			return null;
 		}
 		SimplifiedTheme simpleTheme = null;
-		for (int i = 0; i < themes.size(); i++) {
-			simpleTheme = getSimpleTheme(themes.get(i));
+		for (Theme theme: themes) {
+			simpleTheme = getSimpleTheme(theme);
 			
 			if (simpleTheme != null) {
 				simpleThemes.add(simpleTheme);
@@ -250,7 +258,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		try {
 			return cache.getCache(ThemesConstants.THEME_STYLE_VARIATIONS_CACHE_KEY);
 		} catch(Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error getting cache: " + ThemesConstants.THEME_STYLE_VARIATIONS_CACHE_KEY);
 		}
 		
 		return null;
@@ -320,7 +328,7 @@ public class ThemesEngineBean implements ThemesEngine {
 			try {
 				service = BuilderServiceFactory.getBuilderService(iwc);
 			} catch (RemoteException e) {
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING, "Error getting " + BuilderService.class.getName(), e);
 				return null;
 			}
 		}
@@ -338,7 +346,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		try {
 			return getThemeChanger().changeTheme(themeKey, themeName, change, true);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error changing theme: " + themeName + "("+themeKey+"): " + change, e);
 		}
 		
 		return null;
@@ -351,7 +359,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		try {
 			return getThemeChanger().saveTheme(themeKey, themeName);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error saving theme: " + themeKey + ", name: " + themeName, e);
 		}
 		
 		return false;
@@ -515,7 +523,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		try {
 			service = BuilderServiceFactory.getBuilderService(IWMainApplication.getDefaultIWApplicationContext());
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error getting " + BuilderService.class.getName(), e);
 			return false;
 		}
 		if (service == null) {
@@ -552,7 +560,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		try {
 			return helper.getThemesService().getBuilderService().getTree(iwc);
 		} catch(Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error getting pages tree", e);
 		}
 		return null;
 	}
@@ -580,13 +588,13 @@ public class ThemesEngineBean implements ThemesEngine {
 		try {
 			return getThemeChanger().restoreTheme(themeID);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error restoring theme: " + themeID, e);
 		}
 		
 		return false;
 	}
 	
-	public void updateSiteTemplatesTree(IWContext iwc, boolean sendToAllSessions) {
+	public void updateSiteTemplatesTree(boolean sendToAllSessions) {
 		StringBuffer uri = new StringBuffer(CoreConstants.SLASH).append(CoreConstants.WORKSPACE_VIEW_MANAGER_ID).append(CoreConstants.SLASH);
 		uri.append(CoreConstants.CONTENT_VIEW_MANAGER_ID).append(CoreConstants.SLASH).append(CoreConstants.PAGES_VIEW_MANAGER_ID).append(CoreConstants.SLASH);
 		Thread scriptCaller = new Thread(new ScriptCaller(WebContextFactory.get(), new ScriptBuffer("getUpdatedSiteTemplatesTreeFromServer();"), uri.toString(),
@@ -659,7 +667,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		try {
 			return getThemeChanger().applyMultipleChangesToTheme(themeID, changes, themeName);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error applying multiple changes for theme: " + themeID, e);
 		}
 		
 		return null;
@@ -676,7 +684,7 @@ public class ThemesEngineBean implements ThemesEngine {
 				return getThemeStyleVariations(themeId);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error reloading theme: " + themeId, e);
 			return null;
 		}
 		
@@ -689,7 +697,7 @@ public class ThemesEngineBean implements ThemesEngine {
 			return null;
 		}
 		
-		updateSiteTemplatesTree(getContextAndCheckRights(), true);
+		updateSiteTemplatesTree(true);
 		
 		return newTemplateId;
 	}
@@ -698,7 +706,7 @@ public class ThemesEngineBean implements ThemesEngine {
 		try {
 			return getThemeChanger().setBuiltInStyle(themeId, builtInStyleId);
 		} catch(Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error setting built-in style for theme: " + themeId + ", style id: " + builtInStyleId, e);
 		}
 		return false;
 	}
@@ -826,10 +834,52 @@ public class ThemesEngineBean implements ThemesEngine {
 		try {
 			clearVariationFromCache(themeID, iwc);
 		} catch(Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error cleaninf cache for theme: " + themeID, e);
 			return false;
 		}
 		
 		return true;
+	}
+
+	public void onApplicationEvent(ApplicationEvent event) {
+		if (event instanceof IWMainSlideStartedEvent) {
+			IWMainSlideStartedEvent slideStarted = (IWMainSlideStartedEvent) event;
+			final IWMainApplicationSettings settings = slideStarted.getIWMA().getSettings();
+			if (!settings.getBoolean(DEFAULT_THEMES_INSTALLED_KEY, Boolean.FALSE) && settings.getBoolean("auto_load_themes", Boolean.TRUE)) {
+				Thread themesInstaller = new Thread(new Runnable() {
+					public void run() {
+						Boolean result = installDefaultThemes();
+						settings.setProperty(DEFAULT_THEMES_INSTALLED_KEY, result.toString());
+						if (result) {
+							getThemes();
+						}
+					}
+				});
+				themesInstaller.start();
+			}
+		}
+	}
+	
+	private boolean installDefaultThemes() {
+		WebDAVUploadBean wub = new WebDAVUploadBean();
+		IWSlideService slide = helper.getSlideService();
+		for (AdvancedProperty theme: ThemesConstants.DEFAULT_THEMES) {
+			if (!installTheme(wub, theme.getId(), helper.getInputStream(theme.getValue()), slide)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean installTheme(WebDAVUploadBean uploadBean, String fileName, InputStream stream, IWSlideService slide) {
+		try {
+			uploadBean.setUploadFilePath(ThemesConstants.THEMES_PATH);
+			return uploadBean.uploadZipFile(true, fileName, stream, slide);
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Error installing theme: " + fileName, e);
+		} finally {
+			IOUtil.close(stream);
+		}
+		return false;
 	}
 }

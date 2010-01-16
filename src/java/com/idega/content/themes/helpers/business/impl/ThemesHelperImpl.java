@@ -74,6 +74,7 @@ import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.IOUtil;
+import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 import com.idega.util.xml.XmlUtil;
 import com.idega.webface.WFUtil;
@@ -186,23 +187,14 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			checkedFromSlide = false;
 			return;
 		}
-		List<String> themesSkeletons = loadSearchResults(themes, ThemesConstants.THEME_SKELETONS_FILTER);
 		
-//		String propSearchKey = new StringBuffer("*").append(ThemesConstants.THEME_PROPERTIES_FILE_END).toString();
-//		Collection propertiesLists = search(propSearchKey, searchScope);
-//		List<String> pLists = loadSearchResults(propertiesLists, null);
-//		
-//		String configSearchKey = new StringBuffer("*").append(ThemesConstants.IDEGA_THEME_INFO).toString();
-//		Collection configurationXmls = search(configSearchKey, searchScope);
-//		List<String> configurations = loadSearchResults(configurationXmls, null);
-	
+		List<String> themesSkeletons = loadSearchResults(themes, ThemesConstants.THEME_SKELETONS_FILTER);
 		try {
 			ThemesLoader themesLoader = new ThemesLoader();
 			themesLoader.loadThemes(themesSkeletons, false, true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-//		getThemesPropertiesExtractor().prepareThemes(pLists, configurations, true);
 	}
 	
 	public List<String> loadSearchResults(List<SearchResult> searchResults, List<String> filter) {
@@ -214,35 +206,21 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		String uri = null;
 		for (int i = 0; i < searchResults.size(); i++) {
 			uri = searchResults.get(i).getSearchResultURI();
-			if (isCorrectThemeTemplateFile(uri, filter)) {
+			if (isCorrectThemeTemplateFile(uri, filter) && !loadedResults.contains(uri)) {
 				loadedResults.add(uri);
 			}
 		}
 		return loadedResults;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public List<SearchResult> search(String searchKey, String searchScope) {
 		if (searchKey == null || searchScope == null) {
 			return null;
 		}
 		
 		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
-		Collection results = search.doSimpleDASLSearch(searchKey, searchScope);
-		if (results == null) {
-			return null;
-		}
-		
-		List<SearchResult> wrapped = new ArrayList<SearchResult>();
-		Object o = null;
-		for (Iterator it = results.iterator(); it.hasNext();) {
-			o = it.next();
-			if (o instanceof SearchResult) {
-				wrapped.add((SearchResult) o); 
-			}
-		}
-		
-		return wrapped;
+		Collection<SearchResult> results = search.doSimpleDASLSearch(searchKey, searchScope);
+		return ListUtil.isEmpty(results) ? null : new ArrayList<SearchResult>(results);
 	}
 	
 	public String getFileName(String uri) {
@@ -429,7 +407,22 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	}
 	
 	public void addTheme(Theme theme) {
-		themes.put(theme.getId(), theme);
+		if (theme == null) {
+			return;
+		}
+		
+		Collection<String> registeredThemesIds = new ArrayList<String>(themes.keySet());
+		boolean validTheme = true;
+		for (Iterator<String> idsIter = registeredThemesIds.iterator(); (validTheme && idsIter.hasNext());) {
+			Theme themeInMap = themes.get(idsIter.next());
+			if (themeInMap != null && themeInMap.getLinkToSkeleton().equals(theme.getLinkToSkeleton())) {
+				validTheme = false;
+			}
+		}
+		
+		if (validTheme) {
+			themes.put(theme.getId(), theme);
+		}
 	}
 	
 	public List<Theme> getAvailableThemes() {

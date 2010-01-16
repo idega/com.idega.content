@@ -20,6 +20,7 @@ import com.idega.content.themes.helpers.bean.BuiltInThemeStyle;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
 import com.idega.util.CoreConstants;
+import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 
 @Scope(BeanDefinition.SCOPE_SINGLETON)
@@ -43,11 +44,12 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		
 		//	Firstly getting not prepared themes
 		List<Theme> themesToPrepare = getUnPreparedThemes();
+		if (ListUtil.isEmpty(themesToPrepare)) {
+			return;
+		}
 		
 		//	Preparing new theme(s)
-		Theme theme = null;
-		for (int i = 0; i < themesToPrepare.size(); i++) {
-			theme = themesToPrepare.get(i);
+		for (Theme theme: themesToPrepare) {
 			if (!prepareTheme(theme, pLists, configs, predefinedStyles, useThread)) {
 				markThemeAsNotPrepared(theme);
 			}
@@ -66,16 +68,14 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 	
 	private synchronized List<Theme> getUnPreparedThemes() {
 		List<Theme> newThemes = new ArrayList<Theme>();
-		List <Theme> themes = new ArrayList<Theme>(getHelper().getAllThemes());
+		List<Theme> themes = new ArrayList<Theme>(getHelper().getAllThemes());
 		if (themes == null) {
 			return newThemes;
 		}
 		
-		Theme theme = null;
-		for (int i = 0; i < themes.size(); i++) {
-			theme = themes.get(i);
+		for (Theme theme: themes) {
 			//	Checking if it is possible to extract properties
-			if (!theme.isLoading() && !theme.isPropertiesExtracted()) {
+			if (!theme.isLoading() && !theme.isPropertiesExtracted() && !newThemes.contains(theme)) {
 				theme.setLoading(true);
 				newThemes.add(theme);
 			}

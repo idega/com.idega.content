@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.idega.builder.bean.AdvancedProperty;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.util.CoreConstants;
@@ -208,6 +209,11 @@ public class ThemesConstants {
 	
 	public static final String THEME_PREDEFINED_STYLE_CONFIG_FILE = ".rwstyle";
 	public static final String DEFAULT_THEME_STYLE_ID = "defaultThemeStyleId";
+	
+	//	Add more themes here
+	public static final List<AdvancedProperty> DEFAULT_THEMES = Collections.unmodifiableList(Arrays.asList(
+			new AdvancedProperty("eGov.rwtheme", "http://github.com/idega/eGov.rwtheme/raw/master/src/eGov.rwtheme.zip")
+	));
 	
 	private static String getContentBundleResourcesUri() {
 		if (CONTENT_BUNDLE_RESOURCES == null) {

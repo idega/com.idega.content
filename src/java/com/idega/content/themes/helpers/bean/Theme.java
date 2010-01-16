@@ -364,5 +364,9 @@ public class Theme {
 	public void setThemeChanger(ThemeChanger themeChanger) {
 		this.themeChanger = themeChanger;
 	}
-		
+
+	@Override
+	public String toString() {
+		return "Theme @".concat(linkToSkeleton);
+	}
 }
