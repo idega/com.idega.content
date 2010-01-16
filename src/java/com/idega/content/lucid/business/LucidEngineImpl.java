@@ -110,7 +110,7 @@ public class LucidEngineImpl implements LucidEngine {
 		
 		//	jQuery
 		js.append(jQuery.getBundleURIToJQueryLib()).append(CoreConstants.COMMA);
-		js.append(web2.getBundleUriToContextMenuScript()).append(CoreConstants.COMMA);
+		js.append(web2.getBundleUriToContextMenuScript(false)).append(CoreConstants.COMMA);
 		
 		//	Helpers
 		IWBundle bundle = ContentUtil.getBundle();
@@ -137,7 +137,7 @@ public class LucidEngineImpl implements LucidEngine {
 		
 		//	jQuery
 		js.append(jQuery.getBundleURIToJQueryLib()).append(CoreConstants.COMMA);
-		js.append(web2.getBundleUriToContextMenuScript()).append(CoreConstants.COMMA);
+		js.append(web2.getBundleUriToContextMenuScript(false)).append(CoreConstants.COMMA);
 		
 		//	DWR
 		js.append(CoreConstants.DWR_ENGINE_SCRIPT).append(CoreConstants.COMMA).append("/dwr/interface/ThemesEngine.js,/dwr/interface/LucidEngine.js,");

@@ -83,7 +83,7 @@ public class ThemesSliderViewer extends Block {
 					web2.getReflectionForMootoolsScriptFilePath(),
 					
 					jQuery.getBundleURIToJQueryLib(),
-					web2.getBundleUriToContextMenuScript(),
+					web2.getBundleUriToContextMenuScript(false),
 					
 					CoreConstants.DWR_ENGINE_SCRIPT,
 					"/dwr/interface/ThemesEngine.js",
