@@ -10,6 +10,7 @@
 package com.idega.content.presentation;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import com.idega.block.web2.business.Web2Business;
 import com.idega.block.web2.presentation.Accordion;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -32,6 +34,7 @@ import com.idega.presentation.Layer;
 import com.idega.presentation.text.Text;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.util.PresentationUtil;
+import com.idega.util.expression.ELUtil;
 
 /**
  * A block that displays the latest or all entries in the file repository ordered by modification date<br>
@@ -66,6 +69,7 @@ public class WhatIsNew extends SearchResults {
 		super();
 		this.setCacheable(WHAT_IS_NEW_CACHE_KEY, 0);
 		this.setStyleClass(STYLE_CLASS_WHATISNEW);
+		this.setContainerID(STYLE_CLASS_WHATISNEW);
 		this.setOpenLinksInAnotherWindow(true);
 	}
 
@@ -79,8 +83,16 @@ public class WhatIsNew extends SearchResults {
 		//just listen for changes
 		startCachingStrategy();
 		
-		super.main(iwc);
+		Web2Business business = ELUtil.getInstance().getBean(Web2Business.class);
+
+		List<String> actions = new ArrayList<String>();
+		actions.add(business.getActionToLinkLinksWithFiles(STYLE_CLASS_WHATISNEW, true, false));
 		
+		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, business.getBundleUriToLinkLinksWithFilesScriptFile());
+		PresentationUtil.addStyleSheetToHeader(iwc, business.getBundleUriToLinkLinksWithFilesStyleFile());
+		PresentationUtil.addJavaScriptActionsToBody(iwc, actions);
+		
+		super.main(iwc);
 	}
 	
 	protected void startCachingStrategy() {
