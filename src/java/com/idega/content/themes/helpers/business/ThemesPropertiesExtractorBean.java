@@ -1,5 +1,6 @@
 package com.idega.content.themes.helpers.business;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -107,22 +108,69 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return null;
 	}
 	
-	private String getConfigFile(Theme theme, String searchName, List<String> configs) {
-		if (configs == null) {
-			return null;
+	private boolean checkFileExistence(String uri) {
+		try {
+			return helper.getSlideService().getExistence(uri);
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Error while checking existence of: " + uri, e);
 		}
-		searchName = new StringBuffer(searchName).append(ThemesConstants.IDEGA_THEME_INFO).toString();
-		for (String config: configs) {
-			try {
-				if (config.indexOf(theme.getLinkToBaseAsItIs()) != -1 || config.indexOf(URLEncoder.encode(theme.getLinkToBaseAsItIs(),
-						CoreConstants.ENCODING_UTF8)) != -1) {
-					if (config.endsWith(searchName) || config.endsWith(URLEncoder.encode(searchName, CoreConstants.ENCODING_UTF8))) {
-						return config;
-					}
-				}
-			} catch (Exception e) {
-				LOGGER.log(Level.WARNING, "Error while encoding: " + searchName, e);
+		return false;
+	}
+	
+	private String findThemeConfiguration(String baseUri, String searchName) {
+		if (!baseUri.endsWith(CoreConstants.SLASH)) {
+			baseUri = baseUri.concat(CoreConstants.SLASH);
+		}
+		String configUri = baseUri.concat(searchName);
+		if (checkFileExistence(configUri)) {
+			if (!configUri.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
+				configUri = CoreConstants.WEBDAV_SERVLET_URI.concat(configUri);
 			}
+			return configUri;
+		}
+		return null;
+	}
+	
+	private String getConfigFile(Theme theme, String searchName, List<String> configs) {
+		String baseUri = theme.getLinkToBaseAsItIs();
+		searchName = new StringBuffer(searchName).append(ThemesConstants.IDEGA_THEME_INFO).toString();
+		if (!ListUtil.isEmpty(configs)) {
+			for (String config: configs) {
+				try {
+					if (config.indexOf(baseUri) != -1 || config.indexOf(URLEncoder.encode(baseUri, CoreConstants.ENCODING_UTF8)) != -1) {
+						if (config.endsWith(searchName) || config.endsWith(URLEncoder.encode(searchName, CoreConstants.ENCODING_UTF8))) {
+							return config;
+						}
+					}
+				} catch (Exception e) {
+					LOGGER.log(Level.WARNING, "Error while encoding: " + searchName, e);
+				}
+			}
+		}
+		
+		String config = findThemeConfiguration(baseUri, searchName);
+		if (config != null) {
+			return config;
+		}
+		try {
+			String encodedSearchName = URLEncoder.encode(searchName, CoreConstants.ENCODING_UTF8);
+			config = findThemeConfiguration(baseUri, encodedSearchName);
+			if (config != null) {
+				return config;
+			}
+			
+			String encodedBaseUri = URLEncoder.encode(baseUri, CoreConstants.ENCODING_UTF8);
+			config = findThemeConfiguration(encodedBaseUri, searchName);
+			if (config != null) {
+				return config;
+			}
+			
+			config = findThemeConfiguration(encodedBaseUri, encodedSearchName);
+			if (config != null) {
+				return config;
+			}
+		} catch (UnsupportedEncodingException e) {
+			LOGGER.log(Level.WARNING, "Error while encoding!", e);
 		}
 		
 		LOGGER.info("Didn't find configuration for theme: " + searchName + " in provided configs: " + configs);
@@ -189,9 +237,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 			//	Trying to get configuration file from list
 			linkToConfig = getConfigFile(theme, searchName, configs);
 			
-			if (linkToConfig == null) {
-				theme.setNewTheme(true);	//	Every theme must have configuration file, if don't - treat theme as new theme
-			}
+			theme.setNewTheme(linkToConfig == null);	//	Every theme must have configuration file, if don't - treat theme as new theme
 		}
 		
 		if (theme.isNewTheme()) {

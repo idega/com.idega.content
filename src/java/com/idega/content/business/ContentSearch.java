@@ -299,20 +299,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 				executeSearch(results, servletMapping, contentSearch, client);
 			}
 			searcher.setSearchResults(results);
-		}
-		catch (IBOLookupException e) {
-			e.printStackTrace();
-		}
-		catch (SearchException e) {
-			e.printStackTrace();
-		}
-		catch (HttpException e) {
-			e.printStackTrace();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		catch(NullPointerException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return searcher;
