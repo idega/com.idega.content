@@ -101,7 +101,7 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 
 		//	Checking if exist themes in system
 		Collection<Theme> themesCollection = helper.getAllThemes();
-		if (ListUtil.isEmpty(themesCollection) && (ListUtil.isEmpty(pLists) && ListUtil.isEmpty(configs))) {
+		if (ListUtil.isEmpty(themesCollection)) {
 			return null;	// No themes in system
 		}
 		

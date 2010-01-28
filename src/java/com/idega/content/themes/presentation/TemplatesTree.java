@@ -4,13 +4,18 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import com.idega.content.business.ContentConstants;
 import com.idega.core.builder.business.BuilderService;
+import com.idega.core.builder.data.ICPage;
+import com.idega.core.builder.data.ICPageHome;
 import com.idega.core.business.ICTreeNodeComparator;
 import com.idega.core.data.ICTreeNode;
+import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.Block;
@@ -24,6 +29,7 @@ import com.idega.presentation.text.ListItem;
 import com.idega.presentation.text.Lists;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.util.CoreConstants;
+import com.idega.util.ListUtil;
 
 public class TemplatesTree extends Block {
 
@@ -50,7 +56,7 @@ public class TemplatesTree extends Block {
 		}
 		
 		Collection topLevelTemplates = builder.getTopLevelTemplates(iwc);
-		if (topLevelTemplates == null || topLevelTemplates.isEmpty()) {
+		if (ListUtil.isEmpty(topLevelTemplates)) {
 			container.add(new Heading4(iwrb.getLocalizedString("there_are_no_templates", "There are no templates in system")));
 			return;
 		}
@@ -59,7 +65,9 @@ public class TemplatesTree extends Block {
 		templates.setStyleClass("templatesTreeInLucidStyle");
 		container.add(templates);
 		
-		addTemplatesToTree(templates, topLevelTemplates, iwc.getCurrentLocale(), iwb);
+		Map<String, ICPage> templatesObjects = getTemplatesObjects(getPrimaryKeys(topLevelTemplates));
+		
+		addTemplatesToTree(templates, topLevelTemplates, iwc.getCurrentLocale(), iwb, templatesObjects);
 		
 		Layer buttons = new Layer();
 		buttons.setStyleClass("webfaceButtonLayer");
@@ -70,9 +78,45 @@ public class TemplatesTree extends Block {
 		buttons.add(createTemplate);
 	}
 	
+	private List<String> getPrimaryKeys(Collection<ICTreeNode> templates) {
+		if (ListUtil.isEmpty(templates)) {
+			return null;
+		}
+		
+		List<String> primaryKeys = new ArrayList<String>(templates.size());
+		for (ICTreeNode template: templates) {
+			primaryKeys.add(template.getId());
+		}
+		return primaryKeys;
+	}
+	
 	@SuppressWarnings("unchecked")
-	private void addTemplatesToTree(Lists tree, Collection<ICTreeNode> templates, Locale l, IWBundle iwb) {
-		if (templates == null || templates.size() == 0) {
+	private Map<String, ICPage> getTemplatesObjects(List<String> primaryKeys) {
+		if (ListUtil.isEmpty(primaryKeys)) {
+			return null;
+		}
+		
+		try {
+			ICPageHome pageHome = (ICPageHome) IDOLookup.getHome(ICPage.class);
+			Collection<ICPage> objects = pageHome.findAllByPrimaryKeys(primaryKeys);
+			if (ListUtil.isEmpty(objects)) {
+				return null;
+			}
+			
+			Map<String, ICPage> mappedObjects = new HashMap<String, ICPage>();
+			for (ICPage templateObject: objects) {
+				mappedObjects.put(templateObject.getId(), templateObject);
+			}
+			return mappedObjects;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void addTemplatesToTree(Lists tree, Collection<ICTreeNode> templates, Locale l, IWBundle iwb, Map<String, ICPage> templatesObjects) {
+		if (ListUtil.isEmpty(templates)) {
 			return;
 		}
 		
@@ -84,6 +128,14 @@ public class TemplatesTree extends Block {
 		String imageUri = iwb.getVirtualPathWithFileNameString("images/template.png");
 		String folderImageUri = iwb.getVirtualPathWithFileNameString("images/folder_template.png");
 		for (ICTreeNode template: topTemplates) {
+			ICPage templateObject = templatesObjects == null ? null : templatesObjects.get(template.getId());
+			if (templateObject == null) {
+				continue;
+			}
+			if (!templateObject.isTemplate() || templateObject.getDeleted() || templateObject.isHidePageInMenu()) {
+				continue;
+			}
+			
 			name = null;
 			templateChildren = null;
 			
@@ -105,13 +157,13 @@ public class TemplatesTree extends Block {
 			tree.add(item);
 			
 			templateChildren = template.getChildren();
-			if (templateChildren != null && templateChildren.size() > 0) {
+			if (!ListUtil.isEmpty(templateChildren)) {
 				icon.setURL(folderImageUri);
 				
 				Lists newTree = new Lists();
 				item.add(newTree);
 				
-				addTemplatesToTree(newTree, templateChildren, l, iwb);
+				addTemplatesToTree(newTree, templateChildren, l, iwb, getTemplatesObjects(getPrimaryKeys(templateChildren)));
 			}
 		}
 	}

@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ejb.FinderException;
+
 import org.apache.slide.event.ContentEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,6 +36,7 @@ import com.idega.slide.business.IWContentEvent;
 import com.idega.slide.business.IWSlideChangeListener;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
 public class ThemesServiceBean extends IBOServiceBean implements ThemesService, IWSlideChangeListener {
@@ -235,12 +238,17 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			parentId = lucidEngine.createRootTemplate(domain, getBuilderService(), domainID, getBuilderService().getIBXMLFormat());
 			lucidEngine.initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
 		}
-		String name = getThemesHelper().getPreparedThemeNameToUseInRepository(theme);
 		
+		String name = getThemesHelper().getPreparedThemeNameToUseInRepository(theme);
 		String suffix = getSuffixForTemplate(theme.getName());
 		String templateName = suffix == null ? theme.getName() : new StringBuilder(theme.getName()).append(suffix).toString();
 		String uri = new StringBuilder(ThemesConstants.THEMES).append(name).append(suffix == null ? CoreConstants.EMPTY : suffix)
 						.append(ContentConstants.SLASH).toString();
+		
+		if (existsTheme(uri, domainID)) {
+			return true;
+		}
+		
 		id = createIBPage(parentId, templateName, getBuilderService().getTemplateKey(), null, uri, null, domainID, getBuilderService().getHTMLTemplateKey(), null);
 		if (id == -1) {
 			return false;
@@ -259,6 +267,24 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		return false;
 	}
 	
+	private boolean existsTheme(String webDavUri, int domainId) {
+		if (StringUtil.isEmpty(webDavUri)) {
+			return false;
+		}
+		
+		try {
+			ICPage icpage = getICPageHome().findByWebDavUri(webDavUri);
+			if (icpage == null) {
+				return false;
+			}
+			
+			return !icpage.getDeleted();
+		} catch (FinderException e) {
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Error while checking if template exists by uri: " + webDavUri, e);
+		}
+		return false;
+	}
 	private String getSuffixForTemplate(String name) {
 		int counter = 0;
 		
