@@ -231,6 +231,11 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		domainID = domain.getID();
 		
+		String webDavUri = CoreConstants.WEBDAV_SERVLET_URI.concat(theme.getLinkToSkeleton());
+		if (existsTheme(theme, webDavUri, domainID)) {
+			return true;
+		}
+		
 		//	Creating IBPage (template) for theme
 		String parentId = getBuilderService().getTopLevelTemplateId(getBuilderService().getTopLevelTemplates(iwac));
 		if (parentId == null || ThemesConstants.MINUS_ONE.equals(parentId)) {
@@ -242,11 +247,13 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		String name = getThemesHelper().getPreparedThemeNameToUseInRepository(theme);
 		String suffix = getSuffixForTemplate(theme.getName());
 		String templateName = suffix == null ? theme.getName() : new StringBuilder(theme.getName()).append(suffix).toString();
-		String uri = new StringBuilder(ThemesConstants.THEMES).append(name).append(suffix == null ? CoreConstants.EMPTY : suffix)
-						.append(ContentConstants.SLASH).toString();
-		
-		if (existsTheme(uri, domainID)) {
-			return true;
+		String uri = getUriForTemplate(new StringBuilder(ThemesConstants.THEMES).append(name).append(suffix == null ? CoreConstants.EMPTY : suffix).toString(),
+				domainID);
+		if (uri == null) {
+			return false;
+		}
+		if (!uri.endsWith(CoreConstants.SLASH)) {
+			uri = uri.concat(CoreConstants.SLASH);
 		}
 		
 		id = createIBPage(parentId, templateName, getBuilderService().getTemplateKey(), null, uri, null, domainID, getBuilderService().getHTMLTemplateKey(), null);
@@ -255,7 +262,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		theme.setIBPageID(id);
 		
-		if (updatePageWebDav(theme.getIBPageID(), CoreConstants.WEBDAV_SERVLET_URI + theme.getLinkToSkeleton())) {
+		if (updatePageWebDav(theme.getIBPageID(), webDavUri)) {
 			ThemesEngine themesEngine = getThemesEngine();
 			if (themesEngine != null) {
 				themesEngine.updateSiteTemplatesTree(true);
@@ -267,7 +274,24 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		return false;
 	}
 	
-	private boolean existsTheme(String webDavUri, int domainId) {
+	private String getUriForTemplate(String initialValue, int domainId) {
+		try {
+			ICPageHome pageHome = getICPageHome();
+			ICPage template = pageHome.findByUri(initialValue.concat(CoreConstants.SLASH), domainId);
+			if (template == null) {
+				return initialValue;
+			}
+			
+			LOGGER.warning("Trying to create template with already existing uri: " + initialValue + ", will change it!");
+			initialValue = initialValue.concat(CoreConstants.UNDER).concat(String.valueOf(System.currentTimeMillis()));
+			return getUriForTemplate(initialValue, domainId);
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Error getting template by the uri: " + initialValue.concat(CoreConstants.SLASH), e);
+		}
+		return null;
+	}
+	
+	private boolean existsTheme(Theme theme, String webDavUri, int domainId) {
 		if (StringUtil.isEmpty(webDavUri)) {
 			return false;
 		}
@@ -278,7 +302,12 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 				return false;
 			}
 			
-			return !icpage.getDeleted();
+			boolean exists = !icpage.getDeleted();
+			if (exists) {
+				LOGGER.info("Template with WebDavUri '' already exists! Not creating new one.");
+				theme.setIBPageID(Integer.valueOf(icpage.getPrimaryKey().toString()));
+			}
+			return exists;
 		} catch (FinderException e) {
 		} catch (Exception e) {
 			LOGGER.log(Level.WARNING, "Error while checking if template exists by uri: " + webDavUri, e);

@@ -212,7 +212,7 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 		}
 		
 		Collection children = template.getChildren();
-		if (children == null || children.size() == 0) {
+		if (ListUtil.isEmpty(children)) {
 			return;
 		}
 		

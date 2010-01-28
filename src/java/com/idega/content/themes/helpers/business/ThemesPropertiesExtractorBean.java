@@ -111,12 +111,11 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		if (configs == null) {
 			return null;
 		}
-		String config = null;
 		searchName = new StringBuffer(searchName).append(ThemesConstants.IDEGA_THEME_INFO).toString();
-		for (int i = 0; i < configs.size(); i++) {
-			config = configs.get(i);
+		for (String config: configs) {
 			try {
-				if (config.indexOf(theme.getLinkToBaseAsItIs()) != -1 || config.indexOf(URLEncoder.encode(theme.getLinkToBaseAsItIs(), CoreConstants.ENCODING_UTF8)) != -1) {
+				if (config.indexOf(theme.getLinkToBaseAsItIs()) != -1 || config.indexOf(URLEncoder.encode(theme.getLinkToBaseAsItIs(),
+						CoreConstants.ENCODING_UTF8)) != -1) {
 					if (config.endsWith(searchName) || config.endsWith(URLEncoder.encode(searchName, CoreConstants.ENCODING_UTF8))) {
 						return config;
 					}
@@ -125,6 +124,8 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 				LOGGER.log(Level.WARNING, "Error while encoding: " + searchName, e);
 			}
 		}
+		
+		LOGGER.info("Didn't find configuration for theme: " + searchName + " in provided configs: " + configs);
 		return null;
 	}
 	
