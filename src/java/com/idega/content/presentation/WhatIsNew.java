@@ -50,21 +50,25 @@ public class WhatIsNew extends SearchResults {
 
 	public static final String STYLE_CLASS_WHATISNEW = "whatisnew";
 	public static final String WHAT_IS_NEW_CACHE_KEY = "iw_whatisnew";
+	
 	protected String startingPointURI = "files/public";
 	protected String orderByProperty = "getlastmodified";
-	protected boolean useDescendingOrder = true;
+	protected String groupHeight = null;
+	
 	protected int numberOfResultItemsToDisplay = -1;
+	
+	protected boolean useDescendingOrder = true;
 	protected boolean ignoreFolders = true;
 	protected boolean useRootAccessForSearch = false;
 	protected boolean hideParentFolderPath = false;
 	protected boolean hideFileExtension = false;
 	protected boolean useUserHomeFolder = false;
 	protected boolean showDeleteLink = false;
-	protected ICPage deletePage = null;
 	protected boolean groupByExtraInfo = false;
-	protected String groupHeight = null;
 	protected boolean orderGroups = true;
-
+	
+	protected ICPage deletePage = null;
+	
 	public WhatIsNew(){
 		super();
 		this.setCacheable(WHAT_IS_NEW_CACHE_KEY, 0);
@@ -243,7 +247,7 @@ public class WhatIsNew extends SearchResults {
 	 */
 	@Override
 	protected String getSearchQueryString(IWContext iwc) {
-		String query = "*";
+		String query = isIgnoreFolders() ? "*.*" : "*";
 		if(super.searchQueryString==null){
 			return query;
 		}
