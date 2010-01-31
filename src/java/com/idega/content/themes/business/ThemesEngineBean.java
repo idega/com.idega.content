@@ -846,16 +846,18 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 			IWMainSlideStartedEvent slideStarted = (IWMainSlideStartedEvent) event;
 			final IWMainApplicationSettings settings = slideStarted.getIWMA().getSettings();
 			if (!settings.getBoolean(DEFAULT_THEMES_INSTALLED_KEY, Boolean.FALSE) && settings.getBoolean("auto_load_themes", Boolean.TRUE)) {
-				Thread themesInstaller = new Thread(new Runnable() {
-					public void run() {
-						Boolean result = installDefaultThemes();
-						settings.setProperty(DEFAULT_THEMES_INSTALLED_KEY, result.toString());
-						if (result) {
-							getThemes();
+				if (ListUtil.isEmpty(getThemes())) {
+					Thread themesInstaller = new Thread(new Runnable() {
+						public void run() {
+							Boolean result = installDefaultThemes();
+							settings.setProperty(DEFAULT_THEMES_INSTALLED_KEY, result.toString());
+							if (result) {
+								getThemes();
+							}
 						}
-					}
-				});
-				themesInstaller.start();
+					});
+					themesInstaller.start();
+				}
 			}
 		}
 	}
