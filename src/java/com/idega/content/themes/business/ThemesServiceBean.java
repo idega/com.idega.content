@@ -285,6 +285,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			LOGGER.warning("Trying to create template with already existing uri: " + initialValue + ", will change it!");
 			initialValue = initialValue.concat(CoreConstants.UNDER).concat(String.valueOf(System.currentTimeMillis()));
 			return getUriForTemplate(initialValue, domainId);
+		} catch (FinderException e) {
 		} catch (Exception e) {
 			LOGGER.log(Level.WARNING, "Error getting template by the uri: " + initialValue.concat(CoreConstants.SLASH), e);
 		}
