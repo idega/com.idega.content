@@ -11,6 +11,7 @@ package com.idega.content.presentation;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -87,15 +88,6 @@ public class WhatIsNew extends SearchResults {
 		//just listen for changes
 		startCachingStrategy();
 		
-		Web2Business business = ELUtil.getInstance().getBean(Web2Business.class);
-
-		List<String> actions = new ArrayList<String>();
-		actions.add(business.getActionToLinkLinksWithFiles(STYLE_CLASS_WHATISNEW, true, false));
-		
-		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, business.getBundleUriToLinkLinksWithFilesScriptFile());
-		PresentationUtil.addStyleSheetToHeader(iwc, business.getBundleUriToLinkLinksWithFilesStyleFile());
-		PresentationUtil.addJavaScriptActionsToBody(iwc, actions);
-		
 		super.main(iwc);
 	}
 	
@@ -107,13 +99,21 @@ public class WhatIsNew extends SearchResults {
 		}
 	}
 	
-	
-
 	@Override
 	protected String getCacheState(IWContext iwc, String cacheStatePrefix) {
 		IWBundle iwb = IWContext.getInstance().getIWMainApplication().getCoreBundle();
-		PresentationUtil.addStyleSheetToHeader(iwc, iwb.getVirtualPathWithFileNameString("style/search.css"));
+		Web2Business business = ELUtil.getInstance().getBean(Web2Business.class);
 
+		List<String> actions = new ArrayList<String>();
+		actions.add(business.getActionToLinkLinksWithFiles(STYLE_CLASS_WHATISNEW, true, false));
+		
+		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, business.getBundleUriToLinkLinksWithFilesScriptFile());
+		PresentationUtil.addStyleSheetsToHeader(iwc, Arrays.asList(
+				iwb.getVirtualPathWithFileNameString("style/search.css"),
+				business.getBundleUriToLinkLinksWithFilesStyleFile()
+		));
+		PresentationUtil.addJavaScriptActionsToBody(iwc, actions);
+		
 		StringBuffer buffer = new StringBuffer(cacheStatePrefix);
 		buffer.append(getSearchQueryString(iwc))
 		.append(getStartingPointURI())
