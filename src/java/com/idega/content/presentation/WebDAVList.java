@@ -6,8 +6,6 @@ import java.util.Iterator;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
-import javax.faces.el.ValueBinding;
-
 import org.apache.myfaces.custom.savestate.UISaveState;
 
 import com.idega.content.bean.ContentPathBean;
@@ -87,20 +85,16 @@ public class WebDAVList extends IWBaseComponent {
 		list.setId(this.getId()+"_l");
 		add(list);
 		
-		
-		//to make this object request safe, extension from myfaces
-		//ask Tryggvi
+		//	To make this object request safe, extension from myfaces. Ask Tryggvi
 		UISaveState beanSaveState = new UISaveState();
-		ValueBinding binding = WFUtil.createValueBinding("#{"+WEB_DAV_LIST_BEAN_ID+".dataModel}");
+		beanSaveState.setValueExpression("value", WFUtil.createValueExpression(context.getELContext(),
+				"#{".concat(WEB_DAV_LIST_BEAN_ID).concat(".dataModel}"), Object.class));
 		beanSaveState.setId("WebDavListBeanSaveState");
-		beanSaveState.setValueBinding("value", binding);
 		add(beanSaveState);
-
-		
 	}
 	
 	protected WebDAVListManagedBean getWebDAVListManagedBean(){
-		return (WebDAVListManagedBean) WFUtil.getBeanInstance(WEB_DAV_LIST_BEAN_ID);
+		return WFUtil.getBeanInstance(WEB_DAV_LIST_BEAN_ID, WebDAVListManagedBean.class);
 	}
 	
 	public void setStartFolder(String start) {
@@ -139,6 +133,7 @@ public class WebDAVList extends IWBaseComponent {
 		this.onFileClickEvent = event;
 	}
 	
+	@Override
 	public void encodeChildren(FacesContext context) throws IOException{
 		super.encodeChildren(context);
 		for (Iterator<UIComponent> iter = getChildren().iterator(); iter.hasNext();) {
@@ -147,6 +142,7 @@ public class WebDAVList extends IWBaseComponent {
 		}
 	}
 	
+	@Override
 	public boolean getRendersChildren() {
 		return true;
 	}
