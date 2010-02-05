@@ -35,9 +35,11 @@ import com.idega.util.FileUtil;
 /**
  * @author Roar
  */
-public class WebDAVBean extends Object implements ICTreeNode,Serializable {
+public class WebDAVBean extends Object implements ICTreeNode, Serializable {
     
-    public static final String PROP_ID = "id";
+	private static final long serialVersionUID = -7214381001863096621L;
+	
+	public static final String PROP_ID = "id";
     public static final String PROP_NAME = "name";
     public static final String PROP_LENGTH = "length";
     public static final String PROP_IS_COLLECTION = "is_collection";
