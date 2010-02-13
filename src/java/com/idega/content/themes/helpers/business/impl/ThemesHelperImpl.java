@@ -183,7 +183,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		
 		List<SearchResult> themes = search(ThemesConstants.THEME_SEARCH_KEY, searchScope);
 		if (themes == null) {
-			LOGGER.log(Level.WARNING, "ContentSearch.doSimpleDASLSearch returned results Collection, which is null!");
+			LOGGER.warning("ContentSearch.doSimpleDASLSearch did not return any results! for: " + ThemesConstants.THEME_SEARCH_KEY + " in: " + searchScope);
 			checkedFromSlide = false;
 			return;
 		}
@@ -193,7 +193,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			ThemesLoader themesLoader = new ThemesLoader();
 			themesLoader.loadThemes(themesSkeletons, false, true);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error loading themes: " + themesSkeletons, e);
 		}
 	}
 	
