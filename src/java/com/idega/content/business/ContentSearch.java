@@ -15,6 +15,7 @@ import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -69,6 +70,7 @@ import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
+import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
 
@@ -175,12 +177,12 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 * 
 	 * @see com.idega.core.search.business.SearchPlugin#getAdvancedSearchSupportedParameters()
 	 */
-	public List getAdvancedSearchSupportedParameters() {
-		List parameters = new ArrayList();
-		parameters.add(DOCUMENT_SEARCH_WORD_PARAMETER_NAME);
-		parameters.add(DOCUMENT_TYPE_PARAMETER_NAME);
-		parameters.add(DOCUMENT_ORDERING_PARAMETER_NAME);
-		return parameters;
+	public List<String> getAdvancedSearchSupportedParameters() {
+		return Arrays.asList(
+				DOCUMENT_SEARCH_WORD_PARAMETER_NAME,
+				DOCUMENT_TYPE_PARAMETER_NAME,
+				DOCUMENT_ORDERING_PARAMETER_NAME
+		);
 	}
 
 	/*
@@ -208,8 +210,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 */
 	public boolean initialize(IWMainApplication iwma) {
 		try {
-			IWSlideService service = IBOLookup.getServiceInstance(iwma.getIWApplicationContext(),
-					IWSlideService.class);
+			IWSlideService service = IBOLookup.getServiceInstance(iwma.getIWApplicationContext(), IWSlideService.class);
 			this.httpURL = service.getWebdavServerURL();
 		}
 		catch (IBOLookupException e) {
@@ -237,14 +238,14 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 * @see com.idega.core.search.business.SearchPlugin#createSearch(com.idega.core.search.business.SearchQuery,java.util.List)
 	 */
 	public Search createSearch(SearchQuery searchQuery, List searchRequests) {
-		List results = new ArrayList();
+		List<SearchResult> results = new ArrayList<SearchResult>();
 		BasicSearch searcher = new BasicSearch();
 		searcher.setSearchName(getSearchName());
 		searcher.setSearchType(SEARCH_TYPE);
 		searcher.setSearchQuery(searchQuery);
 		try {
 			Credentials hostCredentials = null;
-			IWSlideService service = IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(),IWSlideService.class);
+			IWSlideService service = IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), IWSlideService.class);
 					
 			if (isUsingRootAccessForSearch()) {
 				hostCredentials = service.getRootUserCredentials();
@@ -263,7 +264,6 @@ public class ContentSearch extends Object implements SearchPlugin{
 			HostConfiguration hostConfig = client.getHostConfiguration();
 			hostConfig.setHost(this.httpURL);
 		
-			
 			if (hostCredentials != null) {
 				HttpState clientState = client.getState();
 				clientState.setCredentials(null, this.httpURL.getHost(), hostCredentials);
@@ -275,14 +275,14 @@ public class ContentSearch extends Object implements SearchPlugin{
 				if (request instanceof String) {
 					queryXML = (String) request;
 				}
-				else {
+				else if (request instanceof SearchRequest) {
 					SearchRequest query = (SearchRequest) request;
 					
 					// executeSearch uses comparator which needs a property set in propertyToOrderBy
 					// in search results. add it if it's not there
 					boolean selectionCorrect = false;
-					for (Iterator selection = query.getSelection(); selection.hasNext(); ) {
-						PropertyName prop = (PropertyName) selection.next();
+					for (Iterator<PropertyName> selection = query.getSelection(); selection.hasNext(); ) {
+						PropertyName prop = selection.next();
 						if (prop.getLocalName().equals(getPropertyToOrderBy())) {
 							selectionCorrect = true;
 							break;
@@ -320,7 +320,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 * @see com.idega.core.search.business.SearchPlugin#createSearch(SearchRequest)
 	 */
 	public Search createSearch(SearchRequest searchRequest) {
-		return createSearch(null, Collections.singletonList(searchRequest));
+		return createSearch(null, Arrays.asList(searchRequest));
 	}
 
 	/*
@@ -621,24 +621,17 @@ public class ContentSearch extends Object implements SearchPlugin{
 		this.ignoreFolders   = ignoreFolders;
 	}
 
-	protected void executeSearch(List results, String servletMapping, SearchMethod method, HttpClient client)
-	throws IOException, HttpException {
-		/*int state =*/ 
-		
-//		Timer timer = new Timer();
-//		timer.start();
-		
+	protected void executeSearch(List<SearchResult> results, String servletMapping, SearchMethod method, HttpClient client) throws IOException, HttpException {
 		client.executeMethod(method);
-		Enumeration enumerator = method.getResponses();
-//		timer.stop();
-//		timer.logTime("ContentSearch");
-	
+		Enumeration<ResponseEntity> enumerator = method.getResponses();
+		List<ResponseEntity> searchResults = Collections.list(enumerator);
+		
 		String fileName;
 		String fileURI;
 		String lastModifiedDate;
 		String parentFolderPath;
 		BasicSearchResult result;
-		ArrayList tempResults = new ArrayList();
+		List<SearchResult> tempResults = new ArrayList<SearchResult>();
 		Property prop;
 		
 		Locale locale = null;
@@ -647,52 +640,46 @@ public class ContentSearch extends Object implements SearchPlugin{
 		try {
 			IWContext iwc = IWContext.getInstance();
 			locale = iwc.getCurrentLocale();
-			
 		} catch (UnavailableIWContext e) {
 			//not being run by a user, e.g. backend search
 			locale = IWMainApplication.getDefaultIWApplicationContext().getApplicationSettings().getDefaultLocale();
 		}
 		
-//		timer.reset();
-//		timer.start();
-		
 		//fixme ONLY NEEDED UNTIL ORDERING / SORTING WORKS IN SLIDE!!, remove when ordering works and put back in the ordering and limiting xml
 		SearchResultComparator comparator = new SearchResultComparator(locale,getPropertyToOrderBy(),isSetToUseDescendingOrder());
 
-		while (enumerator.hasMoreElements()) {
-			ResponseEntity entity = (ResponseEntity) enumerator.nextElement();
+		for (ResponseEntity entity: searchResults) {
 			fileURI = entity.getHref();
 
 			if (!fileURI.equalsIgnoreCase(servletMapping)) {
-				fileName = URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf("/") + 1));
+				fileName = URLDecoder.decode(fileURI.substring(fileURI.lastIndexOf(CoreConstants.SLASH) + 1), CoreConstants.ENCODING_UTF8);
 				//don't return "hidden files" that start with a "."
-				if(fileName.startsWith(".")){
+				if(fileName.startsWith(CoreConstants.DOT)){
 					continue;
 				}
-				Enumeration props = entity.getProperties();
-				Map properties = new HashMap();
-//				System.out.println(fileURI + " properties:");
+				Enumeration<Property> props = entity.getProperties();
+				Map<String, Object> properties = new HashMap<String, Object>();
 				while (props.hasMoreElements()) {
-					prop = (Property) props.nextElement();
+					prop = props.nextElement();
 					String name = prop.getLocalName();
 					String value = prop.getPropertyAsString();
 					properties.put(name,value);
-//					System.out.println("| " + name + " = " + value);
 				}
 				
 				// PARSE PROPERTIES AND CONVERT SOME
 				if(isSetToHideFileExtensions()){
-					int dotIndex = fileName.lastIndexOf(".");
+					int dotIndex = fileName.lastIndexOf(CoreConstants.DOT);
 					if(dotIndex>-1){
 						fileName = fileName.substring(0,dotIndex);
 					}
 				}
 				
-				parentFolderPath = URLDecoder.decode(fileURI.substring(0,fileURI.lastIndexOf("/") + 1));
+				parentFolderPath = URLDecoder.decode(fileURI.substring(0,fileURI.lastIndexOf(CoreConstants.SLASH) + 1), CoreConstants.ENCODING_UTF8);
 
 				if(isSetToHideParentFolderPath()){
-					parentFolderPath = (parentFolderPath.endsWith("/"))? parentFolderPath.substring(0,parentFolderPath.lastIndexOf("/")):parentFolderPath;
-					parentFolderPath = parentFolderPath.substring(parentFolderPath.lastIndexOf("/")+1);
+					parentFolderPath = (parentFolderPath.endsWith(CoreConstants.SLASH)) ?
+							parentFolderPath.substring(0,parentFolderPath.lastIndexOf(CoreConstants.SLASH)):parentFolderPath;
+					parentFolderPath = parentFolderPath.substring(parentFolderPath.lastIndexOf(CoreConstants.SLASH)+1);
 				}
 				String modDate = (String)properties.get("getlastmodified");	
 				String createdDate =  (String)properties.get("creationdate");
@@ -728,14 +715,9 @@ public class ContentSearch extends Object implements SearchPlugin{
 		//fixme LIMITING THE DIRTY WAY, must be done after the order, remove when ordering works in slide and put back in xml ordering and limiting
 		if(getNumberOfResultItemsToReturn()!=-1){
 			results.addAll(tempResults.subList(0, Math.min(tempResults.size(),getNumberOfResultItemsToReturn())));
-		}
-		else{
+		} else {
 			results.addAll(tempResults);
 		}
-		
-//		System.out.println("Results size"+results.size());
-		
-//		timer.logTime("ContentSearch");
 	}
 
 
@@ -755,9 +737,8 @@ public class ContentSearch extends Object implements SearchPlugin{
 		this.deletePage = deletePage;
 	}
 
-	
-	public Collection getExtraRowElements(SearchResult result, IWResourceBundle iwrb) {
-		Collection coll = new Vector();
+	public Collection<Layer> getExtraRowElements(SearchResult result, IWResourceBundle iwrb) {
+		Collection<Layer> coll = new Vector<Layer>();
 		if (isSetToShowDeleteLink()) {
 			Layer deleteL = new Layer();
 			deleteL.setStyleClass(SearchResults.DEFAULT_LINK_STYLE_CLASS+"_delete");
@@ -954,22 +935,15 @@ public class ContentSearch extends Object implements SearchPlugin{
 	 * @return returns a collection of SearchResult objects
 	 */
 	public Collection<SearchResult> doSimpleDASLSearch(String searchString, String scope){
-
 		Map<String, String> queryMap = new HashMap<String, String>();
 		queryMap.put("mysearchstring", searchString);
 		SearchQuery query = new SimpleSearchQuery(queryMap);	
 		
-		
 		this.setScopeURI(scope);
 		String combinedSearch = getDisplayNameSearch(query);
-		ArrayList<String> l = new ArrayList<String>();
-		l.add(combinedSearch);
 		
-		Search search = createSearch(query,l);
-		Collection<SearchResult> results = search.getSearchResults();
-		
-		return results;
-		
+		Search search = createSearch(query, Arrays.asList(combinedSearch));
+		return search.getSearchResults();
 	}
 	
 	public String getSearchIdentifier() {
