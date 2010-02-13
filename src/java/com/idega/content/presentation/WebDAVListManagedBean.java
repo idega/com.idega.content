@@ -663,7 +663,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			WebDAVBean bean;
 			for (WebdavResource resource: resourcesInList) {
 				try {
-					if (!(resource instanceof WebdavExtendedResource) || !resource.getDisplayName().startsWith(CoreConstants.DOT)) {
+					if (resource.exists() && !(resource instanceof WebdavExtendedResource) || !resource.getDisplayName().startsWith(CoreConstants.DOT)) {
 						if (this.showFolders || (!this.showFolders && !resource.isCollection())) {
 							String name = resource.getName();
 							
