@@ -197,7 +197,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		Element root = doc.getRootElement();
-		Element head = getChild(root, HTML_HEAD);//root.getChild(HTML_HEAD, namespace);
+		Element head = getChild(root, HTML_HEAD);
 		if (head == null) {
 			LOGGER.log(Level.WARNING, "Tag <head> was not found in document!");
 			return false;
@@ -211,7 +211,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		// Adding Builder page regions
-		if (!proceedBodyContent(path, getChild(root, HTML_BODY)/*root.getChild(HTML_BODY, namespace)*/)) {
+		if (!proceedBodyContent(path, getChild(root, HTML_BODY))) {
 			return false;
 		}
 		
@@ -301,7 +301,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		Text t = null;
 		for (Iterator<Text> itt = textElements.iterator(); itt.hasNext(); ) {
 			t = itt.next();
-			if (needAddRegion(ThemesConstants.REGIONS, t.getTextNormalize())) {
+			if (needAddRegion(head, ThemesConstants.REGIONS, t.getTextNormalize())) {
 				head.addContent(getCommentsCollection(fixValue(t.getTextNormalize(), linkToBase)));
 			}
 			t.detach();
@@ -389,14 +389,57 @@ public class ThemeChangerBean implements ThemeChanger {
 			members = getEnabledStyles(theme);
 		}
 		
+		List<Element> currentLinks = XmlUtil.getElementsByXPath(head, "link", namespace);
+		
 		//	Finding where to insert element
 		int index = getElementIndex(head.getContent(), ThemesConstants.TAG_ATTRIBUTE_TYPE, TAG_ATTRIBUTE_VALUE_CSS);
 		for (int i = 0; i < members.size(); i++) {
-			addContentToElement(head, getNewStyleElement(basePath, members.get(i)), index);
+			Collection<Element> elementsToAdd = null;
+			Collection<Element> enabledStyles = getNewStyleElement(basePath, members.get(i));
+			if (ListUtil.isEmpty(currentLinks)) {
+				elementsToAdd = enabledStyles;
+			} else {
+				elementsToAdd = new ArrayList<Element>();
+				for (Element enabledStyle: enabledStyles) {
+					if (!currentLinks.contains(enabledStyle) && !hasTheSameAttribute(currentLinks, enabledStyle, ThemesConstants.TAG_ATTRIBUTE_HREF)) {
+						elementsToAdd.add(enabledStyle);
+					}
+				}
+			}
+			
+			if (!ListUtil.isEmpty(elementsToAdd)) {
+				addContentToElement(head, elementsToAdd, index);
+			}
 			index++;
 		}
 		
 		return true;
+	}
+	
+	private boolean hasTheSameAttribute(List<Element> elements, Element element, String attributeName) {
+		if (ListUtil.isEmpty(elements) || element == null || StringUtil.isEmpty(attributeName)) {
+			return false;
+		}
+		
+		Attribute a = element.getAttribute(attributeName);
+		if (a == null) {
+			return false;
+		}
+		String value = a.getValue();
+		if (value == null) {
+			return false;
+		}
+		
+		boolean foundSameValue = false;
+		for (Iterator<Element> elementsIter = elements.iterator(); (elementsIter.hasNext() && !foundSameValue);) {
+			Element e = elementsIter.next();
+			Attribute ea = e.getAttribute(attributeName);
+			if (ea != null) {
+				foundSameValue = value.equals(ea.getValue());
+			}
+		}
+		
+		return foundSameValue;
 	}
 	
 	private boolean addContentToElement(Element parent, Collection<Element> content, int index) {
@@ -836,7 +879,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return;
 		}
 		Attribute a = null;
-		if (!needAddRegion(ThemesConstants.REGIONS, e.getTextNormalize())) {
+		if (!needAddRegion(e, ThemesConstants.REGIONS, e.getTextNormalize())) {
 			e.setText(fixValue(e.getTextNormalize(), linkToBase));
 		}
 		a = getAttribute(e, ThemesConstants.TAG_ATTRIBUTE_HREF);
@@ -901,13 +944,33 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param value
 	 * @return boolean
 	 */
-	private boolean needAddRegion(List<String> regions, String value) {
-		if (regions == null || value == null) {
+	@SuppressWarnings("unchecked")
+	private boolean needAddRegion(Element e, List<String> regions, String value) {
+		if (e == null || regions == null || value == null) {
 			return false;
 		}
+		
 		if (regions.contains(value)) {
-			return true;
+			List<Content> content = e.getContent();
+			if (ListUtil.isEmpty(content)) {
+				return true;
+			}
+			
+			boolean foundRegion = false;
+			for (Iterator<Content> contentIter = content.iterator(); (contentIter.hasNext() && !foundRegion);) {
+				Content c = contentIter.next();
+				if (c instanceof Comment) {
+					Comment comment = (Comment) c;
+					String text = comment.getText();
+					if (!StringUtil.isEmpty(text)) {
+						foundRegion = text.indexOf(CoreConstants.QOUTE_MARK.concat(value).concat(CoreConstants.QOUTE_MARK)) != -1;
+					}
+				}
+			}
+			
+			return foundRegion ? false : true;
 		}
+		
 		return false;
 	}
 	
@@ -1303,17 +1366,15 @@ public class ThemeChangerBean implements ThemeChanger {
 		
 		String regionID = e.getAttributeValue(ThemesConstants.TAG_ATTRIBUTE_ID);
 		
-		if (needAddRegion(ThemesConstants.BASIC_IDS_FOR_REGIONS, regionID)) {
+		if (needAddRegion(e, ThemesConstants.BASIC_IDS_FOR_REGIONS, regionID)) {
 			e.addContent(0, getCommentsCollection(regionID));
 		}
 		
 		fixSiteRegion(e, "h1", ThemesConstants.SITE_TITLE);
 		fixSiteRegion(e, "h2", ThemesConstants.SITE_SLOGAN);
 		
-		if (regionID != null) {
-			if (regionID.equals(REGION_TO_EXPAND)) {
-				e.addContent(getExpandRegion()); // Expanding theme
-			}
+		if (regionID != null && regionID.equals(REGION_TO_EXPAND)) {
+			e.addContent(getExpandRegion()); // Expanding theme
 		}
 		
 		if (!hasElementChildren(e, false)) {
