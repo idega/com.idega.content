@@ -102,41 +102,43 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		notifyManagedBeanOfVariableValues();
 		
 		ContentListViewerManagedBean bean = getManagedBean();
-		ContentItemViewer viewer = bean.getContentViewer();
-		viewer.setShowRequestedItem(false);
-		addContentItemViewer(viewer);
-		
-		String[] actions = getToolbarActions();
-		if(actions != null && actions.length > 0){
-			ContentItemToolbar toolbar = new ContentItemToolbar(true);
-			toolbar.setContainerId(this.getId());
+		if (bean != null) {
+			ContentItemViewer viewer = bean.getContentViewer();
+			viewer.setShowRequestedItem(false);
+			addContentItemViewer(viewer);
 			
-			toolbar.setMenuStyleClass(toolbar.getMenuStyleClass() + " " + toolbar.getMenuStyleClass() + "_top");
-			for (int i = 0; i < actions.length; i++) {
-				toolbar.addToolbarButton(actions[i]);
-			}
-			String categories = this.getCategories();
-			if(categories!=null){
-				toolbar.setCategories(categories);
-			}
-			String basePath = getBaseFolderPath();
-			if(basePath!=null){
-				toolbar.setBaseFolderPath(basePath);
+			String[] actions = getToolbarActions();
+			if(actions != null && actions.length > 0){
+				ContentItemToolbar toolbar = new ContentItemToolbar(true);
+				toolbar.setContainerId(this.getId());
+				
+				toolbar.setMenuStyleClass(toolbar.getMenuStyleClass() + " " + toolbar.getMenuStyleClass() + "_top");
+				for (int i = 0; i < actions.length; i++) {
+					toolbar.addToolbarButton(actions[i]);
+				}
+				String categories = this.getCategories();
+				if(categories!=null){
+					toolbar.setCategories(categories);
+				}
+				String basePath = getBaseFolderPath();
+				if(basePath!=null){
+					toolbar.setBaseFolderPath(basePath);
+				}
+				
+				toolbar.setActionHandlerIdentifier(bean.getIWActionURIHandlerIdentifier());
+				this.setHeader(toolbar);
 			}
 			
-			toolbar.setActionHandlerIdentifier(bean.getIWActionURIHandlerIdentifier());
-			this.setHeader(toolbar);
-		}
-		
-		List attachementViewers = bean.getAttachmentViewers();
-		if(attachementViewers!=null){
-			for (ListIterator iter = attachementViewers.listIterator(); iter.hasNext();) {
-				ContentItemViewer attachmentViewer = (ContentItemViewer) iter.next();
-				int index = iter.nextIndex();
-				addAttachmentViewer(attachmentViewer,index);
+			List attachementViewers = bean.getAttachmentViewers();
+			if(attachementViewers!=null){
+				for (ListIterator iter = attachementViewers.listIterator(); iter.hasNext();) {
+					ContentItemViewer attachmentViewer = (ContentItemViewer) iter.next();
+					int index = iter.nextIndex();
+					addAttachmentViewer(attachmentViewer,index);
+				}
 			}
+			this.initialized = true;
 		}
-		this.initialized = true;
 	}
 	
 	
@@ -166,7 +168,10 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
         String path = vb != null ? (String)vb.getValue(getFacesContext()) : null;
         if(path==null){
 	        	if(this.managedBeanId!=null){
-	        		path = getManagedBean().getBaseFolderPath();
+	        		ContentListViewerManagedBean bean = getManagedBean();
+	        		if (bean != null) {
+	        			path = bean.getBaseFolderPath();
+	        		}
 	        	}
         }
         return path;
@@ -190,17 +195,20 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	@Override
 	public Object getValue(){
 		if(this.model==null){
-			List items = getManagedBean().getContentItems();
-			if(items!=null){
-				this.model = new WFDataModel();
-				for (ListIterator iter = items.listIterator(); iter.hasNext();) {
-					int index = iter.nextIndex();
-					ContentItem item = (ContentItem) iter.next();
-					ContentItemBindingBean bean = new ContentItemBindingBean(item);
-					this.model.set(bean,index);
+    		ContentListViewerManagedBean bean = getManagedBean();
+    		if (bean != null) {
+				List items = bean.getContentItems();
+				if(items!=null){
+					this.model = new WFDataModel();
+					for (ListIterator iter = items.listIterator(); iter.hasNext();) {
+						int index = iter.nextIndex();
+						ContentItem item = (ContentItem) iter.next();
+						ContentItemBindingBean bean2 = new ContentItemBindingBean(item);
+						this.model.set(bean2,index);
+					}
+					return this.model;
 				}
-				return this.model;
-			}
+    		}
 			return super.getValue();
 		}
 		return this.model;
@@ -384,7 +392,10 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		
 		int maxItems = getMaxNumberOfDisplayed();
 		if(maxItems!=-1){
-			getManagedBean().setMaxNumberOfDisplayed(maxItems);
+    		ContentListViewerManagedBean bean = getManagedBean();
+    		if (bean != null) {
+				bean.setMaxNumberOfDisplayed(maxItems);
+    		}
 		}
 	}
 
@@ -393,7 +404,10 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	 */
 	private void notifyManagedBeanOfBaseFolderPath(String resourcePath) {
 		if(this.managedBeanId!=null){
-			getManagedBean().setBaseFolderPath(resourcePath);
+    		ContentListViewerManagedBean bean = getManagedBean();
+    		if (bean != null) {
+				bean.setBaseFolderPath(resourcePath);
+    		}
 		}
 	}
 	
@@ -402,19 +416,28 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 	 */
 	private void notifyManagedBeanOfDetailsViewerPath(String path) {
 		if(this.managedBeanId!=null){
-			getManagedBean().setDetailsViewerPath(this.detailsViewerPath);
+    		ContentListViewerManagedBean bean = getManagedBean();
+    		if (bean != null) {
+				bean.setDetailsViewerPath(this.detailsViewerPath);
+    		}
 		}
 	}
 	
 	private void notifyManagedBeanOfCategories(List<String> categories) {
 		if(this.managedBeanId!=null){
-			getManagedBean().setCategories(categories);
+    		ContentListViewerManagedBean bean = getManagedBean();
+    		if (bean != null) {
+    			bean.setCategories(categories);
+    		}
 		}
 	}
 	
 	private void notifyManagedBeanOfViewerIdentifier(String identifier) {
 		if (this.managedBeanId != null) {
-			getManagedBean().setViewerIdentifier(identifier);
+    		ContentListViewerManagedBean bean = getManagedBean();
+    		if (bean != null) {
+    			bean.setViewerIdentifier(identifier);
+    		}
 		}
 	}
 
