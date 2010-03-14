@@ -203,7 +203,7 @@ public class FileUploadViewer extends IWBaseComponent {
 				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId(),
 				isFakeFileDeletion());
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
-			initAction = new StringBuilder("registerEvent(window, 'load', function() {").append(initAction).append("});").toString();
+			initAction = new StringBuilder("jQuery(window).load(function() {").append(initAction).append("});").toString();
 		}
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
 		
