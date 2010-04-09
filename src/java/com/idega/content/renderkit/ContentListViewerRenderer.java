@@ -79,6 +79,7 @@ public class ContentListViewerRenderer extends BaseRenderer {
 		renderCustomComponent(facesContext, uiComponent, FACET_ITEM_COMMENTS_CONTROLLER);
 		renderHeader(facesContext,(UIData)uiComponent);
 		renderCustomComponent(facesContext, uiComponent, ContentItemViewer.FACET_JAVA_SCRIPT);
+		renderCustomComponent(facesContext, uiComponent, ContentItemViewer.FACET_FEED_SCRIPT);
 		renderCustomComponent(facesContext, uiComponent, ContentConstants.CONTENT_LIST_ITEMS_IDENTIFIER_NAME);
 	}
 	
