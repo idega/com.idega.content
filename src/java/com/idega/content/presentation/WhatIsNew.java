@@ -88,6 +88,16 @@ public class WhatIsNew extends SearchResults {
 		//just listen for changes
 		startCachingStrategy();
 		
+		boolean useGlobalSettings = iwc.getApplicationSettings().getBoolean("whatisnew.use.global.settings", false);
+		if (useGlobalSettings) {
+			boolean useDescending = iwc.getApplicationSettings().getBoolean("whatisnew.use.descending", true);
+			setToUseDescendingOrder(useDescending);
+			
+			String orderByProperty = iwc.getApplicationSettings().getProperty("whatisnew.order.property", "getlastmodified");
+			setOrderByProperty(orderByProperty);
+		}
+		
+		
 		super.main(iwc);
 	}
 	
