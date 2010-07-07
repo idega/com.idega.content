@@ -64,9 +64,6 @@ public class CategoriesEngineBean implements CategoriesEngine {
 		}
 		
 		List<ContentCategory> categories = new ArrayList<ContentCategory>(bean.getCategories());
-		if (categories == null) {
-			return null;
-		}
 		if (categories.size() == 0) {
 			return null;
 		}

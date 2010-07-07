@@ -273,23 +273,7 @@ public class HtmlTreeRendererNew extends HtmlTreeRenderer {
 	}
 
 	protected void encodeCurrentNode(FacesContext context, ResponseWriter out, HtmlTree tree, TreeNode node) throws IOException {
-		// TreeNode node = tree.getNode();
-
-		// TreeNode node = tree.getNode();
-		// set configurable values
-		//boolean showRootNode = tree.isShowRootNode();
-		boolean showNav = tree.isShowNav();
-		//boolean showLines = tree.isShowLines();
-		boolean clientSideToggle = tree.isClientSideToggle();
-
-		if (clientSideToggle) {
-			// we must show the nav icons if client side toggle is enabled (regardless
-			// of what user says)
-			showNav = true;
-		}
-
 		UIComponent nodeTypeFacet = tree.getFacet(node.getType());
-		UIComponent nodeImgFacet = null;
 
 		if (nodeTypeFacet == null) {
 			throw new IllegalArgumentException("Unable to locate facet with the name: " + node.getType());
@@ -297,54 +281,17 @@ public class HtmlTreeRendererNew extends HtmlTreeRenderer {
 
 		// render node padding
 		/*String[] pathInfo =*/ tree.getPathInformation(tree.getNodeId());
-		//int paddingLevel = pathInfo.length - 1;
-
-		// for (int i = (showRootNode ? 0 : 1); i < paddingLevel; i++)
-		// {
-		// boolean lastChild = tree.isLastChild((String)pathInfo[i]);
-		// String lineSrc = (!lastChild && showLines)
-		// ? getImageSrc(context, tree, "line-trunk.gif", true)
-		// : getImageSrc(context, tree, "spacer.gif", true);
-		//                     
-		// out.startElement(HTML.IMG_ELEM, tree);
-		// out.writeURIAttribute(HTML.SRC_ATTR, lineSrc, null);
-		//
-		// out.endElement(HTML.IMG_ELEM);
-		//                     
-		// // out.endElement(HTML.LI_ELEM);
-		// }
-
-		if (showNav) {
-			// nodeImgFacet = encodeNavigation(context, out, tree);
-		}
-
-		// render node
-		// out.startElement(HTML.TD_ELEM, tree);
-		if (nodeImgFacet != null) {
-			RendererUtils.renderChild(context, nodeImgFacet);
-		}
 
 		RendererUtils.renderChild(context, nodeTypeFacet);
-		// out.endElement(HTML.TD_ELEM);
 	}
 
 	protected void encodeRootNode(FacesContext context, ResponseWriter out, HtmlTree tree) throws IOException {
-
 		TreeNode node = tree.getNode();
 
 		boolean showRootNode = tree.isShowRootNode();
-		boolean showNav = tree.isShowNav();
 		boolean showLines = tree.isShowLines();
-		boolean clientSideToggle = tree.isClientSideToggle();
-
-		if (clientSideToggle) {
-			// we must show the nav icons if client side toggle is enabled (regardless
-			// of what user says)
-			showNav = true;
-		}
 
 		UIComponent nodeTypeFacet = tree.getFacet(node.getType());
-		UIComponent nodeImgFacet = null;
 
 		if (nodeTypeFacet == null) {
 			throw new IllegalArgumentException("Unable to locate facet with the name: " + node.getType());
@@ -363,13 +310,6 @@ public class HtmlTreeRendererNew extends HtmlTreeRenderer {
 			out.endElement(HTML.IMG_ELEM);
 		}
 
-		if (showNav) {
-			// nodeImgFacet = encodeNavigation(context, out, tree);
-		}
-
-		if (nodeImgFacet != null) {
-			RendererUtils.renderChild(context, nodeImgFacet);
-		}
 		RendererUtils.renderChild(context, nodeTypeFacet);
 	}
 

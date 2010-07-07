@@ -173,7 +173,6 @@ public class TemplatesLoader implements JarLoader {
 		String pageName = null;	
 		String pageType = null;
 		String iconFile = null;
-		String templateFile = null;
 		SiteTemplate currNode = new SiteTemplate();
 		pageType = currElement.getAttributeValue("type");
 		currNode.setType(pageType);
@@ -189,8 +188,6 @@ public class TemplatesLoader implements JarLoader {
 		}
 		currNode.setTemplateFile(iwma.getApplicationContextURI() + currElement.getAttributeValue("templatefile"));		
 		
-		if (templateFile != null)
-			currNode.setTemplateFile(templateFile);
 		for (Object child: currElement.getChildren()) {
 			currNode.addChild(getNode((Element)child));
 		}

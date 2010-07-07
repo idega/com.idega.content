@@ -70,9 +70,6 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 	private synchronized List<Theme> getUnPreparedThemes() {
 		List<Theme> newThemes = new ArrayList<Theme>();
 		List<Theme> themes = new ArrayList<Theme>(getHelper().getAllThemes());
-		if (themes == null) {
-			return newThemes;
-		}
 		
 		for (Theme theme: themes) {
 			//	Checking if it is possible to extract properties
