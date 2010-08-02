@@ -112,7 +112,6 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		return deletePage(pageID, deleteChildren, false, true, markPagesForDeletingArticles);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean deletePage(String pageKey, boolean deleteChildren, boolean canUseDefaultUser, boolean clearCache, boolean markPagesForDeletingArticles) {
 		if (pageKey == null) {
 			return false;
@@ -120,6 +119,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 
 		IWContext iwc = CoreUtil.getIWContext();
 		
+		@SuppressWarnings("rawtypes")
 		Map tree = null;
 		ICDomain domain = null;
 		int userId = 1;
@@ -135,8 +135,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			} catch(Exception e) {
 				LOGGER.log(Level.WARNING, "Error getting tree", e);
 			}
-		}
-		else {
+		} else {
 			userId = iwc.getCurrentUserId();
 			tree = getBuilderService().getTree(iwc);
 			domain = iwc.getDomain();
