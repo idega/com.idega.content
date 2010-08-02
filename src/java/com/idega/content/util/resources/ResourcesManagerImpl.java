@@ -20,6 +20,7 @@ import com.idega.core.business.DefaultSpringBean;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.include.ExternalLink;
 import com.idega.idegaweb.include.JavaScriptLink;
+import com.idega.idegaweb.include.RSSLink;
 import com.idega.idegaweb.include.StyleSheetLink;
 import com.idega.servlet.filter.IWBundleResourceFilter;
 import com.idega.slide.business.IWSlideService;
@@ -47,6 +48,7 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 	private List<JavaScriptLink> javaScriptActions;
 	private List<JavaScriptLink> javaScriptResources;
 	private List<StyleSheetLink> cssFiles;
+	private List<RSSLink> feedLinks;
 	
 	private Map<String, String> mediaMap;
 	
@@ -402,5 +404,12 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 	private String getMinifiedResource(ExternalLink resource) {
 		AbstractMinifier minifier = resource instanceof StyleSheetLink ? new CSSMinifier() : new  JavaScriptMinifier();
 		return minifier.getMinifiedResource(resource);
+	}
+
+	public List<RSSLink> getFeedLinks() {
+		if (feedLinks == null) {
+			feedLinks = new ArrayList<RSSLink>();
+		}
+		return feedLinks;
 	}
 }
