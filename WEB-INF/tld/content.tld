@@ -1,13 +1,10 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE taglib
-  PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN"
-  "http://java.sun.com/dtd/web-jsptaglibrary_1_2.dtd">
-  
-<taglib xmlns="http://java.sun.com/JSP/TagLibraryDescriptor">
+<taglib xmlns="http://java.sun.com/xml/ns/javaee" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd" 
+        version="2.1">
 
-    <tlib-version>0.9.0</tlib-version>
-    <jsp-version>1.2</jsp-version>
-    <short-name>content</short-name>
+	<tlib-version>2.1</tlib-version>
+    <short-name>Content</short-name>
 	<uri>http://xmlns.idega.com/com.idega.content</uri>
     <display-name>Content Tag Library</display-name>
     <description>JSF Idega Content Management Tag Library</description>
@@ -692,7 +689,8 @@
 		<attribute>
 			<name>title</name>
 			<required>false</required>
-			<rtexprvalue>false</rtexprvalue>
+			<deferred-value></deferred-value>
+			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
 			<name>maximizedVertically</name>
@@ -707,17 +705,20 @@
 		<attribute>
 			<name>collapseAllValue</name>
 			<required>false</required>
-			<rtexprvalue>false</rtexprvalue>
+			<deferred-value></deferred-value>
+			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
 			<name>expandAllValue</name>
 			<required>false</required>
-			<rtexprvalue>false</rtexprvalue>
+			<deferred-value></deferred-value>
+			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
 			<name>trashCanImage</name>
 			<required>false</required>
-			<rtexprvalue>false</rtexprvalue>
+			<deferred-value></deferred-value>
+			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
 			<name>addStartPageButton</name>

@@ -8,7 +8,7 @@
         xmlns:ws="http://xmlns.idega.com/com.idega.workspace"
  		xmlns:c="http://xmlns.idega.com/com.idega.content"
         xmlns:web2="http://xmlns.idega.com/com.idega.block.web2.0"
-version="1.2">
+version="2.1">
 	<jsp:directive.page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"/>
 	<f:view>
 		<ws:page id="pages" javascripturls="#{lucidEngine.javaScriptResources}" stylesheeturls="#{lucidEngine.styleSheetResources}">
