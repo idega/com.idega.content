@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import javax.faces.context.FacesContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,7 +147,6 @@ public class ApplicationPropertyViewer extends Block {
 		return values;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void addPropertyEditAction(IWContext iwc, PresentationObject component, String key, String settingKey, boolean needsReload) {
 		if (iwc == null || component == null || key == null) {
 			return;
@@ -183,7 +183,7 @@ public class ApplicationPropertyViewer extends Block {
 		String id = new StringBuffer(property).append(ThemesConstants.ADD_FOR_PROPERTY_CHANGE).append(component.getId()).toString();
 		component.setID(id);
 		if (component.attributes == null) {
-			component.attributes = new HashMap();
+			component.attributes = new HashMap<String, String>();
 		}
 		StringBuffer onDblClickAction = new StringBuffer();
 		onDblClickAction.append("AdminToolbarSession.getMode({ callback: function(mode) { if ('isContentAdmin' == mode) {changeSiteInfo('").append(id).append("', '")

@@ -634,7 +634,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 	}
 	
 	@SuppressWarnings("unchecked")
-	private List<Element> getStyleGroups(String elementSearchKey, List children) {
+	private List<Element> getStyleGroups(String elementSearchKey, @SuppressWarnings("rawtypes") List children) {
 		Element styleBaseElement = getNextElement(elementSearchKey, children);
 		if (styleBaseElement == null) {
 			return null;

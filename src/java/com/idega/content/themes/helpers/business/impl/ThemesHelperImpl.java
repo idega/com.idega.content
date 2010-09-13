@@ -1093,7 +1093,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return doc;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private List<Element> getArticleViewerElements(Document doc) {
 		if (doc == null) {
 			return null;
@@ -1103,7 +1102,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		Object o = null;
 		Element e = null;
 		Attribute classAttribute = null;
-		for (Iterator it = doc.getDescendants(); it.hasNext();) {
+		for (@SuppressWarnings("rawtypes")
+		Iterator it = doc.getDescendants(); it.hasNext();) {
 			o = it.next();
 			if (o instanceof Element) {
 				e = (Element) o;
@@ -1428,11 +1428,11 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return uri.toString();
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean addIDsToModules(Element root, int pageID) {
 		if (root == null || pageID < 0) {
 			return false;
 		}
+		@SuppressWarnings("rawtypes")
 		Iterator allElements = root.getDescendants();
 		if (allElements == null) {
 			return false;
@@ -1454,7 +1454,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		try {
 			icoiHome = (ICObjectInstanceHome) IDOLookup.getHome(ICObjectInstance.class);
 			icoHome = (ICObjectHome)IDOLookup.getHome(ICObject.class);
-			for (Iterator it = allElements; it.hasNext(); ) {
+			for (@SuppressWarnings("rawtypes")
+			Iterator it = allElements; it.hasNext(); ) {
 				o = it.next();
 				moduleID = null;
 				icObjectId = -1;

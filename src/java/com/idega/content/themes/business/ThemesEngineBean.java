@@ -200,7 +200,6 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void addAllBuilderTypeTemplates(String key, List<SimplifiedTheme> childrenTemplates, BuilderService builder) {
 		if (key == null) {
 			return;
@@ -211,6 +210,7 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 			return;
 		}
 		
+		@SuppressWarnings("rawtypes")
 		Collection children = template.getChildren();
 		if (ListUtil.isEmpty(children)) {
 			return;
@@ -218,7 +218,8 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 		
 		Object o = null;
 		ICPage childTemplate = null;
-		for (Iterator it = children.iterator(); it.hasNext();) {
+		for (@SuppressWarnings("rawtypes")
+		Iterator it = children.iterator(); it.hasNext();) {
 			o = it.next();
 			
 			if (o instanceof ICPage) {
@@ -443,6 +444,7 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 	
 	@SuppressWarnings("unchecked")
 	private boolean setStyleForChildren(String pageKey, int templateKey, IWContext iwc, ICDomain cachedDomain, boolean isContentEditor, Theme theme) {
+		@SuppressWarnings("rawtypes")
 		Map tree = getTree(iwc);
 		if (tree == null) {
 			return true;
@@ -467,13 +469,15 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 			return true;
 		}
 		
+		@SuppressWarnings("rawtypes")
 		Collection pageChildren = parentPage.getChildren();
 		if (pageChildren == null) {
 			return true;
 		}
 		o = null;
 		ICTreeNode childPage = null;
-		for (Iterator it = pageChildren.iterator(); it.hasNext();) {
+		for (@SuppressWarnings("rawtypes")
+		Iterator it = pageChildren.iterator(); it.hasNext();) {
 			o = it.next();
 			if (o instanceof ICTreeNode) {
 				childPage = (ICTreeNode) o;
@@ -555,7 +559,7 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 		return service.copyAllModulesFromRegionIntoRegion(pageKey, region.getId(), newRegionId, newRegionId);
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private Map getTree(IWContext iwc) {
 		try {
 			return helper.getThemesService().getBuilderService().getTree(iwc);
@@ -565,8 +569,8 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean setSiteStyle(int templateID, IWContext iwc, boolean setStyleForChildren, boolean isContentEditor, Theme theme) {
+		@SuppressWarnings("rawtypes")
 		Map tree = getTree(iwc);
 		if (tree == null) {
 			return false;
@@ -575,7 +579,8 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 		ICDomain cachedDomain = iwc.getApplicationContext().getDomain();
 		boolean result = true;
 		Object o = null;
-		for (Iterator it = tree.values().iterator(); it.hasNext();) {
+		for (@SuppressWarnings("rawtypes")
+		Iterator it = tree.values().iterator(); it.hasNext();) {
 			o = it.next();
 			if (o instanceof ICTreeNode) {
 				result = setPageStyle(((ICTreeNode) o).getId(), templateID, iwc, cachedDomain, false, isContentEditor, theme);

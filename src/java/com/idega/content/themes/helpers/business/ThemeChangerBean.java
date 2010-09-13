@@ -265,11 +265,11 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param head
 	 * @return boolean
 	 */
-	@SuppressWarnings("unchecked")
 	private boolean proceedHeadContent(String linkToBase, Element head) {
 		if (linkToBase == null || head == null) {
 			return false;
 		}
+		@SuppressWarnings("rawtypes")
 		List headElements = head.getContent();
 		
 		if (headElements == null) {
@@ -309,6 +309,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	
 		//	Adding fake (comment) element to <script> - to get <script ...></script> in HTML code
 		//	Checking <link> tags in head
+		@SuppressWarnings("rawtypes")
 		List elements = head.getContent();
 		o = null;
 		Element element = null;
@@ -345,7 +346,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		return uploadTheme(XmlUtil.getPrettyJDOMDocument(doc), theme, true);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean checkCssFiles(Document doc, String linkToTheme) {
 		if (doc == null) {
 			return false;
@@ -356,6 +356,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 			
+		@SuppressWarnings("rawtypes")
 		List links = XmlUtil.getElementsByXPath(root, ThemesConstants.LINK_TAG_INSTRUCTION, root.getNamespace());
 		if (links == null) {
 			return true;
@@ -695,8 +696,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param attributeValue
 	 * @return index
 	 */
-	@SuppressWarnings("unchecked")
-	private int getElementIndex(List contents, String attributeType, String attributeValue) {
+	private int getElementIndex(@SuppressWarnings("rawtypes") List contents, String attributeType, String attributeValue) {
 		int index = 0;
 		if (contents == null) {
 			return index;
@@ -826,12 +826,12 @@ public class ThemeChangerBean implements ThemeChanger {
 		return content;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void checkElementAttributes(Element e, List<String> validAttributes) {
 		if (e == null || validAttributes == null) {
 			return;
 		}
 		
+		@SuppressWarnings("rawtypes")
 		List attributes = e.getAttributes();
 		if (attributes == null) {
 			return;
@@ -979,7 +979,6 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param body
 	 * @return boolean
 	 */
-	@SuppressWarnings("unchecked")
 	private boolean proceedBodyContent(String linkToBase, Element body) {
 		if (body == null) {
 			return false;
@@ -1001,6 +1000,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		fixTag(body, ThemesConstants.EMBED_TAG_INSTRUCTION, "src", linkToBase);
 		
 		List<Text> needlessText = new ArrayList<Text>();
+		@SuppressWarnings("rawtypes")
 		List content = body.getContent();
 		if (content == null) {
 			return true;
@@ -1405,13 +1405,13 @@ public class ThemeChangerBean implements ThemeChanger {
 		return content.toString();
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean hasElementChildren(Element e, boolean checkContentOnly) {
 		if (e == null) {
 			return false;
 		}
 		
 		if (checkContentOnly) {
+			@SuppressWarnings("rawtypes")
 			List content = e.getContent();
 			if (ListUtil.isEmpty(content)) {
 				return false;
@@ -1419,6 +1419,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return true;
 		}
 		
+		@SuppressWarnings("rawtypes")
 		List children = e.getChildren();
 		if (ListUtil.isEmpty(children)) {
 			return false;

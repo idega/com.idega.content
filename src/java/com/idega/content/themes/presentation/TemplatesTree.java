@@ -55,6 +55,7 @@ public class TemplatesTree extends Block {
 			return;
 		}
 		
+		@SuppressWarnings("rawtypes")
 		Collection topLevelTemplates = builder.getTopLevelTemplates(iwc);
 		if (ListUtil.isEmpty(topLevelTemplates)) {
 			container.add(new Heading4(iwrb.getLocalizedString("there_are_no_templates", "There are no templates in system")));
@@ -124,6 +125,7 @@ public class TemplatesTree extends Block {
 		Collections.sort(topTemplates, new ICTreeNodeComparator(l));
 		
 		String name = null;
+		@SuppressWarnings("rawtypes")
 		Collection templateChildren = null;
 		String imageUri = iwb.getVirtualPathWithFileNameString("images/template.png");
 		String folderImageUri = iwb.getVirtualPathWithFileNameString("images/folder_template.png");
