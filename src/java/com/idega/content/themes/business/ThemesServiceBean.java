@@ -182,7 +182,6 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		iwc.setSessionAttribute(ContentConstants.DELETED_PAGE_IN_LUCID_PROPERTIES_FOR_ARTICLE, ids);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void putAllIdsOfPageAndChildren(String pageKey, List<String> ids) {
 		ICPage page = getICPage(pageKey);
 		
@@ -192,10 +191,12 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 				ids.add(id);
 			}
 			
+			@SuppressWarnings("rawtypes")
 			Collection children = page.getChildren();
 			if (children != null) {
 				Object o = null;
-				for (Iterator it = children.iterator(); it.hasNext();) {
+				for (@SuppressWarnings("rawtypes")
+				Iterator it = children.iterator(); it.hasNext();) {
 					o = it.next();
 					if (o instanceof ICPage) {
 						putAllIdsOfPageAndChildren(((ICPage) o).getId(), ids);
@@ -366,13 +367,13 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		return createIBPage(parentId, name, type, templateId, pageUri, subType, domainId, format, sourceMarkup, null);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format,
 			String sourceMarkup, String treeOrder) {
 
 		IWContext iwc = CoreUtil.getIWContext();
 		IWApplicationContext iwac = iwc == null ? IWMainApplication.getDefaultIWApplicationContext() : iwc;
 		
+		@SuppressWarnings("rawtypes")
 		Map tree = getBuilderService().getTree(iwac);
 		if (tree == null) {
 			return -1;
@@ -393,6 +394,21 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		
 		int pageId = getBuilderService().createNewPage(parentId, name, type, templateId, pageUri, tree, iwc, subType, domainId, format, sourceMarkup, treeOrder);
+		if (pageId < 0) {
+			LOGGER.warning("Probably page was not created using params:\n" +
+					"parent ID: " + parentId + "\n" +
+					"name: " + name + "\n" +
+					"type: " + type + "\n" +
+					"template ID: " + templateId + "\n" +
+					"page URI: " + pageUri + "\n" +
+					"tree: " + tree + "\n" +
+					"sub type: " + subType + "\n" +
+					"domain ID" + domainId + "\n" +
+					"format: " + format + "\n" +
+					"source markup: " + sourceMarkup + "\n" +
+					"tree order: "+ treeOrder + "\n" +
+				"\nbecause returned ID is: " + pageId);
+		}
 		
 		if (iwc != null && iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR)) {
 			ICPage createdPage = getICPage(pageId);
