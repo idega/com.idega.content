@@ -485,7 +485,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return getXMLDocument(url, false, false);
 	}
 	
-	private Document getXMLDocument(String url, boolean cleanWithHtmlCleaner, boolean useLog, boolean omitComments) {
+	private Document getXMLDocument(String url, boolean cleanWithHtmlCleaner, boolean useLog, boolean omitComments, boolean omitDocTypeDeclaration) {
 		if (url == null) {
 			return null;
 		}
@@ -493,7 +493,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		InputStream stream = getInputStream(url, useLog);
 		
 		if (stream != null && cleanWithHtmlCleaner) {
-			String content = getThemesService().getBuilderService().getCleanedHtmlContent(stream, false, false, omitComments);
+			String content = getThemesService().getBuilderService().getCleanedHtmlContent(stream, omitDocTypeDeclaration, false, omitComments);
 			if (content == null) {
 				return null;
 			}
@@ -517,6 +517,10 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	
 	public Document getXMLDocument(String url, boolean cleanWithHtmlCleaner, boolean omitComments) {
 		return getXMLDocument(url, cleanWithHtmlCleaner, false, omitComments);
+	}
+	
+	public Document getXMLDocument(String url, boolean cleanWithHtmlCleaner, boolean omitComments, boolean omitDocTypeDeclaaration) {
+		return getXMLDocument(url, cleanWithHtmlCleaner, false, omitComments, omitDocTypeDeclaaration);
 	}
 	
 	public Document getXMLDocument(InputStream stream) throws Exception {

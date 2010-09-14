@@ -3,7 +3,6 @@ package com.idega.content.themes.helpers.business;
 import java.util.List;
 import java.util.Map;
 
-import org.jdom.Document;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeChange;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
@@ -31,8 +30,6 @@ public interface ThemeChanger {
 	public boolean prepareThemeForUsage(Theme theme) throws Exception;
 	
 	public boolean prepareThemeStyleFiles(Theme theme) throws Exception;
-	
-	public boolean uploadDocument(Document doc, String linkToBase, String fileName, Theme theme, boolean isTheme) throws Exception;
 	
 	public boolean reloadThemeProperties(String themeKey, boolean checkConfig) throws Exception;
 	

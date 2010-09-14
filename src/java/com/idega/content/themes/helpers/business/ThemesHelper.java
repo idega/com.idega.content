@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import org.jdom.Document;
 
 import com.idega.business.SpringBeanName;
@@ -72,6 +73,7 @@ public interface ThemesHelper {
 	public Document getXMLDocument(String url);
 	
 	public Document getXMLDocument(String url, boolean cleanWithHtmlCleaner, boolean omitComments);
+	public Document getXMLDocument(String url, boolean cleanWithHtmlCleaner, boolean omitComments, boolean omitDocTypeDeclaaration);
 	
 	public Document getXMLDocument(InputStream stream) throws Exception;
 	

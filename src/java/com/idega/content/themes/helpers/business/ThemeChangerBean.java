@@ -143,7 +143,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		try {
 			content = StringHandler.getContentFromInputStream(helper.getInputStream(new StringBuffer(helper.getFullWebRoot()).append(skeleton).toString()));
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error getting contents from " + skeleton, e);
 			return false;
 		}
 		if (StringUtil.isEmpty(content)) {
@@ -190,7 +190,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 		
-		Document doc = helper.getXMLDocument(new StringBuffer(helper.getFullWebRoot()).append(skeleton).toString(), true, false);
+		Document doc = helper.getXMLDocument(new StringBuffer(helper.getFullWebRoot()).append(skeleton).toString(), true, false, true);
 		if (doc == null) {
 			LOGGER.log(Level.WARNING, "Document was not created from: " + skeleton);
 			return false;
@@ -342,7 +342,6 @@ public class ThemeChangerBean implements ThemeChanger {
 	private boolean uploadTheme(Document doc, Theme theme) {
 		checkCssFiles(doc, theme.getLinkToBase());
 		checkScriptTags(doc);
-		
 		return uploadTheme(XmlUtil.getPrettyJDOMDocument(doc), theme, true);
 	}
 	
@@ -526,8 +525,8 @@ public class ThemeChangerBean implements ThemeChanger {
 		if (files == null) {
 			files = theme.getColourFiles();
 		}
-		if (files == null || files.size() == 0) {
-			return true;	//	No color files - it's ok
+		if (ListUtil.isEmpty(files)) {
+			return true;	//	No color files - it's OK
 		}
 		
 		IWSlideService slide = helper.getSlideService();
@@ -565,7 +564,7 @@ public class ThemeChangerBean implements ThemeChanger {
 					return false;
 				}
 			} catch(Exception e) {
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING, "Error uploading to " + theme.getLinkToBase() + uploadName, e);
 				return false;
 			} finally {
 				IOUtil.closeInputStream(stream);
@@ -607,7 +606,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			try {
 				variations.remove(variationsToRemove.get(i));
 			} catch(Exception e) {
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING, "Error removing variations " + variationsToRemove, e);
 			}
 		}
 	}
@@ -683,7 +682,7 @@ public class ThemeChangerBean implements ThemeChanger {
 				return true;
 			}
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error uploading content: " + content, e);
 			return false;
 		}
 		
@@ -745,7 +744,7 @@ public class ThemeChangerBean implements ThemeChanger {
 				return false;
 			}
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error uploading content:\n" + content + "\n to: " + linkToBase + fileName, e);
 			return false;
 		} finally {
 			theme.setLocked(false);
@@ -789,9 +788,8 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param fileName
 	 * @return boolean
 	 */
-	public boolean uploadDocument(Document doc, String linkToBase, String fileName, Theme theme, boolean isTheme) {
+	private boolean uploadDocument(Document doc, String linkToBase, String fileName, Theme theme, boolean isTheme) {
 		checkScriptTags(doc);
-		
 		return uploadDocument(XmlUtil.getPrettyJDOMDocument(doc), linkToBase, fileName, theme, isTheme, false);
 	}
 	
@@ -1901,7 +1899,7 @@ public class ThemeChangerBean implements ThemeChanger {
 				return false;
 			}
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error while uploading", e);
 			return false;
 		} finally {
 			IOUtil.closeInputStream(is);
@@ -1915,7 +1913,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		try {
 			helper.getThemesService().createBuilderTemplate(theme);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error creating template for theme: " + theme, e);
 			return false;
 		}
 		
@@ -1927,7 +1925,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		try {
 			helper.getThemesService().getBuilderService().clearAllCaches();
 		} catch(Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error clearing caches", e);
 			return false;
 		}
 		
@@ -2290,7 +2288,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			ThemesLoader loader = new ThemesLoader();
 			themeKey = loader.createNewTheme(tempLink, new StringBuffer(linkToBase).append(helper.encode(themeName, true)).toString(), true, true);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error creating new theme: " + themeName, e);
 			return false;
 		}
 		if (themeKey == null) {
@@ -2327,7 +2325,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		try {
 			helper.getThemesService().createBuilderTemplate(child);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error creating template", e);
 			return false;
 		}
 		
@@ -2478,7 +2476,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			//	Extracting new properties (also setting default state)
 			themesPropertiesExtractor.prepareTheme(checkConfig, theme, null, null, null);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error preparing theme: " + theme, e);
 			return false;
 		}
 		setSelectedStyles(theme, enabledStyles);												//	Restoring current state
