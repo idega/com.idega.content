@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,6 +35,8 @@ import com.idega.util.ListUtil;
 
 public class RepositoryItemDownloader extends DownloadWriter {
 
+	private static final Logger LOGGER = Logger.getLogger(RepositoryItemDownloader.class.getName());
+	
 	private String url, mimeType;
 	
 	private boolean folder;
@@ -59,7 +63,7 @@ public class RepositoryItemDownloader extends DownloadWriter {
 		try {
 			repository = getRepository();
 		} catch (IBOLookupException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE, "Error getting repository service!", e);
 		}
 		
 		if (folder) {
@@ -101,8 +105,14 @@ public class RepositoryItemDownloader extends DownloadWriter {
 		String fileName = getFileName(url).concat(".zip");
 		Collection<RepositoryItem> itemsToZip = new ArrayList<RepositoryItem>();
 		
+		long start = System.currentTimeMillis();	//	TODO
+		
 		WebdavResource folder = repository.getWebdavResourceAuthenticatedAsRoot(url);
 		addItemsOfFolder(folder, itemsToZip);
+		LOGGER.info("Items to zip: " + itemsToZip);
+		
+		long end = System.currentTimeMillis();		//	TODO
+		LOGGER.info("Items to zip resolved in: " + (end - start) + " ms.");
 		
 		File zippedContents = FileUtil.getZippedFiles(itemsToZip, fileName, false, true);
 		if (zippedContents == null) {
@@ -126,7 +136,12 @@ public class RepositoryItemDownloader extends DownloadWriter {
 		
 		for (WebdavResource resource: resources) {
 			if (resource.isCollection()) {
+				String currentDirectory = resource.toString();
+				long start = System.currentTimeMillis();	//	TODO
+				LOGGER.info("Adding items from a directory: " + currentDirectory);
 				addItemsOfFolder(resource, itemsToZip);
+				long end = System.currentTimeMillis();		//	TODO
+				LOGGER.info("Items of " + currentDirectory + " added in: " + (end - start) + " ms.");
 			} else {
 				itemsToZip.add(new WebDAVItem(resource, url));
 			}
