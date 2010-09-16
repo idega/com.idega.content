@@ -35,10 +35,12 @@ import com.idega.business.IBOLookup;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.business.WebDAVBeanComparator;
 import com.idega.content.data.WebDAVBean;
+import com.idega.content.download.RepositoryItemDownloader;
 import com.idega.core.search.presentation.SearchResults;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.text.DownloadLink;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.ArrayUtil;
@@ -303,7 +305,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		FacesContext fc = FacesContext.getCurrentInstance();
 		ELContext elContext = fc.getELContext();
 		
-		Vector<UIColumn> columns = new Vector<UIColumn>();
+		List<UIColumn> columns = new ArrayList<UIColumn>();
 		String imageSize = "16";
 		if (showColumn(COLUMN_ICON)) {
 			UIColumn columnIcon = new UIColumn();
@@ -525,6 +527,21 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			del.getChildren().add(delLink);
 			
 			columns.add(del);
+		}
+		
+		IWContext iwc = IWContext.getIWContext(fc);
+		if (iwc != null && (iwc.isLoggedOn() && iwc.isSuperAdmin())) {
+			UIColumn download = new UIColumn();
+			download.setHeader(ContentBlock.getBundle().getLocalizedText("download"));
+			
+			DownloadLink downloadLink = new DownloadLink(ContentBlock.getBundle().getResourceBundle(iwc).getLocalizedString("download", "Download"));
+			downloadLink.setValueExpression(RENDERED, WFUtil.createValueExpression(elContext, "#{"+var+".isReal}", Boolean.class));
+			downloadLink.setMediaWriterClass(RepositoryItemDownloader.class);
+			WFUtil.addParameterVB(downloadLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
+			WFUtil.addParameterVB(downloadLink, PARAMETER_IS_FOLDER, var + ".isCollection");
+			
+			download.getChildren().add(downloadLink);
+			columns.add(download);
 		}
 		
 		return ArrayUtil.convertListToArray(columns);
