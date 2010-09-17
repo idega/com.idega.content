@@ -1,4 +1,4 @@
-package com.idega.content.download;
+package com.idega.content.repository.download;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
