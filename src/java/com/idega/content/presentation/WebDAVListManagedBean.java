@@ -565,33 +565,33 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			columns.add(download);
 			
 			//	Stream
-			/*UIColumn stream = new UIColumn();
-			stream.setHeader(bundle.getLocalizedUIComponent("stream", iwc.getApplication().createComponent(HtmlOutputText.COMPONENT_TYPE), "Stream"));
-			
-			PresentationUtil.addStyleSheetToHeader(iwc, getWebBusiness().getBundleURIToFancyBoxStyleFile());
-			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
-					getJQuery().getBundleURIToJQueryLib(),
-					bundle.getVirtualPathWithFileNameString("javascript/ContentAdmin.js"),
-					CoreConstants.DWR_ENGINE_SCRIPT,
-					CoreConstants.DWR_UTIL_SCRIPT,
-					"/dwr/interface/" + RepositoryItemStreamer.DWR_OBJECT + ".js"
-			));
-			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, getWebBusiness().getBundleURIsToFancyBoxScriptFiles());
-			PresentationUtil.addJavaScriptActionOnLoad(iwc, "jQuery(window).load(function() {\n" +
-																"jQuery.each(jQuery('a.streamerLink'), function() {\n" +
-																	"var link = jQuery(this);\n" +
-																	"link.fancybox({autoScale: false, autoDimensions: false, width: 450, height: 175});\n" +
-																"});\n" +
-															"});"
-			);
-			Link streamerLink = new Link(iwrb.getLocalizedString("stream", "Stream"), RepositoryItemStreamViewer.class);
-			streamerLink.setTitle(iwrb.getLocalizedString("stream_to_other_server", "Stream to other server"));
-			streamerLink.setValueExpression(RENDERED, WFUtil.createValueExpression(elContext, "#{"+var+".isReal}", Boolean.class));
-			streamerLink.setStyleClass("streamerLink");
-			WFUtil.addParameterVB(streamerLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
-			
-			stream.getChildren().add(streamerLink);
-			columns.add(stream);*/
+//			UIColumn stream = new UIColumn();
+//			stream.setHeader(bundle.getLocalizedUIComponent("stream", iwc.getApplication().createComponent(HtmlOutputText.COMPONENT_TYPE), "Stream"));
+//			
+//			PresentationUtil.addStyleSheetToHeader(iwc, getWebBusiness().getBundleURIToFancyBoxStyleFile());
+//			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
+//					getJQuery().getBundleURIToJQueryLib(),
+//					bundle.getVirtualPathWithFileNameString("javascript/ContentAdmin.js"),
+//					CoreConstants.DWR_ENGINE_SCRIPT,
+//					CoreConstants.DWR_UTIL_SCRIPT,
+//					"/dwr/interface/" + RepositoryItemStreamer.DWR_OBJECT + ".js"
+//			));
+//			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, getWebBusiness().getBundleURIsToFancyBoxScriptFiles());
+//			PresentationUtil.addJavaScriptActionOnLoad(iwc, "jQuery(window).load(function() {\n" +
+//																"jQuery.each(jQuery('a.streamerLink'), function() {\n" +
+//																	"var link = jQuery(this);\n" +
+//																	"link.fancybox({autoScale: false, autoDimensions: false, width: 450, height: 175});\n" +
+//																"});\n" +
+//															"});"
+//			);
+//			Link streamerLink = new Link(iwrb.getLocalizedString("stream", "Stream"), RepositoryItemStreamViewer.class);
+//			streamerLink.setTitle(iwrb.getLocalizedString("stream_to_other_server", "Stream to other server"));
+//			streamerLink.setValueExpression(RENDERED, WFUtil.createValueExpression(elContext, "#{"+var+".isReal}", Boolean.class));
+//			streamerLink.setStyleClass("streamerLink");
+//			WFUtil.addParameterVB(streamerLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
+//			
+//			stream.getChildren().add(streamerLink);
+//			columns.add(stream);
 		}
 		
 		return ArrayUtil.convertListToArray(columns);
