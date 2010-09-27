@@ -3,7 +3,6 @@ package com.idega.content.upload.business;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +44,7 @@ import com.idega.slide.business.IWSlideSession;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
@@ -120,7 +120,7 @@ public class FileUploaderBean implements FileUploader {
 
 	public String getPropertiesAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId, boolean fakeFileDeletion) {
+			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository) {
 		
 		IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
 		return new StringBuilder("FileUploadHelper.setProperties({id: '").append(id).append("', showProgressBar: ").append(showProgressBar)
@@ -132,11 +132,15 @@ public class FileUploaderBean implements FileUploader {
 				.append(iwrb.getLocalizedString("upload_was_successfully_finished", "Upload was successfully finished."))
 			.append("', UPLOADING_FILE_MESSAGE: '").append(iwrb.getLocalizedString("uploading", "Uploading..."))
 			.append("', UPLOADING_FILE_INVALID_TYPE_MESSAGE: '")
-				.append(iwrb.getLocalizedString("incorrect_file_type", "Unsupported file type! Only zip files allowed")).append("'}, ")
+				.append(iwrb.getLocalizedString("incorrect_file_type", "Unsupported file type! Only zip files allowed"))
+			.append("', UPLOADING_FILE_FAILED: '")
+				.append(iwrb.getLocalizedString("uploading_file_failed_msg", "Sorry, some error occurred - unable to upload file(s). Please, try again"))
+			.append("'}, ")
 			.append("actionAfterUpload: ").append(getJavaScriptAction(actionAfterUpload))
 			.append(", actionAfterCounterReset: ").append(getJavaScriptAction(actionAfterCounterReset))
 			.append(", uploadId: '").append(uploadId).append("', autoUpload: ").append(autoUpload).append(", showUploadedFiles: ").append(showUploadedFiles)
 			.append(", fakeFileDeletion: ").append(fakeFileDeletion)
+			.append(", actionAfterUploadedToRepository: ").append(getJavaScriptAction(actionAfterUploadedToRepository))
 		.append("});").toString();
 	}
 	
@@ -209,19 +213,16 @@ public class FileUploaderBean implements FileUploader {
 				
 				WebDAVUploadBean uploadBean = new WebDAVUploadBean();
 				uploadBean.setUploadFilePath(path);
-				uploadBean.uploadZipFile(themePack, name, stream, slide);
-			}
-			else {
-				return slide.uploadFileAndCreateFoldersFromStringAsRoot(path, name, stream, file.getType(), true);
+				return uploadBean.uploadZipFile(themePack, name, stream, slide);
+			} else {
+				return slide.uploadFile(path, name, file.getType(), stream);
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error uploading file " + file.getName(), e);
 			return false;
 		} finally {
-			closeStream(stream);
+			IOUtil.close(stream);
 		}
-		
-		return true;
 	}
 	
 	private InputStream getInputStream(byte[] bytes) {
@@ -238,16 +239,6 @@ public class FileUploaderBean implements FileUploader {
 		}
 		
 		return stream;
-	}
-	
-	private void closeStream(InputStream stream) {
-		if (stream == null) {
-			return;
-		}
-		
-		try {
-			stream.close();
-		} catch (IOException e) {}
 	}
 	
 	private BuilderService getBuilderService(IWContext iwc) {
@@ -328,10 +319,10 @@ public class FileUploaderBean implements FileUploader {
 	
 	public String getUploadAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId, boolean fakeFileDeletion) {
+			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository) {
 		
 		StringBuilder action = new StringBuilder(getPropertiesAction(iwc, id, progressBarId, uploadId, showProgressBar, showLoadingMessage, zipFile, formId,
-				actionAfterUpload, actionAfterCounterReset, autoUpload, showUploadedFiles, componentToRerenderId, fakeFileDeletion))
+				actionAfterUpload, actionAfterCounterReset, autoUpload, showUploadedFiles, componentToRerenderId, fakeFileDeletion, actionAfterUploadedToRepository))
 				.append("FileUploadHelper.uploadFiles();");
 		return getActionToLoadFilesAndExecuteCustomAction(action.toString(), showProgressBar, !StringUtil.isEmpty(componentToRerenderId));
 	}

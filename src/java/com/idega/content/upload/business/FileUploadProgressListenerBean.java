@@ -1,18 +1,20 @@
 package com.idega.content.upload.business;
 
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.util.StringUtil;
 
-
 public class FileUploadProgressListenerBean implements FileUploadProgressListener {
 	
-	private long bytesTransferred = 0;
-	private long fileSize = 0;
+	private long bytesTransferred, fileSize = 0;
 
+	private Map<String, Boolean> uploadInfo = new HashMap<String, Boolean>();
+	
 	public void update(long bytesRead, long contentLength, int items) {
 		bytesTransferred = bytesRead;
 		fileSize = contentLength;
@@ -50,6 +52,24 @@ public class FileUploadProgressListenerBean implements FileUploadProgressListene
 		}
 		
 		return false;
+	}
+
+	@Override
+	public Boolean isUploadSuccessful(String id) {
+		if (StringUtil.isEmpty(id)) {
+			return Boolean.FALSE;
+		}
+		
+		return uploadInfo.remove(id);
+	}
+
+	@Override
+	public void setUploadSuccessful(String id, boolean success) {
+		if (StringUtil.isEmpty(id)) {
+			return;
+		}
+		
+		uploadInfo.put(id, success);
 	}
 	
 }

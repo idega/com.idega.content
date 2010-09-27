@@ -1,6 +1,7 @@
 package com.idega.content.upload.servlet;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -17,6 +18,7 @@ import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
+
 import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.upload.bean.UploadFile;
@@ -35,7 +37,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 	private static Logger LOGGER = Logger.getLogger(ContentFileUploadServlet.class.getName());
 	
 	private static final long serialVersionUID = -6282517406996613536L;	
-	private static final long MAX_UPLOAD_SIZE = 1024 * 1024 * 1024;
+	private static final long MAX_UPLOAD_SIZE = 1024 * 1024 * 1024;	//	1 GB
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -78,20 +80,15 @@ public class ContentFileUploadServlet extends HttpServlet {
 			if (!StringUtil.isEmpty(fieldName)) {
         		if (file.getSize() > 0 && fieldName.equals(ContentConstants.UPLOAD_FIELD_NAME)) {
         			files.add(new UploadFile(file.getName(), file.getContentType(), file.getSize(), file.get()));
-        		}
-        		else if (fieldName.equals(ContentConstants.UPLOADER_PATH)) {
+        		} else if (fieldName.equals(ContentConstants.UPLOADER_PATH)) {
         			uploadPath = getValueFromBytes(file.get());
-        		}
-        		else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_ZIP_FILE)) {
+        		} else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_ZIP_FILE)) {
         			zipFile = getValueFromString(getValueFromBytes(file.get()));
-        		}
-        		else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_THEME_PACK)) {
+        		} else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_THEME_PACK)) {
         			themePack = getValueFromString(getValueFromBytes(file.get()));
-        		}
-        		else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE)) {
+        		} else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE)) {
         			extractContent = getValueFromString(getValueFromBytes(file.get()));
-        		}
-        		else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_IDENTIFIER)) {
+        		} else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_IDENTIFIER)) {
         			uploadId = getValueFromBytes(file.get());
         		}
         	}
@@ -107,6 +104,7 @@ public class ContentFileUploadServlet extends HttpServlet {
         	iwac.setApplicationAttribute(uploadId, Boolean.TRUE);
         }
         
+        boolean success = false;
         try {
 	        //	Checking upload path
 	        if (uploadPath == null) {
@@ -126,20 +124,22 @@ public class ContentFileUploadServlet extends HttpServlet {
 	        if (zipFile || themePack) {
 	        	if (themePack) {
 	        		uploadPath = ThemesConstants.THEMES_PATH;
-	        		uploader.uploadThemePack(files, uploadPath, isIE);
+	        		success = uploader.uploadThemePack(files, uploadPath, isIE);
+	        	} else {
+	        		success = uploader.uploadZipFile(files, uploadPath, extractContent, isIE);
 	        	}
-	        	else {
-	        		uploader.uploadZipFile(files, uploadPath, extractContent, isIE);
-	        	}
-	        }
-	        else {
-	        	uploader.uploadFile(files, uploadPath, isIE);
+	        } else {
+	        	success = uploader.uploadFile(files, uploadPath, isIE);
 	        }
         } catch(Exception e) {
         	LOGGER.log(Level.SEVERE, "Files uploader failed!", e);
+        	CoreUtil.sendExceptionNotification(e);
         } finally {
-        	if (!StringUtil.isEmpty(uploadId) && iwac != null) {
-        		iwac.removeApplicationAttribute(uploadId);
+        	if (!StringUtil.isEmpty(uploadId)) {
+        		uploadProgressListner.setUploadSuccessful(uploadId, success);
+        		
+        		if (iwac != null)
+        			iwac.removeApplicationAttribute(uploadId);
         	}
         }
 	}
@@ -154,7 +154,13 @@ public class ContentFileUploadServlet extends HttpServlet {
 			return null;
 		}
 		
-		return new String(bytes);
+		try {
+			return new String(bytes, CoreConstants.ENCODING_UTF8);
+		} catch (UnsupportedEncodingException e) {
+			LOGGER.log(Level.WARNING, "Unable to use UTF-8", e);
+			
+			return new String(bytes);
+		}
 	}
 	
 	private boolean getValueFromString(String value) {

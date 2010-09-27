@@ -51,6 +51,7 @@
     		<param name="beanName" value="fileUploadProgressListener" />
     		<include method="resetFileUploaderCounters"/>
     		<include method="getFileUploadStatus"/>
+    		<include method="isUploadSuccessful"/>
 		</create>
 		
 		<create creator="spring" javascript="LucidEngine">

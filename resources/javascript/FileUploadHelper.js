@@ -15,14 +15,16 @@ FileUploadHelper.properties = {
 		UPLOADING_FILE_PLEASE_WAIT_PROGRESS_BOX_TEXT: 'completed, please wait...',
 		UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT: 'Upload was successfully finished.',
 		UPLOADING_FILE_MESSAGE: 'Uploading...',
-		UPLOADING_FILE_INVALID_TYPE_MESSAGE: 'Unsupported file type! Only zip files allowed'
+		UPLOADING_FILE_INVALID_TYPE_MESSAGE: 'Unsupported file type! Only zip files allowed',
+		UPLOADING_FILE_FAILED: 'Sorry, some error occurred - unable to upload file(s). Please, try again'
 	},
 	actionAfterUpload: null,
 	actionAfterCounterReset: null,
 	uploadId: null,
 	autoUpload: false,
 	showUploadedFiles: false,
-	fakeFileDeletion: false
+	fakeFileDeletion: false,
+	actionAfterUploadedToRepository: null
 }
 
 FileUploadHelper.setProperties = function(properties) {
@@ -59,8 +61,6 @@ FileUploadHelper.uploadFiles = function() {
 	
 	var uploadHandler = {
 		upload: function(o) {
-			closeAllLoadingMessages();
-			
 			FileUploadHelper.uploadedFiles = files;
 			if (FileUploadHelper.uploadedFiles != null) {
 				for (var i = 0; i < FileUploadHelper.uploadedFiles.length; i++) {
@@ -91,6 +91,8 @@ FileUploadHelper.uploadFiles = function() {
 					input.parent().remove();
 				})
 			});
+			
+			FileUploadHelper.executeActionAfterUploadedToRepository();
 		}
 	};
 	
@@ -106,6 +108,27 @@ FileUploadHelper.uploadFiles = function() {
 					jQuery('#' + progressBarId).css('display', 'block');
 					showUploadInfoInProgressBar(progressBarId, FileUploadHelper.properties.actionAfterCounterReset);
 				});
+			}
+		}
+	});
+}
+
+FileUploadHelper.executeActionAfterUploadedToRepository = function() {
+	if (FileUploadHelper.properties.uploadId == null || FileUploadHelper.properties.actionAfterUploadedToRepository == null) {
+		closeAllLoadingMessages();
+		return;
+	}
+	
+	FileUploadListener.isUploadSuccessful(FileUploadHelper.properties.uploadId, {
+		callback: function(result) {
+			if (result) {
+				closeAllLoadingMessages();
+				executeUserDefinedActionsAfterUploadFinished(FileUploadHelper.properties.actionAfterUploadedToRepository);
+			} else if (result == null) {
+				window.setTimeout(FileUploadHelper.executeActionAfterUploadedToRepository, 250);
+			} else {
+				closeAllLoadingMessages();
+				humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
 			}
 		}
 	});

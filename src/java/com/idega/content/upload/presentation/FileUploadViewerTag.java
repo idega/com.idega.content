@@ -8,11 +8,9 @@ import com.idega.webface.WFUtil;
 
 public class FileUploadViewerTag extends UIComponentELTag {
 	
-	private String actionAfterUpload = null;
-	private String actionAfterCounterReset = null;
+	private String actionAfterUpload, actionAfterCounterReset, actionAfterUploadedToRepository = null;
 	private String uploadPath = CoreConstants.PUBLIC_PATH;
-	private String formId = null;
-	private String componentToRerenderId = null;
+	private String formId, componentToRerenderId = null;
 	
 	private boolean zipFile = false;
 	private boolean extractContent = false;
@@ -43,6 +41,7 @@ public class FileUploadViewerTag extends UIComponentELTag {
 			
 			uploadViewer.setActionAfterUpload(actionAfterUpload);
 			uploadViewer.setActionAfterCounterReset(actionAfterCounterReset);
+			uploadViewer.setActionAfterUploadedToRepository(actionAfterUploadedToRepository);
 			uploadViewer.setUploadPath(uploadPath);
 			uploadViewer.setFormId(formId);
 			uploadViewer.setZipFile(zipFile);
@@ -60,6 +59,7 @@ public class FileUploadViewerTag extends UIComponentELTag {
 	public void release() {
 		this.actionAfterUpload = null;
 		this.actionAfterCounterReset = null;
+		this.actionAfterUploadedToRepository = null;
 		this.uploadPath = CoreConstants.PUBLIC_PATH;
 		this.componentToRerenderId = null;
 		
@@ -201,6 +201,14 @@ public class FileUploadViewerTag extends UIComponentELTag {
 
 	public void setFakeFileDeletion(boolean fakeFileDeletion) {
 		this.fakeFileDeletion = fakeFileDeletion;
+	}
+
+	public String getActionAfterUploadedToRepository() {
+		return actionAfterUploadedToRepository;
+	}
+
+	public void setActionAfterUploadedToRepository(String actionAfterUploadedToRepository) {
+		this.actionAfterUploadedToRepository = actionAfterUploadedToRepository;
 	}
 	
 }

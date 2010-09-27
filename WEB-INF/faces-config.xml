@@ -296,6 +296,11 @@ version="1.2">
 			<property-class>java.lang.String</property-class>
 		</property>
 		<property>
+			<display-name>JavaScript action after file(s) uploaded to repository</display-name>
+			<property-name>actionAfterUploadedToRepository</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
 			<display-name>Upload path in Slide</display-name>
 			<property-name>uploadPath</property-name>
 			<property-class>java.lang.String</property-class>

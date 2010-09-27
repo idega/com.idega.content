@@ -2,7 +2,7 @@ package com.idega.content.upload.presentation;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Random;
+import java.util.UUID;
 
 import javax.faces.context.FacesContext;
 
@@ -32,11 +32,10 @@ import com.idega.util.expression.ELUtil;
 
 public class FileUploadViewer extends IWBaseComponent {
 	
-	private String actionAfterUpload = null;
-	private String actionAfterCounterReset = null;
+	private String actionAfterUpload, actionAfterCounterReset, actionAfterUploadedToRepository = null;
+	
 	private String uploadPath = CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
-	private String formId = null;
-	private String componentToRerenderId = null;
+	private String formId, componentToRerenderId, uploadId = null;
 	
 	private boolean zipFile = false;
 	private boolean extractContent = false;
@@ -61,6 +60,10 @@ public class FileUploadViewer extends IWBaseComponent {
 	@Autowired
 	private ThemesHelper themesHelper;
 	
+	public FileUploadViewer() {
+		this.uploadId = UUID.randomUUID().toString();
+	}
+	
 	@Override
 	public void restoreState(FacesContext context, Object state) {
 		Object values[] = (Object[]) state;
@@ -81,11 +84,15 @@ public class FileUploadViewer extends IWBaseComponent {
 		
 		this.autoUpload = values[11] == null ? Boolean.FALSE : (Boolean) values[11];
 		this.showUploadedFiles = values[12] == null ? Boolean.FALSE : (Boolean) values[12];
+		
+		this.uploadId = values[13] == null ? null : values[13].toString();
+		
+		this.actionAfterUploadedToRepository = values[14] == null ? null : values[14].toString();
 	}
 	
 	@Override
 	public Object saveState(FacesContext context) {
-		Object values[] = new Object[13];
+		Object values[] = new Object[15];
 		values[0] = super.saveState(context);
 		
 		values[1] = this.actionAfterUpload;
@@ -103,6 +110,10 @@ public class FileUploadViewer extends IWBaseComponent {
 		
 		values[11] = this.autoUpload;
 		values[12] = this.showUploadedFiles;
+		
+		values[13] = this.uploadId;
+		
+		values[14] = this.actionAfterUploadedToRepository;
 		
 		return values;
 	}
@@ -143,18 +154,11 @@ public class FileUploadViewer extends IWBaseComponent {
 			formId = form.getId();
 		}
 		
-		HiddenInput path = new HiddenInput(ContentConstants.UPLOADER_PATH, getUploadPath(iwc));
-		path.setStyleClass(ContentConstants.UPLOADER_PATH);
-		mainContainer.add(path);
-		HiddenInput zipFileValue = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_ZIP_FILE, String.valueOf(zipFile));
-		mainContainer.add(zipFileValue);
-		HiddenInput themePackValue = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_THEME_PACK, String.valueOf(themePack));
-		mainContainer.add(themePackValue);
-		HiddenInput extractContentValue = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE, String.valueOf(extractContent));
-		mainContainer.add(extractContentValue);
-		String uploadId = getGeneratedUploadId();
-		HiddenInput uploadIdInput = new HiddenInput(ContentConstants.UPLOADER_UPLOAD_IDENTIFIER, uploadId);
-		mainContainer.add(uploadIdInput);
+		addProperty(mainContainer, ContentConstants.UPLOADER_PATH, getUploadPath(iwc));
+		addProperty(mainContainer, ContentConstants.UPLOADER_UPLOAD_ZIP_FILE, String.valueOf(zipFile));
+		addProperty(mainContainer, ContentConstants.UPLOADER_UPLOAD_THEME_PACK, String.valueOf(themePack));
+		addProperty(mainContainer, ContentConstants.UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE, String.valueOf(extractContent));
+		addProperty(mainContainer, ContentConstants.UPLOADER_UPLOAD_IDENTIFIER, uploadId);
 		
 		Layer fileInputs = new Layer();
 		String id = fileInputs.getId();
@@ -189,7 +193,8 @@ public class FileUploadViewer extends IWBaseComponent {
 		}
 		upload.setOnClick(getFileUploader().getUploadAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(), isZipFile(),
 				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId(),
-				isFakeFileDeletion()));
+				isFakeFileDeletion(), getActionAfterUploadedToRepository()
+		));
 		buttonsContainer.add(upload);
 		mainContainer.add(buttonsContainer);
 		
@@ -201,7 +206,8 @@ public class FileUploadViewer extends IWBaseComponent {
 		));
 		String initAction = getFileUploader().getPropertiesAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(), isZipFile(),
 				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId(),
-				isFakeFileDeletion());
+				isFakeFileDeletion(), getActionAfterUploadedToRepository()
+		);
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			initAction = new StringBuilder("jQuery(window).load(function() {").append(initAction).append("});").toString();
 		}
@@ -211,11 +217,10 @@ public class FileUploadViewer extends IWBaseComponent {
 		PresentationUtil.addStyleSheetToHeader(iwc, web2.getBundleUriToHumanizedMessagesStyleSheet());
 	}
 	
-	private String getGeneratedUploadId() {
-		Random random = new Random();
-		return new StringBuilder("uploadId").append(System.currentTimeMillis())
-		        .append("_").append(random.nextInt(Integer.MAX_VALUE))
-		        .toString();
+	private void addProperty(PresentationObjectContainer container, String name, String value) {
+		HiddenInput property = new HiddenInput(name, value);
+		property.setStyleClass(name);
+		container.add(property);
 	}
 	
 	@Override
@@ -388,5 +393,16 @@ public class FileUploadViewer extends IWBaseComponent {
 	public void setFakeFileDeletion(boolean fakeFileDeletion) {
 		this.fakeFileDeletion = fakeFileDeletion;
 	}
-	
+
+	public String getUploadId() {
+		return uploadId;
+	}
+
+	public String getActionAfterUploadedToRepository() {
+		return actionAfterUploadedToRepository;
+	}
+
+	public void setActionAfterUploadedToRepository(String actionAfterUploadedToRepository) {
+		this.actionAfterUploadedToRepository = actionAfterUploadedToRepository;
+	}
 }
