@@ -70,29 +70,7 @@ FileUploadHelper.uploadFiles = function() {
 			
 			executeUserDefinedActionsAfterUploadFinished(FileUploadHelper.properties.actionAfterUpload);
 			
-			if (FileUploadHelper.properties.showUploadedFiles) {
-				FileUploadHelper.showUploadedFiles(FileUploadHelper.properties.fakeFileDeletion);
-			}
-			
-			FileUploadHelper.uploadedFiles = null;
-			var inputsToRemove = new Array();
-			for (var i = 0; i < inputs.length; i++) {
-				jQuery(inputs[i]).attr('value', '');
-				inputs[i].setAttribute('value', '');
-				inputs[i].value = '';
-				
-				if (i > 0) {
-					inputsToRemove.push(inputs[i]);
-				}
-			}
-			jQuery.each(inputsToRemove, function() {
-				var input = jQuery(this);
-				input.parent().hide('normal', function() {
-					input.parent().remove();
-				})
-			});
-			
-			FileUploadHelper.executeActionAfterUploadedToRepository();
+			FileUploadHelper.executeActionAfterUploadedToRepository(inputs);
 		}
 	};
 	
@@ -113,8 +91,10 @@ FileUploadHelper.uploadFiles = function() {
 	});
 }
 
-FileUploadHelper.executeActionAfterUploadedToRepository = function() {
-	if (FileUploadHelper.properties.uploadId == null || FileUploadHelper.properties.actionAfterUploadedToRepository == null) {
+FileUploadHelper.executeActionAfterUploadedToRepository = function(inputs) {
+	if (FileUploadHelper.properties.uploadId == null) {
+		FileUploadHelper.prepareToShowUploadedFiles(inputs);
+		
 		closeAllLoadingMessages();
 		return;
 	}
@@ -122,6 +102,8 @@ FileUploadHelper.executeActionAfterUploadedToRepository = function() {
 	FileUploadListener.isUploadSuccessful(FileUploadHelper.properties.uploadId, {
 		callback: function(result) {
 			if (result) {
+				FileUploadHelper.prepareToShowUploadedFiles(inputs);
+				
 				closeAllLoadingMessages();
 				executeUserDefinedActionsAfterUploadFinished(FileUploadHelper.properties.actionAfterUploadedToRepository);
 			} else if (result == null) {
@@ -132,6 +114,32 @@ FileUploadHelper.executeActionAfterUploadedToRepository = function() {
 			}
 		}
 	});
+}
+
+FileUploadHelper.prepareToShowUploadedFiles = function(inputs) {
+	if (FileUploadHelper.properties.showUploadedFiles) {
+		FileUploadHelper.showUploadedFiles(FileUploadHelper.properties.fakeFileDeletion);
+	}
+		
+	FileUploadHelper.uploadedFiles = null;
+	var inputsToRemove = new Array();
+	if (inputs != null) {
+		for (var i = 0; i < inputs.length; i++) {
+			jQuery(inputs[i]).attr('value', '');
+			inputs[i].setAttribute('value', '');
+			inputs[i].value = '';
+			
+			if (i > 0) {
+				inputsToRemove.push(inputs[i]);
+			}
+		}
+		jQuery.each(inputsToRemove, function() {
+			var input = jQuery(this);
+			input.parent().hide('normal', function() {
+				input.parent().remove();
+			})
+		});
+	}
 }
 
 FileUploadHelper.showUploadedFiles = function(fakeFileDeletion) {

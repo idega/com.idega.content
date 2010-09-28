@@ -35,6 +35,7 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
+import com.idega.presentation.text.DownloadLink;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.ListItem;
 import com.idega.presentation.text.Lists;
@@ -401,8 +402,21 @@ public class FileUploaderBean implements FileUploader {
 			if (index > 0) {
 				fileName = fileInSlide.substring(index + 1);
 			}
+			
+			if (!uploadPath.endsWith(CoreConstants.SLASH)) {
+				uploadPath = uploadPath.concat(CoreConstants.SLASH);
+			}
 			fileInSlide = new StringBuilder(CoreConstants.WEBDAV_SERVLET_URI).append(uploadPath).append(fileName).toString();
-			listItem.add(new Link(fileName, fileInSlide));
+			
+			Link link = null;
+			if (iwc.isLoggedOn() || uploadPath.startsWith(CoreConstants.PUBLIC_PATH)) {
+				link = new DownloadLink(fileName);
+				((DownloadLink) link).setRelativeFilePath(fileInSlide);
+				((DownloadLink) link).setAlternativeFileName(fileName);
+			} else {
+				link = new Link(fileName, fileInSlide);
+			}
+			listItem.add(link);
 			
 			Image deleteFile = bundle.getImage("images/remove.png");
 			deleteFile.setOnClick(new StringBuilder("FileUploadHelper.deleteUploadedFile('").append(listItem.getId()).append("', '")
