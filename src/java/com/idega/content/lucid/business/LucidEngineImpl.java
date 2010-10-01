@@ -257,16 +257,18 @@ public class LucidEngineImpl implements LucidEngine {
 	}
 
 	@Override
-	public List<SelectItem> getAvailableLocales() {
+	public Collection<SelectItem> getAvailableLocales() {
+		List<SelectItem> availableLocales = new ArrayList<SelectItem>();
+		
 		List<Locale> locales = ICLocaleBusiness.getListOfLocalesJAVA();
 		if (ListUtil.isEmpty(locales)) {
-			return null;
+			return availableLocales;
 		}
 
 		Locale currentLocale = null;
 		IWContext iwc = getThemesEngine().getContextAndCheckRights();
 		if (iwc == null) {
-			return null;
+			return availableLocales;
 		}
 
 		currentLocale = iwc.getCurrentLocale();
@@ -274,13 +276,12 @@ public class LucidEngineImpl implements LucidEngine {
 			currentLocale = Locale.ENGLISH;
 		}
 
-		List<SelectItem> availableLocales = new ArrayList<SelectItem>();
 		for (Locale locale: locales) {
 			availableLocales.add(new SelectItem(locale.toString(), locale.getDisplayName(currentLocale)));
 		}
 
-		availableLocales.add(0, new SelectItem(String.valueOf(-1),
-									ContentUtil.getBundle().getResourceBundle(currentLocale).getLocalizedString("lucid.change_locale", "Change locale")));
+		availableLocales.add(new SelectItem(String.valueOf(-1),
+				ContentUtil.getBundle().getResourceBundle(currentLocale).getLocalizedString("lucid.change_locale", "Change locale")));
 
 		return availableLocales;
 	}

@@ -2,6 +2,7 @@ package com.idega.content.lucid.business;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.List;
 
 import javax.faces.model.SelectItem;
@@ -37,7 +38,7 @@ public interface LucidEngine extends Serializable {
 	
 	public boolean setLocale(String locale);
 	
-	public List<SelectItem> getAvailableLocales();
+	public Collection<SelectItem> getAvailableLocales();
 	
 	public String getCurrentLocaleValue();
 	
