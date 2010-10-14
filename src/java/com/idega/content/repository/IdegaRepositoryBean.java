@@ -15,6 +15,7 @@ import javax.jcr.NoSuchWorkspaceException;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import javax.jcr.Value;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -77,5 +78,29 @@ public class IdegaRepositoryBean implements IdegaRepository{
 	public Session login(String workspaceName) throws LoginException,
 			NoSuchWorkspaceException, RepositoryException {
 		return getRepository().login(workspaceName);
+	}
+
+	@Override
+	public boolean isStandardDescriptor(String key) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isSingleValueDescriptor(String key) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Value getDescriptorValue(String key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Value[] getDescriptorValues(String key) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
