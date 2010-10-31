@@ -20,30 +20,29 @@ import javax.jcr.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.idega.core.content.IdegaRepository;
 import com.idega.util.expression.ELUtil;
 
 /**
  * <p>
  * Central managing class of the Default JCR repository in idegaWeb.
  * </p>
- * 
+ *
  * Last modified: $Date: 2009/01/06 15:17:25 $ by $Author: tryggvil $
- * 
+ *
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
  * @version $Revision: 1.1 $
  */
 @Scope("singleton")
-@Service(IdegaRepository.SPRING_BEAN_IDENTIFIER)
-public class IdegaRepositoryBean implements IdegaRepository{
+@Service(IdegaRepositoryBean.SLIDE_REPOSITORY)
+public class IdegaRepositoryBean implements Repository {
 	private Repository repository;
-	private final static String SLIDE_REPOSITORY="slideRepository";
-	
+	final static String SLIDE_REPOSITORY="slideRepository";
+
 	public IdegaRepositoryBean(){
 		//this.repository=(Repository) Class.forName("com.idega.slide.jcr.SlideRepository").newInstance();
 		//this.repository=(Repository) ELUtil.getInstance().getBean(SlideRepository.SPRING_BEAN_IDENTIFIER);
 	}
-	
+
 	protected Repository getRepository(){
 		//TODO: Implement dynamic support for more repositories
 		if(this.repository==null){
@@ -51,30 +50,36 @@ public class IdegaRepositoryBean implements IdegaRepository{
 		}
 		return this.repository;
 	}
-	
+
+	@Override
 	public String getDescriptor(String key) {
 		return getRepository().getDescriptor(key);
 	}
 
+	@Override
 	public String[] getDescriptorKeys() {
 		return getRepository().getDescriptorKeys();
 	}
 
+	@Override
 	public Session login() throws LoginException, RepositoryException {
 		return getRepository().login();
 	}
 
+	@Override
 	public Session login(Credentials credentials, String workspaceName)
 			throws LoginException, NoSuchWorkspaceException,
 			RepositoryException {
 		return getRepository().login(credentials, workspaceName);
 	}
 
+	@Override
 	public Session login(Credentials credentials) throws LoginException,
 			RepositoryException {
 		return getRepository().login(credentials);
 	}
 
+	@Override
 	public Session login(String workspaceName) throws LoginException,
 			NoSuchWorkspaceException, RepositoryException {
 		return getRepository().login(workspaceName);
