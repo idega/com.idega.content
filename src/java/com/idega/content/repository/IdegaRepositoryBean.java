@@ -17,9 +17,12 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.Value;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import com.idega.repository.RepositoryService;
 import com.idega.util.expression.ELUtil;
 
 /**
@@ -32,23 +35,18 @@ import com.idega.util.expression.ELUtil;
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
  * @version $Revision: 1.1 $
  */
-@Scope("singleton")
-@Service(IdegaRepositoryBean.SLIDE_REPOSITORY)
+@Service
+@Scope(BeanDefinition.SCOPE_SINGLETON)
 public class IdegaRepositoryBean implements Repository {
-	private Repository repository;
-	final static String SLIDE_REPOSITORY="slideRepository";
 
-	public IdegaRepositoryBean(){
-		//this.repository=(Repository) Class.forName("com.idega.slide.jcr.SlideRepository").newInstance();
-		//this.repository=(Repository) ELUtil.getInstance().getBean(SlideRepository.SPRING_BEAN_IDENTIFIER);
-	}
+	@Autowired
+	private RepositoryService repository;
 
 	protected Repository getRepository(){
-		//TODO: Implement dynamic support for more repositories
-		if(this.repository==null){
-			this.repository=(Repository) ELUtil.getInstance().getBean(SLIDE_REPOSITORY);
+		if (repository == null) {
+			ELUtil.getInstance().autowire(this);
 		}
-		return this.repository;
+		return repository;
 	}
 
 	@Override
