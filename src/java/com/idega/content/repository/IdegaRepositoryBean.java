@@ -17,6 +17,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.Value;
 
+import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 
@@ -30,6 +31,8 @@ import org.springframework.context.annotation.Scope;
  * @author <a href="mailto:tryggvil@idega.com">Tryggvi Larusson</a>
  * @version $Revision: 1.1 $
  */
+ 
+@Service
 @Scope(BeanDefinition.SCOPE_SINGLETON)
 public class IdegaRepositoryBean implements Repository {
 	
