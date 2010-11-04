@@ -13,9 +13,11 @@
         <context:annotation-config/>
         <!--context:component-scan base-package="com.idega,is.idega"/-->
         
+        <!--
         <bean id="slideRepository" class="com.idega.slide.jcr.SlideRepository">
         	<property name="domainConfig" ref="slideTestDomainConfig"></property>
         </bean>
+        -->
         <bean id="slideTestDomainConfig" class="com.idega.slide.webdavservlet.DomainTestConfig"/>
         <bean class="com.idega.content.repository.IdegaRepositoryBean" />
         <bean id="repositoryHelper" class="com.idega.core.content.RepositoryHelper" />
