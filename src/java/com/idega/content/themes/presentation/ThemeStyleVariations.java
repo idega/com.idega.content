@@ -263,7 +263,7 @@ public class ThemeStyleVariations extends Block {
 					variations.add(colorVariation);
 				
 					colourContainer.setStyleAttribute("background-color", color);
-					colourContainer.setOnClick(new StringBuffer(COLOUR_CHOOSER_ACTION).append("'").append(colourContainer.getId()).append(SEPERATOR)
+					colourContainer.setMarkupAttributeMultivalued("onclick", new StringBuffer(COLOUR_CHOOSER_ACTION).append("'").append(colourContainer.getId()).append(SEPERATOR)
 							.append(variation.getVariable()).append(SEPERATOR).append(variation.getGroupName())
 							.append("');").toString());
 					
