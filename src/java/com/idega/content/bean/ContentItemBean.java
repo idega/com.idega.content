@@ -55,6 +55,7 @@ import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.slide.util.WebdavResourceVersion;
 import com.idega.util.CoreConstants;
 import com.idega.util.IWTimestamp;
+import com.idega.util.ListUtil;
 import com.idega.util.expression.ELUtil;
 import com.sun.syndication.io.impl.DateParser;
 
@@ -197,8 +198,8 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		if (this._itemFields == null) {
 			this._itemFields = new HashMap<String, List<ContentItemField>>();
 		}
-		ContentItemField field = (ContentItemField) this._itemFields.get(key + getLanguage());
-		return field;
+		List<ContentItemField> fields = this._itemFields.get(key + getLanguage());
+		return ListUtil.isEmpty(fields) ? null : fields.get(0);
 	}
 
 	public List<ContentItemField> getAttachments() { return getItemFields(FIELDNAME_ATTACHMENT); }

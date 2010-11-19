@@ -40,6 +40,7 @@ import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.themes.presentation.PageInfo;
 import com.idega.content.themes.presentation.SiteInfo;
+import com.idega.core.accesscontrol.business.AccessControl;
 import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.builder.business.BuilderService;
@@ -57,7 +58,6 @@ import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.servlet.filter.IWWelcomeFilter;
-import com.idega.user.data.GroupBMPBean;
 import com.idega.util.ArrayUtil;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
@@ -259,7 +259,7 @@ public class LucidEngineImpl implements LucidEngine {
 	@Override
 	public Collection<SelectItem> getAvailableLocales() {
 		List<SelectItem> availableLocales = new ArrayList<SelectItem>();
-		
+
 		List<Locale> locales = ICLocaleBusiness.getListOfLocalesJAVA();
 		if (ListUtil.isEmpty(locales)) {
 			return availableLocales;
@@ -1869,8 +1869,8 @@ public class LucidEngineImpl implements LucidEngine {
 		}
 
 		boolean restrictedAccess = Boolean.TRUE.toString().equalsIgnoreCase(availability);
-		String usersGroupId = String.valueOf(GroupBMPBean.GROUP_ID_USERS);
-		String everyOneGroupId = String.valueOf(GroupBMPBean.GROUP_ID_EVERYONE);
+		String usersGroupId = String.valueOf(AccessControl._GROUP_ID_USERS);
+		String everyOneGroupId = String.valueOf(AccessControl._GROUP_ID_EVERYONE);
 		try {
 			iwc.getAccessController().setPermission(AccessController.CATEGORY_PAGE_INSTANCE, iwc, usersGroupId, pageKey, AccessController.PERMISSION_KEY_VIEW,
 					Boolean.TRUE);
