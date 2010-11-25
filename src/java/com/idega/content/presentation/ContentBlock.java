@@ -20,6 +20,7 @@ import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavExtendedResource;
+import com.idega.util.CoreConstants;
 import com.idega.webface.WFUtil;
 
 /**
@@ -56,9 +57,13 @@ public abstract class ContentBlock extends IWBaseComponent {
 	}
 
 	public WebdavExtendedResource getWebdavExentededResource(String path) {
+		return getWebdavExentededResource(path, false);
+	}
+	
+	public WebdavExtendedResource getWebdavExentededResource(String path, boolean localResource) {
 		try {
-			IWSlideSession ss = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
-			return ss.getResource(path.replaceFirst(ss.getWebdavServerURI(), ""), false);
+			IWSlideSession ss = getIWSlideSession();
+			return ss.getResource(path.replaceFirst(ss.getWebdavServerURI(), CoreConstants.EMPTY), localResource);
 		} catch (IBOLookupException e) {
 			e.printStackTrace();
 		} catch (UnavailableIWContext e) {
@@ -76,7 +81,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 	protected IWSlideSession getIWSlideSession() {
 		if (this.slideSession == null) {
 			try {
-				this.slideSession = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
+				this.slideSession = (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(), IWSlideSession.class);
 			}
 			catch (IBOLookupException e) {
 				e.printStackTrace();
