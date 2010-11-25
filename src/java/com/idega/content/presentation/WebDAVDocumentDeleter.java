@@ -30,6 +30,8 @@ import org.apache.commons.httpclient.HttpException;
 import com.idega.content.bean.ContentPathBean;
 import com.idega.presentation.IWContext;
 import com.idega.slide.util.WebdavExtendedResource;
+import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
 import com.idega.util.StringUtil;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFUtil;
@@ -197,38 +199,32 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 		String action = (String) source.getAttributes().get(ACTION);
 		
 		if (ACTION_YES.equals(action)) {
-
-			WebdavExtendedResource res = super.getWebdavExentededResource(path);
+			WebdavExtendedResource res = getWebdavExentededResource(path, true);
 			String parentPath = res.getParentPath();
 			Boolean wasFolder = new Boolean(res.isCollection());
-			Boolean deleted = null;
+			Boolean deleted = false;
 			try {
-				super.refreshList();
+				refreshList();
 				if (parentPath != null) {
-					String currentPath = parentPath.replaceFirst(getIWSlideSession().getWebdavServerURI(), "");
+					String currentPath = parentPath.replaceFirst(getIWSlideSession().getWebdavServerURI(), CoreConstants.EMPTY);
 					WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setWebDAVPath", currentPath);
 					WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", currentPath);
 				}
 				WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setClickedFilePath", null, String.class);
-				res.deleteMethod();
-				deleted = new Boolean(true);
-			}
-			catch (HttpException e) {
-				deleted = new Boolean(false);
+				
+				deleted = res.deleteMethod();
+			} catch (HttpException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			catch (IOException e) {
-				deleted = new Boolean(false);
-				e.printStackTrace();
-			}
-			catch (Exception e) {
-				deleted = new Boolean(false);
-				e.printStackTrace();
-			}
+			
 			WFUtil.invoke("webdavdocumentdeleterbean", "setDeleted", deleted, Boolean.class);
 			WFUtil.invoke("webdavdocumentdeleterbean", "setWasFolder", wasFolder, Boolean.class);
-			if (deleted != null && deleted.booleanValue() && redirectOnSuccessURI != null) {
-				IWContext.getInstance().sendRedirect(redirectOnSuccessURI);
+			if (deleted && redirectOnSuccessURI != null) {
+				CoreUtil.getIWContext().sendRedirect(redirectOnSuccessURI);
 			}
 		}
 	}
