@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipInputStream;
@@ -12,9 +13,10 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.event.ActionEvent;
 
-import org.apache.commons.httpclient.HttpException;
 import org.apache.myfaces.custom.fileupload.UploadedFile;
 import org.apache.webdav.lib.PropertyName;
+import org.apache.webdav.lib.WebdavResource;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.bean.ContentPathBean;
@@ -24,9 +26,10 @@ import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
-import com.idega.slide.util.WebdavRootResource;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.FileUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
 
@@ -88,25 +91,21 @@ public class WebDAVUploadBean implements Serializable{
 		if (iwc == null) {
 			return uploadFailed;
 		}
-		if (this.uploadFile == null) {
+		if (uploadFile == null) {
 			return uploadFailed;
 		}
 		
-//		Map parameters = ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest()).getParameterMap();
-//		uploadFolderPath = ((String[])parameters.get("uploadForm:uploadPath"))[0];
-		
 		String tempUploadFolderPath = (String) WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID,"getWebDAVPath");
 		if (tempUploadFolderPath != null && !tempUploadFolderPath.equals(ContentConstants.EMPTY)) {
-			this.uploadFilePath = tempUploadFolderPath;
+			uploadFilePath = tempUploadFolderPath;
 		}
 		
-		IWSlideSession session = IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-		IWSlideService service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+		IWSlideService service = IBOLookup.getServiceInstance(iwc, IWSlideService.class);
 	
-		WebdavRootResource rootResource = session.getWebdavRootResource();
-		String filePath = service.getWebdavServerURI()+getUploadFilePath();
-		String uploadName = this.uploadFile.getName();
-			
+		String filePath = service.getWebdavServerURI().concat(getUploadFilePath());
+		String uploadName = uploadFile.getName();
+		String contentType = uploadFile.getContentType();
+		
 		//FIXME THIS IS A BUG IN THE MYFACES UPLOADER I THINK
 		//The problem is that in IE 6 the filename actually contains the full file path!
 		//example I'm uploading test.txt from c:\myfolder\test.txt to the folder /files/public
@@ -132,52 +131,52 @@ public class WebDAVUploadBean implements Serializable{
 			}
 		}
 
+		long end;
+		long start = System.currentTimeMillis();
 		boolean uploadFileSuccess = false;
-		InputStream stream = null;
 		try {
-			stream = this.uploadFile.getInputStream();
-			uploadFileSuccess = rootResource.putMethod(filePath+fileName, stream);
-		}
-		catch (HttpException e) {
-			e.printStackTrace();
-		}
-		catch (IOException e) {
+			uploadFileSuccess = service.uploadFile(filePath, fileName, contentType, uploadFile.getInputStream());
+		} catch (RemoteException e) {
 			e.printStackTrace();
 		} finally {
-			closeInputStream(stream);
+			end = System.currentTimeMillis();
 		}
+		LOGGER.info("Uploaded (file: '".concat(filePath).concat(fileName).concat("', size: ").concat(FileUtil.getHumanReadableSize(uploadFile.getSize()))
+				.concat(") successfully: ").concat(String.valueOf(uploadFileSuccess)).concat(". It took time to upload: ").concat(String.valueOf(end - start))
+				.concat(" ms."));
 		
-		LOGGER.info("Uploading file success: " + uploadFileSuccess);
-		
-		WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", uploadFilePath);	//	Setting current path to reload
+		//	Setting current path to reload
+		WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", uploadFilePath);
 		//	Always refreshing/keeping status
 		WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "refresh", event.getSource(), UIComponent.class);
 
+		downloadPath = filePath.concat(fileName);
 		if (uploadFileSuccess) {
-			String contentType = this.uploadFile.getContentType();
-			this.downloadPath = filePath + fileName;
-			if (contentType!=null && MimeTypeUtil.getInstance().isImage(contentType)) {
-				this.imagePath = iwc.getIWMainApplication().getURIFromURL(this.downloadPath);	
+			if (contentType != null && MimeTypeUtil.getInstance().isImage(contentType)) {
+				imagePath = iwc.getIWMainApplication().getURIFromURL(downloadPath);	
 			}
 			
-			if (this.comment != null && !ContentConstants.EMPTY.equals(this.comment)) {
-				rootResource.proppatchMethod(filePath + fileName, new PropertyName("DAV:", "comment"), this.comment, true);
+			if (!StringUtil.isEmpty(comment)) {
+				IWSlideSession session = IBOLookup.getSessionInstance(iwc, IWSlideSession.class);
+				WebdavResource resource = session.getWebdavResource(downloadPath);
+				resource.proppatchMethod(new PropertyName("DAV:", "comment"), comment, true);
 			}
+			
 			uploadSuccessful = Boolean.TRUE;
-			uploadMessage = rootResource.getStatusMessage();
-		}
-		else{
+		} else {
 			uploadSuccessful = Boolean.FALSE;
-			uploadMessage = rootResource.getStatusMessage();
-			LOGGER.warning("Error code: " + rootResource.getStatusMessage() + ", message: " + uploadMessage);
+			LOGGER.warning("Error uploading file '" + fileName + "' to " + filePath);
+			downloadPath = null;
 			return uploadFailed;
 		}
+		
+		uploadMessage = uploadSuccessful ? uploadSucceeded : uploadFailed;
 		
 		if (uploadFileSuccess && redirectOnSuccessURI != null) {
 			CoreUtil.getIWContext().sendRedirect(redirectOnSuccessURI);
 		}
 		
-		return uploadSucceeded;
+		return uploadMessage;
 	}
 
 	/**
