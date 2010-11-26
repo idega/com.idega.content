@@ -29,6 +29,7 @@ import com.idega.slide.business.IWSlideSession;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.FileUtil;
+import com.idega.util.IOUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
@@ -134,12 +135,15 @@ public class WebDAVUploadBean implements Serializable{
 		long end;
 		long start = System.currentTimeMillis();
 		boolean uploadFileSuccess = false;
+		InputStream stream = null;
 		try {
-			uploadFileSuccess = service.uploadFile(filePath, fileName, contentType, uploadFile.getInputStream());
+			stream = uploadFile.getInputStream();
+			uploadFileSuccess = service.uploadFile(filePath, fileName, contentType, stream);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		} finally {
 			end = System.currentTimeMillis();
+			IOUtil.close(stream);
 		}
 		LOGGER.info("Uploaded (file: '".concat(filePath).concat(fileName).concat("', size: ").concat(FileUtil.getHumanReadableSize(uploadFile.getSize()))
 				.concat(") successfully: ").concat(String.valueOf(uploadFileSuccess)).concat(". It took time to upload: ").concat(String.valueOf(end - start))
@@ -183,22 +187,16 @@ public class WebDAVUploadBean implements Serializable{
 	 * This does a webdav query
 	 * @return
 	 */
-	public boolean getIsUploaded(){
-		
-		if(this.downloadPath!=null){
-			IWSlideSession session;
+	public boolean getIsUploaded() {
+		if (this.downloadPath != null) {
 			try {
-				session = (IWSlideSession)IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
-
+				IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(IWContext.getInstance(), IWSlideSession.class);
 				return session.getExistence(this.downloadPath);
-			}
-			catch (Exception e){
+			} catch (Exception e){
 				e.printStackTrace();
 			}
 		}
-		
 		return false;
-		
 	}
 	
 	/**
@@ -337,8 +335,8 @@ public class WebDAVUploadBean implements Serializable{
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
-			closeInputStream(stream);
-			closeInputStream(zipStream);
+			IOUtil.close(stream);
+			IOUtil.close(zipStream);
 		}
 		
 		if (uploadingTheme) {
@@ -347,21 +345,6 @@ public class WebDAVUploadBean implements Serializable{
 		
 		LOGGER.info(resultInfo);
 		return result;
-	}
-	
-	private boolean closeInputStream(InputStream stream) {
-		if (stream == null) {
-			return false;
-		}
-		
-		try {
-			stream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-		
-		return true;
 	}
 	
 	private String getUploadFileName() {
