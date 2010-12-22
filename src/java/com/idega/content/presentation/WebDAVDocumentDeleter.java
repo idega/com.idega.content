@@ -204,15 +204,16 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 			Boolean wasFolder = new Boolean(res.isCollection());
 			Boolean deleted = false;
 			try {
-				refreshList();
-				if (parentPath != null) {
-					String currentPath = parentPath.replaceFirst(getIWSlideSession().getWebdavServerURI(), CoreConstants.EMPTY);
-					WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setWebDAVPath", currentPath);
-					WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", currentPath);
-				}
-				WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setClickedFilePath", null, String.class);
-				
 				deleted = res.deleteMethod();
+				if (deleted) {
+					refreshList();
+					if (parentPath != null) {
+						String currentPath = parentPath.replaceFirst(getIWSlideSession().getWebdavServerURI(), CoreConstants.EMPTY);
+						WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setWebDAVPath", currentPath);
+						WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", currentPath);
+					}
+					WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setClickedFilePath", null, String.class);
+				}
 			} catch (HttpException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
