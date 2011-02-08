@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -180,11 +181,11 @@ public class FileUploaderBean implements FileUploader {
 			return false;
 		}
 		
-		boolean result = true;
-		for (int i = 0; (i < files.size() && result); i++) {
-			result = uploadFile(files.get(i), path, zipFile, themePack, extractContent, isIE);
+		boolean uploadedSuccessfully = true;
+		for (Iterator<UploadFile> filesIter = files.iterator(); (filesIter.hasNext() && uploadedSuccessfully);) {
+			uploadedSuccessfully = uploadFile(filesIter.next(), path, zipFile, themePack, extractContent, isIE);
 		}
-		return result;
+		return uploadedSuccessfully;
 	}
 	
 	private boolean uploadFile(UploadFile file, String path, boolean zipFile, boolean themePack, boolean extractContent, boolean isIE) {

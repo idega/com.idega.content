@@ -46,5 +46,9 @@ public class UploadFile {
 	public void setBytes(byte[] bytes) {
 		this.bytes = bytes;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Name: " + getName() + ", type: " + getType() + ", size: " + getSize() + ", bytes: " + getBytes();
+	}
 }

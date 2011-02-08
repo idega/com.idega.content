@@ -104,6 +104,7 @@ public class ContentFileUploadServlet extends HttpServlet {
         	iwac.setApplicationAttribute(uploadId, Boolean.TRUE);
         }
         
+        String errorMessage = null;
         boolean success = false;
         try {
 	        //	Checking upload path
@@ -131,8 +132,14 @@ public class ContentFileUploadServlet extends HttpServlet {
 	        } else {
 	        	success = uploader.uploadFile(files, uploadPath, isIE);
 	        }
+	        
+	        if (!success) {
+	        	errorMessage = "Unable to upload files (" + files + ") to: " + uploadPath + ". Upload ID: " + uploadId;
+	        	throw new RuntimeException(errorMessage);
+	        }
         } catch(Exception e) {
-        	LOGGER.log(Level.SEVERE, "Files uploader failed!", e);
+        	LOGGER.log(Level.SEVERE, errorMessage == null ? "Files uploader failed! Unable to upload files: " + files + " to: " + uploadPath + ". Upload ID: " + uploadId :
+        		errorMessage, e);
         	CoreUtil.sendExceptionNotification(e);
         } finally {
         	if (!StringUtil.isEmpty(uploadId)) {
