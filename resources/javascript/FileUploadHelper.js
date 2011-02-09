@@ -2,7 +2,6 @@ if (!FileUploadHelper) var FileUploadHelper = {};
 
 FileUploadHelper.allUploadedFiles = [];
 FileUploadHelper.uploadedFiles = null;
-FileUploadHelper.strippedFiles = null;
 
 FileUploadHelper.properties = {
 	id: null,
@@ -63,8 +62,21 @@ FileUploadHelper.uploadFiles = function() {
 	
 	var uploadHandler = {
 		upload: function(o) {
-			FileUploadHelper.uploadedFiles = files;
-			if (FileUploadHelper.uploadedFiles != null) {
+			var response = o.responseText;
+			if (response == null) {
+				humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
+				return;
+			}
+			
+			var key = 'web2FilesUploaderFilesListStarts';
+			response = response.substring(response.indexOf(key) + key.length);
+			response = response.replace('</pre>', '');
+			
+			FileUploadHelper.uploadedFiles = response.split(',');
+			if (FileUploadHelper.uploadedFiles == null) {
+				humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
+				return;
+			} else {
 				for (var i = 0; i < FileUploadHelper.uploadedFiles.length; i++) {
 					FileUploadHelper.allUploadedFiles.push(FileUploadHelper.getRealUploadedFile(FileUploadHelper.uploadedFiles[i]));
 				}
@@ -158,11 +170,6 @@ FileUploadHelper.showUploadedFiles = function(fakeFileDeletion) {
 				return;
 			}
 			
-			FileUploadHelper.strippedFiles = [];
-			for (var i = 0; i + 1 < results.length; i++) {
-				FileUploadHelper.strippedFiles.push(results[i]);
-			}
-			
 			var component = results[results.length - 1];
 			filesList.hide('fast', function() {
 				filesList.empty().append(component).show('fast');
@@ -203,6 +210,10 @@ FileUploadHelper.getUploadPath = function() {
 
 FileUploadHelper.getRealUploadedFile = function(file) {
 	var uploadPath = FileUploadHelper.getUploadPath();
+	if (uploadPath.substring(uploadPath.length - 1) != '/') {
+		uploadPath += '/';
+	}
+	
 	var index = file.lastIndexOf('/');
 	if (index != -1) {
 		file = file.substring(index + 1);

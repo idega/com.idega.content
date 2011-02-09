@@ -3,6 +3,7 @@ package com.idega.content.upload.servlet;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -142,7 +143,17 @@ public class ContentFileUploadServlet extends HttpServlet {
 	        	success = uploader.uploadFile(files, uploadPath, isIE);
 	        }
 	        
-	        if (!success) {
+	        if (success) {
+	        	StringBuffer responseBuffer = new StringBuffer("web2FilesUploaderFilesListStarts");
+	        	for (Iterator<UploadFile> filesIter = files.iterator(); filesIter.hasNext();) {
+	        		responseBuffer.append(filesIter.next().getName());
+	        		if (filesIter.hasNext()) {
+	        			responseBuffer.append(CoreConstants.COMMA);
+	        		}
+	        	}
+	        	response.setCharacterEncoding(CoreConstants.ENCODING_UTF8);
+	        	response.getWriter().print(responseBuffer.toString());
+	        } else {
 	        	errorMessage = "Unable to upload files (" + files + ") to: " + uploadPath + ". Upload ID: " + uploadId;
 	        	throw new RuntimeException(errorMessage);
 	        }
