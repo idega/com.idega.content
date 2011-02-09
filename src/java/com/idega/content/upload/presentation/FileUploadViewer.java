@@ -44,9 +44,7 @@ public class FileUploadViewer extends IWBaseComponent {
 	private boolean showLoadingMessage = false;
 	private boolean allowMultipleFiles = false;
 	private boolean autoAddFileInput = true;
-	private boolean autoUpload;
-	private boolean showUploadedFiles;
-	private boolean fakeFileDeletion;
+	private boolean autoUpload, showUploadedFiles, fakeFileDeletion, stripNonRomanLetters;
 	
 	@Autowired
 	private FileUploader fileUploader;
@@ -84,6 +82,8 @@ public class FileUploadViewer extends IWBaseComponent {
 		
 		this.autoUpload = values[11] == null ? Boolean.FALSE : (Boolean) values[11];
 		this.showUploadedFiles = values[12] == null ? Boolean.FALSE : (Boolean) values[12];
+		this.fakeFileDeletion = values[15] == null ? Boolean.FALSE : (Boolean) values[15];
+		this.stripNonRomanLetters = values[16] == null ? Boolean.FALSE : (Boolean) values[16];
 		
 		this.uploadId = values[13] == null ? null : values[13].toString();
 		
@@ -92,7 +92,7 @@ public class FileUploadViewer extends IWBaseComponent {
 	
 	@Override
 	public Object saveState(FacesContext context) {
-		Object values[] = new Object[15];
+		Object values[] = new Object[17];
 		values[0] = super.saveState(context);
 		
 		values[1] = this.actionAfterUpload;
@@ -110,6 +110,8 @@ public class FileUploadViewer extends IWBaseComponent {
 		
 		values[11] = this.autoUpload;
 		values[12] = this.showUploadedFiles;
+		values[15] = this.fakeFileDeletion;
+		values[16] = this.stripNonRomanLetters;
 		
 		values[13] = this.uploadId;
 		
@@ -159,6 +161,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		addProperty(mainContainer, ContentConstants.UPLOADER_UPLOAD_THEME_PACK, String.valueOf(themePack));
 		addProperty(mainContainer, ContentConstants.UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE, String.valueOf(extractContent));
 		addProperty(mainContainer, ContentConstants.UPLOADER_UPLOAD_IDENTIFIER, uploadId);
+		addProperty(mainContainer, ContentConstants.UPLOADER_STRIP_NON_ROMAN_LETTERS, String.valueOf(stripNonRomanLetters));
 		
 		Layer fileInputs = new Layer();
 		String id = fileInputs.getId();
@@ -193,7 +196,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		}
 		upload.setOnClick(getFileUploader().getUploadAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(), isZipFile(),
 				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId(),
-				isFakeFileDeletion(), getActionAfterUploadedToRepository()
+				isFakeFileDeletion(), getActionAfterUploadedToRepository(), isStripNonRomanLetters()
 		));
 		buttonsContainer.add(upload);
 		mainContainer.add(buttonsContainer);
@@ -206,7 +209,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		));
 		String initAction = getFileUploader().getPropertiesAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(), isZipFile(),
 				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId(),
-				isFakeFileDeletion(), getActionAfterUploadedToRepository()
+				isFakeFileDeletion(), getActionAfterUploadedToRepository(), isStripNonRomanLetters()
 		);
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			initAction = new StringBuilder("jQuery(window).load(function() {").append(initAction).append("});").toString();
@@ -404,5 +407,13 @@ public class FileUploadViewer extends IWBaseComponent {
 
 	public void setActionAfterUploadedToRepository(String actionAfterUploadedToRepository) {
 		this.actionAfterUploadedToRepository = actionAfterUploadedToRepository;
+	}
+
+	public boolean isStripNonRomanLetters() {
+		return stripNonRomanLetters;
+	}
+
+	public void setStripNonRomanLetters(boolean stripNonRomanLetters) {
+		this.stripNonRomanLetters = stripNonRomanLetters;
 	}
 }

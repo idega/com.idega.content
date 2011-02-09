@@ -29,6 +29,7 @@ import com.idega.idegaweb.IWMainApplication;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.ListUtil;
+import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
@@ -52,6 +53,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 		boolean zipFile = false;
 		boolean themePack = false;
 		boolean extractContent = false;
+		boolean stripNonRomanLetters = false;
 		
 		FileUploadProgressListener uploadProgressListner = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
 		
@@ -90,6 +92,8 @@ public class ContentFileUploadServlet extends HttpServlet {
         			extractContent = getValueFromString(getValueFromBytes(file.get()));
         		} else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_IDENTIFIER)) {
         			uploadId = getValueFromBytes(file.get());
+        		} else if (fieldName.equals(ContentConstants.UPLOADER_STRIP_NON_ROMAN_LETTERS)) {
+        			stripNonRomanLetters = getValueFromString(getValueFromBytes(file.get()));
         		}
         	}
         }
@@ -117,6 +121,11 @@ public class ContentFileUploadServlet extends HttpServlet {
 	    	}
 	    	if (!uploadPath.endsWith(CoreConstants.SLASH)) {
 	    		uploadPath += CoreConstants.SLASH;
+	    	}
+	    	
+	    	if (stripNonRomanLetters) {
+	    		uploadPath = getStripped(uploadPath);
+	    		prepareFiles(files);
 	    	}
 	    	
 	        boolean isIE = CoreUtil.isIE(request);
@@ -149,6 +158,19 @@ public class ContentFileUploadServlet extends HttpServlet {
         			iwac.removeApplicationAttribute(uploadId);
         	}
         }
+	}
+	
+	private void prepareFiles(List<UploadFile> files) {
+		for (UploadFile file: files) {
+			file.setName(getStripped(file.getName()));
+		}
+	}
+	
+	private String getStripped(String input) {
+		if (StringUtil.isEmpty(input))
+			return input;
+		
+		return StringHandler.stripNonRomanCharacters(input, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS);
 	}
 	
 	@Override

@@ -19,9 +19,7 @@ public class FileUploadViewerTag extends UIComponentELTag {
 	private boolean showLoadingMessage = true;
 	private boolean allowMultipleFiles = false;
 	private boolean autoAddFileInput = true;
-	private boolean autoUpload;
-	private boolean showUploadedFiles;
-	private boolean fakeFileDeletion;
+	private boolean autoUpload, showUploadedFiles, fakeFileDeletion, stripNonRomanLetters;
 	
 	@Override
 	public String getComponentType() {
@@ -52,6 +50,7 @@ public class FileUploadViewerTag extends UIComponentELTag {
 			uploadViewer.setAllowMultipleFiles(allowMultipleFiles);
 			uploadViewer.setAutoAddFileInput(autoAddFileInput);
 			uploadViewer.setFakeFileDeletion(fakeFileDeletion);
+			uploadViewer.setStripNonRomanLetters(stripNonRomanLetters);
 		}
 	}
 
@@ -73,6 +72,7 @@ public class FileUploadViewerTag extends UIComponentELTag {
 		this.autoUpload = false;
 		this.showUploadedFiles = false;
 		this.fakeFileDeletion = false;
+		this.stripNonRomanLetters = false;
 	}
 	
 	public String getActionAfterUpload() {
@@ -209,6 +209,14 @@ public class FileUploadViewerTag extends UIComponentELTag {
 
 	public void setActionAfterUploadedToRepository(String actionAfterUploadedToRepository) {
 		this.actionAfterUploadedToRepository = actionAfterUploadedToRepository;
+	}
+
+	public boolean isStripNonRomanLetters() {
+		return stripNonRomanLetters;
+	}
+
+	public void setStripNonRomanLetters(boolean stripNonRomanLetters) {
+		this.stripNonRomanLetters = stripNonRomanLetters;
 	}
 	
 }

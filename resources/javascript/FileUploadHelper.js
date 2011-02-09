@@ -2,6 +2,7 @@ if (!FileUploadHelper) var FileUploadHelper = {};
 
 FileUploadHelper.allUploadedFiles = [];
 FileUploadHelper.uploadedFiles = null;
+FileUploadHelper.strippedFiles = null;
 
 FileUploadHelper.properties = {
 	id: null,
@@ -24,7 +25,8 @@ FileUploadHelper.properties = {
 	autoUpload: false,
 	showUploadedFiles: false,
 	fakeFileDeletion: false,
-	actionAfterUploadedToRepository: null
+	actionAfterUploadedToRepository: null,
+	stripNonRomanLetters: false
 }
 
 FileUploadHelper.setProperties = function(properties) {
@@ -150,12 +152,18 @@ FileUploadHelper.showUploadedFiles = function(fakeFileDeletion) {
 	}
 	
 	var uploadPath = FileUploadHelper.getUploadPath();
-	FileUploader.getUploadedFilesList(FileUploadHelper.allUploadedFiles, uploadPath, fakeFileDeletion, {
-		callback: function(component) {
-			if (component == null) {
+	FileUploader.getUploadedFilesList(FileUploadHelper.allUploadedFiles, uploadPath, fakeFileDeletion, FileUploadHelper.properties.stripNonRomanLetters, {
+		callback: function(results) {
+			if (results == null) {
 				return;
 			}
 			
+			FileUploadHelper.strippedFiles = [];
+			for (var i = 0; i + 1 < results.length; i++) {
+				FileUploadHelper.strippedFiles.push(results[i]);
+			}
+			
+			var component = results[results.length - 1];
 			filesList.hide('fast', function() {
 				filesList.empty().append(component).show('fast');
 			});

@@ -49,6 +49,7 @@ import com.idega.util.CoreUtil;
 import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
+import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 
 public class FileUploaderBean implements FileUploader {
@@ -122,7 +123,7 @@ public class FileUploaderBean implements FileUploader {
 
 	public String getPropertiesAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository) {
+			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters) {
 		
 		IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
 		return new StringBuilder("FileUploadHelper.setProperties({id: '").append(id).append("', showProgressBar: ").append(showProgressBar)
@@ -143,6 +144,7 @@ public class FileUploaderBean implements FileUploader {
 			.append(", uploadId: '").append(uploadId).append("', autoUpload: ").append(autoUpload).append(", showUploadedFiles: ").append(showUploadedFiles)
 			.append(", fakeFileDeletion: ").append(fakeFileDeletion)
 			.append(", actionAfterUploadedToRepository: ").append(getJavaScriptAction(actionAfterUploadedToRepository))
+			.append(", stripNonRomanLetters: ").append(stripNonRomanLetters)
 		.append("});").toString();
 	}
 	
@@ -321,11 +323,11 @@ public class FileUploaderBean implements FileUploader {
 	
 	public String getUploadAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository) {
+			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters) {
 		
 		StringBuilder action = new StringBuilder(getPropertiesAction(iwc, id, progressBarId, uploadId, showProgressBar, showLoadingMessage, zipFile, formId,
-				actionAfterUpload, actionAfterCounterReset, autoUpload, showUploadedFiles, componentToRerenderId, fakeFileDeletion, actionAfterUploadedToRepository))
-				.append("FileUploadHelper.uploadFiles();");
+				actionAfterUpload, actionAfterCounterReset, autoUpload, showUploadedFiles, componentToRerenderId, fakeFileDeletion, actionAfterUploadedToRepository,
+				stripNonRomanLetters)).append("FileUploadHelper.uploadFiles();");
 		return getActionToLoadFilesAndExecuteCustomAction(action.toString(), showProgressBar, !StringUtil.isEmpty(componentToRerenderId));
 	}
 	
@@ -370,7 +372,7 @@ public class FileUploaderBean implements FileUploader {
 		jQuery = query;
 	}
 
-	public String getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion) {
+	public List<String> getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion, boolean stripNonRomanLetters) {
 		if (ListUtil.isEmpty(files) || StringUtil.isEmpty(uploadPath)) {
 			return null;
 		}
@@ -391,6 +393,8 @@ public class FileUploaderBean implements FileUploader {
 		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
 		String deleteFileTitle = iwrb.getLocalizedString("files_uploader.delete_uploaded_file", "Delete file");
 		
+		List<String> results = new ArrayList<String>(files.size() + 1);
+		
 		Lists list = new Lists();
 		for (String fileInSlide: files) {
 			ListItem listItem = new ListItem();
@@ -407,7 +411,11 @@ public class FileUploaderBean implements FileUploader {
 			if (!uploadPath.endsWith(CoreConstants.SLASH)) {
 				uploadPath = uploadPath.concat(CoreConstants.SLASH);
 			}
+			fileName = stripNonRomanLetters ? StringHandler.stripNonRomanCharacters(fileName, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS) : fileName;
 			fileInSlide = new StringBuilder(CoreConstants.WEBDAV_SERVLET_URI).append(uploadPath).append(fileName).toString();
+			fileInSlide = stripNonRomanLetters ? StringHandler.stripNonRomanCharacters(fileInSlide, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS) : fileInSlide;
+			String fileInSlideWithoutWebDav = fileInSlide.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
+			results.add(fileInSlideWithoutWebDav);
 			
 			Link link = null;
 			if (iwc.isLoggedOn() || uploadPath.startsWith(CoreConstants.PUBLIC_PATH)) {
@@ -421,7 +429,7 @@ public class FileUploaderBean implements FileUploader {
 			
 			Image deleteFile = bundle.getImage("images/remove.png");
 			deleteFile.setOnClick(new StringBuilder("FileUploadHelper.deleteUploadedFile('").append(listItem.getId()).append("', '")
-					.append(fileInSlide.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY)).append("', ").append(fakeFileDeletion)
+					.append(fileInSlideWithoutWebDav).append("', ").append(fakeFileDeletion)
 					.append(");").toString());
 			deleteFile.setTitle(deleteFileTitle);
 			deleteFile.setStyleClass("fileUploaderDeleteFileButtonStyle");
@@ -430,7 +438,8 @@ public class FileUploaderBean implements FileUploader {
 			list.add(listItem);
 		}
 		
-		return getBuilderService(iwc).getRenderedComponent(list, iwc, false);
+		results.add(getBuilderService(iwc).getRenderedComponent(list, iwc, false));
+		return results;
 	}
 
 	public AdvancedProperty deleteFile(String fileInSlide, Boolean fakeFileDeletion) {
