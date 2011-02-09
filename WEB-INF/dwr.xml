@@ -115,7 +115,7 @@
   			List<PageAccessibilityProperty> LucidEngine.getPageAccessibilityProperties(String);
   			LucidApplicationInfo LucidEngine.getStartInfo(Boolean);
   			
-  			FileUploader.getUploadedFilesList(List<String>, String, Boolean);
+  			FileUploader.getUploadedFilesList(List<String>, String, Boolean, Boolean);
   			AdvancedProperty FileUploader.deleteFile(String, Boolean);
   			AdvancedProperty FileUploader.deleteFiles(List<String>, Boolean);
   		]]>

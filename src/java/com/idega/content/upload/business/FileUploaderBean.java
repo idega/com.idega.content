@@ -372,12 +372,13 @@ public class FileUploaderBean implements FileUploader {
 		jQuery = query;
 	}
 
-	public List<String> getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion, boolean stripNonRomanLetters) {
+	public List<String> getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters) {
 		if (ListUtil.isEmpty(files) || StringUtil.isEmpty(uploadPath)) {
 			return null;
 		}
 		
 		fakeFileDeletion = fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion;
+		stripNonRomanLetters = stripNonRomanLetters == null ? Boolean.FALSE : stripNonRomanLetters;
 		
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
