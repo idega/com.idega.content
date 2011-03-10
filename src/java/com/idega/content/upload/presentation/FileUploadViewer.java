@@ -14,6 +14,7 @@ import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.upload.business.FileUploader;
+import com.idega.content.upload.servlet.ContentFileUploadServlet;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWBaseComponent;
@@ -35,7 +36,7 @@ public class FileUploadViewer extends IWBaseComponent {
 	private String actionAfterUpload, actionAfterCounterReset, actionAfterUploadedToRepository = null;
 	
 	private String uploadPath = CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
-	private String formId, componentToRerenderId, uploadId = null;
+	private String formId, componentToRerenderId, uploadId, maxUploadSize = String.valueOf(ContentFileUploadServlet.MAX_UPLOAD_SIZE);
 	
 	private boolean zipFile = false;
 	private boolean extractContent = false;
@@ -88,11 +89,13 @@ public class FileUploadViewer extends IWBaseComponent {
 		this.uploadId = values[13] == null ? null : values[13].toString();
 		
 		this.actionAfterUploadedToRepository = values[14] == null ? null : values[14].toString();
+		
+		this.maxUploadSize = values[17] == null ? null : values[17].toString();
 	}
 	
 	@Override
 	public Object saveState(FacesContext context) {
-		Object values[] = new Object[17];
+		Object values[] = new Object[18];
 		values[0] = super.saveState(context);
 		
 		values[1] = this.actionAfterUpload;
@@ -116,6 +119,8 @@ public class FileUploadViewer extends IWBaseComponent {
 		values[13] = this.uploadId;
 		
 		values[14] = this.actionAfterUploadedToRepository;
+		
+		values[17] = this.maxUploadSize;
 		
 		return values;
 	}
@@ -196,7 +201,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		}
 		upload.setOnClick(getFileUploader().getUploadAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(), isZipFile(),
 				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId(),
-				isFakeFileDeletion(), getActionAfterUploadedToRepository(), isStripNonRomanLetters()
+				isFakeFileDeletion(), getActionAfterUploadedToRepository(), isStripNonRomanLetters(), getMaxUploadSize(context)
 		));
 		buttonsContainer.add(upload);
 		mainContainer.add(buttonsContainer);
@@ -209,7 +214,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		));
 		String initAction = getFileUploader().getPropertiesAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(), isZipFile(),
 				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId(),
-				isFakeFileDeletion(), getActionAfterUploadedToRepository(), isStripNonRomanLetters()
+				isFakeFileDeletion(), getActionAfterUploadedToRepository(), isStripNonRomanLetters(), getMaxUploadSize(context)
 		);
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			initAction = new StringBuilder("jQuery(window).load(function() {").append(initAction).append("});").toString();
@@ -256,9 +261,7 @@ public class FileUploadViewer extends IWBaseComponent {
 	}
 	
 	public String getUploadPath(FacesContext ctx) {
-		
 		String uploadPath = getExpressionValue(ctx, "uploadPath");
-		
 		if (uploadPath != null)
 			this.uploadPath = uploadPath;
 		
@@ -415,5 +418,16 @@ public class FileUploadViewer extends IWBaseComponent {
 
 	public void setStripNonRomanLetters(boolean stripNonRomanLetters) {
 		this.stripNonRomanLetters = stripNonRomanLetters;
+	}
+
+	public String getMaxUploadSize(FacesContext context) {
+		if (maxUploadSize == null) {
+			maxUploadSize = getExpressionValue(context, "maxUploadSize");
+		}
+		return maxUploadSize;
+	}
+
+	public void setMaxUploadSize(String maxUploadSize) {
+		this.maxUploadSize = maxUploadSize;
 	}
 }

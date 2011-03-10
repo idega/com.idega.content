@@ -25,11 +25,14 @@ FileUploadHelper.properties = {
 	showUploadedFiles: false,
 	fakeFileDeletion: false,
 	actionAfterUploadedToRepository: null,
-	stripNonRomanLetters: false
+	stripNonRomanLetters: false,
+	maxSize: 1073741824
 }
 
 FileUploadHelper.setProperties = function(properties) {
 	FileUploadHelper.properties = properties;
+	FileUploadHelper.properties.maxSize--;
+	FileUploadHelper.properties.maxSize++;
 }
 
 FileUploadHelper.uploadFiles = function() {
@@ -76,6 +79,15 @@ FileUploadHelper.uploadFiles = function() {
 			if (FileUploadHelper.uploadedFiles == null) {
 				humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
 				return;
+			} else if (FileUploadHelper.uploadedFiles[0].indexOf('error=') != -1) {
+				var firstValue = FileUploadHelper.uploadedFiles[0];
+				var customMessage = firstValue.substr('error='.length);
+				for (var i = 1; i < FileUploadHelper.uploadedFiles.length; i++) {
+					customMessage += FileUploadHelper.uploadedFiles[i]; 
+				}
+				closeAllLoadingMessages();
+				humanMsg.displayMsg(customMessage);
+				return;
 			} else {
 				for (var i = 0; i < FileUploadHelper.uploadedFiles.length; i++) {
 					FileUploadHelper.allUploadedFiles.push(FileUploadHelper.getRealUploadedFile(FileUploadHelper.uploadedFiles[i]));
@@ -89,14 +101,14 @@ FileUploadHelper.uploadFiles = function() {
 	};
 	
 	var progressBarId = FileUploadHelper.properties.progressBarId;
-	FileUploadListener.resetFileUploaderCounters({
+	FileUploadListener.resetFileUploaderCounters(FileUploadHelper.properties.uploadId, FileUploadHelper.properties.maxSize, {
 		callback: function(result) {
 			YAHOO.util.Connect.setForm(FileUploadHelper.properties.formId, true);
 			YAHOO.util.Connect.asyncRequest('POST', '/servlet/ContentFileUploadServlet', uploadHandler);
 			
 			if (FileUploadHelper.properties.showProgressBar) {
 				jQuery('#' + progressBarId).parent().hide('fast', function() {
-					jQuery('#' + progressBarId).progressBar(0, { showText: true});
+					jQuery('#' + progressBarId).progressBar(0, {showText: true});
 					jQuery('#' + progressBarId).css('display', 'block');
 					showUploadInfoInProgressBar(progressBarId, FileUploadHelper.properties.actionAfterCounterReset);
 				});
@@ -259,23 +271,22 @@ function showUploadInfoInProgressBar(progressBarId, actionAfterCounterReset) {
 }
 
 function fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset) {
-	FileUploadListener.getFileUploadStatus({
+	FileUploadListener.getFileUploadStatus(FileUploadHelper.properties.uploadId, {
 		callback: function(status) {
 			if (status == null) {
 				status = '0';
 			}
 			
-			jQuery('#' + progressBarId).progressBar(status);
+			jQuery('#' + progressBarId).progressBar(status == '-1' ? '0' : status);
 
 			if (status == '100') {
-				jQuery('#' + progressBarId).html(FileUploadHelper.properties.localizations.UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT);
-				var functionAfterCompletedUpload = function() {
-					resetFileUploaderCounterAfterTimeOut(progressBarId, actionAfterCounterReset);
-				}
-				window.setTimeout(functionAfterCompletedUpload, 2000);
+				FileUploadHelper.reportUploadStatus(progressBarId, actionAfterCounterReset,
+				FileUploadHelper.properties.localizations.UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT);
 				return false;
-			}
-			else {
+			} else if (status == '-1') {
+				FileUploadHelper.reportUploadStatus(progressBarId, actionAfterCounterReset, FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
+				return false;
+			} else {
 				var functionWhileUploading = function() {
 					fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset);
 				}
@@ -285,8 +296,16 @@ function fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterRese
 	});
 }
 
+FileUploadHelper.reportUploadStatus = function(progressBarId, actionAfterCounterReset, text) {
+	jQuery('#' + progressBarId).html(text);
+	var functionAfterCompletedUpload = function() {
+		resetFileUploaderCounterAfterTimeOut(progressBarId, actionAfterCounterReset);
+	}
+	window.setTimeout(functionAfterCompletedUpload, 2000);
+}
+
 function resetFileUploaderCounterAfterTimeOut(progressBarId, customActionAfterCounterReset) {
-	FileUploadListener.resetFileUploaderCounters({
+	FileUploadListener.resetFileUploaderCounters(FileUploadHelper.properties.uploadId, FileUploadHelper.properties.maxSize, {
 		callback:function(result) {
 			jQuery('#' + progressBarId).hide('normal', function() {
 				var parentContainer = jQuery('#' + progressBarId).parent();

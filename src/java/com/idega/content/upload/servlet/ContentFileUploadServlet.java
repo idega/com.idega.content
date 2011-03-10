@@ -21,14 +21,17 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
 
 import com.idega.content.business.ContentConstants;
+import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.upload.bean.UploadFile;
 import com.idega.content.upload.business.FileUploadProgressListener;
 import com.idega.content.upload.business.FileUploader;
 import com.idega.idegaweb.IWApplicationContext;
-import com.idega.idegaweb.IWMainApplication;
+import com.idega.idegaweb.IWResourceBundle;
+import com.idega.presentation.IWContext;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.FileUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
@@ -38,8 +41,9 @@ public class ContentFileUploadServlet extends HttpServlet {
 
 	private static Logger LOGGER = Logger.getLogger(ContentFileUploadServlet.class.getName());
 	
-	private static final long serialVersionUID = -6282517406996613536L;	
-	private static final long MAX_UPLOAD_SIZE = 1024 * 1024 * 1024;	//	1 GB
+	private static final long serialVersionUID = -6282517406996613536L;
+	
+	public static final long MAX_UPLOAD_SIZE = 1024 * 1024 * 1024;	//	1 GB
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -50,19 +54,42 @@ public class ContentFileUploadServlet extends HttpServlet {
 			return;
 		}
 		
+		IWContext iwc = new IWContext(request, response, getServletContext());
+		
 		String uploadPath = null;
 		boolean zipFile = false;
 		boolean themePack = false;
 		boolean extractContent = false;
 		boolean stripNonRomanLetters = false;
 		
-		FileUploadProgressListener uploadProgressListner = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
+		FileUploadProgressListener uploadProgressListener = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
 		
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		FileUploadBase fileUploadService = new FileUpload(factory);
-		fileUploadService.setSizeMax(MAX_UPLOAD_SIZE);
-		fileUploadService.setProgressListener(uploadProgressListner);
+		long maxUploadSize = uploadProgressListener.getMaxSize();
+		maxUploadSize = maxUploadSize <= 0 ? MAX_UPLOAD_SIZE : maxUploadSize;
+		fileUploadService.setSizeMax(maxUploadSize);
+		fileUploadService.setProgressListener(uploadProgressListener);
 
+		IWApplicationContext iwac = iwc.getApplicationContext();
+		String uploadId = uploadProgressListener.getUploadId();
+		if (!StringUtil.isEmpty(uploadId)) {
+			iwac.setApplicationAttribute(uploadId, Boolean.TRUE);
+		}
+		
+		Long requestSize = null;
+		try {
+			requestSize = Long.valueOf(request.getHeader("Content-Length"));
+		} catch (Exception e) {}
+		if (requestSize != null && requestSize > maxUploadSize) {
+			IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
+			writeToResponse(response, "error=".concat(iwrb.getLocalizedString("uploader_error_exceeds_max_size", "The file you are uploading is exceeding the limits"))
+					.concat(": ").concat(FileUtil.getHumanReadableSize(maxUploadSize)));
+			uploadProgressListener.markFailedUpload(uploadId);
+			finishUpUpload(iwac, uploadProgressListener, uploadId, false);
+			return;
+		}
+		
 		List<FileItem> fileItems = null;
 		try {
 			fileItems = fileUploadService.parseRequest(src);
@@ -75,7 +102,6 @@ public class ContentFileUploadServlet extends HttpServlet {
 			return;
 		}
 		
-		String uploadId = null;
 		String fieldName = null;
 		List<UploadFile> files = new ArrayList<UploadFile>();
 		for (FileItem file: fileItems) {
@@ -104,13 +130,12 @@ public class ContentFileUploadServlet extends HttpServlet {
         	return;
         }
         
-        IWApplicationContext iwac = IWMainApplication.getDefaultIWApplicationContext();
-        if (!StringUtil.isEmpty(uploadId) && iwac != null) {
+        if (!StringUtil.isEmpty(uploadId)) {
         	iwac.setApplicationAttribute(uploadId, Boolean.TRUE);
         }
         
-        String errorMessage = null;
         boolean success = false;
+        String errorMessage = null;
         try {
 	        //	Checking upload path
 	        if (uploadPath == null) {
@@ -135,15 +160,14 @@ public class ContentFileUploadServlet extends HttpServlet {
 	        }
 	        
 	        if (success) {
-	        	StringBuffer responseBuffer = new StringBuffer("web2FilesUploaderFilesListStarts");
+	        	StringBuffer responseBuffer = new StringBuffer();
 	        	for (Iterator<UploadFile> filesIter = files.iterator(); filesIter.hasNext();) {
 	        		responseBuffer.append(filesIter.next().getName());
 	        		if (filesIter.hasNext()) {
 	        			responseBuffer.append(CoreConstants.COMMA);
 	        		}
 	        	}
-	        	response.setCharacterEncoding(CoreConstants.ENCODING_UTF8);
-	        	response.getWriter().print(responseBuffer.toString());
+	        	writeToResponse(response, responseBuffer.toString());
 	        } else {
 	        	errorMessage = "Unable to upload files (" + files + ") to: " + uploadPath + ". Upload ID: " + uploadId;
 	        	throw new RuntimeException(errorMessage);
@@ -153,13 +177,23 @@ public class ContentFileUploadServlet extends HttpServlet {
         	LOGGER.log(Level.SEVERE, errorMessage, e);
         	CoreUtil.sendExceptionNotification(errorMessage, e);
         } finally {
-        	if (!StringUtil.isEmpty(uploadId)) {
-        		uploadProgressListner.setUploadSuccessful(uploadId, success);
-        		
-        		if (iwac != null)
-        			iwac.removeApplicationAttribute(uploadId);
-        	}
+        	finishUpUpload(iwac, uploadProgressListener, uploadId, success);
         }
+	}
+	
+	private void finishUpUpload(IWApplicationContext iwac, FileUploadProgressListener uploadProgressListner, String uploadId, boolean success) {
+		if (!StringUtil.isEmpty(uploadId)) {
+    		uploadProgressListner.setUploadSuccessful(uploadId, success);
+    		
+    		if (iwac != null)
+    			iwac.removeApplicationAttribute(uploadId);
+    	}
+	}
+	
+	private void writeToResponse(HttpServletResponse response, String responseText) throws IOException {
+		StringBuffer responseBuffer = new StringBuffer("web2FilesUploaderFilesListStarts").append(responseText);
+		response.setCharacterEncoding(CoreConstants.ENCODING_UTF8);
+    	response.getWriter().print(responseBuffer.toString());
 	}
 	
 	private boolean upload(List<UploadFile> files, String uploadPath, boolean zipFile, boolean themePack, boolean isIE, boolean extractContent) {
