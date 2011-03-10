@@ -130,17 +130,8 @@ public class ContentFileUploadServlet extends HttpServlet {
 	    	}
 	    	
 	        boolean isIE = CoreUtil.isIE(request);
-	        FileUploader uploader = ELUtil.getInstance().getBean(FileUploader.class);
-	        
-	        if (zipFile || themePack) {
-	        	if (themePack) {
-	        		uploadPath = ThemesConstants.THEMES_PATH;
-	        		success = uploader.uploadThemePack(files, uploadPath, isIE);
-	        	} else {
-	        		success = uploader.uploadZipFile(files, uploadPath, extractContent, isIE);
-	        	}
-	        } else {
-	        	success = uploader.uploadFile(files, uploadPath, isIE);
+	        if (!(success = upload(files, uploadPath, zipFile, themePack, isIE, extractContent))) {
+	        	success = upload(files, uploadPath, zipFile, themePack, isIE, extractContent);	//	Re-uploading in case of error
 	        }
 	        
 	        if (success) {
@@ -158,9 +149,9 @@ public class ContentFileUploadServlet extends HttpServlet {
 	        	throw new RuntimeException(errorMessage);
 	        }
         } catch(Exception e) {
-        	LOGGER.log(Level.SEVERE, errorMessage == null ? "Files uploader failed! Unable to upload files: " + files + " to: " + uploadPath + ". Upload ID: " + uploadId :
-        		errorMessage, e);
-        	CoreUtil.sendExceptionNotification(e);
+        	errorMessage = errorMessage == null ? "Files uploader failed! Unable to upload files: " + files + " to: " + uploadPath + ". Upload ID: " + uploadId : errorMessage;
+        	LOGGER.log(Level.SEVERE, errorMessage, e);
+        	CoreUtil.sendExceptionNotification(errorMessage, e);
         } finally {
         	if (!StringUtil.isEmpty(uploadId)) {
         		uploadProgressListner.setUploadSuccessful(uploadId, success);
@@ -169,6 +160,27 @@ public class ContentFileUploadServlet extends HttpServlet {
         			iwac.removeApplicationAttribute(uploadId);
         	}
         }
+	}
+	
+	private boolean upload(List<UploadFile> files, String uploadPath, boolean zipFile, boolean themePack, boolean isIE, boolean extractContent) {
+		try {
+			FileUploader uploader = ELUtil.getInstance().getBean(FileUploader.class);
+			if (zipFile || themePack) {
+	        	if (themePack) {
+	        		uploadPath = ThemesConstants.THEMES_PATH;
+	        		return uploader.uploadThemePack(files, uploadPath, isIE);
+	        	} else {
+	        		return uploader.uploadZipFile(files, uploadPath, extractContent, isIE);
+	        	}
+	        } else {
+	        	return uploader.uploadFile(files, uploadPath, isIE);
+	        }
+		} catch (Exception e) {
+			String message = "Error uploading files (" + files + ") to: " + uploadPath;
+			LOGGER.log(Level.WARNING, message, e);
+			CoreUtil.sendExceptionNotification(message, e);
+		}
+		return false;
 	}
 	
 	private void prepareFiles(List<UploadFile> files) {
@@ -197,7 +209,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 		try {
 			return new String(bytes, CoreConstants.ENCODING_UTF8);
 		} catch (UnsupportedEncodingException e) {
-			LOGGER.log(Level.WARNING, "Unable to use UTF-8", e);
+			LOGGER.log(Level.WARNING, "Unable to use encoding " + CoreConstants.ENCODING_UTF8, e);
 			
 			return new String(bytes);
 		}
