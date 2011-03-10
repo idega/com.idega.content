@@ -222,11 +222,13 @@ public class FileUploaderBean implements FileUploader {
 				return slide.uploadFile(path, name, file.getType(), stream);
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Error uploading file " + file.getName(), e);
-			return false;
+			String message = "Error uploading file " + file.getName();
+			LOGGER.log(Level.SEVERE, message, e);
+			CoreUtil.sendExceptionNotification(message, e);
 		} finally {
 			IOUtil.close(stream);
 		}
+		return false;
 	}
 	
 	private InputStream getInputStream(byte[] bytes) {
