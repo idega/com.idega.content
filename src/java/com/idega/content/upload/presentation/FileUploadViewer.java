@@ -421,10 +421,11 @@ public class FileUploadViewer extends IWBaseComponent {
 	}
 
 	public String getMaxUploadSize(FacesContext context) {
-		if (maxUploadSize == null) {
-			maxUploadSize = getExpressionValue(context, "maxUploadSize");
-		}
-		return maxUploadSize;
+		String maxUploadSize = getExpressionValue(context, "maxUploadSize");
+		if (maxUploadSize != null)
+			this.maxUploadSize = maxUploadSize;
+		
+		return this.maxUploadSize;
 	}
 
 	public void setMaxUploadSize(String maxUploadSize) {
