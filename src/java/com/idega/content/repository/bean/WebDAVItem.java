@@ -23,12 +23,10 @@ public class WebDAVItem implements RepositoryItem {
 		this.folder = folder;
 	}
 		
-	@Override
 	public InputStream getInputStream() throws IOException {
 		return resource.getMethodData();
 	}
 
-	@Override
 	public String getName() {
 		if (StringUtil.isEmpty(name)) {
 			String name = resource.getName();
@@ -52,12 +50,10 @@ public class WebDAVItem implements RepositoryItem {
 		return this.name;
 	}
 
-	@Override
 	public long getLength() {
 		return resource.getGetContentLength();
 	}
 
-	@Override
 	public boolean delete() throws IOException {
 		return resource.deleteMethod();
 	}

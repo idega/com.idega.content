@@ -50,59 +50,49 @@ public class IdegaRepositoryBean implements Repository {
 		return this.repository;
 	}
 
-	@Override
 	public String getDescriptor(String key) {
 		return getRepository().getDescriptor(key);
 	}
 
-	@Override
 	public String[] getDescriptorKeys() {
 		return getRepository().getDescriptorKeys();
 	}
 
-	@Override
 	public Session login() throws LoginException, RepositoryException {
 		return getRepository().login();
 	}
 
-	@Override
 	public Session login(Credentials credentials, String workspaceName)
 			throws LoginException, NoSuchWorkspaceException,
 			RepositoryException {
 		return getRepository().login(credentials, workspaceName);
 	}
 
-	@Override
 	public Session login(Credentials credentials) throws LoginException,
 			RepositoryException {
 		return getRepository().login(credentials);
 	}
 
-	@Override
 	public Session login(String workspaceName) throws LoginException,
 			NoSuchWorkspaceException, RepositoryException {
 		return getRepository().login(workspaceName);
 	}
 
-	@Override
 	public boolean isStandardDescriptor(String key) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	@Override
 	public boolean isSingleValueDescriptor(String key) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	@Override
 	public Value getDescriptorValue(String key) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public Value[] getDescriptorValues(String key) {
 		// TODO Auto-generated method stub
 		return null;
