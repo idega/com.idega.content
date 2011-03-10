@@ -54,7 +54,6 @@ public class FileUploadProgressListenerBean implements FileUploadProgressListene
 		return false;
 	}
 
-	@Override
 	public Boolean isUploadSuccessful(String id) {
 		if (StringUtil.isEmpty(id)) {
 			return Boolean.FALSE;
@@ -63,7 +62,6 @@ public class FileUploadProgressListenerBean implements FileUploadProgressListene
 		return uploadInfo.remove(id);
 	}
 
-	@Override
 	public void setUploadSuccessful(String id, boolean success) {
 		if (StringUtil.isEmpty(id)) {
 			return;
