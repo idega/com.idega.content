@@ -32,6 +32,7 @@ import com.idega.presentation.IWContext;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.FileUtil;
+import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
@@ -84,11 +85,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 				iwac.setApplicationAttribute(uploadId, Boolean.TRUE);
 			}
 			
-			Long requestSize = null;
-			try {
-				requestSize = Long.valueOf(request.getHeader("Content-Length"));
-			} catch (Exception e) {}
-			if (requestSize != null && requestSize > maxUploadSize) {
+			if (IOUtil.isUploadExceedingLimits(request, maxUploadSize)) {
 				IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
 				writeToResponse(response, "error=".concat(iwrb.getLocalizedString("uploader_error_exceeds_max_size", "The file you are uploading is exceeding the limits"))
 						.concat(": ").concat(FileUtil.getHumanReadableSize(maxUploadSize)));
