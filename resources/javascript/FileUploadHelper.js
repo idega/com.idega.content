@@ -26,7 +26,7 @@ FileUploadHelper.properties = {
 	fakeFileDeletion: false,
 	actionAfterUploadedToRepository: null,
 	stripNonRomanLetters: false,
-	maxSize: 1073741824
+	maxSize: 1073741824						//	1 GB
 }
 
 FileUploadHelper.setProperties = function(properties) {
@@ -83,7 +83,9 @@ FileUploadHelper.uploadFiles = function() {
 				var firstValue = FileUploadHelper.uploadedFiles[0];
 				var customMessage = firstValue.substr('error='.length);
 				for (var i = 1; i < FileUploadHelper.uploadedFiles.length; i++) {
-					customMessage += FileUploadHelper.uploadedFiles[i]; 
+					customMessage += FileUploadHelper.uploadedFiles[i];
+					if (i + 1 < FileUploadHelper.uploadedFiles.length)
+						customMessage += ',';
 				}
 				closeAllLoadingMessages();
 				humanMsg.displayMsg(customMessage);
