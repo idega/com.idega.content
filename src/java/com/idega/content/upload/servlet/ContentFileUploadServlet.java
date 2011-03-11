@@ -48,142 +48,154 @@ public class ContentFileUploadServlet extends HttpServlet {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ServletRequestContext src = new ServletRequestContext(request);
-		if (!FileUploadBase.isMultipartContent(src)) {
-			LOGGER.log(Level.WARNING, "Request is not multipart content, terminating upload!");
-			return;
-		}
-		
-		IWContext iwc = new IWContext(request, response, getServletContext());
-		
-		String uploadPath = null;
-		boolean zipFile = false;
-		boolean themePack = false;
-		boolean extractContent = false;
-		boolean stripNonRomanLetters = false;
-		
-		FileUploadProgressListener uploadProgressListener = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
-		
-		DiskFileItemFactory factory = new DiskFileItemFactory();
-		FileUploadBase fileUploadService = new FileUpload(factory);
-		long maxUploadSize = uploadProgressListener.getMaxSize();
-		maxUploadSize = maxUploadSize <= 0 ? MAX_UPLOAD_SIZE : maxUploadSize;
-		fileUploadService.setSizeMax(maxUploadSize);
-		fileUploadService.setProgressListener(uploadProgressListener);
-
-		IWApplicationContext iwac = iwc.getApplicationContext();
-		String uploadId = uploadProgressListener.getUploadId();
-		if (!StringUtil.isEmpty(uploadId)) {
-			iwac.setApplicationAttribute(uploadId, Boolean.TRUE);
-		}
-		
-		Long requestSize = null;
+		boolean success = false;
+		String uploadId = null;
+		IWApplicationContext iwac = null;
+		FileUploadProgressListener uploadProgressListener = null;
 		try {
-			requestSize = Long.valueOf(request.getHeader("Content-Length"));
-		} catch (Exception e) {}
-		if (requestSize != null && requestSize > maxUploadSize) {
-			IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
-			writeToResponse(response, "error=".concat(iwrb.getLocalizedString("uploader_error_exceeds_max_size", "The file you are uploading is exceeding the limits"))
-					.concat(": ").concat(FileUtil.getHumanReadableSize(maxUploadSize)));
-			uploadProgressListener.markFailedUpload(uploadId);
-			finishUpUpload(iwac, uploadProgressListener, uploadId, false);
-			return;
-		}
-		
-		List<FileItem> fileItems = null;
-		try {
-			fileItems = fileUploadService.parseRequest(src);
-		} catch (FileUploadException e) {
-			e.printStackTrace();
-			return;
-		}
-		if (ListUtil.isEmpty(fileItems)) {
-			LOGGER.log(Level.WARNING, "No files to upload, terminating upload!");
-			return;
-		}
-		
-		String fieldName = null;
-		List<UploadFile> files = new ArrayList<UploadFile>();
-		for (FileItem file: fileItems) {
-			fieldName = file.getFieldName();
-			if (!StringUtil.isEmpty(fieldName)) {
-        		if (file.getSize() > 0 && fieldName.equals(ContentConstants.UPLOAD_FIELD_NAME)) {
-        			files.add(new UploadFile(file.getName(), file.getContentType(), file.getSize(), file.get()));
-        		} else if (fieldName.equals(ContentConstants.UPLOADER_PATH)) {
-        			uploadPath = getValueFromBytes(file.get());
-        		} else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_ZIP_FILE)) {
-        			zipFile = getValueFromString(getValueFromBytes(file.get()));
-        		} else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_THEME_PACK)) {
-        			themePack = getValueFromString(getValueFromBytes(file.get()));
-        		} else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE)) {
-        			extractContent = getValueFromString(getValueFromBytes(file.get()));
-        		} else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_IDENTIFIER)) {
-        			uploadId = getValueFromBytes(file.get());
-        		} else if (fieldName.equals(ContentConstants.UPLOADER_STRIP_NON_ROMAN_LETTERS)) {
-        			stripNonRomanLetters = getValueFromString(getValueFromBytes(file.get()));
-        		}
-        	}
-        }
-        
-        if (ListUtil.isEmpty(files)) {
-        	LOGGER.log(Level.WARNING, "No files to upload, terminating upload!");
-        	return;
-        }
-        
-        if (!StringUtil.isEmpty(uploadId)) {
-        	iwac.setApplicationAttribute(uploadId, Boolean.TRUE);
-        }
-        
-        boolean success = false;
-        String errorMessage = null;
-        try {
-	        //	Checking upload path
-	        if (uploadPath == null) {
-	        	//	Using default upload path
-	        	uploadPath = CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
-	        }
-	        if (!uploadPath.startsWith(CoreConstants.SLASH)) {
-	    		uploadPath = CoreConstants.SLASH + uploadPath;
-	    	}
-	    	if (!uploadPath.endsWith(CoreConstants.SLASH)) {
-	    		uploadPath += CoreConstants.SLASH;
-	    	}
-	    	
-	    	if (stripNonRomanLetters) {
-	    		uploadPath = getStripped(uploadPath);
-	    		prepareFiles(files);
-	    	}
-	    	
-	        boolean isIE = CoreUtil.isIE(request);
-	        if (!(success = upload(files, uploadPath, zipFile, themePack, isIE, extractContent))) {
-	        	success = upload(files, uploadPath, zipFile, themePack, isIE, extractContent);	//	Re-uploading in case of error
-	        }
-	        
-	        if (success) {
-	        	StringBuffer responseBuffer = new StringBuffer();
-	        	for (Iterator<UploadFile> filesIter = files.iterator(); filesIter.hasNext();) {
-	        		responseBuffer.append(filesIter.next().getName());
-	        		if (filesIter.hasNext()) {
-	        			responseBuffer.append(CoreConstants.COMMA);
+			IWContext iwc = new IWContext(request, response, getServletContext());
+			iwac = iwc.getApplicationContext();
+			
+			ServletRequestContext src = new ServletRequestContext(request);
+			if (!FileUploadBase.isMultipartContent(src)) {
+				LOGGER.log(Level.WARNING, "Request is not multipart content, terminating upload!");
+				return;
+			}
+			
+			String uploadPath = null;
+			boolean zipFile = false;
+			boolean themePack = false;
+			boolean extractContent = false;
+			boolean stripNonRomanLetters = false;
+			
+			uploadProgressListener = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
+			
+			DiskFileItemFactory factory = new DiskFileItemFactory();
+			FileUploadBase fileUploadService = new FileUpload(factory);
+			
+			long maxUploadSize = uploadProgressListener.getMaxSize();
+			maxUploadSize = maxUploadSize <= 0 ? MAX_UPLOAD_SIZE : maxUploadSize;
+			maxUploadSize = maxUploadSize == MAX_UPLOAD_SIZE ? maxUploadSize : Double.valueOf(maxUploadSize * 1.1).longValue();	//	10% reserved for other data when file(s)
+			fileUploadService.setSizeMax(maxUploadSize);
+			fileUploadService.setProgressListener(uploadProgressListener);
+	
+			uploadId = uploadProgressListener.getUploadId();
+			if (!StringUtil.isEmpty(uploadId)) {
+				iwac.setApplicationAttribute(uploadId, Boolean.TRUE);
+			}
+			
+			Long requestSize = null;
+			try {
+				requestSize = Long.valueOf(request.getHeader("Content-Length"));
+			} catch (Exception e) {}
+			if (requestSize != null && requestSize > maxUploadSize) {
+				IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
+				writeToResponse(response, "error=".concat(iwrb.getLocalizedString("uploader_error_exceeds_max_size", "The file you are uploading is exceeding the limits"))
+						.concat(": ").concat(FileUtil.getHumanReadableSize(maxUploadSize)));
+				uploadProgressListener.markFailedUpload(uploadId);
+				finishUpUpload(iwac, uploadProgressListener, uploadId, false);
+				return;
+			}
+			
+			List<FileItem> fileItems = null;
+			try {
+				fileItems = fileUploadService.parseRequest(src);
+			} catch (FileUploadException e) {
+				e.printStackTrace();
+				return;
+			}
+			if (ListUtil.isEmpty(fileItems)) {
+				LOGGER.log(Level.WARNING, "No files to upload, terminating upload!");
+				return;
+			}
+			
+			String fieldName = null;
+			List<UploadFile> files = new ArrayList<UploadFile>();
+			for (FileItem file: fileItems) {
+				fieldName = file.getFieldName();
+				if (!StringUtil.isEmpty(fieldName)) {
+	        		if (file.getSize() > 0 && fieldName.equals(ContentConstants.UPLOAD_FIELD_NAME)) {
+	        			files.add(new UploadFile(file.getName(), file.getContentType(), file.getSize(), file.get()));
+	        		} else if (fieldName.equals(ContentConstants.UPLOADER_PATH)) {
+	        			uploadPath = getValueFromBytes(file.get());
+	        		} else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_ZIP_FILE)) {
+	        			zipFile = getValueFromString(getValueFromBytes(file.get()));
+	        		} else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_THEME_PACK)) {
+	        			themePack = getValueFromString(getValueFromBytes(file.get()));
+	        		} else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE)) {
+	        			extractContent = getValueFromString(getValueFromBytes(file.get()));
+	        		} else if (fieldName.equals(ContentConstants.UPLOADER_UPLOAD_IDENTIFIER)) {
+	        			uploadId = getValueFromBytes(file.get());
+	        		} else if (fieldName.equals(ContentConstants.UPLOADER_STRIP_NON_ROMAN_LETTERS)) {
+	        			stripNonRomanLetters = getValueFromString(getValueFromBytes(file.get()));
 	        		}
 	        	}
-	        	writeToResponse(response, responseBuffer.toString());
-	        } else {
-	        	errorMessage = "Unable to upload files (" + files + ") to: " + uploadPath + ". Upload ID: " + uploadId;
-	        	throw new RuntimeException(errorMessage);
 	        }
-        } catch(Exception e) {
-        	errorMessage = errorMessage == null ? "Files uploader failed! Unable to upload files: " + files + " to: " + uploadPath + ". Upload ID: " + uploadId : errorMessage;
-        	LOGGER.log(Level.SEVERE, errorMessage, e);
-        	CoreUtil.sendExceptionNotification(errorMessage, e);
-        } finally {
-        	finishUpUpload(iwac, uploadProgressListener, uploadId, success);
-        }
+	        
+	        if (ListUtil.isEmpty(files)) {
+	        	LOGGER.log(Level.WARNING, "No files to upload, terminating upload!");
+	        	return;
+	        }
+	        
+	        if (!StringUtil.isEmpty(uploadId)) {
+	        	iwac.setApplicationAttribute(uploadId, Boolean.TRUE);
+	        }
+	        
+	        String errorMessage = null;
+	        try {
+		        //	Checking upload path
+		        if (uploadPath == null) {
+		        	//	Using default upload path
+		        	uploadPath = CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
+		        }
+		        if (!uploadPath.startsWith(CoreConstants.SLASH)) {
+		    		uploadPath = CoreConstants.SLASH + uploadPath;
+		    	}
+		    	if (!uploadPath.endsWith(CoreConstants.SLASH)) {
+		    		uploadPath += CoreConstants.SLASH;
+		    	}
+		    	
+		    	if (stripNonRomanLetters) {
+		    		uploadPath = getStripped(uploadPath);
+		    		prepareFiles(files);
+		    	}
+		    	
+		        boolean isIE = CoreUtil.isIE(request);
+		        if (!(success = upload(files, uploadPath, zipFile, themePack, isIE, extractContent))) {
+		        	success = upload(files, uploadPath, zipFile, themePack, isIE, extractContent);	//	Re-uploading in case of error
+		        }
+		        
+		        if (success) {
+		        	StringBuffer responseBuffer = new StringBuffer();
+		        	for (Iterator<UploadFile> filesIter = files.iterator(); filesIter.hasNext();) {
+		        		responseBuffer.append(filesIter.next().getName());
+		        		if (filesIter.hasNext()) {
+		        			responseBuffer.append(CoreConstants.COMMA);
+		        		}
+		        	}
+		        	writeToResponse(response, responseBuffer.toString());
+		        } else {
+		        	errorMessage = "Unable to upload files (" + files + ") to: " + uploadPath + ". Upload ID: " + uploadId;
+		        	throw new RuntimeException(errorMessage);
+		        }
+	        } catch(Exception e) {
+	        	errorMessage = errorMessage == null ? "Files uploader failed! Unable to upload files: " + files + " to: " + uploadPath + ". Upload ID: " + uploadId : errorMessage;
+	        	LOGGER.log(Level.SEVERE, errorMessage, e);
+	        	CoreUtil.sendExceptionNotification(errorMessage, e);
+	        } finally {
+	        	finishUpUpload(iwac, uploadProgressListener, uploadId, success);
+	        }
+		} finally {
+			if (!success && uploadProgressListener != null) {
+				uploadProgressListener.markFailedUpload(uploadId);
+				finishUpUpload(iwac, uploadProgressListener, uploadId, success);
+			}
+		}
 	}
 	
-	private void finishUpUpload(IWApplicationContext iwac, FileUploadProgressListener uploadProgressListner, String uploadId, boolean success) {
+	private void finishUpUpload(IWApplicationContext iwac, FileUploadProgressListener uploadProgressListener, String uploadId, boolean success) {
 		if (!StringUtil.isEmpty(uploadId)) {
-    		uploadProgressListner.setUploadSuccessful(uploadId, success);
+			uploadProgressListener.setUploadSuccessful(uploadId, success);
     		
     		if (iwac != null)
     			iwac.removeApplicationAttribute(uploadId);
