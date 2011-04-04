@@ -90,12 +90,10 @@ public class FileUploadProgressListenerBean implements FileUploadProgressListene
 		uploadInfo.put(id, success);
 	}
 
-	@Override
 	public long getMaxSize() {
 		return maxSize;
 	}
 
-	@Override
 	public String getUploadId() {
 		return uploadId;
 	}
