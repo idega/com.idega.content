@@ -254,7 +254,7 @@ public class TemplatesLoader implements JarLoader {
 	protected String getSlideTemplatesFolderURI() {
 		String templatesFolder = SLIDE_TEMPLATES_FOLDER;
 		try {
-			templatesFolder = getIWSlideService().getWebdavServerURI()+SLIDE_TEMPLATES_FOLDER;
+			templatesFolder = getIWSlideService().getWebdavServerURL()+SLIDE_TEMPLATES_FOLDER;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -296,7 +296,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		String webDAVServerURI = ThemesConstants.EMPTY;
 		try {
-			webDAVServerURI = getSlideService().getWebdavServerURI();
+			webDAVServerURI = getSlideService().getWebdavServerURL();
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}

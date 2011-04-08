@@ -27,7 +27,7 @@ public class WebDAVFolderCreation extends ContentBlock implements ActionListener
 		
 	@Override
 	protected void initializeComponent(FacesContext context) {
-		WebdavExtendedResource res = getWebdavExtendedResource();
+		WebdavExtendedResource res = getRepositoryItem();
 		
 		//	Messages
 		HtmlTag messagesContainer = (HtmlTag) context.getApplication().createComponent(HtmlTag.COMPONENT_TYPE);

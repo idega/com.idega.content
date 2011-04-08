@@ -634,8 +634,8 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			if (startPath != null && startPath.endsWith(CoreConstants.SLASH)) {
 				startPath = startPath.substring(0, startPath.length()-1);
 			}
-			if (startPath != null && startPath.startsWith(ss.getIWSlideService().getWebdavServerURI())) {
-				startPath = startPath.replaceFirst(ss.getIWSlideService().getWebdavServerURI(), CoreConstants.EMPTY);
+			if (startPath != null && startPath.startsWith(ss.getIWSlideService().getWebdavServerURL())) {
+				startPath = startPath.replaceFirst(ss.getIWSlideService().getWebdavServerURL(), CoreConstants.EMPTY);
 			}
 			if (this.rootPath != null && this.rootPath.equals(CoreConstants.SLASH)) {
 				this.rootPath = CoreConstants.EMPTY;
@@ -650,7 +650,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 				this.webDAVPath = this.rootPath;
 			}
 			if (ss.getExistence(this.webDAVPath)) {
-				data = getDirectoryListing(ss.getResource(this.webDAVPath, false), ss.getWebdavServerURI(), ss);
+				data = getDirectoryListing(ss.getResource(this.webDAVPath, false), ss.getWebdavServerURL(), ss);
 			} else {
 				data = new WebDAVBean[] { new WebDAVBean("Resource does not exist") };
 			}

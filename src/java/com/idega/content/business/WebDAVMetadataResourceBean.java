@@ -119,7 +119,7 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 		WebdavRootResource rootResource = session.getWebdavRootResource();
 
 		String filePath = resourcePath;
-		String serverURI = service.getWebdavServerURI();
+		String serverURI = service.getWebdavServerURL();
 		if(!resourcePath.startsWith(serverURI)) {
 			filePath = service.getURI(resourcePath);
 		}
@@ -172,7 +172,7 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 	
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 	
-			String serverURI = service.getWebdavServerURI();
+			String serverURI = service.getWebdavServerURL();
 			if(!resourcePath.startsWith(serverURI)) {
 				filePath = service.getURI(resourcePath);
 			}
@@ -223,7 +223,7 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 		IWSlideService service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
 
 		String filePath = resourcePath;
-		String serverURI = service.getWebdavServerURI();
+		String serverURI = service.getWebdavServerURL();
 		if(!resourcePath.startsWith(serverURI)) {
 			filePath = service.getURI(resourcePath);
 		}
@@ -248,7 +248,7 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 		WebdavRootResource rootResource = session.getWebdavRootResource();
 
 		String filePath = resourcePath;
-		String serverURI = service.getWebdavServerURI();
+		String serverURI = service.getWebdavServerURL();
 		if(!resourcePath.startsWith(serverURI)) {
 			filePath = service.getURI(resourcePath);
 		}

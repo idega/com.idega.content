@@ -49,7 +49,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 	
 	protected void initializeComponent(FacesContext context) {
 
-		WebdavExtendedResource resource = getWebdavExtendedResource();
+		WebdavExtendedResource resource = getRepositoryItem();
 		String userName = null;
 		
 		if (resource != null) {

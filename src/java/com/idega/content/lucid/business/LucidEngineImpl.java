@@ -49,6 +49,7 @@ import com.idega.core.builder.data.CachedDomain;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.builder.data.ICPageBMPBean;
+import com.idega.core.business.DefaultSpringBean;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.data.TreeableEntity;
@@ -68,7 +69,7 @@ import com.idega.util.expression.ELUtil;
 
 @Scope(BeanDefinition.SCOPE_SINGLETON)
 @Service(LucidEngine.SPRING_BEAN_IDENTIFIER)
-public class LucidEngineImpl implements LucidEngine {
+public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 
 	private static final long serialVersionUID = 201381337142886542L;
 	private static final Logger LOGGER = Logger.getLogger(LucidEngineImpl.class.getName());
@@ -1413,7 +1414,6 @@ public class LucidEngineImpl implements LucidEngine {
 			}
 
 			List<String> decreaseLevelOnTop = new ArrayList<String>();
-			@SuppressWarnings("unchecked")
 			Collection<ICTreeNode> siblings = newRootPage.getParentNode().getChildren();
 			if (siblings == null) {
 				return false;
@@ -1790,7 +1790,6 @@ public class LucidEngineImpl implements LucidEngine {
 				appl);
 	}
 
-	@SuppressWarnings("unchecked")
 	public String changePageUriAfterPageWasMoved(String pageKey) {
 		if (pageKey == null) {
 			return null;
@@ -1809,9 +1808,9 @@ public class LucidEngineImpl implements LucidEngine {
 			return null;
 		}
 
-		Collection<ICPage> children = page.getChildren();
+		Collection<ICTreeNode> children = page.getChildren();
 		if (children != null) {
-			for (Iterator<ICPage> it = children.iterator(); it.hasNext();) {
+			for (Iterator<ICTreeNode> it = children.iterator(); it.hasNext();) {
 				return changePageUriAfterPageWasMoved(it.next().getId());
 			}
 		}

@@ -81,7 +81,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 			WebdavRootResource rootResource = session.getWebdavRootResource();
 
 			String filePath = this.resourcePath;
-			String serverURI = service.getWebdavServerURI();
+			String serverURI = service.getWebdavServerURL();
 			if(!this.resourcePath.startsWith(serverURI)) {
 				filePath = service.getURI(this.resourcePath);
 			}

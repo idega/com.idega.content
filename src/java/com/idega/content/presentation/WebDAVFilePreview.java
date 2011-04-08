@@ -17,7 +17,7 @@ public class WebDAVFilePreview extends ContentBlock {
 	public static final String DEFAULT_STYLE_CLASS = "content_file_preview";
 
 	protected void initializeComponent(FacesContext context) {
-		WebdavExtendedResource resource = getWebdavExtendedResource();
+		WebdavExtendedResource resource = getRepositoryItem();
 		
 		String filePath = resource.getPath();
 		if (resource != null) {

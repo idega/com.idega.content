@@ -14,30 +14,29 @@ import com.idega.content.data.ContentCategory;
 import com.idega.io.MemoryFileBuffer;
 import com.idega.io.MemoryInputStream;
 import com.idega.io.MemoryOutputStream;
-import com.idega.slide.business.IWSlideService;
+import com.idega.repository.RepositoryService;
 import com.idega.util.CoreConstants;
 import com.idega.util.IOUtil;
+import com.idega.util.expression.ELUtil;
 
 public class CategoriesWriter implements Runnable {
-	
+
 	private static final Log log = LogFactory.getLog(CategoriesWriter.class);
-	
+
 	private Map<String, ContentCategory> categories = null;
 
 	private String resourcePath = null;
-	
-	private IWSlideService slideService = null;
-	
-	public CategoriesWriter(Map<String, ContentCategory> categories, String resourcePath, IWSlideService slideService) {
+
+	public CategoriesWriter(Map<String, ContentCategory> categories, String resourcePath) {
 		this.categories = categories;
 		this.resourcePath = resourcePath;
-		this.slideService = slideService;
 	}
 
+	@Override
 	public void run() {
 		writeCategories();
 	}
-	
+
 	protected boolean writeCategories() {
 		InputStream stream = null;
 		try {
@@ -48,17 +47,18 @@ public class CategoriesWriter implements Runnable {
 				root.addContent(cat);
 			}
 			Document document = new Document(root);
-			
+
 			MemoryFileBuffer buf = new MemoryFileBuffer();
 			MemoryOutputStream out = new MemoryOutputStream(buf);
 			XMLOutputter outputter = new XMLOutputter();
 			outputter.output(document, out);
 			out.close();
-			
+
 			stream = new MemoryInputStream(buf);
-	
+
 			String directory = resourcePath.substring(0, resourcePath.lastIndexOf(CoreConstants.SLASH) + 1);
-			if (slideService.uploadFile(directory, CategoryBean.CATEGORIES_FILE, "text/xml", stream)) {
+			RepositoryService repository = ELUtil.getInstance().getBean(RepositoryService.class);
+			if (repository.uploadFile(directory, CategoryBean.CATEGORIES_FILE, "text/xml", stream)) {
 				ContentUtil.removeCategoriesViewersFromCache();
 			}
 		} catch (Exception e) {

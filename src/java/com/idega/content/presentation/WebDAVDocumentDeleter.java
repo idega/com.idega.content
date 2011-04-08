@@ -87,7 +87,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 //			WebdavExtendedResource resource = super.getWebdavExtendedResource();
 			String path = resource.getPath();
 			try {
-				path = path.replaceFirst(getIWSlideSession().getWebdavServerURI(), "");
+				path = path.replaceFirst(getIWSlideSession().getWebdavServerURL(), "");
 			}
 			catch (RemoteException e) {
 				e.printStackTrace();
@@ -205,7 +205,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 			try {
 				super.refreshList();
 				if (parentPath != null) {
-					String currentPath = parentPath.replaceFirst(getIWSlideSession().getWebdavServerURI(), "");
+					String currentPath = parentPath.replaceFirst(getIWSlideSession().getWebdavServerURL(), "");
 					WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setWebDAVPath", currentPath);
 					WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", currentPath);
 				}
