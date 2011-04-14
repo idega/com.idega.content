@@ -1991,7 +1991,9 @@ public class ThemeChangerBean implements ThemeChanger {
 			}
 		}
 		
-		if (helper.generatePreviewsForTheme(theme, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY)) {
+		IWMainApplicationSettings settings = getApplicationSettings();
+		boolean isJpg = settings.getBoolean("theme_preview_jpg", false);
+		if (helper.generatePreviewsForTheme(theme, false, isJpg, 1)) {
 			theme.setChangedName(null);
 			theme.setLinkToDraft(null);
 			theme.setChanges(new ArrayList<ThemeChange>());
@@ -2314,9 +2316,11 @@ public class ThemeChangerBean implements ThemeChanger {
 		restoreTheme(parent, false);
 		
 		//	Generating previews
-		 if (!helper.generatePreviewsForTheme(child, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY)) {
-			 return false;
-		 }
+		IWMainApplicationSettings settings = getApplicationSettings();
+		boolean isJpg = settings.getBoolean("theme_preview_jpg", false);
+		if (!helper.generatePreviewsForTheme(child, false, isJpg, 1)) {
+			return false;
+		}
 		
 		//	Marking properties extracted
 		child.setPropertiesExtracted(true);

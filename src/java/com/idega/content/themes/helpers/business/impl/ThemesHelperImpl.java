@@ -753,7 +753,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			return false;
 		}
 		
-		return generatePreviewsForTheme(theme, false, false, ThemesConstants.THEME_PREVIEW_QUALITY);
+		return generatePreviewsForTheme(theme, false, false, 1);
 	}
 	
 	public boolean createSmallImage(Theme theme, boolean useDraftPreview) {
