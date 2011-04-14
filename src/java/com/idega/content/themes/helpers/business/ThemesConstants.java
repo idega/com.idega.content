@@ -204,7 +204,7 @@ public class ThemesConstants {
 	
 	public static final String THEME_ID_APPLICATION_ATTRIBUTE = "theme_id_application_attribute";
 
-	public static final Boolean IS_THEME_PREVIEW_JPG = Boolean.TRUE;
+	public static final Boolean IS_THEME_PREVIEW_JPG = Boolean.FALSE;
 	public static final Float THEME_PREVIEW_QUALITY = new Float(1f);
 	
 	public static final String THEME_PREDEFINED_STYLE_CONFIG_FILE = ".rwstyle";
