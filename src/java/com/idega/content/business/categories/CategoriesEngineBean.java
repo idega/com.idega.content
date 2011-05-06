@@ -8,6 +8,8 @@ import java.util.Map;
 import org.jdom.Document;
 
 import com.idega.content.business.ContentConstants;
+import com.idega.content.business.categories.event.CategoryAddedEvent;
+import com.idega.content.business.categories.event.CategoryDeletedEvent;
 import com.idega.content.data.ContentCategory;
 import com.idega.content.presentation.categories.CategoriesListViewer;
 import com.idega.core.builder.business.BuilderService;
@@ -18,6 +20,7 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.expression.ELUtil;
 
 public class CategoriesEngineBean implements CategoriesEngine {
 
@@ -94,6 +97,7 @@ public class CategoriesEngineBean implements CategoriesEngine {
 		
 		if (CategoryBean.getInstance().deleteCategory(id)) {
 			CategoryBean.getInstance().storeCategories(true);
+			ELUtil.getInstance().publishEvent(new CategoryDeletedEvent(id));
 			return true;
 		}
 		
@@ -151,6 +155,7 @@ public class CategoriesEngineBean implements CategoriesEngine {
 		}
 		
 		if (CategoryBean.getInstance().addCategory(name, locale)) {
+			ELUtil.getInstance().publishEvent(new CategoryAddedEvent(name));
 			return getCategoriesListViewer(locale);
 		}
 		
