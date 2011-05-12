@@ -267,7 +267,9 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 	 * @return
 	 */
 	private Collection<String> getSetCategoriesList() {
-		if (this.resourcePath != null) {
+		if (this.setCategories != null) {
+			return CategoryBean.getCategoriesFromString(this.setCategories);
+		} else if (this.resourcePath != null) {
 			IWContext iwuc = IWContext.getInstance();
 			try {
 				WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(iwuc, WebDAVMetadataResource.class);
@@ -277,9 +279,6 @@ public class WebDAVCategories extends IWBaseComponent implements ManagedContentB
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-		}
-		else if (this.setCategories != null) {
-			return CategoryBean.getCategoriesFromString(this.setCategories);
 		}
 		return null;
 	}
