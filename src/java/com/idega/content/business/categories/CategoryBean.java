@@ -334,9 +334,9 @@ public class CategoryBean {
 	 * @param language
 	 * @return
 	 */
-	public boolean addCategory(String category, String language) {
+	public String addCategory(String category, String language) {
 		if (category == null || CoreConstants.EMPTY.equals(category)) {
-			return false;
+			return null;
 		}
 		String key = getCategoryKey(category);
 		ContentCategory cat = this.categories.get(key);
@@ -346,7 +346,7 @@ public class CategoryBean {
 		cat.addName(language, category);
 		this.categories.put(key, cat);
 		storeCategories();
-		return true;
+		return key;
 	}
 
 	protected static final char[] LEAVE_AS_IS = {'-','0','1','2','3','4','5','6','7','8','9'};

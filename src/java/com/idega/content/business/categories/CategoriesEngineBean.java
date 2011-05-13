@@ -20,6 +20,7 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
 public class CategoriesEngineBean implements CategoriesEngine {
@@ -154,12 +155,12 @@ public class CategoriesEngineBean implements CategoriesEngine {
 			return null;
 		}
 		
-		if (CategoryBean.getInstance().addCategory(name, locale)) {
-			ELUtil.getInstance().publishEvent(new CategoryAddedEvent(name));
-			return getCategoriesListViewer(locale);
-		}
-		
-		return null;
+		String categoryId = CategoryBean.getInstance().addCategory(name, locale);
+		if (StringUtil.isEmpty(categoryId))
+			return null;
+			
+		ELUtil.getInstance().publishEvent(new CategoryAddedEvent(categoryId));
+		return getCategoriesListViewer(locale);
 	}
 	
 	private Document getCategoriesListViewer(String locale) {
