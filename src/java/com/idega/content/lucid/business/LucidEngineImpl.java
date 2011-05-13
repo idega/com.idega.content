@@ -308,6 +308,10 @@ public class LucidEngineImpl implements LucidEngine {
 	}
 
 	public String changePageUri(String pageKey, String pageUri, boolean needSetPageTitle) {
+		return changePageUri(pageKey, pageUri, ":method:1:implied:void:setTitle:java.lang.String:", needSetPageTitle);
+	}
+	
+	private String changePageUri(String pageKey, String pageUri, String methodName, boolean needSetPageTitle) {
 		if (pageKey == null || pageUri == null) {
 			return null;
 		}
@@ -323,9 +327,19 @@ public class LucidEngineImpl implements LucidEngine {
 			return null;
 		}
 
+		boolean changePageUri = true;
 		if (needSetPageTitle) {
-			setPageTitle(pageKey, pageUri);
+			if (!setPageTitle(pageKey, pageUri, methodName))
+				return null;
+			
+			IWContext iwc = CoreUtil.getIWContext();
+			Locale currentLocale = iwc.getCurrentLocale();
+			IWMainApplication iwma = iwc.getIWMainApplication();
+			Locale defaultLocale = iwma.getDefaultLocale();
+			changePageUri = currentLocale != null && defaultLocale != null && currentLocale.toString().equals(defaultLocale.toString());
 		}
+		if (!changePageUri)
+			return page.getDefaultPageURI();
 
 		ICDomain domain = null;
 		IWContext iwc = getThemesEngine().getContextAndCheckRights();
@@ -474,11 +488,10 @@ public class LucidEngineImpl implements LucidEngine {
 						needSetValue = false;
 					}
 					if (needSetValue) {
-						getThemesHelper().getThemesService().getBuilderService().setProperty(pageKey, ThemesConstants.MINUS_ONE, s.getMethod(),
-								newValues, appl);
 						if (s.getCode().equals(PAGE_TITLE)) {
-							changedPageTitle = changePageName(Integer.valueOf(pageKey).intValue(), currentValue, iwc);
-							changedPageUri = changePageUri(pageKey, currentValue, true);	//	Changing uri by new name
+							changedPageUri = changePageUri(pageKey, currentValue, s.getMethod(), true);	//	Changing uri by new name
+						} else {
+							getThemesHelper().getThemesService().getBuilderService().setProperty(pageKey, ThemesConstants.MINUS_ONE, s.getMethod(), newValues, appl);
 						}
 					}
 				}
@@ -1734,7 +1747,7 @@ public class LucidEngineImpl implements LucidEngine {
 		return pathToImagesFolder;
 	}
 
-	private boolean setPageTitle(String pageID, String title) {
+	private boolean setPageTitle(String pageID, String title, String method) {
 		if (pageID == null || title == null) {
 			return false;
 		}
@@ -1752,9 +1765,10 @@ public class LucidEngineImpl implements LucidEngine {
 			return false;
 		}
 
-		String method = ":method:1:implied:void:setTitle:java.lang.String:";
-		return getThemesHelper().getThemesService().getBuilderService().setProperty(pageID, ThemesConstants.MINUS_ONE, method, new String[]{title},
-				appl);
+		if (!changePageName(Integer.valueOf(pageID), title, iwc))
+			return false;
+		
+		return getThemesHelper().getThemesService().getBuilderService().setProperty(pageID, ThemesConstants.MINUS_ONE, method, new String[]{title}, appl);
 	}
 
 	@SuppressWarnings("unchecked")
