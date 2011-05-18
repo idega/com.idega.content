@@ -118,6 +118,10 @@ public class CategoriesEngineBean implements CategoriesEngine {
 		return true;
 	}
 	
+	/**
+	 * @param id Category id.
+	 * @return ContentCategory instance if exists.
+	 */
 	private ContentCategory getCategory(String id) {
 		if (id == null) {
 			return null;
