@@ -16,8 +16,10 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Vector;
+
 import org.apache.commons.httpclient.HttpException;
 import org.apache.webdav.lib.WebdavResources;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.core.data.ICTreeNode;
@@ -204,22 +206,23 @@ public class WebDAVBean extends Object implements ICTreeNode, Serializable {
 	    	this.propertySupport.firePropertyChange(PROP_ENCODED_URL, old, this.permissionActionURI);
 	}
 	
-	public boolean getRenderPermissionLink(){
-		if(getIsFile() && this.renderPermissionLink){
+	public boolean getRenderPermissionLink() {
+		if (getIsFile() && this.renderPermissionLink) {
 			try {
 				IWContext iwc = IWContext.getInstance();
-				IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-				return session.hasPermission(getEncodedURL(),IWSlideConstants.PRIVILEGE_READ_ACL);
-			}
-			catch (IBOLookupException e) {
+				IWSlideSession session = (IWSlideSession) IBOLookup.getSessionInstance(iwc, IWSlideSession.class);
+				return session.hasPermission(getEncodedURL(), IWSlideConstants.PRIVILEGE_READ_ACL);
+			} catch (IBOLookupException e) {
+				e.printStackTrace();
+			} catch (UnavailableIWContext e) {
+				e.printStackTrace();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			catch (UnavailableIWContext e) {
-				e.printStackTrace();
-			}
-			catch (RemoteException e) {
-				e.printStackTrace();
-			}        		
 		}
 		return false;
 	}
