@@ -7,7 +7,6 @@ import org.jdom.Document;
 import com.idega.business.SpringBeanName;
 import com.idega.content.data.ContentCategory;
 
-@SpringBeanName("content.CategoriesEngineBean")
 public interface CategoriesEngine {
 	
 	public List<String> getInfo();
