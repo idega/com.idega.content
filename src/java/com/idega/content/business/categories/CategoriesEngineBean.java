@@ -30,7 +30,6 @@ import com.idega.util.expression.ELUtil;
 @Service("content.CategoriesEngineBean")
 public class CategoriesEngineBean implements CategoriesEngine {
 
-	@Override
 	public List<String> getInfo() {
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
@@ -63,12 +62,10 @@ public class CategoriesEngineBean implements CategoriesEngine {
 		return info;
 	}
 
-	@Override
 	public Document getCategoriesList(String locale) {
 		return getCategoriesListViewer(locale);
 	}
 
-	@Override
 	public List<ContentCategory> getCategoriesByLocale(String locale) {
 		CategoryBean bean = CategoryBean.getInstance();
 		if (bean == null) {
@@ -98,7 +95,6 @@ public class CategoriesEngineBean implements CategoriesEngine {
 		return filtered;
 	}
 
-	@Override
 	public boolean deleteCategory(String id) {
 		ContentCategory category = getCategory(id);
 		if (category == null) {
@@ -114,7 +110,6 @@ public class CategoriesEngineBean implements CategoriesEngine {
 		return false;
 	}
 
-	@Override
 	public boolean renameCategory(String id, String locale, String newName) {
 		ContentCategory category = getCategory(id);
 		if (category == null) {
@@ -143,7 +138,6 @@ public class CategoriesEngineBean implements CategoriesEngine {
 		return CategoryBean.getInstance().getCategory(id);
 	}
 
-	@Override
 	public String manageCategoryUsage(String id, boolean disable) {
 		ContentCategory category = getCategory(id);
 		if (category == null) {
@@ -166,7 +160,6 @@ public class CategoriesEngineBean implements CategoriesEngine {
 	}
 
 
-	@Override
 	public Document addCategory(String name, String locale) {
 		return isAddCategorySuccessful(name,locale) ? getCategoriesListViewer(locale) : null;
 	}
