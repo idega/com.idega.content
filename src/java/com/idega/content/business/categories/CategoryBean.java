@@ -27,8 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.webdav.lib.PropertyName;
 import org.apache.webdav.lib.WebdavResource;
 import org.apache.webdav.lib.util.WebdavStatus;
@@ -44,7 +42,6 @@ import com.idega.content.data.CategoryComparator;
 import com.idega.content.data.ContentCategory;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.idegaweb.IWMainApplication;
-import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.slide.business.IWSlideSession;
@@ -65,12 +62,13 @@ import com.idega.util.StringHandler;
  * @version $Revision: 1.10 $
  */
 public class CategoryBean {
-    private static final Log log = LogFactory.getLog(CategoryBean.class);
+	
     private static Logger LOGGER = Logger.getLogger(CategoryBean.class.getName());
     
     private static String BEAN_KEY="ContentCategoryBean";
     
     private static final String CATEGORY_CONFIG_PATH = CoreConstants.CONTENT_PATH + CoreConstants.SLASH;
+    
     /**
      * @deprecated this file will no longer be used
      */
@@ -78,10 +76,11 @@ public class CategoryBean {
     private static final String CATEGORY_CONFIG_FILE = CATEGORY_CONFIG_PATH + "categories.prop";
     public static final String CATEGORIES_FILE = "categories.xml";
     private static final String CATEGORY_PROPERTIES_FILE = CATEGORY_CONFIG_PATH + CATEGORIES_FILE;
+    
     private IWMainApplication iwma;
     protected Map<String, ContentCategory> categories;
     
-    public static final String CATEGORY_DELIMETER = ",";
+    public static final String CATEGORY_DELIMETER = CoreConstants.COMMA;
 
     private CategoryBean() {
         this(IWMainApplication.getDefaultIWMainApplication());
@@ -99,15 +98,13 @@ public class CategoryBean {
 	
 
     protected class CategoriesMigrator {
-        private final Log log = LogFactory.getLog(CategoriesMigrator.class);
         private final String PROPERTY_NAME_CATEGORIES = new PropertyName("DAV","categories").toString();
         
         private HashMap<String, String> valuesToKeys;
-        private IWSlideSession session;
         private IWSlideService service;
         
         protected void migrate(Collection<String> cats) {
-            log.info("Migrating " + CATEGORY_CONFIG_FILE + " to new format at " + CATEGORY_PROPERTIES_FILE);
+            LOGGER.info("Migrating " + CATEGORY_CONFIG_FILE + " to new format at " + CATEGORY_PROPERTIES_FILE);
             categories = new TreeMap<String, ContentCategory>();
             valuesToKeys = new HashMap<String, String>();
             String lang = getCurrentLocale();
@@ -123,15 +120,10 @@ public class CategoryBean {
             storeCategories();
             
             try {
-                IWContext iwc = CoreUtil.getIWContext();
-                if (iwc != null){
-                    session = IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-                    service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
-	                updateCategoriesOnFiles(CATEGORY_CONFIG_PATH);
-                }
+            	service = IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), IWSlideService.class);
+	            updateCategoriesOnFiles(CATEGORY_CONFIG_PATH);
             } catch (IBOLookupException e) {
-                // TODO Use here Logger instead
-                e.printStackTrace();
+                LOGGER.log(Level.WARNING, "Error getting EJB bean: " + IWSlideService.class, e);
             }
         }
         
@@ -146,10 +138,10 @@ public class CategoryBean {
                     filePath = service.getURI(resourcePath);
                 }
                 
-                WebdavResource resource = session.getWebdavResource(filePath);
+                WebdavResource resource = service.getWebdavResourceAuthenticatedAsRoot(filePath);
 				
                 String oldCats = CATEGORY_DELIMETER;
-                Enumeration enumerator = resource.propfindMethod(PROPERTY_NAME_CATEGORIES);
+                Enumeration<?> enumerator = resource.propfindMethod(PROPERTY_NAME_CATEGORIES);
                 if (enumerator.hasMoreElements()) {
                     StringBuffer cats = new StringBuffer();
                     while(enumerator.hasMoreElements()) {
@@ -159,8 +151,8 @@ public class CategoryBean {
                 }
                 
                 if (!oldCats.equals(CATEGORY_DELIMETER) && !oldCats.equals("")) {
-                    log.info("Updating categories on resource " + resourcePath);
-                    log.info("- " + oldCats);
+                    LOGGER.info("Updating categories on resource " + resourcePath);
+                    LOGGER.info("- " + oldCats);
                     
                     StringTokenizer tokenizer = new StringTokenizer(oldCats, CATEGORY_DELIMETER);
                     StringBuffer newCats = new StringBuffer(CATEGORY_DELIMETER);
@@ -176,12 +168,12 @@ public class CategoryBean {
 						newCats.append(CATEGORY_DELIMETER);
                     }
 	
-                    log.info("+ " + newCats.toString());
+                    LOGGER.info("+ " + newCats.toString());
                     resource.proppatchMethod(PROPERTY_NAME_CATEGORIES, newCats.toString(), true);
                 }
 				
                 // update categories on all child resources
-                Enumeration children = resource.getChildResources().getResourceNames();
+                Enumeration<?> children = resource.getChildResources().getResourceNames();
                 if (children.hasMoreElements()) {
                     while(children.hasMoreElements()) {
                         String child = (String) children.nextElement();
@@ -191,7 +183,7 @@ public class CategoryBean {
 				
                 resource.close();			
             } catch (Exception e) {
-                log.error("Exception updating categories on resource " + resourcePath + ": " + e.getMessage());
+                LOGGER.warning("Exception updating categories on resource " + resourcePath + ": " + e.getMessage());
             }
         }
     }
@@ -262,10 +254,11 @@ public class CategoryBean {
     }
 	
     protected String getCurrentLocale() {
+        Locale locale = null;
         IWContext iwContext = CoreUtil.getIWContext();
-        if (iwContext == null)
-            return null;
-        return iwContext.getCurrentLocale().toString();
+        locale = iwContext == null ? IWMainApplication.getDefaultIWMainApplication().getDefaultLocale() : iwContext.getCurrentLocale();
+        locale = locale == null ? Locale.ENGLISH : locale;
+        return locale.toString();
     }
 
     /**
@@ -275,14 +268,13 @@ public class CategoryBean {
      */
     @Deprecated 
     public String getCategoriesAsString() {
-        IWUserContext iwuc = CoreUtil.getIWContext();
-        if (iwuc == null) {
-            return null;
-        }
-      
+    	IWContext iwc = CoreUtil.getIWContext();
+    	if (iwc == null)
+    		return null;
+    	
         String categories = null;
         try {
-            IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwuc,IWSlideSession.class);
+            IWSlideSession session = IBOLookup.getSessionInstance(iwc, IWSlideSession.class);
             WebdavRootResource rootResource = session.getWebdavRootResource();
             
             String path = getSlideService().getURI(CATEGORY_CONFIG_FILE);
@@ -370,6 +362,9 @@ public class CategoryBean {
         try {
             String resourcePath = getSlideService().getURI(CATEGORY_PROPERTIES_FILE);
             stream = getSlideService().getInputStream(resourcePath);
+            if (stream == null)
+            	return null;
+            
             SAXBuilder builder = new SAXBuilder();
             Document document = builder.build(stream);
             Element root = document.getRootElement();
@@ -394,7 +389,7 @@ public class CategoryBean {
                 map.put(key, category);
             }
         } catch (IOException e) {
-            log.warn("Error loading categories: " + e.getMessage());
+            LOGGER.log(Level.WARNING, "Error loading categories: " + e.getMessage(), e);
             return null;
         }
         catch (JDOMException e) {
