@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.jdom.Document;
 
-import com.idega.business.SpringBeanName;
 import com.idega.content.data.ContentCategory;
 
 public interface CategoriesEngine {
