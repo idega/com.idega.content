@@ -59,15 +59,15 @@ import com.idega.util.StringHandler;
  * Includes functions for getting and setting all the available categories
  * </p>
  *  Last modified: $Date: 2009/05/15 07:23:54 $ by $Author: valdas $
- * 
+ *
  * @author <a href="mailto:Joakim@idega.com">Joakim</a>,<a href="mailto:tryggvi@idega.com">Tryggvi Larusson</a>
  * @version $Revision: 1.10 $
  */
 public class CategoryBean {
 	private static final Log log = LogFactory.getLog(CategoryBean.class);
-	
+
 	private static String BEAN_KEY="ContentCategoryBean";
-	
+
 	private static final String CATEGORY_CONFIG_PATH = CoreConstants.CONTENT_PATH + CoreConstants.SLASH;
 	/**
 	 * @deprecated this file will no longer be used
@@ -78,13 +78,13 @@ public class CategoryBean {
 	private static final String CATEGORY_PROPERTIES_FILE = CATEGORY_CONFIG_PATH + CATEGORIES_FILE;
 	private IWMainApplication iwma;
 	protected Map<String, ContentCategory> categories;
-	
+
 	public static final String CATEGORY_DELIMETER = ",";
 
 	private CategoryBean() {
 		this(IWMainApplication.getDefaultIWMainApplication());
 	}
-	
+
 	private CategoryBean(IWMainApplication iwma){
 		this.iwma=iwma;
 		this.categories = loadCategories();
@@ -94,7 +94,7 @@ public class CategoryBean {
 			migrator.migrate(oldCategories);
 		}
 	}
-	
+
 
 	protected class CategoriesMigrator {
 		private final Log log = LogFactory.getLog(CategoriesMigrator.class);
@@ -103,7 +103,7 @@ public class CategoryBean {
 		private HashMap<String, String> valuesToKeys;
 		private IWSlideSession session;
 		private IWSlideService service;
-		
+
 		protected void migrate(Collection<String> cats) {
 			log.info("Migrating " + CATEGORY_CONFIG_FILE + " to new format at " + CATEGORY_PROPERTIES_FILE);
 			categories = new TreeMap<String, ContentCategory>();
@@ -117,16 +117,16 @@ public class CategoryBean {
 				categories.put(key, category);
 				valuesToKeys.put(cat, key);
 			}
-			
+
 			storeCategories();
-			
+
 			try {
 				IWContext iwc = IWContext.getInstance();
 				session = IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
 				service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
-	
+
 				updateCategoriesOnFiles(CATEGORY_CONFIG_PATH);
-	
+
 				/*
 				log.info("Deleting old file " + CATEGORY_CONFIG_FILE);
 				WebdavResource resource = session.getWebdavResource(service.getURI(CATEGORY_CONFIG_FILE));
@@ -136,7 +136,7 @@ public class CategoryBean {
 				e.printStackTrace();
 			}
 		}
-		
+
 		private void updateCategoriesOnFiles(String resourcePath) {
 			if (resourcePath.indexOf(ThemesConstants.THEMES_PATH) >= 0) {
 				return;
@@ -147,9 +147,9 @@ public class CategoryBean {
 				if(!resourcePath.startsWith(serverURI)) {
 					filePath = service.getURI(resourcePath);
 				}
-	
+
 				WebdavResource resource = session.getWebdavResource(filePath);
-				
+
 				String oldCats = CATEGORY_DELIMETER;
 				Enumeration enumerator = resource.propfindMethod(PROPERTY_NAME_CATEGORIES);
 				if (enumerator.hasMoreElements()) {
@@ -159,11 +159,11 @@ public class CategoryBean {
 					}
 					oldCats = cats.toString();
 				}
-				
+
 				if (!oldCats.equals(CATEGORY_DELIMETER) && !oldCats.equals("")) {
 					log.info("Updating categories on resource " + resourcePath);
 					log.info("- " + oldCats);
-					
+
 					StringTokenizer tokenizer = new StringTokenizer(oldCats, CATEGORY_DELIMETER);
 					StringBuffer newCats = new StringBuffer(CATEGORY_DELIMETER);
 					while (tokenizer.hasMoreTokens()) {
@@ -177,11 +177,11 @@ public class CategoryBean {
 						}
 						newCats.append(CATEGORY_DELIMETER);
 					}
-	
+
 					log.info("+ " + newCats.toString());
 					resource.proppatchMethod(PROPERTY_NAME_CATEGORIES, newCats.toString(), true);
 				}
-				
+
 				// update categories on all child resources
 				Enumeration children = resource.getChildResources().getResourceNames();
 				if (children.hasMoreElements()) {
@@ -190,8 +190,8 @@ public class CategoryBean {
 						updateCategoriesOnFiles(child);
 					}
 				}
-				
-				resource.close();			
+
+				resource.close();
 			} catch (Exception e) {
 				log.error("Exception updating categories on resource " + resourcePath + ": " + e.getMessage());
 			}
@@ -222,7 +222,7 @@ public class CategoryBean {
 			throw new RuntimeException("Error getting IWSlideService");
 		}
 	}
-	
+
 	/**
 	 * <p> Get a collection of categories, sorted by keys </p>
 	 * @return collection of strings
@@ -230,11 +230,11 @@ public class CategoryBean {
 	public Collection<ContentCategory> getCategories() {
 		return this.categories.values();
 	}
-	
+
 	public ContentCategory getCategory(String id) {
 		return this.categories.get(id);
 	}
-	
+
 	/**
 	 * <p> Get a collection of categories, sorted by given locale </p>
 	 * @return collection of strings
@@ -245,7 +245,7 @@ public class CategoryBean {
 		Collections.sort(list, comparator);
 		return Collections.unmodifiableCollection(list);
 	}
-	
+
 	public String getCategoryName(String categoryKey) {
 		ContentCategory cat = this.categories.get(categoryKey);
 		if (cat == null) {
@@ -262,7 +262,7 @@ public class CategoryBean {
 		}
 		return name;
 	}
-	
+
 	protected String getCurrentLocale() {
 		return IWContext.getInstance().getCurrentLocale().toString();
 	}
@@ -279,9 +279,9 @@ public class CategoryBean {
 		try {
 			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwuc,IWSlideSession.class);
 			WebdavRootResource rootResource = session.getWebdavRootResource();
-			
+
 			String path = getSlideService().getURI(CATEGORY_CONFIG_FILE);
-			
+
 			categories = rootResource.getMethodDataAsString(path);
 			if(rootResource.getStatusCode() != WebdavStatus.SC_OK){
 				return "";
@@ -301,7 +301,7 @@ public class CategoryBean {
 		}
 		return categories;
 	}
-	
+
 	/**
 	 * <p>
 	 * Constructs a collection from a comma separated list of categories
@@ -310,7 +310,7 @@ public class CategoryBean {
 	 */
 	public static Collection<String> getCategoriesFromString(String categoryCommaSeparatedList){
 		Collection<String> ret = new ArrayList<String>();
-		
+
 		if( categoryCommaSeparatedList != null){
 			StringTokenizer st = new StringTokenizer(categoryCommaSeparatedList,CATEGORY_DELIMETER);
 			while(st.hasMoreTokens()) {
@@ -319,7 +319,7 @@ public class CategoryBean {
 		}
 		return ret;
 	}
-	
+
 	/**
 	 * <p>Adds a category to the available categories</p>
 	 * @param category
@@ -327,7 +327,7 @@ public class CategoryBean {
 	public void addCategory(String category) {
 		addCategory(category, getCurrentLocale());
 	}
-	
+
 	/**
 	 * Adds a category to the available categories
 	 * @param category
@@ -353,14 +353,14 @@ public class CategoryBean {
 	protected static String getCategoryKey(String category) {
 		return StringHandler.stripNonRomanCharacters(category, LEAVE_AS_IS).toLowerCase();
 	}
-	
+
 	/**
 	 * Loads category definitions from <code>categories.xml</code> file.
 	 * @return categories as Map<String, ContentCategory>, or <code>null</code> if loading failed.
 	 */
 	private Map<String, ContentCategory> loadCategories() {
 		Map<String, ContentCategory> map = new TreeMap<String, ContentCategory>();
-		
+
 		InputStream stream = null;
 		try {
 			String resourcePath = getSlideService().getURI(CATEGORY_PROPERTIES_FILE);
@@ -369,6 +369,7 @@ public class CategoryBean {
 			Document document = builder.build(stream);
 			Element root = document.getRootElement();
 			Iterator<Element> cats = root.getDescendants(new Filter() {
+				@Override
 				public boolean matches(Object obj) {
 					if (obj instanceof Element) {
 						Element elem = (Element) obj;
@@ -404,7 +405,7 @@ public class CategoryBean {
 	public void storeCategories() {
 		storeCategories(false);
 	}
-	
+
 	public synchronized boolean storeCategories(boolean useThread) {
 		CategoriesWriter writer = null;
 		try {
@@ -413,7 +414,7 @@ public class CategoryBean {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		if (useThread) {
 			IWContext iwc = CoreUtil.getIWContext();
 			if (iwc == null) {
@@ -423,17 +424,17 @@ public class CategoryBean {
 				useThread = !iwc.isIE();
 			}
 		}
-		
+
 		if (useThread) {
 			writer.run();
 		}
 		else {
 			return writer.writeCategories();
 		}
-		
+
 		return true;
 	}
-	
+
 	public boolean deleteCategory(String id) {
 		try {
 			this.categories.remove(id);
@@ -443,25 +444,25 @@ public class CategoryBean {
 		}
 		return true;
 	}
-	
-	public String getCategoryName(String id, String language, IWContext iwc) {		
+
+	public String getCategoryName(String id, String language, IWContext iwc) {
 		if (id == null) {
 			return null;
 		}
-		
+
 		return getCategoryName(this.categories.get(id), language, iwc);
 	}
-	
+
 	public String getCategoryName(ContentCategory category, String language, IWContext iwc) {
 		if (category == null || language == null || iwc == null) {
 			return null;
 		}
-		
+
 		String name = category.getName(language);
 		if (name != null) {
 			return name;
 		}
-		
+
 		//	Didn't find category's name by current locale, looking for by default locale
 		Locale defaultLocale = IWMainApplication.getIWMainApplication(iwc).getDefaultLocale();
 		if (defaultLocale == null) {
@@ -469,5 +470,5 @@ public class CategoryBean {
 		}
 		return category.getName(defaultLocale.toString());	//	Returning name by default locale or null if such doesn't exist
 	}
-	
+
 }
