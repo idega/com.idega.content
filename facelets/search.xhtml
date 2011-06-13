@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html 	xmlns="http://www.w3.org/1999/xhtml" 
+		xmlns:ui="http://java.sun.com/jsf/facelets"
+		xmlns:h="http://java.sun.com/jsf/html"
+		xmlns:f="http://java.sun.com/jsf/core"
+		xmlns:t="http://myfaces.apache.org/tomahawk"
+	    xmlns:wf="http://xmlns.idega.com/com.idega.webface"
+		xmlns:ws="http://xmlns.idega.com/com.idega.workspace"
+		xmlns:co="http://xmlns.idega.com/com.idega.content"
+        xmlns:article="http://xmlns.idega.com/com.idega.block.article"
+        xmlns:builder="http://xmlns.idega.com/com.idega.builder" >
+
+    <head>
+    
+    </head>
+    
+    <body>
+		<f:view>
+		        <ws:page id="contentsearch1" stylesheeturls="/idegaweb/bundles/com.idega.content.bundle/resources/style/content.css">
+		                <h:form id="contentsearchform1">
+		                <wf:block id="contentsearchblock1" title="#{localizedStrings['com.idega.content']['search']}">
+		                		<builder:module id="contentsearcher1" componentClass="com.idega.core.search.presentation.Searcher" />
+		                		<builder:module id="contentsearchresults1" componentClass="com.idega.core.search.presentation.SearchResults" />
+		                </wf:block>
+		                </h:form>
+		        </ws:page>
+		</f:view>
+	</body>
+</html>

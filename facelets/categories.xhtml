@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html 	xmlns="http://www.w3.org/1999/xhtml" 
+		xmlns:ui="http://java.sun.com/jsf/facelets"
+		xmlns:h="http://java.sun.com/jsf/html"
+		xmlns:f="http://java.sun.com/jsf/core"
+		xmlns:t="http://myfaces.apache.org/tomahawk"
+	    xmlns:wf="http://xmlns.idega.com/com.idega.webface"
+		xmlns:ws="http://xmlns.idega.com/com.idega.workspace"
+		xmlns:co="http://xmlns.idega.com/com.idega.content" >
+
+    <head>
+    
+    </head>
+    
+    <body>
+	    <f:view>
+	    	<ws:page id="categories1"	javascripturls="/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.11/mootools-all-compressed.js,
+	    												
+	    												/dwr/interface/CategoriesEngine.js,
+	    												/dwr/engine.js,
+	    												
+	    												/idegaweb/bundles/com.idega.content.bundle/resources/javascript/CategoriesHelper.js"
+	    								
+	    								stylesheeturls="/idegaweb/bundles/com.idega.content.bundle/resources/style/categories.css">
+	    												
+				<h:form id="categoriesForm" enctype="multipart/form-data" onsubmit="return false">
+					<f:verbatim>
+	        			<script type="text/javascript">
+	        				window.addEvent('domready', function() {
+	        					var errorHanlder = function() {
+									reloadPage();
+								}
+	        					dwr.engine.setErrorHandler(errorHanlder);
+	        				
+	        					getInfoForCategories();
+	        					initializeContentCategoriesActions();
+	        				});
+	        			</script>
+					</f:verbatim>           
+					
+					<wf:block id="categoriesblock" title="#{localizedStrings['com.idega.content']['categories']}">
+						<co:CategoriesEditor id="categoriesEditor" />
+					</wf:block>
+				</h:form>
+			</ws:page>
+		</f:view>
+	</body>
+</html>
+

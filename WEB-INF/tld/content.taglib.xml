@@ -12,4 +12,59 @@
         </component>
 	</tag>
     
+    <tag>
+		<tag-name>blockWithToolbar</tag-name>
+		<component>
+            <component-type>WFBlockWithToolbar</component-type>
+        </component>
+	</tag>
+		
+	<tag>
+		<tag-name>TemplatesTree</tag-name>
+		<component>
+            <component-type>TemplatesTree</component-type>
+        </component>
+	</tag>
+	
+	<tag>
+		<tag-name>PageInfo</tag-name>
+		<component>
+            <component-type>PageInfo</component-type>
+        </component>
+	</tag>
+	
+	<tag>
+		<tag-name>SiteInfo</tag-name>
+		<component>
+            <component-type>SiteInfo</component-type>
+        </component>
+	</tag>
+	
+	<tag>
+		<tag-name>ThemesSliderViewer</tag-name>
+		<component>
+            <component-type>ThemesSliderViewer</component-type>
+        </component>
+	</tag>
+	
+	<tag>
+		<tag-name>siteTemplatesViewer</tag-name>
+		<component>
+            <component-type>siteTemplatesViewer</component-type>
+        </component>
+	</tag>
+	
+	<tag>
+		<tag-name>ContentViewer</tag-name>
+		<component>
+            <component-type>ContentViewer</component-type>
+        </component>
+	</tag>
+	  
+	<tag>
+		<tag-name>CategoriesEditor</tag-name>
+		<component>
+            <component-type>CategoriesEditor</component-type>
+        </component>
+	</tag>  
 </facelet-taglib>

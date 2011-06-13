@@ -23,6 +23,7 @@ import org.apache.myfaces.shared_tomahawk.renderkit.RendererUtils;
 import org.apache.myfaces.shared_tomahawk.renderkit.html.HTML;
 import org.apache.myfaces.shared_tomahawk.renderkit.html.HtmlLinkRendererBase;
 import org.apache.myfaces.shared_tomahawk.renderkit.html.HtmlRendererUtils;
+import org.apache.myfaces.shared_tomahawk.renderkit.html.util.FormInfo;
 
 import com.idega.content.business.ContentConstants;
 import com.idega.content.presentation.ContentItemToolbarButton;
@@ -66,9 +67,9 @@ public class ContentItemToolbarButtonRenderer extends HtmlLinkRendererBase {
 	/* (non-Javadoc)
 	 * @see org.apache.myfaces.renderkit.html.HtmlLinkRendererBase#renderJavaScriptAnchorStart(javax.faces.context.FacesContext, javax.faces.context.ResponseWriter, javax.faces.component.UIComponent, java.lang.String)
 	 */
-	protected void renderJavaScriptAnchorStart(FacesContext facesContext, ResponseWriter writer, UIComponent component, String clientId) throws IOException {
+	protected void renderJavaScriptAnchorStart(FacesContext facesContext, ResponseWriter writer, UIComponent component, String clientId, FormInfo formInfo) throws IOException {
 		// TODO Auto-generated method stub
-		super.renderJavaScriptAnchorStart(facesContext, writer, component, clientId);
+		super.renderJavaScriptAnchorStart(facesContext, writer, component, clientId, formInfo);
 	}
 
 	/* (non-Javadoc)
@@ -82,9 +83,9 @@ public class ContentItemToolbarButtonRenderer extends HtmlLinkRendererBase {
 	/* (non-Javadoc)
 	 * @see org.apache.myfaces.renderkit.html.HtmlLinkRendererBase#renderNonJavaScriptAnchorStart(javax.faces.context.FacesContext, javax.faces.context.ResponseWriter, javax.faces.component.UIComponent, java.lang.String)
 	 */
-	protected void renderNonJavaScriptAnchorStart(FacesContext facesContext, ResponseWriter writer, UIComponent component, String clientId) throws IOException {
+	protected void renderNonJavaScriptAnchorStart(FacesContext facesContext, ResponseWriter writer, UIComponent component, String clientId, FormInfo formInfo) throws IOException {
 		// TODO Auto-generated method stub
-		super.renderNonJavaScriptAnchorStart(facesContext, writer, component, clientId);
+		super.renderNonJavaScriptAnchorStart(facesContext, writer, component, clientId, formInfo);
 	}
 
 	/* (non-Javadoc)

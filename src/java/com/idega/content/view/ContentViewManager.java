@@ -80,7 +80,7 @@ public class ContentViewManager implements Singleton  {
 		roles.add(StandardRoles.ROLE_KEY_AUTHOR);
 		contentNode.setAuthorizedRoles(roles);
 		
-		contentNode.setJspUri(contentBundle.getJSPURI("pages.jsp"));
+		contentNode.setFaceletUri(contentBundle.getFaceletURI("pages.xhtml"));
 		contentNode.setKeyboardShortcut(new KeyboardShortcut("4"));
 		contentNode.setName("#{localizedStrings['com.idega.content']['lucid_application']}");
 		
@@ -96,36 +96,36 @@ public class ContentViewManager implements Singleton  {
 		ViewNode contentNode = initalizeContentNode(bundle);
 
 		DefaultViewNode pagesNode = new DefaultViewNode(CoreConstants.PAGES_VIEW_MANAGER_ID, contentNode);
-		pagesNode.setJspUri(bundle.getJSPURI("pages.jsp"));
+		pagesNode.setFaceletUri(bundle.getFaceletURI("pages.xhtml"));
 		pagesNode.setKeyboardShortcut(new KeyboardShortcut("p"));
 		pagesNode.setName("#{localizedStrings['com.idega.content']['pages']}");
 		
 		DefaultViewNode themesNode = new DefaultViewNode("themes", contentNode);
-		themesNode.setJspUri(bundle.getJSPURI("themes.jsp"));
+		themesNode.setFaceletUri(bundle.getFaceletURI("themes.xhtml"));
 		themesNode.setKeyboardShortcut(new KeyboardShortcut("t"));
 		themesNode.setName("#{localizedStrings['com.idega.content']['themes']}");
 
 		DefaultViewNode usersNode = new DefaultViewNode("users", contentNode);
-		usersNode.setJspUri(bundle.getJSPURI("users.jsp"));
+		usersNode.setFaceletUri(bundle.getFaceletURI("users.xhtml"));
 		usersNode.setKeyboardShortcut(new KeyboardShortcut("u"));
 		usersNode.setName("#{localizedStrings['com.idega.content']['users']}");
 		//only editor!
 		usersNode.setAuthorizedRoles(editor);
 		
 		DefaultViewNode documentsNode = new DefaultViewNode("documents",contentNode);
-		documentsNode.setJspUri(bundle.getJSPURI("listDocuments.jsp"));
+		documentsNode.setFaceletUri(bundle.getFaceletURI("listDocuments.xhtml"));
 		documentsNode.setKeyboardShortcut(new KeyboardShortcut("d"));
 		documentsNode.setName("#{localizedStrings['com.idega.content']['documents']}");
 		
 		DefaultViewNode categoriesNode = new DefaultViewNode("categories",contentNode);
-		categoriesNode.setJspUri(bundle.getJSPURI("categories.jsp"));	
+		categoriesNode.setFaceletUri(bundle.getFaceletURI("categories.xhtml"));	
 		categoriesNode.setKeyboardShortcut(new KeyboardShortcut("c"));
 		categoriesNode.setName("#{localizedStrings['com.idega.content']['categories']}");
 		//only editor!
 		categoriesNode.setAuthorizedRoles(editor);
 		
 		DefaultViewNode searchNode = new DefaultViewNode("search",contentNode);
-		searchNode.setJspUri(bundle.getJSPURI("search.jsp"));	
+		searchNode.setFaceletUri(bundle.getFaceletURI("search.xhtml"));	
 		searchNode.setKeyboardShortcut(new KeyboardShortcut("s"));
 		searchNode.setName("#{localizedStrings['com.idega.content']['search']}");
 		
