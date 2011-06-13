@@ -3,6 +3,7 @@ package com.idega.content.upload.presentation;
 import javax.faces.component.UIComponent;
 import javax.faces.webapp.UIComponentELTag;
 
+import com.idega.content.upload.servlet.ContentFileUploadServlet;
 import com.idega.util.CoreConstants;
 import com.idega.webface.WFUtil;
 
@@ -10,7 +11,7 @@ public class FileUploadViewerTag extends UIComponentELTag {
 	
 	private String actionAfterUpload, actionAfterCounterReset, actionAfterUploadedToRepository = null;
 	private String uploadPath = CoreConstants.PUBLIC_PATH;
-	private String formId, componentToRerenderId = null;
+	private String formId, componentToRerenderId, maxUploadSize = String.valueOf(ContentFileUploadServlet.MAX_UPLOAD_SIZE);
 	
 	private boolean zipFile = false;
 	private boolean extractContent = false;
@@ -51,6 +52,7 @@ public class FileUploadViewerTag extends UIComponentELTag {
 			uploadViewer.setAutoAddFileInput(autoAddFileInput);
 			uploadViewer.setFakeFileDeletion(fakeFileDeletion);
 			uploadViewer.setStripNonRomanLetters(stripNonRomanLetters);
+			uploadViewer.setMaxUploadSize(maxUploadSize);
 		}
 	}
 
@@ -61,6 +63,7 @@ public class FileUploadViewerTag extends UIComponentELTag {
 		this.actionAfterUploadedToRepository = null;
 		this.uploadPath = CoreConstants.PUBLIC_PATH;
 		this.componentToRerenderId = null;
+		this.maxUploadSize = null;
 		
 		this.zipFile = false;
 		this.extractContent = false;
@@ -217,6 +220,14 @@ public class FileUploadViewerTag extends UIComponentELTag {
 
 	public void setStripNonRomanLetters(boolean stripNonRomanLetters) {
 		this.stripNonRomanLetters = stripNonRomanLetters;
+	}
+
+	public String getMaxUploadSize() {
+		return maxUploadSize;
+	}
+
+	public void setMaxUploadSize(String maxUploadSize) {
+		this.maxUploadSize = maxUploadSize;
 	}
 	
 }

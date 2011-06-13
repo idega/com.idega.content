@@ -9,8 +9,9 @@
  */
 package com.idega.content.presentation;
 
+import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
-import javax.faces.el.ValueBinding;
+
 import com.idega.idegaweb.IWBundle;
 import com.idega.util.CoreConstants;
 import com.idega.webface.htmlarea.HTMLAreaLinkType;
@@ -18,8 +19,8 @@ import com.idega.webface.htmlarea.HTMLAreaLinkType;
 
 public class HTMLAreaDocumentLinkCreator implements HTMLAreaLinkType {
 	
-	public ValueBinding getLinkTypeName(IWBundle bundle) {
-		return bundle.getValueBinding("link_type_document");
+	public ValueExpression getLinkTypeName(IWBundle bundle) {
+		return bundle.getValueExpression("link_type_document");
 	}
 	
 	public UIComponent getLinkCreation(Object param) {

@@ -187,8 +187,7 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 			this.selectedCategories=CategoryBean.getCategoriesFromString(value.toString());
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			Logger.getLogger(WebDAVMetadataResourceBean.class.getName()).log(Level.SEVERE, "Warning could not load categories for "+ filePath);
+			Logger.getLogger(WebDAVMetadataResourceBean.class.getName()).log(Level.SEVERE, "Warning could not load categories for "+ filePath, e);
 		}
 		
 		return this.selectedCategories;

@@ -73,3 +73,7 @@ input.addCategoryButtonStyle {
 .categoriesTable .name {
 	text-align: left;
 }
+
+.categoryLocaleEditor {
+	overflow: auto;
+}

@@ -123,7 +123,7 @@ public class FileUploaderBean implements FileUploader {
 
 	public String getPropertiesAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters) {
+			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters, String maxUploadSize) {
 		
 		IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
 		return new StringBuilder("FileUploadHelper.setProperties({id: '").append(id).append("', showProgressBar: ").append(showProgressBar)
@@ -145,6 +145,7 @@ public class FileUploaderBean implements FileUploader {
 			.append(", fakeFileDeletion: ").append(fakeFileDeletion)
 			.append(", actionAfterUploadedToRepository: ").append(getJavaScriptAction(actionAfterUploadedToRepository))
 			.append(", stripNonRomanLetters: ").append(stripNonRomanLetters)
+			.append(", maxSize: ").append(maxUploadSize)
 		.append("});").toString();
 	}
 	
@@ -222,11 +223,13 @@ public class FileUploaderBean implements FileUploader {
 				return slide.uploadFile(path, name, file.getType(), stream);
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Error uploading file " + file.getName(), e);
-			return false;
+			String message = "Error uploading file " + file.getName();
+			LOGGER.log(Level.SEVERE, message, e);
+			CoreUtil.sendExceptionNotification(message, e);
 		} finally {
 			IOUtil.close(stream);
 		}
+		return false;
 	}
 	
 	private InputStream getInputStream(byte[] bytes) {
@@ -323,11 +326,11 @@ public class FileUploaderBean implements FileUploader {
 	
 	public String getUploadAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters) {
+			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters, String maxUploadSize) {
 		
 		StringBuilder action = new StringBuilder(getPropertiesAction(iwc, id, progressBarId, uploadId, showProgressBar, showLoadingMessage, zipFile, formId,
 				actionAfterUpload, actionAfterCounterReset, autoUpload, showUploadedFiles, componentToRerenderId, fakeFileDeletion, actionAfterUploadedToRepository,
-				stripNonRomanLetters)).append("FileUploadHelper.uploadFiles();");
+				stripNonRomanLetters, maxUploadSize)).append("FileUploadHelper.uploadFiles();");
 		return getActionToLoadFilesAndExecuteCustomAction(action.toString(), showProgressBar, !StringUtil.isEmpty(componentToRerenderId));
 	}
 	
@@ -398,6 +401,9 @@ public class FileUploaderBean implements FileUploader {
 		
 		Lists list = new Lists();
 		for (String fileInSlide: files) {
+			if (StringUtil.isEmpty(fileInSlide) || fileInSlide.indexOf(CoreConstants.DOT) == -1)
+				continue;
+			
 			ListItem listItem = new ListItem();
 			
 			int index = fileInSlide.lastIndexOf(File.separator);

@@ -78,6 +78,10 @@ public class CssScanner implements ResourceScanner {
 			return false;
 		}
 		
+		String file = line.substring(line.lastIndexOf(CoreConstants.SLASH));
+		if (StringUtil.isEmpty(file) || file.indexOf(CoreConstants.DOT) == -1)
+			return false;
+		
 		String urlExpression = line.substring(start + urlExpressionStart.length(), end);
 		urlExpression = StringHandler.replace(urlExpression, DIRECTORY_LEVEL_UP, ThemesConstants.EMPTY);
 		urlExpression = StringHandler.replace(urlExpression, "'", CoreConstants.EMPTY);
@@ -131,9 +135,8 @@ public class CssScanner implements ResourceScanner {
 		if (line.indexOf("url(") != -1) {
 			if (canUseURL(line)) {
 				return line;
-			}
-			else {
-				LOGGER.log(Level.WARNING, "Removing CSS expression: '" + line + "' because this object was not found in theme's pack!");
+			} else {
+				LOGGER.log(Level.WARNING, "Removing CSS expression: '" + line + "' because this object was not found in theme's pack or it is invalid!");
 				return ThemesConstants.EMPTY;
 			}
 		}
