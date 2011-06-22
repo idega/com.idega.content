@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,7 +32,9 @@ import com.idega.content.business.ContentUtil;
 import com.idega.content.business.WebDAVUploadBean;
 import com.idega.content.upload.bean.UploadFile;
 import com.idega.core.builder.business.BuilderService;
+import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
@@ -51,6 +54,7 @@ import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
 
 public class FileUploaderBean implements FileUploader {
 
@@ -101,6 +105,7 @@ public class FileUploaderBean implements FileUploader {
 		input.getId();
 		input.setStyleClass(FILE_UPLOAD_INPUT_STYLE);
 		input.setName(ContentConstants.UPLOAD_FIELD_NAME);
+		input.setMultiple(autoAddFileInput);
 		if (autoUpload) {
 			input.setOnChange(getActionToLoadFilesAndExecuteCustomAction("FileUploadHelper.uploadFiles();", showProgressBar, addjQuery));
 		}
@@ -125,7 +130,8 @@ public class FileUploaderBean implements FileUploader {
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
 			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters, String maxUploadSize) {
 		
-		IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
+		IWBundle bundle = ContentUtil.getBundle();
+		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
 		return new StringBuilder("FileUploadHelper.setProperties({id: '").append(id).append("', showProgressBar: ").append(showProgressBar)
 			.append(", showMessage: ").append(showLoadingMessage).append(", zipFile: ").append(zipFile).append(", formId: '").append(formId)
 			.append("', progressBarId: '").append(progressBarId).append("', ")
@@ -138,6 +144,18 @@ public class FileUploaderBean implements FileUploader {
 				.append(iwrb.getLocalizedString("incorrect_file_type", "Unsupported file type! Only zip files allowed"))
 			.append("', UPLOADING_FILE_FAILED: '")
 				.append(iwrb.getLocalizedString("uploading_file_failed_msg", "Sorry, some error occurred - unable to upload file(s). Please, try again"))
+			.append("', UPLOADING_FILE_EXCEEDED_SIZE: '")
+				.append(iwrb.getLocalizedString("upload_exceeding_limits", "Sorry, the size of selected file(s) is exceeding the max allowed size"))
+			.append("', CHOOSE_FILE: '")
+				.append(iwrb.getLocalizedString("choose_file", "Choose file"))
+			.append("', FILES_SELECTED: '")
+				.append(iwrb.getLocalizedString("web2_uploader.files_selected", "files selected"))
+			.append("', SELECTED_FILE: '")
+				.append(iwrb.getLocalizedString("web2_uploader.selected_file", "Selected file"))
+			.append("', FLASH_IS_MISSING: '")
+				.append(iwrb.getLocalizedString("web2_uploader.flash_is_missing", "Unable to upload file(s): you need to install Flash plug-in"))
+			.append("', LOADING: '")
+				.append(iwrb.getLocalizedString("loading", "Loading..."))
 			.append("'}, ")
 			.append("actionAfterUpload: ").append(getJavaScriptAction(actionAfterUpload))
 			.append(", actionAfterCounterReset: ").append(getJavaScriptAction(actionAfterCounterReset))
@@ -146,6 +164,11 @@ public class FileUploaderBean implements FileUploader {
 			.append(", actionAfterUploadedToRepository: ").append(getJavaScriptAction(actionAfterUploadedToRepository))
 			.append(", stripNonRomanLetters: ").append(stripNonRomanLetters)
 			.append(", maxSize: ").append(maxUploadSize)
+			.append(", uploadImage: '").append(bundle.getVirtualPathWithFileNameString("images/upload.png")).append("'")
+			.append(", sessionId: '").append(iwc.getSession().getId()).append("'")
+			.append(", swfObject: '").append(web2.getSWFUploadObjectScript()).append("'")
+			.append(", swfUploadScript: '").append(web2.getSWFUploadScript()).append("'")
+			.append(", swfUploadPlugin: '").append(web2.getSWFUploadPlugin()).append("'")
 		.append("});").toString();
 	}
 	
@@ -180,7 +203,7 @@ public class FileUploaderBean implements FileUploader {
 			return false;
 		}
 		
-		if (slide == null) {
+		if (getSlideService(IWMainApplication.getDefaultIWApplicationContext()) == null) {
 			return false;
 		}
 		
@@ -255,10 +278,10 @@ public class FileUploaderBean implements FileUploader {
 		return builder;
 	}
 	
-	private IWSlideService getSlideService(IWContext iwc) {
+	private IWSlideService getSlideService(IWApplicationContext iwac) {
 		if (slide == null) {
 			try {
-				slide = IBOLookup.getServiceInstance(iwc, IWSlideService.class);
+				slide = IBOLookup.getServiceInstance(iwac, IWSlideService.class);
 			} catch (IBOLookupException e) {
 				e.printStackTrace();
 				return null;
@@ -375,6 +398,23 @@ public class FileUploaderBean implements FileUploader {
 		jQuery = query;
 	}
 
+	public List<String> getUploadedFilesListById(String uploadId, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters) {
+		FileUploadProgressListener fileUploadProgress = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
+		if (fileUploadProgress == null)
+			return null;
+		
+		Collection<AdvancedProperty> files = fileUploadProgress.getUploadedFiles(uploadId);
+		if (ListUtil.isEmpty(files))
+			return null;
+		
+		List<String> uploadedFiles = new ArrayList<String>(files.size());
+		for (AdvancedProperty file: files) {
+			uploadedFiles.add(file.getValue());
+		}
+		
+		return getUploadedFilesList(uploadedFiles, uploadPath, fakeFileDeletion, stripNonRomanLetters);
+	}
+	
 	public List<String> getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters) {
 		if (ListUtil.isEmpty(files) || StringUtil.isEmpty(uploadPath)) {
 			return null;

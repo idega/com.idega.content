@@ -1,18 +1,24 @@
 package com.idega.content.upload.bean;
 
+import java.io.Serializable;
+import java.util.Random;
 
-public class UploadFile {
+public class UploadFile implements Serializable {
 	
-	private String name = null;
-	private String type = null;
+	private static final long serialVersionUID = 237119286592662435L;
+	
+	private String name, type, path;
 	private long size = 0;
 	private byte[] bytes = null;
+	private int hash;
 	
 	public UploadFile(String name, String type, long size, byte[] bytes) {
 		this.name = name;
 		this.type = type;
 		this.size = size;
 		this.bytes = bytes;
+		
+		hash = new Random().nextInt();
 	}
 
 	public String getName() {
@@ -48,7 +54,29 @@ public class UploadFile {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof UploadFile))
+			return false;
+		
+		UploadFile file = (UploadFile) obj;
+		return getName().equals(file.getName()) && getPath().equals(file.getPath()) && getSize() == file.getSize() && hashCode() == file.hashCode();
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	@Override
+	public int hashCode() {
+		return hash;
+	}
+
+	@Override
 	public String toString() {
-		return "Name: " + getName() + ", type: " + getType() + ", size: " + getSize() + ", bytes: " + getBytes();
+		return "Name: " + getName() + ", path: " + getPath() + ", type: " + getType() + ", size: " + getSize() + ", bytes: " + getBytes();
 	}
 }

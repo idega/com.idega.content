@@ -44,12 +44,12 @@ public class ContentFileUploadServlet extends HttpServlet {
 	
 	private static final long serialVersionUID = -6282517406996613536L;
 	
-	public static final long MAX_UPLOAD_SIZE = 1024 * 1024 * 1024;	//	1 GB
+	public static final long MAX_UPLOAD_SIZE = 20 * 1024 * 1024;	//	20 MBs
 
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		boolean success = false;
+		Boolean success = Boolean.FALSE;
 		String uploadId = null;
 		IWApplicationContext iwac = null;
 		FileUploadProgressListener uploadProgressListener = null;
@@ -165,11 +165,17 @@ public class ContentFileUploadServlet extends HttpServlet {
 		        if (success) {
 		        	StringBuffer responseBuffer = new StringBuffer();
 		        	for (Iterator<UploadFile> filesIter = files.iterator(); filesIter.hasNext();) {
-		        		responseBuffer.append(filesIter.next().getName());
+		        		UploadFile file = filesIter.next();
+		        		file.setPath(uploadPath);
+		        		
+		        		responseBuffer.append(file.getName());
 		        		if (filesIter.hasNext()) {
 		        			responseBuffer.append(CoreConstants.COMMA);
 		        		}
 		        	}
+		        	
+		        	uploadProgressListener.addUploadedFiles(uploadId, files);
+		        	
 		        	writeToResponse(response, responseBuffer.toString());
 		        } else {
 		        	errorMessage = "Unable to upload files (" + files + ") to: " + uploadPath + ". Upload ID: " + uploadId;
@@ -190,7 +196,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 		}
 	}
 	
-	private void finishUpUpload(IWApplicationContext iwac, FileUploadProgressListener uploadProgressListener, String uploadId, boolean success) {
+	private void finishUpUpload(IWApplicationContext iwac, FileUploadProgressListener uploadProgressListener, String uploadId, Boolean success) {
 		if (!StringUtil.isEmpty(uploadId)) {
 			uploadProgressListener.setUploadSuccessful(uploadId, success);
     		

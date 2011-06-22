@@ -2,13 +2,17 @@ package com.idega.content.upload.business;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.idega.builder.bean.AdvancedProperty;
+import com.idega.content.upload.bean.UploadFile;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 
 public class FileUploadProgressListenerBean implements FileUploadProgressListener {
@@ -19,7 +23,8 @@ public class FileUploadProgressListenerBean implements FileUploadProgressListene
 	private String uploadId;
 
 	private Map<String, Boolean> uploadInfo = new HashMap<String, Boolean>();
-
+	private Map<String, List<UploadFile>> uploadedFiles = new HashMap<String, List<UploadFile>>();
+	
 	private List<String> failedUploads = new ArrayList<String>();
 	
 	public void update(long bytesRead, long contentLength, int items) {
@@ -96,6 +101,38 @@ public class FileUploadProgressListenerBean implements FileUploadProgressListene
 
 	public String getUploadId() {
 		return uploadId;
+	}
+
+	@Override
+	public void addUploadedFiles(String uploadId, Collection<UploadFile> files) {
+		if (StringUtil.isEmpty(uploadId) || ListUtil.isEmpty(files))
+			return;
+		
+		List<UploadFile> uploadFiles = uploadedFiles.get(uploadId);
+		if (uploadFiles == null) {
+			uploadFiles = new ArrayList<UploadFile>();
+			uploadedFiles.put(uploadId, uploadFiles);
+		}
+		for (UploadFile file: files) {
+			if (!uploadFiles.contains(file))
+				uploadFiles.add(file);
+		}
+	}
+
+	@Override
+	public Collection<AdvancedProperty> getUploadedFiles(String uploadId) {
+		if (StringUtil.isEmpty(uploadId))
+			return null;
+		
+		List<UploadFile> files = uploadedFiles.remove(uploadId);
+		if (ListUtil.isEmpty(files))
+			return null;
+		
+		Collection<AdvancedProperty> uploadedFiles = new ArrayList<AdvancedProperty>(files.size());
+		for (UploadFile file: files) {
+			uploadedFiles.add(new AdvancedProperty(file.getPath(), file.getName()));
+		}
+		return uploadedFiles;
 	}
 	
 }
