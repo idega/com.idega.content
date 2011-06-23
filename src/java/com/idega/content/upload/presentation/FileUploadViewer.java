@@ -19,6 +19,7 @@ import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.upload.business.FileUploader;
 import com.idega.content.upload.servlet.ContentFileUploadServlet;
 import com.idega.core.builder.business.BuilderService;
+import com.idega.core.component.business.ICObjectBusiness;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWBaseComponent;
@@ -188,6 +189,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		
 		if (allowMultipleFiles) {
 			GenericButton addFileInput = new GenericButton(iwrb.getLocalizedString("add_file", "Add file"));
+			addFileInput.setStyleClass("fileUploadAddInputStyle");
 			addFileInput.setOnClick(getFileUploader().getActionToLoadFilesAndExecuteCustomAction(getFileUploader()
 					.getAddFileInputJavaScriptAction(id, iwrb, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId), isAutoAddFileInput(),
 							isAutoUpload()), isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId)));
@@ -272,7 +274,12 @@ public class FileUploadViewer extends IWBaseComponent {
 			IWContext iwc = IWContext.getIWContext(context);
 			BuilderService builderService = builderLogic.getBuilderService(iwc);
 			String pageKey = String.valueOf(iwc.getCurrentIBPageID());
-			return builderService.getProperty(pageKey, getId(), methodName);
+			if (StringUtil.isEmpty(pageKey) || pageKey.equals(String.valueOf(-1)))
+				return null;
+			String id = getId();
+			if (StringUtil.isEmpty(id) || !id.startsWith(ICObjectBusiness.UUID_PREFIX))
+				return null;
+			return builderService.getProperty(pageKey, id, methodName);
 		} catch (Exception e) {
 			Logger.getLogger(getClass().getName()).log(Level.WARNING, "Error getting value for property: " + methodName, e);
 		}

@@ -169,6 +169,9 @@ public class FileUploaderBean implements FileUploader {
 			.append(", swfObject: '").append(web2.getSWFUploadObjectScript()).append("'")
 			.append(", swfUploadScript: '").append(web2.getSWFUploadScript()).append("'")
 			.append(", swfUploadPlugin: '").append(web2.getSWFUploadPlugin()).append("'")
+			.append(", needFlash: false")
+			.append(", initializeScriptsAction: function() {").append(getActionToLoadFilesAndExecuteCustomAction("FileUploadHelper.initializeFlashUploader();",
+					showProgressBar, true)).append("}")
 		.append("});").toString();
 	}
 	
