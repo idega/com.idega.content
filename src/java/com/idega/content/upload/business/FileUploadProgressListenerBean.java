@@ -103,7 +103,6 @@ public class FileUploadProgressListenerBean implements FileUploadProgressListene
 		return uploadId;
 	}
 
-	@Override
 	public void addUploadedFiles(String uploadId, Collection<UploadFile> files) {
 		if (StringUtil.isEmpty(uploadId) || ListUtil.isEmpty(files))
 			return;
@@ -119,7 +118,6 @@ public class FileUploadProgressListenerBean implements FileUploadProgressListene
 		}
 	}
 
-	@Override
 	public Collection<AdvancedProperty> getUploadedFiles(String uploadId) {
 		if (StringUtil.isEmpty(uploadId))
 			return null;
