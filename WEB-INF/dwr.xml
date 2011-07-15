@@ -43,6 +43,7 @@
     		<include method="getRenderedFileInput" />
     		<include method="getRenderedComponent" />
     		<include method="getUploadedFilesList" />
+    		<include method="getUploadedFilesListById"/>
     		<include method="deleteFile" />
     		<include method="deleteFiles" />
 		</create>

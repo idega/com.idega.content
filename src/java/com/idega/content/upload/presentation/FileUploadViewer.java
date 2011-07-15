@@ -3,6 +3,8 @@ package com.idega.content.upload.presentation;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.faces.context.FacesContext;
 
@@ -10,11 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.web2.business.JQuery;
 import com.idega.block.web2.business.Web2Business;
+import com.idega.builder.business.BuilderLogicWrapper;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.upload.business.FileUploader;
 import com.idega.content.upload.servlet.ContentFileUploadServlet;
+import com.idega.core.builder.business.BuilderService;
+import com.idega.core.component.business.ICObjectBusiness;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWBaseComponent;
@@ -59,7 +64,12 @@ public class FileUploadViewer extends IWBaseComponent {
 	@Autowired
 	private ThemesHelper themesHelper;
 	
+	@Autowired
+	private BuilderLogicWrapper builderLogic;
+	
 	public FileUploadViewer() {
+		ELUtil.getInstance().autowire(this);
+		
 		this.uploadId = UUID.randomUUID().toString();
 	}
 	
@@ -127,8 +137,6 @@ public class FileUploadViewer extends IWBaseComponent {
 	
 	@Override
 	public void initializeComponent(FacesContext context) {
-		ELUtil.getInstance().autowire(this);
-		
 		IWContext iwc = IWContext.getIWContext(context);
 		try {
 			getFileUploader().initializeUploader(iwc);
@@ -181,6 +189,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		
 		if (allowMultipleFiles) {
 			GenericButton addFileInput = new GenericButton(iwrb.getLocalizedString("add_file", "Add file"));
+			addFileInput.setStyleClass("fileUploadAddInputStyle");
 			addFileInput.setOnClick(getFileUploader().getActionToLoadFilesAndExecuteCustomAction(getFileUploader()
 					.getAddFileInputJavaScriptAction(id, iwrb, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId), isAutoAddFileInput(),
 							isAutoUpload()), isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId)));
@@ -260,8 +269,27 @@ public class FileUploadViewer extends IWBaseComponent {
 		return uploadPath;
 	}
 	
+	private String getProperty(FacesContext context, String methodName) {
+		try {
+			IWContext iwc = IWContext.getIWContext(context);
+			BuilderService builderService = builderLogic.getBuilderService(iwc);
+			String pageKey = String.valueOf(iwc.getCurrentIBPageID());
+			if (StringUtil.isEmpty(pageKey) || pageKey.equals(String.valueOf(-1)))
+				return null;
+			String id = getId();
+			if (StringUtil.isEmpty(id) || !id.startsWith(ICObjectBusiness.UUID_PREFIX))
+				return null;
+			return builderService.getProperty(pageKey, id, methodName);
+		} catch (Exception e) {
+			Logger.getLogger(getClass().getName()).log(Level.WARNING, "Error getting value for property: " + methodName, e);
+		}
+		return null;
+	}
+	
 	public String getUploadPath(FacesContext ctx) {
 		String uploadPath = getExpressionValue(ctx, "uploadPath");
+		if (uploadPath == null)
+			uploadPath = getProperty(ctx, "uploadPath");
 		if (uploadPath != null)
 			this.uploadPath = uploadPath;
 		
@@ -422,9 +450,12 @@ public class FileUploadViewer extends IWBaseComponent {
 
 	public String getMaxUploadSize(FacesContext context) {
 		String maxUploadSize = getExpressionValue(context, "maxUploadSize");
-		if (maxUploadSize != null)
+		if (maxUploadSize == null)
+			maxUploadSize = getProperty(context, "maxUploadSize");
+		if (maxUploadSize != null) {
+			maxUploadSize = String.valueOf(Long.valueOf(maxUploadSize) * 1024 * 1024);	//	Converting from mega bytes to bytes
 			this.maxUploadSize = maxUploadSize;
-		
+		}
 		return this.maxUploadSize;
 	}
 

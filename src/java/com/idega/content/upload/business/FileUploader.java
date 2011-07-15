@@ -65,4 +65,6 @@ public interface FileUploader {
 	public AdvancedProperty deleteFile(String fileInSlide, Boolean fakeFileDeletion);
 	
 	public AdvancedProperty deleteFiles(List<String> filesInSlide, Boolean fakeFileDeletion);
+	
+	public List<String> getUploadedFilesListById(String uploadId, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters);
 }

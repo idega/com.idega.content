@@ -16,7 +16,13 @@ FileUploadHelper.properties = {
 		UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT: 'Upload was successfully finished.',
 		UPLOADING_FILE_MESSAGE: 'Uploading...',
 		UPLOADING_FILE_INVALID_TYPE_MESSAGE: 'Unsupported file type! Only zip files allowed',
-		UPLOADING_FILE_FAILED: 'Sorry, some error occurred - unable to upload file(s). Please, try again'
+		UPLOADING_FILE_FAILED: 'Sorry, some error occurred - unable to upload file(s). Please, try again',
+		UPLOADING_FILE_EXCEEDED_SIZE: 'Sorry, the size of selected file(s) is exceeding the max allowed size',
+		CHOOSE_FILE: 'Choose file',
+		FILES_SELECTED: 'files selected',
+		SELECTED_FILE: 'Selected file',
+		FLASH_IS_MISSING: 'Unable to upload file(s): you need to install Flash plug-in',
+		LOADING: 'Loading...'
 	},
 	actionAfterUpload: null,
 	actionAfterCounterReset: null,
@@ -26,20 +32,248 @@ FileUploadHelper.properties = {
 	fakeFileDeletion: false,
 	actionAfterUploadedToRepository: null,
 	stripNonRomanLetters: false,
-	maxSize: 1073741824						//	1 GB
+	maxSize: 20971520,	//	20 MBs
+	uploadImage: null,
+	sessionId: null,
+	swfObject: null,
+	swfUploadScript: null,
+	swfUploadPlugin: null,
+	needFlash: false,
+	initializeScriptsAction: null
 }
+
+FileUploadHelper.bytesToUpload = 0;
+FileUploadHelper.bytesCompleted = 0;
+FileUploadHelper.filesToUpload = 0;
+FileUploadHelper.selectedFiles = [];
 
 FileUploadHelper.setProperties = function(properties) {
 	FileUploadHelper.properties = properties;
 	FileUploadHelper.properties.maxSize--;
 	FileUploadHelper.properties.maxSize++;
+	
+	jQuery('input[type=\'file\']').each(function() {
+		FileUploadHelper.properties.needFlash = this.files == null;
+	});
+	if (!FileUploadHelper.properties.needFlash)
+		return;
+	
+	FileUploadHelper.properties.initializeScriptsAction();
+}
+
+FileUploadHelper.initializeFlashUploader = function() {
+	showLoadingMessage(FileUploadHelper.properties.localizations.LOADING);
+	jQuery(jQuery('input.fileUploadAddInputStyle')).hide('fast');
+	LazyLoader.loadMultiple([FileUploadHelper.properties.swfObject, FileUploadHelper.properties.swfUploadScript], function() {
+		if (!swfobject.hasFlashPlayerVersion("9")) {
+			humanMsg.displayMsg(FileUploadHelper.properties.localizations.FLASH_IS_MISSING, {timeOut: 3000});
+			return false;
+		}
+		
+		try {
+			if (jQuery('.swfupload-control').length == 0) {
+				var buttonId = "spanSWFUploadButton";
+				jQuery('#' + FileUploadHelper.properties.id).append('<div class="swfupload-control"><span id="'+ buttonId +'"></span></div>');
+				var settings = {
+					flash_url : FileUploadHelper.properties.swfUploadPlugin,
+					upload_url: "/servlet/ContentFileUploadServlet;jsessionid=" + FileUploadHelper.properties.sessionId,
+					
+					file_post_name: 'web2FileUploadField',
+					
+					file_size_limit : FileUploadHelper.properties.maxSize + " B",
+					file_types : FileUploadHelper.properties.zipFile ? "*.zip" : "*.*",
+					file_types_description : FileUploadHelper.properties.zipFile ? "ZIP" : "",
+					file_upload_limit : 100,
+					file_queue_limit : 0,
+					custom_settings : {
+						progressTarget : "fsUploadProgress",
+						cancelButtonId : "btnCancel"
+					},
+					debug: false,
+	
+					// Button settings
+					button_image_url: FileUploadHelper.properties.uploadImage,
+					button_width: "180",
+					button_height: "24",
+					button_placeholder_id: buttonId,
+					button_text: '<span class="upload_button_style">' + FileUploadHelper.properties.localizations.CHOOSE_FILE + '</span>',
+					button_text_style: ".upload_button_style {font-size: 14; text-align: center;}",
+					button_action: SWFUpload.BUTTON_ACTION.SELECT_FILES,
+					button_cursor: SWFUpload.CURSOR.HAND,
+					
+					file_queued_handler: function(file) {
+						if (file == null)
+							return false;
+						
+						FileUploadHelper.bytesToUpload += file.size;
+						FileUploadHelper.selectedFiles.push({id: file.id, name: file.name});
+					},
+					file_queue_error_handler: function(params) {
+						humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_EXCEEDED_SIZE, {timeOut: 3000});
+					},
+					file_dialog_start_handler: function() {
+					},
+					file_dialog_complete_handler: function(filesToUpload) {
+						if (FileUploadHelper.bytesToUpload >= FileUploadHelper.properties.maxSize) {
+							return FileUploadHelper.removeAllFilesFromQueue(true);
+						}
+						
+						FileUploadHelper.filesToUpload += filesToUpload;
+						
+						var uploadInfo = 'swfupload-info';
+						if (jQuery('div.swfupload-info', jQuery('#' + FileUploadHelper.properties.id)).length == 0)
+							jQuery('.swfupload-control', jQuery('#' + FileUploadHelper.properties.id)).append('<div id=\'' + uploadInfo + '\' class=\'' + uploadInfo + '\'></div>');
+						else
+							jQuery('div.swfupload-info', jQuery('#' + FileUploadHelper.properties.id)).empty();
+						
+						if (FileUploadHelper.filesToUpload == 1) {
+							jQuery('div.swfupload-info', jQuery('#' + FileUploadHelper.properties.id)).html('<span>' + FileUploadHelper.properties.localizations.SELECTED_FILE +
+								': ' + FileUploadHelper.selectedFiles[0].name + '</span>');
+						} else if (FileUploadHelper.filesToUpload > 1) {
+							jQuery('div.swfupload-info', jQuery('#' + FileUploadHelper.properties.id)).html('<span>' + FileUploadHelper.filesToUpload + ' ' +
+								FileUploadHelper.properties.localizations.FILES_SELECTED + '</span>');
+						}
+						
+						if (FileUploadHelper.properties.autoUpload && FileUploadHelper.filesToUpload > 0)
+							FileUploadHelper.uploadFiles();
+					},
+					upload_start_handler: function(file) {
+					},
+					upload_progress_handler: function(file, bytesCompleted, bytesTotal) {
+						var bytesUploaded = FileUploadHelper.bytesCompleted + bytesCompleted;
+						var progress = bytesUploaded / FileUploadHelper.bytesToUpload * 100;
+						progress = Math.round(progress);
+						FileUploadHelper.updateProgressBar(progress + '', FileUploadHelper.properties.progressBarId, FileUploadHelper.properties.actionAfterCounterReset, false);
+					},
+					upload_error_handler: function(file, errorCode, message) {
+						FileUploadHelper.bytesToUpload = 0;
+						FileUploadHelper.bytesCompleted = 0;
+						LazyLoader.loadMultiple(['/dwr/engine.js', '/dwr/interface/WebUtil.js'], function() {
+							WebUtil.sendEmail(null, null, 'Error uploading file (name: ' + file.name + ', size: ' + file.size + ') on ' + window.location.href,
+								'Error code: ' + errorCode + '\nmessage: ' + message);
+						}, null);
+						humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED, {timeOut: 3000});
+					},
+					upload_success_handler: function(file, serverData, receivedResponse) {
+						FileUploadHelper.filesToUpload--;
+						FileUploadHelper.bytesCompleted += file.size;
+						
+						if (FileUploadHelper.filesToUpload > 0) {
+							FileUploadHelper.uploadFilesUsingFlash();
+						} else {
+							FileUploadHelper.selectedFiles = [];
+							FileUploadHelper.bytesToUpload = 0;
+							FileUploadHelper.manageResponse(serverData, getInputsForUpload(FileUploadHelper.properties.id));
+						}
+					},
+					upload_complete_handler: function(file) {
+					},
+					debug_handler: function(message) {
+					},
+					swfupload_loaded_handler: function() {
+						jQuery('input.fileUploadInputStyle').each(function() {
+							jQuery(this).parent().hide('fast');
+						});
+						
+						jQuery('input[type=\'hidden\']').each(function() {
+							var input = jQuery(this);
+							if (input.attr('class').indexOf('web2FileUploader') != -1) {
+								FileUploadHelper.swfu.addPostParam(input.attr('name'), input.attr('value'));
+							}
+						});
+						closeAllLoadingMessages();
+					}
+				};
+				FileUploadHelper.swfu = new SWFUpload(settings);
+			}
+		} catch (e) {
+			humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED, {timeOut: 3000});
+		}
+	});
+}
+
+FileUploadHelper.removeAllFilesFromQueue = function(resetNumberOfBytes) {
+	for (var i = 0; i < FileUploadHelper.selectedFiles.length; i++) {
+		FileUploadHelper.swfu.cancelUpload(FileUploadHelper.selectedFiles[i].id);
+	}
+	
+	FileUploadHelper.filesToUpload = 0;
+	FileUploadHelper.selectedFiles = [];
+	if (resetNumberOfBytes)
+		FileUploadHelper.bytesToUpload = 0;
+	humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_EXCEEDED_SIZE, {timeOut: 3000});
+	return false;
+}
+
+FileUploadHelper.uploadFilesUsingFlash = function() {
+	try {
+		FileUploadHelper.swfu.startUpload();
+		return true;
+	} catch (e) {
+		humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED, {timeOut: 3000});
+	}
+	return false;
+}
+
+FileUploadHelper.prepareProgressBar = function(callback) {
+	var progressBarId = FileUploadHelper.properties.progressBarId;
+	if (FileUploadHelper.properties.showProgressBar) {
+		jQuery('#' + progressBarId).parent().hide('fast', function() {
+			jQuery('#' + progressBarId).progressBar(0, {showText: true});
+			jQuery('#' + progressBarId).css('display', 'block');
+			jQuery('#' + progressBarId).parent().show('normal', function() {
+				if (callback)
+					return callback();
+			});
+		});
+	} else if (callback)
+		return callback();
+	
+	return true;
 }
 
 FileUploadHelper.uploadFiles = function() {
+	FileUploadHelper.bytesCompleted = 0;
+	
+	if (FileUploadHelper.swfu != null) {
+		if (FileUploadHelper.filesToUpload == 0) {
+			closeAllLoadingMessages();
+			return false;
+		}
+		
+		if (FileUploadHelper.properties.showMessage || FileUploadHelper.properties.autoUpload) {
+			showLoadingMessage(FileUploadHelper.properties.localizations.UPLOADING_FILE_MESSAGE);
+		}
+		return FileUploadHelper.prepareProgressBar(function() {
+			FileUploadHelper.uploadFilesUsingFlash();
+		});
+	}
+	
 	var inputs = getInputsForUpload(FileUploadHelper.properties.id);
 	var files = getFilesValuesToUpload(inputs, FileUploadHelper.properties.zipFile, FileUploadHelper.properties.localizations.UPLOADING_FILE_INVALID_TYPE_MESSAGE);
 	if (files.length == 0) {
 		return false;
+	}
+	
+	var totalSize = 0;
+	for (var i = 0; i < inputs.length; i++) {
+		var fileInput = inputs[i];
+		if (fileInput == null)
+			return false;
+			
+		var filesByInput = fileInput.files;
+		if (filesByInput == null || filesByInput.length == 0) {
+			//	Not HTML 5 browser!
+		} else {
+			for (var j = 0; j < filesByInput.length; j++) {
+				var file = filesByInput[j];
+				totalSize += file.size;
+				if (totalSize >= FileUploadHelper.properties.maxSize) {
+					humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_EXCEEDED_SIZE, {timeOut: 3000});
+					return false;
+				}
+			}
+		}
 	}
 	
 	var form = null;
@@ -65,58 +299,56 @@ FileUploadHelper.uploadFiles = function() {
 	
 	var uploadHandler = {
 		upload: function(o) {
-			var response = o.responseText;
-			if (response == null) {
-				humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
-				return;
-			}
-			
-			var key = 'web2FilesUploaderFilesListStarts';
-			response = response.substring(response.indexOf(key) + key.length);
-			response = response.replace('</pre>', '');
-			
-			FileUploadHelper.uploadedFiles = response.split(',');
-			if (FileUploadHelper.uploadedFiles == null) {
-				humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
-				return;
-			} else if (FileUploadHelper.uploadedFiles[0].indexOf('error=') != -1) {
-				var firstValue = FileUploadHelper.uploadedFiles[0];
-				var customMessage = firstValue.substr('error='.length);
-				for (var i = 1; i < FileUploadHelper.uploadedFiles.length; i++) {
-					customMessage += FileUploadHelper.uploadedFiles[i];
-					if (i + 1 < FileUploadHelper.uploadedFiles.length)
-						customMessage += ',';
-				}
-				closeAllLoadingMessages();
-				humanMsg.displayMsg(customMessage);
-				return;
-			} else {
-				for (var i = 0; i < FileUploadHelper.uploadedFiles.length; i++) {
-					FileUploadHelper.allUploadedFiles.push(FileUploadHelper.getRealUploadedFile(FileUploadHelper.uploadedFiles[i]));
-				}
-			}
-			
-			executeUserDefinedActionsAfterUploadFinished(FileUploadHelper.properties.actionAfterUpload);
-			
-			FileUploadHelper.executeActionAfterUploadedToRepository(inputs);
+			FileUploadHelper.manageResponse(o.responseText, inputs);
 		}
 	};
 	
-	var progressBarId = FileUploadHelper.properties.progressBarId;
 	FileUploadListener.resetFileUploaderCounters(FileUploadHelper.properties.uploadId, FileUploadHelper.properties.maxSize, {
 		callback: function(result) {
 			YAHOO.util.Connect.setForm(FileUploadHelper.properties.formId, true);
 			YAHOO.util.Connect.asyncRequest('POST', '/servlet/ContentFileUploadServlet', uploadHandler);
 			
-			if (FileUploadHelper.properties.showProgressBar) {
-				jQuery('#' + progressBarId).parent().hide('fast', function() {
-					jQuery('#' + progressBarId).progressBar(0, {showText: true});
-					jQuery('#' + progressBarId).css('display', 'block');
-					showUploadInfoInProgressBar(progressBarId, FileUploadHelper.properties.actionAfterCounterReset);
-				});
-			}
+			FileUploadHelper.prepareProgressBar(function() {
+				showUploadInfoInProgressBar(FileUploadHelper.properties.progressBarId, FileUploadHelper.properties.actionAfterCounterReset);
+			});
 		}
 	});
+}
+
+FileUploadHelper.manageResponse = function(response, inputs) {
+	if (response == null) {
+		humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
+		return;
+	}
+			
+	var key = 'web2FilesUploaderFilesListStarts';
+	response = response.substring(response.indexOf(key) + key.length);
+	response = response.replace('</pre>', '');
+	
+	FileUploadHelper.uploadedFiles = response.split(',');
+	if (FileUploadHelper.uploadedFiles == null) {
+		humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
+		return;
+	} else if (FileUploadHelper.uploadedFiles[0].indexOf('error=') != -1) {
+		var firstValue = FileUploadHelper.uploadedFiles[0];
+		var customMessage = firstValue.substr('error='.length);
+		for (var i = 1; i < FileUploadHelper.uploadedFiles.length; i++) {
+			customMessage += FileUploadHelper.uploadedFiles[i];
+			if (i + 1 < FileUploadHelper.uploadedFiles.length)
+				customMessage += ',';
+		}
+		closeAllLoadingMessages();
+		humanMsg.displayMsg(customMessage);
+		return;
+	} else {
+		for (var i = 0; i < FileUploadHelper.uploadedFiles.length; i++) {
+			FileUploadHelper.allUploadedFiles.push(FileUploadHelper.getRealUploadedFile(FileUploadHelper.uploadedFiles[i]));
+		}
+	}
+	
+	executeUserDefinedActionsAfterUploadFinished(FileUploadHelper.properties.actionAfterUpload);
+			
+	FileUploadHelper.executeActionAfterUploadedToRepository(inputs);
 }
 
 FileUploadHelper.executeActionAfterUploadedToRepository = function(inputs) {
@@ -177,19 +409,31 @@ FileUploadHelper.showUploadedFiles = function(fakeFileDeletion) {
 		filesList = jQuery('div.fileUploadViewerUploadedFilesContainerStyle');
 	}
 	
-	var uploadPath = FileUploadHelper.getUploadPath();
-	FileUploader.getUploadedFilesList(FileUploadHelper.allUploadedFiles, uploadPath, fakeFileDeletion, FileUploadHelper.properties.stripNonRomanLetters, {
-		callback: function(results) {
-			if (results == null) {
-				return;
-			}
-			
-			var component = results[results.length - 1];
-			filesList.hide('fast', function() {
-				filesList.empty().append(component).show('fast');
-			});
+	var filesListCallback = function(results) {
+		if (results == null) {
+			return;
 		}
-	});
+		
+		var component = results[results.length - 1];
+		filesList.hide('fast', function() {
+			filesList.empty().append(component).show('fast');
+		});
+	}
+	
+	var uploadPath = FileUploadHelper.getUploadPath();
+	if (FileUploadHelper.properties.uploadId == null) {
+		FileUploader.getUploadedFilesList(FileUploadHelper.allUploadedFiles, uploadPath, fakeFileDeletion, FileUploadHelper.properties.stripNonRomanLetters, {
+			callback: function(results) {
+				filesListCallback(results);
+			}
+		});
+	} else {
+		FileUploader.getUploadedFilesListById(FileUploadHelper.properties.uploadId, uploadPath, fakeFileDeletion, FileUploadHelper.properties.stripNonRomanLetters, {
+			callback: function(results) {
+				filesListCallback(results);
+			}
+		});
+	}
 }
 
 FileUploadHelper.deleteUploadedFile = function(id, file, fakeFileDeletion) {
@@ -267,35 +511,36 @@ FileUploadHelper.removeAllUploadedFiles = function(fakeFileDeletion) {
 }
 
 function showUploadInfoInProgressBar(progressBarId, actionAfterCounterReset) {
-	jQuery('#' + progressBarId).parent().show('normal', function() {
-		fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset);
-	});
+	fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset);
 }
 
 function fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset) {
 	FileUploadListener.getFileUploadStatus(FileUploadHelper.properties.uploadId, {
 		callback: function(status) {
-			if (status == null) {
-				status = '0';
-			}
-			
-			jQuery('#' + progressBarId).progressBar(status == '-1' ? '0' : status);
-
-			if (status == '100') {
-				FileUploadHelper.reportUploadStatus(progressBarId, actionAfterCounterReset,
-				FileUploadHelper.properties.localizations.UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT);
-				return false;
-			} else if (status == '-1') {
-				FileUploadHelper.reportUploadStatus(progressBarId, actionAfterCounterReset, FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
-				return false;
-			} else {
-				var functionWhileUploading = function() {
-					fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset);
-				}
-				window.setTimeout(functionWhileUploading, 750);
-			}
+			FileUploadHelper.updateProgressBar(status, progressBarId, actionAfterCounterReset, true);
 		}
 	});
+}
+
+FileUploadHelper.updateProgressBar = function(progress, progressBarId, actionAfterCounterReset, callAfterTimeOut) {
+	if (progress == null || progress == 0)
+		progress = '0';
+	
+	jQuery('#' + progressBarId).progressBar(progress == '-1' ? '0' : progress);
+
+	if (progress == '100') {
+		FileUploadHelper.reportUploadStatus(progressBarId, actionAfterCounterReset,
+		FileUploadHelper.properties.localizations.UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT);
+		return false;
+	} else if (progress == '-1') {
+		FileUploadHelper.reportUploadStatus(progressBarId, actionAfterCounterReset, FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
+		return false;
+	} else if (callAfterTimeOut) {
+		var functionWhileUploading = function() {
+			fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset);
+		}
+		window.setTimeout(functionWhileUploading, 750);
+	}
 }
 
 FileUploadHelper.reportUploadStatus = function(progressBarId, actionAfterCounterReset, text) {
@@ -312,6 +557,8 @@ function resetFileUploaderCounterAfterTimeOut(progressBarId, customActionAfterCo
 			jQuery('#' + progressBarId).hide('normal', function() {
 				var parentContainer = jQuery('#' + progressBarId).parent();
 				jQuery('#' + progressBarId).remove();
+				
+				jQuery('div.swfupload-info', jQuery('#' + FileUploadHelper.properties.id)).empty();
 				
 				jQuery(parentContainer).hide('fast', function() {
 					jQuery(parentContainer).append('<span id=\''+progressBarId+'\' class=\'progressBar\' style=\'display: none;\'/>');
@@ -361,7 +608,7 @@ function executeUserDefinedActionsAfterUploadFinished(actionAfterUpload) {
 
 function removeFileInput(id, message) {
 	var confirmed = false;
-	var value = document.getElementById(id).getValue();
+	var value = document.getElementById(id).value;
 	if (value == null || value == '') {
 		confirmed = true;
 	}
@@ -394,8 +641,7 @@ function getFilesValuesToUpload(inputs, zipFile, invalidTypeMessage) {
 				if (isCorrectFileType(file.id, 'zip', null, invalidTypeMessage)) {
 					files.push(fileValue);
 				}
-			}
-			else {
+			} else {
 				files.push(fileValue);
 			}
 		}
@@ -405,18 +651,14 @@ function getFilesValuesToUpload(inputs, zipFile, invalidTypeMessage) {
 }
 
 function addFileInputForUpload(id, message, className, showProgressBar, addjQuery, autoAddFileInput, autoUpload) {
-	var foundEmptyInput = false;
-	var currentInputs = $$('input.' + className, id);
-	if (currentInputs != null) {
-		var valueProperty = null;
-		for (var i = 0; (i < currentInputs.length && !foundEmptyInput); i++) {
-			valueProperty = $(currentInputs[i]).getProperty('value');
-			foundEmptyInput = (valueProperty == null || valueProperty == '');
-		}
-	}
-	if (foundEmptyInput) {
+	if (FileUploadHelper.properties.needFlash)
 		return;
-	}
+	
+	jQuery('input.' + className, jQuery('#' + id)).each(function() {
+		var valueProperty = this.value;
+		if (valueProperty == null || valueProperty == '')
+			return;
+	});
 	
 	showLoadingMessage(message);
 	
