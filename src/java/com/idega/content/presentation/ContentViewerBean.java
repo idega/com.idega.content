@@ -4,6 +4,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
+
 import com.idega.webface.WFList;
 import com.idega.webface.event.WFToolbarButtonPressedListener;
 
@@ -12,6 +13,7 @@ import com.idega.webface.event.WFToolbarButtonPressedListener;
  */
 public class ContentViewerBean implements WFToolbarButtonPressedListener {
 
+	@Override
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
 		UIComponent parent = ((UIComponent)actionEvent.getSource()).getParent();
 		while (parent!= null && ((parent instanceof WFList) || !(parent instanceof ActionListener) )) {

@@ -1414,11 +1414,11 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 			}
 
 			List<String> decreaseLevelOnTop = new ArrayList<String>();
-			Collection<ICTreeNode> siblings = newRootPage.getParentNode().getChildren();
+			Collection<? extends ICTreeNode> siblings = newRootPage.getParentNode().getChildren();
 			if (siblings == null) {
 				return false;
 			}
-			for (Iterator<ICTreeNode> iter = siblings.iterator(); iter.hasNext();) {
+			for (Iterator<? extends ICTreeNode> iter = siblings.iterator(); iter.hasNext();) {
 				element = iter.next();
 				page = getThemesHelper().getThemesService().getICPage(element.getId());
 				newPage = getThemesHelper().getThemesService().getICPage(newRoot);
@@ -1808,9 +1808,9 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 			return null;
 		}
 
-		Collection<ICTreeNode> children = page.getChildren();
+		Collection<? extends ICTreeNode> children = page.getChildren();
 		if (children != null) {
-			for (Iterator<ICTreeNode> it = children.iterator(); it.hasNext();) {
+			for (Iterator<? extends ICTreeNode> it = children.iterator(); it.hasNext();) {
 				return changePageUriAfterPageWasMoved(it.next().getId());
 			}
 		}

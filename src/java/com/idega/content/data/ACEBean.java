@@ -9,7 +9,28 @@
  */
 package com.idega.content.data;
 
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import javax.ejb.CreateException;
+import javax.ejb.FinderException;
+import javax.faces.model.SelectItem;
+import javax.jcr.security.Privilege;
+
+import com.idega.content.business.ContentUtil;
+import com.idega.content.presentation.ContentBlock;
+import com.idega.core.accesscontrol.data.ICRole;
+import com.idega.core.accesscontrol.data.ICRoleHome;
+import com.idega.data.IDOLookup;
+import com.idega.data.IDOLookupException;
+import com.idega.data.IDOStoreException;
+import com.idega.idegaweb.block.presentation.Builderaware;
+import com.idega.presentation.IWContext;
 import com.idega.repository.access.AccessControlEntry;
+import com.idega.repository.access.RepositoryPrivilege;
+import com.idega.util.ArrayUtil;
 import com.idega.webface.bean.WFEditableListDataBean;
 
 /**
@@ -20,22 +41,26 @@ import com.idega.webface.bean.WFEditableListDataBean;
  * @version $Revision: 1.9 $
  */
 
-//	TODO: implement
 public class ACEBean implements WFEditableListDataBean {
 
-//	private String principal;
-//	private int principalType;
-//	private Locale locale;
-//	private static final int ARRAYINDEX_ALL = 0;
-//	private static final int ARRAYINDEX_READ = 1;
-//	private static final int ARRAYINDEX_WRITE = 2;
-//	private static final int ARRAYINDEX_READ_ACE = 3;
-//	private static final int ARRAYINDEX_WRITE_ACE = 4;
-//	private static final String[] PROPERTY_NAMES = new String[] {"all","read","write","read_acl","write_acl"};
-//	private static final Privilege[] PRIVILEGES = new Privilege[] {IWSlideConstants.PRIVILEGE_ALL,IWSlideConstants.PRIVILEGE_READ,IWSlideConstants.PRIVILEGE_WRITE,IWSlideConstants.PRIVILEGE_READ_ACL,IWSlideConstants.PRIVILEGE_WRITE_ACL};
-//	private String[] privligeInitialValue;
-//	private String[] inheritedFrom;
-//	private boolean[] isInherited;
+	private Principal principal;
+	private int principalType;
+	private Locale locale;
+	private static final int ARRAYINDEX_ALL = 0;
+	private static final int ARRAYINDEX_READ = 1;
+	private static final int ARRAYINDEX_WRITE = 2;
+	private static final int ARRAYINDEX_READ_ACE = 3;
+	private static final int ARRAYINDEX_WRITE_ACE = 4;
+
+	private static final String[] PROPERTY_NAMES = new String[] {Privilege.JCR_ALL, Privilege.JCR_READ,
+		Privilege.JCR_WRITE, Privilege.JCR_READ_ACCESS_CONTROL, Privilege.JCR_MODIFY_ACCESS_CONTROL};
+	private static final Privilege[] PRIVILEGES = new Privilege[] {new RepositoryPrivilege(Privilege.JCR_ALL), new RepositoryPrivilege(Privilege.JCR_READ),
+		new RepositoryPrivilege(Privilege.JCR_WRITE), new RepositoryPrivilege(Privilege.JCR_READ_ACCESS_CONTROL),
+		new RepositoryPrivilege(Privilege.JCR_MODIFY_ACCESS_CONTROL)};
+
+	private String[] privligeInitialValue;
+	private String[] inheritedFrom;
+	private boolean[] isInherited;
 
 	private Object[] selectItemArray = null;
 	private Object[] columnValueArray = null;
@@ -47,23 +72,6 @@ public class ACEBean implements WFEditableListDataBean {
 	private AccessControlEntry grantedACE = null;
 	private AccessControlEntry deniedACE = null;
 
-	@Override
-	public Object[] getSelectItemListArray() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public Object[] getValues() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public Boolean getRendered() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
 	private ACEBean() {
 		super();
 		int arraySize = PROPERTY_NAMES.length;
@@ -80,7 +88,7 @@ public class ACEBean implements WFEditableListDataBean {
 		this.locale = locale;
 	}
 
-	public ACEBean(String principal, int type, Locale locale){
+	public ACEBean(Principal principal, int type, Locale locale){
 		this(locale);
 		initialize(principal,type);
 	}
@@ -111,30 +119,30 @@ public class ACEBean implements WFEditableListDataBean {
 		}else {  //granted and denied is null
 
 		}
-
-
-
 	}
 
 	protected void initializePrivlidges(AccessControlEntry ace) {
-		Enumeration enumAces = ace.enumeratePrivileges();
-		while (enumAces.hasMoreElements()) {
-			Privilege element = (Privilege) enumAces.nextElement();
-			int arrayIndex=-1;
-			if(IWSlideConstants.PRIVILEGE_ALL.equals(element)){
-				arrayIndex=ARRAYINDEX_ALL;
-			} else if(IWSlideConstants.PRIVILEGE_READ.equals(element)){
-				arrayIndex=ARRAYINDEX_READ;
-			} else if(IWSlideConstants.PRIVILEGE_WRITE.equals(element)){
-				arrayIndex=ARRAYINDEX_WRITE;
-			} else if(IWSlideConstants.PRIVILEGE_READ_ACL.equals(element)){
-				arrayIndex=ARRAYINDEX_READ_ACE;
-			} else if(IWSlideConstants.PRIVILEGE_WRITE_ACL.equals(element)){
-				arrayIndex=ARRAYINDEX_WRITE_ACE;
+		Privilege[] privileges = ace.getPrivileges();
+		if (ArrayUtil.isEmpty(privileges))
+			return;
+
+		for (Privilege privilege: privileges) {
+			int arrayIndex = -1;
+			if (Privilege.JCR_ALL.equals(privilege.getName())) {
+				arrayIndex = ARRAYINDEX_ALL;
+			} else if (Privilege.JCR_READ.equals(privilege.getName())) {
+				arrayIndex = ARRAYINDEX_READ;
+			} else if (Privilege.JCR_WRITE.equals(privilege.getName())) {
+				arrayIndex = ARRAYINDEX_WRITE;
+			} else if (Privilege.JCR_READ_ACCESS_CONTROL.equals(privilege.getName())) {
+				arrayIndex = ARRAYINDEX_READ_ACE;
+			} else if (Privilege.JCR_MODIFY_ACCESS_CONTROL.equals(privilege.getName())) {
+				arrayIndex = ARRAYINDEX_WRITE_ACE;
 			}
-			if(arrayIndex>-1){
+
+			if (arrayIndex > -1) {
 				boolean granted = !ace.isNegative();
-				this.privligeInitialValue[arrayIndex]=((granted)?PRIVLIDGE_VALUE_GRANTED:PRIVLIDGE_VALUE_DENIED);
+				this.privligeInitialValue[arrayIndex] = ((granted) ? PRIVLIDGE_VALUE_GRANTED:PRIVLIDGE_VALUE_DENIED);
 				if(ace.isInherited()){
 					this.isInherited[arrayIndex]=true;
 					this.inheritedFrom[arrayIndex]=ace.getInheritedFrom();
@@ -150,25 +158,26 @@ public class ACEBean implements WFEditableListDataBean {
 			throw new RuntimeException("The old and new objects must be for the same principal and either both negative or both positive.");
 		}
 
-		Enumeration enumPriv = oldAce.enumeratePrivileges();
-		while (enumPriv.hasMoreElements()) {
-			Privilege element = (Privilege) enumPriv.nextElement();
-			int arrayIndex=-1;
-			if(IWSlideConstants.PRIVILEGE_ALL.equals(element)){
-				arrayIndex=ARRAYINDEX_ALL;
-			} else if(IWSlideConstants.PRIVILEGE_READ.equals(element)){
-				arrayIndex=ARRAYINDEX_READ;
-			} else if(IWSlideConstants.PRIVILEGE_WRITE.equals(element)){
-				arrayIndex=ARRAYINDEX_WRITE;
-			} else if(IWSlideConstants.PRIVILEGE_READ_ACL.equals(element)){
-				arrayIndex=ARRAYINDEX_READ_ACE;
-			} else if(IWSlideConstants.PRIVILEGE_WRITE_ACL.equals(element)){
-				arrayIndex=ARRAYINDEX_WRITE_ACE;
-			}
-			if(arrayIndex>-1){
-				this.privligeInitialValue[arrayIndex]=null;
-				this.isInherited[arrayIndex]=false;
-				this.inheritedFrom[arrayIndex]=null;
+		Privilege[] privileges = oldAce.getPrivileges();
+		if (!ArrayUtil.isEmpty(privileges)) {
+			for (Privilege privilege: privileges) {
+				int arrayIndex = -1;
+				if (Privilege.JCR_ALL.equals(privilege.getName())) {
+					arrayIndex = ARRAYINDEX_ALL;
+				} else if (Privilege.JCR_READ.equals(privilege.getName())) {
+					arrayIndex = ARRAYINDEX_READ;
+				} else if (Privilege.JCR_WRITE.equals(privilege.getName())) {
+					arrayIndex = ARRAYINDEX_WRITE;
+				} else if (Privilege.JCR_READ_ACCESS_CONTROL.equals(privilege.getName())) {
+					arrayIndex = ARRAYINDEX_READ_ACE;
+				} else if (Privilege.JCR_MODIFY_ACCESS_CONTROL.equals(privilege.getName())) {
+					arrayIndex = ARRAYINDEX_WRITE_ACE;
+				}
+				if(arrayIndex>-1){
+					this.privligeInitialValue[arrayIndex]=null;
+					this.isInherited[arrayIndex]=false;
+					this.inheritedFrom[arrayIndex]=null;
+				}
 			}
 		}
 
@@ -186,7 +195,7 @@ public class ACEBean implements WFEditableListDataBean {
 		initialize(ace.getPrincipal(), ace.getPrincipalType());
 	}
 
-	protected void initialize(String principal, int principalType){
+	protected void initialize(Principal principal, int principalType){
 		this.principal=principal;
 		this.principalType=principalType;
 	}
@@ -219,7 +228,7 @@ public class ACEBean implements WFEditableListDataBean {
 
 
 	public String getPrincipalName(){
-		return this.principal;
+		return this.principal.getName();
 	}
 
 	public String getPrincipalDisplayName(){
@@ -236,14 +245,11 @@ public class ACEBean implements WFEditableListDataBean {
 				String roleName = roleKey;
 
 				ICRole role = null;
-
 				try {
-					role = ((ICRoleHome)IDOLookup.getHome(ICRole.class)).findByPrimaryKey(roleKey);
-				}
-				catch (IDOLookupException e) {
+					role = ((ICRoleHome) IDOLookup.getHome(ICRole.class)).findByPrimaryKey(roleKey);
+				} catch (IDOLookupException e) {
 					e.printStackTrace();
-				}
-				catch (FinderException e) {
+				} catch (FinderException e) {
 					try {
 						role = ((ICRoleHome)IDOLookup.getHome(ICRole.class)).create();
 						role.setRoleKey(roleKey);
@@ -358,7 +364,7 @@ public class ACEBean implements WFEditableListDataBean {
 		return this.deniedACE;
 	}
 
-	public List getSelectItemList(int index){
+	public List<SelectItem> getSelectItemList(int index){
 		Locale locale = IWContext.getInstance().getCurrentLocale();
 		String label = ContentBlock.getBundle().getLocalizedString("permission.option."+ACEBean.PRIVLIDGE_VALUE_GRANTED,locale);
 		String label2 = ContentBlock.getBundle().getLocalizedString("permission.option."+ACEBean.PRIVLIDGE_VALUE_DENIED,locale);
@@ -366,7 +372,7 @@ public class ACEBean implements WFEditableListDataBean {
 		SelectItem item = new SelectItem(ACEBean.PRIVLIDGE_VALUE_GRANTED, label,"Granted", false);
 		SelectItem item2 = new SelectItem(ACEBean.PRIVLIDGE_VALUE_DENIED, label2,"Denied", false);
 
-		List l = new ArrayList();
+		List<SelectItem> l = new ArrayList<SelectItem>();
 		l.add(item);
 		l.add(item2);
 		if(!this.isInherited[index]){
@@ -402,6 +408,7 @@ public class ACEBean implements WFEditableListDataBean {
 		}
 	}
 
+	@Override
 	public Object[] getSelectItemListArray(){
 		if(this.selectItemArray==null){
 			//+1 because the first column has no UIInput item
@@ -413,6 +420,7 @@ public class ACEBean implements WFEditableListDataBean {
 		return this.selectItemArray;
 	}
 
+	@Override
 	public Object[] getValues() {
 		if(this.columnValueArray==null){
 			this.columnValueArray = new Object[PROPERTY_NAMES.length+1];
@@ -427,8 +435,8 @@ public class ACEBean implements WFEditableListDataBean {
 		return this.principalType;
 	}
 
+	@Override
 	public Boolean getRendered() {
 		return Boolean.TRUE;
 	}
-	**/
 }

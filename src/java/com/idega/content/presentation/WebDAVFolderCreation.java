@@ -1,21 +1,23 @@
 package com.idega.content.presentation;
 
-import java.io.IOException;
-
+import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
-import javax.faces.el.ValueBinding;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
+import javax.jcr.RepositoryException;
 
-import org.apache.commons.httpclient.HttpException;
 import org.apache.myfaces.custom.htmlTag.HtmlTag;
 
-import com.idega.slide.util.WebdavExtendedResource;
+import com.idega.content.business.ContentUtil;
+import com.idega.idegaweb.IWResourceBundle;
+import com.idega.presentation.IWContext;
+import com.idega.repository.jcr.JCRItem;
+import com.idega.util.CoreConstants;
 import com.idega.webface.WFUtil;
 
 /**
@@ -24,15 +26,15 @@ import com.idega.webface.WFUtil;
 public class WebDAVFolderCreation extends ContentBlock implements ActionListener {
 
 	protected static final String PARAMETER_RESOURCE_PATH = "prp";
-		
+
 	@Override
 	protected void initializeComponent(FacesContext context) {
-		WebdavExtendedResource res = getRepositoryItem();
-		
+		JCRItem res = getRepositoryItem();
+
 		//	Messages
 		HtmlTag messagesContainer = (HtmlTag) context.getApplication().createComponent(HtmlTag.COMPONENT_TYPE);
 		messagesContainer.setValue("div");
-		
+
 		Boolean folderCreated = (Boolean) WFUtil.invoke("webdavfoldercreationbean", "getFolderCreated");
 		String errorMessage = (String) WFUtil.invoke("webdavfoldercreationbean", "getErrorMessage");
 		if (folderCreated == null) {
@@ -41,7 +43,7 @@ public class WebDAVFolderCreation extends ContentBlock implements ActionListener
 		if (errorMessage != null) {
 			HtmlOutputText txt = getBundle().getLocalizedText("folder_creation_failed");
 			txt.setStyleClass("wf_listtext");
-			
+
 			messagesContainer.getChildren().add(WFUtil.getText(" = "+errorMessage, "wf_listtext"));
 		} else if (folderCreated.booleanValue()) {
 			ContentViewer viewer = (ContentViewer) getParent().getParent();
@@ -52,11 +54,11 @@ public class WebDAVFolderCreation extends ContentBlock implements ActionListener
 			messagesContainer.getChildren().add(txt);
 		}
 		getChildren().add(messagesContainer);
-	
+
 		//	Folder creation
 		HtmlTag creationContainer = (HtmlTag) context.getApplication().createComponent(HtmlTag.COMPONENT_TYPE);
 		creationContainer.setValue("div");
-		
+
 		HtmlOutputText text = getBundle().getLocalizedText("name");
 		text.setId(getId()+"_txtN");
 		text.setStyleClass("wf_inputtext");
@@ -72,35 +74,31 @@ public class WebDAVFolderCreation extends ContentBlock implements ActionListener
 		save = (HtmlCommandButton) getBundle().getLocalizedUIComponent("create", save);
 		save.addActionListener(WFUtil.getActionListener(context.getELContext(), "#{contentviewerbean.processAction}"));
 		creationContainer.getChildren().add(save);
-		
+
 		getChildren().add(creationContainer);
 	}
-	
+
 	private void createResource(String parentPath, String name) {
 		if (name != null) {
 			try {
-				if (name.charAt(0) != '/') {
-					name = "/"+name;
+				FacesContext fc = getFacesContext();
+				IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(IWContext.getIWContext(fc));
+
+				if (!name.startsWith(CoreConstants.SLASH)) {
+					name = CoreConstants.SLASH.concat(name);
 				}
 				name = parentPath+name;
-				WebdavExtendedResource parent = getWebdavExentededResource(parentPath);
-				boolean folderCreated = parent.mkcolMethod(name);
-				String errorMessage = null;
+				boolean folderCreated = getRepositoryService().createFolderAsRoot(name);
 				if (!folderCreated) {
-					errorMessage = parent.getStatusMessage();
-					WFUtil.invoke("webdavfoldercreationbean", "setErrorMessage", errorMessage, String.class);
+					WFUtil.invoke("webdavfoldercreationbean", "setErrorMessage", iwrb.getLocalizedString("error_creating_folder", "Error creating folder") + ": " + name,
+							String.class);
 				} else {
 					super.refreshList();
 					WFUtil.invoke("webdavfoldercreationbean", "setFolderCreated", new Boolean(folderCreated), Boolean.class);
-//					ContentViewer viewer = (ContentViewer) getParent().getParent();
-//					viewer.getFacet(ContentViewer.NEW_FOLDER).setRendered(false);
-//					viewer.setRenderFlags(ContentViewer.LIST);
-					ValueBinding vb = WFUtil.createValueBinding("#{webdavfoldercreationbean.folderName}");
-					vb.setValue(FacesContext.getCurrentInstance(), "");
+					ValueExpression ve = WFUtil.createValueExpression(fc.getELContext(), "#{webdavfoldercreationbean.folderName}", String.class);
+					ve.setValue(fc.getELContext(), CoreConstants.EMPTY);
 				}
-			} catch (HttpException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
+			} catch (RepositoryException e) {
 				e.printStackTrace();
 			}
 		}
@@ -111,9 +109,10 @@ public class WebDAVFolderCreation extends ContentBlock implements ActionListener
 		return true;
 	}
 
+	@Override
 	public void processAction(ActionEvent event) throws AbortProcessingException {
 		UIComponent source = (UIComponent) event.getSource();
-		
+
 		ContentViewer.maintainPathParameter(source.getAttributes(), PARAMETER_RESOURCE_PATH);
 
 		String newFolderName = (String) WFUtil.invoke("webdavfoldercreationbean", "getFolderName");

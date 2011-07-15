@@ -4,7 +4,8 @@
 package com.idega.content.presentation;
 
 import javax.faces.context.FacesContext;
-import com.idega.slide.util.WebdavExtendedResource;
+
+import com.idega.repository.bean.RepositoryItem;
 import com.idega.webface.WFFrame;
 import com.idega.webface.WFToolbar;
 
@@ -13,15 +14,16 @@ import com.idega.webface.WFToolbar;
  * @author <a href="mailto:eiki@idega.is">Eirikur S. Hrafnsson</a>
  */
 public class WebDAVFilePreview extends ContentBlock {
-	
+
 	public static final String DEFAULT_STYLE_CLASS = "content_file_preview";
 
+	@Override
 	protected void initializeComponent(FacesContext context) {
-		WebdavExtendedResource resource = getRepositoryItem();
-		
+		RepositoryItem resource = getRepositoryItem();
+
 		String filePath = resource.getPath();
 		if (resource != null) {
-			String resourceName = resource.getDisplayName();
+			String resourceName = resource.getName();
 			WFFrame frame = new WFFrame(resourceName,filePath);
 			frame.setStyleClass(DEFAULT_STYLE_CLASS);
 			frame.setToolbar(new WFToolbar());

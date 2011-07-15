@@ -1,13 +1,9 @@
 package com.idega.content.upload.presentation;
 
-import java.io.File;
-import java.rmi.RemoteException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.idega.business.IBOLookup;
-import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.upload.business.FileUploader;
 import com.idega.presentation.Block;
@@ -18,30 +14,30 @@ import com.idega.presentation.text.Heading1;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SelectOption;
-import com.idega.slide.business.IWSlideService;
+import com.idega.repository.bean.RepositoryItem;
 import com.idega.util.CoreConstants;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
 public class FilesUploaderForm extends Block {
-	
+
 	@Autowired
 	private FileUploader fileUploader;
-	
+
 	private String parentPath = null;
-	
+
 	protected static final String PARENT_PATH_FOLDER_CHOOSER_PARAMETER = "parentPathForFolderChooserPrm";
 	protected static final String COMPONENT_TO_RERENDER_ID_PARAMETER = "componentToRerenderIdPrm";
-	
+
 	@Override
 	public void main(IWContext iwc) {
 		ELUtil.getInstance().autowire(this);
-		
+
 		Layer container = new Layer();
 		add(container);
 		container.setStyleClass("filesUploaderFormStyle");
-		
+
 		if (iwc.isParameterSet(PARENT_PATH_FOLDER_CHOOSER_PARAMETER)) {
 			parentPath = iwc.getParameter(PARENT_PATH_FOLDER_CHOOSER_PARAMETER);
 		}
@@ -55,7 +51,7 @@ public class FilesUploaderForm extends Block {
 		if (!parentPath.endsWith(CoreConstants.SLASH)) {
 			parentPath = new StringBuilder(parentPath).append(CoreConstants.SLASH).toString();
 		}
-		
+
 		Layer folderChooserContainer = new Layer();
 		container.add(folderChooserContainer);
 		folderChooserContainer.setStyleClass("filesUploaderFolderChooserStyle");
@@ -63,9 +59,9 @@ public class FilesUploaderForm extends Block {
 		Label selectFolder = new Label(getResourceBundle(iwc).getLocalizedString("select_folder_in_repostory", "Select folder in repository"), folders);
 		folderChooserContainer.add(selectFolder);
 		folderChooserContainer.add(folders);
-		
+
 		container.add(new CSSSpacer());
-		
+
 		String uploadPath = folders.getSelectedElementValue();
 		Layer uploaderContainer = new Layer();
 		uploaderContainer.setStyleClass("filesUploaderUploaderContainerStyle");
@@ -76,7 +72,7 @@ public class FilesUploaderForm extends Block {
 		uploader.setAutoAddFileInput(true);
 		uploader.setShowLoadingMessage(true);
 		uploader.setActionAfterCounterReset("MOOdalBox.close();");
-		
+
 		if (iwc.isParameterSet(COMPONENT_TO_RERENDER_ID_PARAMETER)) {
 			uploader.setComponentToRerenderId(iwc.getParameter(COMPONENT_TO_RERENDER_ID_PARAMETER));
 		}
@@ -84,25 +80,15 @@ public class FilesUploaderForm extends Block {
 
 	private DropdownMenu getFolderChooser(IWContext iwc) {
 		DropdownMenu folders = new DropdownMenu();
-		
-		IWSlideService slide = null;
-		try {
-			slide = IBOLookup.getServiceInstance(iwc, IWSlideService.class);
-		} catch (IBOLookupException e) {
-			e.printStackTrace();
-		}
-		if (slide == null) {
-			return folders;
-		}
-		
+
 		if (parentPath.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
 			parentPath = parentPath.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
 		}
-		
+
 		List<String> paths = null;
 		try {
-			paths = slide.getChildFolderPaths(parentPath);
-		} catch (RemoteException e) {
+			paths = getRepositoryService().getChildFolderPaths(parentPath);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		if (ListUtil.isEmpty(paths)) {
@@ -110,35 +96,34 @@ public class FilesUploaderForm extends Block {
 			folders.setSelectedElement(parentPath);
 			return folders;
 		}
-		
-		File file = null;
+
 		String pathString = null;
 		for (int i = 0; i < paths.size(); i++) {
 			pathString = paths.get(i);
 			if (pathString.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
 				pathString = pathString.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
 			}
-			
-			file = null;
+
+			RepositoryItem item = null;
 			try {
-				file = slide.getFile(pathString);
+				item = getRepositoryService().getRepositoryItem(pathString);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			folders.add(new SelectOption(file == null ? pathString.replaceFirst(parentPath, CoreConstants.EMPTY) : file.getName(), pathString));
-			
+			folders.add(new SelectOption(item == null ? pathString.replaceFirst(parentPath, CoreConstants.EMPTY) : item.getName(), pathString));
+
 			if (i == 0) {
 				folders.setSelectedElement(pathString);
 			}
 		}
-		
+
 		StringBuilder action = new StringBuilder("FileUploadHelper.changeUploadPath(dwr.util.getValue('").append(folders.getId()).append("'), '")
 								.append(ContentConstants.UPLOADER_PATH).append("');");
 		folders.setOnChange(getFileUploader().getActionToLoadFilesAndExecuteCustomAction(action.toString(), true, true));
-		
+
 		return folders;
 	}
-	
+
 	public String getParentPath() {
 		return parentPath;
 	}
@@ -159,5 +144,5 @@ public class FilesUploaderForm extends Block {
 	public void setFileUploader(FileUploader fileUploader) {
 		this.fileUploader = fileUploader;
 	}
-	
+
 }

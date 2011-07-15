@@ -11,6 +11,7 @@ package com.idega.content.presentation;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+
 import javax.faces.component.UIColumn;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
@@ -19,16 +20,17 @@ import javax.faces.component.html.HtmlOutputText;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.webdav.lib.PropertyName;
+import javax.jcr.RepositoryException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.WebDAVMetadataResource;
 import com.idega.content.data.MetadataValueBean;
 import com.idega.presentation.IWContext;
-import com.idega.slide.business.IWSlideService;
-import com.idega.slide.business.IWSlideSession;
-import com.idega.slide.util.WebdavRootResource;
+import com.idega.repository.RepositoryService;
+import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFResourceUtil;
 import com.idega.webface.WFUtil;
 import com.idega.webface.bean.AbstractWFEditableListManagedBean;
@@ -37,7 +39,7 @@ import com.idega.webface.bean.WFListBean;
 
 
 /**
- * 
+ *
  * Last modified: $Date: 2009/05/15 07:23:54 $ by $Author: valdas $
  * Displays all the metadata types and values for the specified resource
  * Typically followed by WebDavMetadata in presentation to enable addeing metadata
@@ -51,10 +53,14 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	protected String[] localizationKey = new String[] { "type", "values", "" };
 
 	private String resourcePath = null;
-	
+
 	private static WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
 
+	@Autowired
+	private RepositoryService repository;
+
 	public MetadataListManagedBean() {
+		ELUtil.getInstance().autowire(this);
 	}
 
 	public void setResourcePath(String path){
@@ -64,43 +70,30 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 	/**
 	 * Deleting metadata settings
 	 */
+	@Override
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
-//		System.out.println("MetadataList action");
 		UIComponent comp = actionEvent.getComponent();
 		String var = (String)comp.getAttributes().get("var");
 		this.resourcePath = (String)comp.getAttributes().get("resourcePath");
-		String type = WFUtil.getStringValue(var,"type");
-		
-		MetadataValueBean[] ret = new MetadataValueBean[0];
+		String type = WFUtil.getStringValue(var, "type");
+
+//		MetadataValueBean[] ret = new MetadataValueBean[0];
 
 		try {
-			IWContext iwc = IWContext.getInstance();
-			IWSlideSession session = IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-			IWSlideService service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
-	
-			WebdavRootResource rootResource = session.getWebdavRootResource();
+//			IWContext iwc = IWContext.getInstance();
+//			IWSlideSession session = IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
+//			IWSlideService service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
+
+//			WebdavRootResource rootResource = session.getWebdavRootResource();
 
 			String filePath = this.resourcePath;
-			String serverURI = service.getWebdavServerURL();
+			String serverURI = repository.getWebdavServerURL();
 			if(!this.resourcePath.startsWith(serverURI)) {
-				filePath = service.getURI(this.resourcePath);
+				filePath = repository.getURI(this.resourcePath);
 			}
-			rootResource.proppatchMethod(filePath,new PropertyName("DAV:",type),"",true);
-			
-			WebDAVMetadataResource resource;
-			resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
-					iwc, WebDAVMetadataResource.class);
-			ret = resource.getMetadata(this.resourcePath);
-
-			for(int i=0; i<ret.length;i++) {
-//				System.out.println("type="+ret[i].getType()+"  val="+ret[i].getValues());
-			}
-			resource.clear();
-			
-		} catch (HttpException ex) {
-			ex.printStackTrace();
-		} catch (IOException ex) {
-			ex.printStackTrace();
+			repository.removeProperty(filePath, "jcr:".concat(type));
+		} catch (RepositoryException e) {
+			e.printStackTrace();
 		} catch (NullPointerException ex) {
 			ex.printStackTrace();
 		}
@@ -213,11 +206,11 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 		HtmlCommandButton deleteButton = localizer.getButtonVB("delete", "delete", this);
 		deleteButton.getAttributes().put("var",var);
 		deleteButton.getAttributes().put("resourcePath",this.resourcePath);
-		
+
 		buttonCol.getChildren().add(deleteButton);
 		return buttonCol;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see com.idega.webface.bean.AbstractWFEditableListManagedBean#getHeader(int)
 	 */

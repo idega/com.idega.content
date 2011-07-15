@@ -9,62 +9,68 @@
  */
 package com.idega.content.business;
 
-import java.io.IOException;
-import java.rmi.RemoteException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-import org.apache.commons.httpclient.HttpException;
-import com.idega.business.IBOLookupException;
+import java.util.logging.Level;
+
+import javax.jcr.RepositoryException;
+import javax.jcr.security.AccessControlException;
+
+import org.apache.jackrabbit.core.security.principal.PrincipalImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.idega.business.IBOSessionBean;
 import com.idega.content.data.ACEBean;
-import com.idega.core.accesscontrol.data.ICRole;
-import com.idega.slide.authentication.AuthenticationBusiness;
-import com.idega.slide.business.IWSlideSession;
-import com.idega.slide.util.AccessControlEntry;
-import com.idega.slide.util.AccessControlList;
-import com.idega.slide.util.IWSlideConstants;
-
+import com.idega.core.accesscontrol.data.bean.ICRole;
+import com.idega.jackrabbit.repository.access.JackrabbitAccessControlEntry;
+import com.idega.repository.RepositoryConstants;
+import com.idega.repository.access.AccessControlEntry;
+import com.idega.repository.access.AccessControlList;
+import com.idega.repository.authentication.AuthenticationBusiness;
+import com.idega.util.ArrayUtil;
+import com.idega.util.ListUtil;
+import com.idega.util.expression.ELUtil;
 
 /**
- * 
+ *
  *  Last modified: $Date: 2006/04/09 12:01:55 $ by $Author: laddi $
- * 
+ *
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
  * @version $Revision: 1.7 $
  */
-public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements WebDAVFilePermissionResource{
+public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements WebDAVFilePermissionResource {
 
 	private AccessControlList currentList = null;
-	private Collection allACEBeans = null;
-	private Collection aceBeansForGroups = null;
-	private Collection aceBeansForRoles = null;
-	private Collection aceBeansForUsers = null;
-	private Collection aceBeansForStandard = null;
-	private Collection aceBeansForOthers = null;
-	
-	private Comparator aceBeanComparator = null;
-	
+	private Collection<ACEBean> allACEBeans = null;
+	private Collection<ACEBean> aceBeansForGroups = null;
+	private Collection<ACEBean> aceBeansForRoles = null;
+	private Collection<ACEBean> aceBeansForUsers = null;
+	private Collection<ACEBean> aceBeansForStandard = null;
+	private Collection<ACEBean> aceBeansForOthers = null;
+
+	private Comparator<ACEBean> aceBeanComparator = null;
+
 	private final static int BEANTYPE_ALL = -1;
 	private final static int BEANTYPE_STANDARD = 0;
 	private final static int BEANTYPE_ROLES = 1;
 	private final static int BEANTYPE_GROUPS = 2;
 	private final static int BEANTYPE_USERS = 3;
-	/**
-	 * 
-	 */
+
+	@Autowired
+	private AuthenticationBusiness authBusiness;
+
 	public WebDAVFilePermissionResourceBean() {
 		super();
 	}
-	
-	
-	
+
+	@Override
 	public void clear(){
 		this.currentList = null;
 		this.allACEBeans = null;
@@ -74,225 +80,201 @@ public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements 
 		this.aceBeansForStandard = null;
 		this.aceBeansForOthers = null;
 	}
-	
+
 	/**
 	 * @param path
 	 */
 	protected void updateACEValues() {
-		updateACEValues(this.allACEBeans);	
+		updateACEValues(this.allACEBeans);
 		updateACEValues(this.aceBeansForGroups);
 		updateACEValues(this.aceBeansForRoles);
 		updateACEValues(this.aceBeansForUsers);
 		updateACEValues(this.aceBeansForStandard);
 		updateACEValues(this.aceBeansForOthers);
 	}
-	
-	
-	
-	/**
-	 * @param aceBeanCollection
-	 */
-	protected void updateACEValues(Collection aceBeanCollection) {
-		if(aceBeanCollection!=null){
-			for (Iterator iter = aceBeanCollection.iterator(); iter.hasNext();) {
-				ACEBean bean = (ACEBean) iter.next();
-				bean.updateACEs();
-			}
+
+	protected void updateACEValues(Collection<ACEBean> aceBeanCollection) {
+		if (ListUtil.isEmpty(aceBeanCollection))
+			return;
+
+		for (ACEBean bean: aceBeanCollection) {
+			bean.updateACEs();
 		}
 	}
 
-
-
-	protected AccessControlList getACL(String path) throws HttpException, RemoteException, IOException{
-		if(this.currentList==null){
-			IWSlideSession slideSession = (IWSlideSession)getSessionInstance(IWSlideSession.class);
-			this.currentList = slideSession.getAccessControlList(path);
+	protected AccessControlList getACL(String path) throws RepositoryException {
+		if (currentList == null) {
+			try {
+				this.currentList = getRepositorySession(getUserContext()).getAccessControlList(path);
+			} catch (RepositoryException e) {
+				e.printStackTrace();
+			}
 		}
+
 		checkPath(path);
 		return this.currentList;
 	}
-	
+
 	protected void checkPath(String path){
-		if(this.currentList!=null){ 
+		if(this.currentList!=null){
 			String currentListPath = this.currentList.getResourcePath();
 			if(currentListPath==null && path==null){
 				return;
 			}
 			if(( ((currentListPath==null || path==null)&&currentListPath!=path) || !((currentListPath!=null) && currentListPath.equals(path)) )){
-				throw new ConcurrentModificationException("Asking for ACL for path '"+path+"' while current ACL is for '"+this.currentList.getResourcePath()+"'. The #clear() method needs to be invoked first.");
+				throw new ConcurrentModificationException("Asking for ACL for path '"+path+"' while current ACL is for '"+this.currentList.getResourcePath()+
+						"'. The #clear() method needs to be invoked first.");
 			}
 		}
 	}
-	
-	public Collection getAllAces(String path) throws HttpException, RemoteException, IOException{		
-		if(this.allACEBeans == null){
+
+	@Override
+	public Collection<ACEBean> getAllAces(String path) throws RepositoryException {
+		if (this.allACEBeans == null){
 			AccessControlList acl = getACL(path);
-			List l = acl.getAccessControlEntries();
-			if(l!=null){
-				this.allACEBeans = getACEBeans(l,path,BEANTYPE_ALL);
+			javax.jcr.security.AccessControlEntry[] entries = acl.getAccessControlEntries();
+			if(ArrayUtil.isEmpty(entries)){
+				this.allACEBeans = getACEBeans(entries, path, BEANTYPE_ALL);
 			}
 		}
 		checkPath(path);
 		return this.allACEBeans;
 	}
-	
-	
-	public Collection getRoleAces(String path) throws HttpException, RemoteException, IOException{
+
+
+	@Override
+	public Collection<ACEBean> getRoleAces(String path) throws RepositoryException {
 		if(this.aceBeansForRoles == null){
 			AccessControlList acl = getACL(path);
-			List l = acl.getAccessControlEntriesForRoles();
-			this.aceBeansForRoles = getACEBeans(l,path,BEANTYPE_ROLES);
+			this.aceBeansForRoles = getACEBeans(acl.getAccessControlEntries(), path, BEANTYPE_ROLES);
 		}
 		checkPath(path);
 		return this.aceBeansForRoles;
 	}
-	
-	
-	public Collection getStandardAces(String path) throws HttpException, RemoteException, IOException {
-		if(this.aceBeansForStandard == null){
+
+
+	@Override
+	public Collection<ACEBean> getStandardAces(String path) throws RepositoryException {
+		if (this.aceBeansForStandard == null) {
 			AccessControlList acl = getACL(path);
-			List l = acl.getAccessControlEntriesForStandardPrincipals();
-			Collection c = new ArrayList();
-			c.addAll(getACEBeans(l,path,BEANTYPE_STANDARD));
-			
-//			List l2 = acl.getAccessControlEntriesForOthers();
-//			c.addAll(getACEBeans(l2,pathBEANTYPE_OTHERS));
-			
+			Collection<ACEBean> c = new ArrayList<ACEBean>();
+			c.addAll(getACEBeans(acl.getAccessControlEntries(), path, BEANTYPE_STANDARD));
+
 			this.aceBeansForStandard = c;
-			
 		}
 		checkPath(path);
 		return this.aceBeansForStandard;
 	}
 
 
-	public Collection getGroupAces(String path) throws HttpException, RemoteException, IOException {
+	@Override
+	public Collection<ACEBean> getGroupAces(String path) throws RepositoryException  {
 		if(this.aceBeansForGroups == null){
 			AccessControlList acl = getACL(path);
-			List l = acl.getAccessControlEntriesForGroups();
-			this.aceBeansForGroups = getACEBeans(l,path,BEANTYPE_GROUPS);
+			this.aceBeansForGroups = getACEBeans(acl.getAccessControlEntries(), path, BEANTYPE_GROUPS);
 		}
 		checkPath(path);
 		return this.aceBeansForGroups;
 	}
 
 
-	public Collection getUserAces(String path) throws HttpException, RemoteException, IOException {
+	@Override
+	public Collection<ACEBean> getUserAces(String path) throws RepositoryException {
 		if(this.aceBeansForUsers == null){
 			AccessControlList acl = getACL(path);
-			List l = acl.getAccessControlEntriesForUsers();
-			this.aceBeansForUsers = getACEBeans(l,path,BEANTYPE_USERS);
+			this.aceBeansForUsers = getACEBeans(acl.getAccessControlEntries(), path, BEANTYPE_USERS);
 		}
 		checkPath(path);
 		return this.aceBeansForUsers;
 	}
-	
-	
-	/**
-	 * @param l List of <code>AccessControlEntry</code>s
-	 */
-	protected Collection getACEBeans(List l,String path,int beantype) {
-		Map m = new HashMap();
-		if(l!=null){
-			for (Iterator iter = l.iterator(); iter.hasNext();) {
-				AccessControlEntry ace = (AccessControlEntry) iter.next();
-				ACEBean bean = (ACEBean) m.get(ace.getPrincipal());
+
+	protected Collection<ACEBean> getACEBeans(javax.jcr.security.AccessControlEntry[] entries, String path,int beantype) throws RepositoryException {
+		Map<Principal, ACEBean> m = new HashMap<Principal, ACEBean>();
+		if (!ArrayUtil.isEmpty(entries)) {
+			for (javax.jcr.security.AccessControlEntry ace: entries) {
+				AccessControlEntry iwAce = new JackrabbitAccessControlEntry(ace);
+
+				ACEBean bean = m.get(ace.getPrincipal());
 				if(bean == null){
-					bean = new ACEBean(ace,getUserContext().getCurrentLocale());
+					bean = new ACEBean(iwAce, getUserContext().getCurrentLocale());
 					m.put(ace.getPrincipal(),bean);
 				} else {
-					if(ace.isNegative()){
-						bean.setNegativeAccessControlEntry(ace);
+					if(iwAce.isNegative()){
+						bean.setNegativeAccessControlEntry(iwAce);
 					} else {
-						bean.setPositiveAccessControlEntry(ace);
+						bean.setPositiveAccessControlEntry(iwAce);
 					}
 				}
 			}
 		}
-		
-		Collection beanCollection = new TreeSet(getACEBeanComparator());
+
+		Collection<ACEBean> beanCollection = new TreeSet<ACEBean>(getACEBeanComparator());
 		beanCollection.addAll(m.values());
-		
+
 		//add missing AccesscontrolEntry to ACEBeans
-		for (Iterator iter = beanCollection.iterator(); iter.hasNext();) {
-			ACEBean aBean = (ACEBean) iter.next();
+		for (Iterator<ACEBean> iter = beanCollection.iterator(); iter.hasNext();) {
+			ACEBean aBean = iter.next();
 			if(!aBean.hasNegativeAccessControlEntry()){
 				AccessControlEntry theOtherAce = aBean.getPositiveAccessControlEntry();
-				AccessControlEntry thisAce = new AccessControlEntry(theOtherAce.getPrincipal(),true,false,false,null,theOtherAce.getPrincipalType());
+
+				AccessControlEntry thisAce = new JackrabbitAccessControlEntry(theOtherAce.getPrincipal(),true,false,false,null,theOtherAce.getPrincipalType());
 				this.currentList.add(thisAce);
 				aBean.setNegativeAccessControlEntry(thisAce);
 			} else if(!aBean.hasPositiveAccessControlEntry()){
 				AccessControlEntry theOtherAce = aBean.getNegativeAccessControlEntry();
-				AccessControlEntry thisAce = new AccessControlEntry(theOtherAce.getPrincipal(),false,false,false,null,theOtherAce.getPrincipalType());
+				AccessControlEntry thisAce = new JackrabbitAccessControlEntry(theOtherAce.getPrincipal(),false,false,false,null,theOtherAce.getPrincipalType());
 				this.currentList.add(thisAce);
 				aBean.setPositiveAccessControlEntry(thisAce);
 			}
 		}
-		
+
 
 		//fill with missing aces
 		switch (beantype) {
 			case BEANTYPE_STANDARD:
-//				try {
-//					IWSlideSession slideSession = (IWSlideSession)getSessionInstance(IWSlideSession.class);
-					List allStandardAces = IWSlideConstants.ALL_STANDARD_SUBJECT_URIS;
-					for (Iterator iter = allStandardAces.iterator(); iter.hasNext();) {
-						String principal = (String)iter.next();
-						if(!m.containsKey(principal) && !principal.equals(IWSlideConstants.SUBJECT_URI_OWNER) && !principal.equals(IWSlideConstants.SUBJECT_URI_SELF)){
-							addACEBeanSkippingPathCheck(principal,AccessControlEntry.PRINCIPAL_TYPE_STANDARD,beanCollection);
-						}
+				for (String principal: RepositoryConstants.ALL_STANDARD_SUBJECT_URIS) {
+					if(!m.containsKey(principal) && !principal.equals(RepositoryConstants.SUBJECT_URI_OWNER) && !principal.equals(RepositoryConstants.SUBJECT_URI_SELF)) {
+						addACEBeanSkippingPathCheck(principal, AccessControlEntry.PRINCIPAL_TYPE_STANDARD, beanCollection);
 					}
-//				}
-//				catch (IBOLookupException e) {
-//					e.printStackTrace();
-//				}
-//				catch (RemoteException e) {
-//					e.printStackTrace();
-//				}
+				}
 				break;
 			case BEANTYPE_ROLES:
 				try {
-					AuthenticationBusiness authBean = (AuthenticationBusiness)getServiceInstance(AuthenticationBusiness.class);
-					String rootRoleURI = authBean.getRoleURI(IWSlideConstants.ROLENAME_ROOT);
+					AuthenticationBusiness authBean = getAuthenticationBusiness();
+					String rootRoleURI = authBean.getRoleURI(RepositoryConstants.ROLENAME_ROOT);
 					//Remove root role
 					if(m.containsKey(rootRoleURI)){
-						for (Iterator iter = beanCollection.iterator(); iter.hasNext();) {
-							ACEBean aceBean = (ACEBean) iter.next();
-							if(rootRoleURI.equals(aceBean.getPrincipalName())){
+						for (Iterator<ACEBean> iter = beanCollection.iterator(); iter.hasNext();) {
+							if (rootRoleURI.equals(iter.next().getPrincipalName())) {
 								iter.remove();
 							}
 						}
 					}
-					
+
 					//add all missing roles
-					Collection roles = getIWApplicationContext().getIWMainApplication().getAccessController().getAllRoles();
-					for (Iterator iter = roles.iterator(); iter.hasNext();) {
-						ICRole role = (ICRole) iter.next();
-						String roleURI = authBean.getRoleURI(role.getRoleKey());
+					Collection<ICRole> roles = getIWApplicationContext().getIWMainApplication().getAccessController().getAllRoles();
+					for (Iterator<ICRole> iter = roles.iterator(); iter.hasNext();) {
+						String roleURI = authBean.getRoleURI(iter.next().getRoleKey());
 						if(!m.containsKey(roleURI)){
 							addACEBeanSkippingPathCheck(roleURI,AccessControlEntry.PRINCIPAL_TYPE_ROLE,beanCollection);
 						}
 					}
-					
-				}
-				catch (IBOLookupException e) {
-					e.printStackTrace();
-				}
-				catch (RemoteException e) {
+
+				} catch (RepositoryException e) {
 					e.printStackTrace();
 				}
 				break;
 			default:
 				break;
 		}
-		
+
 		return beanCollection;
 	}
-	
+
 	/**
 	 * @return
 	 */
-	private Comparator getACEBeanComparator() {
+	private Comparator<ACEBean> getACEBeanComparator() {
 		if(this.aceBeanComparator == null){
 			this.aceBeanComparator = new ACEBeanComparator(getUserContext().getCurrentLocale());
 		}
@@ -309,7 +291,7 @@ public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements 
 	 */
 	public ACEBean getAdditionalACEBean(String path, String principal, int principalType) {
 		checkPath(path);
-		Collection l = null;
+		Collection<ACEBean> l = null;
 		switch (principalType) {
 			case AccessControlEntry.PRINCIPAL_TYPE_STANDARD:
 				l = this.aceBeansForStandard;
@@ -327,24 +309,28 @@ public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements 
 				l = this.allACEBeans;
 				break;
 			default:
-//				l = aceBeansForAll;
 				break;
 		}
-		ACEBean aBean = addACEBeanSkippingPathCheck(principal, principalType,l);
+		ACEBean aBean = null;
+		try {
+			aBean = addACEBeanSkippingPathCheck(principal, principalType, l);
+		} catch (AccessControlException e) {
+			e.printStackTrace();
+		} catch (RepositoryException e) {
+			e.printStackTrace();
+		}
 		return aBean;
 	}
-
-
 
 	/**
 	 * @param principal
 	 * @param principalType
 	 * @return
 	 */
-	private ACEBean addACEBeanSkippingPathCheck(String principal, int principalType,Collection aceBeanList) {
-		AccessControlEntry negativeAce = new AccessControlEntry(principal,true,false,false,null,principalType);
+	private ACEBean addACEBeanSkippingPathCheck(String principal, int principalType, Collection<ACEBean> aceBeanList) throws AccessControlException, RepositoryException {
+		AccessControlEntry negativeAce = new JackrabbitAccessControlEntry(new PrincipalImpl(principal), true, false, false, null, principalType);
 		this.currentList.add(negativeAce);
-		AccessControlEntry positiveAce = new AccessControlEntry(principal,false,false,false,null,principalType);
+		AccessControlEntry positiveAce = new JackrabbitAccessControlEntry(new PrincipalImpl(principal), false, false, false, null, principalType);
 		this.currentList.add(positiveAce);
 		ACEBean aBean = new ACEBean(positiveAce,negativeAce,getUserContext().getCurrentLocale());
 		if(aceBeanList!=null){
@@ -357,16 +343,20 @@ public class WebDAVFilePermissionResourceBean extends IBOSessionBean implements 
 
 
 
-	public void store(String path) throws HttpException, RemoteException, IOException{
+	@Override
+	public void store(String path) throws RepositoryException {
 		checkPath(path);
 		updateACEValues();
-		
+
 		AccessControlList acl = getACL(path);
-		IWSlideSession slideSession = (IWSlideSession)getSessionInstance(IWSlideSession.class);
-		boolean successful = slideSession.storeAccessControlList(acl);
-		System.out.println("Save ACL for resource '"+acl.getResourcePath()+((successful)?"' was successful":"' failed"));
+		boolean successful = getRepositorySession(getUserContext()).storeAccessControlList(acl);
+		log(Level.INFO, "Save ACL for resource '"+acl.getResourcePath()+((successful)?"' was successful":"' failed"));
 		clear();
 	}
-	
-	
+
+	private AuthenticationBusiness getAuthenticationBusiness() {
+		if (authBusiness == null)
+			ELUtil.getInstance().autowire(this);
+		return authBusiness;
+	}
 }

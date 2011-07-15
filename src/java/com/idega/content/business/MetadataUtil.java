@@ -12,28 +12,30 @@ package com.idega.content.business;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
 /**
- * 
+ *
  * Last modified: $Date: 2006/02/20 11:03:21 $ by $Author: laddi $
- * 
+ *
  * Utility class for Metadata
  *
  * @author Joakim Johnson
  * @version $Revision: 1.3 $
  */
 public class MetadataUtil {
-	private static ArrayList metadataType = new ArrayList();
+
+	private static List<String> metadataType = new ArrayList<String>();
 	private static final String TYPE_KEY = "type";
 	private static final String METADATA_PATH = "/properties/MetadataType.properties";
-	
+
 	/**
 	 * Fetches metadata types from properties file
 	 * @return ArrayList of metadata types as strings
 	 */
-	public static ArrayList getMetadataTypes() {
+	public static List<String> getMetadataTypes() {
 		//Only read file first time
 		if(metadataType.size() == 0) {
 			Properties prop = new Properties();

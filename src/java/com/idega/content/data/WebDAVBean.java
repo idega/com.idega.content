@@ -11,6 +11,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -19,12 +20,11 @@ import com.idega.core.data.ICTreeNode;
 import com.idega.core.file.business.FileIconSupplier;
 import com.idega.core.uri.IWActionURIManager;
 import com.idega.idegaweb.IWApplicationContext;
-import com.idega.presentation.IWContext;
 import com.idega.repository.RepositoryService;
 import com.idega.repository.bean.RepositoryItem;
 import com.idega.util.CoreConstants;
 import com.idega.util.FileUtil;
-import com.idega.util.ListUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
 /**
@@ -87,7 +87,6 @@ public class WebDAVBean implements ICTreeNode, Serializable {
 	}
 
     public WebDAVBean() {
-
     	this.propertySupport = new PropertyChangeSupport(this);
 	    setId((int) (Math.random()*1000));
     }
@@ -99,42 +98,41 @@ public class WebDAVBean implements ICTreeNode, Serializable {
 
     public WebDAVBean(RepositoryItem resource) {
     		this();
-    		try{
+    		try {
     			String name = resource.getName();
-			setName(name);
-			setIsCollection(resource.isCollection());
-			setLength(resource.getLength());
-			setModifiedDate(resource.getLastModified());
-			setMime(resource.getMimeType());
-			setCreationDate(resource.getCreationDate());
-			setWebDavHttpURL(resource.getPath());
-			//	TODO
-//			setVersion(VersionHelper.getLatestVersionName(resource));
+				setName(name);
+				setIsCollection(resource.isCollection());
+				setLength(resource.getLength());
+				setModifiedDate(resource.getLastModified());
+				setMime(resource.getMimeType());
+				setCreationDate(resource.getCreationDate());
+				setWebDavHttpURL(resource.getPath());
+				//	FIXME: finish implementation
+//				setVersion(VersionHelper.getLatestVersionName(resource));
 
-//			try {
-//				setVersion(VersionHelper.getLatestVersion(resource.getEncodedPath()));
-//			}
-//			catch (HttpException e) {
-//				e.printStackTrace();
-//			}
-//			catch (RemoteException e) {
-//				e.printStackTrace();
-//			}
-//			catch (IOException e) {
-//				e.printStackTrace();
-//			}
+	//			try {
+	//				setVersion(VersionHelper.getLatestVersion(resource.getEncodedPath()));
+	//			}
+	//			catch (HttpException e) {
+	//				e.printStackTrace();
+	//			}
+	//			catch (RemoteException e) {
+	//				e.printStackTrace();
+	//			}
+	//			catch (IOException e) {
+	//				e.printStackTrace();
+	//			}
 
-			//	TODO
-//			setIsLocked(resource.isLocked());
-//			setCheckedOutString(resource.getCheckedOut());
-//			setComment(resource.getComment());
-//			setEncodedURL(resource.getEncodedPath());
+				//	TODO
+	//			setIsLocked(resource.isLocked());
+	//			setCheckedOutString(resource.getCheckedOut());
+	//			setComment(resource.getComment());
+	//			setEncodedURL(resource.getEncodedPath());
 
-			//action uri for preview
-			setPreviewActionURI(IWActionURIManager.getInstance().getActionURIPrefixWithContext("preview",getEncodedURL()));
-			setPermissionActionURI(IWActionURIManager.getInstance().getActionURIPrefixWithContext("permission",getEncodedURL()));
-    		}
-    		catch(Exception e){
+				//action uri for preview
+				setPreviewActionURI(IWActionURIManager.getInstance().getActionURIPrefixWithContext("preview",getEncodedURL()));
+				setPermissionActionURI(IWActionURIManager.getInstance().getActionURIPrefixWithContext("permission",getEncodedURL()));
+    		} catch(Exception e) {
     			e.printStackTrace();
     		}
     }
@@ -384,13 +382,15 @@ public class WebDAVBean implements ICTreeNode, Serializable {
 		return this.me;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<RepositoryItem> getChildren() {
 		if (children == null) {
 			RepositoryItem resource = getMe();
 			Collection<RepositoryItem> children = resource.getChildResources();
-			this.children = (List<RepositoryItem>) (children == null ? ListUtil.getEmptyList() : new ArrayList<RepositoryItem>(children));
+			if (children == null)
+				this.children = Collections.emptyList();
+			else
+				this.children = new ArrayList<RepositoryItem>(children);
 		}
 		childrenCount = children.size();
 		return children;
@@ -501,7 +501,6 @@ public class WebDAVBean implements ICTreeNode, Serializable {
 			try {
 				if (getMe() != null) {
 					String url = getMe().getParentPath();
-					IWContext iwc = IWContext.getInstance();
 					url = url.replaceFirst(getRepositoryService().getWebdavServerURL(), CoreConstants.EMPTY);
 					RepositoryItem selectedNode = getRepositoryService().getRepositoryItem(url);
 					this.parent = new WebDAVBean(selectedNode);
@@ -564,10 +563,9 @@ public class WebDAVBean implements ICTreeNode, Serializable {
 	 * @return Returns the comment.
 	 */
 	public String getComment() {
-		if(this.comment!=null && !"".equals(this.comment)){
+		if (!StringUtil.isEmpty(this.comment)) {
 			return this.comment;
-		}
-		else{
+		} else {
 			if(isCheckedOut()){
 				return getCheckedOutString().substring(getCheckedOutString().lastIndexOf("/")+1);
 			}

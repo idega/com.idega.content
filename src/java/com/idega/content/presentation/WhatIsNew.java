@@ -9,21 +9,18 @@
  */
 package com.idega.content.presentation;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
+
+import javax.faces.component.UIComponent;
 
 import com.idega.block.web2.business.Web2Business;
 import com.idega.block.web2.presentation.Accordion;
-import com.idega.business.IBOLookup;
-import com.idega.business.IBOLookupException;
-import com.idega.business.IBORuntimeException;
 import com.idega.content.business.ContentSearch;
 import com.idega.content.business.IWCacheInvalidatorIWSlideListener;
 import com.idega.core.builder.data.ICPage;
@@ -33,7 +30,7 @@ import com.idega.idegaweb.IWBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Text;
-import com.idega.slide.business.IWSlideSession;
+import com.idega.util.CoreConstants;
 import com.idega.util.PresentationUtil;
 import com.idega.util.expression.ELUtil;
 
@@ -41,9 +38,9 @@ import com.idega.util.expression.ELUtil;
  * A block that displays the latest or all entries in the file repository ordered by modification date<br>
  * It extends SearchResults block and forces it to only use a DASL search (ContentSearch) with specific settings<br>
  * and the query is by default set to "*" and the path to "files" but that can be changed.
- * 
+ *
  *  Last modified: $Date: 2008/12/11 08:03:58 $ by $Author: laddi $
- * 
+ *
  * @author <a href="mailto:eiki@idega.com">eiki</a>
  * @version $Revision: 1.9 $
  */
@@ -51,13 +48,13 @@ public class WhatIsNew extends SearchResults {
 
 	public static final String STYLE_CLASS_WHATISNEW = "whatisnew";
 	public static final String WHAT_IS_NEW_CACHE_KEY = "iw_whatisnew";
-	
+
 	protected String startingPointURI = "files/public";
 	protected String orderByProperty = "getlastmodified";
 	protected String groupHeight = null;
-	
+
 	protected int numberOfResultItemsToDisplay = -1;
-	
+
 	protected boolean useDescendingOrder = true;
 	protected boolean ignoreFolders = true;
 	protected boolean useRootAccessForSearch = false;
@@ -67,9 +64,9 @@ public class WhatIsNew extends SearchResults {
 	protected boolean showDeleteLink = false;
 	protected boolean groupByExtraInfo = false;
 	protected boolean orderGroups = true;
-	
+
 	protected ICPage deletePage = null;
-	
+
 	public WhatIsNew(){
 		super();
 		this.setCacheable(WHAT_IS_NEW_CACHE_KEY, 0);
@@ -80,35 +77,31 @@ public class WhatIsNew extends SearchResults {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.idega.presentation.PresentationObject#main(com.idega.presentation.IWContext)
 	 */
 	@Override
 	public void main(IWContext iwc) throws Exception {
 		//just listen for changes
 		startCachingStrategy();
-		
+
 		boolean useGlobalSettings = iwc.getApplicationSettings().getBoolean("whatisnew.use.global.settings", false);
 		if (useGlobalSettings) {
 			boolean useDescending = iwc.getApplicationSettings().getBoolean("whatisnew.use.descending", true);
 			setToUseDescendingOrder(useDescending);
-			
+
 			String orderByProperty = iwc.getApplicationSettings().getProperty("whatisnew.order.property", "getlastmodified");
 			setOrderByProperty(orderByProperty);
 		}
-		
-		
+
+
 		super.main(iwc);
 	}
-	
+
 	protected void startCachingStrategy() {
-		try {
-			this.getIWSlideSession().getIWSlideService().addIWSlideChangeListeners(new IWCacheInvalidatorIWSlideListener(getStartingPointURI(),WHAT_IS_NEW_CACHE_KEY));
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		getRepositoryService().addRepositoryChangeListeners(new IWCacheInvalidatorIWSlideListener(getStartingPointURI(), WHAT_IS_NEW_CACHE_KEY));
 	}
-	
+
 	@Override
 	protected String getCacheState(IWContext iwc, String cacheStatePrefix) {
 		IWBundle iwb = IWContext.getInstance().getIWMainApplication().getCoreBundle();
@@ -116,14 +109,14 @@ public class WhatIsNew extends SearchResults {
 
 		List<String> actions = new ArrayList<String>();
 		actions.add(business.getActionToLinkLinksWithFiles(STYLE_CLASS_WHATISNEW, true, false));
-		
+
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, business.getBundleUriToLinkLinksWithFilesScriptFile());
 		PresentationUtil.addStyleSheetsToHeader(iwc, Arrays.asList(
 				iwb.getVirtualPathWithFileNameString("style/search.css"),
 				business.getBundleUriToLinkLinksWithFilesStyleFile()
 		));
 		PresentationUtil.addJavaScriptActionsToBody(iwc, actions);
-		
+
 		StringBuffer buffer = new StringBuffer(cacheStatePrefix);
 		buffer.append(getSearchQueryString(iwc))
 		.append(getStartingPointURI())
@@ -142,9 +135,9 @@ public class WhatIsNew extends SearchResults {
 		.append(getSearchNameStyleClass())
 		.append(getRowEvenStyleClass())
 		.append(getRowOddStyleClass());
-		
+
 		//hope I got them all!
-		
+
 		return buffer.toString();
 	}
 
@@ -172,75 +165,61 @@ public class WhatIsNew extends SearchResults {
 			return super.configureSearchPlugin(searchPlugin);
 		}
 	}
-	
-	private HashMap groups = null;
-	
+
+	private Map<String, List<UIComponent>> groups = null;
+
 	@Override
 	protected void addResultRow(Layer container, Layer rowContainer, String rowKey) {
 		if (groupByExtraInfo) {
-			if (rowKey.endsWith("/")) {
+			if (rowKey.endsWith(CoreConstants.SLASH)) {
 				rowKey = rowKey.substring(0, rowKey.length()-1);
 			}
-			rowKey = rowKey.substring(rowKey.lastIndexOf('/')+1);
+			rowKey = rowKey.substring(rowKey.lastIndexOf(CoreConstants.SLASH)+1);
 			if (!groups.containsKey(rowKey)) {
-				groups.put(rowKey, new Vector());
+				groups.put(rowKey, new ArrayList<UIComponent>());
 			}
-			
-			((Vector) groups.get(rowKey)).add(rowContainer);
+
+			groups.get(rowKey).add(rowContainer);
 		} else {
 			super.addResultRow(container, rowContainer, rowKey);
 		}
 	}
-	
+
 	@Override
 	protected void beforeAddingResultRows(Layer container) {
 		// CREATE THE MAP FOR THE CONTAINER
 		if (groupByExtraInfo) {
-			groups = new HashMap();
+			groups = new HashMap<String, List<UIComponent>>();
 		}
-	
+
 	}
 	@Override
 	protected void afterAddingResultRows(Layer container) {
 		if (groupByExtraInfo) {
-			Set keySet = groups.keySet();
+			Set<String> keySet = groups.keySet();
 			Accordion acc = new Accordion(getId()+"_acc");
 			if (groupHeight != null) {
 				acc.setHeight(groupHeight);
 			}
 			container.add(acc);
 
-			List keyList = new Vector();
-			keyList.addAll(keySet);
+			List<String> keyList = new ArrayList<String>(keySet);
 			if (orderGroups) {
 				// sorting the keys.
 				Collections.sort(keyList);
 			}
-			
-			Iterator keys = keyList.iterator();
-			while (keys.hasNext()) {
-				String key = (String) keys.next();
-				Vector v = (Vector) groups.get(key);
+
+			for (String key: keyList) {
+				List<UIComponent> v = groups.get(key);
 				if (v != null) {
-					Iterator iter = v.iterator();
 					Layer la = new Layer();
-					
-					while (iter.hasNext()) {
-						Layer l =  (Layer) iter.next();
-						la.add(l);
+
+					for (UIComponent component: v) {
+						la.add(component);
 					}
 					acc.addPanel(new Text(key), la);
 				}
 			}
-		}
-	}
-
-	
-	protected IWSlideSession getIWSlideSession() {
-		try {
-			return (IWSlideSession) IBOLookup.getSessionInstance(IWContext.getInstance(),IWSlideSession.class);
-		} catch (IBOLookupException e) {
-			throw new IBORuntimeException(e);
 		}
 	}
 
@@ -336,10 +315,9 @@ public class WhatIsNew extends SearchResults {
 	 * @return the startingPointURI
 	 */
 	public String getStartingPointURI() {
-
 		if (useUserHomeFolder) {
 			try {
-				String homeFolder = getIWSlideSession().getUserHomeFolder();
+				String homeFolder = getRepositorySession().getUserHomeFolder();
 				if (homeFolder != null) {
 					if (homeFolder.indexOf("/") == 0) {
 						homeFolder = homeFolder.substring(1);
@@ -349,8 +327,7 @@ public class WhatIsNew extends SearchResults {
 					useUserHomeFolder = false;
 					return getStartingPointURI();
 				}
-			}
-			catch (RemoteException e) {
+			} catch (Exception e) {
 				useUserHomeFolder = false;
 				return getStartingPointURI();
 			}
@@ -360,7 +337,6 @@ public class WhatIsNew extends SearchResults {
 			}
 			else return this.startingPointURI;
 		}
-
 	}
 
 
@@ -424,7 +400,7 @@ public class WhatIsNew extends SearchResults {
 
 	/**
 	 * If set to true the result will only state the parent folder of the result itm and not the full path
-	 * @param hideParentFolderPath 
+	 * @param hideParentFolderPath
 	 */
 	public void setToHideParentFolderPath(boolean hideParentFolderPath) {
 		this.hideParentFolderPath = hideParentFolderPath;
@@ -437,11 +413,11 @@ public class WhatIsNew extends SearchResults {
 	public void setToHideFileExtension(boolean hideFileExtension) {
 		this.hideFileExtension = hideFileExtension;
 	}
-	
+
 	public void setToShowDeleteLink(boolean show) {
 		this.showDeleteLink = show;
 	}
-	
+
 	public boolean isSetToShowDeleteLink() {
 		return showDeleteLink;
 	}
@@ -457,15 +433,15 @@ public class WhatIsNew extends SearchResults {
 	public boolean isGroupByExtraInfo() {
 		return groupByExtraInfo;
 	}
-	
+
 	public void setGroupByExtraInfo(boolean groupByExtraInfo) {
 		this.groupByExtraInfo = groupByExtraInfo;
 	}
-	
+
 	public void setGroupHeight(String height) {
 		this.groupHeight = height;
 	}
-	
+
 	public void setOrderGroups(boolean orderGroups) {
 		this.orderGroups = orderGroups;
 	}

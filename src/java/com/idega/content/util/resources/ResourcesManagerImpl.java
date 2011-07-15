@@ -23,7 +23,6 @@ import com.idega.idegaweb.include.JavaScriptLink;
 import com.idega.idegaweb.include.RSSLink;
 import com.idega.idegaweb.include.StyleSheetLink;
 import com.idega.servlet.filter.IWBundleResourceFilter;
-import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
@@ -41,7 +40,7 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 
 	private static final long serialVersionUID = -3876318831841387443L;
 	private static final Logger LOGGER = Logger.getLogger(ResourcesManagerImpl.class.getName());
-	
+
 	private static final String WEB_PAGE_RESOURCES = "idegaCoreWebPageResources";
 	private static final String CONCATENATED_RESOURCES = "idegaCoreConcatenatedRecources";
 
@@ -49,85 +48,90 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 	private List<JavaScriptLink> javaScriptResources;
 	private List<StyleSheetLink> cssFiles;
 	private List<RSSLink> feedLinks;
-	
+
 	private Map<String, String> mediaMap;
-	
+
+	@Override
 	public List<JavaScriptLink> getJavaScriptResources() {
 		if (javaScriptResources == null) {
 			javaScriptResources = new ArrayList<JavaScriptLink>();
 		}
 		return javaScriptResources;
 	}
-	
+
+	@Override
 	public List<JavaScriptLink> getJavaScriptActions() {
 		if (javaScriptActions == null) {
 			javaScriptActions = new ArrayList<JavaScriptLink>();
 		}
 		return javaScriptActions;
 	}
-	
+
+	@Override
 	public List<StyleSheetLink> getCSSFiles() {
 		if (cssFiles == null) {
 			cssFiles = new ArrayList<StyleSheetLink>();
 		}
 		return cssFiles;
 	}
-	
+
+	@Override
 	public Map<String, String> getMediaMap() {
 		if (mediaMap == null) {
 			mediaMap = new HashMap<String, String>();
 		}
 		return mediaMap;
 	}
-	
+
 	private String getCachedConcatenatedResources(String cacheName, String fileType) {
 		String concatenatedResourcesUri = getCachedResource(CONCATENATED_RESOURCES, cacheName);
 		if (StringUtil.isEmpty(concatenatedResourcesUri)) {
 			return null;
 		}
-		
+
 		String cachedContent = getCachedResource(CONCATENATED_RESOURCES, new StringBuilder(cacheName.toString()).append("_content").toString());
 		if (StringUtil.isEmpty(cachedContent)) {
 			return null;
 		}
-		
+
 		return StringUtil.isEmpty(concatenatedResourcesUri) ? null : concatenatedResourcesUri;
 	}
-	
+
 	private String getUriToConcatenatedResourcesFromCache(List<? extends ExternalLink> resources, String fileType) {
 		if (ListUtil.isEmpty(resources) || StringUtil.isEmpty(fileType)) {
 			return null;
 		}
-		
+
 		//	Will try to get big file URI from requested resources
 		StringBuilder cacheName = new StringBuilder();
 		for (ExternalLink resource: resources) {
 			cacheName.append(resource.getUrl());
 		}
-		
+
 		String uriToConcatenatedResources = getCachedConcatenatedResources(cacheName.toString(), fileType);
 		if (!StringUtil.isEmpty(uriToConcatenatedResources)) {
 			resources.clear();
 		}
-		
+
 		if (!StringUtil.isEmpty(uriToConcatenatedResources)) {
 			addNotifierAboutLoadedCSSFiles(resources, fileType);
 		}
-		
+
 		return uriToConcatenatedResources;
 	}
-	
+
+	@Override
 	public String getConcatenatedResources(List<? extends ExternalLink> resources, String fileType, String serverName) {
 		if (ListUtil.isEmpty(resources)) {
 			return null;
 		}
-		
+
 		//	Checking if ALL resources were concatenated already
 		String uriToAllConcatenatedResources = getUriToConcatenatedResourcesFromCache(resources, fileType);
 		if (!StringUtil.isEmpty(uriToAllConcatenatedResources)) {
 			return uriToAllConcatenatedResources;
 		}
-		
+
 		//	Didn't find concatenated file for ALL resources, will check every resource separately if it's available to be minified
 		String resourceContent = null;
 		List<ExternalLink> resourcesToLoad = new ArrayList<ExternalLink>();
@@ -142,27 +146,27 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 						.toString();
 				}
 			}
-			
+
 			if (!StringUtil.isEmpty(resourceContent)) {
 				//	Resource is available to be concatenated
 				resourcesToLoad.add(resource);
 				addedResources.put(resource.getUrl(), resourceContent);
 			}
 		}
-		
+
 		if (ListUtil.isEmpty(addedResources.values())) {
 			return null;	//	Nothing to concatenate
 		}
-		
+
 		//	Removing AVAILABLE resources from request. Available resources will be concatenated to one big file
 		resources.removeAll(resourcesToLoad);
-		
+
 		//	Checking if there is concatenated resource from ONLY AVAILABLE resources
 		String concatenatedResourcesUri = getUriToConcatenatedResourcesFromCache(resources, fileType);
 		if (!StringUtil.isEmpty(concatenatedResourcesUri)) {
 			return concatenatedResourcesUri;
 		}
-		
+
 		//	Nothing found in cache, creating big file
 		StringBuilder allResources = null;
 		if (isJavaScriptFile(fileType)) {
@@ -173,14 +177,14 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		else {
 			addNotifierAboutLoadedCSSFiles(resourcesToLoad, fileType);
 		}
-		
+
 		if (allResources == null) {
 			allResources = new StringBuilder();
 		}
 		StringBuilder cacheName = new StringBuilder();
 		for (ExternalLink resource: resourcesToLoad) {
 			allResources.append(addedResources.get(resource.getUrl()));
-			
+
 			cacheName.append(resource);
 		}
 		concatenatedResourcesUri = copyConcatenatedResourcesToWebApp(allResources.toString(), fileType);
@@ -191,43 +195,44 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		//	Putting in cache
 		setCachedResource(CONCATENATED_RESOURCES, cacheName.toString(), concatenatedResourcesUri);
 		setCachedResource(CONCATENATED_RESOURCES, cacheName.append("_content").toString(), allResources.toString());
-		
+
 		return concatenatedResourcesUri;
 	}
-	
+
 	private void addNotifierAboutLoadedCSSFiles(List<? extends ExternalLink> resources, String fileType) {
 		if (isJavaScriptFile(fileType)) {
 			return;
 		}
-		
+
 		//	Notifying about CSS files
 		String addedCSSFilesNotifier = getJavaScriptActionForLoadedCSSFiles(resources);
 		if (StringUtil.isEmpty(addedCSSFilesNotifier)) {
 			return;
 		}
-		
+
 		JavaScriptLink loadedCSSFilesAction = new JavaScriptLink();
 		loadedCSSFilesAction.addAction(addedCSSFilesNotifier);
 		if (!getJavaScriptActions().contains(loadedCSSFilesAction)) {
 			getJavaScriptActions().add(loadedCSSFilesAction);
 		}
 	}
-	
+
+	@Override
 	public boolean isJavaScriptFile(String fileType) {
 		return ResourcesAdder.FILE_TYPE_JAVA_SCRIPT.equals(fileType);
 	}
-	
+
 	private String getJavaScriptActionForLoadedCSSFiles(List<? extends ExternalLink> cssFiles) {
 		if (ListUtil.isEmpty(cssFiles)) {
 			return null;
 		}
-		
+
 		StringBuilder addedCSSFilesNotifier = new StringBuilder("IWCORE.addLoadedResources(");
 		addedCSSFilesNotifier = addResourcesToList(addedCSSFilesNotifier, cssFiles);
 		addedCSSFilesNotifier.append(");");
 		return addedCSSFilesNotifier.toString();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private StringBuilder addResourcesToList(StringBuilder content, List<? extends ExternalLink> resources) {
 		for (Iterator<ExternalLink> resourcesIter = (Iterator<ExternalLink>) resources.iterator(); resourcesIter.hasNext();) {
@@ -238,21 +243,21 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		}
 		return content;
 	}
-	
+
 	private String copyConcatenatedResourcesToWebApp(String content, String fileType) {
 		if (StringUtil.isEmpty(content)) {
 			return null;
 		}
-		
+
 		String fileName = new StringBuilder().append(getCachePrefix()).append(ResourcesAdder.OPTIMIZIED_RESOURCES).append(System.currentTimeMillis())
 											.append(fileType).toString();
 		String uriToResources = IWMainApplication.getDefaultIWMainApplication().getBundle(CoreConstants.CORE_IW_BUNDLE_IDENTIFIER)
 																			.getVirtualPathWithFileNameString(fileName);
-		
+
 		File file = IWBundleResourceFilter.copyResourceFromJarOrCustomContentToWebapp(IWMainApplication.getDefaultIWMainApplication(), uriToResources, content);
 		return (file == null || !file.exists()) ? null : uriToResources;
 	}
-	
+
 	private String getCachedResource(String cacheName, String resourceName) {
 		String prefix = getCachePrefix();
 		try {
@@ -263,7 +268,7 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		}
 		return null;
 	}
-	
+
 	private boolean setCachedResource(String cacheName, String resourceName, String content) {
 		String prefix = getCachePrefix();
 		try {
@@ -274,7 +279,7 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		}
 		return false;
 	}
-	
+
 	private String getCachePrefix() {
 		try {
 			return IWMainApplication.getDefaultIWMainApplication().getSettings().getProperty("idega_core.resources_prefix", CoreConstants.EMPTY);
@@ -283,13 +288,13 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		}
 		return CoreConstants.EMPTY;
 	}
-	
+
 	private String getResource(String cacheName, ExternalLink resource, String serverName) {
 		String minifiedResource = getCachedResource(cacheName, resource.getUrl());
 		if (!StringUtil.isEmpty(minifiedResource)) {
 			return minifiedResource;
 		}
-		
+
 		File resourceInWorkspace = IWBundleResourceFilter.copyResourceFromJarToWebapp(IWMainApplication.getDefaultIWMainApplication(), resource.getUrl());
 		minifiedResource = (resourceInWorkspace == null || !resourceInWorkspace.exists()) ?
 				getMinifiedResourceFromApplication(serverName, resource) :
@@ -297,42 +302,41 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		if (minifiedResource == null) {
 			return null;
 		}
-		
+
 		setCachedResource(cacheName, resource.getUrl(), minifiedResource);
 		return minifiedResource;
 	}
-	
+
 	private InputStream getStreamFromRepository(String path) {
 		if (StringUtil.isEmpty(path)) {
 			return null;
 		}
-		
+
 		if (path.startsWith(CoreConstants.WEBDAV_SERVLET_URI) || path.startsWith(CoreConstants.PATH_FILES_ROOT)) {
 			try {
-				IWSlideService slideService = getServiceInstance(IWSlideService.class);
-				return slideService.getInputStream(path);
+				return getRepositoryService().getInputStreamAsRoot(path);
 			} catch (Exception e) {
 				LOGGER.log(Level.WARNING, "Error getting input stream from repository: " + path, e);
 			}
 		}
-		
+
 		return null;	//	Object not in repository or error occurred
 	}
-	
+
 	private String getMinifiedResourceFromApplication(String serverURL, ExternalLink resource) {
 		String resourceURI = resource.getUrl();
-		
+
 		InputStream input = getStreamFromRepository(resourceURI);
 		if (input == null) {
 			IWMainApplication iwma = IWMainApplication.getDefaultIWMainApplication();
 			input = iwma.getResourceAsStream(resourceURI);
 		}
-		
+
 		if (input == null) {
 			if (resourceURI.startsWith(CoreConstants.SLASH)) {
 				resourceURI = resourceURI.replaceFirst(CoreConstants.SLASH, CoreConstants.EMPTY);
 			}
-			
+
 			String fullLink = new StringBuilder(serverURL).append(resourceURI).toString();
 			URL url = null;
 			try {
@@ -343,18 +347,18 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 			if (url == null) {
 				return null;
 			}
-			
+
 			try {
 				input = url.openStream();
 			} catch (IOException e) {
 				LOGGER.warning("Error getting resource from: " + fullLink);
 			}
 		}
-		
+
 		if (input == null) {
 			return null;
 		}
-		
+
 		resource.setContentStream(input);
 
 		String minified = null;
@@ -365,15 +369,15 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		} finally {
 			IOUtil.closeInputStream(input);
 		}
-		
+
 		return minified;
 	}
-	
+
 	private String getMinifiedResourceFromWorkspace(File resource, ExternalLink resourceLink) {
 		if (resource == null || !resource.exists()) {
 			return null;
 		}
-		
+
 		String fileContent = null;
 		try {
 			fileContent = FileUtil.getStringFromFile(resource);
@@ -383,9 +387,9 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		if (StringUtil.isEmpty(fileContent)) {
 			return null;
 		}
-		
+
 		resourceLink.setContent(fileContent);
-		
+
 		String minified = null;
 		try {
 			minified = getMinifiedResource(resourceLink);
@@ -397,15 +401,16 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 			LOGGER.log(Level.WARNING, "Error while minifying resource: " + resource.getName());
 			return fileContent;
 		}
-		
+
 		return minified;
 	}
-	
+
 	private String getMinifiedResource(ExternalLink resource) {
 		AbstractMinifier minifier = resource instanceof StyleSheetLink ? new CSSMinifier() : new  JavaScriptMinifier();
 		return minifier.getMinifiedResource(resource);
 	}
 
+	@Override
 	public List<RSSLink> getFeedLinks() {
 		if (feedLinks == null) {
 			feedLinks = new ArrayList<RSSLink>();

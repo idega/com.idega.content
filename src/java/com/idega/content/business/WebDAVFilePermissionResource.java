@@ -9,17 +9,18 @@
  */
 package com.idega.content.business;
 
-import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.Collection;
-import org.apache.commons.httpclient.HttpException;
+
+import javax.jcr.RepositoryException;
+
 import com.idega.business.IBOSession;
+import com.idega.content.data.ACEBean;
 
 
 /**
- * 
+ *
  *  Last modified: $Date: 2005/01/07 19:46:49 $ by $Author: gummi $
- * 
+ *
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson</a>
  * @version $Revision: 1.1 $
  */
@@ -28,35 +29,35 @@ public interface WebDAVFilePermissionResource extends IBOSession {
 	/**
 	 * @see com.idega.content.business.WebDAVFilePermissionResourceBean#clear
 	 */
-	public void clear() throws java.rmi.RemoteException;
+	public void clear() throws RepositoryException;
 
 	/**
 	 * @see com.idega.content.business.WebDAVFilePermissionResourceBean#getAllAces
 	 */
-	public Collection getAllAces(String path) throws HttpException, RemoteException, IOException;
+	public Collection<ACEBean> getAllAces(String path) throws RepositoryException;
 
 	/**
 	 * @see com.idega.content.business.WebDAVFilePermissionResourceBean#getRoleAces
 	 */
-	public Collection getRoleAces(String path) throws HttpException, RemoteException, IOException;
+	public Collection<ACEBean> getRoleAces(String path) throws RepositoryException;
 
 	/**
 	 * @see com.idega.content.business.WebDAVFilePermissionResourceBean#getStandardAces
 	 */
-	public Collection getStandardAces(String path) throws HttpException, RemoteException, IOException;
+	public Collection<ACEBean> getStandardAces(String path) throws RepositoryException;
 
 	/**
 	 * @see com.idega.content.business.WebDAVFilePermissionResourceBean#getGroupAces
 	 */
-	public Collection getGroupAces(String path) throws HttpException, RemoteException, IOException;
+	public Collection<ACEBean> getGroupAces(String path) throws RepositoryException;
 
 	/**
 	 * @see com.idega.content.business.WebDAVFilePermissionResourceBean#getUserAces
 	 */
-	public Collection getUserAces(String path) throws HttpException, RemoteException, IOException;
+	public Collection<ACEBean> getUserAces(String path) throws RepositoryException;
 
 	/**
 	 * @see com.idega.content.business.WebDAVFilePermissionResourceBean#store
 	 */
-	public void store(String path) throws HttpException, RemoteException, IOException;
+	public void store(String path) throws RepositoryException;
 }

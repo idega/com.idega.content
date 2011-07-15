@@ -3,16 +3,17 @@ package com.idega.content.presentation;
 import java.io.IOException;
 import java.util.Iterator;
 
+import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
-import javax.faces.el.ValueBinding;
 import javax.jcr.RepositoryException;
 
 import com.idega.content.business.ContentUtil;
 import com.idega.idegaweb.IWBundle;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.repository.bean.RepositoryItem;
+import com.idega.repository.jcr.JCRItem;
 import com.idega.util.CoreConstants;
 import com.idega.webface.WFUtil;
 
@@ -21,7 +22,7 @@ import com.idega.webface.WFUtil;
  */
 public abstract class ContentBlock extends IWBaseComponent {
 
-	private RepositoryItem resource = null;
+	private JCRItem resource = null;
 
 	// this, parentContentViewer, should not be saved in save state
 	private ContentViewer parentContentViewer = null;
@@ -35,7 +36,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 		return ContentUtil.getBundle();
 	}
 
-	protected RepositoryItem getRepositoryItem() {
+	protected JCRItem getRepositoryItem() {
 		return this.resource;
 	}
 
@@ -47,7 +48,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 		WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "refresh", this, UIComponent.class);
 	}
 
-	public RepositoryItem getWebdavExentededResource(String path) {
+	public <T extends RepositoryItem> T getWebdavExentededResource(String path) {
 		try {
 			return getRepositoryService().getRepositoryItem(path.replaceFirst(getRepositoryService().getWebdavServerURL(), CoreConstants.EMPTY));
 		} catch (RepositoryException e) {
@@ -75,22 +76,20 @@ public abstract class ContentBlock extends IWBaseComponent {
 	 * @return
 	 */
 	public String getCurrentResourcePath() {
-
-		if (this.currentResourcePath != null) {
+		if (this.currentResourcePath != null)
 			return this.currentResourcePath;
-		}
-		ValueBinding vb = getValueBinding("currentResourcePath");
-		String returner = vb != null ? (String)vb.getValue(getFacesContext()) : null;
-		if(returner != null) {
+
+		ValueExpression ve = getValueExpression("currentResourcePath");
+		String returner = ve == null ? null : (String) ve.getValue(getFacesContext().getELContext());
+		if (returner instanceof String)
 			return returner;
-		}
 
 		ContentViewer v = getContentViewer();
-		if(v!=null){
-			String tmp = v.getCurrentResourcePath();
-			return tmp;
-		}
-		return null;
+		if (v == null)
+			return null;
+
+		String tmp = v.getCurrentResourcePath();
+		return tmp;
 	}
 
 	public ContentViewer getContentViewer(){
@@ -125,8 +124,8 @@ public abstract class ContentBlock extends IWBaseComponent {
 			path = (String) WFUtil.invoke(webDavPath);
 		}
 		try {
-			RepositoryItem oldRes = this.resource;
-			RepositoryItem newRes = getRepositoryService().getRepositoryItem(path);
+			JCRItem oldRes = this.resource;
+			JCRItem newRes = getRepositoryService().getRepositoryItem(path);
 			if (oldRes == null || oldRes.getName().equals(newRes.getName())) {
 				if ((!useFolders() && !newRes.isCollection() ) || (useFolders() && newRes.isCollection())) {
 					this.resource = newRes;

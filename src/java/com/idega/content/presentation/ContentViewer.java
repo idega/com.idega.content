@@ -1,7 +1,6 @@
 package com.idega.content.presentation;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -16,7 +15,6 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 
 import com.idega.business.IBOLookup;
-import com.idega.business.IBOLookupException;
 import com.idega.content.bean.ContentPathBean;
 import com.idega.content.business.WebDAVFilePermissionResource;
 import com.idega.idegaweb.IWUserContext;
@@ -93,7 +91,6 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		super();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void initializeComponent(FacesContext context) {
 		WFBlock listBlock = new WFBlock();
@@ -279,11 +276,10 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void decode(FacesContext context) {
 		//TODO USE DECODE, DOES NOT WORK BECAUSE IT IS NEVER CALLED!
 
-		Map parameters = context.getExternalContext().getRequestMap();
+		Map<String, Object> parameters = context.getExternalContext().getRequestMap();
 
 		String action = (String) parameters.get(PARAMETER_ACTION);
 		String resourceURL = (String) parameters.get(PARAMETER_CONTENT_RESOURCE);
@@ -299,17 +295,11 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 				try {
 					WebDAVFilePermissionResource resource = (WebDAVFilePermissionResource) IBOLookup.getSessionInstance(iwc, WebDAVFilePermissionResource.class);
 					resource.clear();
-				}
-				catch (IBOLookupException e) {
-					e.printStackTrace();
-				}
-				catch (RemoteException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-
 			maintainPath(true);
-
 		}
 
 	}
@@ -359,7 +349,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
 		if (this.useUserHomeFolder) {
-			this.rootFolder = getRepositoryService().getUserHomeFolder();
+			IWContext iwc = IWContext.getIWContext(context);
+			this.rootFolder = getRepositoryService().getUserHomeFolder(iwc.getLoggedInUser());
 		}
 
 		if (this.rootFolder == null) {
@@ -382,11 +373,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 				try {
 					WebDAVFilePermissionResource resource = (WebDAVFilePermissionResource) IBOLookup.getSessionInstance(iwc, WebDAVFilePermissionResource.class);
 					resource.clear();
-				}
-				catch (IBOLookupException e) {
-					e.printStackTrace();
-				}
-				catch (RemoteException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -582,11 +569,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 					try {
 						WebDAVFilePermissionResource resource = (WebDAVFilePermissionResource) IBOLookup.getSessionInstance(iwc, WebDAVFilePermissionResource.class);
 						resource.clear();
-					}
-					catch (IBOLookupException e) {
-						e.printStackTrace();
-					}
-					catch (RemoteException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}

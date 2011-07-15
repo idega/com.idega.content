@@ -13,7 +13,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.rmi.RemoteException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,14 +28,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ejb.FinderException;
+import javax.jcr.RepositoryException;
 
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpURL;
-import org.apache.commons.httpclient.URIException;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.content.bean.ContentItemFeedBean;
@@ -65,12 +63,11 @@ import com.idega.core.search.business.SearchResult;
 import com.idega.data.IDOLookup;
 import com.idega.graphics.image.business.ImageGenerator;
 import com.idega.graphics.image.business.ImageGeneratorImpl;
-import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.presentation.IWContext;
+import com.idega.repository.RepositoryService;
 import com.idega.servlet.filter.IWBundleResourceFilter;
-import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.IOUtil;
@@ -80,14 +77,16 @@ import com.idega.util.xml.XmlUtil;
 import com.idega.webface.WFUtil;
 
 public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper {
-	
+
 	private static Logger LOGGER = Logger.getLogger(ThemesHelperImpl.class.getName());
-	
+
+	@Autowired
+	private RepositoryService repositoryService;
+
 	private volatile ImageGenerator generator = null;
-	private volatile IWSlideService service = null;
 	private volatile ThemesService themesService = null;
 	private volatile ContentItemFeedBean feedBean = null;
-	
+
 	private Map<String, Theme> themes = null;
 	private List<Setting> pageSettings = null;
 	private List<Setting> themeSettings = null;
@@ -96,14 +95,14 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	private List<String> urisToThemes = null;
 	private List<String> loadedThemes = null;
 	private List<String> predefinedThemeStyles = null;
-	
+
 	private boolean checkedFromSlide = false;
 	private boolean loadedThemeSettings = false;
 	private boolean loadedPageSettings = false;
-	
+
 	private String fullWebRoot; // For cache
 	private String webRoot;
-	
+
 	private static final String RESOURCE_PATH_END = CoreConstants.DOT + "article";
 	private static final String ATTRIBUTE_PROPERTY = "value";
 	private static final String ROOT_PAGE_ARTICLE = "root_page_article";
@@ -113,24 +112,25 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	private static final String ELEMENT_CLASS_ATTRIBUTE = "class";
 	private static final String ATTRIBUTE_NAME = "name";
 	private static final String ATTRIBUTE_RESOURCE_PATH_VALUE = "resourcePath";
-	
+
 	private Random numberGenerator = null;
-	
+
 	private ThemesHelperImpl() {
 		themes = new HashMap <String, Theme> ();
-		
+
 		pageSettings = Collections.synchronizedList(new ArrayList<Setting>());
 		themeSettings = Collections.synchronizedList(new ArrayList<Setting>());
-		
+
 		themeQueue = new ArrayList <String> ();
 		urisToThemes = new ArrayList <String> ();
 		loadedThemes = new ArrayList<String>();
 		moduleIds = new ArrayList<String>();
 		predefinedThemeStyles = new ArrayList<String>();
-		
+
 		numberGenerator = new Random();
 	}
-	
+
+	@Override
 	public ImageGenerator getImageGenerator(IWContext iwc) {
 		if (generator == null) {
 			if (iwc == null) {
@@ -145,49 +145,35 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return generator;
 	}
-	
-	public IWSlideService getSlideService() {
-		return getSlideService(null);
+
+	@Override
+	public RepositoryService getRepositoryService() {
+		return repositoryService;
 	}
-	
-	public IWSlideService getSlideService(IWApplicationContext iwac) {
-		if (service == null) {
-			try {
-				if (iwac == null) {
-					iwac = CoreUtil.getIWContext();
-				}
-				service = getServiceInstance(iwac, IWSlideService.class);
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-		}
-		return service;
-	}
-	
-	
+
 	private ContentItemFeedBean getFeedBean() {
 		if (feedBean == null) {
 			feedBean = new ContentItemFeedBean((IWContext)null, ContentItemFeedBean.FEED_TYPE_ATOM_1);
 		}
 		return feedBean;
 	}
-	
+
+	@Override
 	public synchronized void searchForThemes() {
 		if (checkedFromSlide) {
 			return;
 		}
 		checkedFromSlide = true;
-		
+
 		String searchScope = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(ThemesConstants.THEMES_PATH).toString();
-		
+
 		List<SearchResult> themes = search(ThemesConstants.THEME_SEARCH_KEY, searchScope);
 		if (themes == null) {
 			LOGGER.warning("ContentSearch.doSimpleDASLSearch did not return any results! for: " + ThemesConstants.THEME_SEARCH_KEY + " in: " + searchScope);
 			checkedFromSlide = false;
 			return;
 		}
-		
+
 		List<String> themesSkeletons = loadSearchResults(themes, ThemesConstants.THEME_SKELETONS_FILTER);
 		try {
 			ThemesLoader themesLoader = new ThemesLoader();
@@ -196,13 +182,14 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			LOGGER.log(Level.WARNING, "Error loading themes: " + themesSkeletons, e);
 		}
 	}
-	
+
+	@Override
 	public List<String> loadSearchResults(List<SearchResult> searchResults, List<String> filter) {
 		List <String> loadedResults = new ArrayList<String>();
 		if (searchResults == null) {
 			return loadedResults;
 		}
-		
+
 		String uri = null;
 		for (int i = 0; i < searchResults.size(); i++) {
 			uri = searchResults.get(i).getSearchResultURI();
@@ -212,17 +199,19 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return loadedResults;
 	}
-	
+
+	@Override
 	public List<SearchResult> search(String searchKey, String searchScope) {
 		if (searchKey == null || searchScope == null) {
 			return null;
 		}
-		
+
 		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
 		Collection<SearchResult> results = search.doSimpleDASLSearch(searchKey, searchScope);
 		return ListUtil.isEmpty(results) ? null : new ArrayList<SearchResult>(results);
 	}
-	
+
+	@Override
 	public String getFileName(String uri) {
 		if (uri == null) {
 			return null;
@@ -238,7 +227,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return name;
 	}
-	
+
+	@Override
 	public String getFileNameWithExtension(String uri) {
 		if (uri == null) {
 			return null;
@@ -253,7 +243,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return name;
 	}
-	
+
+	@Override
 	public String extractValueFromString(String fullString, int beginIndex, int endIndex) {
 		String value = ThemesConstants.EMPTY;
 		if (canExtractValueFromString(fullString, beginIndex, endIndex)) {
@@ -261,7 +252,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return value;
 	}
-	
+
 	private boolean canExtractValueFromString(String fullString, int beginIndex, int endIndex) {
 		if (fullString == null) {
 			return false;
@@ -273,7 +264,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return false;
 	}
-	
+
+	@Override
 	public String getFileExtension(String uri) {
 		if (uri == null) {
 			return null;
@@ -285,58 +277,44 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return type;
 	}
-	
+
+	@Override
 	public String getWebRootWithoutContent() {
 		return getWebRootWithoutContent(getFullWebRoot());
 	}
-	
+
+	@Override
 	public String getWebRootWithoutContent(String fullWebRoot) {
 		if (webRoot != null) {
 			return webRoot;
 		}
-		String webDAVServerURI = ThemesConstants.EMPTY;
-		try {
-			webDAVServerURI = getSlideService().getWebdavServerURL();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		String webDAVServerURI = getRepositoryService().getWebdavServerURL();
 		int contentIndex = fullWebRoot.indexOf(webDAVServerURI);
 		webRoot = extractValueFromString(fullWebRoot, 0, contentIndex);
 		return webRoot;
 	}
-	
+
+	@Override
 	public String getFullWebRoot() {
 		if (fullWebRoot != null) {
 			return fullWebRoot;
 		}
-		HttpURL root = null;
-		try {
-			root = getSlideService().getWebdavServerURL();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-			return null;
-		}
-		
-		String serverURL = null;
-		try {
-			serverURL = root.getURI();
-		} catch (URIException e) {
-			e.printStackTrace();
-			return null;
-		}
-		
+
+		String serverURL = getRepositoryService().getWebdavServerURL();
 		fullWebRoot = serverURL;
-		
+
 		return fullWebRoot;
 	}
-	
+
+	@Override
 	public boolean isCorrectFile(String fileName, String nameTemplate) {
 		if (fileName == null || nameTemplate == null) {
 			return false;
 		}
 		return fileName.equals(nameTemplate);
 	}
-	
+
+	@Override
 	public boolean isCorrectThemeTemplateFile(String fileName, List<String> filter) {
 		boolean result = false;
 		if (fileName == null) {
@@ -348,27 +326,28 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		if (isDraft(fileName)) {
 			return false;
 		}
-		
+
 		int index = fileName.lastIndexOf(CoreConstants.DOT);
 		if (index == -1) {
 			return false;
 		}
 		String fileExtension = fileName.substring(index + 1);
-		
+
 		if (filter == null) {
 			return true;
 		}
-		
+
 		if (fileName.indexOf("index") == -1 && fileName.indexOf(ThemesConstants.IDEGA_THEME) == -1) {
 			return false;
 		}
-		
+
 		for (int i = 0; (i < filter.size() && !result); i++) {
 			result = isCorrectFile(fileExtension, filter.get(i));
 		}
 		return result;
 	}
-	
+
+	@Override
 	public boolean isCreatedManually(String fileName) {
 		if (fileName == null) {
 			return true;
@@ -378,7 +357,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return false;
 	}
-	
+
+	@Override
 	public boolean isDraft(String fileName) {
 		if (fileName == null) {
 			return true;
@@ -388,7 +368,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return false;
 	}
-	
+
+	@Override
 	public boolean isSystemFile(String fileName) {
 		if (fileName == null) {
 			return true; // Not a system file, but invalid also
@@ -398,19 +379,21 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return false;
 	}
-	
+
+	@Override
 	public boolean isPropertiesFile(String uri) {
 		if (ThemesConstants.THEME_PROPERTIES_FILES.contains(uri)) {
 			return true;
 		}
 		return false;
 	}
-	
+
+	@Override
 	public void addTheme(Theme theme) {
 		if (theme == null) {
 			return;
 		}
-		
+
 		Collection<String> registeredThemesIds = new ArrayList<String>(themes.keySet());
 		boolean validTheme = true;
 		for (Iterator<String> idsIter = registeredThemesIds.iterator(); (validTheme && idsIter.hasNext());) {
@@ -419,56 +402,61 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 				validTheme = false;
 			}
 		}
-		
+
 		if (validTheme) {
 			themes.put(theme.getId(), theme);
 		}
 	}
-	
+
+	@Override
 	public List<Theme> getAvailableThemes() {
 		Iterator<Theme> it = themes.values().iterator();
 		if (it == null) {
 			return null;
 		}
-		
+
 		List<Theme> availableThemes = new ArrayList<Theme>();
 		Theme theme = null;
 		for (Iterator<Theme> i = it; i.hasNext();) {
 			theme = i.next();
-			
+
 			if (!theme.isLoading() && !theme.isLocked() && theme.isPropertiesExtracted()) {
 				availableThemes.add(theme);
 			}
 		}
-		
+
 		return availableThemes;
 	}
-	
+
+	@Override
 	public Collection<Theme> getAllThemes() {
 		return themes.values();
 	}
-	
+
+	@Override
 	public List<Theme> getSortedThemes() {
 		List<Theme> availableThemes = getAvailableThemes();
-		
+
 		if (availableThemes == null || availableThemes.isEmpty()) {
 			return null;
 		}
-		
+
 		Locale locale = null;
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc != null) {
 			locale = iwc.getCurrentLocale();
 		}
 		Collections.sort(availableThemes, new ThemesComparator(locale == null ? Locale.ENGLISH : locale));
-		
+
 		return availableThemes;
 	}
-	
+
+	@Override
 	public synchronized void addUriToTheme(String uri) {
 		urisToThemes.add(uri);
 	}
-	
+
+	@Override
 	public synchronized boolean existTheme(String uri) {
 		if (urisToThemes == null) {
 			return false;
@@ -480,18 +468,19 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return false;
 	}
-	
+
+	@Override
 	public Document getXMLDocument(String url) {
 		return getXMLDocument(url, false, false);
 	}
-	
+
 	private Document getXMLDocument(String url, boolean cleanWithHtmlCleaner, boolean useLog, boolean omitComments, boolean omitDocTypeDeclaration) {
 		if (url == null) {
 			return null;
 		}
-		
+
 		InputStream stream = getInputStream(url, useLog);
-		
+
 		if (stream != null && cleanWithHtmlCleaner) {
 			String content = getThemesService().getBuilderService().getCleanedHtmlContent(stream, omitDocTypeDeclaration, false, omitComments);
 			if (content == null) {
@@ -503,7 +492,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 				e.printStackTrace();
 			}
 		}
-		
+
 		try {
 			return getXMLDocument(stream);
 		} catch(Exception e) {
@@ -511,22 +500,26 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		} finally {
 			IOUtil.closeInputStream(stream);
 		}
-		
+
 		return null;
 	}
-	
+
+	@Override
 	public Document getXMLDocument(String url, boolean cleanWithHtmlCleaner, boolean omitComments) {
 		return getXMLDocument(url, cleanWithHtmlCleaner, false, omitComments);
 	}
-	
+
+	@Override
 	public Document getXMLDocument(String url, boolean cleanWithHtmlCleaner, boolean omitComments, boolean omitDocTypeDeclaaration) {
 		return getXMLDocument(url, cleanWithHtmlCleaner, false, omitComments, omitDocTypeDeclaaration);
 	}
-	
+
+	@Override
 	public Document getXMLDocument(InputStream stream) throws Exception {
 		return XmlUtil.getJDOMXMLDocument(stream, false);
 	}
-	
+
+	@Override
 	public String getLinkToBase(String uri) {
 		int index = uri.lastIndexOf(ContentConstants.SLASH);
 		String link = extractValueFromString(uri, 0, index);
@@ -535,14 +528,16 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return link;
 	}
-	
+
+	@Override
 	public Theme getTheme(String themeKey) {
 		if (themeKey == null) {
 			return null;
 		}
 		return themes.get(themeKey);
 	}
-	
+
+	@Override
 	public void removeTheme(String uri, String themeKey) {
 		if (uri == null || themeKey == null) {
 			return;
@@ -551,23 +546,27 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		themes.remove(themeKey);
 	}
 
+	@Override
 	public Map<String, Theme> getThemes() {
 		return themes;
 	}
-	
+
+	@Override
 	public List<Setting> getThemeSettings() {
 		return themeSettings;
 	}
-	
+
+	@Override
 	public List<Setting> getPageSettings() {
 		return pageSettings;
 	}
-	
+
+	@Override
 	public void loadThemeSettings(InputStream stream) {
 		if (loadedThemeSettings) {
 			return;
 		}
-		
+
 		try {
 			loadSettings(themeSettings, getXMLDocument(stream));
 			loadedThemeSettings = true;
@@ -576,7 +575,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			loadedThemeSettings = false;
 		}
 	}
-	
+
+	@Override
 	public void loadPageSettings(String url) {
 		if (loadedPageSettings) {
 			return;
@@ -584,7 +584,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		loadSettings(pageSettings, getXMLDocument(url));
 		loadedPageSettings = true;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void loadSettings(List<Setting> settings, Document doc) {
 		if (doc == null) {
@@ -603,13 +603,13 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		for (int i = 0; i < keys.size(); i++) {
 			key = keys.get(i);
 			setting = new Setting();
-			
+
 			setting.setCode(key.getChildTextNormalize(ThemesConstants.SETTING_CODE));
 			setting.setLabel(key.getChildTextNormalize(ThemesConstants.SETTING_LABEL));
 			setting.setDefaultValue(key.getChildTextNormalize(ThemesConstants.SETTING_DEFAULT_VALUE));
 			setting.setType(key.getChildTextNormalize(ThemesConstants.SETTING_TYPE));
 			setting.setMethod(key.getChildTextNormalize(ThemesConstants.SETTING_METHOD));
-			
+
 			settings.add(setting);
 		}
 	}
@@ -618,7 +618,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		if (uri == null) {
 			return null;
 		}
-		
+
 		if (uri.startsWith(IWBundleResourceFilter.BUNDLES_STANDARD_DIR)) {
 			File file = IWBundleResourceFilter.copyResourceFromJarToWebapp(IWMainApplication.getDefaultIWMainApplication(), uri);
 			if (file == null) {
@@ -627,7 +627,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 				}
 				return null;
 			}
-			
+
 			try {
 				return new FileInputStream(file);
 			} catch (FileNotFoundException e) {
@@ -653,7 +653,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 					uri = uri.replace(webServer, CoreConstants.EMPTY);
 				}
 				try {
-					return getSlideService().getInputStream(uri);
+					return getRepositoryService().getInputStream(uri);
 				} catch (Exception e) {
 					if (printError) {
 						LOGGER.log(Level.WARNING, "Error getting InputStream from: " + uri, e);
@@ -661,14 +661,16 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 				}
 			}
 		}
-		
+
 		return null;
 	}
-	
+
+	@Override
 	public InputStream getInputStream(String link) {
 		return getInputStream(link, false);
 	}
-	
+
+	@Override
 	public String encode(String value, boolean fullyEncode) {
 		if (value == null) {
 			return null;
@@ -686,7 +688,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return value;
 	}
-	
+
+	@Override
 	public String urlEncode(String url) {
 		String[] fileParts = url.split(ContentConstants.SLASH);
 		StringBuffer encoded = new StringBuffer();
@@ -708,7 +711,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return encode(encoded.toString(), false);
 	}
-	
+
+	@Override
 	public String decode(String value, boolean fullyDecode) {
 		if (value == null) {
 			return null;
@@ -726,7 +730,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return value;
 	}
-	
+
+	@Override
 	public String decodeUrl(String url) {
 		url = decode(url, false);
 		String[] fileParts = url.split(ContentConstants.SLASH);
@@ -747,19 +752,22 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return encoded.toString();
 	}
-	
+
+	@Override
 	public boolean createSmallImage(Theme theme) {
 		if (theme == null) {
 			return false;
 		}
-		
+
 		return generatePreviewsForTheme(theme, false, false, ThemesConstants.THEME_PREVIEW_QUALITY);
 	}
-	
+
+	@Override
 	public boolean createSmallImage(Theme theme, boolean useDraftPreview) {
 		return createSmallImage(theme);
 	}
-	
+
+	@Override
 	public ThemesService getThemesService() {
 		if (themesService == null) {
 			try {
@@ -771,20 +779,21 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return themesService;
 	}
 
+	@Override
 	public boolean createThemeConfig(Theme theme) {
 		Document doc = new Document();
 		Element root = new Element(ThemesConstants.CON_THEME);
 		Collection <Element> rootElements = new ArrayList<Element>();
-		
+
 		//	Name
 		Element name = new Element(ThemesConstants.CON_NAME);
 		name.setText(theme.getName());
 		rootElements.add(name);
-		
+
 		//	Style variations
 		Element styles = new Element(ThemesConstants.CON_STYLES);
 		Collection <Element> stylesElements = new ArrayList<Element>();
-		
+
 		List<ThemeStyleGroupMember> enabled = null;
 		try {
 			enabled = theme.getEnabledStyles();
@@ -792,9 +801,9 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		ThemeStyleGroupMember member = null;
-		
+
 		Element style = null;
 		Collection <Element> styleElements = null;
 		Element groupName = null;
@@ -810,18 +819,18 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			groupName = new Element(ThemesConstants.CON_GROUP);
 			groupName.setText(member.getGroupName());
 			styleElements.add(groupName);
-			
+
 			variation = new Element(ThemesConstants.CON_VARIATION);
 			variation.setText(member.getName());
 			styleElements.add(variation);
-			
+
 			if (!member.isStylesheet()) {	//	For other types then simple CSS variations
 				if (member.getColour() != null && member.getVariable() != null) {
 					//	Color settings
 					variable = new Element(ThemesConstants.CON_VARIABLE);
 					variable.setText(member.getVariable());
 					styleElements.add(variable);
-					
+
 					color = new Element(ThemesConstants.CON_COLOR);
 					hexColor = theme.getStyleVariableValue(member.getVariable());
 					if (hexColor == null) {
@@ -838,21 +847,21 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		styles.setContent(stylesElements);
 		rootElements.add(styles);
-		
+
 		//	Color files
 		addColourFilesToConfig(rootElements, theme.getOriginalColourFiles(), ThemesConstants.CON_COLOUR_FILES_ORIGINAL);
 		addColourFilesToConfig(rootElements, theme.getColourFiles(), ThemesConstants.CON_COLOUR_FILES);
-		
+
 		//	Small preview image
 		Element smallPreview = new Element(ThemesConstants.CON_SMALL_PREVIEW);
 		smallPreview.setText(theme.getLinkToSmallPreview());
 		rootElements.add(smallPreview);
-		
+
 		//	Page id
 		Element pageId = new Element(ThemesConstants.CON_PAGE_ID);
 		pageId.setText(String.valueOf(theme.getIBPageID()));
 		rootElements.add(pageId);
-		
+
 		//	Extra regions
 		List<AdvancedProperty> extraRegions = theme.getExtraRegions();
 		if (extraRegions.size() > 0) {
@@ -862,74 +871,77 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			Collection<Element> allRegions = new ArrayList<Element>();
 			for (int i = 0; i < extraRegions.size(); i++) {
 				extraRegion = extraRegions.get(i);
-			
+
 				region = new Element(ThemesConstants.CON_EXTRA_REGION);
 				region.setAttribute(ThemesConstants.CON_ATT_EXTRA_REGION_PARENT, extraRegion.getId());
 				region.setText(extraRegion.getValue());
 				allRegions.add(region);
 			}
-			
+
 			regions.setContent(allRegions);
 			rootElements.add(regions);
 		}
-		
+
 		//	Current built-in style
 		String uriOfCurrentlyUsedBuiltInStyle = theme.getCurrentlyUsedBuiltInStyleUri();
 		Element builtInStyleUri = new Element(ThemesConstants.CON_URI_OF_CURRENT_BUILT_IN_STYLE);
 		builtInStyleUri.setText(uriOfCurrentlyUsedBuiltInStyle == null ? ThemesConstants.MINUS_ONE : uriOfCurrentlyUsedBuiltInStyle);
 		rootElements.add(builtInStyleUri);
-		
+
 		root.setContent(rootElements);
 		doc.setRootElement(root);
-		
+
 		String fileName = getPreparedThemeNameToUseInRepository(theme);
 		try {
-			return getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), fileName + ThemesConstants.IDEGA_THEME_INFO,
-					XmlUtil.getPrettyJDOMDocument(doc), MimeTypeUtil.MIME_TYPE_XML, true);
+			return getRepositoryService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), fileName + ThemesConstants.IDEGA_THEME_INFO,
+					XmlUtil.getPrettyJDOMDocument(doc), MimeTypeUtil.MIME_TYPE_XML);
 			//changer.uploadDocument(doc, theme.getLinkToBaseAsItIs(), fileName + ThemesConstants.IDEGA_THEME_INFO, theme, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
 	}
-	
+
 	private void addColourFilesToConfig(Collection<Element> rootElements, List<String> files, String elementName) {
 		Element filesElement = new Element(elementName);
-		
+
 		Element fileElement = null;
 		Collection<Element> filesCollection = new ArrayList<Element>();
 		for (String file: files) {
 			fileElement = new Element(ThemesConstants.CON_COLOUR_FILE);
 			fileElement.setText(file);
-			
+
 			filesCollection.add(fileElement);
 		}
-		
+
 		if (filesCollection.isEmpty()) {
 			return;
 		}
-		
+
 		filesElement.setContent(filesCollection);
 		rootElements.add(filesElement);
 	}
-	
+
+	@Override
 	public String getPreparedThemeNameToUseInRepository(Theme theme) {
 		if (theme == null) {
 			return null;
 		}
-		
+
 		return getPreparedThemeNameToUseInRepository(theme.getName());
 	}
-	
+
+	@Override
 	public String getPreparedThemeNameToUseInRepository(String themeName) {
 		if (themeName == null) {
 			return null;
 		}
-		
+
 		String fileName = StringHandler.removeCharacters(themeName, ContentConstants.SPACE, ContentConstants.UNDER);
 		return StringHandler.replace(fileName, "'", CoreConstants.EMPTY);
 	}
-	
+
+	@Override
 	public String[] getPageValues(Setting s, String value) {
 		if (ThemesConstants.EMPTY.equals(s.getDefaultValue()) && value == null) {
 			return new String[] {ThemesConstants.EMPTY};
@@ -950,7 +962,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		parsedValues[parsedValues.length - 1] = value.trim();
 		return parsedValues;
 	}
-	
+
 	public boolean closeInputStreamReader(InputStreamReader stream) {
 		if (stream == null) {
 			return true;
@@ -963,7 +975,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return true;
 	}
-	
+
 	public boolean closeBufferedReader(BufferedReader buffer) {
 		if (buffer == null) {
 			return true;
@@ -976,13 +988,15 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return true;
 	}
-	
+
+	@Override
 	public synchronized void addThemeToQueue(String linkToBase) {
 		if (!themeQueue.contains(linkToBase)) {
 			themeQueue.add(linkToBase);
 		}
 	}
-	
+
+	@Override
 	public synchronized void removeThemeFromQueue(String linkToBase) {
 		Collection<Theme> themes = getAllThemes();
 		Theme theme = null;
@@ -994,8 +1008,9 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		themeQueue.remove(linkToBase);
 	}
-	
 
+
+	@Override
 	public String getLastVisitedPage() {
 		Object lastVisitedPage = WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "getLastVisitedPageId");
 		if (lastVisitedPage != null) {
@@ -1004,10 +1019,12 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return null;
 	}
 
+	@Override
 	public void setLastVisitedPage(String lastVisitedPage) {
 		WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "setLastVisitedPageId", lastVisitedPage, String.class);
 	}
-	
+
+	@Override
 	public String getLastUsedTheme() {
 		String lastUsedTheme = getDefaultTheme();
 		if (lastUsedTheme != null) {
@@ -1028,17 +1045,18 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return lastUsedTheme;
 	}
-	
+
+	@Override
 	public Theme getThemeByTemplateKey(String templateKey) {
 		if (templateKey == null) {
 			return null;
 		}
-		
+
 		List<Theme> themes = getAvailableThemes();
 		if (themes == null) {
 			return null;
 		}
-		
+
 		Theme theme = null;
 		for (int i = 0; i < themes.size(); i++) {
 			theme = themes.get(i);
@@ -1046,10 +1064,11 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 				return theme;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
+	@Override
 	public void setLastUsedTheme(String templateId) {
 		if (templateId == null || templateId.equals(ThemesConstants.MINUS_ONE)) {
 			return;
@@ -1061,7 +1080,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			e.printStackTrace();
 		}
 	}
-	
+
+	@Override
 	public String getDefaultTheme() {
 		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
 		if (settings == null) {
@@ -1069,7 +1089,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return settings.getProperty(ThemesConstants.LAST_USED_THEME);
 	}
-	
+
 	private Document preparePageDocument(Document doc, List<String> articlesPaths, int pageID) {
 		if (articlesPaths != null) {
 			List<Element> articleViewers = getArticleViewerElements(doc);
@@ -1089,19 +1109,19 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 				}
 			}
 		}
-		
+
 		if (!addIDsToModules(doc.getRootElement(), pageID)) {
 			return null;
 		}
-		
+
 		return doc;
 	}
-	
+
 	private List<Element> getArticleViewerElements(Document doc) {
 		if (doc == null) {
 			return null;
 		}
-		
+
 		List<Element> articleViewers = new ArrayList<Element>();
 		Object o = null;
 		Element e = null;
@@ -1125,10 +1145,10 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 				}
 			}
 		}
-		
+
 		return articleViewers;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private Attribute getArticleViewerResourcePathValueAttribute(Element articleViewer) {
 		if (articleViewer == null) {
@@ -1138,7 +1158,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		if (elements == null) {
 			return null;
 		}
-		
+
 		Attribute resourcePath = null;
 		Element element = null;
 		for (int j = 0; j < elements.size(); j++) {
@@ -1152,7 +1172,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return null;
 	}
-	
+
 	private boolean isArticleViewerWithoutResourcePath(Element articleViewer) {
 		Attribute resourcePathValue = getArticleViewerResourcePathValueAttribute(articleViewer);
 		if (resourcePathValue == null) {
@@ -1164,7 +1184,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return ContentConstants.EMPTY.equals(value) ? true : false;
 	}
-	
+
 	private String getTemplateForPage(String type, List<String> articlesPaths, String templateFile, int pageId) {
 		if (!templateFile.startsWith(IWBundleResourceFilter.BUNDLES_STANDARD_DIR)) {
 			templateFile = new StringBuffer(getWebRootWithoutContent()).append(templateFile).toString();
@@ -1182,27 +1202,28 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			return null;
 		}
 	}
-	
+
+	@Override
 	public String loadPageToSlide(String type, String templateFile, List<String> articlesPaths, int pageID) {
 		if (type == null || templateFile == null) {
 			return null;
 		}
-		
+
 		ICPage page = getThemesService().getICPage(pageID);
 		if (page == null) {
 			return null;
 		}
-		
+
 		String docContent = getTemplateForPage(type, articlesPaths, templateFile, pageID);
 		if (docContent == null) {
 			return null;
 		}
-		
+
 		templateFile = getFileNameWithExtension(templateFile);
 		if (templateFile == null) {
 			return null;
 		}
-		
+
 		String fullUrl = changeUploadFileName(ThemesConstants.PAGES_PATH_SLIDE + templateFile);
 		String base = extractValueFromString(fullUrl, 0, fullUrl.lastIndexOf(ContentConstants.SLASH));
 		if (!base.endsWith(ContentConstants.SLASH)) {
@@ -1211,58 +1232,57 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		String changedFileName = extractValueFromString(fullUrl, fullUrl.lastIndexOf(ContentConstants.SLASH) + 1, fullUrl.length());
 
 		try {
-			getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base, changedFileName, docContent, ContentConstants.XML_MIME_TYPE, true);
-		} catch (RemoteException e) {
-			e.printStackTrace();
+			if (!getRepositoryService().uploadFileAndCreateFoldersFromStringAsRoot(base, changedFileName, docContent, ContentConstants.XML_MIME_TYPE))
+				return null;
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Error uploading to " + base + changedFileName, e);
 			return null;
 		}
-		
+
 		return CoreConstants.WEBDAV_SERVLET_URI + base + changedFileName;
 	}
-	
+
 	private boolean existInSlide(String path) {
 		try {
-			return getSlideService().getExistence(path);
-		} catch (HttpException e) {
-			e.printStackTrace();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+			return getRepositoryService().getExistence(path);
+		} catch (RepositoryException e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
-	
+
+	@Override
 	public String getFixedSlideFileName(String fileName) {
 		if (fileName == null) {
 			return null;
 		}
-		
+
 		fileName = getPreparedThemeNameToUseInRepository(fileName);
 		fileName = StringHandler.removeCharacters(fileName, ContentConstants.BRACKET_OPENING, ContentConstants.EMPTY);
 		fileName = StringHandler.removeCharacters(fileName, ContentConstants.BRACKET_CLOSING, ContentConstants.EMPTY);
-		
+
 		return fileName;
 	}
-	
+
 	private String changeUploadFileName(String fileName) {
 		if (fileName == null) {
 			return null;
 		}
-		
+
 		String fileRoot = getFixedSlideFileName(fileName);
 		String fileType = ThemesConstants.EMPTY;
 		if (fileName.indexOf(CoreConstants.DOT) != -1) {
 			fileRoot = extractValueFromString(fileName, 0, fileName.lastIndexOf(CoreConstants.DOT));
 			fileType = getFileExtension(fileName);
 		}
-		
+
 		StringBuffer path = new StringBuffer(fileRoot).append(ContentConstants.UNDER);
 		path.append(getUniqueIdByNumberAndDate(IDEGA_PAGES_SCOPE)).append(CoreConstants.DOT).append(fileType);
-		
+
 		return path.toString();
 	}
-	
+
+	@Override
 	public String changeFileUploadPath(String path) {
 		if (path == null) {
 			return null;
@@ -1270,7 +1290,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 
 		path = getFixedSlideFileName(path);
 		StringBuffer tempPath = new StringBuffer(path);
-		
+
 		int i = 1;
 		while (existInSlide(tempPath.toString())) {
 			tempPath = new StringBuffer(path).append(i);
@@ -1279,7 +1299,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		path = tempPath.toString();
 		return path;
 	}
-	
+
+	@Override
 	public int getRandomNumber(int maxValue) {
 		int number;
 		try {
@@ -1290,7 +1311,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return number;
 	}
-	
+
+	@Override
 	public void removeLastUsedTheme(String templateID) {
 		if (templateID == null) {
 			return;
@@ -1304,7 +1326,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			settings.removeProperty(ThemesConstants.LAST_USED_THEME);
 		}
 	}
-	
+
+	@Override
 	public List<String> createArticle(String templateFile, int id) {
 		if (templateFile == null) {
 			return null;
@@ -1312,13 +1335,13 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		if (id == -1) {
 			return null;
 		}
-		
+
 		Document doc = getXMLDocument(templateFile);
 		List<Element> articleViewers = getArticleViewerElements(doc);
 		if (articleViewers == null) {
 			return null;
 		}
-		
+
 		ICPage page = getThemesService().getICPage(id);
 		if (page == null) {
 			return null;
@@ -1327,12 +1350,12 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		if (uri == null) {
 			return null;
 		}
-		
+
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return null;
 		}
-		
+
 		String language = getCurrentLanguage(iwc);
 
 		if (uri.endsWith(ContentConstants.SLASH)) {
@@ -1354,24 +1377,24 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 				}
 				base.append(ROOT_PAGE_ARTICLE);
 			}
-			base.append(getSlideService().createUniqueFileName(ContentConstants.ARTICLE_SCOPE));
+			base.append(getRepositoryService().createUniqueFileName(ContentConstants.ARTICLE_SCOPE));
 			base.append(RESOURCE_PATH_END);
-			
+
 			article = getArticleDocument(language, base.toString(), iwc);
-			
+
 			base.append(CoreConstants.SLASH);
 			try {
-				getSlideService().uploadFileAndCreateFoldersFromStringAsRoot(base.toString(), file.toString(), article, ContentConstants.XML_MIME_TYPE, true);
-				paths.add(base.toString());
-			} catch (RemoteException e) {
+				if (getRepositoryService().uploadFileAndCreateFoldersFromStringAsRoot(base.toString(), file.toString(), article, ContentConstants.XML_MIME_TYPE))
+					paths.add(base.toString());
+			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
 			}
 		}
-		
+
 		return paths;
 	}
-	
+
 	private String getArticleDocument(String language, String uri, IWContext iwc) {
 		String article = getArticle();
 		StringBuffer summary = new StringBuffer();
@@ -1392,13 +1415,14 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 				new Timestamp(System.currentTimeMillis()), null, summary.toString(), article, user, language, null, link.toString(),
 				null, null, linkToComments, ThemesConstants.MINUS_ONE);
 	}
-	
+
+	@Override
 	public String getArticleCommentLink(IWContext iwc, String pageURI) {
 		StringBuffer commentPath = new StringBuffer(ContentConstants.ARTICLE_PATH_START);
 		if (pageURI == null) {
 			commentPath.append(ContentConstants.SLASH).append(ContentUtil.getYearMonthPath(iwc));
 			commentPath.append(ContentConstants.SLASH);
-		} 
+		}
 		else {
 			String articleEnd = new StringBuffer(CoreConstants.DOT).append(CoreConstants.ARTICLE_FILENAME_SCOPE).toString();
 			if (pageURI.indexOf(commentPath.toString()) != -1 && pageURI.endsWith(articleEnd)) {
@@ -1416,22 +1440,22 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 				commentPath.append(pageURI);
 			}
 		}
-		commentPath.append(getSlideService().createUniqueFileName(ContentConstants.COMMENT_SCOPE));
-		
+		commentPath.append(getRepositoryService().createUniqueFileName(ContentConstants.COMMENT_SCOPE));
+
 		return getFinishedCommentsLink(commentPath);
 	}
-	
+
 	private String getFinishedCommentsLink(StringBuffer uri) {
 		if (uri == null) {
 			return null;
 		}
-		
+
 		uri.append(ContentConstants.COMMENT_PREFIX).append(ContentConstants.SLASH).append(ContentConstants.COMMENT_SCOPE).append(CoreConstants.DOT);
 		uri.append(ThemesConstants.XML_EXTENSION);
-		
+
 		return uri.toString();
 	}
-	
+
 	private boolean addIDsToModules(Element root, int pageID) {
 		if (root == null || pageID < 0) {
 			return false;
@@ -1444,17 +1468,17 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		Element e = null;
 		Object o = null;
 		Attribute moduleIdAttribute = null;
-		
+
 		String id = "id";
 		String pageKey = String.valueOf(pageID);
 		String moduleID = null;
-		
+
 		int icObjectId = -1;
-		
+
 		ICObjectInstanceHome icoiHome = null;
 		ICObjectHome icoHome = null;
 		ICObjectInstance instance = null;
-		
+
 		try {
 			icoiHome = (ICObjectInstanceHome) IDOLookup.getHome(ICObjectInstance.class);
 			icoHome = (ICObjectHome)IDOLookup.getHome(ICObject.class);
@@ -1500,12 +1524,12 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return true;
 	}
-	
+
 	private int getICObjectId(String className, ICObjectHome icoHome) {
 		if (className == null || icoHome == null) {
 			return -1;
 		}
-		
+
 		ICObject object = null;
 		try {
 			object = icoHome.findByClassName(className);
@@ -1521,14 +1545,14 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			return -1;
 		}
 	}
-	
+
 	private String getArticle() {
 		StringBuffer article = new StringBuffer();
 		article.append(getArticleImageTag());
 		article.append(ThemesConstants.DUMMY_ARTICLES.get(getRandomNumber(ThemesConstants.DUMMY_ARTICLES.size())));
 		return article.toString();
 	}
-	
+
 	private String getArticleImageTag() {
 		StringBuffer img = new StringBuffer();
 		img.append("<img vspace=\"0\" hspace=\"5px\" border=\"0\" align=\"");
@@ -1539,13 +1563,14 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		img.append("\" />");
 		return img.toString();
 	}
-	
+
+	@Override
 	public String getFullServerName(IWContext iwc) {
 		StringBuffer server = new StringBuffer();
 		if (iwc == null) {
 			iwc = CoreUtil.getIWContext();
 		}
-		
+
 		if (iwc == null) {
 			return getWebRootWithoutContent();
 		}
@@ -1565,12 +1590,13 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return server.toString();
 	}
-	
+
+	@Override
 	public boolean setNewLinkInArticleFile(IWContext iwc, String link, String language, String baseDirectory, String pageUri) {
 		if (iwc == null || link == null || language == null || baseDirectory == null || pageUri == null) {
 			return false;
 		}
-		
+
 		StringBuffer fileName = new StringBuffer(language).append(CoreConstants.DOT).append(ThemesConstants.XML_EXTENSION);
 		StringBuffer articleLink = new StringBuffer(link).append(fileName.toString());
 		Document d = getXMLDocument(articleLink.toString());
@@ -1598,22 +1624,21 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			id.setText(newLink.toString());
 		}
 		try {
-			getSlideService(iwc).uploadFileAndCreateFoldersFromStringAsRoot(baseDirectory, fileName.toString(), XmlUtil.getPrettyJDOMDocument(d),
-					ContentConstants.XML_MIME_TYPE, true);
+			return getRepositoryService().uploadFileAndCreateFoldersFromStringAsRoot(baseDirectory, fileName.toString(), XmlUtil.getPrettyJDOMDocument(d),
+					ContentConstants.XML_MIME_TYPE);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
 		}
-		return true;
+		return false;
 	}
-	
+
 	private boolean existFileInSlide(String path, boolean printError) {
 		if (path == null) {
 			return false;
 		}
-		
+
 		try {
-			return getSlideService().getExistence(path);
+			return getRepositoryService().getExistence(path);
 		} catch (Exception e) {
 			if (printError) {
 				LOGGER.log(Level.WARNING, "Error checking if file '" + path + "' exists", e);
@@ -1621,17 +1646,17 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return false;
 	}
-	
+
 	public boolean existFileInSlide(String path) {
 		return existFileInSlide(path, false);
 	}
-	
+
 	public String getUniqueIdByNumberAndDate(String scope) {
 		StringBuffer id = new StringBuffer();
-		id.append(getRandomNumber(Integer.MAX_VALUE)).append(getSlideService().createUniqueFileName(scope));
+		id.append(getRandomNumber(Integer.MAX_VALUE)).append(getRepositoryService().createUniqueFileName(scope));
 		return id.toString();
 	}
-	
+
 	public String getLocalizedText(String key) {
 		try {
 			return ContentUtil.getBundle().getLocalizedString(key);
@@ -1640,7 +1665,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			return key;
 		}
 	}
-	
+
 	public String getCurrentLanguage(IWContext iwc) {
 		if (iwc == null) {
 			iwc = CoreUtil.getIWContext();
@@ -1654,22 +1679,22 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return l.getLanguage();
 	}
-	
+
 	public void addLoadedTheme(String id) {
 		if (loadedThemes.contains(id)) {
 			return;
 		}
 		loadedThemes.add(id);
 	}
-	
+
 	public int getLoadedThemesCount() {
 		return loadedThemes.size();
 	}
-	
+
 	public boolean isCheckedFromSlide() {
 		return checkedFromSlide;
 	}
-	
+
 	/**
 	 * Generates big and small previews for single theme
 	 * @param theme
@@ -1681,30 +1706,28 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	public boolean generatePreviewsForTheme(Theme theme, boolean useDraft, boolean isJpg, float quality) {
 		String url = new StringBuilder(getFullWebRoot()).append(useDraft ? theme.getLinkToDraft() : theme.getLinkToSkeleton()).toString();
 		String smallPreviewName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).toString();
-		
+
 		List<Dimension> dimensions = Arrays.asList(new Dimension(ThemesConstants.SMALL_PREVIEW_WIDTH, ThemesConstants.SMALL_PREVIEW_HEIGHT));
-	
+
 		ImageGenerator imageGenerator = getImageGenerator(null);
-		
+
 		List<BufferedImage> images = imageGenerator.generatePreviews(url, dimensions, isJpg, quality);
 		if (images == null) {
 			return false;
 		}
-		
+
 		String extension = imageGenerator.getFileExtension();
 		String mimeType = new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString();
 		smallPreviewName = new StringBuffer(smallPreviewName).append(CoreConstants.DOT).append(extension).toString();
-		
+
 		BufferedImage image = null;
 		InputStream stream = null;
-		IWSlideService slide = getSlideService();
 		for (int i = 0; i < images.size(); i++) {
 			image = images.get(i);
 			stream = imageGenerator.getImageInputStream(image, extension);
 			try {
-				if (slide.uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), smallPreviewName, stream, mimeType, true)) {
+				if (getRepositoryService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), smallPreviewName, stream, mimeType))
 					theme.setLinkToSmallPreview(smallPreviewName);
-				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				return false;
@@ -1712,15 +1735,15 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 				IOUtil.closeInputStream(stream);
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	public String getThemeColourFileName(Theme theme, String customName, String file, boolean markAsOriginalFile) {
 		if (file == null) {
 			return null;
 		}
-		
+
 		if (customName == null) {
 			if (theme != null) {
 				customName = theme.getName();
@@ -1730,12 +1753,12 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			}
 		}
 		customName = StringHandler.convertToUrlFriendly(customName);
-	
+
 		String cssFileName = file;
 		if (file.indexOf(CoreConstants.DOT) != -1) {
 			cssFileName = file.substring(0, file.lastIndexOf(CoreConstants.DOT));
 		}
-		
+
 		StringBuffer name = new StringBuffer(cssFileName);
 		if (!(name.toString().endsWith(customName))) {
 			name.append(CoreConstants.UNDER).append(customName);
@@ -1746,19 +1769,19 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		name.append(CoreConstants.DOT).append(getFileExtension(file));
 		return name.toString();
 	}
-	
+
 	public void addPredefinedThemeStyle(String uri) {
 		if (predefinedThemeStyles.contains(uri)) {
 			return;
 		}
-		
+
 		predefinedThemeStyles.add(uri);
 	}
-	
+
 	public List<String> getPredefinedThemeStyles() {
 		return predefinedThemeStyles;
 	}
-	
+
 	public String getBuiltInThemeStyleId(Theme theme) {
 		String id = String.valueOf(getRandomNumber(Integer.MAX_VALUE));
 		while (theme.getBuiltInThemeStyle(id) != null) {

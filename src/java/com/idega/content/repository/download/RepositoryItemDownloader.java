@@ -8,39 +8,40 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.webdav.lib.WebdavResource;
+import org.apache.jackrabbit.JcrConstants;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.presentation.WebDAVListManagedBean;
-import com.idega.content.repository.bean.WebDAVItem;
 import com.idega.core.file.util.MimeTypeUtil;
-import com.idega.idegaweb.IWMainApplication;
 import com.idega.io.DownloadWriter;
+import com.idega.jackrabbit.bean.JackrabbitRepositoryItem;
 import com.idega.presentation.IWContext;
+import com.idega.repository.RepositoryService;
 import com.idega.repository.bean.RepositoryItem;
-import com.idega.slide.business.IWSlideService;
+import com.idega.user.data.bean.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
-import com.idega.util.ListUtil;
+import com.idega.util.expression.ELUtil;
 
 public class RepositoryItemDownloader extends DownloadWriter {
 
 	private static final Logger LOGGER = Logger.getLogger(RepositoryItemDownloader.class.getName());
-	
+
 	private String url, mimeType;
-	
+
 	private boolean folder;
-	
+
 	@Override
 	public String getMimeType() {
 		return mimeType;
@@ -51,7 +52,7 @@ public class RepositoryItemDownloader extends DownloadWriter {
 		if (!iwc.isLoggedOn() && !iwc.isSuperAdmin()) {
 			return;
 		}
-		
+
 		url = iwc.getParameter(WebDAVListManagedBean.PARAMETER_WEB_DAV_URL);
 		folder = Boolean.valueOf(iwc.getParameter(WebDAVListManagedBean.PARAMETER_IS_FOLDER));
 		mimeType = folder ? MimeTypeUtil.MIME_TYPE_ZIP : MimeTypeUtil.resolveMimeTypeFromFileName(url);
@@ -59,16 +60,12 @@ public class RepositoryItemDownloader extends DownloadWriter {
 
 	@Override
 	public void writeTo(OutputStream out) throws IOException {
-		IWSlideService repository = null;
-		try {
-			repository = getRepository();
-		} catch (IBOLookupException e) {
-			LOGGER.log(Level.SEVERE, "Error getting repository service!", e);
-		}
-		
+		RepositoryService repository = getRepository();
+
 		if (folder) {
+			User user = CoreUtil.getIWContext().getLoggedInUser();
 			//	ZIP the contents of the folder and write to the output stream
-			File zippedContents = getZippedContents(repository);
+			File zippedContents = getZippedContents(repository, user);
 			try {
 				FileUtil.streamToOutputStream(new FileInputStream(zippedContents), out);
 			} finally {
@@ -78,7 +75,15 @@ public class RepositoryItemDownloader extends DownloadWriter {
 			}
 		} else {
 			//	Writing the contents of selected file to the output stream
-			InputStream stream = repository.getInputStream(url);
+			InputStream stream = null;
+			try {
+				stream = repository.getInputStream(url);
+			} catch (RepositoryException e) {
+				e.printStackTrace();
+			}
+			if (stream == null)
+				return;
+
 			IWContext iwc = CoreUtil.getIWContext();
 			if (iwc != null) {
 				String fileName = getFileName(url);
@@ -89,7 +94,7 @@ public class RepositoryItemDownloader extends DownloadWriter {
 			FileUtil.streamToOutputStream(stream, out);
 		}
 	}
-	
+
 	private String getFileName(String url) {
 		String fileName = url;
 		if (fileName.endsWith(CoreConstants.SLASH)) {
@@ -100,55 +105,62 @@ public class RepositoryItemDownloader extends DownloadWriter {
 		}
 		return fileName;
 	}
-	
-	private File getZippedContents(IWSlideService repository) throws IOException {
+
+	private File getZippedContents(RepositoryService repository, User user) throws IOException {
+		Node folder = null;
+		try {
+			folder = repository.getNodeAsRootUser(url);
+		} catch (RepositoryException e) {
+			e.printStackTrace();
+		}
+		if (folder == null)
+			return null;
+
 		String fileName = getFileName(url).concat(".zip");
 		Collection<RepositoryItem> itemsToZip = new ArrayList<RepositoryItem>();
-		
-		long start = System.currentTimeMillis();	//	TODO
-		
-		WebdavResource folder = repository.getWebdavResourceAuthenticatedAsRoot(url);
-		addItemsOfFolder(folder, itemsToZip);
-		LOGGER.info("Items to zip: " + itemsToZip);
-		
-		long end = System.currentTimeMillis();		//	TODO
-		LOGGER.info("Items to zip resolved in: " + (end - start) + " ms.");
-		
+		try {
+			addItemsOfFolder(folder, itemsToZip, user);
+		} catch (RepositoryException e) {
+			LOGGER.log(Level.WARNING, "Error adding items of " + folder + " to a ZIP file", e);
+		}
+
 		File zippedContents = FileUtil.getZippedFiles(itemsToZip, fileName, false, true);
 		if (zippedContents == null) {
 			return null;
 		}
-		
+
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc != null) {
 			setAsDownload(iwc, zippedContents.getName(), Long.valueOf(zippedContents.length()).intValue());
 		}
-		
+
 		return zippedContents;
 	}
-	
-	@SuppressWarnings("unchecked")
-	private void addItemsOfFolder(WebdavResource folder, Collection<RepositoryItem> itemsToZip) throws IOException {
-		List<WebdavResource> resources = Collections.list(folder.getChildResources().getResources());
-		if (ListUtil.isEmpty(resources)) {
+
+	private void addItemsOfFolder(Node folder, Collection<RepositoryItem> itemsToZip, User user) throws IOException, RepositoryException {
+		NodeIterator nodeIterator = folder.getNodes();
+		if (nodeIterator == null)
 			return;
-		}
-		
-		for (WebdavResource resource: resources) {
-			if (resource.isCollection()) {
-				String currentDirectory = resource.toString();
-				long start = System.currentTimeMillis();	//	TODO
-				LOGGER.info("Adding items from a directory: " + currentDirectory);
-				addItemsOfFolder(resource, itemsToZip);
-				long end = System.currentTimeMillis();		//	TODO
-				LOGGER.info("Items of " + currentDirectory + " added in: " + (end - start) + " ms.");
+
+		while (nodeIterator.hasNext()) {
+			Node node = nodeIterator.nextNode();
+
+			if (node.hasProperty(JcrConstants.NT_FOLDER)) {
+				addItemsOfFolder(node, itemsToZip, user);
+			} else if (node.hasProperty(JcrConstants.NT_FILE)) {
+				itemsToZip.add(new JackrabbitRepositoryItem(url, user, node));
 			} else {
-				itemsToZip.add(new WebDAVItem(resource, url));
+				LOGGER.warning("Node " + node + " is not a folder nor a file");
 			}
 		}
 	}
 
-	private IWSlideService getRepository() throws IBOLookupException {
-		return IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), IWSlideService.class);
+	@Autowired
+	private RepositoryService repository;
+
+	private RepositoryService getRepository() throws IBOLookupException {
+		if (repository == null)
+			ELUtil.getInstance().autowire(this);
+		return repository;
 	}
 }

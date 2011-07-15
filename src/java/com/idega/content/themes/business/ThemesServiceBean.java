@@ -10,8 +10,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ejb.FinderException;
+import javax.jcr.observation.Event;
+import javax.jcr.observation.EventIterator;
 
-import org.apache.slide.event.ContentEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.builder.business.BuilderLogicWrapper;
@@ -32,98 +33,51 @@ import com.idega.idegaweb.IWApplicationContextFactory;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
 import com.idega.servlet.filter.BaseFilter;
-import com.idega.slide.business.IWContentEvent;
-import com.idega.slide.business.IWSlideChangeListener;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
-public class ThemesServiceBean extends IBOServiceBean implements ThemesService, IWSlideChangeListener {
+public class ThemesServiceBean extends IBOServiceBean implements ThemesService {
 
 	private static final long serialVersionUID = -1765120426660957585L;
-	
+
 	private static final Logger LOGGER = Logger.getLogger(ThemesServiceBean.class.getName());
-	
+
 	@Autowired
 	private BuilderLogicWrapper builderLogicWrapper;
 
 	@Autowired
 	private ThemesHelper themesHelper;
-	
+
 	@Autowired
 	private ThemesEngine themesEngine;
-	
-	public void onSlideChange(IWContentEvent idegaWebContentEvent) {
-		String uri = idegaWebContentEvent.getContentEvent().getUri();
-		if (uri.indexOf(ThemesConstants.THEMES_PATH) == -1) {
-			return;	// If not processing theme
-		}
-		if (ContentEvent.REMOVE.equals(idegaWebContentEvent.getMethod())) {
-			if (getThemesHelper().isCorrectThemeTemplateFile(uri, ThemesConstants.THEME_SKELETONS_FILTER)) {
-				Collection<Theme> themes = getThemesHelper().getAllThemes();
-				if (themes == null) {
-					return;
-				}
-				boolean foundTheme = false;
-				Theme theme = null;
-				for (Iterator<Theme> it = themes.iterator(); (it.hasNext() && !foundTheme);) {
-					theme = it.next();
-					if (uri.equals(getThemesHelper().decodeUrl(theme.getLinkToSkeleton()))) {
-						foundTheme = true;
-					}
-				}
-				if (foundTheme && !theme.isLocked()) {
-					getThemesHelper().removeLastUsedTheme(String.valueOf(theme.getIBPageID()));
-					int pageId = theme.getIBPageID();
-					
-					String themeID = theme.getId();
-					getThemesHelper().removeTheme(uri, themeID);
-					
-					deleteTemplate(pageId);
-				}
-			}
-		}
-		else {
-			if (!getThemesHelper().isCreatedManually(uri) && getThemesHelper().isCorrectThemeTemplateFile(uri,
-					ThemesConstants.THEME_SKELETONS_FILTER) && isNewTheme(uri)) {
-				try {
-					ThemesLoader loader = new ThemesLoader();
-					loader.loadTheme(uri, getThemesHelper().urlEncode(uri), true, false);
-				} catch (Exception e) {
-					LOGGER.log(Level.WARNING, "Error loading theme: " + uri, e);
-				}
-			}
-			if (uri.endsWith(ThemesConstants.THEME_PREDEFINED_STYLE_CONFIG_FILE)) {
-				getThemesHelper().addPredefinedThemeStyle(uri);
-			}
-		}
-	}
-	
+
 	private boolean deleteTemplate(int pageId) {
 		if (pageId < 0) {
 			return false;
 		}
-		
+
 		return deletePage(String.valueOf(pageId), true, true, false, false);
 	}
-	
+
+	@Override
 	public boolean deleteIBPage(String pageID, boolean deleteChildren, boolean markPagesForDeletingArticles) {
 		return deletePage(pageID, deleteChildren, false, true, markPagesForDeletingArticles);
 	}
-	
+
 	private boolean deletePage(String pageKey, boolean deleteChildren, boolean canUseDefaultUser, boolean clearCache, boolean markPagesForDeletingArticles) {
 		if (pageKey == null) {
 			return false;
 		}
 
 		IWContext iwc = CoreUtil.getIWContext();
-		
+
 		@SuppressWarnings("rawtypes")
 		Map tree = null;
 		ICDomain domain = null;
 		int userId = 1;
-		
+
 		if (iwc == null && canUseDefaultUser) {
 			try {
 				userId = Integer.valueOf(getAccessController().getAdministratorUser().getId());	//	Using default user
@@ -139,18 +93,18 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			userId = iwc.getCurrentUserId();
 			tree = getBuilderService().getTree(iwc);
 			domain = iwc.getDomain();
-			
+
 			if (pageKey.equals(getThemesHelper().getLastVisitedPage())) {
 				getThemesHelper().setLastVisitedPage(null);
 			}
 		}
-		
+
 		if (markPagesForDeletingArticles) {
 			markPagesForDeletingArticles(pageKey, iwc);
 		}
 		boolean result = getBuilderService().deletePage(pageKey, deleteChildren, tree, userId, domain);
 		LOGGER.info("IBPage (id=" + pageKey + ") was deleted successfully: " + result);
-		
+
 		if (domain != null) {
 			try {
 				if (Integer.valueOf(pageKey).intValue() == domain.getStartPageID()) {
@@ -160,37 +114,37 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			} catch (NumberFormatException e) {
 				LOGGER.log(Level.WARNING, "Error converting to number: " + pageKey, e);
 			}
-			
+
 			if (clearCache) {
 				getBuilderService().clearAllCachedPages();
 			}
 		}
-		
+
 		BaseFilter.reInitializeCachedDomainOnNextRequest();
-		
+
 		return result;
 	}
-	
+
 	private void markPagesForDeletingArticles(String pageKey, IWContext iwc) {
 		if (pageKey == null || iwc == null) {
 			return;
 		}
-		
+
 		List<String> ids = new ArrayList<String>();
 		putAllIdsOfPageAndChildren(pageKey, ids);
-		
+
 		iwc.setSessionAttribute(ContentConstants.DELETED_PAGE_IN_LUCID_PROPERTIES_FOR_ARTICLE, ids);
 	}
-	
+
 	private void putAllIdsOfPageAndChildren(String pageKey, List<String> ids) {
 		ICPage page = getICPage(pageKey);
-		
+
 		if (page != null) {
 			String id = page.getId();
 			if (!ids.contains(id)) {
 				ids.add(id);
 			}
-			
+
 			@SuppressWarnings("rawtypes")
 			Collection children = page.getChildren();
 			if (children != null) {
@@ -205,37 +159,38 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			}
 		}
 	}
-	
+
+	@Override
 	public boolean createBuilderTemplate(Theme theme) {
 		if (theme == null) {
 			return false;
 		}
-		
+
 		if (theme.getIBPageID() != -1) {
 			return true;	//	IBPage (template) for this theme already exists
 		}
-		
+
 		int id = -1;
 		IWContext iwc = CoreUtil.getIWContext();
 		IWApplicationContext iwac = iwc == null ? IWMainApplication.getDefaultIWApplicationContext() : iwc;
-		
+
 		LucidEngine lucidEngine = ELUtil.getInstance().getBean(LucidEngine.SPRING_BEAN_IDENTIFIER);
 		if (lucidEngine == null) {
 			return false;
 		}
-		
+
 		int domainID = -1;
 		ICDomain domain = iwac.getDomain();
 		if (domain == null) {
 			return false;
 		}
 		domainID = domain.getID();
-		
+
 		String webDavUri = CoreConstants.WEBDAV_SERVLET_URI.concat(theme.getLinkToSkeleton());
 		if (existsTheme(theme, webDavUri, domainID)) {
 			return true;
 		}
-		
+
 		//	Creating IBPage (template) for theme
 		String parentId = getBuilderService().getTopLevelTemplateId(getBuilderService().getTopLevelTemplates(iwac));
 		if (parentId == null || ThemesConstants.MINUS_ONE.equals(parentId)) {
@@ -243,7 +198,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			parentId = lucidEngine.createRootTemplate(domain, getBuilderService(), domainID, getBuilderService().getIBXMLFormat());
 			lucidEngine.initializeCachedDomain(ThemesConstants.DEFAULT_DOMAIN_NAME, domain);
 		}
-		
+
 		String name = getThemesHelper().getPreparedThemeNameToUseInRepository(theme);
 		String suffix = getSuffixForTemplate(theme.getName());
 		String templateName = suffix == null ? theme.getName() : new StringBuilder(theme.getName()).append(suffix).toString();
@@ -255,25 +210,25 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		if (!uri.endsWith(CoreConstants.SLASH)) {
 			uri = uri.concat(CoreConstants.SLASH);
 		}
-		
+
 		id = createIBPage(parentId, templateName, getBuilderService().getTemplateKey(), null, uri, null, domainID, getBuilderService().getHTMLTemplateKey(), null);
 		if (id == -1) {
 			return false;
 		}
 		theme.setIBPageID(id);
-		
+
 		if (updatePageWebDav(theme.getIBPageID(), webDavUri)) {
 			ThemesEngine themesEngine = getThemesEngine();
 			if (themesEngine != null) {
 				themesEngine.updateSiteTemplatesTree(true);
 			}
-			
+
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	private String getUriForTemplate(String initialValue, int domainId) {
 		try {
 			ICPageHome pageHome = getICPageHome();
@@ -281,7 +236,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			if (template == null) {
 				return initialValue;
 			}
-			
+
 			LOGGER.warning("Trying to create template with already existing uri: " + initialValue + ", will change it!");
 			initialValue = initialValue.concat(CoreConstants.UNDER).concat(String.valueOf(System.currentTimeMillis()));
 			return getUriForTemplate(initialValue, domainId);
@@ -292,18 +247,18 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		return null;
 	}
-	
+
 	private boolean existsTheme(Theme theme, String webDavUri, int domainId) {
 		if (StringUtil.isEmpty(webDavUri)) {
 			return false;
 		}
-		
+
 		try {
 			ICPage icpage = getICPageHome().findByWebDavUri(webDavUri);
 			if (icpage == null) {
 				return false;
 			}
-			
+
 			boolean exists = !icpage.getDeleted();
 			if (exists) {
 				LOGGER.info("Template with WebDavUri '' already exists! Not creating new one.");
@@ -318,7 +273,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 	}
 	private String getSuffixForTemplate(String name) {
 		int counter = 0;
-		
+
 		Collection<ICPage> templates = null;
 		try {
 			templates = getICPageHome().findAllByName(name, true);
@@ -326,12 +281,12 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 			LOGGER.log(Level.WARNING, "Error getting templates", e);
 			return null;
 		}
-		
+
 		String queryName = null;
 		while (templates != null && !templates.isEmpty()) {
 			counter++;
 			queryName = new StringBuilder(name).append(CoreConstants.UNDER).append(counter).toString();
-			
+
 			try {
 				templates = getICPageHome().findAllByName(queryName, true);
 			} catch (Exception e) {
@@ -339,52 +294,56 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 				return null;
 			}
 		}
-		
+
 		return counter == 0 ? null : new StringBuilder(CoreConstants.UNDER).append(counter).toString();
 	}
-	
+
+	@Override
 	public boolean updatePageWebDav(int id, String uri) {
 		return updatePageWebDav(id, uri, true);
 	}
-	
+
+	@Override
 	public boolean updatePageWebDav(int id, String uri, boolean clearCache) {
 		ICPage page = getICPage(id);
 		if (page == null) {
 			return false;
 		}
-		
+
 		page.setWebDavUri(uri);
 		page.store();
-		
+
 		if (clearCache) {
 			getBuilderService().clearAllCachedPages();
 		}
 		return true;
 	}
-	
+
+	@Override
 	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format,
 			String sourceMarkup) {
 		return createIBPage(parentId, name, type, templateId, pageUri, subType, domainId, format, sourceMarkup, null);
 	}
-	
+
+	@Override
 	public int createIBPage(String parentId, String name, String type, String templateId, String pageUri, String subType, int domainId, String format,
 			String sourceMarkup, String treeOrder) {
 
 		IWContext iwc = CoreUtil.getIWContext();
 		IWApplicationContext iwac = iwc == null ? IWMainApplication.getDefaultIWApplicationContext() : iwc;
-		
+
 		@SuppressWarnings("rawtypes")
 		Map tree = getBuilderService().getTree(iwac);
 		if (tree == null) {
 			return -1;
 		}
-		
+
 		if (getBuilderService().getPageKey().equals(type)) {
 			if (templateId == null) {
 				templateId = getThemesHelper().getLastUsedTheme();
 			}
 		}
-		
+
 		if (parentId == null && domainId == -1) { // Creating top level page
 			ICDomain domain = null;
 			domain = iwac.getDomain();
@@ -392,7 +351,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 				domainId = domain.getID();
 			}
 		}
-		
+
 		int pageId = getBuilderService().createNewPage(parentId, name, type, templateId, pageUri, tree, iwc, subType, domainId, format, sourceMarkup, treeOrder);
 		if (pageId < 0) {
 			LOGGER.warning("Probably page was not created using params:\n" +
@@ -409,7 +368,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 					"tree order: "+ treeOrder + "\n" +
 				"\nbecause returned ID is: " + pageId);
 		}
-		
+
 		if (iwc != null && iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR)) {
 			ICPage createdPage = getICPage(pageId);
 			if (createdPage != null) {
@@ -417,29 +376,32 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 				createdPage.store();
 			}
 		}
-		
+
 		return pageId;
 	}
-	
+
 	private boolean isNewTheme(String uri) {
 		if (getThemesHelper().existTheme(uri)) {
 			return false;
 		}
 		return true;
 	}
-	
+
+	@Override
 	public ICPageHome getICPageHome() throws RemoteException {
 		ICPageHome sHome = (ICPageHome) getIDOHome(ICPage.class);
 		return sHome;
 	}
-	
+
+	@Override
 	public BuilderService getBuilderService() {
 		if (builderLogicWrapper == null) {
 			ELUtil.getInstance().autowire(this);
 		}
 		return builderLogicWrapper.getBuilderService(getIWApplicationContext());
 	}
-	
+
+	@Override
 	public ICPage getICPage(String pageKey) {
 		if (pageKey == null) {
 			return null;
@@ -453,7 +415,8 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		return getICPage(id);
 	}
-	
+
+	@Override
 	public ICPage getICPage(int id) {
 		ICPage page = null;
 		try {
@@ -464,16 +427,18 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		}
 		return page;
 	}
-	
+
+	@Override
 	public ICDomain getDomain() {
 		return IWApplicationContextFactory.getCurrentIWApplicationContext().getDomain();
 	}
-	
+
+	@Override
 	public String createChildTemplateForThisTemplate(String parentTemplateKey) {
 		if (parentTemplateKey == null) {
 			return null;
 		}
-		
+
 		ICPage currentTemplate = getICPage(parentTemplateKey);
 		if (currentTemplate == null) {
 			return null;
@@ -482,7 +447,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		if (domain == null) {
 			return null;
 		}
-		
+
 		String childTemplate = "Child Template";
 		String name = currentTemplate.getName();
 		if (name == null) {
@@ -491,7 +456,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		else {
 			name = new StringBuffer(name).append(CoreConstants.SPACE).append(childTemplate).toString();
 		}
-		
+
 		int templateId = -1;
 		try {
 			templateId = createIBPage(parentTemplateKey, name, getBuilderService().getTemplateKey(), parentTemplateKey, null, null, domain.getID(),
@@ -499,11 +464,11 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 		} catch (Exception e) {
 			LOGGER.log(Level.WARNING, "Error creating template: " + name, e);
 		}
-		
+
 		if (templateId == -1) {
 			return null;
 		}
-		
+
 		return String.valueOf(templateId);
 	}
 
@@ -527,5 +492,66 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService, 
 
 	public void setThemesEngine(ThemesEngine themesEngine) {
 		this.themesEngine = themesEngine;
+	}
+
+	@Override
+	public void onEvent(EventIterator events) {
+		for (; events.hasNext();) {
+			onSlideChange(events.nextEvent());
+		}
+	}
+
+	@Override
+	public void onSlideChange(Event event) {
+		String uri = null;
+		try {
+			uri = event.getPath();
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Error resolving JCR event path", e);
+		}
+		if (StringUtil.isEmpty(uri))
+			return;
+
+		if (uri.indexOf(ThemesConstants.THEMES_PATH) == -1)
+			return;	// If not processing theme
+
+		if (Event.NODE_REMOVED == event.getType()) {
+			if (getThemesHelper().isCorrectThemeTemplateFile(uri, ThemesConstants.THEME_SKELETONS_FILTER)) {
+				Collection<Theme> themes = getThemesHelper().getAllThemes();
+				if (themes == null) {
+					return;
+				}
+				boolean foundTheme = false;
+				Theme theme = null;
+				for (Iterator<Theme> it = themes.iterator(); (it.hasNext() && !foundTheme);) {
+					theme = it.next();
+					if (uri.equals(getThemesHelper().decodeUrl(theme.getLinkToSkeleton()))) {
+						foundTheme = true;
+					}
+				}
+				if (foundTheme && !theme.isLocked()) {
+					getThemesHelper().removeLastUsedTheme(String.valueOf(theme.getIBPageID()));
+					int pageId = theme.getIBPageID();
+
+					String themeID = theme.getId();
+					getThemesHelper().removeTheme(uri, themeID);
+
+					deleteTemplate(pageId);
+				}
+			}
+		} else if (Event.NODE_ADDED == event.getType()) {
+			if (!getThemesHelper().isCreatedManually(uri) && getThemesHelper().isCorrectThemeTemplateFile(uri,
+					ThemesConstants.THEME_SKELETONS_FILTER) && isNewTheme(uri)) {
+				try {
+					ThemesLoader loader = new ThemesLoader();
+					loader.loadTheme(uri, getThemesHelper().urlEncode(uri), true, false);
+				} catch (Exception e) {
+					LOGGER.log(Level.WARNING, "Error loading theme: " + uri, e);
+				}
+			}
+			if (uri.endsWith(ThemesConstants.THEME_PREDEFINED_STYLE_CONFIG_FILE)) {
+				getThemesHelper().addPredefinedThemeStyle(uri);
+			}
+		}
 	}
 }

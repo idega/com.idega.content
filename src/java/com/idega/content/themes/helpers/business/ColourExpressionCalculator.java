@@ -1,7 +1,6 @@
 package com.idega.content.themes.helpers.business;
 
 import java.io.InputStream;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,9 +20,9 @@ import bsh.Interpreter;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
+import com.idega.core.business.DefaultSpringBean;
 import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.core.search.business.SearchResult;
-import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
 import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
@@ -40,31 +39,31 @@ import com.idega.util.StringHandler;
 
 @Service
 @Scope(BeanDefinition.SCOPE_SINGLETON)
-public class ColourExpressionCalculator {
-	
+public class ColourExpressionCalculator extends DefaultSpringBean {
+
 	private static final Logger logger = Logger.getLogger(ColourExpressionCalculator.class.getName());
-	
+
 	private static final String[] _SEARCH_TERMS = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"};
 	private static final List<String> SEARCH_TERMS = Collections.unmodifiableList(Arrays.asList(_SEARCH_TERMS));
-	
+
 	private static final String[] _COLOUR_MATH_OPERATIONS = {CoreConstants.PLUS, CoreConstants.MINUS, CoreConstants.STAR};
 	private static final List<String> COLOUR_MATH_OPERATIONS = Collections.unmodifiableList(Arrays.asList(_COLOUR_MATH_OPERATIONS));
-	
+
 	private static final String DEFAULT_COLOUR = "#ffffff";
-	
+
 	private static final String RED_COLOUR_START = "r(";
 	private static final String GREEN_COLOUR_START = "g(";
 	private static final String BLUE_COLOUR_START = "b(";
-	
+
 	private static final Map<String, Integer> HEX_TO_DEC_NUMBERS_CACHE = new HashMap<String, Integer>();
-	
+
 	@Autowired
 	private ThemesHelper helper;
 	@Autowired
 	private ThemeChanger themeChanger;
-	
+
 	private Interpreter mathInterpreter = null;
-	
+
 	public ColourExpressionCalculator() {
 		mathInterpreter = new bsh.Interpreter();
 	}
@@ -74,28 +73,28 @@ public class ColourExpressionCalculator {
 		if (!searchScope.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
 			searchScope = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(searchScope).toString();
 		}
-		
+
 		List<SearchResult> searchResults = getHelper().search("*_original.css", searchScope);
 		if (searchResults == null || searchResults.isEmpty()) {
 			return null;
 		}
-		
+
 		List<String> files = new ArrayList<String>();
 		for (SearchResult result: searchResults) {
 			files.add(StringHandler.remove(result.getSearchResultURI(), searchScope));
 		}
 		return files;
 	}
-	
+
 	protected boolean setValuesToColourFiles(Theme theme) {
 		if (theme == null) {
 			return false;
 		}
-		
+
 		if (!theme.hasColourFiles()) {
 			return true;
 		}
-		
+
 		List<String> originalColourFiles = theme.getOriginalColourFiles();
 		boolean addOriginalFile = false;
 		if (ListUtil.isEmpty(originalColourFiles)) {
@@ -106,14 +105,9 @@ public class ColourExpressionCalculator {
 			logger.log(Level.WARNING, "No colour files found for theme: " + theme.getName() + ", " + theme.getLinkToBase());
 			return false;
 		}
-		
-		IWSlideService slide = getHelper().getSlideService();
-		if (slide == null) {
-			return false;
-		}
-		
+
 		List<String> keys = theme.getStyleVariablesKeys();
-		
+
 		String file = null;
 		String originalColourFile = null;
 		String webRoot = getHelper().getFullWebRoot();
@@ -122,20 +116,20 @@ public class ColourExpressionCalculator {
 		String key = null;
 		for (int i = 0; i < originalColourFiles.size(); i++) {
 			originalColourFile = originalColourFiles.get(i);
-			
+
 			file = getColourFileByOriginalFile(theme, originalColourFile);
 			if (file == null) {
 				logger.log(Level.WARNING, "Colour file for original CSS file ('" + originalColourFile + "') was not found, can't set new values!");
 				continue;
 			}
-			
+
 			sourceLink = new StringBuffer(webRoot).append(theme.getLinkToBase()).append(originalColourFile).toString();
 			stream = getHelper().getInputStream(sourceLink);
 			if (stream == null) {
 				logger.log(Level.WARNING, "Can't read CSS file from: " + sourceLink);
 				continue;
 			}
-			
+
 			String content = null;
 			try {
 				content = StringHandler.getContentFromInputStream(stream);
@@ -148,63 +142,63 @@ public class ColourExpressionCalculator {
 				logger.log(Level.WARNING, "No content in CSS file: " + sourceLink);
 				continue;
 			}
-			
+
 			for (int j = 0; (j < keys.size() && content != null); j++) {
 				key = keys.get(j);
 				content = replaceColourFileContent(content, key, theme.getStyleVariableValue(key));
 			}
-			
+
 			content = checkIfAllVariablesReplaced(content, theme);
-			
+
 			if (content == null) {
 				logger.log(Level.WARNING, "No content in CSS file: " + sourceLink);
 				continue;
 			}
-			
+
 			try {
-				if (!(slide.uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBase(), file, content, MimeTypeUtil.MIME_TYPE_CSS, true))) {
+				if (!(getRepositoryService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBase(), file, content, MimeTypeUtil.MIME_TYPE_CSS))) {
 					logger.log(Level.WARNING, "Error while writing file: " + file);
 					continue;
 				}
-			} catch (RemoteException e) {
+			} catch (Exception e) {
 				logger.log(Level.SEVERE, "Error while writing file: " + file, e);
 			}
-			
+
 			if (addOriginalFile) {
 				theme.addOriginalColourFile(originalColourFile);
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	private String getColourFileByOriginalFile(Theme theme, String originalFile) {
 		List<String> files = theme.getColourFiles();
 		if (files == null || files.isEmpty()) {
 			return null;
 		}
-		
+
 		String fileStart = null;
 		int underIndex = originalFile.indexOf(CoreConstants.UNDER);
 		if (underIndex == -1) {
 			return null;
 		}
-		
+
 		fileStart = originalFile.substring(0, underIndex);
 		for (String file: files) {
 			if (file.startsWith(fileStart)) {
 				return file;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	private String checkIfAllVariablesReplaced(String content, Theme theme) {
 		if (content == null || theme == null) {
 			return null;
 		}
-		
+
 		int start = -1;
 		int end = -1;
 		List<String> searchTerm = ListUtil.convertStringArrayToList(new String[] {CoreConstants.PERCENT});
@@ -219,10 +213,10 @@ public class ColourExpressionCalculator {
 			variable = null;
 			styleValue = null;
 			colourVariation = null;
-			
+
 			start = getStartIndexForCssVariable(content, CoreConstants.PERCENT, CoreConstants.PERCENT);
 			end = getEndIndexForCssVariable(content, CoreConstants.PERCENT, searchTerm, true, true);
-			
+
 			if (!(canSubstring(content, start, end))) {
 				return content;
 			}
@@ -243,14 +237,14 @@ public class ColourExpressionCalculator {
 			if (styleValue == null) {
 				styleValue = DEFAULT_COLOUR;
 			}
-			
+
 			fixedCssExpression = computeCssValue(cssExpression, variable, styleValue);
 			content = StringHandler.replace(content, cssExpression, fixedCssExpression);
 		}
-		
+
 		return content;
 	}
-	
+
 	private String replaceColourFileContent(String content, String variable, String value) {
 		if (content == null) {
 			return null;
@@ -258,7 +252,7 @@ public class ColourExpressionCalculator {
 		if (variable == null || value == null) {
 			return null;
 		}
-		
+
 		int start = -1;
 		int end = -1;
 		String originalValue = null;
@@ -273,7 +267,7 @@ public class ColourExpressionCalculator {
 						". Using default colour: '"+DEFAULT_COLOUR+"'");
 				computedCSSValue = DEFAULT_COLOUR;	//	Error
 			}
-			
+
 			originalValue = content.substring(start, end);
 			computedCSSValue = computeCssValue(originalValue, variable, value);
 			if (computedCSSValue == null) {
@@ -286,47 +280,47 @@ public class ColourExpressionCalculator {
 					computedCSSValue = computedCSSValue.replaceFirst(CoreConstants.NUMBER_SIGN, String.valueOf(CoreConstants.NUMBER_SIGN + 0));
 				}
 			}
-			
+
 			content = StringHandler.replace(content, originalValue, computedCSSValue);
 		}
-		
+
 		return content;
 	}
-	
+
 	private String computeCssValue(String colourExpression, String variable, String value) {
 		if (colourExpression.indexOf(CoreConstants.PLUS) == -1 && colourExpression.indexOf(CoreConstants.MINUS) == -1 &&
 				colourExpression.indexOf(CoreConstants.STAR) == -1) {
 			//	No math expression
 			return value;
 		}
-		
+
 		String finalHexExpression = null;
-		
+
 		colourExpression = colourExpression.toLowerCase();
 		colourExpression = StringHandler.replace(colourExpression, CoreConstants.PERCENT, CoreConstants.EMPTY);	//	Removing '%'
 		colourExpression = StringHandler.replace(colourExpression, CoreConstants.SPACE, CoreConstants.EMPTY);	//	Removing white spaces
 		colourExpression = StringHandler.replace(colourExpression, variable, value);							//	Replacing variable with value
-		
+
 		if (!isWithoutRGBExpression(colourExpression)) {
 			colourExpression = getComputedHeximalValueByRGB(colourExpression);									//	RGB expression(s) will be replaced with hex number(s)
 		}
-			
+
 		finalHexExpression = getComputedHeximalValueByCSSExpression(colourExpression);							//	-, +, * expression(s)
-		
+
 		return finalHexExpression == null ? value : finalHexExpression;
 	}
-	
+
 	private String getComputedHeximalValueByRGB(String colourExpression) {
 		if (colourExpression == null) {
 			return null;
 		}
-		
+
 		if (isWithoutRGBExpression(colourExpression)) {
 			return colourExpression;
 		}
-		
+
 		boolean roundResult = isNeedRoundResult(colourExpression);
-		
+
 		String redColourValue = extractRGBValue(colourExpression.substring(colourExpression.indexOf(RED_COLOUR_START) + RED_COLOUR_START.length()));
 		if (redColourValue == null) {
 			return null;
@@ -339,30 +333,30 @@ public class ColourExpressionCalculator {
 		if (blueColourValue == null) {
 			return null;
 		}
-		
+
 		String MAX_VALUE = String.valueOf(255);
 		String operation = CoreConstants.STAR;
 		List<Integer> computedHexPartsInDecimals = new ArrayList<Integer>(3);
 		makeMathOperation(MAX_VALUE, operation, redColourValue, computedHexPartsInDecimals, roundResult);
 		makeMathOperation(MAX_VALUE, operation, greenColourValue, computedHexPartsInDecimals, roundResult);
 		makeMathOperation(MAX_VALUE, operation, blueColourValue, computedHexPartsInDecimals, roundResult);
-		
+
 		String rgbReplacement = getConvertedDecimalsToHex(computedHexPartsInDecimals);
 		if (rgbReplacement == null) {
 			return null;
 		}
-		
+
 		String fullRGBExpression = new StringBuffer(RED_COLOUR_START).append(redColourValue).append(ContentConstants.BRACKET_CLOSING).append(GREEN_COLOUR_START)
 									.append(greenColourValue).append(ContentConstants.BRACKET_CLOSING).append(BLUE_COLOUR_START).append(blueColourValue)
 									.append(ContentConstants.BRACKET_CLOSING).toString();
 		colourExpression = StringHandler.replace(colourExpression, fullRGBExpression, rgbReplacement);
 		return getComputedHeximalValueByRGB(colourExpression);
 	}
-	
+
 	private boolean isWithoutRGBExpression(String expression) {
 		return expression.indexOf(RED_COLOUR_START) == -1 && expression.indexOf(GREEN_COLOUR_START) == -1 && expression.indexOf(BLUE_COLOUR_START) == -1;
 	}
-	
+
 	private String extractRGBValue(String value) {
 		int index = 0;
 		String currentSymbol = value.substring(index, index + 1);
@@ -370,25 +364,25 @@ public class ColourExpressionCalculator {
 			index++;
 			currentSymbol = value.substring(index, index + 1);
 		}
-		
+
 		String extractedValue = value.substring(0, index);
 		return extractedValue;
 	}
-	
+
 	private String getComputedHeximalValueByCSSExpression(String expression) {
 		//	Firstly making multiplication operations
 		expression = makeMultiplication(expression);
 		if (expression == null) {
 			return null;
 		}
-		
+
 		String variable = getHexValueFromExpression(expression);
 		if (variable == null) {
 			return null;
 		}
-		
+
 		expression = StringHandler.replace(expression, variable, CoreConstants.EMPTY);
-		
+
 		String operand = null;
 		List<String> operands = new ArrayList<String>();
 		while (expression.indexOf(CoreConstants.NUMBER_SIGN) != -1) {
@@ -396,11 +390,11 @@ public class ColourExpressionCalculator {
 			if (operand == null) {
 				return null;
 			}
-			
+
 			operands.add(operand);
 			expression = StringHandler.replace(expression, operand, CoreConstants.EMPTY);
 		}
-		
+
 		if (operands.isEmpty()) {
 			return variable;
 		}
@@ -411,7 +405,7 @@ public class ColourExpressionCalculator {
 		if (expression.equals(CoreConstants.EMPTY) || expression.length() != operands.size()) {
 			return null;
 		}
-		
+
 		//	Now left only operations: -, +
 		int index = 0;
 		String operation = null;
@@ -420,27 +414,27 @@ public class ColourExpressionCalculator {
 			operation = expression.substring(0, 1);
 			if (operation.equals(CoreConstants.MINUS) || operation.equals(CoreConstants.PLUS)) {
 				computedCSSValue = getExecutedColourOperation(computedCSSValue, operation, operands.get(index));
-				
+
 				if (computedCSSValue == null) {
 					return null;
 				}
 			}
-			
+
 			expression = expression.substring(1);
 			index++;
 		}
-		
+
 		return computedCSSValue;
 	}
-	
+
 	private boolean isNeedRoundResult(String expression) {
 		if (expression == null) {
 			return false;
 		}
-		
+
 		return expression.indexOf(CoreConstants.MINUS) != -1;
 	}
-	
+
 	private String makeMultiplication(String cssColourExpression) {
 		if (cssColourExpression == null) {
 			return null;
@@ -448,15 +442,15 @@ public class ColourExpressionCalculator {
 		if (cssColourExpression.indexOf(CoreConstants.STAR) == -1) {
 			return cssColourExpression;
 		}
-		
+
 		String expression = cssColourExpression.replaceAll(CoreConstants.SPACE, CoreConstants.EMPTY);
 		if (expression.startsWith(CoreConstants.STAR) || expression.endsWith(CoreConstants.STAR)) {
 			return null;
 		}
-		
+
 		boolean roundResult = isNeedRoundResult(expression);
 		int operationIndex = expression.indexOf(CoreConstants.STAR);
-		
+
 		String leftOperand = null;
 		try {
 			String leftPart = expression.substring(0, operationIndex);
@@ -476,7 +470,7 @@ public class ColourExpressionCalculator {
 		if (leftOperand == null) {
 			return null;
 		}
-		
+
 		String rightOperand = null;
 		try {
 			int index = 0;
@@ -485,7 +479,7 @@ public class ColourExpressionCalculator {
 			boolean firstOccuranceOfNumberSign = CoreConstants.NUMBER_SIGN.equals(currentSymbol);
 			while ((StringHandler.isNaturalNumber(currentSymbol) || CoreConstants.DOT.equals(currentSymbol) || firstOccuranceOfNumberSign ||
 					SEARCH_TERMS.contains(currentSymbol)) && !COLOUR_MATH_OPERATIONS.contains(currentSymbol) && index + 1 < rightPart.length()) {
-				
+
 				firstOccuranceOfNumberSign = false;
 				index++;
 				currentSymbol = rightPart.substring(index, index + 1);
@@ -499,7 +493,7 @@ public class ColourExpressionCalculator {
 		if (rightOperand == null) {
 			return null;
 		}
-		
+
 		int startIndex = cssColourExpression.lastIndexOf(leftOperand);
 		int endIndex = cssColourExpression.lastIndexOf(rightOperand) + rightOperand.length();
 		if (!canSubstring(cssColourExpression, startIndex, endIndex)) {
@@ -509,7 +503,7 @@ public class ColourExpressionCalculator {
 		if (expressionToReplace == null) {
 			return null;
 		}
-		
+
 		String computedValue = null;
 		if (leftOperand.startsWith(CoreConstants.NUMBER_SIGN) && rightOperand.startsWith(CoreConstants.NUMBER_SIGN)) {
 			//	Both operands - hex numbers
@@ -539,7 +533,7 @@ public class ColourExpressionCalculator {
 				if (splittedHexOperand == null || decimalOperand == null) {
 					return null;
 				}
-				
+
 				List<Integer> hexPartsInDecimals = new ArrayList<Integer>();
 				for (String hexPart: splittedHexOperand) {
 					makeMathOperation(hexPart, CoreConstants.STAR, decimalOperand, hexPartsInDecimals, roundResult);
@@ -547,22 +541,22 @@ public class ColourExpressionCalculator {
 				computedValue = getConvertedDecimalsToHex(hexPartsInDecimals);
 			}
 		}
-		
+
 		if (computedValue == null) {
 			return null;
 		}
 		cssColourExpression = StringHandler.replace(cssColourExpression, expressionToReplace, computedValue);
 		return makeMultiplication(cssColourExpression);
 	}
-	
+
 	private String getExecutedColourOperation(String operand1, String operation, String operand2) {
 		String[] splitted1 = getHexValueSplitted(operand1);
 		String[] splitted2 = getHexValueSplitted(operand2);
-	
+
 		if (splitted1 == null || splitted2 == null) {
 			return null;
 		}
-		
+
 		List<Integer> hexPartsInDecimals = new ArrayList<Integer>();
 		for (int i = 0; i <splitted1.length; i++) {
 			makeMathOperation(splitted1[i], operation, splitted2[i], hexPartsInDecimals, false);
@@ -570,7 +564,7 @@ public class ColourExpressionCalculator {
 
 		return getConvertedDecimalsToHex(hexPartsInDecimals);
 	}
-	
+
 	private void makeMathOperation(String operand1, String operation, String operand2, List<Integer> computedHexPartsInDecimals, boolean roundResult) {
 		Integer resultInDecimals = getComputedValue(getMathOperation(operand1, operation, operand2), roundResult);
 		if (resultInDecimals == null) {
@@ -578,12 +572,12 @@ public class ColourExpressionCalculator {
 		}
 		computedHexPartsInDecimals.add(resultInDecimals);
 	}
-	
+
 	private Integer getComputedValue(String mathOperation, boolean roundResult) {
 		if (mathOperation == null) {
 			return null;
 		}
-		
+
 		Object result = null;
 		String cacheKey = roundResult ? new StringBuffer("rounded_").append(mathOperation).toString() : mathOperation;
 		Integer resultInDecimals = HEX_TO_DEC_NUMBERS_CACHE.get(cacheKey);
@@ -598,7 +592,7 @@ public class ColourExpressionCalculator {
 				logger.log(Level.SEVERE, "Error while computing CSS colour value: " + mathOperation);
 				return null;
 			}
-			
+
 			if (result instanceof Double) {
 				Double resultAsDouble = (Double) result;
 				if (roundResult) {
@@ -614,18 +608,18 @@ public class ColourExpressionCalculator {
 			if (resultInDecimals == null) {
 				return null;
 			}
-			
+
 			HEX_TO_DEC_NUMBERS_CACHE.put(cacheKey, resultInDecimals);
 		}
-		
+
 		return resultInDecimals;
 	}
-	
+
 	private String getConvertedDecimalsToHex(List<Integer> hexPartsInDecimals) {
 		if (hexPartsInDecimals == null || hexPartsInDecimals.isEmpty()) {
 			return null;
 		}
-		
+
 		String hexPartInString = null;
 		StringBuffer computedHexValue = new StringBuffer(CoreConstants.NUMBER_SIGN);
 		for (Integer hexPart: hexPartsInDecimals) {
@@ -635,7 +629,7 @@ public class ColourExpressionCalculator {
 			if (hexPart > 255) {
 				hexPart = 255;
 			}
-			
+
 			hexPartInString = null;
 			try {
 				hexPartInString = Integer.toHexString(hexPart);
@@ -649,13 +643,13 @@ public class ColourExpressionCalculator {
 			if (hexPartInString.length() == 1) {
 				hexPartInString = new StringBuffer("0").append(hexPartInString).toString();
 			}
-			
+
 			computedHexValue.append(hexPartInString);
 		}
-		
+
 		return computedHexValue.toString();
 	}
-	
+
 	private String getMathOperation(String operand1, String operation, String operand2) {
 		StringBuffer mathOperation = null;
 		try {
@@ -665,22 +659,22 @@ public class ColourExpressionCalculator {
 			logger.log(Level.SEVERE, "Error while converting hex value to decimal", e);
 			return null;
 		}
-		
+
 		return mathOperation == null ? null : mathOperation.toString();
 	}
-	
+
 	private String[] getHexValueSplitted(String hexValue) {
 		if (hexValue.startsWith(CoreConstants.NUMBER_SIGN)) {
 			hexValue = StringHandler.replace(hexValue, CoreConstants.NUMBER_SIGN, CoreConstants.EMPTY);
 		}
-		
+
 		hexValue = hexValue.trim();
-		
+
 		if (hexValue.length() != 3 && hexValue.length() != 6) {
 			logger.log(Level.WARNING, "Invalid length (must be 3 or 6) for hex value: " + hexValue);
 			return null;
 		}
-		
+
 		String[] hexParts = new String[3];
 		int beginIndex = 0;
 		int stepSize = hexValue.length() == 3 ? 1 : 2;
@@ -690,46 +684,46 @@ public class ColourExpressionCalculator {
 				logger.log(Level.WARNING, "Got invalid indexes (begin: " + beginIndex + ", end: " + endIndex + ") while splitting hex value: " + hexValue);
 				return null;
 			}
-			
+
 			hexParts[i] = new StringBuilder(CoreConstants.NUMBER_SIGN).append(hexValue.substring(beginIndex, endIndex)).toString();
 			beginIndex += stepSize;
 			endIndex += stepSize;
 		}
-		
+
 		return hexParts;
 	}
-	
+
 	private String getHexValueFromExpression(String expression) {
 		int start = getStartIndexForCssVariable(expression, CoreConstants.NUMBER_SIGN, CoreConstants.NUMBER_SIGN);
 		int end = getEndIndexForCssVariable(expression, CoreConstants.NUMBER_SIGN, SEARCH_TERMS, false, false);
-		
+
 		if (!(canSubstring(expression, start, end))) {
 			return null;	//	Error
 		}
-			
+
 		return expression.substring(start, end);
 	}
-	
+
 	private boolean canSubstring(String content, int start, int end) {
 		if (content == null || start == -1 || end == -1) {
 			return false;
 		}
-		
+
 		if (start < 0 || end <= start || end > content.length()) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	private int getEndIndexForCssVariable(String content, String key, List<String> searchTerms, boolean checkIfContains, boolean increaseIndex) {
 		int index = content.indexOf(key);
 		if (index == -1) {
 			return -1;
 		}
-		
+
 		index += key.length();
-		
+
 		boolean foundPercentMarkAtTheEnd = false;
 		while (!foundPercentMarkAtTheEnd && index < content.length()) {
 			if (checkIfContains) {
@@ -749,7 +743,7 @@ public class ColourExpressionCalculator {
 				}
 			}
 		}
-		
+
 		if (increaseIndex) {
 			if (index + 1 < content.length()) {
 				index++;
@@ -757,13 +751,13 @@ public class ColourExpressionCalculator {
 		}
 		return index;
 	}
-	
+
 	private int getStartIndexForCssVariable(String content, String key, String searchTerm) {
 		int index = content.indexOf(key);
 		if (index == -1) {
 			return -1;
 		}
-		
+
 		boolean foundPercentMarkAtTheBegin = false;
 		while (!foundPercentMarkAtTheBegin && index > 0) {
 			if (content.substring(index).startsWith(searchTerm)) {
@@ -773,7 +767,7 @@ public class ColourExpressionCalculator {
 				index--;
 			}
 		}
-		
+
 		return index;
 	}
 
@@ -792,5 +786,5 @@ public class ColourExpressionCalculator {
 	public void setThemeChanger(ThemeChanger themeChanger) {
 		this.themeChanger = themeChanger;
 	}
-	
+
 }

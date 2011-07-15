@@ -9,8 +9,6 @@
  */
 package com.idega.content.presentation;
 
-import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,20 +23,18 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 
-import org.apache.commons.httpclient.HttpException;
-
 import com.idega.content.bean.ContentPathBean;
 import com.idega.presentation.IWContext;
-import com.idega.slide.util.WebdavExtendedResource;
+import com.idega.repository.bean.RepositoryItem;
+import com.idega.util.CoreConstants;
 import com.idega.util.StringUtil;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFUtil;
 
-
 /**
- * 
+ *
  *  Last modified: $Date: 2009/01/12 14:44:57 $ by $Author: valdas $
- * 
+ *
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
  * @version $Revision: 1.12 $
  */
@@ -47,13 +43,13 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	private static final String ACTION = "dd_a";
 	private static final String ACTION_YES = "dd_ay";
 	public static final String PARAMETER_PATH = "dd_pp";
-	
+
 	private boolean embedInForm = false;
 	private String redirectOnSuccessURI = null;
 	private boolean useLinkAsSubmit = false;
 	private List<UIComponent> WFContainerLines = null;
 	private HtmlForm form = null;
-	
+
 	@Override
 	protected void initializeComponent(FacesContext context) {
 		IWContext iwc = IWContext.getIWContext(context);
@@ -70,45 +66,25 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 			if (StringUtil.isEmpty(clickedPath)) {
 				clickedPath = iwc.getParameter(ContentViewer.PATH_TO_DELETE);
 			}
-			WebdavExtendedResource resource = null;
+
+			RepositoryItem item = null;
 			try {
-				resource = getIWSlideSession().getWebdavResource(clickedPath);
-			}
-			catch (HttpException e1) {
-				e1.printStackTrace();
-			}
-			catch (RemoteException e1) {
-				e1.printStackTrace();
-			}
-			catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			
-//			WebdavExtendedResource resource = super.getWebdavExtendedResource();
-			String path = resource.getPath();
-			try {
-				path = path.replaceFirst(getIWSlideSession().getWebdavServerURL(), "");
-			}
-			catch (RemoteException e) {
+				item = getRepositoryService().getRepositoryItem(iwc.getLoggedInUser(), clickedPath);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	
+
+			String path = item.getPath();
+			path = path.replaceFirst(getRepositoryService().getWebdavServerURL(), CoreConstants.EMPTY);
+
 			addLineToContainer(new UIComponent[]{WFUtil.getText(path)}, "wf_text", "resource_path");
-			
-//			if (showResourceName) {
-//				HtmlOutputText resName = new HtmlOutputText();
-//				resName.setValue(resource.getName());
-//				resName.setStyleClass("wf_header_text");
-//				
-//				table.add(resName, 1, row++);
-//			}
-			
-			if (resource.isCollection()) {
+
+			if (item.isCollection()) {
 				addLineToContainer(new UIComponent[]{getText("are_you_sure_you_want_to_delete_folder")}, "verify", "verify_question");
 			} else {
 				addLineToContainer(new UIComponent[]{getText("are_you_sure_you_want_to_delete_file")}, "verify", "verify_question");
 			}
-			
+
 			UICommand button = null;
 			if (useLinkAsSubmit) {
 				button = new HtmlCommandLink();
@@ -120,11 +96,11 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 				getBundle().getLocalizedUIComponent("yes", button);
 			}
 			button.getAttributes().put(ACTION, ACTION_YES);
-			button.getAttributes().put(PARAMETER_PATH, resource.getPath());
-			button.setActionListener(WFUtil.createMethodBinding("#{contentviewerbean.processAction}", new Class[]{ActionEvent.class}));
+			button.getAttributes().put(PARAMETER_PATH, item.getPath());
+			button.setActionExpression(WFUtil.getMethodExpression(iwc.getELContext(), "#{contentviewerbean.processAction}", Void.class, new Class[] {ActionEvent.class}));
 
 			addLineToContainer(new UIComponent[]{button}, "submit", "submit");
-			
+
 		} else {
 			Boolean wasFolder = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getWasFolder");
 			if (deleted.booleanValue()) {
@@ -148,7 +124,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 			HtmlForm form = getForm();
 			add(form);
 		}
-		
+
 		addLines();
 	}
 
@@ -174,12 +150,12 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 		}
 		WFContainerLines.add(line);
 	}
-	
+
 	private void addLines() {
 		if (WFContainerLines == null) {
 			return;
 		}
-		
+
 		if (embedInForm) {
 			for (int i = 0; i < WFContainerLines.size(); i++) {
 				getForm().getChildren().add(WFContainerLines.get(i));
@@ -190,41 +166,32 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 			}
 		}
 	}
-	
+
+	@Override
 	public void processAction(ActionEvent arg0) throws AbortProcessingException {
 		UICommand source = (UICommand) arg0.getSource();
 		String path = (String) source.getAttributes().get(PARAMETER_PATH);
 		String action = (String) source.getAttributes().get(ACTION);
-		
-		if (ACTION_YES.equals(action)) {
 
-			WebdavExtendedResource res = super.getWebdavExentededResource(path);
-			String parentPath = res.getParentPath();
-			Boolean wasFolder = new Boolean(res.isCollection());
-			Boolean deleted = null;
+		if (ACTION_YES.equals(action)) {
+			Boolean deleted = Boolean.FALSE;
+			Boolean wasFolder = Boolean.FALSE;
 			try {
+				RepositoryItem res = getRepositoryService().getRepositoryItem(path);
+				String parentPath = res.getParentPath();
+				wasFolder = res.isCollection();
 				super.refreshList();
 				if (parentPath != null) {
-					String currentPath = parentPath.replaceFirst(getIWSlideSession().getWebdavServerURL(), "");
+					String currentPath = parentPath.replaceFirst(getRepositoryService().getWebdavServerURL(), CoreConstants.EMPTY);
 					WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setWebDAVPath", currentPath);
 					WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", currentPath);
 				}
 				WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setClickedFilePath", null, String.class);
-				res.deleteMethod();
-				deleted = new Boolean(true);
-			}
-			catch (HttpException e) {
-				deleted = new Boolean(false);
+				deleted = res.delete();
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			catch (IOException e) {
-				deleted = new Boolean(false);
-				e.printStackTrace();
-			}
-			catch (Exception e) {
-				deleted = new Boolean(false);
-				e.printStackTrace();
-			}
+
 			WFUtil.invoke("webdavdocumentdeleterbean", "setDeleted", deleted, Boolean.class);
 			WFUtil.invoke("webdavdocumentdeleterbean", "setWasFolder", wasFolder, Boolean.class);
 			if (deleted != null && deleted.booleanValue() && redirectOnSuccessURI != null) {
@@ -236,7 +203,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	public void setEmbeddedInForm(boolean embedInForm) {
 		this.embedInForm = embedInForm;
 	}
-	
+
 	public boolean getEmbeddedInForm() {
 		return embedInForm;
 	}
@@ -248,7 +215,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	public String getRedirectOnSuccessURI() {
 		return redirectOnSuccessURI;
 	}
-	
+
 	public boolean getUseLinkAsSubmit() {
 		return useLinkAsSubmit;
 	}
@@ -256,7 +223,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	public void setUseLinkAsSubmit(boolean useLinkAsSubmit) {
 		this.useLinkAsSubmit = useLinkAsSubmit;
 	}
-	
+
 	@Override
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[4];
@@ -274,6 +241,6 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 		this.embedInForm = ((Boolean) values[1]).booleanValue();
 		redirectOnSuccessURI = (String) values[2];
 		this.useLinkAsSubmit = ((Boolean) values[3]).booleanValue();
-	}	
+	}
 
 }
