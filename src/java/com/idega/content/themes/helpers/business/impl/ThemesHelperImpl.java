@@ -132,7 +132,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		numberGenerator = new Random();
 	}
 
-	@Override
 	public ImageGenerator getImageGenerator(IWContext iwc) {
 		if (generator == null) {
 			if (iwc == null) {
@@ -148,12 +147,10 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return generator;
 	}
 
-	@Override
 	public IWSlideService getSlideService() {
 		return getSlideService(null);
 	}
 
-	@Override
 	public IWSlideService getSlideService(IWApplicationContext iwac) {
 		if (service == null) {
 			try {
@@ -177,7 +174,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return feedBean;
 	}
 
-	@Override
 	public synchronized void searchForThemes() {
 		if (checkedFromSlide) {
 			return;
@@ -202,7 +198,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 	}
 
-	@Override
 	public List<String> loadSearchResults(List<SearchResult> searchResults, List<String> filter) {
 		List <String> loadedResults = new ArrayList<String>();
 		if (searchResults == null) {
@@ -219,7 +214,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return loadedResults;
 	}
 
-	@Override
 	public List<SearchResult> search(String searchKey, String searchScope) {
 		if (searchKey == null || searchScope == null) {
 			return null;
@@ -230,7 +224,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return ListUtil.isEmpty(results) ? null : new ArrayList<SearchResult>(results);
 	}
 
-	@Override
 	public String getFileName(String uri) {
 		if (uri == null) {
 			return null;
@@ -247,7 +240,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return name;
 	}
 
-	@Override
 	public String getFileNameWithExtension(String uri) {
 		if (uri == null) {
 			return null;
@@ -263,7 +255,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return name;
 	}
 
-	@Override
 	public String extractValueFromString(String fullString, int beginIndex, int endIndex) {
 		String value = ThemesConstants.EMPTY;
 		if (canExtractValueFromString(fullString, beginIndex, endIndex)) {
@@ -284,7 +275,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return false;
 	}
 
-	@Override
 	public String getFileExtension(String uri) {
 		if (uri == null) {
 			return null;
@@ -297,12 +287,10 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return type;
 	}
 
-	@Override
 	public String getWebRootWithoutContent() {
 		return getWebRootWithoutContent(getFullWebRoot());
 	}
 
-	@Override
 	public String getWebRootWithoutContent(String fullWebRoot) {
 		if (webRoot != null) {
 			return webRoot;
@@ -318,7 +306,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return webRoot;
 	}
 
-	@Override
 	public String getFullWebRoot() {
 		if (fullWebRoot != null) {
 			return fullWebRoot;
@@ -344,7 +331,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return fullWebRoot;
 	}
 
-	@Override
 	public boolean isCorrectFile(String fileName, String nameTemplate) {
 		if (fileName == null || nameTemplate == null) {
 			return false;
@@ -352,7 +338,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return fileName.equals(nameTemplate);
 	}
 
-	@Override
 	public boolean isCorrectThemeTemplateFile(String fileName, List<String> filter) {
 		boolean result = false;
 		if (fileName == null) {
@@ -385,7 +370,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return result;
 	}
 
-	@Override
 	public boolean isCreatedManually(String fileName) {
 		if (fileName == null) {
 			return true;
@@ -396,7 +380,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return false;
 	}
 
-	@Override
 	public boolean isDraft(String fileName) {
 		if (fileName == null) {
 			return true;
@@ -407,7 +390,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return false;
 	}
 
-	@Override
 	public boolean isSystemFile(String fileName) {
 		if (fileName == null) {
 			return true; // Not a system file, but invalid also
@@ -418,7 +400,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return false;
 	}
 
-	@Override
 	public boolean isPropertiesFile(String uri) {
 		if (ThemesConstants.THEME_PROPERTIES_FILES.contains(uri)) {
 			return true;
@@ -426,7 +407,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return false;
 	}
 
-	@Override
 	public void addTheme(Theme theme) {
 		if (theme == null) {
 			return;
@@ -446,7 +426,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 	}
 
-	@Override
 	public List<Theme> getAvailableThemes() {
 		Iterator<Theme> it = themes.values().iterator();
 		if (it == null) {
@@ -466,12 +445,10 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return availableThemes;
 	}
 
-	@Override
 	public Collection<Theme> getAllThemes() {
 		return themes.values();
 	}
 
-	@Override
 	public List<Theme> getSortedThemes() {
 		List<Theme> availableThemes = getAvailableThemes();
 
@@ -489,12 +466,10 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return availableThemes;
 	}
 
-	@Override
 	public synchronized void addUriToTheme(String uri) {
 		urisToThemes.add(uri);
 	}
 
-	@Override
 	public synchronized boolean existTheme(String uri) {
 		if (urisToThemes == null) {
 			return false;
@@ -507,7 +482,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return false;
 	}
 
-	@Override
 	public Document getXMLDocument(String url) {
 		return getXMLDocument(url, false, false);
 	}
@@ -542,22 +516,18 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return null;
 	}
 
-	@Override
 	public Document getXMLDocument(String url, boolean cleanWithHtmlCleaner, boolean omitComments) {
 		return getXMLDocument(url, cleanWithHtmlCleaner, false, omitComments);
 	}
 
-	@Override
 	public Document getXMLDocument(String url, boolean cleanWithHtmlCleaner, boolean omitComments, boolean omitDocTypeDeclaaration) {
 		return getXMLDocument(url, cleanWithHtmlCleaner, false, omitComments, omitDocTypeDeclaaration);
 	}
 
-	@Override
 	public Document getXMLDocument(InputStream stream) throws Exception {
 		return XmlUtil.getJDOMXMLDocument(stream, false);
 	}
 
-	@Override
 	public String getLinkToBase(String uri) {
 		int index = uri.lastIndexOf(ContentConstants.SLASH);
 		String link = extractValueFromString(uri, 0, index);
@@ -567,7 +537,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return link;
 	}
 
-	@Override
 	public Theme getTheme(String themeKey) {
 		if (themeKey == null) {
 			return null;
@@ -575,7 +544,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return themes.get(themeKey);
 	}
 
-	@Override
 	public void removeTheme(String uri, String themeKey) {
 		if (uri == null || themeKey == null) {
 			return;
@@ -584,22 +552,18 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		themes.remove(themeKey);
 	}
 
-	@Override
 	public Map<String, Theme> getThemes() {
 		return themes;
 	}
 
-	@Override
 	public List<Setting> getThemeSettings() {
 		return themeSettings;
 	}
 
-	@Override
 	public List<Setting> getPageSettings() {
 		return pageSettings;
 	}
 
-	@Override
 	public void loadThemeSettings(InputStream stream) {
 		if (loadedThemeSettings) {
 			return;
@@ -614,7 +578,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 	}
 
-	@Override
 	public void loadPageSettings(String url) {
 		if (loadedPageSettings) {
 			return;
@@ -703,12 +666,10 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return null;
 	}
 
-	@Override
 	public InputStream getInputStream(String link) {
 		return getInputStream(link, false);
 	}
 
-	@Override
 	public String encode(String value, boolean fullyEncode) {
 		if (value == null) {
 			return null;
@@ -727,7 +688,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return value;
 	}
 
-	@Override
 	public String urlEncode(String url) {
 		String[] fileParts = url.split(ContentConstants.SLASH);
 		StringBuffer encoded = new StringBuffer();
@@ -750,7 +710,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return encode(encoded.toString(), false);
 	}
 
-	@Override
 	public String decode(String value, boolean fullyDecode) {
 		if (value == null) {
 			return null;
@@ -769,7 +728,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return value;
 	}
 
-	@Override
 	public String decodeUrl(String url) {
 		url = decode(url, false);
 		String[] fileParts = url.split(ContentConstants.SLASH);
@@ -791,7 +749,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return encoded.toString();
 	}
 
-	@Override
 	public boolean createSmallImage(Theme theme) {
 		if (theme == null) {
 			return false;
@@ -800,12 +757,10 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return generatePreviewsForTheme(theme, false, false, 1);
 	}
 
-	@Override
 	public boolean createSmallImage(Theme theme, boolean useDraftPreview) {
 		return createSmallImage(theme);
 	}
 
-	@Override
 	public ThemesService getThemesService() {
 		if (themesService == null) {
 			try {
@@ -817,7 +772,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return themesService;
 	}
 
-	@Override
 	public boolean createThemeConfig(Theme theme) {
 		Document doc = new Document();
 		Element root = new Element(ThemesConstants.CON_THEME);
@@ -960,7 +914,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		rootElements.add(filesElement);
 	}
 
-	@Override
 	public String getPreparedThemeNameToUseInRepository(Theme theme) {
 		if (theme == null) {
 			return null;
@@ -969,7 +922,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return getPreparedThemeNameToUseInRepository(theme.getName());
 	}
 
-	@Override
 	public String getPreparedThemeNameToUseInRepository(String themeName) {
 		if (themeName == null) {
 			return null;
@@ -979,7 +931,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return StringHandler.replace(fileName, "'", CoreConstants.EMPTY);
 	}
 
-	@Override
 	public String[] getPageValues(Setting s, String value) {
 		if (ThemesConstants.EMPTY.equals(s.getDefaultValue()) && value == null) {
 			return new String[] {ThemesConstants.EMPTY};
@@ -1027,14 +978,12 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return true;
 	}
 
-	@Override
 	public synchronized void addThemeToQueue(String linkToBase) {
 		if (!themeQueue.contains(linkToBase)) {
 			themeQueue.add(linkToBase);
 		}
 	}
 
-	@Override
 	public synchronized void removeThemeFromQueue(String linkToBase) {
 		Collection<Theme> themes = getAllThemes();
 		Theme theme = null;
@@ -1048,7 +997,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	}
 
 
-	@Override
 	public String getLastVisitedPage() {
 		Object lastVisitedPage = WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "getLastVisitedPageId");
 		if (lastVisitedPage != null) {
@@ -1057,12 +1005,10 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return null;
 	}
 
-	@Override
 	public void setLastVisitedPage(String lastVisitedPage) {
 		WFUtil.invoke(ThemesManagerBean.THEMES_MANAGER_BEAN_ID, "setLastVisitedPageId", lastVisitedPage, String.class);
 	}
 
-	@Override
 	public String getLastUsedTheme() {
 		String lastUsedTheme = getDefaultTheme();
 		if (lastUsedTheme != null) {
@@ -1084,7 +1030,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return lastUsedTheme;
 	}
 
-	@Override
 	public Theme getThemeByTemplateKey(String templateKey) {
 		if (templateKey == null) {
 			return null;
@@ -1106,7 +1051,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return null;
 	}
 
-	@Override
 	public void setLastUsedTheme(String templateId) {
 		if (templateId == null || templateId.equals(ThemesConstants.MINUS_ONE)) {
 			return;
@@ -1119,7 +1063,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 	}
 
-	@Override
 	public String getDefaultTheme() {
 		IWMainApplicationSettings settings  = ContentUtil.getBundle().getApplication().getSettings();
 		if (settings == null) {
@@ -1241,7 +1184,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 	}
 
-	@Override
 	public String loadPageToSlide(String type, String templateFile, List<String> articlesPaths, int pageID) {
 		if (type == null || templateFile == null) {
 			return null;
@@ -1292,7 +1234,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return false;
 	}
 
-	@Override
 	public String getFixedSlideFileName(String fileName) {
 		if (fileName == null) {
 			return null;
@@ -1323,7 +1264,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return path.toString();
 	}
 
-	@Override
 	public String changeFileUploadPath(String path) {
 		if (path == null) {
 			return null;
@@ -1341,7 +1281,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return path;
 	}
 
-	@Override
 	public int getRandomNumber(int maxValue) {
 		int number;
 		try {
@@ -1353,7 +1292,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return number;
 	}
 
-	@Override
 	public void removeLastUsedTheme(String templateID) {
 		if (templateID == null) {
 			return;
@@ -1368,7 +1306,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 	}
 
-	@Override
 	public List<String> createArticle(String templateFile, int id) {
 		if (templateFile == null) {
 			return null;
@@ -1468,7 +1405,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 
 	}
 
-	@Override
 	public String getArticleCommentLink(IWContext iwc, String pageURI) {
 		StringBuffer commentPath = new StringBuffer(ContentConstants.ARTICLE_PATH_START);
 		if (pageURI == null) {
@@ -1616,7 +1552,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return img.toString();
 	}
 
-	@Override
 	public String getFullServerName(IWContext iwc) {
 		StringBuffer server = new StringBuffer();
 		if (iwc == null) {
@@ -1643,7 +1578,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return server.toString();
 	}
 
-	@Override
 	public boolean setNewLinkInArticleFile(IWContext iwc, String link, String language, String baseDirectory, String pageUri) {
 		if (iwc == null || link == null || language == null || baseDirectory == null || pageUri == null) {
 			return false;
@@ -1700,19 +1634,16 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return false;
 	}
 
-	@Override
 	public boolean existFileInSlide(String path) {
 		return existFileInSlide(path, false);
 	}
 
-	@Override
 	public String getUniqueIdByNumberAndDate(String scope) {
 		StringBuffer id = new StringBuffer();
 		id.append(getRandomNumber(Integer.MAX_VALUE)).append(getSlideService().createUniqueFileName(scope));
 		return id.toString();
 	}
 
-	@Override
 	public String getLocalizedText(String key) {
 		try {
 			return ContentUtil.getBundle().getLocalizedString(key);
@@ -1722,7 +1653,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 	}
 
-	@Override
 	public String getCurrentLanguage(IWContext iwc) {
 		if (iwc == null) {
 			iwc = CoreUtil.getIWContext();
@@ -1737,7 +1667,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return l.getLanguage();
 	}
 
-	@Override
 	public void addLoadedTheme(String id) {
 		if (loadedThemes.contains(id)) {
 			return;
@@ -1745,12 +1674,10 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		loadedThemes.add(id);
 	}
 
-	@Override
 	public int getLoadedThemesCount() {
 		return loadedThemes.size();
 	}
 
-	@Override
 	public boolean isCheckedFromSlide() {
 		return checkedFromSlide;
 	}
@@ -1763,7 +1690,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	 * @param quality
 	 * @return true - success, false - failure
 	 */
-	@Override
 	public boolean generatePreviewsForTheme(Theme theme, boolean useDraft, boolean isJpg, float quality) {
 		String url = new StringBuilder(getFullWebRoot()).append(useDraft ? theme.getLinkToDraft() : theme.getLinkToSkeleton()).toString();
 		String smallPreviewName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).toString();
@@ -1802,7 +1728,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return true;
 	}
 
-	@Override
 	public String getThemeColourFileName(Theme theme, String customName, String file, boolean markAsOriginalFile) {
 		if (file == null) {
 			return null;
@@ -1834,7 +1759,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return name.toString();
 	}
 
-	@Override
 	public void addPredefinedThemeStyle(String uri) {
 		if (predefinedThemeStyles.contains(uri)) {
 			return;
@@ -1843,12 +1767,10 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		predefinedThemeStyles.add(uri);
 	}
 
-	@Override
 	public List<String> getPredefinedThemeStyles() {
 		return predefinedThemeStyles;
 	}
 
-	@Override
 	public String getBuiltInThemeStyleId(Theme theme) {
 		String id = String.valueOf(getRandomNumber(Integer.MAX_VALUE));
 		while (theme.getBuiltInThemeStyle(id) != null) {
