@@ -11,6 +11,7 @@ import com.idega.business.SpringBeanName;
 import com.idega.content.themes.business.ThemesService;
 import com.idega.content.themes.helpers.bean.Setting;
 import com.idega.content.themes.helpers.bean.Theme;
+import com.idega.core.builder.data.ICPage;
 import com.idega.core.search.business.SearchResult;
 import com.idega.graphics.image.business.ImageGenerator;
 import com.idega.idegaweb.IWApplicationContext;
@@ -26,9 +27,9 @@ public interface ThemesHelper {
 	
 	public IWSlideService getSlideService(IWApplicationContext iwac);
 	
-	public void searchForThemes();
+	public void searchForThemes(Collection<ICPage> templates);
 	
-	public List<String> loadSearchResults(List<SearchResult> searchResults, List<String> filter);
+	public List<String> loadSearchResults(Collection<ICPage> searchResults, List<String> filter);
 	
 	public List<SearchResult> search(String searchKey, String searchScope);
 	

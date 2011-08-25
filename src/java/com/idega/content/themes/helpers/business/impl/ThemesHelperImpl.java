@@ -174,22 +174,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return feedBean;
 	}
 
-	public synchronized void searchForThemes() {
-		if (checkedFromSlide) {
-			return;
-		}
-		checkedFromSlide = true;
-
-		String searchScope = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(ThemesConstants.THEMES_PATH).toString();
-
-		List<SearchResult> themes = search(ThemesConstants.THEME_SEARCH_KEY, searchScope);
-		if (themes == null) {
-			LOGGER.warning("ContentSearch.doSimpleDASLSearch did not return any results! for: " + ThemesConstants.THEME_SEARCH_KEY + " in: " + searchScope);
-			checkedFromSlide = false;
-			return;
-		}
-
-		List<String> themesSkeletons = loadSearchResults(themes, ThemesConstants.THEME_SKELETONS_FILTER);
+	public synchronized void searchForThemes(Collection<ICPage> templates) {
+		List<String> themesSkeletons = loadSearchResults(templates, ThemesConstants.THEME_SKELETONS_FILTER);
 		try {
 			ThemesLoader themesLoader = new ThemesLoader();
 			themesLoader.loadThemes(themesSkeletons, false, true);
@@ -198,15 +184,13 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 	}
 
-	public List<String> loadSearchResults(List<SearchResult> searchResults, List<String> filter) {
-		List <String> loadedResults = new ArrayList<String>();
-		if (searchResults == null) {
+	public List<String> loadSearchResults(Collection<ICPage> searchResults, List<String> filter) {
+		List<String> loadedResults = new ArrayList<String>();
+		if (searchResults == null)
 			return loadedResults;
-		}
 
-		String uri = null;
-		for (int i = 0; i < searchResults.size(); i++) {
-			uri = searchResults.get(i).getSearchResultURI();
+		for (ICPage template: searchResults) {
+			String uri = template.getWebDavUri();
 			if (isCorrectThemeTemplateFile(uri, filter) && !loadedResults.contains(uri)) {
 				loadedResults.add(uri);
 			}
