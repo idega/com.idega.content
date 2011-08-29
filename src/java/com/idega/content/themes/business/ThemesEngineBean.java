@@ -74,7 +74,19 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 	@Autowired
 	private ThemesPropertiesExtractor themesPropertiesExtractor;
 
-	private boolean configLoaded;
+	private void addPropertiesList(String linkToSkeleton, List<String> pLists) {
+		String base = linkToSkeleton.substring(0, linkToSkeleton.lastIndexOf(CoreConstants.SLASH));
+		
+		String pList = base.concat("/Theme.plist");
+		if (!pList.startsWith(CoreConstants.WEBDAV_SERVLET_URI))
+			pList = CoreConstants.WEBDAV_SERVLET_URI.concat(pList);
+		try {
+			if (!pLists.contains(pList) && helper.getSlideService().getExistence(pList))
+				pLists.add(pList);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * Returns info about themes in Slide
@@ -89,10 +101,10 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if (ListUtil.isEmpty(templates))
-			return Collections.emptyList();
-		
-		helper.searchForThemes(templates);
+		if (templates == null)
+			templates = Collections.emptyList();
+		else
+			helper.searchForThemes(templates);
 		
 		//	Checking if exist themes in system
 		Collection<Theme> themesCollection = helper.getAllThemes();
@@ -100,32 +112,21 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 			return Collections.emptyList();	// No themes in system
 		
 		//	Finding configuration and properties files
-		List<String> pLists = null;
+		List<String> pLists = new ArrayList<String>();
 		List<String> configs = null;
 		List<String> predefinedThemeStyles = helper.getPredefinedThemeStyles();
-		if (!configLoaded) {
-			configLoaded = true;
-			pLists = new ArrayList<String>();
-			for (ICPage template: templates) {
-				String uri = template.getWebDavUri();
-				
-				String base = uri.substring(0, uri.lastIndexOf(CoreConstants.SLASH));
-				
-				String pList = base.concat("/Theme.plist");
-				try {
-					if (!pLists.contains(pList) && helper.getSlideService().getExistence(pList))
-						pLists.add(pList);
-				} catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
+		for (ICPage template: templates) {
+			addPropertiesList(template.getWebDavUri(), pLists);
+		}
+		for (Theme theme: themesCollection) {
+			addPropertiesList(theme.getLinkToSkeleton(), pLists);
 		}
 		
 		//	Exists some themes, preparing for usage
 		try {
 			getThemesPropertiesExtractor().prepareThemes(pLists, configs, new ArrayList<String>(predefinedThemeStyles), false);
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Error preparing theme(s): plists: "+pLists+", configs: "+configs+", predefined styles: "+predefinedThemeStyles, e);
+			LOGGER.log(Level.WARNING, "Error preparing theme(s): plists: " + pLists + ", configs: " + configs + ", predefined styles: " + predefinedThemeStyles, e);
 			return null;
 		}
 		

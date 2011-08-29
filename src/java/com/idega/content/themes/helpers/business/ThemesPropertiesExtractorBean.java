@@ -47,9 +47,8 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		
 		//	Firstly getting not prepared themes
 		List<Theme> themesToPrepare = getUnPreparedThemes();
-		if (ListUtil.isEmpty(themesToPrepare)) {
+		if (ListUtil.isEmpty(themesToPrepare))
 			return;
-		}
 		
 		//	Preparing new theme(s)
 		for (Theme theme: themesToPrepare) {
@@ -177,9 +176,8 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 	}
 	
 	public boolean prepareTheme(boolean checkConfigFile, Theme theme, List<String> pLists, List<String> configs, List<String> predefinedStyles) {
-		if (theme == null) {
+		if (theme == null)
 			return false;
-		}
 		
 		String webRoot = getHelper().getFullWebRoot();
 		String url = getHelper().getWebRootWithoutContent(webRoot);
