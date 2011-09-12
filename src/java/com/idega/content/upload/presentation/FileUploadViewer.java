@@ -231,15 +231,13 @@ public class FileUploadViewer extends IWBaseComponent {
 
 		String initializationFunction =
 				new StringBuilder("var FileUploaderInitializer = {}; \n FileUploaderInitializer.initFileUploadHelper = function(){")
-				.append(initializAtion).append("}").toString();
+				.append(initializAtion).append("};").toString();
 		String actionString = PresentationUtil.getJavaScriptAction(initializationFunction.toString());
 		mainContainer.add(actionString);
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			initAction = new StringBuilder("jQuery(window).load(function() {").append(initAction).append("});").toString();
 		}
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
-
-
 
 		//	CSS
 		PresentationUtil.addStyleSheetToHeader(iwc, web2.getBundleUriToHumanizedMessagesStyleSheet());
