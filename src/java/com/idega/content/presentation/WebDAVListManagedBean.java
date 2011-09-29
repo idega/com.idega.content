@@ -682,24 +682,52 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		return traceString;
 	}
 	
-	@SuppressWarnings("unchecked")
-	private WebDAVBean[] getDirectoryListing(WebdavExtendedResource headResource, String webDAVServletURL, IWSlideSession slide)
-		throws IOException, HttpException {
-		
-		WebdavResources resources = headResource.listWithDeltaV();
-		Enumeration<WebdavResource> enumer = resources.getResources();
-		List<WebdavResource> resourcesInList = Collections.list(enumer);
-		if (ListUtil.isEmpty(resourcesInList)) {
-			LOGGER.info("No objects found in: " + headResource + ". Will try to use Slide API to fetch objects");
-			
-			WebdavResource wdr = slide.getWebdavResource(headResource.getPath());
-			WebdavResource[] children = wdr.listWebdavResources();
-			if (ArrayUtil.isEmpty(children)) {
-				LOGGER.info("No objects there found by Slide API too in: " + headResource);
-			} else {
-				resourcesInList = Arrays.asList(children);
-			}
+	private List<WebdavResource> getChildResourcesOverRequest(WebdavExtendedResource headResource, IWSlideSession slideSession) {
+		WebdavResources resources = null;
+		try {
+			resources = headResource.listWithDeltaV();
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Error retrieving child resource of: " + headResource + " over HTTP", e);
 		}
+		if (resources == null) {
+			LOGGER.warning("No child resources found for: " + headResource);
+			return null;
+		}
+		
+		Enumeration<?> enumer = null;
+		try {
+			enumer = resources.getResources();
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Error enumerating child resources of: " + headResource + ". All child resources: " + resources, e);
+		}
+		if (enumer == null)
+			return null;
+		
+		@SuppressWarnings("unchecked")
+		List<WebdavResource> childResources = (List<WebdavResource>) Collections.list(enumer);
+		return childResources;
+	}
+	
+	private List<WebdavResource> getChildResources(WebdavExtendedResource headResource, IWSlideSession slideSession) {
+		WebdavResource[] children = null;
+		try {
+			WebdavResource wdr = slideSession.getWebdavResource(headResource.getPath());
+			children = wdr.listWebdavResources();
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Error retrieving child resources of: " + headResource + " using local Slide API", e);
+		}
+		if (ArrayUtil.isEmpty(children)) {
+			LOGGER.info("No objects were found by Slide API in: " + headResource + ". Will try to get child resources over HTTP");
+			return getChildResourcesOverRequest(headResource, slideSession);
+		}
+		
+		return Arrays.asList(children);
+	}
+	
+	private WebDAVBean[] getDirectoryListing(WebdavExtendedResource headResource, String webDAVServletURL, IWSlideSession slide) throws IOException, HttpException {
+		List<WebdavResource> childResources = getChildResources(headResource, slide);
+		if (ListUtil.isEmpty(childResources))
+			return new WebDAVBean[0];
 		
 		List<WebDAVBean> directories = new Vector<WebDAVBean>();
 		WebDAVBean upBean = null;
@@ -725,46 +753,43 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			upBean.setIsCollection(true);
 		}
 		
-		if (resourcesInList != null) {
-			String url;
-			WebDAVBean bean;
-			for (WebdavResource resource: resourcesInList) {
-				try {
-					if (resource.exists() && !(resource instanceof WebdavExtendedResource) || !resource.getDisplayName().startsWith(CoreConstants.DOT)) {
-						if (this.showFolders || (!this.showFolders && !resource.isCollection())) {
-							String name = resource.getName();
-							
-							if (name == null || (name.equalsIgnoreCase("public") && resource.isCollection() && !this.showPublicFolder)) {
-								continue;
-							}
-							if (name.equalsIgnoreCase("dropbox") && resource.isCollection() && !this.showDropboxFolder) {
-								continue;
-							}
-							
-							try {
-								bean = new WebDAVBean((WebdavExtendedResource) resource);
-								url = resource.getPath();
-								url = url.replaceFirst(webDAVServletURL, CoreConstants.EMPTY);
-								bean.setWebDavHttpURL(url);
-								bean.setIconTheme(this.iconTheme);
-								directories.add(bean);
-							} catch (ClassCastException e) {
-								//cused by 403 Forbidden
-								//Should not stop the list from being shown
-								LOGGER.log(Level.WARNING, "Error while creating WebDAVBean from resource: " + resource, e);
-							}
+		String url;
+		WebDAVBean bean;
+		for (WebdavResource resource: childResources) {
+			try {
+				if (resource.exists() && !(resource instanceof WebdavExtendedResource) || !resource.getDisplayName().startsWith(CoreConstants.DOT)) {
+					if (this.showFolders || (!this.showFolders && !resource.isCollection())) {
+						String name = resource.getName();
+						
+						if (name == null || (name.equalsIgnoreCase("public") && resource.isCollection() && !this.showPublicFolder)) {
+							continue;
+						}
+						if (name.equalsIgnoreCase("dropbox") && resource.isCollection() && !this.showDropboxFolder) {
+							continue;
+						}
+						
+						try {
+							bean = new WebDAVBean((WebdavExtendedResource) resource);
+							url = resource.getPath();
+							url = url.replaceFirst(webDAVServletURL, CoreConstants.EMPTY);
+							bean.setWebDavHttpURL(url);
+							bean.setIconTheme(this.iconTheme);
+							directories.add(bean);
+						} catch (ClassCastException e) {
+							//cused by 403 Forbidden
+							//Should not stop the list from being shown
+							LOGGER.log(Level.WARNING, "Error while creating WebDAVBean from resource: " + resource, e);
 						}
 					}
-				} catch(Exception e){
-					e.printStackTrace();
 				}
+			} catch(Exception e){
+				e.printStackTrace();
 			}
 		}
 		
 		sortResources(directories);
-		if (upBean != null) {
+		if (upBean != null)
 			directories.add(0, upBean);
-		}
 
 		return ArrayUtil.convertListToArray(directories);
 	}
