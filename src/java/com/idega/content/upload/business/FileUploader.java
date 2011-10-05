@@ -54,15 +54,17 @@ public interface FileUploader {
 	
 	public String getUploadAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository);
+			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters, String maxUploadSize);
 	
 	public String getPropertiesAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository);
+			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters, String maxUploadSize);
 	
-	public String getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion);
+	public List<String> getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters);
 	
 	public AdvancedProperty deleteFile(String fileInSlide, Boolean fakeFileDeletion);
 	
 	public AdvancedProperty deleteFiles(List<String> filesInSlide, Boolean fakeFileDeletion);
+	
+	public List<String> getUploadedFilesListById(String uploadId, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters);
 }

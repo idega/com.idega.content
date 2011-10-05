@@ -631,6 +631,20 @@
 			<type>java.lang.String</type>
 			<description>Form ID</description>
 		</attribute>
+		<attribute>
+			<name>stripNonRomanLetters</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+			<type>boolean</type>
+			<description>Strip non Roman letters?</description>
+		</attribute>
+		<attribute>
+			<name>maxUploadSize</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+			<type>java.lang.String</type>
+			<description>Set max size for the upload</description>
+		</attribute>
 	</tag>
 	
 	<tag>

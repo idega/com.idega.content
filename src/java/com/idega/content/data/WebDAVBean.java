@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.file.business.FileIconSupplier;
@@ -203,7 +204,8 @@ public class WebDAVBean implements ICTreeNode, Serializable {
 	}
 
 	public boolean getRenderPermissionLink(){
-		if(getIsFile() && this.renderPermissionLink){
+		if (getIsFile() && this.renderPermissionLink) {
+			Logger.getLogger(getClass().getName()).warning("Not implemented!");
 			return true;	//	TODO
 //			try {
 //				IWContext iwc = IWContext.getInstance();

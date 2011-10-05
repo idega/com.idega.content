@@ -27,6 +27,7 @@ import com.idega.content.bean.ContentPathBean;
 import com.idega.presentation.IWContext;
 import com.idega.repository.bean.RepositoryItem;
 import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
 import com.idega.util.StringUtil;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFUtil;
@@ -194,8 +195,8 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 
 			WFUtil.invoke("webdavdocumentdeleterbean", "setDeleted", deleted, Boolean.class);
 			WFUtil.invoke("webdavdocumentdeleterbean", "setWasFolder", wasFolder, Boolean.class);
-			if (deleted != null && deleted.booleanValue() && redirectOnSuccessURI != null) {
-				IWContext.getInstance().sendRedirect(redirectOnSuccessURI);
+			if (deleted && redirectOnSuccessURI != null) {
+				CoreUtil.getIWContext().sendRedirect(redirectOnSuccessURI);
 			}
 		}
 	}

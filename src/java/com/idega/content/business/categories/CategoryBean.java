@@ -38,7 +38,6 @@ import com.idega.util.IOUtil;
 import com.idega.util.StringHandler;
 import com.idega.util.expression.ELUtil;
 
-
 /**
  * <p>
  * Class for manipulating Categories that are stored in slide.<br/>
@@ -376,9 +375,99 @@ public class CategoryBean {
 		} finally {
 			IOUtil.closeInputStream(stream);
 		}
-
 		return map;
 	}
+
+//    final class CategoriesMigrator {
+//        private final String PROPERTY_NAME_CATEGORIES = new PropertyName("DAV","categories").toString();
+//
+//        private HashMap<String, String> valuesToKeys;
+//        private IWSlideService service;
+//
+//        protected void migrate(Collection<String> cats) {
+//            LOGGER.info("Migrating " + CATEGORY_CONFIG_FILE + " to new format at " + CATEGORY_PROPERTIES_FILE);
+//            categories = new TreeMap<String, ContentCategory>();
+//            valuesToKeys = new HashMap<String, String>();
+//            String lang = getCurrentLocale();
+//            for (Iterator<String> iter = cats.iterator(); iter.hasNext();) {
+//                String cat = iter.next();
+//                String key = CategoryBean.getCategoryKey(cat);
+//                ContentCategory category = new ContentCategory(key);
+//                category.addName(lang, cat);
+//                categories.put(key, category);
+//                valuesToKeys.put(cat, key);
+//            }
+//
+//            storeCategories();
+//
+//            try {
+//            	service = IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), IWSlideService.class);
+//	            updateCategoriesOnFiles(CATEGORY_CONFIG_PATH);
+//            } catch (IBOLookupException e) {
+//                LOGGER.log(Level.WARNING, "Error getting EJB bean: " + IWSlideService.class, e);
+//            }
+//        }
+//
+//        private void updateCategoriesOnFiles(String resourcePath) {
+//            if (resourcePath.indexOf(ThemesConstants.THEMES_PATH) >= 0) {
+//                return;
+//            }
+//            try {
+//                String filePath = resourcePath;
+//                String serverURI = service.getWebdavServerURI();
+//                if(!resourcePath.startsWith(serverURI)) {
+//                    filePath = service.getURI(resourcePath);
+//                }
+//
+//                WebdavResource resource = service.getWebdavResourceAuthenticatedAsRoot(filePath);
+//
+//                String oldCats = CATEGORY_DELIMETER;
+//                Enumeration<?> enumerator = resource.propfindMethod(PROPERTY_NAME_CATEGORIES);
+//                if (enumerator.hasMoreElements()) {
+//                    StringBuffer cats = new StringBuffer();
+//                    while(enumerator.hasMoreElements()) {
+//                        cats.append(enumerator.nextElement());
+//                    }
+//                    oldCats = cats.toString();
+//                }
+//
+//                if (!oldCats.equals(CATEGORY_DELIMETER) && !oldCats.equals("")) {
+//                    LOGGER.info("Updating categories on resource " + resourcePath);
+//                    LOGGER.info("- " + oldCats);
+//
+//                    StringTokenizer tokenizer = new StringTokenizer(oldCats, CATEGORY_DELIMETER);
+//                    StringBuffer newCats = new StringBuffer(CATEGORY_DELIMETER);
+//                    while (tokenizer.hasMoreTokens()) {
+//                        String cat = tokenizer.nextToken();
+//						String key = valuesToKeys.get(cat);
+//						// if we renamed the category key, replace category with it, otherwise leave as is
+//						if (key != null) {
+//						    newCats.append(key);
+//						} else {
+//						    newCats.append(cat);
+//						}
+//						newCats.append(CATEGORY_DELIMETER);
+//                    }
+//
+//                    LOGGER.info("+ " + newCats.toString());
+//                    resource.proppatchMethod(PROPERTY_NAME_CATEGORIES, newCats.toString(), true);
+//                }
+//
+//                // update categories on all child resources
+//                Enumeration<?> children = resource.getChildResources().getResourceNames();
+//                if (children.hasMoreElements()) {
+//                    while(children.hasMoreElements()) {
+//                        String child = (String) children.nextElement();
+//                        updateCategoriesOnFiles(child);
+//                    }
+//                }
+//
+//                resource.close();
+//            } catch (Exception e) {
+//                LOGGER.warning("Exception updating categories on resource " + resourcePath + ": " + e.getMessage());
+//            }
+//        }
+//    }
 
 	public void storeCategories() {
 		storeCategories(false);
@@ -414,39 +503,43 @@ public class CategoryBean {
 	}
 
 	public boolean deleteCategory(String id) {
-		try {
-			this.categories.remove(id);
-		} catch(Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-		return true;
-	}
+        try {
+            this.categories.remove(id);
+        } catch(Exception e) {
+            LOGGER.log(Level.WARNING, "Failed to remove category with id: "+id+ " from categories.xml", e);
+            return Boolean.FALSE;
+        }
+        return Boolean.TRUE;
+    }
 
 	public String getCategoryName(String id, String language, IWContext iwc) {
-		if (id == null) {
-			return null;
-		}
+        if (id == null) {
+            return null;
+        }
 
-		return getCategoryName(this.categories.get(id), language, iwc);
-	}
+        return getCategoryName(this.categories.get(id), language, iwc);
+    }
 
-	public String getCategoryName(ContentCategory category, String language, IWContext iwc) {
-		if (category == null || language == null || iwc == null) {
-			return null;
-		}
+    /**
+     * @param category Category content.
+     * @param language Category locale or default application locale: "en", "is_IS"
+     * @return Category name represented in:
+     */
+    public String getCategoryName(ContentCategory category, String language, IWContext iwc) {
+        if (category == null || language == null || iwc == null) {
+            return null;
+        }
 
-		String name = category.getName(language);
-		if (name != null) {
-			return name;
-		}
-
-		//	Didn't find category's name by current locale, looking for by default locale
-		Locale defaultLocale = IWMainApplication.getIWMainApplication(iwc).getDefaultLocale();
-		if (defaultLocale == null) {
-			return null;
-		}
-		return category.getName(defaultLocale.toString());	//	Returning name by default locale or null if such doesn't exist
-	}
+        String name = category.getName(language);
+        if (name != null) {
+            return name;
+        }
+        //	Didn't find category's name by current locale, looking for by default locale
+        Locale defaultLocale = IWMainApplication.getIWMainApplication(iwc).getDefaultLocale();
+        if (defaultLocale == null) {
+            return null;
+        }
+        return category.getName(defaultLocale.toString());	//	Returning name by default locale or null if such doesn't exist
+    }
 
 }

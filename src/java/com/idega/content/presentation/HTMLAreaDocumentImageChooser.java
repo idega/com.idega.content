@@ -9,17 +9,17 @@
  */
 package com.idega.content.presentation;
 
+import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
-import javax.faces.el.ValueBinding;
+
 import com.idega.idegaweb.IWBundle;
 import com.idega.util.CoreConstants;
 import com.idega.webface.htmlarea.HTMLAreaImageType;
 
-
 public class HTMLAreaDocumentImageChooser implements HTMLAreaImageType {
 
-	public ValueBinding getLinkTypeName(IWBundle iwb) {
-		return iwb.getValueBinding("image_type_document");
+	public ValueExpression getLinkTypeName(IWBundle iwb) {
+		return iwb.getValueExpression("image_type_document");
 	}
 
 	public UIComponent getCreationComponent(String url) {

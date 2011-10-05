@@ -20,6 +20,8 @@ import com.idega.content.business.ContentConstants;
 import com.idega.content.themes.helpers.bean.BuiltInThemeStyle;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
+import com.idega.idegaweb.IWMainApplication;
+import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.util.CoreConstants;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
@@ -46,9 +48,8 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 
 		//	Firstly getting not prepared themes
 		List<Theme> themesToPrepare = getUnPreparedThemes();
-		if (ListUtil.isEmpty(themesToPrepare)) {
+		if (ListUtil.isEmpty(themesToPrepare))
 			return;
-		}
 
 		//	Preparing new theme(s)
 		for (Theme theme: themesToPrepare) {
@@ -177,9 +178,8 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 
 	@Override
 	public boolean prepareTheme(boolean checkConfigFile, Theme theme, List<String> pLists, List<String> configs, List<String> predefinedStyles) {
-		if (theme == null) {
+		if (theme == null)
 			return false;
-		}
 
 		String webRoot = getHelper().getFullWebRoot();
 		String url = getHelper().getWebRootWithoutContent(webRoot);
@@ -280,7 +280,9 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		//	Checking previews
 		if (theme.getLinkToSmallPreview() == null) {
 			//	And creating if don't exist
-			if (!getHelper().generatePreviewsForTheme(theme, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY)) {
+			IWMainApplicationSettings settings = IWMainApplication.getDefaultIWMainApplication().getSettings();
+			boolean isJpg = settings.getBoolean("theme_preview_jpg", false);
+			if (!getHelper().generatePreviewsForTheme(theme, false, isJpg, 1)) {
 				markThemeAsNotPrepared(theme);
 				return false;
 			}

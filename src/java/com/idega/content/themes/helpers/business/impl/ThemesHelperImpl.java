@@ -36,10 +36,10 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.idega.block.rss.business.EntryData;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.content.bean.ContentItemFeedBean;
 import com.idega.content.business.ContentConstants;
-import com.idega.content.business.ContentSearch;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.themes.bean.ThemesManagerBean;
 import com.idega.content.themes.business.ThemesService;
@@ -71,7 +71,6 @@ import com.idega.servlet.filter.IWBundleResourceFilter;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.IOUtil;
-import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 import com.idega.util.xml.XmlUtil;
 import com.idega.webface.WFUtil;
@@ -159,22 +158,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	}
 
 	@Override
-	public synchronized void searchForThemes() {
-		if (checkedFromSlide) {
-			return;
-		}
-		checkedFromSlide = true;
-
-		String searchScope = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(ThemesConstants.THEMES_PATH).toString();
-
-		List<SearchResult> themes = search(ThemesConstants.THEME_SEARCH_KEY, searchScope);
-		if (themes == null) {
-			LOGGER.warning("ContentSearch.doSimpleDASLSearch did not return any results! for: " + ThemesConstants.THEME_SEARCH_KEY + " in: " + searchScope);
-			checkedFromSlide = false;
-			return;
-		}
-
-		List<String> themesSkeletons = loadSearchResults(themes, ThemesConstants.THEME_SKELETONS_FILTER);
+	public synchronized void searchForThemes(Collection<ICPage> templates) {
+		List<String> themesSkeletons = loadSearchResults(templates, ThemesConstants.THEME_SKELETONS_FILTER);
 		try {
 			ThemesLoader themesLoader = new ThemesLoader();
 			themesLoader.loadThemes(themesSkeletons, false, true);
@@ -184,31 +169,18 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	}
 
 	@Override
-	public List<String> loadSearchResults(List<SearchResult> searchResults, List<String> filter) {
-		List <String> loadedResults = new ArrayList<String>();
-		if (searchResults == null) {
+	public List<String> loadSearchResults(Collection<ICPage> searchResults, List<String> filter) {
+		List<String> loadedResults = new ArrayList<String>();
+		if (searchResults == null)
 			return loadedResults;
-		}
 
-		String uri = null;
-		for (int i = 0; i < searchResults.size(); i++) {
-			uri = searchResults.get(i).getSearchResultURI();
+		for (ICPage template: searchResults) {
+			String uri = template.getWebDavUri();
 			if (isCorrectThemeTemplateFile(uri, filter) && !loadedResults.contains(uri)) {
 				loadedResults.add(uri);
 			}
 		}
 		return loadedResults;
-	}
-
-	@Override
-	public List<SearchResult> search(String searchKey, String searchScope) {
-		if (searchKey == null || searchScope == null) {
-			return null;
-		}
-
-		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
-		Collection<SearchResult> results = search.doSimpleDASLSearch(searchKey, searchScope);
-		return ListUtil.isEmpty(results) ? null : new ArrayList<SearchResult>(results);
 	}
 
 	@Override
@@ -759,7 +731,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			return false;
 		}
 
-		return generatePreviewsForTheme(theme, false, false, ThemesConstants.THEME_PREVIEW_QUALITY);
+		return generatePreviewsForTheme(theme, false, false, 1);
 	}
 
 	@Override
@@ -1008,7 +980,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		themeQueue.remove(linkToBase);
 	}
-
 
 	@Override
 	public String getLastVisitedPage() {
@@ -1411,9 +1382,20 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		link.append(uri);
 		String linkToComments = getArticleCommentLink(iwc, uri);
 		String user = iwc.getCurrentUser().getName();
-		return getFeedBean().getFeedEntryAsXML(ThemesConstants.ARTICLE_TITLE, server, null, ThemesConstants.ARTICLE_TITLE,
-				new Timestamp(System.currentTimeMillis()), null, summary.toString(), article, user, language, null, link.toString(),
-				null, null, linkToComments, ThemesConstants.MINUS_ONE);
+
+		EntryData entryData = new EntryData();
+		entryData.setTitle(ThemesConstants.ARTICLE_TITLE);
+		entryData.setUpdated(new Timestamp(System.currentTimeMillis()));
+		entryData.setDescription(summary.toString());
+		entryData.setBody(article);
+		entryData.setAuthor(user);
+		entryData.setLanguage(language);
+		entryData.setLink(link.toString());
+		entryData.setLinkToComments(linkToComments);
+		entryData.setCreator(ThemesConstants.MINUS_ONE);
+
+		return getFeedBean().getFeedEntryAsXML(ThemesConstants.ARTICLE_TITLE, server, null, entryData);
+
 	}
 
 	@Override
@@ -1647,16 +1629,19 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return false;
 	}
 
+	@Override
 	public boolean existFileInSlide(String path) {
 		return existFileInSlide(path, false);
 	}
 
+	@Override
 	public String getUniqueIdByNumberAndDate(String scope) {
 		StringBuffer id = new StringBuffer();
 		id.append(getRandomNumber(Integer.MAX_VALUE)).append(getRepositoryService().createUniqueFileName(scope));
 		return id.toString();
 	}
 
+	@Override
 	public String getLocalizedText(String key) {
 		try {
 			return ContentUtil.getBundle().getLocalizedString(key);
@@ -1666,6 +1651,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 	}
 
+	@Override
 	public String getCurrentLanguage(IWContext iwc) {
 		if (iwc == null) {
 			iwc = CoreUtil.getIWContext();
@@ -1680,6 +1666,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return l.getLanguage();
 	}
 
+	@Override
 	public void addLoadedTheme(String id) {
 		if (loadedThemes.contains(id)) {
 			return;
@@ -1687,10 +1674,12 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		loadedThemes.add(id);
 	}
 
+	@Override
 	public int getLoadedThemesCount() {
 		return loadedThemes.size();
 	}
 
+	@Override
 	public boolean isCheckedFromSlide() {
 		return checkedFromSlide;
 	}
@@ -1703,6 +1692,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	 * @param quality
 	 * @return true - success, false - failure
 	 */
+	@Override
 	public boolean generatePreviewsForTheme(Theme theme, boolean useDraft, boolean isJpg, float quality) {
 		String url = new StringBuilder(getFullWebRoot()).append(useDraft ? theme.getLinkToDraft() : theme.getLinkToSkeleton()).toString();
 		String smallPreviewName = new StringBuffer(theme.getName()).append(ThemesConstants.THEME_SMALL_PREVIEW).toString();
@@ -1739,6 +1729,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return true;
 	}
 
+	@Override
 	public String getThemeColourFileName(Theme theme, String customName, String file, boolean markAsOriginalFile) {
 		if (file == null) {
 			return null;
@@ -1770,6 +1761,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return name.toString();
 	}
 
+	@Override
 	public void addPredefinedThemeStyle(String uri) {
 		if (predefinedThemeStyles.contains(uri)) {
 			return;
@@ -1778,10 +1770,12 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		predefinedThemeStyles.add(uri);
 	}
 
+	@Override
 	public List<String> getPredefinedThemeStyles() {
 		return predefinedThemeStyles;
 	}
 
+	@Override
 	public String getBuiltInThemeStyleId(Theme theme) {
 		String id = String.valueOf(getRandomNumber(Integer.MAX_VALUE));
 		while (theme.getBuiltInThemeStyle(id) != null) {
@@ -1789,4 +1783,18 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 		return id;
 	}
+
+	@Override
+	public List<SearchResult> search(String searchKey, String searchScope) {
+		if (searchKey == null || searchScope == null) {
+			return null;
+		}
+
+//		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
+//		Collection<SearchResult> results = search.doSimpleDASLSearch(searchKey, searchScope);
+//		return ListUtil.isEmpty(results) ? null : new ArrayList<SearchResult>(results);
+		LOGGER.warning("Not implemented!");
+		return null;
+	}
+
 }

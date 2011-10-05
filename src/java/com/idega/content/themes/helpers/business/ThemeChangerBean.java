@@ -494,7 +494,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 
 		List<String> invalidFiles = new ArrayList<String>();
-		int i = 0;
 		for (Iterator<ThemeStyleGroupMember> it = styles.iterator(); it.hasNext(); ) {
 			member = it.next();
 			files = member.getStyleFiles();
@@ -503,7 +502,6 @@ public class ThemeChangerBean implements ThemeChanger {
 					invalidFiles.add(files.get(index));	//	Invalid CSS file, disabling variation
 				}
 			}
-			i++;
 		}
 		removeVariationsFromTheme(theme, invalidFiles);
 
@@ -1485,6 +1483,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param variation
 	 * @return String
 	 */
+	@Override
 	public String changeTheme(String themeKey, String themeName, ThemeChange change, boolean lastChange) {
 		if (themeKey == null || change == null) {
 			return null;
@@ -1625,6 +1624,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 
+	@Override
 	public ThemeStyleGroupMember getColorGroupMember(Theme theme, String variable) {
 		if (theme == null || variable == null) {
 			return null;
@@ -1786,6 +1786,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param theme
 	 * @return List
 	 */
+	@Override
 	public List<ThemeStyleGroupMember> getEnabledStyles(Theme theme) {
 		List <ThemeStyleGroupMember> members = new ArrayList<ThemeStyleGroupMember>();
 		List <String> groupNames = theme.getStyleGroupsNames();
@@ -1817,6 +1818,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return members;
 	}
 
+	@Override
 	public ThemeStyleGroupMember getMember(Map <String, ThemeStyleGroupMember> styleMembers, String styleGroupName, int index) {
 		if (styleMembers == null || styleGroupName == null) {
 			return null;
@@ -1831,6 +1833,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param styleVariation
 	 * @return ThemeStyleGroupMember
 	 */
+	@Override
 	public ThemeStyleGroupMember getStyleMember(Theme theme, String styleGroupName, String styleVariation) {
 		Map <String, ThemeStyleGroupMember> styleMembers = theme.getStyleGroupsMembers();
 		int i = 0;
@@ -1852,6 +1855,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param themeName
 	 * @return boolean
 	 */
+	@Override
 	public synchronized boolean saveTheme(String themeKey, String themeName) {
 		if (themeKey == null || themeName == null) {
 			return false;
@@ -1921,6 +1925,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 
+	@Override
 	public boolean setSelectedStyles(Theme theme, List<ThemeChange> enabledStyles) {
 		if (theme == null) {
 			return false;
@@ -1980,7 +1985,9 @@ public class ThemeChangerBean implements ThemeChanger {
 			}
 		}
 
-		if (helper.generatePreviewsForTheme(theme, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY)) {
+		IWMainApplicationSettings settings = getApplicationSettings();
+		boolean isJpg = settings.getBoolean("theme_preview_jpg", false);
+		if (helper.generatePreviewsForTheme(theme, false, isJpg, 1)) {
 			theme.setChangedName(null);
 			theme.setLinkToDraft(null);
 			theme.setChanges(new ArrayList<ThemeChange>());
@@ -2162,6 +2169,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 
+	@Override
 	public boolean restoreTheme(String themeID) {
 		if (themeID == null) {
 			return false;
@@ -2303,9 +2311,11 @@ public class ThemeChangerBean implements ThemeChanger {
 		restoreTheme(parent, false);
 
 		//	Generating previews
-		 if (!helper.generatePreviewsForTheme(child, false, ThemesConstants.IS_THEME_PREVIEW_JPG, ThemesConstants.THEME_PREVIEW_QUALITY)) {
-			 return false;
-		 }
+		IWMainApplicationSettings settings = getApplicationSettings();
+		boolean isJpg = settings.getBoolean("theme_preview_jpg", false);
+		if (!helper.generatePreviewsForTheme(child, false, isJpg, 1)) {
+			return false;
+		}
 
 		//	Marking properties extracted
 		child.setPropertiesExtracted(true);
@@ -2395,6 +2405,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return helper.getXMLDocument(new StringBuffer(helper.getFullWebRoot()).append(linkToDoc).toString());
 	}
 
+	@Override
 	public String applyMultipleChangesToTheme(String themeKey, List<ThemeChange> changes, String themeName) {
 		if (themeKey == null) {
 			return null;
@@ -2449,6 +2460,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return !theme.getName().equals(changedName);
 	}
 
+	@Override
 	public boolean reloadThemeProperties(String themeId, boolean checkConfig) {
 		if (themeId == null) {
 			return false;
@@ -2495,6 +2507,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return enabled;
 	}
 
+	@Override
 	public boolean setBuiltInStyle(String themeId, String builtInStyleId) throws Exception {
 		if (themeId == null || builtInStyleId == null) {
 			return false;

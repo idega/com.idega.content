@@ -421,9 +421,10 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService {
 		ICPage page = null;
 		try {
 			page = getICPageHome().findByPrimaryKey(id);
+		} catch (FinderException e) {	
+			LOGGER.warning("Page by ID=" + id + " does not exist!");
 		} catch (Exception e) {
 			LOGGER.log(Level.WARNING, "Error getting page by id: " + id, e);
-			return null;
 		}
 		return page;
 	}

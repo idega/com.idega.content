@@ -42,10 +42,10 @@ public class IdegaRepositoryBean implements Repository {
 	@Autowired
 	private RepositoryService repository;
 
-	protected Repository getRepository(){
-		if (repository == null) {
+	protected RepositoryService getRepository(){
+		if (repository == null)
 			ELUtil.getInstance().autowire(this);
-		}
+
 		return repository;
 	}
 

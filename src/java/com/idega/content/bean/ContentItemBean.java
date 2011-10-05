@@ -32,6 +32,7 @@ import javax.jcr.ValueFormatException;
 import org.apache.xmlbeans.XmlException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.idega.block.rss.business.EntryData;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentItemHelper;
 import com.idega.content.themes.helpers.business.ThemesConstants;
@@ -123,7 +124,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	 */
 	public ContentItemBean() {}
 
-
 	@Override
 	public Locale getLocale() {
 		if(this._locale==null){
@@ -132,6 +132,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		}
 		return this._locale;
 	}
+
 	public String getName() { return this._name; }
 	public String getDescription() { return this._description; }
 	public String getItemType() { return this._itemType; }
@@ -211,9 +212,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 
 	@Override
 	public abstract String[] getContentFieldNames();
-	/*
-	 *
-	 */
 
 	@Override
 	public String[] getToolbarActions(){
@@ -415,6 +413,9 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 //	}
 
 	protected boolean loadFromJCR(String path) throws IOException {
+		if (isLoaded())
+			return true;
+
 		//	TODO: test it
 		boolean returner = true;
 		try {
@@ -422,6 +423,8 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 			Node folderNode = getRepositoryService().getNode(path);//session.getRootNode().getNode(path);
 
 			//here I don't use the variable 'path' since it can actually be the URI
+
+
 			setResourcePath(folderNode.getPath());
 			Property displayNameProp = folderNode.getProperty(DISPLAYNAME);
 			if(displayNameProp!=null){
@@ -640,20 +643,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		}
 	}
 
-	/*public Session getSession() throws RepositoryException{
-		if (session == null) {
-			IWContext iwc = IWContext.getInstance();
-			Session session = iwc.getRepositorySession();
-			return session;
-		} else {
-			return session;
-		}
-	}
-
-	public void setSession(Session session){
-		this.session = session;
-	}*/
-
 	@Override
 	public void delete(){
 		try {
@@ -721,9 +710,8 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	 * @param moduleClass
 	 * @return String of SyndFeed xml if entry was successfully added to feed, otherwise - null
 	 */
-	public String getFeedEntryAsXML(IWContext iwc, String feedTitle, String feedDescription, String title, String description,
-			String body, String author, List<String> categories, String source, String comment, String moduleClass,
-			String linkToComments) {
+	public String getFeedEntryAsXML(IWContext iwc, String feedTitle, String feedDescription, String moduleClass,
+			EntryData entryData) {
 
 		ThemesHelper themesHelper = null;
 		try {
@@ -757,28 +745,21 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 			creatorId = String.valueOf(getCreatedByUserId());
 		}
 
-		if (linkToComments == null) {
-			linkToComments = themesHelper.getArticleCommentLink(iwc, pageUri);
+		if (entryData.getLinkToComments() == null) {
+			entryData.setLinkToComments(themesHelper.getArticleCommentLink(iwc, pageUri));
 		}
 
-		description = getFixedDescription(description);
+		String fixedDescription = getFixedDescription(entryData.getDescription());
+		entryData.setDescription(fixedDescription);
 
 		ContentItemFeedBean feedBean = new ContentItemFeedBean(iwc, ContentItemFeedBean.FEED_TYPE_ATOM_1);
-		return getFeedEntryAsXML(feedTitle, feedDescription, title,
-				description, body, author, categories, source, comment,
-				linkToComments, published, updated, server, articleURL.toString(),
-				creatorId, feedBean);
+		entryData.setLink(articleURL.toString());
+		return getFeedEntryAsXML(feedTitle, feedDescription,server, feedBean, entryData);
 	}
 
-
-	public String getFeedEntryAsXML(String feedTitle, String feedDescription,
-			String title, String description, String body, String author,
-			List<String> categories, String source, String comment,
-			String linkToComments, Timestamp published, Timestamp updated,
-			String server, String articleURL, String creatorId,
-			ContentItemFeedBean feedBean) {
-		return feedBean.getFeedEntryAsXML(feedTitle, server, feedDescription, title, updated, published, description,
-				body, author, getLanguage(), categories, articleURL, source, comment, linkToComments, creatorId);
+	public String getFeedEntryAsXML(String feedTitle, String feedDescription, String server,ContentItemFeedBean feedBean, EntryData entryData) {
+		entryData.setLanguage(getLanguage());
+		return feedBean.getFeedEntryAsXML(feedTitle, server, feedDescription, entryData);
 	}
 
 	private String getFixedDescription(String description) {
@@ -865,6 +846,25 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 			ELUtil.getInstance().autowire(this);
 		}
 		return repository;
+	}
+
+	/*public void setPersistToWebDav(boolean persistToWebDav) {
+		this.persistToWebDav = persistToWebDav;
+	}*/
+
+
+	public boolean isPersistToWebDav() {
+		return getContentRepositoryMode().isPersistToWebDav();
+	}
+
+
+	/*public void setPersistToJCR(boolean persistToJCR) {
+		this.persistToJCR = persistToJCR;
+	}*/
+
+
+	public boolean isPersistToJCR() {
+		return getContentRepositoryMode().isPersistToJCR();
 	}
 
 	public ContentRepositoryMode getContentRepositoryMode(){

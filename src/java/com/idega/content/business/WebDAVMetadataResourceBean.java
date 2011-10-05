@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.jcr.Node;
 import javax.jcr.Property;
@@ -199,16 +200,23 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 			return Collections.emptyList();
 
 		StringBuffer values = new StringBuffer();
-		for (String type: metaDataValues.keySet()) {
-			List<String> typeValues = metaDataValues.get(type);
-			if (ListUtil.isEmpty(typeValues))
-				continue;
+		try {
+			for (String type: metaDataValues.keySet()) {
+				List<String> typeValues = metaDataValues.get(type);
+				if (ListUtil.isEmpty(typeValues))
+					continue;
 
-			for (Iterator<String> typeValuesIter = typeValues.iterator(); typeValuesIter.hasNext();) {
-				values.append(typeValuesIter.next());
-				if (typeValuesIter.hasNext())
-					values.append(CoreConstants.COMMA);
+				for (Iterator<String> typeValuesIter = typeValues.iterator(); typeValuesIter.hasNext();) {
+					values.append(typeValuesIter.next());
+					if (typeValuesIter.hasNext())
+						values.append(CoreConstants.COMMA);
+				}
 			}
+
+			this.selectedCategories=CategoryBean.getCategoriesFromString(values.toString());
+
+		} catch (Exception e) {
+			Logger.getLogger(WebDAVMetadataResourceBean.class.getName()).log(Level.SEVERE, "Warning could not load categories for "+ resourcePath, e);
 		}
 
 		selectedCategories = CategoryBean.getCategoriesFromString(values.toString());

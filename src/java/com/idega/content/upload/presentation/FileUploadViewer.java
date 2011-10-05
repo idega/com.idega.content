@@ -3,6 +3,8 @@ package com.idega.content.upload.presentation;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.faces.context.FacesContext;
 
@@ -10,9 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.web2.business.JQuery;
 import com.idega.block.web2.business.Web2Business;
+import com.idega.builder.business.BuilderLogicWrapper;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.upload.business.FileUploader;
+import com.idega.content.upload.servlet.ContentFileUploadServlet;
+import com.idega.core.builder.business.BuilderService;
+import com.idega.core.component.business.ICObjectBusiness;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWBaseComponent;
@@ -34,7 +40,7 @@ public class FileUploadViewer extends IWBaseComponent {
 	private String actionAfterUpload, actionAfterCounterReset, actionAfterUploadedToRepository = null;
 
 	private String uploadPath = CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
-	private String formId, componentToRerenderId, uploadId = null;
+	private String formId, componentToRerenderId, uploadId, maxUploadSize = String.valueOf(ContentFileUploadServlet.MAX_UPLOAD_SIZE);
 
 	private boolean zipFile = false;
 	private boolean extractContent = false;
@@ -43,9 +49,7 @@ public class FileUploadViewer extends IWBaseComponent {
 	private boolean showLoadingMessage = false;
 	private boolean allowMultipleFiles = false;
 	private boolean autoAddFileInput = true;
-	private boolean autoUpload;
-	private boolean showUploadedFiles;
-	private boolean fakeFileDeletion;
+	private boolean autoUpload, showUploadedFiles, fakeFileDeletion, stripNonRomanLetters;
 
 	@Autowired
 	private FileUploader fileUploader;
@@ -56,7 +60,12 @@ public class FileUploadViewer extends IWBaseComponent {
 	@Autowired
 	private Web2Business web2;
 
+	@Autowired
+	private BuilderLogicWrapper builderLogic;
+
 	public FileUploadViewer() {
+		ELUtil.getInstance().autowire(this);
+
 		this.uploadId = UUID.randomUUID().toString();
 	}
 
@@ -80,15 +89,19 @@ public class FileUploadViewer extends IWBaseComponent {
 
 		this.autoUpload = values[11] == null ? Boolean.FALSE : (Boolean) values[11];
 		this.showUploadedFiles = values[12] == null ? Boolean.FALSE : (Boolean) values[12];
+		this.fakeFileDeletion = values[15] == null ? Boolean.FALSE : (Boolean) values[15];
+		this.stripNonRomanLetters = values[16] == null ? Boolean.FALSE : (Boolean) values[16];
 
 		this.uploadId = values[13] == null ? null : values[13].toString();
 
 		this.actionAfterUploadedToRepository = values[14] == null ? null : values[14].toString();
+
+		this.maxUploadSize = values[17] == null ? null : values[17].toString();
 	}
 
 	@Override
 	public Object saveState(FacesContext context) {
-		Object values[] = new Object[15];
+		Object values[] = new Object[18];
 		values[0] = super.saveState(context);
 
 		values[1] = this.actionAfterUpload;
@@ -106,10 +119,14 @@ public class FileUploadViewer extends IWBaseComponent {
 
 		values[11] = this.autoUpload;
 		values[12] = this.showUploadedFiles;
+		values[15] = this.fakeFileDeletion;
+		values[16] = this.stripNonRomanLetters;
 
 		values[13] = this.uploadId;
 
 		values[14] = this.actionAfterUploadedToRepository;
+
+		values[17] = this.maxUploadSize;
 
 		return values;
 	}
@@ -154,6 +171,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		addProperty(mainContainer, ContentConstants.UPLOADER_UPLOAD_THEME_PACK, String.valueOf(themePack));
 		addProperty(mainContainer, ContentConstants.UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE, String.valueOf(extractContent));
 		addProperty(mainContainer, ContentConstants.UPLOADER_UPLOAD_IDENTIFIER, uploadId);
+		addProperty(mainContainer, ContentConstants.UPLOADER_STRIP_NON_ROMAN_LETTERS, String.valueOf(stripNonRomanLetters));
 
 		Layer fileInputs = new Layer();
 		String id = fileInputs.getId();
@@ -168,6 +186,7 @@ public class FileUploadViewer extends IWBaseComponent {
 
 		if (allowMultipleFiles) {
 			GenericButton addFileInput = new GenericButton(iwrb.getLocalizedString("add_file", "Add file"));
+			addFileInput.setStyleClass("fileUploadAddInputStyle");
 			addFileInput.setOnClick(getFileUploader().getActionToLoadFilesAndExecuteCustomAction(getFileUploader()
 					.getAddFileInputJavaScriptAction(id, iwrb, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId), isAutoAddFileInput(),
 							isAutoUpload()), isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId)));
@@ -188,7 +207,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		}
 		upload.setOnClick(getFileUploader().getUploadAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(), isZipFile(),
 				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId(),
-				isFakeFileDeletion(), getActionAfterUploadedToRepository()
+				isFakeFileDeletion(), getActionAfterUploadedToRepository(), isStripNonRomanLetters(), getMaxUploadSize(context)
 		));
 		buttonsContainer.add(upload);
 		mainContainer.add(buttonsContainer);
@@ -201,8 +220,17 @@ public class FileUploadViewer extends IWBaseComponent {
 		));
 		String initAction = getFileUploader().getPropertiesAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(), isZipFile(),
 				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId(),
-				isFakeFileDeletion(), getActionAfterUploadedToRepository()
+				isFakeFileDeletion(), getActionAfterUploadedToRepository(), isStripNonRomanLetters(), getMaxUploadSize(context)
 		);
+
+		StringBuilder initializAtion = new StringBuilder(getFileUploader()
+				.getActionToLoadFilesAndExecuteCustomAction(initAction, false, false));
+
+		String initializationFunction =
+				new StringBuilder("var FileUploaderInitializer = {}; \n FileUploaderInitializer.initFileUploadHelper = function(){")
+				.append(initializAtion).append("};").toString();
+		String actionString = PresentationUtil.getJavaScriptAction(initializationFunction.toString());
+		mainContainer.add(actionString);
 		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
 			initAction = new StringBuilder("jQuery(window).load(function() {").append(initAction).append("});").toString();
 		}
@@ -247,10 +275,27 @@ public class FileUploadViewer extends IWBaseComponent {
 		return uploadPath;
 	}
 
+	private String getProperty(FacesContext context, String methodName) {
+		try {
+			IWContext iwc = IWContext.getIWContext(context);
+			BuilderService builderService = builderLogic.getBuilderService(iwc);
+			String pageKey = String.valueOf(iwc.getCurrentIBPageID());
+			if (StringUtil.isEmpty(pageKey) || pageKey.equals(String.valueOf(-1)))
+				return null;
+			String id = getId();
+			if (StringUtil.isEmpty(id) || !id.startsWith(ICObjectBusiness.UUID_PREFIX))
+				return null;
+			return builderService.getProperty(pageKey, id, methodName);
+		} catch (Exception e) {
+			Logger.getLogger(getClass().getName()).log(Level.WARNING, "Error getting value for property: " + methodName, e);
+		}
+		return null;
+	}
+
 	public String getUploadPath(FacesContext ctx) {
-
 		String uploadPath = getExpressionValue(ctx, "uploadPath");
-
+		if (uploadPath == null)
+			uploadPath = getProperty(ctx, "uploadPath");
 		if (uploadPath != null)
 			this.uploadPath = uploadPath;
 
@@ -399,5 +444,28 @@ public class FileUploadViewer extends IWBaseComponent {
 
 	public void setActionAfterUploadedToRepository(String actionAfterUploadedToRepository) {
 		this.actionAfterUploadedToRepository = actionAfterUploadedToRepository;
+	}
+
+	public boolean isStripNonRomanLetters() {
+		return stripNonRomanLetters;
+	}
+
+	public void setStripNonRomanLetters(boolean stripNonRomanLetters) {
+		this.stripNonRomanLetters = stripNonRomanLetters;
+	}
+
+	public String getMaxUploadSize(FacesContext context) {
+		String maxUploadSize = getExpressionValue(context, "maxUploadSize");
+		if (maxUploadSize == null)
+			maxUploadSize = getProperty(context, "maxUploadSize");
+		if (maxUploadSize != null) {
+			maxUploadSize = String.valueOf(Long.valueOf(maxUploadSize) * 1024 * 1024);	//	Converting from mega bytes to bytes
+			this.maxUploadSize = maxUploadSize;
+		}
+		return this.maxUploadSize;
+	}
+
+	public void setMaxUploadSize(String maxUploadSize) {
+		this.maxUploadSize = maxUploadSize;
 	}
 }

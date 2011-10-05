@@ -23,6 +23,8 @@ import com.idega.presentation.IWContext;
 import com.idega.repository.RepositoryService;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.FileUtil;
+import com.idega.util.IOUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
 
@@ -87,16 +89,12 @@ public class WebDAVUploadBean implements Serializable {
 		if (iwc == null) {
 			return uploadFailed;
 		}
-		if (this.uploadFile == null) {
+		if (uploadFile == null) {
 			return uploadFailed;
 		}
-
-//		Map parameters = ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest()).getParameterMap();
-//		uploadFolderPath = ((String[])parameters.get("uploadForm:uploadPath"))[0];
-
 		String tempUploadFolderPath = (String) WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID,"getWebDAVPath");
 		if (tempUploadFolderPath != null && !tempUploadFolderPath.equals(ContentConstants.EMPTY)) {
-			this.uploadFilePath = tempUploadFolderPath;
+			uploadFilePath = tempUploadFolderPath;
 		}
 
 		String filePath = getUploadFilePath();
@@ -127,6 +125,8 @@ public class WebDAVUploadBean implements Serializable {
 			}
 		}
 
+		long end;
+		long start = System.currentTimeMillis();
 		boolean uploadFileSuccess = false;
 		InputStream stream = null;
 		try {
@@ -135,15 +135,20 @@ public class WebDAVUploadBean implements Serializable {
 		} catch (RepositoryException e) {
 			e.printStackTrace();
 		} finally {
-			closeInputStream(stream);
+			end = System.currentTimeMillis();
+			IOUtil.close(stream);
 		}
 
-		LOGGER.info("Uploading file success: " + uploadFileSuccess);
-
 		WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", uploadFilePath);	//	Setting current path to reload
+
+		LOGGER.info("Uploaded (file: '".concat(filePath).concat(fileName).concat("', size: ").concat(FileUtil.getHumanReadableSize(uploadFile.getSize()))
+				.concat(") successfully: ").concat(String.valueOf(uploadFileSuccess)).concat(". It took time to upload: ").concat(String.valueOf(end - start))
+				.concat(" ms."));
+
 		//	Always refreshing/keeping status
 		WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "refresh", event.getSource(), UIComponent.class);
 
+		downloadPath = filePath.concat(fileName);
 		if (uploadFileSuccess) {
 			String contentType = this.uploadFile.getContentType();
 			this.downloadPath = filePath + fileName;
@@ -181,7 +186,6 @@ public class WebDAVUploadBean implements Serializable {
 		}
 
 		return false;
-
 	}
 
 	/**
@@ -312,8 +316,8 @@ public class WebDAVUploadBean implements Serializable {
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
-			closeInputStream(stream);
-			closeInputStream(zipStream);
+			IOUtil.close(stream);
+			IOUtil.close(zipStream);
 		}
 
 		if (uploadingTheme) {
@@ -322,21 +326,6 @@ public class WebDAVUploadBean implements Serializable {
 
 		LOGGER.info(resultInfo);
 		return result;
-	}
-
-	private boolean closeInputStream(InputStream stream) {
-		if (stream == null) {
-			return false;
-		}
-
-		try {
-			stream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		return true;
 	}
 
 	private String getUploadFileName() {

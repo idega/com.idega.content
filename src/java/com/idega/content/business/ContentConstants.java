@@ -41,7 +41,9 @@ public class ContentConstants {
 	public static final String UPLOADER_UPLOAD_THEME_PACK = "web2FileUploaderUploadThemePackValue";
 	public static final String UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE = "web2FileUploaderExtractArchivedFileValue";
 	public static final String UPLOADER_UPLOAD_IDENTIFIER = "web2FileUploaderUploadIdentifier";
-
+	public static final String UPLOADER_STRIP_NON_ROMAN_LETTERS = "web2FileUploaderStripNonRomanLetters";
+	public static final char[] UPLOADER_EXCEPTIONS_FOR_LETTERS = new char[] {'/', '\\', '-', '_', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+	
 	public final static String ATTRIBUTE_HEADLINE = "headline";
 	public final static String ATTRIBUTE_CREATION_DATE = "creation_date";
 	public final static String ATTRIBUTE_BODY = "body";

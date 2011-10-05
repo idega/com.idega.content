@@ -5,6 +5,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,11 +45,12 @@ import com.idega.util.CoreUtil;
 import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
+import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
 
 public class FileUploaderBean extends DefaultSpringBean implements FileUploader {
 
-	private static final long serialVersionUID = 896091693178092417L;
 	private static final Logger LOGGER = Logger.getLogger(FileUploaderBean.class.getName());
 
 	private BuilderService builder = null;
@@ -91,6 +94,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 		input.getId();
 		input.setStyleClass(FILE_UPLOAD_INPUT_STYLE);
 		input.setName(ContentConstants.UPLOAD_FIELD_NAME);
+		input.setMultiple(autoAddFileInput);
 		if (autoUpload) {
 			input.setOnChange(getActionToLoadFilesAndExecuteCustomAction("FileUploadHelper.uploadFiles();", showProgressBar, addjQuery));
 		}
@@ -114,9 +118,10 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	@Override
 	public String getPropertiesAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository) {
+			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters, String maxUploadSize) {
 
-		IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
+		IWBundle bundle = ContentUtil.getBundle();
+		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
 		return new StringBuilder("FileUploadHelper.setProperties({id: '").append(id).append("', showProgressBar: ").append(showProgressBar)
 			.append(", showMessage: ").append(showLoadingMessage).append(", zipFile: ").append(zipFile).append(", formId: '").append(formId)
 			.append("', progressBarId: '").append(progressBarId).append("', ")
@@ -129,12 +134,34 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 				.append(iwrb.getLocalizedString("incorrect_file_type", "Unsupported file type! Only zip files allowed"))
 			.append("', UPLOADING_FILE_FAILED: '")
 				.append(iwrb.getLocalizedString("uploading_file_failed_msg", "Sorry, some error occurred - unable to upload file(s). Please, try again"))
+			.append("', UPLOADING_FILE_EXCEEDED_SIZE: '")
+				.append(iwrb.getLocalizedString("upload_exceeding_limits", "Sorry, the size of selected file(s) is exceeding the max allowed size"))
+			.append("', CHOOSE_FILE: '")
+				.append(iwrb.getLocalizedString("choose_file", "Choose file"))
+			.append("', FILES_SELECTED: '")
+				.append(iwrb.getLocalizedString("web2_uploader.files_selected", "files selected"))
+			.append("', SELECTED_FILE: '")
+				.append(iwrb.getLocalizedString("web2_uploader.selected_file", "Selected file"))
+			.append("', FLASH_IS_MISSING: '")
+				.append(iwrb.getLocalizedString("web2_uploader.flash_is_missing", "Unable to upload file(s): you need to install Flash plug-in"))
+			.append("', LOADING: '")
+				.append(iwrb.getLocalizedString("loading", "Loading..."))
 			.append("'}, ")
 			.append("actionAfterUpload: ").append(getJavaScriptAction(actionAfterUpload))
 			.append(", actionAfterCounterReset: ").append(getJavaScriptAction(actionAfterCounterReset))
 			.append(", uploadId: '").append(uploadId).append("', autoUpload: ").append(autoUpload).append(", showUploadedFiles: ").append(showUploadedFiles)
 			.append(", fakeFileDeletion: ").append(fakeFileDeletion)
 			.append(", actionAfterUploadedToRepository: ").append(getJavaScriptAction(actionAfterUploadedToRepository))
+			.append(", stripNonRomanLetters: ").append(stripNonRomanLetters)
+			.append(", maxSize: ").append(maxUploadSize)
+			.append(", uploadImage: '").append(bundle.getVirtualPathWithFileNameString("images/upload.png")).append("'")
+			.append(", sessionId: '").append(iwc.getSession().getId()).append("'")
+			.append(", swfObject: '").append(web2.getSWFUploadObjectScript()).append("'")
+			.append(", swfUploadScript: '").append(web2.getSWFUploadScript()).append("'")
+			.append(", swfUploadPlugin: '").append(web2.getSWFUploadPlugin()).append("'")
+			.append(", needFlash: false")
+			.append(", initializeScriptsAction: function() {").append(getActionToLoadFilesAndExecuteCustomAction("FileUploadHelper.initializeFlashUploader();",
+					showProgressBar, true)).append("}")
 		.append("});").toString();
 	}
 
@@ -173,11 +200,11 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 			return false;
 		}
 
-		boolean result = true;
-		for (int i = 0; (i < files.size() && result); i++) {
-			result = uploadFile(files.get(i), path, zipFile, themePack, extractContent, isIE);
+		boolean uploadedSuccessfully = true;
+		for (Iterator<UploadFile> filesIter = files.iterator(); (filesIter.hasNext() && uploadedSuccessfully);) {
+			uploadedSuccessfully = uploadFile(filesIter.next(), path, zipFile, themePack, extractContent, isIE);
 		}
-		return result;
+		return uploadedSuccessfully;
 	}
 
 	private boolean uploadFile(UploadFile file, String path, boolean zipFile, boolean themePack, boolean extractContent, boolean isIE) {
@@ -212,11 +239,13 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 				return getRepositoryService().uploadFile(path, name, file.getType(), stream);
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Error uploading file " + file.getName(), e);
-			return false;
+			String message = "Error uploading file " + file.getName();
+			LOGGER.log(Level.SEVERE, message, e);
+			CoreUtil.sendExceptionNotification(message, e);
 		} finally {
 			IOUtil.close(stream);
 		}
+		return false;
 	}
 
 	private InputStream getInputStream(byte[] bytes) {
@@ -305,11 +334,11 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	@Override
 	public String getUploadAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository) {
+			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters, String maxUploadSize) {
 
 		StringBuilder action = new StringBuilder(getPropertiesAction(iwc, id, progressBarId, uploadId, showProgressBar, showLoadingMessage, zipFile, formId,
-				actionAfterUpload, actionAfterCounterReset, autoUpload, showUploadedFiles, componentToRerenderId, fakeFileDeletion, actionAfterUploadedToRepository))
-				.append("FileUploadHelper.uploadFiles();");
+				actionAfterUpload, actionAfterCounterReset, autoUpload, showUploadedFiles, componentToRerenderId, fakeFileDeletion, actionAfterUploadedToRepository,
+				stripNonRomanLetters, maxUploadSize)).append("FileUploadHelper.uploadFiles();");
 		return getActionToLoadFilesAndExecuteCustomAction(action.toString(), showProgressBar, !StringUtil.isEmpty(componentToRerenderId));
 	}
 
@@ -355,12 +384,31 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	}
 
 	@Override
-	public String getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion) {
+	public List<String> getUploadedFilesListById(String uploadId, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters) {
+		FileUploadProgressListener fileUploadProgress = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
+		if (fileUploadProgress == null)
+			return null;
+
+		Collection<AdvancedProperty> files = fileUploadProgress.getUploadedFiles(uploadId);
+		if (ListUtil.isEmpty(files))
+			return null;
+
+		List<String> uploadedFiles = new ArrayList<String>(files.size());
+		for (AdvancedProperty file: files) {
+			uploadedFiles.add(file.getValue());
+		}
+
+		return getUploadedFilesList(uploadedFiles, uploadPath, fakeFileDeletion, stripNonRomanLetters);
+	}
+
+	@Override
+	public List<String> getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters) {
 		if (ListUtil.isEmpty(files) || StringUtil.isEmpty(uploadPath)) {
 			return null;
 		}
 
 		fakeFileDeletion = fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion;
+		stripNonRomanLetters = stripNonRomanLetters == null ? Boolean.FALSE : stripNonRomanLetters;
 
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
@@ -371,8 +419,13 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
 		String deleteFileTitle = iwrb.getLocalizedString("files_uploader.delete_uploaded_file", "Delete file");
 
+		List<String> results = new ArrayList<String>(files.size() + 1);
+
 		Lists list = new Lists();
 		for (String fileInSlide: files) {
+			if (StringUtil.isEmpty(fileInSlide) || fileInSlide.indexOf(CoreConstants.DOT) == -1)
+				continue;
+
 			ListItem listItem = new ListItem();
 
 			int index = fileInSlide.lastIndexOf(File.separator);
@@ -387,7 +440,11 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 			if (!uploadPath.endsWith(CoreConstants.SLASH)) {
 				uploadPath = uploadPath.concat(CoreConstants.SLASH);
 			}
+			fileName = stripNonRomanLetters ? StringHandler.stripNonRomanCharacters(fileName, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS) : fileName;
 			fileInSlide = new StringBuilder(CoreConstants.WEBDAV_SERVLET_URI).append(uploadPath).append(fileName).toString();
+			fileInSlide = stripNonRomanLetters ? StringHandler.stripNonRomanCharacters(fileInSlide, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS) : fileInSlide;
+			String fileInSlideWithoutWebDav = fileInSlide.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
+			results.add(fileInSlideWithoutWebDav);
 
 			Link link = null;
 			if (iwc.isLoggedOn() || uploadPath.startsWith(CoreConstants.PUBLIC_PATH)) {
@@ -401,7 +458,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 
 			Image deleteFile = bundle.getImage("images/remove.png");
 			deleteFile.setOnClick(new StringBuilder("FileUploadHelper.deleteUploadedFile('").append(listItem.getId()).append("', '")
-					.append(fileInSlide.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY)).append("', ").append(fakeFileDeletion)
+					.append(fileInSlideWithoutWebDav).append("', ").append(fakeFileDeletion)
 					.append(");").toString());
 			deleteFile.setTitle(deleteFileTitle);
 			deleteFile.setStyleClass("fileUploaderDeleteFileButtonStyle");
@@ -410,7 +467,8 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 			list.add(listItem);
 		}
 
-		return getBuilderService(iwc).getRenderedComponent(list, iwc, false);
+		results.add(getBuilderService(iwc).getRenderedComponent(list, iwc, false));
+		return results;
 	}
 
 	@Override

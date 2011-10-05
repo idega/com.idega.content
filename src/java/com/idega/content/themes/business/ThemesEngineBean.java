@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -38,9 +39,10 @@ import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.business.BuilderServiceFactory;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
+import com.idega.core.builder.data.ICPageHome;
 import com.idega.core.cache.IWCacheManager2;
 import com.idega.core.data.ICTreeNode;
-import com.idega.core.search.business.SearchResult;
+import com.idega.data.IDOLookup;
 import com.idega.dwr.reverse.ScriptCaller;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
@@ -71,9 +73,22 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 	private ThemeChanger themeChanger;
 	@Autowired
 	private ThemesPropertiesExtractor themesPropertiesExtractor;
-
 	@Autowired
 	private RepositoryService repositoryService;
+
+	private void addPropertiesList(String linkToSkeleton, List<String> pLists) {
+		String base = linkToSkeleton.substring(0, linkToSkeleton.lastIndexOf(CoreConstants.SLASH));
+
+		String pList = base.concat("/Theme.plist");
+		if (!pList.startsWith(CoreConstants.WEBDAV_SERVLET_URI))
+			pList = CoreConstants.WEBDAV_SERVLET_URI.concat(pList);
+		try {
+			if (!pLists.contains(pList) && repositoryService.getExistence(pList))
+				pLists.add(pList);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Returns info about themes in Slide
@@ -82,38 +97,39 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 	public List<SimplifiedTheme> getThemes() {
 		List<SimplifiedTheme> simpleThemes = new ArrayList<SimplifiedTheme>();
 
-		List<String> pLists = null;
-		List<String> configs = null;
-		List<String> predefinedThemeStyles = helper.getPredefinedThemeStyles();
-		if (!helper.isCheckedFromSlide()) {
-			String searchScope = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(ThemesConstants.THEMES_PATH).toString();
-
-			String propSearchKey = new StringBuffer("*").append(ThemesConstants.THEME_PROPERTIES_FILE_END).toString();
-			List<SearchResult> propertiesLists = helper.search(propSearchKey, searchScope);
-			pLists = helper.loadSearchResults(propertiesLists, null);
-
-			String configSearchKey = new StringBuffer("*").append(ThemesConstants.IDEGA_THEME_INFO).toString();
-			List<SearchResult> configurationXmls = helper.search(configSearchKey, searchScope);
-			configs = helper.loadSearchResults(configurationXmls, null);
-
-			String predefinedThemeStyleSearchKey = new StringBuffer("*").append(ThemesConstants.THEME_PREDEFINED_STYLE_CONFIG_FILE).toString();
-			List<SearchResult> predefinedStyles = helper.search(predefinedThemeStyleSearchKey, searchScope);
-			predefinedThemeStyles.addAll(helper.loadSearchResults(predefinedStyles, null));
+		Collection<ICPage> templates = null;
+		try {
+			ICPageHome pageHome = (ICPageHome) IDOLookup.getHome(ICPage.class);
+			templates = pageHome.findAllTemplatesWithWebDavUri();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
-		helper.searchForThemes();
+		if (templates == null)
+			templates = Collections.emptyList();
+		else
+			helper.searchForThemes(templates);
 
 		//	Checking if exist themes in system
 		Collection<Theme> themesCollection = helper.getAllThemes();
-		if (ListUtil.isEmpty(themesCollection)) {
-			return null;	// No themes in system
+		if (ListUtil.isEmpty(themesCollection))
+			return Collections.emptyList();	// No themes in system
+
+		//	Finding configuration and properties files
+		List<String> pLists = new ArrayList<String>();
+		List<String> configs = null;
+		List<String> predefinedThemeStyles = helper.getPredefinedThemeStyles();
+		for (ICPage template: templates) {
+			addPropertiesList(template.getWebDavUri(), pLists);
+		}
+		for (Theme theme: themesCollection) {
+			addPropertiesList(theme.getLinkToSkeleton(), pLists);
 		}
 
 		//	Exists some themes, preparing for usage
 		try {
 			getThemesPropertiesExtractor().prepareThemes(pLists, configs, new ArrayList<String>(predefinedThemeStyles), false);
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Error preparing theme(s): plists: "+pLists+", configs: "+configs+", predefined styles: "+predefinedThemeStyles, e);
+			LOGGER.log(Level.WARNING, "Error preparing theme(s): plists: " + pLists + ", configs: " + configs + ", predefined styles: " + predefinedThemeStyles, e);
 			return null;
 		}
 
