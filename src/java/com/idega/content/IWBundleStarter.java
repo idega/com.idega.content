@@ -37,6 +37,7 @@ import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.repository.RepositoryService;
 import com.idega.servlet.filter.IWBundleResourceFilter;
 import com.idega.user.business.GroupBusiness;
+import com.idega.user.dao.GroupDAO;
 import com.idega.user.data.Group;
 import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
@@ -57,9 +58,9 @@ public class IWBundleStarter implements IWBundleStartable{
 	@Autowired
 	private RepositoryService repositoryService;
 
-	/**
-	 *
-	 */
+	@Autowired
+	private GroupDAO groupDAO;
+
 	public IWBundleStarter() {
 		super();
 	}
@@ -105,14 +106,18 @@ public class IWBundleStarter implements IWBundleStartable{
 
 			//	Only generate groups if none exist
 			if (editorGroups == null || editorGroups.isEmpty()){
-				Group editorGroup = groupBiz.createGroup(StandardRoles.ROLE_KEY_EDITOR, "This is the system group for content editors.", groupBiz.getGroupTypeHome().getPermissionGroupTypeString(), true);
-				iwac.getIWMainApplication().getAccessController().addRoleToGroup(StandardRoles.ROLE_KEY_EDITOR,editorGroup, iwac);
+				Group editorGroup = groupBiz.createGroup(StandardRoles.ROLE_KEY_EDITOR, "This is the system group for content editors.",
+						groupBiz.getGroupTypeHome().getPermissionGroupTypeString(), true);
+				com.idega.user.data.bean.Group editor = getGroupDAO().findGroup(Integer.valueOf(editorGroup.getId()));
+				iwac.getIWMainApplication().getAccessController().addRoleToGroup(StandardRoles.ROLE_KEY_EDITOR, editor, iwac);
 				clearCache = true;
 			}
 
 			if (authorGroups == null || authorGroups.isEmpty()) {
-				Group authorGroup = groupBiz.createGroup(StandardRoles.ROLE_KEY_AUTHOR, "This is the system group for content authors.", groupBiz.getGroupTypeHome().getPermissionGroupTypeString(), true);
-				iwac.getIWMainApplication().getAccessController().addRoleToGroup(StandardRoles.ROLE_KEY_AUTHOR,authorGroup, iwac);
+				Group authorGroup = groupBiz.createGroup(StandardRoles.ROLE_KEY_AUTHOR, "This is the system group for content authors.",
+						groupBiz.getGroupTypeHome().getPermissionGroupTypeString(), true);
+				com.idega.user.data.bean.Group author = getGroupDAO().findGroup(Integer.valueOf(authorGroup.getId()));
+				iwac.getIWMainApplication().getAccessController().addRoleToGroup(StandardRoles.ROLE_KEY_AUTHOR, author, iwac);
 				clearCache = true;
 			}
 
@@ -129,14 +134,9 @@ public class IWBundleStarter implements IWBundleStartable{
 	public void stop(IWBundle starterBundle) {
 	}
 
-	/**
-	 *
-	 */
 	private void addIWActionURIHandlers() {
 		IWActionURIManager manager = IWActionURIManager.getInstance();
-
 		manager.registerHandler(new ContentIWActionURIHandler());
-
 	}
 
 	private void loadThemeValues(IWBundle bundle) {
@@ -144,7 +144,7 @@ public class IWBundleStarter implements IWBundleStartable{
 		IWMainApplication app = bundle.getApplication();
 		try {
 			stream = new FileInputStream(IWBundleResourceFilter.copyResourceFromJarToWebapp(app, bundle.getResourcesPath() + "/themes/theme.xml"));
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		if (stream == null) {
@@ -181,6 +181,12 @@ public class IWBundleStarter implements IWBundleStartable{
 		ContentRSSProducer contentProducer = new ContentRSSProducer();
 		registry.addRSSProducer("content", contentProducer);
 		getRepositoryService().addRepositoryChangeListeners(contentProducer);
+	}
+
+	private GroupDAO getGroupDAO() {
+		if (groupDAO == null)
+			ELUtil.getInstance().autowire(this);
+		return groupDAO;
 	}
 
 	private RepositoryService getRepositoryService() {
