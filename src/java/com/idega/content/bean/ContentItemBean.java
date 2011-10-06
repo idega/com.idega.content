@@ -269,7 +269,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		ContentItemField field = getItemField(key);
 		if (field == null) {
 			String type = null;
-			if(value instanceof String){
+			if (value instanceof String) {
 				type = ContentItemField.FIELD_TYPE_STRING;
 			} else if(value instanceof Timestamp) {
 				type = ContentItemField.FIELD_TYPE_TIMESTAMP;
@@ -721,7 +721,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		}
 
 		Timestamp published = getPublishedDate();
-		Timestamp updated = getLastModifiedDate();
 		String server = themesHelper.getFullServerName(iwc);
 		StringBuffer articleURL = new StringBuffer(server);
 		ContentItemHelper helper = new ContentItemHelper(getResourcePath());
