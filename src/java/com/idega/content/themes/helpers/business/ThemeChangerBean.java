@@ -493,7 +493,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		
 		List<String> invalidFiles = new ArrayList<String>();
-		int i = 0;
 		for (Iterator<ThemeStyleGroupMember> it = styles.iterator(); it.hasNext(); ) {
 			member = it.next();
 			files = member.getStyleFiles();
@@ -502,7 +501,6 @@ public class ThemeChangerBean implements ThemeChanger {
 					invalidFiles.add(files.get(index));	//	Invalid CSS file, disabling variation
 				}
 			}
-			i++;
 		}
 		removeVariationsFromTheme(theme, invalidFiles);
 		
@@ -725,8 +723,12 @@ public class ThemeChangerBean implements ThemeChanger {
 					return false;
 				}
 			}
-			content = StringHandler.replace(content, ThemesConstants.USELESS_PATHTO_ELEMENT,
-					new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(linkToBase).toString());
+			
+			String linkToThemeBase = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(linkToBase).toString();
+			content = StringHandler.replace(content, ThemesConstants.USELESS_PATHTO_ELEMENT, linkToThemeBase);
+			if (content.indexOf("%base_url%") != -1) {
+				content = StringHandler.replace(content, "%base_url%", linkToThemeBase);
+			}
 			
 			if (addRegions) {
 				content = getFixedDocumentContent(content);
