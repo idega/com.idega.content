@@ -67,6 +67,7 @@ FileUploadHelper.initializeFlashUploader = function() {
 	LazyLoader.loadMultiple([FileUploadHelper.properties.swfObject, FileUploadHelper.properties.swfUploadScript], function() {
 		if (!swfobject.hasFlashPlayerVersion("9")) {
 			humanMsg.displayMsg(FileUploadHelper.properties.localizations.FLASH_IS_MISSING, {timeOut: 3000});
+			closeAllLoadingMessages();
 			return false;
 		}
 		
@@ -181,13 +182,14 @@ FileUploadHelper.initializeFlashUploader = function() {
 								FileUploadHelper.swfu.addPostParam(input.attr('name'), input.attr('value'));
 							}
 						});
-						closeAllLoadingMessages();
 					}
 				};
 				FileUploadHelper.swfu = new SWFUpload(settings);
 			}
+			closeAllLoadingMessages();
 		} catch (e) {
 			humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED, {timeOut: 3000});
+			closeAllLoadingMessages();
 		}
 	});
 }
