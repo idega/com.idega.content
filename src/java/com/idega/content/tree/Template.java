@@ -1,6 +1,10 @@
 package com.idega.content.tree;
 
-public class Template {
+import java.io.Serializable;
+
+public class Template implements Serializable {
+	
+	private static final long serialVersionUID = -2064488146401067511L;
 	
 	private String name = null;
 	private String type = null;
