@@ -43,7 +43,7 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 	private static final Logger LOGGER = Logger.getLogger(ResourcesManagerImpl.class.getName());
 	
 	private static final String WEB_PAGE_RESOURCES = "idegaCoreWebPageResources";
-	private static final String CONCATENATED_RESOURCES = "idegaCoreConcatenatedRecources";
+	static final String CONCATENATED_RESOURCES = "idegaCoreConcatenatedRecources";
 
 	private List<JavaScriptLink> javaScriptActions;
 	private List<JavaScriptLink> javaScriptResources;
@@ -80,24 +80,21 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		return mediaMap;
 	}
 	
-	private String getCachedConcatenatedResources(String cacheName, String fileType) {
-		String concatenatedResourcesUri = getCachedResource(CONCATENATED_RESOURCES, cacheName);
-		if (StringUtil.isEmpty(concatenatedResourcesUri)) {
+	private String getCachedConcatenatedResources(String resourceName) {
+		String concatenatedResourcesUri = getCachedResource(CONCATENATED_RESOURCES, resourceName);
+		if (StringUtil.isEmpty(concatenatedResourcesUri))
 			return null;
-		}
 		
-		String cachedContent = getCachedResource(CONCATENATED_RESOURCES, new StringBuilder(cacheName.toString()).append("_content").toString());
-		if (StringUtil.isEmpty(cachedContent)) {
+		String cachedContent = getCachedResource(CONCATENATED_RESOURCES, new StringBuilder(resourceName.toString()).append("_content").toString());
+		if (StringUtil.isEmpty(cachedContent))
 			return null;
-		}
 		
-		return StringUtil.isEmpty(concatenatedResourcesUri) ? null : concatenatedResourcesUri;
+		return concatenatedResourcesUri;
 	}
 	
 	private String getUriToConcatenatedResourcesFromCache(List<? extends ExternalLink> resources, String fileType) {
-		if (ListUtil.isEmpty(resources) || StringUtil.isEmpty(fileType)) {
+		if (ListUtil.isEmpty(resources) || StringUtil.isEmpty(fileType))
 			return null;
-		}
 		
 		//	Will try to get big file URI from requested resources
 		StringBuilder cacheName = new StringBuilder();
@@ -105,12 +102,9 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 			cacheName.append(resource.getUrl());
 		}
 		
-		String uriToConcatenatedResources = getCachedConcatenatedResources(cacheName.toString(), fileType);
+		String uriToConcatenatedResources = getCachedConcatenatedResources(cacheName.toString());
 		if (!StringUtil.isEmpty(uriToConcatenatedResources)) {
 			resources.clear();
-		}
-		
-		if (!StringUtil.isEmpty(uriToConcatenatedResources)) {
 			addNotifierAboutLoadedCSSFiles(resources, fileType);
 		}
 		
@@ -118,9 +112,8 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 	}
 	
 	public String getConcatenatedResources(List<? extends ExternalLink> resources, String fileType, String serverName) {
-		if (ListUtil.isEmpty(resources)) {
+		if (ListUtil.isEmpty(resources))
 			return null;
-		}
 		
 		//	Checking if ALL resources were concatenated already
 		String uriToAllConcatenatedResources = getUriToConcatenatedResourcesFromCache(resources, fileType);
@@ -150,18 +143,16 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 			}
 		}
 		
-		if (ListUtil.isEmpty(addedResources.values())) {
+		if (ListUtil.isEmpty(addedResources.values()))
 			return null;	//	Nothing to concatenate
-		}
 		
 		//	Removing AVAILABLE resources from request. Available resources will be concatenated to one big file
 		resources.removeAll(resourcesToLoad);
 		
 		//	Checking if there is concatenated resource from ONLY AVAILABLE resources
 		String concatenatedResourcesUri = getUriToConcatenatedResourcesFromCache(resources, fileType);
-		if (!StringUtil.isEmpty(concatenatedResourcesUri)) {
+		if (!StringUtil.isEmpty(concatenatedResourcesUri))
 			return concatenatedResourcesUri;
-		}
 		
 		//	Nothing found in cache, creating big file
 		StringBuilder allResources = null;
@@ -169,48 +160,42 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 			allResources = new StringBuilder("var IdegaResourcesHandler = [");
 			allResources = addResourcesToList(allResources, resourcesToLoad);
 			allResources.append("];\n");
-		}
-		else {
+		} else {
 			addNotifierAboutLoadedCSSFiles(resourcesToLoad, fileType);
 		}
 		
-		if (allResources == null) {
+		if (allResources == null) 
 			allResources = new StringBuilder();
-		}
-		StringBuilder cacheName = new StringBuilder();
+		StringBuilder key = new StringBuilder();
 		for (ExternalLink resource: resourcesToLoad) {
 			allResources.append(addedResources.get(resource.getUrl()));
 			
-			cacheName.append(resource);
+			key.append(resource);
 		}
 		concatenatedResourcesUri = copyConcatenatedResourcesToWebApp(allResources.toString(), fileType);
-		if (StringUtil.isEmpty(concatenatedResourcesUri)) {
+		if (StringUtil.isEmpty(concatenatedResourcesUri))
 			return null;
-		}
 
 		//	Putting in cache
-		setCachedResource(CONCATENATED_RESOURCES, cacheName.toString(), concatenatedResourcesUri);
-		setCachedResource(CONCATENATED_RESOURCES, cacheName.append("_content").toString(), allResources.toString());
+		setCachedResource(CONCATENATED_RESOURCES, key.toString(), concatenatedResourcesUri);
+		setCachedResource(CONCATENATED_RESOURCES, key.append("_content").toString(), allResources.toString());
 		
 		return concatenatedResourcesUri;
 	}
 	
 	private void addNotifierAboutLoadedCSSFiles(List<? extends ExternalLink> resources, String fileType) {
-		if (isJavaScriptFile(fileType)) {
+		if (isJavaScriptFile(fileType))
 			return;
-		}
 		
 		//	Notifying about CSS files
 		String addedCSSFilesNotifier = getJavaScriptActionForLoadedCSSFiles(resources);
-		if (StringUtil.isEmpty(addedCSSFilesNotifier)) {
+		if (StringUtil.isEmpty(addedCSSFilesNotifier))
 			return;
-		}
 		
 		JavaScriptLink loadedCSSFilesAction = new JavaScriptLink();
 		loadedCSSFilesAction.addAction(addedCSSFilesNotifier);
-		if (!getJavaScriptActions().contains(loadedCSSFilesAction)) {
+		if (!getJavaScriptActions().contains(loadedCSSFilesAction))
 			getJavaScriptActions().add(loadedCSSFilesAction);
-		}
 	}
 	
 	public boolean isJavaScriptFile(String fileType) {
@@ -264,18 +249,19 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		return null;
 	}
 	
-	private boolean setCachedResource(String cacheName, String resourceName, String content) {
+	private boolean setCachedResource(String cacheName, String key, String value) {
 		String prefix = getCachePrefix();
 		try {
-			getCache(new StringBuilder().append(prefix).append(cacheName).toString()).put(resourceName, content);
-			return true;
+			Map<String, String> cache = getCache(new StringBuilder().append(prefix).append(cacheName).toString());
+			String objectInCache = cache.put(key, value);
+			return objectInCache != null;
 		} catch(Exception e) {
 			LOGGER.log(Level.WARNING, "Error putting resource to cache: " + cacheName, e);
 		}
 		return false;
 	}
 	
-	private String getCachePrefix() {
+	static final String getCachePrefix() {
 		try {
 			return IWMainApplication.getDefaultIWMainApplication().getSettings().getProperty("idega_core.resources_prefix", CoreConstants.EMPTY);
 		} catch(Exception e) {
@@ -378,7 +364,7 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		try {
 			fileContent = FileUtil.getStringFromFile(resource);
 		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, "Error getting content from file: " + resource.getName(), e);
+			LOGGER.log(Level.WARNING, "Error getting content from file: " + resource.getName());
 		}
 		if (StringUtil.isEmpty(fileContent)) {
 			return null;
