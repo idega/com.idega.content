@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.idega.idegaweb.IWMainSlideStartedEvent;
+import com.idega.idegaweb.RepositoryStartedEvent;
 
 /**
  * Installs basic themes on Slide startup
@@ -23,7 +23,7 @@ public class ThemesInstaller implements ApplicationListener {
 	private boolean processHasStarted = false;
 	
 	public void onApplicationEvent(ApplicationEvent event) {
-		if (!(event instanceof IWMainSlideStartedEvent)) {
+		if (!(event instanceof RepositoryStartedEvent)) {
 			return;
 		}
 		
@@ -32,10 +32,10 @@ public class ThemesInstaller implements ApplicationListener {
 		}
 		processHasStarted = true;
 
-		processHasStarted = installOrActivateThemes((IWMainSlideStartedEvent) event);
+		processHasStarted = installOrActivateThemes((RepositoryStartedEvent) event);
 	}
 	
-	private synchronized boolean installOrActivateThemes(IWMainSlideStartedEvent event) {
+	private synchronized boolean installOrActivateThemes(RepositoryStartedEvent event) {
 //		IWMainApplication iwma = event.getIWMA();
 //		Thread themesInstaller = new Thread(new ThemesInstallerRunner(getThemesEngine(), iwma));
 //		themesInstaller.start();

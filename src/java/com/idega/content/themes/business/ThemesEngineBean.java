@@ -46,7 +46,7 @@ import com.idega.data.IDOLookup;
 import com.idega.dwr.reverse.ScriptCaller;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
-import com.idega.idegaweb.IWMainSlideStartedEvent;
+import com.idega.idegaweb.RepositoryStartedEvent;
 import com.idega.presentation.IWContext;
 import com.idega.repository.RepositoryService;
 import com.idega.util.CoreConstants;
@@ -886,8 +886,8 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 
 	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
-		if (event instanceof IWMainSlideStartedEvent) {
-			IWMainSlideStartedEvent slideStarted = (IWMainSlideStartedEvent) event;
+		if (event instanceof RepositoryStartedEvent) {
+			RepositoryStartedEvent slideStarted = (RepositoryStartedEvent) event;
 			final IWMainApplicationSettings settings = slideStarted.getIWMA().getSettings();
 			if (!settings.getBoolean(DEFAULT_THEMES_INSTALLED_KEY, Boolean.FALSE) && settings.getBoolean("auto_load_themes", Boolean.TRUE)) {
 				if (ListUtil.isEmpty(getThemes())) {

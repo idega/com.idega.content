@@ -29,7 +29,6 @@ import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import javax.jcr.ValueFormatException;
 
-import org.apache.xmlbeans.XmlException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.rss.business.EntryData;
