@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -121,6 +122,7 @@ public class ContentCategory {
 			this.disabled = false;
 		}
 		this.names = new HashMap<String, String>();
+		@SuppressWarnings("unchecked")
 		List<Element> namesEl = cat.getChildren("name");
 		for (Iterator<Element> iter = namesEl.iterator(); iter.hasNext(); ) {
 			Element name = iter.next();
@@ -146,6 +148,11 @@ public class ContentCategory {
 			cat.addContent(locName);
 		}
 		return cat;
+	}
+	
+	@Override
+	public String toString() {
+		return "Category with ID " + getId() + ", names: " + getNames() + ", disabled: " + isDisabled();
 	}
 	
 }
