@@ -78,15 +78,32 @@ public class RepositoryItemDownloader extends DownloadWriter {
 			}
 		} else {
 			//	Writing the contents of selected file to the output stream
-			InputStream stream = repository.getInputStream(url);
-			IWContext iwc = CoreUtil.getIWContext();
-			if (iwc != null) {
-				String fileName = getFileName(url);
-				byte[] bytes = IOUtil.getBytesFromInputStream(stream);
-				setAsDownload(iwc, fileName, bytes == null ? 0 : bytes.length);
-				stream = new ByteArrayInputStream(bytes);
+			InputStream stream = null;
+			Boolean success = Boolean.TRUE;
+			try {
+				stream = repository.getInputStream(url);
+				IWContext iwc = CoreUtil.getIWContext();
+				if (iwc != null) {
+					String fileName = getFileName(url);
+					byte[] bytes = IOUtil.getBytesFromInputStream(stream);
+					setAsDownload(iwc, fileName, bytes == null ? 0 : bytes.length);
+					stream = new ByteArrayInputStream(bytes);
+				}
+				FileUtil.streamToOutputStream(stream, out);
+			} catch (IOException e) {
+				IOUtil.close(stream);
+				success = Boolean.FALSE;
+				LOGGER.log(Level.WARNING, "Error downloading file: " + url, e);
 			}
-			FileUtil.streamToOutputStream(stream, out);
+			
+			if (success) {
+				out.flush();
+				IOUtil.closeOutputStream(out);
+				return;
+			}
+			
+			setFile(getFileFromRepository(url.concat("_1.0")));
+			super.writeTo(out);
 		}
 	}
 	
