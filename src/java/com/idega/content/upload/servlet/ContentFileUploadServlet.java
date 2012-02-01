@@ -3,6 +3,7 @@ package com.idega.content.upload.servlet;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -22,6 +23,8 @@ import org.apache.commons.fileupload.servlet.ServletRequestContext;
 
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
+import com.idega.content.repository.stream.bean.StreamData;
+import com.idega.content.repository.stream.bean.StreamResult;
 import com.idega.content.themes.helpers.business.ThemesConstants;
 import com.idega.content.upload.bean.UploadFile;
 import com.idega.content.upload.business.FileUploadProgressListener;
@@ -41,14 +44,22 @@ import com.idega.util.expression.ELUtil;
 public class ContentFileUploadServlet extends HttpServlet {
 
 	private static Logger LOGGER = Logger.getLogger(ContentFileUploadServlet.class.getName());
-	
+
 	private static final long serialVersionUID = -6282517406996613536L;
-	
+
 	public static final long MAX_UPLOAD_SIZE = 20 * 1024 * 1024;	//	20 MBs
+
+	public static final String PARAMETER_BINARY_STREAM = "binaryStream";
 
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String binaryStream = request.getParameter(PARAMETER_BINARY_STREAM);
+		if (!StringUtil.isEmpty(binaryStream) && Boolean.TRUE.toString().equals(binaryStream)) {
+			handleStream(request, response);
+			return;
+		}
+
 		Boolean success = Boolean.FALSE;
 		String uploadId = null;
 		IWApplicationContext iwac = null;
@@ -56,35 +67,35 @@ public class ContentFileUploadServlet extends HttpServlet {
 		try {
 			IWContext iwc = new IWContext(request, response, getServletContext());
 			iwac = iwc.getApplicationContext();
-			
+
 			ServletRequestContext src = new ServletRequestContext(request);
 			if (!FileUploadBase.isMultipartContent(src)) {
 				LOGGER.log(Level.WARNING, "Request is not multipart content, terminating upload!");
 				return;
 			}
-			
+
 			String uploadPath = null;
 			boolean zipFile = false;
 			boolean themePack = false;
 			boolean extractContent = false;
 			boolean stripNonRomanLetters = false;
-			
+
 			uploadProgressListener = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
-			
+
 			DiskFileItemFactory factory = new DiskFileItemFactory();
 			FileUploadBase fileUploadService = new FileUpload(factory);
-			
+
 			long maxUploadSize = uploadProgressListener.getMaxSize();
 			maxUploadSize = maxUploadSize <= 0 ? MAX_UPLOAD_SIZE : maxUploadSize;
 			maxUploadSize = maxUploadSize == MAX_UPLOAD_SIZE ? maxUploadSize : Double.valueOf(maxUploadSize * 1.1).longValue();	//	10% reserved for other data when file(s)
 			fileUploadService.setSizeMax(maxUploadSize);
 			fileUploadService.setProgressListener(uploadProgressListener);
-	
+
 			uploadId = uploadProgressListener.getUploadId();
 			if (!StringUtil.isEmpty(uploadId)) {
 				iwac.setApplicationAttribute(uploadId, Boolean.TRUE);
 			}
-			
+
 			if (IOUtil.isUploadExceedingLimits(request, maxUploadSize)) {
 				IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
 				writeToResponse(response, "error=".concat(iwrb.getLocalizedString("uploader_error_exceeds_max_size", "The file you are uploading is exceeding the limits"))
@@ -93,7 +104,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 				finishUpUpload(iwac, uploadProgressListener, uploadId, false);
 				return;
 			}
-			
+
 			List<FileItem> fileItems = null;
 			try {
 				fileItems = fileUploadService.parseRequest(src);
@@ -105,7 +116,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 				LOGGER.log(Level.WARNING, "No files to upload, terminating upload!");
 				return;
 			}
-			
+
 			String fieldName = null;
 			List<UploadFile> files = new ArrayList<UploadFile>();
 			for (FileItem file: fileItems) {
@@ -128,16 +139,16 @@ public class ContentFileUploadServlet extends HttpServlet {
 	        		}
 	        	}
 	        }
-	        
+
 	        if (ListUtil.isEmpty(files)) {
 	        	LOGGER.log(Level.WARNING, "No files to upload, terminating upload!");
 	        	return;
 	        }
-	        
+
 	        if (!StringUtil.isEmpty(uploadId)) {
 	        	iwac.setApplicationAttribute(uploadId, Boolean.TRUE);
 	        }
-	        
+
 	        String errorMessage = null;
 	        try {
 		        //	Checking upload path
@@ -151,38 +162,39 @@ public class ContentFileUploadServlet extends HttpServlet {
 		    	if (!uploadPath.endsWith(CoreConstants.SLASH)) {
 		    		uploadPath += CoreConstants.SLASH;
 		    	}
-		    	
+
 		    	if (stripNonRomanLetters) {
 		    		uploadPath = getStripped(uploadPath);
 		    		prepareFiles(files);
 		    	}
-		    	
+
 		        boolean isIE = CoreUtil.isIE(request);
 		        if (!(success = upload(files, uploadPath, zipFile, themePack, isIE, extractContent))) {
 		        	success = upload(files, uploadPath, zipFile, themePack, isIE, extractContent);	//	Re-uploading in case of error
 		        }
-		        
+
 		        if (success) {
 		        	StringBuffer responseBuffer = new StringBuffer();
 		        	for (Iterator<UploadFile> filesIter = files.iterator(); filesIter.hasNext();) {
 		        		UploadFile file = filesIter.next();
 		        		file.setPath(uploadPath);
-		        		
+
 		        		responseBuffer.append(file.getName());
 		        		if (filesIter.hasNext()) {
 		        			responseBuffer.append(CoreConstants.COMMA);
 		        		}
 		        	}
-		        	
+
 		        	uploadProgressListener.addUploadedFiles(uploadId, files);
-		        	
+
 		        	writeToResponse(response, responseBuffer.toString());
 		        } else {
 		        	errorMessage = "Unable to upload files (" + files + ") to: " + uploadPath + ". Upload ID: " + uploadId;
 		        	throw new RuntimeException(errorMessage);
 		        }
 	        } catch(Exception e) {
-	        	errorMessage = errorMessage == null ? "Files uploader failed! Unable to upload files: " + files + " to: " + uploadPath + ". Upload ID: " + uploadId : errorMessage;
+	        	errorMessage = errorMessage == null ? "Files uploader failed! Unable to upload files: " + files + " to: " + uploadPath + ". Upload ID: " + uploadId :
+	        		errorMessage;
 	        	LOGGER.log(Level.SEVERE, errorMessage, e);
 	        	CoreUtil.sendExceptionNotification(errorMessage, e);
 	        } finally {
@@ -195,22 +207,44 @@ public class ContentFileUploadServlet extends HttpServlet {
 			}
 		}
 	}
-	
+
+	private void handleStream(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		StreamResult result = new StreamResult();
+		StreamData data = IOUtil.getObjectFromInputStream(request.getInputStream());
+		if (data == null) {
+			writeToResponse(response, result);
+			return;
+		}
+
+		result.setDestinationDirectory(data.getDestinationDirectory());
+		result.setName(data.getName());
+		result.setUuid(data.getUuid());
+		result.setSize(data.getBytes().length);
+		result.setSuccess(upload(Arrays.asList(new UploadFile(data.getName(), null, data.getBytes().length, data.getBytes())), data.getDestinationDirectory(), false, false,
+				false, false));
+		writeToResponse(response, result);
+	}
+
 	private void finishUpUpload(IWApplicationContext iwac, FileUploadProgressListener uploadProgressListener, String uploadId, Boolean success) {
 		if (!StringUtil.isEmpty(uploadId)) {
 			uploadProgressListener.setUploadSuccessful(uploadId, success);
-    		
+
     		if (iwac != null)
     			iwac.removeApplicationAttribute(uploadId);
     	}
 	}
-	
+
 	private void writeToResponse(HttpServletResponse response, String responseText) throws IOException {
 		StringBuffer responseBuffer = new StringBuffer("web2FilesUploaderFilesListStarts").append(responseText);
 		response.setCharacterEncoding(CoreConstants.ENCODING_UTF8);
     	response.getWriter().print(responseBuffer.toString());
 	}
-	
+
+	private void writeToResponse(HttpServletResponse response, StreamResult responseObject) throws IOException {
+		response.setCharacterEncoding(CoreConstants.ENCODING_UTF8);
+    	response.getOutputStream().write(IOUtil.getBytesFromObject(responseObject));
+	}
+
 	private boolean upload(List<UploadFile> files, String uploadPath, boolean zipFile, boolean themePack, boolean isIE, boolean extractContent) {
 		try {
 			FileUploader uploader = ELUtil.getInstance().getBean(FileUploader.class);
@@ -231,39 +265,39 @@ public class ContentFileUploadServlet extends HttpServlet {
 		}
 		return false;
 	}
-	
+
 	private void prepareFiles(List<UploadFile> files) {
 		for (UploadFile file: files) {
 			file.setName(getStripped(file.getName()));
 		}
 	}
-	
+
 	private String getStripped(String input) {
 		if (StringUtil.isEmpty(input))
 			return input;
-		
+
 		return StringHandler.stripNonRomanCharacters(input, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS);
 	}
-	
+
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		super.doGet(request, response);
 	}
-	
+
 	private String getValueFromBytes(byte[] bytes) {
 		if (bytes == null) {
 			return null;
 		}
-		
+
 		try {
 			return new String(bytes, CoreConstants.ENCODING_UTF8);
 		} catch (UnsupportedEncodingException e) {
 			LOGGER.log(Level.WARNING, "Unable to use encoding " + CoreConstants.ENCODING_UTF8, e);
-			
+
 			return new String(bytes);
 		}
 	}
-	
+
 	private boolean getValueFromString(String value) {
 		return Boolean.TRUE.toString().equals(value);
 	}

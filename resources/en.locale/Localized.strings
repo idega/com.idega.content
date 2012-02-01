@@ -302,3 +302,4 @@ version=Version
 version_comment=and a version comment (optional)
 yes=Yes
 delete_all_themes=Delete all themes
+stream=Stream

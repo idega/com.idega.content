@@ -39,6 +39,9 @@ import com.idega.content.business.ContentUtil;
 import com.idega.content.business.WebDAVBeanComparator;
 import com.idega.content.data.WebDAVBean;
 import com.idega.content.repository.download.RepositoryItemDownloader;
+import com.idega.content.repository.stream.business.RepositoryItemStreamer;
+import com.idega.content.repository.stream.presentation.RepositoryItemStreamViewer;
+import com.idega.content.upload.servlet.ContentFileUploadServlet;
 import com.idega.core.search.presentation.SearchResults;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
@@ -46,11 +49,13 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.text.DownloadLink;
+import com.idega.presentation.text.Link;
 import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.ArrayUtil;
 import com.idega.util.CoreConstants;
 import com.idega.util.ListUtil;
+import com.idega.util.PresentationUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFList;
 import com.idega.webface.WFUtil;
@@ -66,7 +71,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 
 	private static final long serialVersionUID = 5991054676990358537L;
 	private static final Logger LOGGER = Logger.getLogger(WebDAVListManagedBean.class.getName());
-	
+
 	private static final String P_ID = "wb_list";
 	public static final String PARAMETER_WEB_DAV_URL = "wdurl";
 	public static final String PARAMETER_IS_FOLDER = "isf";
@@ -81,7 +86,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 	private static final String RENDERED = "rendered";
 	private static final String VALUE = "value";
 	private static final String ACTION_LISTENER_EXPRESSION = "#{".concat(WebDAVList.WEB_DAV_LIST_BEAN_ID).concat(".processAction}");
-	
+
 	public static final String COLUMN_ICON = "icon";
 	public static final String COLUMN_NAME = "name";
 	public static final String COLUMN_SIZE = "size";
@@ -90,10 +95,10 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 	public static final String COLUMN_CHECKOUT = "checkout";
 	public static final String COLUMN_LAST_MODIFIED = "last_modified";
 	public static final String COLUMN_DELETE = "delete";
-	
+
 	private String clickedFilePath;
 	private String clickedFileName;
-	
+
 	private String webDAVPath = CoreConstants.EMPTY;
 	private String rootPath = null;
 	private String startPath = null;
@@ -113,38 +118,38 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 	private Web2Business web2;
 	@Autowired
 	private JQuery jQuery;
-	
+
 	public WebDAVListManagedBean() {
 		List<String> hideColumns = new ArrayList<String>();
 		hideColumns.add(COLUMN_CHECKOUT);
 		hideColumns.add(COLUMN_LOCK);
 		setColumnsToHide(hideColumns);
 	}
-	
+
 	public void resetSorter() {
 		this.sorter = SORT_BY_NAME;
 	}
-	
+
 	public void setWebDAVPath(String path) {
 		this.webDAVPath = path;
 	}
-	
+
 	public String getWebDAVPath() {
 		return this.webDAVPath;
 	}
-	
+
 	public boolean getIsClickedFile() {
 		return (getClickedFilePath() != null && !(CoreConstants.EMPTY.equals(getClickedFilePath()))  );
 	}
-	
+
 	public void setClickedFilePath(String path) {
 		this.clickedFilePath = path;
 	}
-	
+
 	public String getClickedFilePath() {
 		return this.clickedFilePath;
 	}
-	
+
 	public String getClickedFileName() {
 		return this.clickedFileName;
 	}
@@ -155,44 +160,44 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		}
 		this.startPath = start;
 	}
-	
+
 	public void setRootFolder(String root) {
 		if (root != null && CoreConstants.EMPTY.equals(root)) {
 			root = null;
 		}
 		this.rootPath = root;
 	}
-	
+
 	public void setShowFolders(Boolean show) {
 		this.showFolders = show.booleanValue();
 	}
-	
+
 	public void setShowPublicFolder(Boolean show){
 		this.showPublicFolder = show.booleanValue();
 	}
-	
+
 	public void setShowDropboxFolder(Boolean show){
 		this.showDropboxFolder = show.booleanValue();
 	}
-	
+
 	public void setIconTheme(String theme) {
 		if (theme != null && CoreConstants.EMPTY.equals(theme)) {
 			theme = null;
 		}
 		this.iconTheme = theme;
 	}
-	
+
 	public Collection<String> getColumnsToHide(){
 		if(this.columnsToHide==null){
 			this.columnsToHide=new ArrayList<String>();
 		}
 		return this.columnsToHide;
 	}
-	
+
 	public void setColumnsToHide(Collection<String> columns) {
 		this.columnsToHide = columns;
 	}
-	
+
 	public void addColumnsToHide(Collection<String> coll){
 		if(this.columnsToHide==null){
 			setColumnsToHide(coll);
@@ -201,28 +206,28 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			this.columnsToHide.addAll(coll);
 		}
 	}
-	
+
 	private boolean showColumn(String columnName) {
 		return (this.columnsToHide == null || !this.columnsToHide.contains(columnName));
 	}
-	
+
 	public void setUseVersionControl(Boolean useVersionControl) {
 		this.useVersionControl = useVersionControl.booleanValue();
 		if (!this.useVersionControl) {
-			
+
 			getColumnsToHide().add(COLUMN_VERSION);
 			getColumnsToHide().add(COLUMN_LOCK);
 			getColumnsToHide().add(COLUMN_CHECKOUT);
 		}
 	}
-	
+
 	public void refresh(UIComponent comp) {
 		ContentBlock block = null;
 		while (comp != null && block == null) {
 			if (comp instanceof ContentBlock) {
 				block = (ContentBlock) comp;
 				ContentViewer cv = block.getContentViewer();
-				if (cv != null) { 
+				if (cv != null) {
 					cv.maintainPath(true);
 				}
 			} else {
@@ -232,10 +237,11 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 
 		updateDataModel(new Integer(this.startPage), new Integer(this.rows));
 	}
-	
+
+	@Override
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
 		UIComponent comp = actionEvent.getComponent();
-		
+
 		ContentViewer v = null;
 		UIComponent tmp = comp.getParent();
 		while (tmp != null && v == null) {
@@ -245,15 +251,15 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 				tmp = tmp.getParent();
 			}
 		}
-		
+
 		if (v != null) {
 			v.maintainPath(true);
-		
+
 			if (comp.getAttributes().get(ContentViewer.PARAMETER_ACTION) != null) {
-				v.setRenderFlags((String) comp.getAttributes().get(ContentViewer.PARAMETER_ACTION) ); 
+				v.setRenderFlags((String) comp.getAttributes().get(ContentViewer.PARAMETER_ACTION) );
 			}
 		}
-		
+
 		boolean isFolder = true;
 		String sortBy = (String) comp.getAttributes().get(ACTION_SORT);
 		if (sortBy != null) {
@@ -278,11 +284,11 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 						}
 					}
 				}
-	
+
 			}
-			
+
 			WFList parent = getWFListParent(comp);
-			
+
 			if (this.webDAVPath != null && parent != null) {
 				if (isFolder) {
 					this.setClickedFilePath(null);
@@ -296,13 +302,13 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 					}
 				}
 			}
-			
+
 			if (v != null) {
 				v.setCurrentFolderPath(this.webDAVPath);
 				v.setCurrentFileName(getClickedFileName());
 			}
 		}
-		
+
 	}
 
 	private WFList getWFListParent(UIComponent comp) {
@@ -317,10 +323,11 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		}
 	}
 
+	@Override
 	public UIColumn[] createColumns(String var) {
 		FacesContext fc = FacesContext.getCurrentInstance();
 		ELContext elContext = fc.getELContext();
-		
+
 		List<UIColumn> columns = new ArrayList<UIColumn>();
 		String imageSize = "16";
 		if (showColumn(COLUMN_ICON)) {
@@ -332,18 +339,18 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			icon.setHeight("16");// sizes that make sense 16/32/64/128
 			HtmlCommandLink iconLink = new HtmlCommandLink();
 			iconLink.setId(P_ID+"_L");
-			
+
 			WFUtil.addParameterVB(iconLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 			WFUtil.addParameterVB(iconLink, PARAMETER_IS_FOLDER, var + ".isCollection");
 			iconLink.addActionListener(WFUtil.getMethodExpressionForActionListener(elContext, ACTION_LISTENER_EXPRESSION));
 			iconLink.getChildren().add(icon);
 			columnIcon.getChildren().add(iconLink);
-			
+
 			columns.add(columnIcon);
 		}
-		
+
 		IWBundle bundle = ContentBlock.getBundle();
-		
+
 		if (showColumn(COLUMN_NAME)) {
 			UIColumn columnSort = new UIColumn();
 			HtmlCommandLink nameSortLink = new HtmlCommandLink();
@@ -362,10 +369,10 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			nameSortLink.addActionListener(WFUtil.getMethodExpressionForActionListener(elContext, ACTION_LISTENER_EXPRESSION));
 			nameSortLink.setId(P_ID+"_sortName");
 			columnSort.setHeader(nameSortLink);
-			
+
 			//NameLink for file
 			HtmlOutputLink nameLink = new HtmlOutputLink();
-			
+
 			if (this.onFileClickEventName != null) {
 				nameLink.setOnclick(onFileClickEventName);
 			}
@@ -375,7 +382,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			nameLink.setStyleClass("wf_listlink");
 			nameLink.getChildren().add(WFUtil.getTextVB(var + ".name"));
 			nameLink.setValueExpression(RENDERED, WFUtil.createValueExpression(elContext, "#{"+var+".isFile}", Boolean.class));
-			
+
 			//NameLink for folder
 			HtmlCommandLink nameFolderLink = new HtmlCommandLink();
 			nameFolderLink.setId(P_ID);
@@ -385,7 +392,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			WFUtil.addParameterVB(nameFolderLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 			WFUtil.addParameterVB(nameFolderLink, PARAMETER_IS_FOLDER, var + ".isCollection");
 			nameFolderLink.addActionListener(WFUtil.getMethodExpressionForActionListener(elContext, ACTION_LISTENER_EXPRESSION));
-			
+
 			// DetailLink
 			HtmlCommandLink nameDetailsLink = new HtmlCommandLink();
 			nameDetailsLink.setId(P_ID+"_det");
@@ -394,7 +401,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			nameDetailsLink.setValueExpression(RENDERED, WFUtil.createValueExpression(elContext, "#{"+var+".isFile}", Boolean.class));
 			nameDetailsLink.setValueExpression("alt", bundle.getValueExpression("document_details"));
 			nameDetailsLink.setValueExpression("title", bundle.getValueExpression("document_details"));
-			
+
 			WFUtil.addParameterVB(nameDetailsLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 			WFUtil.addParameterVB(nameDetailsLink, PARAMETER_IS_FOLDER, var + ".isCollection");
 			nameDetailsLink.addActionListener(WFUtil.getMethodExpressionForActionListener(elContext, ACTION_LISTENER_EXPRESSION));
@@ -403,7 +410,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			HtmlOutputLink namePreviewLink = new HtmlOutputLink();
 			namePreviewLink.setId(P_ID+"_pre");
 			namePreviewLink.setValueExpression(VALUE, WFUtil.createValueExpression(elContext, "#{"+ var + ".previewActionURI}", String.class));
-			
+
 			//"document_details"
 			namePreviewLink.setStyleClass("content_viewer_file_preview");
 			namePreviewLink.setValueExpression(RENDERED, WFUtil.createValueExpression(elContext, "#{"+var+".isFile}", Boolean.class));
@@ -417,10 +424,10 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			permissionLink.setValueExpression(RENDERED, WFUtil.createValueExpression(elContext, "#{"+var+".renderPermissionLink}", Boolean.class));
 			permissionLink.setValueExpression("alt", bundle.getValueExpression("permissions"));
 			permissionLink.setValueExpression("title", bundle.getValueExpression("permissions"));
-			
+
 			columnSort.getChildren().add(nameLink);
 			columnSort.getChildren().add(nameFolderLink);
-			
+
 			UIColumn mainColumn = new UIColumn();
 			HtmlOutputText emptyText = WFUtil.getText(CoreConstants.EMPTY, "wf_listtext");
 			emptyText.setValueExpression(RENDERED, WFUtil.createValueExpression(elContext, "#{"+var+".isCollection}", Boolean.class));
@@ -432,7 +439,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			columns.add(columnSort);
 			columns.add(mainColumn);
 		}
-		
+
 		if (showColumn(COLUMN_SIZE)) {
 			UIColumn columnSize = new UIColumn();
 			HtmlCommandLink sizeSortLink = new HtmlCommandLink();
@@ -454,20 +461,20 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			HtmlOutputText size = WFUtil.getTextVB(var + ".length");
 			size.setStyleClass("wf_listtext");
 			columnSize.getChildren().add(size);
-			
+
 			columns.add(columnSize);
 		}
-		
+
 		if (showColumn(COLUMN_VERSION)) {
 			UIColumn columnVersion = new UIColumn();
 			columnVersion.setHeader(bundle.getLocalizedText("version"));
 			HtmlOutputText version = WFUtil.getTextVB(var + ".version");
 			version.setStyleClass("wf_listtext");
 			columnVersion.getChildren().add(version);
-			
+
 			columns.add(columnVersion);
 		}
-		
+
 		if (showColumn(COLUMN_LOCK)) {
 			HtmlGraphicImage lock = new HtmlGraphicImage();
 			lock.setValueExpression(RENDERED, WFUtil.createValueExpression(elContext, "#{"+var+".isLocked}", Boolean.class));
@@ -482,10 +489,10 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			columnLock.setHeader(bundle.getLocalizedText("lock"));
 			columnLock.getChildren().add(lock);
 			columnLock.getChildren().add(emptyText);
-			
+
 			columns.add(columnLock);
 		}
-		
+
 		if (showColumn(COLUMN_CHECKOUT)) {
 			UIColumn checkout = new UIColumn();
 			checkout.setHeader(bundle.getLocalizedText("checked_out"));
@@ -493,13 +500,13 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			checkedOut.setValueExpression(RENDERED, WFUtil.createValueExpression(elContext, "#{"+var+".checkedOut}", Boolean.class));
 			checkedOut.setStyleClass("wf_listtext");
 			checkout.getChildren().add(checkedOut);
-			
+
 			HtmlOutputText emptyText = WFUtil.getText(CoreConstants.EMPTY, "wf_listtext");
 			checkout.getChildren().add(emptyText);
-			
+
 			columns.add(checkout);
 		}
-		
+
 		if (showColumn(COLUMN_LAST_MODIFIED)) {
 			UIColumn lastModified = new UIColumn();
 			HtmlCommandLink modSortLink = new HtmlCommandLink();
@@ -522,10 +529,10 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			modifiedDate.setStyleClass("wf_listtext");
 			modifiedDate.setConverter(new WFTimestampConverter());
 			lastModified.getChildren().add(modifiedDate);
-			
+
 			columns.add(lastModified);
 		}
-		
+
 		if (showColumn(COLUMN_DELETE)) {
 			UIColumn del = new UIColumn();
 			del.setHeader(bundle.getLocalizedText("delete"));
@@ -541,33 +548,33 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			delete.setValueExpression("alt", ContentUtil.getBundle().getValueExpression("delete"));
 			delete.setHeight(imageSize);// sizes that make sense 16/32/64/128
 			delLink.getChildren().add(delete);
-			
+
 			del.getChildren().add(delLink);
-			
+
 			columns.add(del);
 		}
-		
+
 		IWContext iwc = IWContext.getIWContext(fc);
 		if (iwc != null && (iwc.isLoggedOn() && iwc.isSuperAdmin())) {
 			//	Download
 			UIColumn download = new UIColumn();
 			download.setHeader(bundle.getLocalizedText("download"));
-			
+
 			IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
-			
+
 			DownloadLink downloadLink = new DownloadLink(iwrb.getLocalizedString("download", "Download"));
 			downloadLink.setValueExpression(RENDERED, WFUtil.createValueExpression(elContext, "#{"+var+".isReal}", Boolean.class));
 			downloadLink.setMediaWriterClass(RepositoryItemDownloader.class);
 			WFUtil.addParameterVB(downloadLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
 			WFUtil.addParameterVB(downloadLink, PARAMETER_IS_FOLDER, var + ".isCollection");
-			
+
 			download.getChildren().add(downloadLink);
 			columns.add(download);
-			
+
 			//	Stream
-			/*UIColumn stream = new UIColumn();
+			UIColumn stream = new UIColumn();
 			stream.setHeader(bundle.getLocalizedUIComponent("stream", iwc.getApplication().createComponent(HtmlOutputText.COMPONENT_TYPE), "Stream"));
-			
+
 			PresentationUtil.addStyleSheetToHeader(iwc, getWebBusiness().getBundleURIToFancyBoxStyleFile());
 			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
 					getJQuery().getBundleURIToJQueryLib(),
@@ -577,39 +584,34 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 					"/dwr/interface/" + RepositoryItemStreamer.DWR_OBJECT + ".js"
 			));
 			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, getWebBusiness().getBundleURIsToFancyBoxScriptFiles());
-			PresentationUtil.addJavaScriptActionOnLoad(iwc, "jQuery(window).load(function() {\n" +
-																"jQuery.each(jQuery('a.streamerLink'), function() {\n" +
-																	"var link = jQuery(this);\n" +
-																	"link.fancybox({autoScale: false, autoDimensions: false, width: 450, height: 175});\n" +
-																"});\n" +
-															"});"
-			);
 			Link streamerLink = new Link(iwrb.getLocalizedString("stream", "Stream"), RepositoryItemStreamViewer.class);
 			streamerLink.setTitle(iwrb.getLocalizedString("stream_to_other_server", "Stream to other server"));
 			streamerLink.setValueExpression(RENDERED, WFUtil.createValueExpression(elContext, "#{"+var+".isReal}", Boolean.class));
 			streamerLink.setStyleClass("streamerLink");
 			WFUtil.addParameterVB(streamerLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
-			
+			WFUtil.addParameter(streamerLink, ContentFileUploadServlet.PARAMETER_BINARY_STREAM, Boolean.TRUE.toString());
+
 			stream.getChildren().add(streamerLink);
-			columns.add(stream);*/
+			columns.add(stream);
 		}
-		
+
 		return ArrayUtil.convertListToArray(columns);
 	}
-		
+
 	/**
 	 * Updates the datamodel, definded by WFList
 	 * @param first Number of first element
 	 * @param rows Total number of rows
 	 */
+	@Override
 	public void updateDataModel(Integer start, Integer rows) {
 		if (this.dataModel == null) {
 			this.dataModel = new WFDataModel();
 		}
-		
+
 		WebDAVBean[] beans = getDavData();
 		int availableRows = beans.length;
-		
+
 		int nrOfRows = rows.intValue();
 		if (nrOfRows == 0) {
 			nrOfRows = availableRows;
@@ -618,15 +620,15 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		for (int i = start.intValue(); i < maxRow; i++) {
 			this.dataModel.set(beans[i], i);
 		}
-		
+
 		this.dataModel.setRowCount(availableRows);
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	private WebDAVBean[] getDavData() {
 		WebDAVBean[] data;
 		try {
-			IWUserContext iwuc = IWContext.getInstance();			
+			IWUserContext iwuc = IWContext.getInstance();
 			IWSlideSession ss = IBOLookup.getSessionInstance(iwuc, IWSlideSession.class);
 			if (this.startPath != null && this.startPath.equals(CoreConstants.SLASH)) {
 				this.startPath = CoreConstants.EMPTY;
@@ -672,7 +674,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		}
 		return data;
 	}
-	
+
 	private String getExceptionData(Throwable t) {
 		StackTraceElement[] trace = t.getStackTrace();
 		String traceString = t.getClass().getName().concat(":\n\r");
@@ -681,7 +683,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		}
 		return traceString;
 	}
-	
+
 	private List<WebdavResource> getChildResourcesOverRequest(WebdavExtendedResource headResource, IWSlideSession slideSession) {
 		WebdavResources resources = null;
 		try {
@@ -693,7 +695,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			LOGGER.warning("No child resources found for: " + headResource);
 			return null;
 		}
-		
+
 		Enumeration<?> enumer = null;
 		try {
 			enumer = resources.getResources();
@@ -702,12 +704,12 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		}
 		if (enumer == null)
 			return null;
-		
+
 		@SuppressWarnings("unchecked")
 		List<WebdavResource> childResources = (List<WebdavResource>) Collections.list(enumer);
 		return childResources;
 	}
-	
+
 	private List<WebdavResource> getChildResources(WebdavExtendedResource headResource, IWSlideSession slideSession) {
 		WebdavResource[] children = null;
 		try {
@@ -720,15 +722,15 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			LOGGER.info("No objects were found by Slide API in: " + headResource + ". Will try to get child resources over HTTP");
 			return getChildResourcesOverRequest(headResource, slideSession);
 		}
-		
+
 		return Arrays.asList(children);
 	}
-	
+
 	private WebDAVBean[] getDirectoryListing(WebdavExtendedResource headResource, String webDAVServletURL, IWSlideSession slide) throws IOException, HttpException {
 		List<WebdavResource> childResources = getChildResources(headResource, slide);
 		if (ListUtil.isEmpty(childResources))
 			return new WebDAVBean[0];
-		
+
 		List<WebDAVBean> directories = new Vector<WebDAVBean>();
 		WebDAVBean upBean = null;
 		if (this.webDAVPath != null && !CoreConstants.EMPTY.equals(this.webDAVPath) && !this.webDAVPath.equals(this.rootPath)) {
@@ -752,7 +754,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			upBean.setIsReal(false);
 			upBean.setIsCollection(true);
 		}
-		
+
 		String url;
 		WebDAVBean bean;
 		for (WebdavResource resource: childResources) {
@@ -760,14 +762,14 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 				if (resource.exists() && !(resource instanceof WebdavExtendedResource) || !resource.getDisplayName().startsWith(CoreConstants.DOT)) {
 					if (this.showFolders || (!this.showFolders && !resource.isCollection())) {
 						String name = resource.getName();
-						
+
 						if (name == null || (name.equalsIgnoreCase("public") && resource.isCollection() && !this.showPublicFolder)) {
 							continue;
 						}
 						if (name.equalsIgnoreCase("dropbox") && resource.isCollection() && !this.showDropboxFolder) {
 							continue;
 						}
-						
+
 						try {
 							bean = new WebDAVBean((WebdavExtendedResource) resource);
 							url = resource.getPath();
@@ -786,18 +788,18 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 				e.printStackTrace();
 			}
 		}
-		
+
 		sortResources(directories);
 		if (upBean != null)
 			directories.add(0, upBean);
 
 		return ArrayUtil.convertListToArray(directories);
 	}
-	
+
 	private void sortResources(List<WebDAVBean> v) {
 		int sortMethod = 1;
 		boolean desc = false;
-		
+
 		if (SORT_BY_NAME.equals(this.sorter)) {
 			sortMethod = WebDAVBeanComparator.SORT_BY_NAME;
 			desc = false;
@@ -817,16 +819,18 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			sortMethod = WebDAVBeanComparator.SORT_BY_MODIFICATION_DATE;
 			desc = true;
 		}
-		
+
 		Collections.sort(v, new WebDAVBeanComparator(IWContext.getInstance().getCurrentLocale(), sortMethod, desc));
 	}
-	
+
 	private WFDataModel dataModel = new WFDataModel();
-	
+
+	@Override
 	public DataModel getDataModel() {
 		return this.dataModel;
 	}
-	
+
+	@Override
 	public void setDataModel(DataModel model) {
 		this.dataModel = (WFDataModel) model;
 	}
@@ -849,12 +853,12 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		}
 		return web2;
 	}
-	
+
 	JQuery getJQuery() {
 		if (jQuery == null) {
 			ELUtil.getInstance().autowire(this);
 		}
 		return jQuery;
 	}
-	
+
 }
