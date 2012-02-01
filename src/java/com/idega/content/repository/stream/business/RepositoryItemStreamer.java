@@ -1,6 +1,5 @@
 package com.idega.content.repository.stream.business;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -222,8 +221,7 @@ public class RepositoryItemStreamer extends DefaultSpringBean implements DWRAnno
 			os.flush();
 			os.close();
 
-			byte[] response = IOUtil.getBytesFromInputStream(connection.getInputStream());
-			StreamResult result = IOUtil.getObjectFromInputStream(new ByteArrayInputStream(response));
+			StreamResult result = IOUtil.getObjectFromInputStream(connection.getInputStream());
 			if (result == null)
 				return false;
 
