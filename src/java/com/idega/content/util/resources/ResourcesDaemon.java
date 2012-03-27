@@ -26,7 +26,6 @@ public class ResourcesDaemon implements IWBundleStartable, ActionListener {
 	
 	private EventTimer timer;
 	
-	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (CONCATENATED_WEB_PAGE_RESOURCES_CLEANER.equals(e.getActionCommand())) {
 			IWMainApplication iwma = IWMainApplication.getDefaultIWMainApplication();
@@ -71,14 +70,12 @@ public class ResourcesDaemon implements IWBundleStartable, ActionListener {
 		}
 	}
 
-	@Override
 	public void start(IWBundle starterBundle) {
 		timer = new EventTimer(EventTimer.THREAD_SLEEP_5_MINUTES, CONCATENATED_WEB_PAGE_RESOURCES_CLEANER);
 		timer.addActionListener(this);
 		timer.start(900000);
 	}
 
-	@Override
 	public void stop(IWBundle starterBundle) {
 		if (timer == null)
 			return;

@@ -74,7 +74,6 @@ public class FileUploaderBean implements FileUploader {
 
 	public static final String FILE_UPLOAD_INPUT_STYLE = "fileUploadInputStyle";
 
-	@Override
 	public void initializeUploader(IWContext iwc) {
 		if (iwc == null) {
 			return;
@@ -88,7 +87,6 @@ public class FileUploaderBean implements FileUploader {
 		getSlideService(iwc);
 	}
 
-	@Override
 	public Layer getFileInput(IWContext iwc, String id, boolean addRemoveImage, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput,
 			boolean autoUpload) {
 		if (iwc == null) {
@@ -127,7 +125,6 @@ public class FileUploaderBean implements FileUploader {
 		return fileInputContainer;
 	}
 
-	@Override
 	public String getPropertiesAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
 			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters, String maxUploadSize) {
@@ -177,7 +174,6 @@ public class FileUploaderBean implements FileUploader {
 		.append("});").toString();
 	}
 
-	@Override
 	public Document getRenderedFileInput(String id, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput, boolean autoUpload) {
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
@@ -192,17 +188,14 @@ public class FileUploaderBean implements FileUploader {
 		return builder.getRenderedComponent(iwc, getFileInput(iwc, id, true, showProgressBar, addjQuery, autoAddFileInput, autoUpload), false);
 	}
 
-	@Override
 	public boolean uploadFile(List<UploadFile> files, String uploadPath, boolean isIE) {
 		return doUploading(files, uploadPath, false, false, false, isIE);
 	}
 
-	@Override
 	public boolean uploadThemePack(List<UploadFile> files, String uploadPath, boolean isIE) {
 		return doUploading(files, uploadPath, true, true, true, isIE);
 	}
 
-	@Override
 	public boolean uploadZipFile(List<UploadFile> files, String uploadPath, boolean extractContent, boolean isIE) {
 		return doUploading(files, uploadPath, true, false, extractContent, isIE);
 	}
@@ -299,7 +292,6 @@ public class FileUploaderBean implements FileUploader {
 		return slide;
 	}
 
-	@Override
 	public String getAddFileInputJavaScriptAction(String containerId, IWResourceBundle iwrb, boolean showProgressBar, boolean addjQuery,
 			boolean autoAddFileInput, boolean autoUpload) {
 		return new StringBuilder("addFileInputForUpload('").append(containerId).append("', '").append(iwrb.getLocalizedString("loading", "Loading..."))
@@ -307,7 +299,6 @@ public class FileUploaderBean implements FileUploader {
 				.append(autoAddFileInput).append(", ").append(autoUpload).append(");").toString();
 	}
 
-	@Override
 	public String getRenderedComponent(String id) {
 		if (StringUtil.isEmpty(id)) {
 			return null;
@@ -340,7 +331,6 @@ public class FileUploaderBean implements FileUploader {
 		return builderService.getRenderedComponent(component, iwc, false);
 	}
 
-	@Override
 	public String getActionToLoadFilesAndExecuteCustomAction(String customAction, boolean showProgressBar, boolean addjQuery) {
 		List<String> scripts = new ArrayList<String>();
 		scripts.add(ContentUtil.getBundle().getVirtualPathWithFileNameString("javascript/FileUploadHelper.js"));
@@ -359,7 +349,6 @@ public class FileUploaderBean implements FileUploader {
 		return PresentationUtil.getJavaScriptLinesLoadedLazily(scripts, customAction);
 	}
 
-	@Override
 	public String getUploadAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
 			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters, String maxUploadSize) {
@@ -411,7 +400,6 @@ public class FileUploaderBean implements FileUploader {
 		jQuery = query;
 	}
 
-	@Override
 	public List<String> getUploadedFilesListById(String uploadId, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters) {
 		FileUploadProgressListener fileUploadProgress = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
 		if (fileUploadProgress == null)
@@ -429,7 +417,6 @@ public class FileUploaderBean implements FileUploader {
 		return getUploadedFilesList(uploadedFiles, uploadPath, fakeFileDeletion, stripNonRomanLetters);
 	}
 
-	@Override
 	public List<String> getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters) {
 		if (ListUtil.isEmpty(files) || StringUtil.isEmpty(uploadPath)) {
 			return null;
@@ -504,7 +491,6 @@ public class FileUploaderBean implements FileUploader {
 		return results;
 	}
 
-	@Override
 	public AdvancedProperty deleteFile(String fileInSlide, Boolean fakeFileDeletion) {
 		return deleteFile(CoreUtil.getIWContext(), fileInSlide, fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion);
 	}
@@ -614,7 +600,6 @@ public class FileUploaderBean implements FileUploader {
 		this.builderLogicWrapper = builderLogicWrapper;
 	}
 
-	@Override
 	public AdvancedProperty deleteFiles(List<String> filesInSlide, Boolean fakeFileDeletion) {
 		if (ListUtil.isEmpty(filesInSlide)) {
 			return null;
