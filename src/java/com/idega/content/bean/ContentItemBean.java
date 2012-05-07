@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.faces.context.FacesContext;
 import javax.jcr.Node;
@@ -52,6 +54,7 @@ import com.idega.slide.business.IWSlideSession;
 import com.idega.slide.util.IWSlideConstants;
 import com.idega.slide.util.WebdavExtendedResource;
 import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.expression.ELUtil;
 import com.sun.syndication.io.impl.DateParser;
@@ -128,6 +131,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	 */
 	public ContentItemBean() {}
 
+	@Override
 	public Locale getLocale() {
 		if(this._locale==null){
 			IWContext iwc = IWContext.getIWContext(FacesContext.getCurrentInstance());
@@ -202,6 +206,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	public List getAttachments() { return getItemFields(FIELDNAME_ATTACHMENT); }
 	public void setAttachment(List l) { setItemFields(FIELDNAME_ATTACHMENT, l); }
 
+	@Override
 	public Object getValue(String fieldName){
 		ContentItemField field = getItemField(fieldName);
 		if(field != null){
@@ -211,12 +216,15 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		}
 	}
 
+	@Override
 	public void setValue(String fieldName, Object value){
 		setItemFieldValue(fieldName, value);
 	}
 
+	@Override
 	public abstract String[] getContentFieldNames();
 
+	@Override
 	public String[] getToolbarActions(){
 		if(getExists()){
 			return ACTION_EXISTS_ARRAY;
@@ -325,6 +333,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	 * @throws IOException
 	 * @throws Exception If there is an exception loading
 	 */
+	@Override
 	public void load() throws IOException {
 		if(!isLoaded()){
 			String resourcePath = getResourcePath();
@@ -542,18 +551,43 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		}
 	}
 
+	@Override
 	public Timestamp getCreationDate() {
 		return (Timestamp)getValue(FIELDNAME_CREATION_DATE);
 	}
 
+	@Override
 	public Timestamp getLastModifiedDate() {
 		return (Timestamp)getValue(FIELDNAME_LAST_MODIFIED_DATE);
 	}
 
+	@Override
 	public String getResourcePath() {
 		return (String)getValue(FIELDNAME_RESOURCE_PATH);
 	}
+	
+	public boolean createItemFolder(){
+		IWContext iwc = CoreUtil.getIWContext();
+		return createItemFolder(iwc);
+	}
+	
+	public boolean createItemFolder(IWContext iwc){
+		IWSlideSession session = getIWSlideSession(iwc);
+		try{
+			return session.createAllFoldersInPath(getResourcePath());
+		}catch(Exception e){
+			Logger.getLogger(ContentItemBean.class.getName()).log(Level.WARNING, "Failed creating item folder", e);
+			return false;
+		}finally{
+			try {
+				session.close();
+			} catch (Exception e) {
+				Logger.getLogger(ContentItemBean.class.getName()).log(Level.WARNING, "Failed closing session.", e);
+			}
+		}
+	}
 
+	@Override
 	public String getVersionName(){
 		return (String)getValue(FIELDNAME_VERSION_NAME);
 	}
@@ -562,6 +596,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		setValue(FIELDNAME_VERSION_NAME,name);
 	}
 
+	@Override
 	public Boolean getRendered() {
 		return this.doRender;
 	}
@@ -714,6 +749,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		this.session=session;
 	}
 
+	@Override
 	public void delete(){
 		try {
 			String resourcePath = getResourcePath();
