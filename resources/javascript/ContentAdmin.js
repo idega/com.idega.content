@@ -32,8 +32,8 @@ ContentAdmin.streamToRemoteServer = function(serverId, url, directoryId, reCreat
 	ContentAdmin.uuid = uuid;
 	var reCreateStructure = true;
 	jQuery('input[type=\'radio\']', 'div.repositoryItemStreamerReCreateStructure').each(function() {
-		var checked = jQuery(this).attr('checked');
-		if (checked != null) {
+		var checked = jQuery(this).attr('checked') == 'checked';
+		if (checked) {
 			reCreateStructure = 'true' == jQuery(this).val();
 		}
 	});
