@@ -600,6 +600,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 	 * @param first Number of first element
 	 * @param rows Total number of rows
 	 */
+	@Override
 	public void updateDataModel(Integer start, Integer rows) {
 		if (this.dataModel == null) {
 			this.dataModel = new WFDataModel();
@@ -710,8 +711,8 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		}
 
 		if (!ListUtil.isEmpty(children)) {
-			String url;
-			WebDAVBean bean;
+			String url = null;
+			WebDAVBean bean = null;
 			for (RepositoryItem resource: children) {
 				try {
 					String name = resource.getName();
@@ -780,10 +781,12 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 
 	private WFDataModel dataModel = new WFDataModel();
 
+	@Override
 	public DataModel getDataModel() {
 		return this.dataModel;
 	}
 
+	@Override
 	public void setDataModel(DataModel model) {
 		this.dataModel = (WFDataModel) model;
 	}

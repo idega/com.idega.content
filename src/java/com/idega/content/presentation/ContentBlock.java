@@ -119,8 +119,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 //				path = (String) WFUtil.createMethodBinding("#{WebDAVListBean.getWebDAVPath}", null).invoke(context,null);
 //			}
 			path = getCurrentResourcePath();
-		}
-		else {
+		} else {
 			path = (String) WFUtil.invoke(webDavPath);
 		}
 		try {
@@ -137,8 +136,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 					getChildren().clear();
 				}
 			}
-		}
-		catch (RepositoryException e) {
+		} catch (RepositoryException e) {
 			e.printStackTrace();
 		}
 		super.encodeBegin(context);

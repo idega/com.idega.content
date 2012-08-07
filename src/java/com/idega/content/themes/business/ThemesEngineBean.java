@@ -60,8 +60,6 @@ import com.idega.webface.WFUtil;
 @Service(ThemesEngine.SPRING_BEAN_IDENTIFIER)
 public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 
-	private static final long serialVersionUID = 5875353284352953688L;
-
 	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(ThemesEngineBean.class.getName());
 
 	public static final String ARTICLE_VIEWER_TEMPLATE_KEY = "article_viewer_page_key";

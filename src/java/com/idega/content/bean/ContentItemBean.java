@@ -14,20 +14,14 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Enumeration;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
-import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.Property;
 import javax.jcr.RepositoryException;
-import javax.jcr.ValueFormatException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -115,12 +109,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	private String categories = null; // This string is parsed from WebDavResource
 
 	private boolean setPublishedDateByDefault = false;
-	//private boolean persistToWebDav=false;
-	//private boolean persistToJCR=true;
-//	private Session session;
-	/**
-	 * Default constructor.
-	 */
+
 	public ContentItemBean() {}
 
 	@Override
@@ -309,7 +298,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		setValue(FIELDNAME_STATUS,status);
 	}
 
-
 	/**
 	 * Update pending locale change.
 	 */
@@ -320,7 +308,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		}
 	}
 
-
 	/**
 	 * <p>
 	 * Loads this resource from the folder set by setResourcepath();
@@ -330,13 +317,12 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	 */
 	@Override
 	public void load() throws IOException {
-		if(!isLoaded()){
+		if (!isLoaded()) {
 			String resourcePath = getResourcePath();
-			if(resourcePath==null){
+			if (resourcePath == null)
 				throw new FileNotFoundException("Error loading content Item. No resourcePath set");
-			}
-			load(resourcePath);
-			setLoaded(true);
+
+			setLoaded(load(resourcePath));
 		}
 	}
 
@@ -418,64 +404,33 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		//	TODO: test it
 		boolean returner = true;
 		try {
-//			Session session = getSession();
-			Node folderNode = getRepositoryService().getNode(path);//session.getRootNode().getNode(path);
+			RepositoryItem item = getRepositoryService().getRepositoryItemAsRootUser(path);
+			if (item == null || !item.exists())
+				return false;
 
-			//here I don't use the variable 'path' since it can actually be the URI
+			setResourcePath(item.getPath());
+			setName(item.getName());
 
+			long created = item.getCreationDate();
+			if (created > 0)
+				setCreationDate(new IWTimestamp(created).getTimestamp());
 
-			setResourcePath(folderNode.getPath());
-			Property displayNameProp = folderNode.getProperty(DISPLAYNAME);
-			if(displayNameProp!=null){
-				setName(displayNameProp.getValue().getString());
-			}
+			long lastModified = item.getLastModified();
+			if (lastModified > 0)
+				setLastModifiedDate(new IWTimestamp(lastModified).getTimestamp());
 
-			Property createDateProp = folderNode.getProperty(CREATIONDATE);
-			if(createDateProp!=null){
-				try{
-					Calendar creationDate = createDateProp.getDate();
-					setCreationDate(new IWTimestamp((GregorianCalendar)creationDate).getTimestamp());
-				}
-				catch(Exception e){
-					e.printStackTrace();
-				}
-			}
-
-			Property lastmodifiedProp = folderNode.getProperty(GETLASTMODIFIED);
-			if(lastmodifiedProp!=null){
-				try{
-					Calendar creationDate = lastmodifiedProp.getDate();
-					setLastModifiedDate(new IWTimestamp((GregorianCalendar)creationDate).getTimestamp());
-				}
-				catch(ValueFormatException vfe){
-					vfe.printStackTrace();
-				}
-			}
-
-			try{
-				Property categoriesProp = folderNode.getProperty("category"/*IWSlideConstants.PROPERTYNAME_CATEGORY*/);
-				if(categoriesProp!=null){
-					String categories = categoriesProp.getValue().getString();
-					setCategories(categories);
-				}
-			}
-			catch(PathNotFoundException pnfe){}
-
-			returner = load(folderNode);
+			//	TODO
+//			try{
+//				Property categoriesProp = folderNode.getProperty("category"/*IWSlideConstants.PROPERTYNAME_CATEGORY*/);
+//				if(categoriesProp!=null){
+//					String categories = categoriesProp.getValue().getString();
+//					setCategories(categories);
+//				}
+//			}
+//			catch(PathNotFoundException pnfe){}
+//
+			returner = load(item);
 			setExists(true);
-		} catch(PathNotFoundException e) {
-			//if(e.getReasonCode()==WebdavStatus.SC_NOT_FOUND) {
-				/*if(isAutoCreateResource()){
-					//in this case ignore the error message that it isn't fount
-					return true;
-				}
-				else{*/
-					setRendered(false);
-					return false;
-				//}
-			//} else {
-			//	throw e;
-			//}
 		} catch (RepositoryException e) {
 			e.printStackTrace();
 			setRendered(false);
@@ -484,7 +439,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		return returner;
 	}
 
-	protected boolean load(Node folderNode) throws IOException, RepositoryException {
+	protected boolean load(RepositoryItem item) throws IOException, RepositoryException {
 		return true;
 	}
 
@@ -494,33 +449,32 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 
 	public void setPublishedDate(Timestamp date) {
 		setValue(FIELDNAME_PUBLISHED_DATE, date);
-		if (date != null) {
+		if (date != null)
 			setCreationDate(date);
-		}
 	}
 
 	@Override
 	public Timestamp getCreationDate() {
-		return (Timestamp)getValue(FIELDNAME_CREATION_DATE);
+		return (Timestamp) getValue(FIELDNAME_CREATION_DATE);
 	}
 
 	@Override
 	public Timestamp getLastModifiedDate() {
-		return (Timestamp)getValue(FIELDNAME_LAST_MODIFIED_DATE);
+		return (Timestamp) getValue(FIELDNAME_LAST_MODIFIED_DATE);
 	}
 
 	@Override
 	public String getResourcePath() {
-		return (String)getValue(FIELDNAME_RESOURCE_PATH);
+		return (String) getValue(FIELDNAME_RESOURCE_PATH);
 	}
 
 	@Override
-	public String getVersionName(){
-		return (String)getValue(FIELDNAME_VERSION_NAME);
+	public String getVersionName() {
+		return (String) getValue(FIELDNAME_VERSION_NAME);
 	}
 
-	public void setVersionName(String name){
-		setValue(FIELDNAME_VERSION_NAME,name);
+	public void setVersionName(String name) {
+		setValue(FIELDNAME_VERSION_NAME, name);
 	}
 
 	@Override
@@ -528,7 +482,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		return this.doRender;
 	}
 
-	public void setRendered(boolean render){
+	public void setRendered(boolean render) {
 		setRendered(Boolean.valueOf(render));
 	}
 
@@ -537,17 +491,17 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	}
 
 	public void setCreationDate(Timestamp date) {
-		setValue(FIELDNAME_CREATION_DATE,date);
+		setValue(FIELDNAME_CREATION_DATE, date);
 		//setItemType(ContentItemField.FIELD_TYPE_TIMESTAMP);
 	}
 
 	public void setLastModifiedDate(Timestamp date) {
-		setValue(FIELDNAME_LAST_MODIFIED_DATE,date);
+		setValue(FIELDNAME_LAST_MODIFIED_DATE, date);
 		//setItemType(ContentItemField.FIELD_TYPE_TIMESTAMP);
 	}
 
 	public void setResourcePath(String path) {
-		setValue(FIELDNAME_RESOURCE_PATH,path);
+		setValue(FIELDNAME_RESOURCE_PATH, path);
 	}
 
 	/**
@@ -556,7 +510,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	public boolean isAutoCreateResource() {
 		return this.autoCreateResource;
 	}
-
 
 	/**
 	 * @param autoCreateResource The autoCreateResource to set.
@@ -576,14 +529,12 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		return this.exists;
 	}
 
-
 	/**
 	 * @param exists The exists to set.
 	 */
 	public void setExists(boolean exists) {
 		this.exists = exists;
 	}
-
 
 	/**
 	 * <p>
@@ -593,9 +544,8 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	 */
 	public String getLanguage() {
 		Locale locale = getLocale();
-		return locale == null ? "" : locale.getLanguage();
+		return locale == null ? CoreConstants.EMPTY : locale.getLanguage();
 	}
-
 
 	public void setLanguage(String lang){
 		if (lang == null) {
@@ -604,7 +554,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		Locale locale = new Locale(lang);
 		setLocale(locale);
 	}
-
 
 	/**
 	 * @return Returns the versions.
@@ -632,24 +581,12 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		return item;
 	}
 
-	protected Node getNode(){
-		String resourcePath = getResourcePath();
-		try {
-			return getRepositoryService().getNode(resourcePath);
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	@Override
 	public void delete(){
 		try {
 			String resourcePath = getResourcePath();
 			deleteFromJCR(resourcePath);
-			System.out.println("Deleted: "+resourcePath+" successfully");
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -846,20 +783,9 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		return repository;
 	}
 
-	/*public void setPersistToWebDav(boolean persistToWebDav) {
-		this.persistToWebDav = persistToWebDav;
-	}*/
-
-
 	public boolean isPersistToWebDav() {
 		return getContentRepositoryMode().isPersistToWebDav();
 	}
-
-
-	/*public void setPersistToJCR(boolean persistToJCR) {
-		this.persistToJCR = persistToJCR;
-	}*/
-
 
 	public boolean isPersistToJCR() {
 		return getContentRepositoryMode().isPersistToJCR();
@@ -868,4 +794,5 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	public ContentRepositoryMode getContentRepositoryMode(){
 		return (ContentRepositoryMode)ELUtil.getInstance().getBean(ContentRepositoryMode.SPRING_BEAN_IDENTIFIER);
 	}
+
 }

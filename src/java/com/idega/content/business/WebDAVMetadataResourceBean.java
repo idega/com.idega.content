@@ -27,7 +27,6 @@ import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 
-import com.idega.builder.bean.AdvancedProperty;
 import com.idega.business.IBOSessionBean;
 import com.idega.content.business.categories.CategoryBean;
 import com.idega.content.data.MetadataValueBean;
@@ -250,17 +249,17 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 		if (StringUtil.isEmpty(categories))
 			return;
 
-		setProperties(filePath, new AdvancedProperty("DAV:categories", categories));
+		setProperties(filePath, new com.idega.repository.bean.Property("DAV:categories", categories));
 		if (setOnParent)
-			setProperties(getParentResource(filePath), new AdvancedProperty("DAV:categories", categories));
+			setProperties(getParentResource(filePath), new com.idega.repository.bean.Property("DAV:categories", categories));
 
 		// clear cached values so that they are reloaded
 		clear();
 	}
 
-	private boolean setProperties(String path, AdvancedProperty... properties) {
+	private boolean setProperties(String path, com.idega.repository.bean.Property... properties) {
 		try {
-			return getRepositoryService().setProperties(getRepositoryService().getNodeAsRootUser(path), properties);
+			return getRepositoryService().setProperties(path, properties);
 		} catch (RepositoryException e) {
 			e.printStackTrace();
 		}
@@ -278,9 +277,9 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 			filePath = getRepositoryService().getURI(resourcePath);
 
 		//Store new settings
-		setProperties(filePath, new AdvancedProperty("DAV:".concat(type), val));
+		setProperties(filePath, new com.idega.repository.bean.Property("DAV:".concat(type), val));
 		//Also set the metadata on the parent folder
-		setProperties(getParentResource(filePath), new AdvancedProperty("DAV:".concat(type), val));
+		setProperties(getParentResource(filePath), new com.idega.repository.bean.Property("DAV:".concat(type), val));
 
 		// clear cached values so that they are reloaded
 		clear();

@@ -13,12 +13,15 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
+import javax.jcr.RepositoryException;
+import javax.jcr.security.Privilege;
 
 import com.idega.business.IBOLookup;
 import com.idega.content.bean.ContentPathBean;
 import com.idega.content.business.WebDAVFilePermissionResource;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
+import com.idega.repository.access.RepositoryPrivilege;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.ListUtil;
@@ -174,8 +177,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		WebDAVUpload upload = new WebDAVUpload();
 		if (startFolder == null) {
 			upload.setUploadPath(currentFolderPath);
-		}
-		else {
+		} else {
 			if (startFolder.equals(CoreConstants.PATH_FILES_ROOT) && !(startFolder.equals(currentFolderPath))) {
 				upload.setUploadPath(currentFolderPath);
 			}
@@ -325,23 +327,13 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 		return false;
 	}
 
-	public boolean doRenderUploadeComponent(){
-		if(this.renderWebDAVUploadeComponent){
-			//	TODO: implement
-//			try {
-//				IWContext iwc = IWContext.getInstance();
-//				IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-//				return session.hasPermission(getCurrentResourcePath(),IWSlideConstants.PRIVILEGE_WRITE);
-//			}
-//			catch (IBOLookupException e) {
-//				e.printStackTrace();
-//			}
-//			catch (UnavailableIWContext e) {
-//				e.printStackTrace();
-//			}
-//			catch (RemoteException e) {
-//				e.printStackTrace();
-//			}
+	public boolean doRenderUploadComponent() {
+		if (this.renderWebDAVUploadeComponent) {
+			try {
+				return getRepositorySession().hasPermission(getCurrentResourcePath(), new RepositoryPrivilege(Privilege.JCR_WRITE));
+			} catch (RepositoryException e) {
+				e.printStackTrace();
+			}
 		}
 		return false;
 	}
@@ -491,7 +483,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 
 		UIComponent upload = getFacet(ACTION_UPLOAD);
 		if (upload != null) {
-			upload.setRendered(doRenderUploadeComponent());
+			upload.setRendered(doRenderUploadComponent());
 			renderChild(context, upload);
 		}
 	}

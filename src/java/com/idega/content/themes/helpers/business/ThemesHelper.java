@@ -151,7 +151,7 @@ public interface ThemesHelper {
 
 	public boolean existFileInSlide(String path);
 
-	public String getUniqueIdByNumberAndDate(String scope);
+	public String getUniqueIdByNumberAndDate(String path, String scope);
 
 	public String getLocalizedText(String key);
 

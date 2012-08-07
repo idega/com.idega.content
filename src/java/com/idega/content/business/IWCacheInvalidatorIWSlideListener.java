@@ -37,4 +37,14 @@ public class IWCacheInvalidatorIWSlideListener implements RepositoryEventListene
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	public String getPath() {
+		return this.startingPath;
+	}
+
+	@Override
+	public int getEventTypes() {
+		return Event.NODE_ADDED | Event.NODE_MOVED | Event.NODE_REMOVED;
+	}
 }

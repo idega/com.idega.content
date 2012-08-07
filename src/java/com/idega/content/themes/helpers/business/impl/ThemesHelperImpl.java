@@ -72,6 +72,7 @@ import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.IOUtil;
 import com.idega.util.StringHandler;
+import com.idega.util.StringUtil;
 import com.idega.util.xml.XmlUtil;
 import com.idega.webface.WFUtil;
 
@@ -1248,7 +1249,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		}
 
 		StringBuffer path = new StringBuffer(fileRoot).append(ContentConstants.UNDER);
-		path.append(getUniqueIdByNumberAndDate(IDEGA_PAGES_SCOPE)).append(CoreConstants.DOT).append(fileType);
+		path.append(getUniqueIdByNumberAndDate(path.toString(), IDEGA_PAGES_SCOPE)).append(CoreConstants.DOT).append(fileType);
 
 		return path.toString();
 	}
@@ -1348,7 +1349,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 				}
 				base.append(ROOT_PAGE_ARTICLE);
 			}
-			base.append(getRepositoryService().createUniqueFileName(ContentConstants.ARTICLE_SCOPE));
+			base.append(CoreConstants.UNDER).append(getRepositoryService().createUniqueFileName(base.toString(), ContentConstants.ARTICLE_SCOPE));
 			base.append(RESOURCE_PATH_END);
 
 			article = getArticleDocument(language, base.toString(), iwc);
@@ -1422,7 +1423,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 				commentPath.append(pageURI);
 			}
 		}
-		commentPath.append(getRepositoryService().createUniqueFileName(ContentConstants.COMMENT_SCOPE));
+		commentPath.append(getRepositoryService().createUniqueFileName(commentPath.toString(), ContentConstants.COMMENT_SCOPE));
 
 		return getFinishedCommentsLink(commentPath);
 	}
@@ -1476,14 +1477,13 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 						if (icObjectId == -1) {
 							LOGGER.log(Level.WARNING, "Didn't get ICObject for: "+e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE));
 							LOGGER.log(Level.WARNING, "Generating unique module id");
-							moduleID = getUniqueIdByNumberAndDate(MODULE_ID_SCOPE);
+							moduleID = getUniqueIdByNumberAndDate(null, MODULE_ID_SCOPE);
 							while (moduleIds.contains(moduleID)) {
-								moduleID = getUniqueIdByNumberAndDate(MODULE_ID_SCOPE);
+								moduleID = getUniqueIdByNumberAndDate(null, MODULE_ID_SCOPE);
 							}
 							moduleIds.add(moduleID);
 							moduleID = new StringBuffer(ICObjectBusiness.UUID_PREFIX).append(moduleID).toString();
-						}
-						else {
+						} else {
 							instance = icoiHome.create();
 							instance.setICObjectID(icObjectId);
 							instance.setIBPageByKey(pageKey);
@@ -1493,8 +1493,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 						moduleIdAttribute = e.getAttribute(id);
 						if (moduleIdAttribute != null) {
 							moduleIdAttribute.setValue(moduleID);
-						}
-						else {
+						} else {
 							LOGGER.log(Level.WARNING, "Didn't find module id attribute for: " + e.getAttributeValue(ELEMENT_CLASS_ATTRIBUTE));
 						}
 					}
@@ -1635,9 +1634,15 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	}
 
 	@Override
-	public String getUniqueIdByNumberAndDate(String scope) {
+	public String getUniqueIdByNumberAndDate(String path, String scope) {
 		StringBuffer id = new StringBuffer();
-		id.append(getRandomNumber(Integer.MAX_VALUE)).append(getRepositoryService().createUniqueFileName(scope));
+		String postfix = null;
+		if (StringUtil.isEmpty(path)) {
+			postfix = String.valueOf(System.nanoTime());
+		} else{
+			postfix = getRepositoryService().createUniqueFileName(path, scope);
+		}
+		id.append(getRandomNumber(Integer.MAX_VALUE)).append(postfix);
 		return id.toString();
 	}
 

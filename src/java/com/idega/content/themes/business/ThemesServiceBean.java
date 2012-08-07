@@ -421,7 +421,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService {
 		ICPage page = null;
 		try {
 			page = getICPageHome().findByPrimaryKey(id);
-		} catch (FinderException e) {	
+		} catch (FinderException e) {
 			LOGGER.warning("Page by ID=" + id + " does not exist!");
 		} catch (Exception e) {
 			LOGGER.log(Level.WARNING, "Error getting page by id: " + id, e);
@@ -554,5 +554,15 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService {
 				getThemesHelper().addPredefinedThemeStyle(uri);
 			}
 		}
+	}
+
+	@Override
+	public String getPath() {
+		return ThemesConstants.THEMES_PATH;
+	}
+
+	@Override
+	public int getEventTypes() {
+		return Event.NODE_ADDED | Event.NODE_REMOVED | Event.NODE_MOVED;
 	}
 }

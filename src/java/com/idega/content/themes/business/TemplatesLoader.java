@@ -205,7 +205,6 @@ public class TemplatesLoader implements JarLoader {
 		}
 
 		//	Load from slide
-
 		String templatesFolder = getSlideTemplatesFolderURI();
 
 		Collection<SearchResult> results = getThemesHelper().search(PAGE_TEMPLATES_XML_FILE_NAME, templatesFolder);

@@ -610,4 +610,9 @@ public class WebDAVBean implements ICTreeNode, Serializable {
 		return service;
 	}
 
+	@Override
+	public String toString() {
+		return getName();
+	}
+
 }

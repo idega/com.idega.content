@@ -9,6 +9,7 @@
  */
 package com.idega.content.bean;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -19,22 +20,22 @@ import com.idega.idegaweb.IWMainApplication;
  * Class to control central settings of the Content subsystem
  * </p>
  *  Last modified: $Date: 2009/01/06 15:17:24 $ by $Author: tryggvil $
- * 
+ *
  * @author <a href="mailto:tryggvil@idega.com">tryggvil</a>
  * @version $Revision: 1.1 $
  */
-@Scope("singleton")
+@Scope(BeanDefinition.SCOPE_SINGLETON)
 @Service(ContentRepositoryMode.SPRING_BEAN_IDENTIFIER)
 public class ContentRepositoryMode {
 
 	public static final String SPRING_BEAN_IDENTIFIER="contentRepositoryMode";
-	
+
 	private String persistenceMode;
-	
+
 	public final static String CONTENT_PERSISTENCE="content.persistence";
 	public final static String CONTENT_PERSISTENCE_WEBDAV="webdav";
 	public final static String CONTENT_PERSISTENCE_JCR="jcr";
-	
+
 	public final static String DEFAULT_CONTENT_PERSISTENCE=CONTENT_PERSISTENCE_WEBDAV;
 
 	/*public void setPersistToWebDav(boolean persistToWebDav) {
@@ -56,11 +57,11 @@ public class ContentRepositoryMode {
 			return this.persistenceMode;
 		}
 	}
-	
+
 	public void setPersistenceMode(String mode){
 		this.persistenceMode=mode;
 	}
-	
+
 	public boolean isPersistToWebDav() {
 		return(getPersistenceMode().equals(CONTENT_PERSISTENCE_WEBDAV));
 	}
@@ -68,6 +69,6 @@ public class ContentRepositoryMode {
 	public boolean isPersistToJCR() {
 		return(getPersistenceMode().equals(CONTENT_PERSISTENCE_JCR));
 	}
-	
-	
+
+
 }

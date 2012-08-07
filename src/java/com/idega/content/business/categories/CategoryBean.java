@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -56,13 +57,11 @@ public class CategoryBean {
 
 	private static final String CATEGORY_CONFIG_PATH = CoreConstants.CONTENT_PATH + CoreConstants.SLASH;
 
-//	@Deprecated
-//	private static final String CATEGORY_CONFIG_FILE = CATEGORY_CONFIG_PATH + "categories.prop";
-
 	public static final String CATEGORIES_FILE = "categories.xml";
 	private static final String CATEGORY_PROPERTIES_FILE = CATEGORY_CONFIG_PATH + CATEGORIES_FILE;
+
 	private IWMainApplication iwma;
-	protected Map<String, ContentCategory> categories;
+	private Map<String, ContentCategory> categories;
 
 	public static final String CATEGORY_DELIMETER = ",";
 
@@ -70,118 +69,13 @@ public class CategoryBean {
 		this(IWMainApplication.getDefaultIWMainApplication());
 	}
 
-	private CategoryBean(IWMainApplication iwma){
-		this.iwma=iwma;
-		this.categories = loadCategories();
-//		if (this.categories == null) {
-//			CategoriesMigrator migrator = new CategoriesMigrator();
-//			Collection<String> oldCategories = getCategoriesFromString(getCategoriesAsString());
-//			migrator.migrate(oldCategories);
-//		}
+	private CategoryBean(IWMainApplication iwma) {
+		this.iwma = iwma;
+		categories = loadCategories();
+		if (categories == null)
+			categories = new HashMap<String, ContentCategory>();
 	}
 
-
-//	protected class CategoriesMigrator {
-//		private final Log log = LogFactory.getLog(CategoriesMigrator.class);
-//		private final String PROPERTY_NAME_CATEGORIES = new PropertyName("DAV","categories").toString();
-//
-//		private HashMap<String, String> valuesToKeys;
-//		private IWSlideSession session;
-//		private IWSlideService service;
-//
-//		protected void migrate(Collection<String> cats) {
-//			log.info("Migrating " + CATEGORY_CONFIG_FILE + " to new format at " + CATEGORY_PROPERTIES_FILE);
-//			categories = new TreeMap<String, ContentCategory>();
-//			valuesToKeys = new HashMap<String, String>();
-//			String lang = getCurrentLocale();
-//			for (Iterator<String> iter = cats.iterator(); iter.hasNext();) {
-//				String cat = iter.next();
-//				String key = CategoryBean.getCategoryKey(cat);
-//				ContentCategory category = new ContentCategory(key);
-//				category.addName(lang, cat);
-//				categories.put(key, category);
-//				valuesToKeys.put(cat, key);
-//			}
-//
-//			storeCategories();
-//
-//			try {
-//				IWContext iwc = IWContext.getInstance();
-//				session = IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-//				service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
-//
-//				updateCategoriesOnFiles(CATEGORY_CONFIG_PATH);
-//
-//				/*
-//				log.info("Deleting old file " + CATEGORY_CONFIG_FILE);
-//				WebdavResource resource = session.getWebdavResource(service.getURI(CATEGORY_CONFIG_FILE));
-//				resource.deleteMethod();
-//				*/
-//			} catch (IBOLookupException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//
-//		private void updateCategoriesOnFiles(String resourcePath) {
-//			if (resourcePath.indexOf(ThemesConstants.THEMES_PATH) >= 0) {
-//				return;
-//			}
-//			try {
-//				String filePath = resourcePath;
-//				String serverURI = service.getWebdavServerURL();
-//				if(!resourcePath.startsWith(serverURI)) {
-//					filePath = service.getURI(resourcePath);
-//				}
-//
-//				WebdavResource resource = session.getWebdavResource(filePath);
-//
-//				String oldCats = CATEGORY_DELIMETER;
-//				Enumeration enumerator = resource.propfindMethod(PROPERTY_NAME_CATEGORIES);
-//				if (enumerator.hasMoreElements()) {
-//					StringBuffer cats = new StringBuffer();
-//					while(enumerator.hasMoreElements()) {
-//						cats.append(enumerator.nextElement());
-//					}
-//					oldCats = cats.toString();
-//				}
-//
-//				if (!oldCats.equals(CATEGORY_DELIMETER) && !oldCats.equals("")) {
-//					log.info("Updating categories on resource " + resourcePath);
-//					log.info("- " + oldCats);
-//
-//					StringTokenizer tokenizer = new StringTokenizer(oldCats, CATEGORY_DELIMETER);
-//					StringBuffer newCats = new StringBuffer(CATEGORY_DELIMETER);
-//					while (tokenizer.hasMoreTokens()) {
-//						String cat = tokenizer.nextToken();
-//						String key = valuesToKeys.get(cat);
-//						// if we renamed the category key, replace category with it, otherwise leave as is
-//						if (key != null) {
-//							newCats.append(key);
-//						} else {
-//							newCats.append(cat);
-//						}
-//						newCats.append(CATEGORY_DELIMETER);
-//					}
-//
-//					log.info("+ " + newCats.toString());
-//					resource.proppatchMethod(PROPERTY_NAME_CATEGORIES, newCats.toString(), true);
-//				}
-//
-//				// update categories on all child resources
-//				Enumeration children = resource.getChildResources().getResourceNames();
-//				if (children.hasMoreElements()) {
-//					while(children.hasMoreElements()) {
-//						String child = (String) children.nextElement();
-//						updateCategoriesOnFiles(child);
-//					}
-//				}
-//
-//				resource.close();
-//			} catch (Exception e) {
-//				log.error("Exception updating categories on resource " + resourcePath + ": " + e.getMessage());
-//			}
-//		}
-//	}
 
 	/**
 	 * <p>
@@ -342,6 +236,9 @@ public class CategoryBean {
 			RepositoryService repository = ELUtil.getInstance().getBean(RepositoryService.class);
 			String resourcePath = repository.getURI(CATEGORY_PROPERTIES_FILE);
 			stream = repository.getInputStream(resourcePath);
+			if (stream == null)
+				return Collections.emptyMap();
+
 			SAXBuilder builder = new SAXBuilder();
 			Document document = builder.build(stream);
 			Element root = document.getRootElement();

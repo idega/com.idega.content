@@ -13,7 +13,6 @@ import javax.faces.event.ActionEvent;
 import javax.jcr.RepositoryException;
 
 import org.apache.myfaces.custom.fileupload.UploadedFile;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.content.bean.ContentPathBean;
 import com.idega.content.presentation.WebDAVList;
@@ -32,9 +31,6 @@ public class WebDAVUploadBean implements Serializable {
 
 	private static final long serialVersionUID = -1760819218959402747L;
 	private static final Logger LOGGER = Logger.getLogger(WebDAVUploadBean.class.getName());
-
-	@Autowired
-	private RepositoryService repository;
 
 	private static String DEFAULT_PATH = CoreConstants.PATH_FILES_ROOT.concat(CoreConstants.SLASH);
 	private UploadedFile uploadFile;
@@ -100,15 +96,13 @@ public class WebDAVUploadBean implements Serializable {
 		String filePath = getUploadFilePath();
 		String uploadName = this.uploadFile.getName();
 
-		//FIXME THIS IS A BUG IN THE MYFACES UPLOADER I THINK
 		//The problem is that in IE 6 the filename actually contains the full file path!
 		//example I'm uploading test.txt from c:\myfolder\test.txt to the folder /files/public
 		//then the variable filePath+fileName = /files/public/C:/myfolder/test.txt
 		//workaround
 		int lastBloodySlash = uploadName.lastIndexOf("\\");
-		if(lastBloodySlash > -1) {
-			uploadName = uploadName.substring(lastBloodySlash+1);
-		}
+		if (lastBloodySlash > -1)
+			uploadName = uploadName.substring(lastBloodySlash + 1);
 		//workaround ends
 
 		String fileName = uploadName;
@@ -358,9 +352,7 @@ public class WebDAVUploadBean implements Serializable {
 	}
 
 	RepositoryService getRepositoryService() {
-		if (repository == null) {
-			ELUtil.getInstance().autowire(this);
-		}
-		return repository;
+		RepositoryService service = ELUtil.getInstance().getBean(RepositoryService.class);
+		return service;
 	}
 }

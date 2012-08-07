@@ -114,12 +114,10 @@ public class WebDAVUpload extends ContentBlock {
 
 	@Override
 	protected void initializeComponent(FacesContext context) {
-
-
 		WebDAVUploadBean bean = (WebDAVUploadBean) WFUtil.getBeanInstance(BEAN_ID);
 		WFContainerLines = new ArrayList<WFContainer>();
 
-		if ( showStatusAfterUploadAttempt && bean.wasUploadAttemped()) {
+		if (showStatusAfterUploadAttempt && bean.wasUploadAttemped()) {
 			String message = bean.getUploadMessage();
 			Boolean success = bean.isUploadSuccessful();
 
@@ -234,8 +232,6 @@ public class WebDAVUpload extends ContentBlock {
 		upload.setId(getId()+"_uploadCmd");
 		upload.setActionListener(WFUtil.createMethodBinding("#{"+BEAN_ID+"."+getUploadMethod()+"}", new Class[]{ActionEvent.class}));
 
-
-
 		addLineToContainer(new UIComponent[] {selectFile, fileUpload}, getStyleClassWFContainerLine(), "upload_file");
 
 		if (useFileName) {
@@ -252,8 +248,7 @@ public class WebDAVUpload extends ContentBlock {
 
 		if (useFileLink && useImagePreview) {
 			addLineToContainer(new UIComponent[] {fileLink, imagePreview}, getStyleClassWFContainerLine()+ "filelink_imgprev", "file_link_image_preview");
-		}
-		else {
+		} else {
 			if (useFileLink) {
 				addLineToContainer(new UIComponent[] {fileLink}, getStyleClassWFContainerLine()+" filelink", "file_link");
 			}
@@ -271,12 +266,11 @@ public class WebDAVUpload extends ContentBlock {
 		addLines();
 
 
-//		Saving the state of the webuploadbean specially because the scope
-		//of this bean now is 'request' not 'session'
+		//	Saving the state of the webuploadbean specially because the scope of this bean now is 'request' not 'session'
 		UISaveState beanSaveState = new UISaveState();
 		ValueBinding binding = WFUtil.createValueBinding("#{"+BEAN_ID+"}");
 		beanSaveState.setId("webdavuploadIds");
-		beanSaveState.setValueBinding("value",binding);
+		beanSaveState.setValueBinding("value", binding);
 
 		if (embedInForm) {
 			form.getChildren().add(beanSaveState);
@@ -505,7 +499,6 @@ public class WebDAVUpload extends ContentBlock {
 		this.useUserHomeFolder = useUserHomeFolder;
 	}
 
-
 	public boolean getUseUserHomeFolder() {
 		return useUserHomeFolder;
 	}
@@ -532,6 +525,7 @@ public class WebDAVUpload extends ContentBlock {
 	public void setUseLinkAsSubmit(boolean useLinkAsSubmit) {
 		this.useLinkAsSubmit = useLinkAsSubmit;
 	}
+
 	@Override
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[6];

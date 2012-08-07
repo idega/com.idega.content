@@ -142,13 +142,13 @@ public class RepositoryItemDownloader extends DownloadWriter {
 		if (nodeIterator == null)
 			return;
 
-		while (nodeIterator.hasNext()) {
+		for (; nodeIterator.hasNext();) {
 			Node node = nodeIterator.nextNode();
 
 			if (node.hasProperty(JcrConstants.NT_FOLDER)) {
 				addItemsOfFolder(node, itemsToZip, user);
 			} else if (node.hasProperty(JcrConstants.NT_FILE)) {
-				itemsToZip.add(new JackrabbitRepositoryItem(url, user, node));
+				itemsToZip.add(new JackrabbitRepositoryItem(url, user));
 			} else {
 				LOGGER.warning("Node " + node + " is not a folder nor a file");
 			}
