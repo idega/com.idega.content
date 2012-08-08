@@ -22,15 +22,12 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import javax.jcr.RepositoryException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.business.WebDAVMetadataResource;
 import com.idega.content.data.MetadataValueBean;
 import com.idega.presentation.IWContext;
 import com.idega.repository.RepositoryService;
-import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFResourceUtil;
 import com.idega.webface.WFUtil;
 import com.idega.webface.bean.AbstractWFEditableListManagedBean;
@@ -56,11 +53,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 
 	private static WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
 
-	@Autowired
-	private RepositoryService repository;
-
 	public MetadataListManagedBean() {
-		ELUtil.getInstance().autowire(this);
 	}
 
 	public void setResourcePath(String path){
@@ -87,6 +80,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 //			WebdavRootResource rootResource = session.getWebdavRootResource();
 
 			String filePath = this.resourcePath;
+			RepositoryService repository = getRepository();
 			String serverURI = repository.getWebdavServerURL();
 			if(!this.resourcePath.startsWith(serverURI)) {
 				filePath = repository.getURI(this.resourcePath);

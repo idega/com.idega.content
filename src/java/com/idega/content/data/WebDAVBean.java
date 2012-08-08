@@ -606,8 +606,7 @@ public class WebDAVBean implements ICTreeNode, Serializable {
 	}
 
 	RepositoryService getRepositoryService() {
-		RepositoryService service = ELUtil.getInstance().getBean(RepositoryService.class);
-		return service;
+		return ELUtil.getInstance().getBean(RepositoryService.class);
 	}
 
 	@Override

@@ -352,7 +352,6 @@ public class WebDAVUploadBean implements Serializable {
 	}
 
 	RepositoryService getRepositoryService() {
-		RepositoryService service = ELUtil.getInstance().getBean(RepositoryService.class);
-		return service;
+		return ELUtil.getInstance().getBean(RepositoryService.class);
 	}
 }

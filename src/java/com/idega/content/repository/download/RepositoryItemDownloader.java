@@ -17,7 +17,6 @@ import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.jackrabbit.JcrConstants;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.business.IBOLookupException;
 import com.idega.content.presentation.WebDAVListManagedBean;
@@ -155,12 +154,7 @@ public class RepositoryItemDownloader extends DownloadWriter {
 		}
 	}
 
-	@Autowired
-	private RepositoryService repository;
-
 	private RepositoryService getRepository() throws IBOLookupException {
-		if (repository == null)
-			ELUtil.getInstance().autowire(this);
-		return repository;
+		return ELUtil.getInstance().getBean(RepositoryService.class);
 	}
 }

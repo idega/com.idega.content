@@ -23,8 +23,6 @@ import java.util.Map;
 import javax.faces.context.FacesContext;
 import javax.jcr.RepositoryException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.idega.block.rss.business.EntryData;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentItemHelper;
@@ -55,9 +53,6 @@ import com.sun.syndication.io.impl.DateParser;
 public abstract class ContentItemBean implements Serializable, ContentItem {
 
 	private static final long serialVersionUID = -1620171698501618358L;
-
-	@Autowired
-	private RepositoryService repository;
 
     public static final String DISPLAYNAME = "displayname";
     public static final String GETCONTENTLANGUAGE = "getcontentlanguage";
@@ -777,10 +772,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	}
 
 	protected RepositoryService getRepositoryService() {
-		if (repository == null) {
-			ELUtil.getInstance().autowire(this);
-		}
-		return repository;
+		return ELUtil.getInstance().getBean(RepositoryService.class);
 	}
 
 	public boolean isPersistToWebDav() {

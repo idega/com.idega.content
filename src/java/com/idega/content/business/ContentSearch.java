@@ -29,7 +29,6 @@ import javax.jcr.query.Query;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.jackrabbit.webdav.client.methods.SearchMethod;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.content.presentation.WebDAVDocumentDeleter;
 import com.idega.core.builder.data.ICPage;
@@ -98,9 +97,6 @@ public class ContentSearch extends Object implements SearchPlugin{
 	protected static final String ORDER_DESCENDING = "descending";
 	private boolean showDeleteLink = false;
 	private ICPage deletePage = null;
-
-	@Autowired
-	private RepositoryService repositoryService;
 
 	/* STUFF FROM WebdavResource to handle better dates from slide */
 	 /**
@@ -926,9 +922,6 @@ public class ContentSearch extends Object implements SearchPlugin{
 	}
 
 	RepositoryService getRepositoryService() {
-		if (repositoryService == null) {
-			ELUtil.getInstance().autowire(this);
-		}
-		return repositoryService;
+		return ELUtil.getInstance().getBean(RepositoryService.class);
 	}
 }
