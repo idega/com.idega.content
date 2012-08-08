@@ -9,7 +9,6 @@ import java.util.Locale;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlGraphicImage;
-import javax.faces.component.html.HtmlOutputLink;
 import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
@@ -22,6 +21,7 @@ import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.DownloadLink;
+import com.idega.presentation.text.Text;
 import com.idega.repository.bean.RepositoryItem;
 import com.idega.repository.bean.RepositoryItemVersionInfo;
 import com.idega.repository.jcr.JCRItem;
@@ -76,11 +76,10 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 //		table.setWidth("100%");
 //		table.setBorder(1);
 
-		HtmlOutputLink link = new HtmlOutputLink();
-		link.setValue(resource.getEncodedPath());
+		DownloadLink link = new DownloadLink(new Text(getBundle().getLocalizedString("download_view", "Download/View")),
+				resource.getPath());
 		link.setStyleClass("wf_listlink");
 		link.setId(getId() + "_dl");
-		link.getChildren().add(getBundle().getLocalizedText("download_view"));
 
 			table.add(getText("document_name"), 1, row);
 			table.add(WFUtil.getText(resourceName,"wf_listtext"), 2, row);
