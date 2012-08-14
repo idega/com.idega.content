@@ -39,7 +39,8 @@ FileUploadHelper.properties = {
 	swfUploadScript: null,
 	swfUploadPlugin: null,
 	needFlash: false,
-	initializeScriptsAction: null
+	initializeScriptsAction: null,
+	failure: false
 }
 
 FileUploadHelper.bytesToUpload = 0;
@@ -66,7 +67,6 @@ FileUploadHelper.initializeFlashUploader = function() {
 	jQuery(jQuery('input.fileUploadAddInputStyle')).hide('fast');
 	LazyLoader.loadMultiple([FileUploadHelper.properties.swfObject, FileUploadHelper.properties.swfUploadScript], function() {
 		if (!swfobject.hasFlashPlayerVersion("9")) {
-			humanMsg.displayMsg(FileUploadHelper.properties.localizations.FLASH_IS_MISSING, {timeOut: 3000});
 			closeAllLoadingMessages();
 			return false;
 		}
@@ -299,10 +299,16 @@ FileUploadHelper.uploadFiles = function() {
 		showLoadingMessage(FileUploadHelper.properties.localizations.UPLOADING_FILE_MESSAGE);
 	}
 	
+	FileUploadHelper.properties.failure = false;
 	var uploadHandler = {
 		upload: function(o) {
-			FileUploadHelper.manageResponse(o.responseText, inputs);
-		}
+			FileUploadHelper.manageResponse(o == null ? null : o.responseText, inputs);
+		},
+		failure: function(o) {
+			FileUploadHelper.properties.failure = true;
+			FileUploadHelper.manageResponse(null, inputs);
+		},
+		timeout: 5000
 	};
 	
 	FileUploadListener.resetFileUploaderCounters(FileUploadHelper.properties.uploadId, FileUploadHelper.properties.maxSize, {
@@ -319,32 +325,37 @@ FileUploadHelper.uploadFiles = function() {
 
 FileUploadHelper.manageResponse = function(response, inputs) {
 	if (response == null) {
-		humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
-		return;
-	}
-			
-	var key = 'web2FilesUploaderFilesListStarts';
-	response = response.substring(response.indexOf(key) + key.length);
-	response = response.replace('</pre>', '');
-	
-	FileUploadHelper.uploadedFiles = response.split(',');
-	if (FileUploadHelper.uploadedFiles == null) {
-		humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
-		return;
-	} else if (FileUploadHelper.uploadedFiles[0].indexOf('error=') != -1) {
-		var firstValue = FileUploadHelper.uploadedFiles[0];
-		var customMessage = firstValue.substr('error='.length);
-		for (var i = 1; i < FileUploadHelper.uploadedFiles.length; i++) {
-			customMessage += FileUploadHelper.uploadedFiles[i];
-			if (i + 1 < FileUploadHelper.uploadedFiles.length)
-				customMessage += ',';
-		}
 		closeAllLoadingMessages();
-		humanMsg.displayMsg(customMessage);
-		return;
-	} else {
-		for (var i = 0; i < FileUploadHelper.uploadedFiles.length; i++) {
-			FileUploadHelper.allUploadedFiles.push(FileUploadHelper.getRealUploadedFile(FileUploadHelper.uploadedFiles[i]));
+		FileUploadHelper.properties.failure = true;
+		humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED, {timeOut: 3000});
+		jQuery('#' + FileUploadHelper.properties.progressBarId).parent().hide('fast');
+		return false;
+	}
+
+	if (response != null) {
+		var key = 'web2FilesUploaderFilesListStarts';
+		response = response.substring(response.indexOf(key) + key.length);
+		response = response.replace('</pre>', '');
+		
+		FileUploadHelper.uploadedFiles = response.split(',');
+		if (FileUploadHelper.uploadedFiles == null) {
+			humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
+			return;
+		} else if (FileUploadHelper.uploadedFiles[0].indexOf('error=') != -1) {
+			var firstValue = FileUploadHelper.uploadedFiles[0];
+			var customMessage = firstValue.substr('error='.length);
+			for (var i = 1; i < FileUploadHelper.uploadedFiles.length; i++) {
+				customMessage += FileUploadHelper.uploadedFiles[i];
+				if (i + 1 < FileUploadHelper.uploadedFiles.length)
+					customMessage += ',';
+			}
+			closeAllLoadingMessages();
+			humanMsg.displayMsg(customMessage);
+			return;
+		} else {
+			for (var i = 0; i < FileUploadHelper.uploadedFiles.length; i++) {
+				FileUploadHelper.allUploadedFiles.push(FileUploadHelper.getRealUploadedFile(FileUploadHelper.uploadedFiles[i]));
+			}
 		}
 	}
 	
@@ -519,7 +530,7 @@ function showUploadInfoInProgressBar(progressBarId, actionAfterCounterReset) {
 function fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset) {
 	FileUploadListener.getFileUploadStatus(FileUploadHelper.properties.uploadId, {
 		callback: function(status) {
-			FileUploadHelper.updateProgressBar(status, progressBarId, actionAfterCounterReset, true);
+			FileUploadHelper.updateProgressBar(FileUploadHelper.properties.failure ? '-1' : status, progressBarId, actionAfterCounterReset, true);
 		}
 	});
 }
