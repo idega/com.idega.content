@@ -34,8 +34,10 @@ import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 
+//TODO: add my code
 public class RepositoryItemDownloader extends DownloadWriter {
 
+	public static final String PARAMETER_URL = WebDAVListManagedBean.PARAMETER_WEB_DAV_URL;
 	private static final Logger LOGGER = Logger.getLogger(RepositoryItemDownloader.class.getName());
 
 	private String url, mimeType;
