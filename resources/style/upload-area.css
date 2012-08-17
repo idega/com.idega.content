@@ -1,0 +1,13 @@
+@CHARSET "UTF-8";
+.uploaded-files-table img {
+    height: 2em;
+    width: 4em;
+}
+
+.uploaded-files-table td.preview {
+    width: 20%;
+}
+
+.upload-area-progressbar{
+	width:30%;
+}

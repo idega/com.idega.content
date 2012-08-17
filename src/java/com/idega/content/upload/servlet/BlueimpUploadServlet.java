@@ -111,7 +111,7 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet{
 				fileData.put("name", fileName);
 				fileData.put("size", file.getSize());
 				fileData.put("url", "/content" + pathAndName);
-				fileData.put("thumbnail_url", "/");
+				fileData.put("thumbnail_url", "/content" + pathAndName);
 				fileData.put("delete_url", getDeleteUrl(iwc, uploadPath, file));
 				fileData.put("delete_type", "DELETE");
 				fileData.put("message", "");
