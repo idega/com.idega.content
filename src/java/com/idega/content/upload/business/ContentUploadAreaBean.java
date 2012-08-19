@@ -10,7 +10,7 @@ import com.idega.presentation.IWContext;
 @Scope(BeanDefinition.SCOPE_SINGLETON)
 public class ContentUploadAreaBean implements UploadAreaBean{
 
-	private static final Long MAX_UPLOAD_SIZE = new Long(20 * 1024 * 1024);	//	20 MBs
+	private static final Long MAX_UPLOAD_SIZE = new Long(1024 * 1024) * 20;	//	20 MBs
 	private static final String SERVLET_PATH = "/servlet/blueimp-upload";
 	@Override
 	public Long getMaxFileSize(IWContext iwc) {

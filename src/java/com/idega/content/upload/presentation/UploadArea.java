@@ -75,10 +75,9 @@ public class UploadArea  extends IWBaseComponent{
 	}
 	
 	private UIComponent getAddfilesButton(IWResourceBundle iwrb){
-		Span addFiles = new Span();
+		Layer addFiles = new Layer("span");
 		addFiles.setStyleClass("btn btn-success fileinput-button");
-		
-		Span icon = new Span();
+		Layer icon = new Layer("span");
 		addFiles.add(icon);
 		icon.setStyleClass("icon-plus icon-white");
 		
@@ -86,13 +85,15 @@ public class UploadArea  extends IWBaseComponent{
 		addFiles.add(text);
 		text.add(iwrb.getLocalizedString("add_files", "Add files"));
 		
-		addFiles.add("<input type=\"file\" name=\"files[]\" />");
+		addFiles.add("<input type=\"file\" name=\"files[]\" multiple>");
+		
+		
 		
 		return addFiles;
 	}
 	
 	private UIComponent getStartUploadButton(IWResourceBundle iwrb){
-		Span startUpload = new Span();
+		Layer startUpload = new Layer("button");
 		startUpload.setStyleClass("btn btn-primary start");
 		
 		Span icon = new Span();
@@ -107,7 +108,7 @@ public class UploadArea  extends IWBaseComponent{
 	}
 	
 	private UIComponent getCanceltUploadButton(IWResourceBundle iwrb){
-		Span button = new Span();
+		Layer button = new Layer("button");
 		button.setStyleClass("btn btn-warning cancel");
 		
 		Span icon = new Span();
@@ -122,7 +123,7 @@ public class UploadArea  extends IWBaseComponent{
 	}
 	
 	private UIComponent getDeleteButton(IWResourceBundle iwrb){
-		Span button = new Span();
+		Layer button = new Layer("button");
 		button.setStyleClass("btn btn-danger delete");
 		
 		Span icon = new Span();
@@ -200,11 +201,11 @@ public class UploadArea  extends IWBaseComponent{
 		
 		Layer inputs = new Layer();
 		add(inputs);
-		inputs.setStyleClass("row fileupload-buttonbar");
+		inputs.setStyleClass("fileupload-buttonbar");
 		
 		Layer buttons = new Layer();
 		inputs.add(buttons);
-		buttons.setStyleClass("span7");
+//		buttons.setStyleClass("span7");
 		
 		buttons.add(getAddfilesButton(iwrb));
 		
@@ -350,7 +351,7 @@ public class UploadArea  extends IWBaseComponent{
 	}
 
 	public void setStyleClass(String styleClass) {
-		this.styleClass = styleClass;
+		this.styleClass = this.styleClass  + CoreConstants.SPACE + styleClass;
 	}
 
 	public boolean isAutoUpload() {

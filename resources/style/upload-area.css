@@ -11,3 +11,19 @@
 .upload-area-progressbar{
 	width:30%;
 }
+
+.uploaded-files-table{
+	background-color:#FFFFFF;
+}
+
+.fileupload-buttonbar{
+		display:block;
+}
+
+.fileinput-button{
+	float:none;	
+}
+
+.idega-upload-area{
+	width:100%;
+}
