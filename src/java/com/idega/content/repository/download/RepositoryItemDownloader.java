@@ -32,15 +32,46 @@ import com.idega.util.CoreUtil;
 import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
+import com.idega.util.StringUtil;
 
+//TODO: add my code
 public class RepositoryItemDownloader extends DownloadWriter {
 
+	public static final String PARAMETER_URL = WebDAVListManagedBean.PARAMETER_WEB_DAV_URL;
 	private static final Logger LOGGER = Logger.getLogger(RepositoryItemDownloader.class.getName());
-	
+
 	private String url, mimeType;
-	
-	private boolean folder;
-	
+
+	private boolean folder, allowAnonymous;
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public boolean isFolder() {
+		return folder;
+	}
+
+	public void setFolder(boolean folder) {
+		this.folder = folder;
+	}
+
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
+
+	public boolean isAllowAnonymous() {
+		return allowAnonymous;
+	}
+
+	public void setAllowAnonymous(boolean allowAnonymous) {
+		this.allowAnonymous = allowAnonymous;
+	}
+
 	@Override
 	public String getMimeType() {
 		return mimeType;
@@ -48,11 +79,12 @@ public class RepositoryItemDownloader extends DownloadWriter {
 
 	@Override
 	public void init(HttpServletRequest req, IWContext iwc) {
-		if (!iwc.isLoggedOn() && !iwc.isSuperAdmin()) {
+		allowAnonymous = iwc.isParameterSet("allowAnonymous") ? Boolean.valueOf(iwc.getParameter("allowAnonymous")) : allowAnonymous;
+
+		if (!allowAnonymous && !iwc.isLoggedOn() && !iwc.isSuperAdmin())
 			return;
-		}
-		
-		url = iwc.getParameter(WebDAVListManagedBean.PARAMETER_WEB_DAV_URL);
+
+		url = url == null ? iwc.getParameter(WebDAVListManagedBean.PARAMETER_WEB_DAV_URL) : url;
 		folder = Boolean.valueOf(iwc.getParameter(WebDAVListManagedBean.PARAMETER_IS_FOLDER));
 		mimeType = folder ? MimeTypeUtil.MIME_TYPE_ZIP : MimeTypeUtil.resolveMimeTypeFromFileName(url);
 	}
@@ -65,7 +97,7 @@ public class RepositoryItemDownloader extends DownloadWriter {
 		} catch (IBOLookupException e) {
 			LOGGER.log(Level.SEVERE, "Error getting repository service!", e);
 		}
-		
+
 		if (folder) {
 			//	ZIP the contents of the folder and write to the output stream
 			File zippedContents = getZippedContents(repository);
@@ -95,19 +127,22 @@ public class RepositoryItemDownloader extends DownloadWriter {
 				success = Boolean.FALSE;
 				LOGGER.log(Level.WARNING, "Error downloading file: " + url, e);
 			}
-			
+
 			if (success) {
 				out.flush();
 				IOUtil.closeOutputStream(out);
 				return;
 			}
-			
+
 			setFile(getFileFromRepository(url.concat("_1.0")));
 			super.writeTo(out);
 		}
 	}
-	
+
 	private String getFileName(String url) {
+		if (StringUtil.isEmpty(url))
+			return CoreConstants.EMPTY;
+
 		String fileName = url;
 		if (fileName.endsWith(CoreConstants.SLASH)) {
 			fileName = fileName.substring(0, fileName.lastIndexOf(CoreConstants.SLASH));
@@ -117,40 +152,40 @@ public class RepositoryItemDownloader extends DownloadWriter {
 		}
 		return fileName;
 	}
-	
+
 	private File getZippedContents(IWSlideService repository) throws IOException {
 		String fileName = getFileName(url).concat(".zip");
 		Collection<RepositoryItem> itemsToZip = new ArrayList<RepositoryItem>();
-		
+
 		long start = System.currentTimeMillis();	//	TODO
-		
+
 		WebdavResource folder = repository.getWebdavResourceAuthenticatedAsRoot(url);
 		addItemsOfFolder(folder, itemsToZip);
 		LOGGER.info("Items to zip: " + itemsToZip);
-		
+
 		long end = System.currentTimeMillis();		//	TODO
 		LOGGER.info("Items to zip resolved in: " + (end - start) + " ms.");
-		
+
 		File zippedContents = FileUtil.getZippedFiles(itemsToZip, fileName, false, true);
 		if (zippedContents == null) {
 			return null;
 		}
-		
+
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc != null) {
 			setAsDownload(iwc, zippedContents.getName(), Long.valueOf(zippedContents.length()).intValue());
 		}
-		
+
 		return zippedContents;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void addItemsOfFolder(WebdavResource folder, Collection<RepositoryItem> itemsToZip) throws IOException {
 		List<WebdavResource> resources = Collections.list(folder.getChildResources().getResources());
 		if (ListUtil.isEmpty(resources)) {
 			return;
 		}
-		
+
 		for (WebdavResource resource: resources) {
 			if (resource.isCollection()) {
 				String currentDirectory = resource.toString();

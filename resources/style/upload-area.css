@@ -1,0 +1,29 @@
+@CHARSET "UTF-8";
+.uploaded-files-table img {
+    height: 2em;
+    width: 4em;
+}
+
+.uploaded-files-table td.preview {
+    width: 20%;
+}
+
+.upload-area-progressbar{
+	width:30%;
+}
+
+.uploaded-files-table{
+	background-color:#FFFFFF;
+}
+
+.fileupload-buttonbar{
+		display:block;
+}
+
+.fileinput-button{
+	float:none;	
+}
+
+.idega-upload-area{
+	width:100%;
+}
