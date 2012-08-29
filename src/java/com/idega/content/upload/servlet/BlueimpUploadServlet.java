@@ -19,10 +19,9 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.google.gson.Gson;
 import com.idega.business.IBOLookup;
-import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentConstants;
+import com.idega.content.business.ThumbnailService;
 import com.idega.content.upload.business.UploadAreaBean;
-import com.idega.graphics.image.business.ImageResizer;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
@@ -102,22 +101,23 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet{
 					uploadPath = uploadPath + CoreConstants.SLASH;
 				}
 			}
+			ThumbnailService thumbnailService = ELUtil.getInstance().getBean(ThumbnailService.BEAN_NAME);
 			responseMapArray = new ArrayList<HashMap<String,Object>>(files.size());
 			for(FileItem file : files){
 				String fileName = file.getName();
 				String pathAndName = uploadPath + fileName;
+				iwSlideService.uploadFile(uploadPath, fileName, file.getContentType(), file.getInputStream());
 				
 				HashMap<String,Object> fileData = new HashMap<String, Object>();
 				fileData.put("name", fileName);
 				fileData.put("size", file.getSize());
 				fileData.put("url", "/content" + pathAndName);
-				fileData.put("thumbnail_url", "/content" + pathAndName);
+				fileData.put("thumbnail_url", thumbnailService.getThumbnail(pathAndName, ThumbnailService.THUMBNAIL_SMALL, iwc));
 				fileData.put("delete_url", getDeleteUrl(iwc, uploadPath, file));
 				fileData.put("delete_type", "DELETE");
 				fileData.put("message", "");
 				fileData.put("status", "OK");
 				responseMapArray.add(fileData);
-				iwSlideService.uploadFile(uploadPath, fileName, file.getContentType(), file.getInputStream());
 			}
 			Gson gson = new Gson();
 			String jsonString =  gson.toJson(responseMapArray);
@@ -195,11 +195,4 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet{
 		
 	}
 	
-	protected String createThumbnail(IWContext iwc, FileItem file, String uploadPath) throws IBOLookupException{
-		// TODO: Create thumbnails
-		IWSlideService iwSlideService = IBOLookup.getServiceInstance(iwc, IWSlideService.class);
-		ImageResizer imageResizer = ELUtil.getInstance().getBean("imageResizer");
-		return null;
-	}
-
 }

@@ -3,22 +3,36 @@
 		   
 		   var opts = $.extend({}, $.fn.uploadAreaHelper.defaults, options);
 		   
-		   var dropZones = jQuery(eval(opts.dropZone));
-		   opts.dropZone = dropZones;
-		   var doc = jQuery(document);
-		   doc.bind('dragover',{dropZones : dropZones},function(e){
-			   e.data.dropZones.css({
+		   if((options.dropZone != null) && (options.dropZone != undefined)){
+			   var dropZones = jQuery(eval(opts.dropZone));
+			   opts.dropZone = dropZones;
+			   var doc = jQuery(document);
+			   dropZones.css({
 				   'border' : 'solid',
 				   'border-width' : '2px',
-				   'border-color' : '#3333EE',
+				   'border-color' : 'transparent',
 				   'border-radius': '20px'
 			   });
-		   });
-		   doc.bind('dragleave drop',{dropZones : dropZones},function(e){
-			   e.data.dropZones.css({
-				   'border' : 'none'
+			   doc.bind('dragover',{dropZones : dropZones},function(e){
+				   e.data.dropZones.css({
+					   'border-color' : '#3333EE'
+				   });
 			   });
-		   });
+			   doc.bind('dragleave drop',{dropZones : dropZones},function(e){
+				   e.data.dropZones.css({
+					   'border-color' : 'transparent'
+				   });
+			   });
+			// Disabling default action of droping files
+				jQuery(document).bind('drop dragover', function (e) {
+				    e.preventDefault();
+				});
+		   }
+		   if((options.filesContainer != null) && (options.filesContainer != undefined)){
+			   var filesContainerLayer = jQuery(eval(opts.filesContainer));
+			   filesContainerLayer.append(options.uploadAreaOptions.filesContainerContent);
+			   opts.filesContainer = filesContainerLayer.find(".files");
+		   }
 		   return this.each(function(){
 			   var uploader = jQuery(this);
 
@@ -26,10 +40,6 @@
 				opts.uploadAreaHelper.element = uploader;
 				uploader.fileupload( opts);
 				
-				// Disabling default action of droping files
-				jQuery(document).bind('drop dragover', function (e) {
-				    e.preventDefault();
-				});
 		   } ); 
 		   
 	   

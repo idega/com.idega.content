@@ -38,7 +38,7 @@ public class UploadArea  extends IWBaseComponent{
 	private String name = "uploaded-files";
 	private StringBuilder scriptOnLoad = null;
 	
-	private String dropZonesSelectionFunction = "jQuery('document')";
+	private String dropZonesSelectionFunction = null;
 	
 	private String uploadPath = null;
 	
@@ -55,6 +55,8 @@ public class UploadArea  extends IWBaseComponent{
 	private boolean addDeleteUploadsButton = false;
 	
 	private boolean addUploadsProgressLayer = false;
+	
+	private String filesListContainerSelectFunction = null;
 	
 	
 	public UploadAreaBean getUploadAreaBean(){
@@ -167,7 +169,6 @@ public class UploadArea  extends IWBaseComponent{
 	protected Map<String, Object> getUploaderOptions(IWContext iwc){
 		UploadAreaBean uploadAreaBean = getUploadAreaBean();
 		HashMap<String, Object> options = new HashMap<String, Object>();
-		options.put("dropZone",getDropZonesSelectionFunction());
 		options.put("maxFileSize", uploadAreaBean.getMaxFileSize(iwc));
 		options.put("url", uploadAreaBean.getServletPath());
 		options.put("autoUpload", isAutoUpload());
@@ -176,6 +177,17 @@ public class UploadArea  extends IWBaseComponent{
 		HashMap<String, Object> uploadAreaOptions = new HashMap<String, Object>();
 		options.put("uploadAreaOptions", uploadAreaOptions);
 		uploadAreaOptions.put("checkboxNeeded", isCheckboxNeeded());
+		
+		String dropZonesSelectFunction = getDropZonesSelectionFunction();
+		if(!StringUtil.isEmpty(dropZonesSelectFunction)){
+			options.put("dropZone",dropZonesSelectFunction);
+		}
+		String fileListSelectFunction = getFilesListContainerSelectFunction();
+		if(!StringUtil.isEmpty(fileListSelectFunction)){
+			options.put("filesContainer", fileListSelectFunction);
+			uploadAreaOptions.put("filesContainerContent",
+					"<table role='presentation' class='table table-striped uploaded-files-table'  ><tbody class='files' data-toggle='modal-gallery' data-target='#modal-gallery'></tbody></table>");
+		}
 		
 		
 		String uploadPath = getUploadPath();
@@ -193,6 +205,8 @@ public class UploadArea  extends IWBaseComponent{
 	private boolean isCheckboxNeeded(){
 		return isAddStartUploadsButton() || isAddCancelUploadsButton() || isAddDeleteUploadsButton();
 	}
+	
+	
 	private void addFileInput(IWContext iwc, IWResourceBundle iwrb){
 		setStyleClass(getStyleClass());
 		getScriptOnLoad().append("\n\tjQuery('#").append(getId()).append("').uploadAreaHelper(").append(new Gson().toJson(getUploaderOptions(iwc))).append(");");
@@ -205,7 +219,6 @@ public class UploadArea  extends IWBaseComponent{
 		
 		Layer buttons = new Layer();
 		inputs.add(buttons);
-//		buttons.setStyleClass("span7");
 		
 		buttons.add(getAddfilesButton(iwrb));
 		
@@ -235,7 +248,9 @@ public class UploadArea  extends IWBaseComponent{
 		Layer presentation = new Layer();
 		presentation.setStyleAttribute("width:100%");
 		add(presentation);
-		presentation.add("<table role='presentation' class='table table-striped uploaded-files-table'  ><tbody class='files' data-toggle='modal-gallery' data-target='#modal-gallery'></tbody></table>");
+		if(StringUtil.isEmpty(getFilesListContainerSelectFunction())){
+			presentation.add("<table role='presentation' class='table table-striped uploaded-files-table'  ><tbody class='files' data-toggle='modal-gallery' data-target='#modal-gallery'></tbody></table>");
+		}
 		
 		
 		//Fake templates for script to load I don't know how to remove them		
@@ -452,6 +467,15 @@ public class UploadArea  extends IWBaseComponent{
 
 	public void setAddUploadsProgressLayer(boolean addUploadsProgressLayer) {
 		this.addUploadsProgressLayer = addUploadsProgressLayer;
+	}
+
+	public String getFilesListContainerSelectFunction() {
+		return filesListContainerSelectFunction;
+	}
+
+	public void setFilesListContainerSelectFunction(
+			String filesListContainerSelectFunction) {
+		this.filesListContainerSelectFunction = filesListContainerSelectFunction;
 	}
 
 }
