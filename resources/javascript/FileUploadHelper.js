@@ -2,6 +2,7 @@ if (!FileUploadHelper) var FileUploadHelper = {};
 
 FileUploadHelper.allUploadedFiles = [];
 FileUploadHelper.uploadedFiles = null;
+FileUploadHelper.uploadingWithFrame = false;
 
 FileUploadHelper.properties = {
 	id: null,
@@ -66,7 +67,7 @@ FileUploadHelper.initializeFlashUploader = function() {
 	showLoadingMessage(FileUploadHelper.properties.localizations.LOADING);
 	jQuery(jQuery('input.fileUploadAddInputStyle')).hide('fast');
 	LazyLoader.loadMultiple([FileUploadHelper.properties.swfObject, FileUploadHelper.properties.swfUploadScript], function() {
-		if (!swfobject.hasFlashPlayerVersion("9")) {
+		if (swfobject == null || !swfobject.hasFlashPlayerVersion("9")) {
 			closeAllLoadingMessages();
 			return false;
 		}
@@ -313,8 +314,22 @@ FileUploadHelper.uploadFiles = function() {
 	
 	FileUploadListener.resetFileUploaderCounters(FileUploadHelper.properties.uploadId, FileUploadHelper.properties.maxSize, {
 		callback: function(result) {
-			YAHOO.util.Connect.setForm(FileUploadHelper.properties.formId, true);
-			YAHOO.util.Connect.asyncRequest('POST', '/servlet/ContentFileUploadServlet', uploadHandler);
+			var utilError = false;
+			try {
+				YAHOO.util.Connect.setForm(FileUploadHelper.properties.formId, true);
+				YAHOO.util.Connect.asyncRequest('POST', '/servlet/ContentFileUploadServlet', uploadHandler);
+			} catch (e) {
+				utilError = true;
+			}
+			if (!utilError) {
+				FileUploadHelper.uploadingWithFrame = true;
+				jQuery(document.body).append('<iframe style="display: none;" name="uploadFrame">iframe</iframe>');
+				form.enctype = 'multipart/form-data';
+				form.action = '/servlet/ContentFileUploadServlet';
+				form.method = 'post';
+				form.target = 'uploadFrame';
+				form.submit();
+			}
 			
 			FileUploadHelper.prepareProgressBar(function() {
 				showUploadInfoInProgressBar(FileUploadHelper.properties.progressBarId, FileUploadHelper.properties.actionAfterCounterReset);
@@ -544,6 +559,10 @@ FileUploadHelper.updateProgressBar = function(progress, progressBarId, actionAft
 	if (progress == '100') {
 		FileUploadHelper.reportUploadStatus(progressBarId, actionAfterCounterReset,
 		FileUploadHelper.properties.localizations.UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT);
+		if (FileUploadHelper.uploadingWithFrame) {
+			FileUploadHelper.uploadingWithFrame = false;
+			FileUploadHelper.executeActionAfterUploadedToRepository(getInputsForUpload(FileUploadHelper.properties.id));
+		}
 		return false;
 	} else if (progress == '-1') {
 		FileUploadHelper.reportUploadStatus(progressBarId, actionAfterCounterReset, FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
