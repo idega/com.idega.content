@@ -321,7 +321,7 @@ FileUploadHelper.uploadFiles = function() {
 			} catch (e) {
 				utilError = true;
 			}
-			if (!utilError) {
+			if (utilError) {
 				FileUploadHelper.uploadingWithFrame = true;
 				jQuery(document.body).append('<iframe style="display: none;" name="uploadFrame">iframe</iframe>');
 				form.enctype = 'multipart/form-data';
