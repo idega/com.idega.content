@@ -156,3 +156,12 @@
 		};
 })(jQuery);
 
+var UploadArea = {};
+
+UploadArea.initializeLocale = function(localeObject){
+	if(typeof(window.locale) == 'undefined'){window.locale = {}; }
+	if(window.locale.fileupload == undefined){
+		window.locale.fileupload = {};
+	} 
+	window.locale.fileupload = jQuery.extend({}, window.locale.fileupload,localeObject);
+}
