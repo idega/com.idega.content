@@ -160,6 +160,8 @@ public class FileUploaderBean implements FileUploader {
 				.append(iwrb.getLocalizedString("web2_uploader.flash_is_missing", "Unable to upload file(s): you need to install Flash plug-in"))
 			.append("', LOADING: '")
 				.append(iwrb.getLocalizedString("loading", "Loading..."))
+			.append("', MOVING_DATA_INTO_THE_PLACE: '")
+				.append(iwrb.getLocalizedString("preparing_data", "Preparing data..."))
 			.append("'}, ")
 			.append("actionAfterUpload: ").append(getJavaScriptAction(actionAfterUpload))
 			.append(", actionAfterCounterReset: ").append(getJavaScriptAction(actionAfterCounterReset))
