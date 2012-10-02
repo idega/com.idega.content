@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUpload;
 import org.apache.commons.fileupload.FileUploadBase;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
 
@@ -83,39 +82,53 @@ public class ContentFileUploadServlet extends HttpServlet {
 			uploadProgressListener = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
 
 			DiskFileItemFactory factory = new DiskFileItemFactory();
-			FileUploadBase fileUploadService = new FileUpload(factory);
+			FileUpload fileUploadService = new FileUpload(factory);
 
 			long maxUploadSize = uploadProgressListener.getMaxSize();
 			maxUploadSize = maxUploadSize <= 0 ? MAX_UPLOAD_SIZE : maxUploadSize;
-			maxUploadSize = maxUploadSize == MAX_UPLOAD_SIZE ? maxUploadSize : Double.valueOf(maxUploadSize * 1.1).longValue();	//	10% reserved for other data when file(s)
+																				//	10% reserved for other data when file(s)
+			maxUploadSize = maxUploadSize == MAX_UPLOAD_SIZE ? maxUploadSize : Double.valueOf(maxUploadSize * 1.1).longValue();
 			fileUploadService.setSizeMax(maxUploadSize);
 			fileUploadService.setProgressListener(uploadProgressListener);
 
 			uploadId = uploadProgressListener.getUploadId();
-			if (!StringUtil.isEmpty(uploadId)) {
+			if (!StringUtil.isEmpty(uploadId))
 				iwac.setApplicationAttribute(uploadId, Boolean.TRUE);
-			}
 
 			if (IOUtil.isUploadExceedingLimits(request, maxUploadSize)) {
 				IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
-				writeToResponse(response, "error=".concat(iwrb.getLocalizedString("uploader_error_exceeds_max_size", "The file you are uploading is exceeding the limits"))
-						.concat(": ").concat(FileUtil.getHumanReadableSize(maxUploadSize)));
+				writeToResponse(response, "error=".concat(iwrb.getLocalizedString("uploader_error_exceeds_max_size",
+						"The file you are uploading is exceeding the limits")).concat(": ").concat(FileUtil.getHumanReadableSize(maxUploadSize)));
 				uploadProgressListener.markFailedUpload(uploadId);
 				finishUpUpload(iwac, uploadProgressListener, uploadId, false);
 				return;
 			}
 
+			String fileItem = request.getParameter("fileItem");
+			if (!StringUtil.isEmpty(fileItem)) {
+				int fileItemNr = -1;
+				try {
+					fileItemNr = Integer.valueOf(fileItem);
+				} catch (NumberFormatException e) {}
+				uploadProgressListener.setFileNumberInUploadSequence(fileItemNr);
+			}
+
 			List<FileItem> fileItems = null;
 			try {
+				//	Submitted data is copied from client to server
 				fileItems = fileUploadService.parseRequest(src);
-			} catch (FileUploadException e) {
-				e.printStackTrace();
+			} catch (Exception e) {
+				String message = "Error parsing request " + src;
+				LOGGER.log(Level.WARNING, message, e);
+				CoreUtil.sendExceptionNotification(message, e);
 				return;
 			}
 			if (ListUtil.isEmpty(fileItems)) {
 				LOGGER.log(Level.WARNING, "No files to upload, terminating upload!");
 				return;
 			}
+
+			LOGGER.info("Data was copied to the server (ID: " + uploadId + "), now will upload to the repository");
 
 			String fieldName = null;
 			List<UploadFile> files = new ArrayList<UploadFile>();
@@ -145,9 +158,8 @@ public class ContentFileUploadServlet extends HttpServlet {
 	        	return;
 	        }
 
-	        if (!StringUtil.isEmpty(uploadId)) {
+	        if (!StringUtil.isEmpty(uploadId))
 	        	iwac.setApplicationAttribute(uploadId, Boolean.TRUE);
-	        }
 
 	        String errorMessage = null;
 	        try {
@@ -169,9 +181,8 @@ public class ContentFileUploadServlet extends HttpServlet {
 		    	}
 
 		        boolean isIE = CoreUtil.isIE(request);
-		        if (!(success = upload(files, uploadPath, zipFile, themePack, isIE, extractContent))) {
+		        if (!(success = upload(files, uploadPath, zipFile, themePack, isIE, extractContent)))
 		        	success = upload(files, uploadPath, zipFile, themePack, isIE, extractContent);	//	Re-uploading in case of error
-		        }
 
 		        if (success) {
 		        	StringBuffer responseBuffer = new StringBuffer();
@@ -193,8 +204,8 @@ public class ContentFileUploadServlet extends HttpServlet {
 		        	throw new RuntimeException(errorMessage);
 		        }
 	        } catch(Exception e) {
-	        	errorMessage = errorMessage == null ? "Files uploader failed! Unable to upload files: " + files + " to: " + uploadPath + ". Upload ID: " + uploadId :
-	        		errorMessage;
+	        	errorMessage = errorMessage == null ? "Files uploader failed! Unable to upload files: " + files + " to: " + uploadPath +
+	        			". Upload ID: " + uploadId : errorMessage;
 	        	LOGGER.log(Level.SEVERE, errorMessage, e);
 	        	CoreUtil.sendExceptionNotification(errorMessage, e);
 	        } finally {
@@ -220,18 +231,19 @@ public class ContentFileUploadServlet extends HttpServlet {
 		result.setName(data.getName());
 		result.setUuid(data.getUuid());
 		result.setSize(data.getBytes().length);
-		result.setSuccess(upload(Arrays.asList(new UploadFile(data.getName(), null, data.getBytes().length, data.getBytes())), data.getDestinationDirectory(), false, false,
-				false, false));
+		result.setSuccess(upload(Arrays.asList(new UploadFile(data.getName(), null, data.getBytes().length, data.getBytes())),
+				data.getDestinationDirectory(), false, false, false, false));
 		writeToResponse(response, result);
 	}
 
 	private void finishUpUpload(IWApplicationContext iwac, FileUploadProgressListener uploadProgressListener, String uploadId, Boolean success) {
-		if (!StringUtil.isEmpty(uploadId)) {
-			uploadProgressListener.setUploadSuccessful(uploadId, success);
+		LOGGER.info("Upload by ID " + uploadId + " has ended. Successfully: " + success);
+		if (StringUtil.isEmpty(uploadId))
+			return;
 
-    		if (iwac != null)
-    			iwac.removeApplicationAttribute(uploadId);
-    	}
+		uploadProgressListener.setUploadSuccessful(uploadId, success);
+   		if (iwac != null)
+   			iwac.removeApplicationAttribute(uploadId);
 	}
 
 	private void writeToResponse(HttpServletResponse response, String responseText) throws IOException {
