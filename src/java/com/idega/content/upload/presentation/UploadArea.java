@@ -25,7 +25,6 @@ import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
-import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.CheckBox;
 import com.idega.util.CoreConstants;
 import com.idega.util.PresentationUtil;
@@ -88,7 +87,7 @@ public class UploadArea  extends IWBaseComponent{
 		addFiles.add(text);
 		text.add(iwrb.getLocalizedString("add_files", "Add files"));
 		
-		addFiles.add("<input type=\"file\" name=\"files[]\" multiple>");
+		addFiles.add("<input type=\"file\" name=\"files[]\" multiple=\"multiple\" />");
 		
 		
 		
@@ -266,25 +265,15 @@ public class UploadArea  extends IWBaseComponent{
 		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
 		Layer scriptLayer = new Layer();
 		add(scriptLayer);
-		StringBuilder scriptOnLoad = /*new StringBuilder("jQuery(document).ready(function(){");*/getScriptOnLoad();
-		
-		add(new Text("<button onclick='LastMessagesList.testLocale();' style='height:100px;';>test locale </button> "));
+		StringBuilder scriptOnLoad = /*new StringBuilder("jQuery(document).ready(function(){");//*/getScriptOnLoad();
 		
 		//localize
 		scriptOnLoad.append("\n\tUploadArea.initializeLocale({")
-				.append("'destroy' : '").append(iwrb.getLocalizedString("dddelete", "ddddd")).append("',")
-				.append("'cancel' :").append(iwrb.getLocalizedString("cancel", "Cancel")).append("',")
+				.append("'destroy' : '").append(iwrb.getLocalizedString("delete", "Delete")).append("',")
+				.append("'cancel' : '").append(iwrb.getLocalizedString("cancel", "Cancel")).append("',")
 				.append("'errors' :{")
 				.append("'maxFileSize' : '").append(iwrb.getLocalizedString("file_is_too_big", "File is too big"))
 				.append("'}});");
-		
-//		scriptOnLoad.append("\n\talert('starting');if(typeof(window.locale) == 'undefined'){alert('creating'); window.locale = {'name' : 'locale'}; alert('created');}");
-//		scriptOnLoad.append("\n\tif(window.locale.fileupload == undefined){window.locale.fileupload = {};}");
-//		scriptOnLoad.append("\n\twindow.locale.fileupload.destroy = '").append(iwrb.getLocalizedString("dddelete", "ddddd")).append(CoreConstants.JS_STR_INITIALIZATION_END);
-//		scriptOnLoad.append("window.locale.fileupload.cancel = '").append(iwrb.getLocalizedString("cancel", "Cancel")).append(CoreConstants.JS_STR_INITIALIZATION_END);
-//		scriptOnLoad.append("if(window.locale.fileupload.errors == undefined){window.locale.fileupload.errors = {};}");
-//		scriptOnLoad.append("window.locale.fileupload.errors.maxFileSize = '").append(iwrb.getLocalizedString("file_is_too_big", "File is too big")).append(CoreConstants.JS_STR_INITIALIZATION_END);
-		
 		
 		scriptOnLoad.append("\n});");
 		scriptLayer.add(PresentationUtil.getJavaScriptAction(scriptOnLoad.toString()));

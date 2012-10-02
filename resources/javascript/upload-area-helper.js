@@ -165,3 +165,4 @@ UploadArea.initializeLocale = function(localeObject){
 	} 
 	window.locale.fileupload = jQuery.extend({}, window.locale.fileupload,localeObject);
 }
+
