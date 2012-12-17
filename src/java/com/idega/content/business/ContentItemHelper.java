@@ -4,6 +4,8 @@ import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -26,30 +28,29 @@ public class ContentItemHelper {
 	}
 	
 	public String getPageUrlByArticleResourcePath(IWContext iwc, String moduleClass) {
-		if (iwc == null) {
+		if (iwc == null)
 			return getDefaultPageUrlByArticleResourcePath();
-		}
+		
 		BuilderService builder = null;
 		try {
 			builder = BuilderServiceFactory.getBuilderService(iwc.getApplicationContext());
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		if (builder == null) {
+		if (builder == null)
 			return getDefaultPageUrlByArticleResourcePath();
-		}
-		Map tree = builder.getTree(iwc);
-		if (tree == null) {
+		
+		Map<?, ?> tree = builder.getTree(iwc);
+		if (tree == null)
 			return getDefaultPageUrlByArticleResourcePath();
-		}
+		
 		Object o = null;
 		String pageID = null;
 		List<String> moduleIds = null;
 		String propertyName = "resourcePath";
 		String propertyValue = getPathAppliedForSearch();
-		if (propertyValue == null) {
+		if (propertyValue == null)
 			return getDefaultPageUrlByArticleResourcePath();
-		}
 		
 		ThemesService themesService = null;
 		try {
@@ -57,26 +58,33 @@ public class ContentItemHelper {
 		} catch (IBOLookupException e) {
 			e.printStackTrace();
 		}
-		if (themesService == null) {
+		if (themesService == null)
 			return getDefaultPageUrlByArticleResourcePath();
-		}
 		
 		ICPage page = null;
-		for (Iterator it = tree.values().iterator(); it.hasNext();) {
+		for (Iterator<?> it = tree.values().iterator(); it.hasNext();) {
 			o = it.next();
 			if (o instanceof ICTreeNode) {
 				pageID = ((ICTreeNode) o).getId();
-				page = themesService.getICPage(Integer.valueOf(pageID));
-				if (page != null) {
-					if (page.isPage() && !page.getDeleted()) {
-						moduleIds = builder.getModuleId(pageID, moduleClass);
-						if (moduleIds == null) {
-							return getDefaultPageUrlByArticleResourcePath();
-						}
-						for (int i = 0; i < moduleIds.size(); i++) {
-							if (builder.isPropertyValueSet(pageID, moduleIds.get(i), propertyName, propertyValue)) {
-								return ContentConstants.PAGES_START_URI + page.getDefaultPageURI();
-							}
+				
+				page = null;
+				try {
+					page = themesService.getICPage(Integer.valueOf(pageID));
+				} catch (Exception e) {
+					Logger.getLogger(getClass().getName()).log(Level.WARNING, "Error getting page by ID: " + pageID, e);
+				}
+				
+				if (page == null)
+					continue;
+				
+				if (page.isPage() && !page.getDeleted()) {
+					moduleIds = builder.getModuleId(pageID, moduleClass);
+					if (moduleIds == null)
+						return getDefaultPageUrlByArticleResourcePath();
+
+					for (int i = 0; i < moduleIds.size(); i++) {
+						if (builder.isPropertyValueSet(pageID, moduleIds.get(i), propertyName, propertyValue)) {
+							return ContentConstants.PAGES_START_URI + page.getDefaultPageURI();
 						}
 					}
 				}
