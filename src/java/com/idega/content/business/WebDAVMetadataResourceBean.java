@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import javax.jcr.Node;
 import javax.jcr.Property;
 import javax.jcr.RepositoryException;
+import javax.jcr.Session;
 import javax.jcr.Value;
 
 import com.idega.business.IBOSessionBean;
@@ -34,7 +35,6 @@ import com.idega.util.ArrayUtil;
 import com.idega.util.CoreConstants;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
-
 
 /**
  * A resource bean that holds metadata info for the selected resouce
@@ -146,11 +146,13 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 		}
 
 		Map<String, List<String>> metaDataValues = new HashMap<String, List<String>>();
+		Session session = null;
 		try {
-			Node item = getRepositoryService().getNodeAsRootUser(filePath);
+			Node item = getRepositoryService().getNodeAsRootUser(filePath, false);
 			if (item == null)
 				return Collections.emptyMap();
 
+			session = item.getSession();
 			for (String type: metaData) {
 				String propName = "DAV:".concat(type);
 				if (!item.hasProperty(propName)) {
@@ -180,6 +182,8 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 			}
 		} catch (Exception e) {
 			log(Level.WARNING, "Could not load metadata types " + metaData + " for " + filePath, e);
+		} finally {
+			getRepositoryService().logout(session);
 		}
 
 		return metaDataValues;
@@ -242,11 +246,10 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 	public void setCategories(String resourcePath, String categories, boolean setOnParent) throws IOException {
 		String filePath = resourcePath;
 		String serverURI = getRepositoryService().getWebdavServerURL();
-		if(!resourcePath.startsWith(serverURI)) {
+		if (!resourcePath.startsWith(serverURI))
 			filePath = getRepositoryService().getURI(resourcePath);
-		}
 
-		if (StringUtil.isEmpty(categories))
+		if (StringUtil.isEmpty(categories) || categories.equals(CoreConstants.COMMA))
 			return;
 
 		setProperties(filePath, new com.idega.repository.bean.Property("DAV:categories", categories));
@@ -258,6 +261,9 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 	}
 
 	private boolean setProperties(String path, com.idega.repository.bean.Property... properties) {
+		if (ArrayUtil.isEmpty(properties))
+			return true;
+
 		try {
 			return getRepositoryService().setProperties(path, properties);
 		} catch (RepositoryException e) {

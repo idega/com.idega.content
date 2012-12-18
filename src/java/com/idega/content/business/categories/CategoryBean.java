@@ -23,6 +23,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.collections.MapUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.Filter;
@@ -72,7 +73,7 @@ public class CategoryBean {
 	private CategoryBean(IWMainApplication iwma) {
 		this.iwma = iwma;
 		categories = loadCategories();
-		if (categories == null)
+		if (MapUtils.isEmpty(categories))
 			categories = new HashMap<String, ContentCategory>();
 	}
 
