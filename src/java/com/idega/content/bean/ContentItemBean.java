@@ -396,8 +396,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		if (isLoaded())
 			return true;
 
-		//	TODO: test it
-		boolean returner = true;
+		boolean result = true;
 		try {
 			RepositoryItem item = getRepositoryService().getRepositoryItemAsRootUser(path);
 			if (item == null || !item.exists())
@@ -414,24 +413,14 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 			if (lastModified > 0)
 				setLastModifiedDate(new IWTimestamp(lastModified).getTimestamp());
 
-			//	TODO
-//			try{
-//				Property categoriesProp = folderNode.getProperty("category"/*IWSlideConstants.PROPERTYNAME_CATEGORY*/);
-//				if(categoriesProp!=null){
-//					String categories = categoriesProp.getValue().getString();
-//					setCategories(categories);
-//				}
-//			}
-//			catch(PathNotFoundException pnfe){}
-//
-			returner = load(item);
-			setExists(true);
+			result = load(item);
+			setExists(result);
 		} catch (RepositoryException e) {
 			e.printStackTrace();
 			setRendered(false);
 			return false;
 		}
-		return returner;
+		return result;
 	}
 
 	protected boolean load(RepositoryItem item) throws IOException, RepositoryException {

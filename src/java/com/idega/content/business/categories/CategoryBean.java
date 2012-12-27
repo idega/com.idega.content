@@ -138,41 +138,6 @@ public class CategoryBean {
 		return IWContext.getInstance().getCurrentLocale().toString();
 	}
 
-//	/**
-//	 * <p>Getts all the categories as one String (comma separated)</p>
-//	 * @return categories
-//	 * @deprecated this file is no longer used
-//	 */
-//	@Deprecated
-//	public String getCategoriesAsString() {
-//		IWUserContext iwuc = IWContext.getInstance();
-//		String categories = null;
-//		try {
-//			IWSlideSession session = (IWSlideSession)IBOLookup.getSessionInstance(iwuc,IWSlideSession.class);
-//			WebdavRootResource rootResource = session.getWebdavRootResource();
-//
-//			String path = getSlideService().getURI(CATEGORY_CONFIG_FILE);
-//
-//			categories = rootResource.getMethodDataAsString(path);
-//			if(rootResource.getStatusCode() != WebdavStatus.SC_OK){
-//				return "";
-//			}
-//		}
-//		catch (IBOLookupException e) {
-//			e.printStackTrace();
-//		}
-//		catch (RemoteException e) {
-//			e.printStackTrace();
-//		}
-//		catch (HttpException e) {
-//			e.printStackTrace();
-//		}
-//		catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		return categories;
-//	}
-
 	/**
 	 * <p>
 	 * Constructs a collection from a comma separated list of categories
@@ -275,97 +240,6 @@ public class CategoryBean {
 		}
 		return map;
 	}
-
-//    final class CategoriesMigrator {
-//        private final String PROPERTY_NAME_CATEGORIES = new PropertyName("DAV","categories").toString();
-//
-//        private HashMap<String, String> valuesToKeys;
-//        private IWSlideService service;
-//
-//        protected void migrate(Collection<String> cats) {
-//            LOGGER.info("Migrating " + CATEGORY_CONFIG_FILE + " to new format at " + CATEGORY_PROPERTIES_FILE);
-//            categories = new TreeMap<String, ContentCategory>();
-//            valuesToKeys = new HashMap<String, String>();
-//            String lang = getCurrentLocale();
-//            for (Iterator<String> iter = cats.iterator(); iter.hasNext();) {
-//                String cat = iter.next();
-//                String key = CategoryBean.getCategoryKey(cat);
-//                ContentCategory category = new ContentCategory(key);
-//                category.addName(lang, cat);
-//                categories.put(key, category);
-//                valuesToKeys.put(cat, key);
-//            }
-//
-//            storeCategories();
-//
-//            try {
-//            	service = IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), IWSlideService.class);
-//	            updateCategoriesOnFiles(CATEGORY_CONFIG_PATH);
-//            } catch (IBOLookupException e) {
-//                LOGGER.log(Level.WARNING, "Error getting EJB bean: " + IWSlideService.class, e);
-//            }
-//        }
-//
-//        private void updateCategoriesOnFiles(String resourcePath) {
-//            if (resourcePath.indexOf(ThemesConstants.THEMES_PATH) >= 0) {
-//                return;
-//            }
-//            try {
-//                String filePath = resourcePath;
-//                String serverURI = service.getWebdavServerURI();
-//                if(!resourcePath.startsWith(serverURI)) {
-//                    filePath = service.getURI(resourcePath);
-//                }
-//
-//                WebdavResource resource = service.getWebdavResourceAuthenticatedAsRoot(filePath);
-//
-//                String oldCats = CATEGORY_DELIMETER;
-//                Enumeration<?> enumerator = resource.propfindMethod(PROPERTY_NAME_CATEGORIES);
-//                if (enumerator.hasMoreElements()) {
-//                    StringBuffer cats = new StringBuffer();
-//                    while(enumerator.hasMoreElements()) {
-//                        cats.append(enumerator.nextElement());
-//                    }
-//                    oldCats = cats.toString();
-//                }
-//
-//                if (!oldCats.equals(CATEGORY_DELIMETER) && !oldCats.equals("")) {
-//                    LOGGER.info("Updating categories on resource " + resourcePath);
-//                    LOGGER.info("- " + oldCats);
-//
-//                    StringTokenizer tokenizer = new StringTokenizer(oldCats, CATEGORY_DELIMETER);
-//                    StringBuffer newCats = new StringBuffer(CATEGORY_DELIMETER);
-//                    while (tokenizer.hasMoreTokens()) {
-//                        String cat = tokenizer.nextToken();
-//						String key = valuesToKeys.get(cat);
-//						// if we renamed the category key, replace category with it, otherwise leave as is
-//						if (key != null) {
-//						    newCats.append(key);
-//						} else {
-//						    newCats.append(cat);
-//						}
-//						newCats.append(CATEGORY_DELIMETER);
-//                    }
-//
-//                    LOGGER.info("+ " + newCats.toString());
-//                    resource.proppatchMethod(PROPERTY_NAME_CATEGORIES, newCats.toString(), true);
-//                }
-//
-//                // update categories on all child resources
-//                Enumeration<?> children = resource.getChildResources().getResourceNames();
-//                if (children.hasMoreElements()) {
-//                    while(children.hasMoreElements()) {
-//                        String child = (String) children.nextElement();
-//                        updateCategoriesOnFiles(child);
-//                    }
-//                }
-//
-//                resource.close();
-//            } catch (Exception e) {
-//                LOGGER.warning("Exception updating categories on resource " + resourcePath + ": " + e.getMessage());
-//            }
-//        }
-//    }
 
 	public void storeCategories() {
 		storeCategories(false);
