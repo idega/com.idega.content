@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.faces.context.FacesContext;
 import javax.jcr.RepositoryException;
@@ -119,13 +121,11 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	public String getName() { return this._name; }
 	public String getDescription() { return this._description; }
 	public String getItemType() { return this._itemType; }
-//	public Date getCreatedTimestamp() { return _createdTimestamp; }
 	public int getCreatedByUserId() { return this._createdByUserId; }
 
 	public void setName(String s) { this._name = s; }
 	public void setDescription(String s) { this._description = s; }
 	public void setItemType(String s) { this._itemType = s; }
-//	public void setCreatedTimestamp(Date d) { _createdTimestamp = d; }
 	public void setCreatedByUserId(int id) { this._createdByUserId = id; }
 
 	public void setLocale(Locale locale) {
@@ -148,7 +148,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	 * Clears all attributes for this bean.
 	 */
 	public void clear() {
-		//setLocale(Locale.getDefault());
 		this._name = null;
 		this._description = null;
 		this._itemType = null;
@@ -462,6 +461,22 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	}
 
 	@Override
+	public boolean createItemFolder(){
+		IWContext iwc = CoreUtil.getIWContext();
+		return createItemFolder(iwc);
+	}
+
+	@Override
+	public boolean createItemFolder(IWContext iwc) {
+		try {
+			return getRepositoryService().createFolderAsRoot(getResourcePath());
+		} catch (RepositoryException e) {
+			Logger.getLogger(ContentItemBean.class.getName()).log(Level.WARNING, "Failed creating item folder", e);
+			return false;
+		}
+	}
+
+	@Override
 	public Boolean getRendered() {
 		return this.doRender;
 	}
@@ -501,7 +516,6 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	public void setAutoCreateResource(boolean autoCreateResource) {
 		this.autoCreateResource = autoCreateResource;
 	}
-
 
 	/**
 	 * <p>
@@ -561,6 +575,8 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 			item = getRepositoryService().getRepositoryItem(iwuc.getLoggedInUser(), resourcePath);
 		} catch (RepositoryException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 		return item;
 	}

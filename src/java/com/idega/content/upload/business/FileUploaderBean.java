@@ -26,6 +26,8 @@ import com.idega.builder.business.BuilderLogicWrapper;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.business.WebDAVUploadBean;
+import com.idega.content.presentation.WebDAVListManagedBean;
+import com.idega.content.repository.download.RepositoryItemDownloader;
 import com.idega.content.upload.bean.UploadFile;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.business.DefaultSpringBean;
@@ -35,9 +37,9 @@ import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.DownloadLink;
-import com.idega.presentation.text.Link;
 import com.idega.presentation.text.ListItem;
 import com.idega.presentation.text.Lists;
+import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.FileInput;
 import com.idega.repository.bean.RepositoryItem;
 import com.idega.util.CoreConstants;
@@ -146,6 +148,8 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 				.append(iwrb.getLocalizedString("web2_uploader.flash_is_missing", "Unable to upload file(s): you need to install Flash plug-in"))
 			.append("', LOADING: '")
 				.append(iwrb.getLocalizedString("loading", "Loading..."))
+			.append("', MOVING_DATA_INTO_THE_PLACE: '")
+				.append(iwrb.getLocalizedString("preparing_data", "Preparing data..."))
 			.append("'}, ")
 			.append("actionAfterUpload: ").append(getJavaScriptAction(actionAfterUpload))
 			.append(", actionAfterCounterReset: ").append(getJavaScriptAction(actionAfterCounterReset))
@@ -446,14 +450,10 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 			String fileInSlideWithoutWebDav = fileInSlide.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
 			results.add(fileInSlideWithoutWebDav);
 
-			Link link = null;
-			if (iwc.isLoggedOn() || uploadPath.startsWith(CoreConstants.PUBLIC_PATH)) {
-				link = new DownloadLink(fileName);
-				((DownloadLink) link).setRelativeFilePath(fileInSlide);
-				((DownloadLink) link).setAlternativeFileName(fileName);
-			} else {
-				link = new Link(fileName, fileInSlide);
-			}
+			DownloadLink link = new DownloadLink(new Text(fileName));
+			link.setMediaWriterClass(RepositoryItemDownloader.class);
+			link.setParameter(WebDAVListManagedBean.PARAMETER_WEB_DAV_URL, fileInSlide);
+			link.setParameter("allowAnonymous", Boolean.TRUE.toString());
 			listItem.add(link);
 
 			Image deleteFile = bundle.getImage("images/remove.png");

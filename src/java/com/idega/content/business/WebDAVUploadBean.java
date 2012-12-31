@@ -88,6 +88,7 @@ public class WebDAVUploadBean implements Serializable {
 		if (uploadFile == null) {
 			return uploadFailed;
 		}
+
 		String tempUploadFolderPath = (String) WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID,"getWebDAVPath");
 		if (tempUploadFolderPath != null && !tempUploadFolderPath.equals(ContentConstants.EMPTY)) {
 			uploadFilePath = tempUploadFolderPath;
@@ -95,7 +96,9 @@ public class WebDAVUploadBean implements Serializable {
 
 		String filePath = getUploadFilePath();
 		String uploadName = this.uploadFile.getName();
+		String contentType = uploadFile.getContentType();
 
+		//FIXME THIS IS A BUG IN THE MYFACES UPLOADER I THINK
 		//The problem is that in IE 6 the filename actually contains the full file path!
 		//example I'm uploading test.txt from c:\myfolder\test.txt to the folder /files/public
 		//then the variable filePath+fileName = /files/public/C:/myfolder/test.txt
@@ -144,7 +147,7 @@ public class WebDAVUploadBean implements Serializable {
 
 		downloadPath = filePath.concat(fileName);
 		if (uploadFileSuccess) {
-			String contentType = this.uploadFile.getContentType();
+			contentType = this.uploadFile.getContentType();
 			this.downloadPath = filePath + fileName;
 			if (contentType!=null && MimeTypeUtil.getInstance().isImage(contentType)) {
 				this.imagePath = iwc.getIWMainApplication().getURIFromURL(this.downloadPath);
@@ -178,7 +181,6 @@ public class WebDAVUploadBean implements Serializable {
 				e.printStackTrace();
 			}
 		}
-
 		return false;
 	}
 

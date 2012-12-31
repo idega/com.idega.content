@@ -173,7 +173,6 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 		UICommand source = (UICommand) arg0.getSource();
 		String path = (String) source.getAttributes().get(PARAMETER_PATH);
 		String action = (String) source.getAttributes().get(ACTION);
-
 		if (ACTION_YES.equals(action)) {
 			Boolean deleted = Boolean.FALSE;
 			Boolean wasFolder = Boolean.FALSE;

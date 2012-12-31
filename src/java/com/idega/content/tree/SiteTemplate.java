@@ -1,20 +1,23 @@
 package com.idega.content.tree;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SiteTemplate extends Template {
 	
-	private ArrayList <SiteTemplate> childStructure = new ArrayList <SiteTemplate> ();
+	private static final long serialVersionUID = 5950983612728912305L;
+	
+	private List<SiteTemplate> childStructure = new ArrayList <SiteTemplate> ();
 	
 	public SiteTemplate() {
 		super();
 	}
 
-	public ArrayList<SiteTemplate> getChildStructure() {
+	public List<SiteTemplate> getChildStructure() {
 		return childStructure;
 	}
 
-	public void setChildStructure(ArrayList<SiteTemplate> childStructure) {
+	public void setChildStructure(List<SiteTemplate> childStructure) {
 		this.childStructure = childStructure;
 	}
 	

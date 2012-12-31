@@ -715,9 +715,19 @@ public class ThemeChangerBean implements ThemeChanger {
 					return false;
 				}
 			}
+<<<<<<< HEAD
 			content = StringHandler.replace(content, ThemesConstants.USELESS_PATHTO_ELEMENT,
 					new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(linkToBase).toString());
 
+=======
+			
+			String linkToThemeBase = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(linkToBase).toString();
+			content = StringHandler.replace(content, ThemesConstants.USELESS_PATHTO_ELEMENT, linkToThemeBase);
+			if (content.indexOf("%base_url%") != -1) {
+				content = StringHandler.replace(content, "%base_url%", linkToThemeBase);
+			}
+			
+>>>>>>> 2795de162f9761084f56b8aea71748f87dd8e4ee
 			if (addRegions) {
 				content = getFixedDocumentContent(content);
 				content = removeNeedlessStuffWithRegularExpressions(content);
@@ -1984,7 +1994,11 @@ public class ThemeChangerBean implements ThemeChanger {
 				}
 			}
 		}
+<<<<<<< HEAD
 
+=======
+		
+>>>>>>> 2795de162f9761084f56b8aea71748f87dd8e4ee
 		IWMainApplicationSettings settings = getApplicationSettings();
 		boolean isJpg = settings.getBoolean("theme_preview_jpg", false);
 		if (helper.generatePreviewsForTheme(theme, false, isJpg, 1)) {
@@ -2316,7 +2330,11 @@ public class ThemeChangerBean implements ThemeChanger {
 		if (!helper.generatePreviewsForTheme(child, false, isJpg, 1)) {
 			return false;
 		}
+<<<<<<< HEAD
 
+=======
+		
+>>>>>>> 2795de162f9761084f56b8aea71748f87dd8e4ee
 		//	Marking properties extracted
 		child.setPropertiesExtracted(true);
 

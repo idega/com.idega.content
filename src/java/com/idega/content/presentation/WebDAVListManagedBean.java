@@ -3,6 +3,7 @@ package com.idega.content.presentation;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +35,9 @@ import com.idega.content.business.ContentUtil;
 import com.idega.content.business.WebDAVBeanComparator;
 import com.idega.content.data.WebDAVBean;
 import com.idega.content.repository.download.RepositoryItemDownloader;
+import com.idega.content.repository.stream.business.RepositoryItemStreamer;
+import com.idega.content.repository.stream.presentation.RepositoryItemStreamViewer;
+import com.idega.content.upload.servlet.ContentFileUploadServlet;
 import com.idega.core.search.presentation.SearchResults;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
@@ -41,11 +45,13 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.text.DownloadLink;
+import com.idega.presentation.text.Link;
 import com.idega.repository.RepositoryService;
 import com.idega.repository.bean.RepositoryItem;
 import com.idega.util.ArrayUtil;
 import com.idega.util.CoreConstants;
 import com.idega.util.ListUtil;
+import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFList;
@@ -563,7 +569,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			columns.add(download);
 
 			//	Stream
-			/*UIColumn stream = new UIColumn();
+			UIColumn stream = new UIColumn();
 			stream.setHeader(bundle.getLocalizedUIComponent("stream", iwc.getApplication().createComponent(HtmlOutputText.COMPONENT_TYPE), "Stream"));
 
 			PresentationUtil.addStyleSheetToHeader(iwc, getWebBusiness().getBundleURIToFancyBoxStyleFile());
@@ -575,21 +581,15 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 					"/dwr/interface/" + RepositoryItemStreamer.DWR_OBJECT + ".js"
 			));
 			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, getWebBusiness().getBundleURIsToFancyBoxScriptFiles());
-			PresentationUtil.addJavaScriptActionOnLoad(iwc, "jQuery(window).load(function() {\n" +
-																"jQuery.each(jQuery('a.streamerLink'), function() {\n" +
-																	"var link = jQuery(this);\n" +
-																	"link.fancybox({autoScale: false, autoDimensions: false, width: 450, height: 175});\n" +
-																"});\n" +
-															"});"
-			);
 			Link streamerLink = new Link(iwrb.getLocalizedString("stream", "Stream"), RepositoryItemStreamViewer.class);
 			streamerLink.setTitle(iwrb.getLocalizedString("stream_to_other_server", "Stream to other server"));
 			streamerLink.setValueExpression(RENDERED, WFUtil.createValueExpression(elContext, "#{"+var+".isReal}", Boolean.class));
 			streamerLink.setStyleClass("streamerLink");
 			WFUtil.addParameterVB(streamerLink, PARAMETER_WEB_DAV_URL, var + ".webDavUrl");
+			WFUtil.addParameter(streamerLink, ContentFileUploadServlet.PARAMETER_BINARY_STREAM, Boolean.TRUE.toString());
 
 			stream.getChildren().add(streamerLink);
-			columns.add(stream);*/
+			columns.add(stream);
 		}
 
 		return ArrayUtil.convertListToArray(columns);
@@ -732,8 +732,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 								bean.setIconTheme(this.iconTheme);
 								directories.add(bean);
 							} catch (ClassCastException e) {
-								//cused by 403 Forbidden
-								//Should not stop the list from being shown
+								//	Caused by 403 Forbidden, should not stop the list from being shown
 								LOGGER.log(Level.WARNING, "Error while creating WebDAVBean from resource: " + resource, e);
 							}
 						}
@@ -745,9 +744,8 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		}
 
 		sortResources(directories);
-		if (upBean != null) {
+		if (upBean != null)
 			directories.add(0, upBean);
-		}
 
 		return ArrayUtil.convertListToArray(directories);
 	}

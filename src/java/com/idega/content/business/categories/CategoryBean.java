@@ -23,7 +23,6 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.collections.MapUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.Filter;
@@ -73,10 +72,9 @@ public class CategoryBean {
 	private CategoryBean(IWMainApplication iwma) {
 		this.iwma = iwma;
 		categories = loadCategories();
-		if (MapUtils.isEmpty(categories))
+		if (categories == null)
 			categories = new HashMap<String, ContentCategory>();
 	}
-
 
 	/**
 	 * <p>
@@ -274,7 +272,7 @@ public class CategoryBean {
 		return true;
 	}
 
-	public boolean deleteCategory(String id) {
+    public boolean deleteCategory(String id) {
         try {
             this.categories.remove(id);
         } catch(Exception e) {
@@ -301,7 +299,6 @@ public class CategoryBean {
         if (category == null || language == null || iwc == null) {
             return null;
         }
-
         String name = category.getName(language);
         if (name != null) {
             return name;
@@ -313,5 +310,4 @@ public class CategoryBean {
         }
         return category.getName(defaultLocale.toString());	//	Returning name by default locale or null if such doesn't exist
     }
-
 }

@@ -12,6 +12,8 @@ package com.idega.content.bean;
 import java.sql.Timestamp;
 import java.util.Locale;
 
+import com.idega.presentation.IWContext;
+
 
 /**
  *  <p>
@@ -58,5 +60,7 @@ public interface ContentItem {
 	public void load()throws Exception;
 	public void store()throws Exception;
 	public void delete()throws Exception;
+	public boolean createItemFolder();
+	public boolean createItemFolder(IWContext iwc);
 
 }

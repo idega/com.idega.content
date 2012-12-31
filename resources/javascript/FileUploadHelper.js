@@ -2,6 +2,7 @@ if (!FileUploadHelper) var FileUploadHelper = {};
 
 FileUploadHelper.allUploadedFiles = [];
 FileUploadHelper.uploadedFiles = null;
+FileUploadHelper.uploadingWithFrame = false;
 
 FileUploadHelper.properties = {
 	id: null,
@@ -22,7 +23,8 @@ FileUploadHelper.properties = {
 		FILES_SELECTED: 'files selected',
 		SELECTED_FILE: 'Selected file',
 		FLASH_IS_MISSING: 'Unable to upload file(s): you need to install Flash plug-in',
-		LOADING: 'Loading...'
+		LOADING: 'Loading...',
+		MOVING_DATA_INTO_THE_PLACE: 'Preparing data...'
 	},
 	actionAfterUpload: null,
 	actionAfterCounterReset: null,
@@ -39,7 +41,8 @@ FileUploadHelper.properties = {
 	swfUploadScript: null,
 	swfUploadPlugin: null,
 	needFlash: false,
-	initializeScriptsAction: null
+	initializeScriptsAction: null,
+	failure: false
 }
 
 FileUploadHelper.bytesToUpload = 0;
@@ -65,8 +68,8 @@ FileUploadHelper.initializeFlashUploader = function() {
 	showLoadingMessage(FileUploadHelper.properties.localizations.LOADING);
 	jQuery(jQuery('input.fileUploadAddInputStyle')).hide('fast');
 	LazyLoader.loadMultiple([FileUploadHelper.properties.swfObject, FileUploadHelper.properties.swfUploadScript], function() {
-		if (!swfobject.hasFlashPlayerVersion("9")) {
-			humanMsg.displayMsg(FileUploadHelper.properties.localizations.FLASH_IS_MISSING, {timeOut: 3000});
+		if (swfobject == null || !swfobject.hasFlashPlayerVersion("9")) {
+			closeAllLoadingMessages();
 			return false;
 		}
 		
@@ -143,7 +146,7 @@ FileUploadHelper.initializeFlashUploader = function() {
 						var bytesUploaded = FileUploadHelper.bytesCompleted + bytesCompleted;
 						var progress = bytesUploaded / FileUploadHelper.bytesToUpload * 100;
 						progress = Math.round(progress);
-						FileUploadHelper.updateProgressBar(progress + '', FileUploadHelper.properties.progressBarId, FileUploadHelper.properties.actionAfterCounterReset, false);
+						FileUploadHelper.updateProgressBar(progress + '', FileUploadHelper.properties.progressBarId, FileUploadHelper.properties.actionAfterCounterReset, false, null);
 					},
 					upload_error_handler: function(file, errorCode, message) {
 						FileUploadHelper.bytesToUpload = 0;
@@ -181,13 +184,14 @@ FileUploadHelper.initializeFlashUploader = function() {
 								FileUploadHelper.swfu.addPostParam(input.attr('name'), input.attr('value'));
 							}
 						});
-						closeAllLoadingMessages();
 					}
 				};
 				FileUploadHelper.swfu = new SWFUpload(settings);
 			}
+			closeAllLoadingMessages();
 		} catch (e) {
 			humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED, {timeOut: 3000});
+			closeAllLoadingMessages();
 		}
 	});
 }
@@ -297,16 +301,37 @@ FileUploadHelper.uploadFiles = function() {
 		showLoadingMessage(FileUploadHelper.properties.localizations.UPLOADING_FILE_MESSAGE);
 	}
 	
+	FileUploadHelper.properties.failure = false;
 	var uploadHandler = {
 		upload: function(o) {
-			FileUploadHelper.manageResponse(o.responseText, inputs);
-		}
+			FileUploadHelper.manageResponse(o == null ? null : o.responseText, inputs);
+		},
+		failure: function(o) {
+			FileUploadHelper.properties.failure = true;
+			FileUploadHelper.manageResponse(null, inputs);
+		},
+		timeout: 5000
 	};
 	
+	var fileItemNumber = FileUploadHelper.getFileElementNumber(FileUploadHelper.properties.formId);
 	FileUploadListener.resetFileUploaderCounters(FileUploadHelper.properties.uploadId, FileUploadHelper.properties.maxSize, {
 		callback: function(result) {
-			YAHOO.util.Connect.setForm(FileUploadHelper.properties.formId, true);
-			YAHOO.util.Connect.asyncRequest('POST', '/servlet/ContentFileUploadServlet', uploadHandler);
+			var utilError = false;
+			try {
+				YAHOO.util.Connect.setForm(FileUploadHelper.properties.formId, true);
+				YAHOO.util.Connect.asyncRequest('POST', '/servlet/ContentFileUploadServlet?fileItem=' + fileItemNumber, uploadHandler);
+			} catch (e) {
+				utilError = true;
+			}
+			if (utilError) {
+				FileUploadHelper.uploadingWithFrame = true;
+				jQuery(document.body).append('<iframe style="display: none;" name="uploadFrame">iframe</iframe>');
+				form.enctype = 'multipart/form-data';
+				form.action = '/servlet/ContentFileUploadServlet?fileItem=' + fileItemNumber;
+				form.method = 'post';
+				form.target = 'uploadFrame';
+				form.submit();
+			}
 			
 			FileUploadHelper.prepareProgressBar(function() {
 				showUploadInfoInProgressBar(FileUploadHelper.properties.progressBarId, FileUploadHelper.properties.actionAfterCounterReset);
@@ -315,34 +340,55 @@ FileUploadHelper.uploadFiles = function() {
 	});
 }
 
+FileUploadHelper.getFileElementNumber = function(containerId) {
+	var allElements = jQuery(':input', jQuery('#' + containerId));
+	var needless = 0;
+	for (var index = 0; index < allElements.length; index++) {
+		var element = allElements[index];
+		if (element.name == 'web2FileUploadField')
+			return index - needless;
+		
+		if ((element.type == 'checkbox' || element.type == 'radio') && !element.checked)
+			needless++;
+		else if (element.type == 'submit')
+			needless++;
+	}
+	return -1;
+}
+
 FileUploadHelper.manageResponse = function(response, inputs) {
 	if (response == null) {
-		humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
-		return;
-	}
-			
-	var key = 'web2FilesUploaderFilesListStarts';
-	response = response.substring(response.indexOf(key) + key.length);
-	response = response.replace('</pre>', '');
-	
-	FileUploadHelper.uploadedFiles = response.split(',');
-	if (FileUploadHelper.uploadedFiles == null) {
-		humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
-		return;
-	} else if (FileUploadHelper.uploadedFiles[0].indexOf('error=') != -1) {
-		var firstValue = FileUploadHelper.uploadedFiles[0];
-		var customMessage = firstValue.substr('error='.length);
-		for (var i = 1; i < FileUploadHelper.uploadedFiles.length; i++) {
-			customMessage += FileUploadHelper.uploadedFiles[i];
-			if (i + 1 < FileUploadHelper.uploadedFiles.length)
-				customMessage += ',';
-		}
 		closeAllLoadingMessages();
-		humanMsg.displayMsg(customMessage);
-		return;
-	} else {
-		for (var i = 0; i < FileUploadHelper.uploadedFiles.length; i++) {
-			FileUploadHelper.allUploadedFiles.push(FileUploadHelper.getRealUploadedFile(FileUploadHelper.uploadedFiles[i]));
+		FileUploadHelper.properties.failure = true;
+		humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED, {timeOut: 3000});
+		jQuery('#' + FileUploadHelper.properties.progressBarId).parent().hide('fast');
+		return false;
+	}
+
+	if (response != null) {
+		var key = 'web2FilesUploaderFilesListStarts';
+		response = response.substring(response.indexOf(key) + key.length);
+		response = response.replace('</pre>', '');
+		
+		FileUploadHelper.uploadedFiles = response.split(',');
+		if (FileUploadHelper.uploadedFiles == null) {
+			humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
+			return;
+		} else if (FileUploadHelper.uploadedFiles[0].indexOf('error=') != -1) {
+			var firstValue = FileUploadHelper.uploadedFiles[0];
+			var customMessage = firstValue.substr('error='.length);
+			for (var i = 1; i < FileUploadHelper.uploadedFiles.length; i++) {
+				customMessage += FileUploadHelper.uploadedFiles[i];
+				if (i + 1 < FileUploadHelper.uploadedFiles.length)
+					customMessage += ',';
+			}
+			closeAllLoadingMessages();
+			humanMsg.displayMsg(customMessage);
+			return;
+		} else {
+			for (var i = 0; i < FileUploadHelper.uploadedFiles.length; i++) {
+				FileUploadHelper.allUploadedFiles.push(FileUploadHelper.getRealUploadedFile(FileUploadHelper.uploadedFiles[i]));
+			}
 		}
 	}
 	
@@ -511,35 +557,47 @@ FileUploadHelper.removeAllUploadedFiles = function(fakeFileDeletion) {
 }
 
 function showUploadInfoInProgressBar(progressBarId, actionAfterCounterReset) {
-	fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset);
+	fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset, null);
 }
 
-function fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset) {
+function fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset, intervalId) {
 	FileUploadListener.getFileUploadStatus(FileUploadHelper.properties.uploadId, {
 		callback: function(status) {
-			FileUploadHelper.updateProgressBar(status, progressBarId, actionAfterCounterReset, true);
+			FileUploadHelper.updateProgressBar(FileUploadHelper.properties.failure ? '-1' : status, progressBarId, actionAfterCounterReset, true, intervalId);
 		}
 	});
 }
 
-FileUploadHelper.updateProgressBar = function(progress, progressBarId, actionAfterCounterReset, callAfterTimeOut) {
+FileUploadHelper.updateProgressBar = function(progress, progressBarId, actionAfterCounterReset, callAfterTimeOut, intervalId) {
 	if (progress == null || progress == 0)
 		progress = '0';
 	
 	jQuery('#' + progressBarId).progressBar(progress == '-1' ? '0' : progress);
 
 	if (progress == '100') {
+		if (intervalId != null)
+			window.clearInterval(intervalId);
+		
 		FileUploadHelper.reportUploadStatus(progressBarId, actionAfterCounterReset,
 		FileUploadHelper.properties.localizations.UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT);
+		closeAllLoadingMessages();
+		showLoadingMessage(FileUploadHelper.properties.localizations.MOVING_DATA_INTO_THE_PLACE);
+		if (FileUploadHelper.uploadingWithFrame) {
+			FileUploadHelper.uploadingWithFrame = false;
+			FileUploadHelper.executeActionAfterUploadedToRepository(getInputsForUpload(FileUploadHelper.properties.id));
+		}
 		return false;
 	} else if (progress == '-1') {
+		if (intervalId != null)
+			window.clearInterval(intervalId);
 		FileUploadHelper.reportUploadStatus(progressBarId, actionAfterCounterReset, FileUploadHelper.properties.localizations.UPLOADING_FILE_FAILED);
 		return false;
 	} else if (callAfterTimeOut) {
 		var functionWhileUploading = function() {
-			fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset);
+			fillProgressBoxWithFileUploadInfo(progressBarId, actionAfterCounterReset, intervalId);
 		}
-		window.setTimeout(functionWhileUploading, 750);
+		if (intervalId == null)
+			intervalId = window.setInterval(functionWhileUploading, 750);
 	}
 }
 

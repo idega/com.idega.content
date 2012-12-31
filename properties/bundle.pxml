@@ -7,6 +7,11 @@
       <value>com.idega.content</value>
     </key>
     <key>
+      <name>iw_bundle_starter_class</name>
+      <type>java.lang.String</type>
+      <value>com.idega.content.util.resources.ResourcesDaemon</value>
+    </key>
+    <key>
       <name>iw_components</name>
       <value>
         <map>

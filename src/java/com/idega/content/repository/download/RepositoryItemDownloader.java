@@ -31,15 +31,45 @@ import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
 public class RepositoryItemDownloader extends DownloadWriter {
 
+	public static final String PARAMETER_URL = WebDAVListManagedBean.PARAMETER_WEB_DAV_URL;
 	private static final Logger LOGGER = Logger.getLogger(RepositoryItemDownloader.class.getName());
 
 	private String url, mimeType;
 
-	private boolean folder;
+	private boolean folder, allowAnonymous;
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public boolean isFolder() {
+		return folder;
+	}
+
+	public void setFolder(boolean folder) {
+		this.folder = folder;
+	}
+
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
+
+	public boolean isAllowAnonymous() {
+		return allowAnonymous;
+	}
+
+	public void setAllowAnonymous(boolean allowAnonymous) {
+		this.allowAnonymous = allowAnonymous;
+	}
 
 	@Override
 	public String getMimeType() {
@@ -48,11 +78,13 @@ public class RepositoryItemDownloader extends DownloadWriter {
 
 	@Override
 	public void init(HttpServletRequest req, IWContext iwc) {
-		if (!iwc.isLoggedOn() && !iwc.isSuperAdmin()) {
+		allowAnonymous = iwc.isParameterSet("allowAnonymous") ? Boolean.valueOf(iwc.getParameter("allowAnonymous")) : allowAnonymous;
+
+		if (!allowAnonymous && !iwc.isLoggedOn() && !iwc.isSuperAdmin())
 			return;
-		}
 
 		url = iwc.getParameter(WebDAVListManagedBean.PARAMETER_WEB_DAV_URL);
+		url = url == null ? iwc.getParameter(WebDAVListManagedBean.PARAMETER_WEB_DAV_URL) : url;
 		folder = Boolean.valueOf(iwc.getParameter(WebDAVListManagedBean.PARAMETER_IS_FOLDER));
 		mimeType = folder ? MimeTypeUtil.MIME_TYPE_ZIP : MimeTypeUtil.resolveMimeTypeFromFileName(url);
 	}
@@ -60,6 +92,11 @@ public class RepositoryItemDownloader extends DownloadWriter {
 	@Override
 	public void writeTo(OutputStream out) throws IOException {
 		RepositoryService repository = getRepository();
+		try {
+			repository = getRepository();
+		} catch (IBOLookupException e) {
+			LOGGER.log(Level.SEVERE, "Error getting repository service!", e);
+		}
 
 		if (folder) {
 			User user = CoreUtil.getIWContext().getLoggedInUser();
@@ -83,18 +120,34 @@ public class RepositoryItemDownloader extends DownloadWriter {
 			if (stream == null)
 				return;
 
+			Boolean success = Boolean.TRUE;
 			IWContext iwc = CoreUtil.getIWContext();
-			if (iwc != null) {
+			try {
 				String fileName = getFileName(url);
 				byte[] bytes = IOUtil.getBytesFromInputStream(stream);
 				setAsDownload(iwc, fileName, bytes == null ? 0 : bytes.length);
 				stream = new ByteArrayInputStream(bytes);
+				FileUtil.streamToOutputStream(stream, out);
+			} catch (IOException e) {
+				IOUtil.close(stream);
+				success = Boolean.FALSE;
+				LOGGER.log(Level.WARNING, "Error downloading file: " + url, e);
 			}
-			FileUtil.streamToOutputStream(stream, out);
+
+			if (success) {
+				out.flush();
+				IOUtil.closeOutputStream(out);
+				return;
+			}
+
+			super.writeTo(out);
 		}
 	}
 
 	private String getFileName(String url) {
+		if (StringUtil.isEmpty(url))
+			return CoreConstants.EMPTY;
+
 		String fileName = url;
 		if (fileName.endsWith(CoreConstants.SLASH)) {
 			fileName = fileName.substring(0, fileName.lastIndexOf(CoreConstants.SLASH));
