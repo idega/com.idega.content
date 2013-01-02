@@ -6,12 +6,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.apache.webdav.lib.WebdavResource;
-import org.apache.webdav.lib.WebdavResources;
 import org.directwebremoting.annotations.Param;
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
@@ -39,8 +38,7 @@ import com.idega.presentation.TableHeaderRowGroup;
 import com.idega.presentation.TableRow;
 import com.idega.presentation.text.Heading3;
 import com.idega.presentation.text.Text;
-import com.idega.slide.business.IWSlideService;
-import com.idega.util.ArrayUtil;
+import com.idega.repository.bean.RepositoryItem;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.FileUtil;
@@ -147,8 +145,7 @@ public class RepositoryItemStreamer extends DefaultSpringBean implements DWRAnno
 		uri.setParameter(ContentFileUploadServlet.PARAMETER_BINARY_STREAM, Boolean.TRUE.toString());
 		String url = uri.getUri();
 		try {
-			IWSlideService repository = getServiceInstance(IWSlideService.class);
-			WebdavResource resource = repository.getWebdavResourceAuthenticatedAsRoot(repositoryItem);
+			RepositoryItem resource = getRepositoryService().getRepositoryItemAsRootUser(repositoryItem);
 
 			if (writeItems(resource, url, toFolder, reCreateStructure, uuid)) {
 				result.setId(Boolean.TRUE.toString());
@@ -163,20 +160,16 @@ public class RepositoryItemStreamer extends DefaultSpringBean implements DWRAnno
 		return result;
 	}
 
-	private boolean writeItems(WebdavResource resource, String uri, String toFolder, boolean reCreateStructure, String uuid) throws IOException {
+	private boolean writeItems(RepositoryItem resource, String uri, String toFolder, boolean reCreateStructure, String uuid) throws IOException {
 		if (resource == null || !resource.exists())
 			return false;
 
 		if (resource.isCollection()) {
-			WebdavResources resources = resource.getChildResources();
-			if (resources == null)
-				return false;
-
-			WebdavResource[] childResources = resources.listResources();
-			if (ArrayUtil.isEmpty(childResources))
+			Collection<RepositoryItem> childResources = resource.getChildResources();
+			if (ListUtil.isEmpty(childResources))
 				return true;
 
-			for (WebdavResource childResource: childResources) {
+			for (RepositoryItem childResource: childResources) {
 				if (!writeItems(childResource, uri, toFolder, reCreateStructure, uuid))
 					return false;
 			}
@@ -187,7 +180,7 @@ public class RepositoryItemStreamer extends DefaultSpringBean implements DWRAnno
 		return true;
 	}
 
-	private boolean writeItem(WebdavResource file, String uri, String toFolder, boolean reCreateStructure, String uuid) throws IOException {
+	private boolean writeItem(RepositoryItem file, String uri, String toFolder, boolean reCreateStructure, String uuid) throws IOException {
 		long start = System.nanoTime();
 
 		URL url = new URL(uri);
@@ -205,7 +198,7 @@ public class RepositoryItemStreamer extends DefaultSpringBean implements DWRAnno
 				if (!destination.endsWith(CoreConstants.SLASH))
 					destination = destination.concat(CoreConstants.SLASH);
 			}
-			StreamData data = new StreamData(file.getDisplayName(), destination, uuid, file.getMethodData());
+			StreamData data = new StreamData(file.getName(), destination, uuid, file.getInputStream());
 			byte[] objectData = IOUtil.getBytesFromObject(data);
 
 			connection.setRequestMethod("POST");
