@@ -70,15 +70,7 @@ public class MetadataListManagedBean extends AbstractWFEditableListManagedBean i
 		this.resourcePath = (String)comp.getAttributes().get("resourcePath");
 		String type = WFUtil.getStringValue(var, "type");
 
-//		MetadataValueBean[] ret = new MetadataValueBean[0];
-
 		try {
-//			IWContext iwc = IWContext.getInstance();
-//			IWSlideSession session = IBOLookup.getSessionInstance(iwc,IWSlideSession.class);
-//			IWSlideService service = IBOLookup.getServiceInstance(iwc,IWSlideService.class);
-
-//			WebdavRootResource rootResource = session.getWebdavRootResource();
-
 			String filePath = this.resourcePath;
 			RepositoryService repository = getRepository();
 			String serverURI = repository.getWebdavServerURL();
