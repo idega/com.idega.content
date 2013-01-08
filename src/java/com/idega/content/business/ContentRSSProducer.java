@@ -155,7 +155,7 @@ public class ContentRSSProducer extends RSSAbstractProducer implements RSSProduc
 
 		for (RepositoryItem child: folder.getChildResources()) {
 			String fileName = child.getName();
-			if (!getRepository().isHiddenFile(fileName)){
+			if (!child.isHidden()) {
 				boolean isFolder = child.isCollection();
 
 				entry = new SyndEntryImpl();

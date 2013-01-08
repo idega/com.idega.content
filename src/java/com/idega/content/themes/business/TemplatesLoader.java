@@ -21,7 +21,6 @@ import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.tree.PageTemplate;
 import com.idega.content.tree.SiteTemplate;
 import com.idega.core.cache.IWCacheManager2;
-import com.idega.core.search.business.SearchResult;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWModuleLoader;
 import com.idega.idegaweb.JarLoader;
@@ -204,24 +203,6 @@ public class TemplatesLoader implements JarLoader {
 		    loadTemplatesFromBundles();
 		}
 
-		//	Load from slide
-		String templatesFolder = getSlideTemplatesFolderURI();
-
-		Collection<SearchResult> results = getThemesHelper().search(PAGE_TEMPLATES_XML_FILE_NAME, templatesFolder);
-
-		if (results == null) {
-			return pageTemplates.get(ContentConstants.PAGES_MAP_KEY);
-		}
-
-		String serverURL = iwma.getIWApplicationContext().getDomain().getURL();
-		Document xml = null;
-		for (Iterator<SearchResult> iter = results.iterator(); iter.hasNext();) {
-			xml = getTemplateDocument(iter.next(), serverURL);
-			if (xml != null) {
-				addPageTypesFromDocument(xml);
-			}
-		}
-
 		return pageTemplates.get(ContentConstants.PAGES_MAP_KEY);
 	}
 
@@ -230,23 +211,6 @@ public class TemplatesLoader implements JarLoader {
 
 		if (!siteTemplates.containsKey(ContentConstants.SITE_MAP_KEY)) {
 		    loadTemplatesFromBundles();
-		}
-
-		//	Load from slide
-		String templatesFolder = getSlideTemplatesFolderURI();
-
-		Collection<SearchResult> results = getThemesHelper().search(SITE_TEMPLATES_XML_FILE_NAME, templatesFolder);
-		if (results == null) {
-			return siteTemplates.get(ContentConstants.SITE_MAP_KEY);
-		}
-
-		String serverURL = iwma.getIWApplicationContext().getDomain().getURL();
-		Document xml = null;
-		for (Iterator<SearchResult> it = results.iterator(); it.hasNext();) {
-			xml = getTemplateDocument(it.next(), serverURL);
-			if (xml != null) {
-				addSiteTemplatesFromDocument(xml);
-			}
 		}
 
 		return siteTemplates.get(ContentConstants.SITE_MAP_KEY);
@@ -260,20 +224,6 @@ public class TemplatesLoader implements JarLoader {
 			e.printStackTrace();
 		}
 		return templatesFolder;
-	}
-
-	private Document getTemplateDocument(SearchResult result, String serverName) {
-		if (result == null || serverName == null) {
-			return null;
-		}
-
-		if (result.getSearchResultName().startsWith("._")) {
-			return null;
-		}
-
-		String uri = result.getSearchResultURI();
-		//	Will try to use Slide API by default
-		return getThemesHelper().getXMLDocument(new StringBuffer(serverName).append(uri.substring(1)).toString());
 	}
 
 	protected RepositoryService getRepositoryService() {

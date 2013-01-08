@@ -59,7 +59,6 @@ import com.idega.core.component.data.ICObjectHome;
 import com.idega.core.component.data.ICObjectInstance;
 import com.idega.core.component.data.ICObjectInstanceHome;
 import com.idega.core.file.util.MimeTypeUtil;
-import com.idega.core.search.business.SearchResult;
 import com.idega.data.IDOLookup;
 import com.idega.graphics.image.business.ImageGenerator;
 import com.idega.graphics.image.business.ImageGeneratorImpl;
@@ -1787,19 +1786,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			id = String.valueOf(getRandomNumber(Integer.MAX_VALUE));
 		}
 		return id;
-	}
-
-	@Override
-	public List<SearchResult> search(String searchKey, String searchScope) {
-		if (searchKey == null || searchScope == null) {
-			return null;
-		}
-
-//		ContentSearch search = new ContentSearch(IWMainApplication.getDefaultIWMainApplication());
-//		Collection<SearchResult> results = search.doSimpleDASLSearch(searchKey, searchScope);
-//		return ListUtil.isEmpty(results) ? null : new ArrayList<SearchResult>(results);
-		LOGGER.warning("Not implemented!");
-		return null;
 	}
 
 }

@@ -22,7 +22,6 @@ import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.content.themes.helpers.bean.ThemeStyleGroupMember;
 import com.idega.core.business.DefaultSpringBean;
 import com.idega.core.file.util.MimeTypeUtil;
-import com.idega.core.search.business.SearchResult;
 import com.idega.util.CoreConstants;
 import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
@@ -74,16 +73,15 @@ public class ColourExpressionCalculator extends DefaultSpringBean {
 			searchScope = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(searchScope).toString();
 		}
 
-		List<SearchResult> searchResults = getHelper().search("*_original.css", searchScope);
-		if (searchResults == null || searchResults.isEmpty()) {
-			return null;
-		}
+		getLogger().warning("Search is not implemented. Search for: '*_original.css' in " + searchScope);
+		//List<SearchResult> searchResults = getHelper().search("*_original.css", searchScope);
+		return null;
 
-		List<String> files = new ArrayList<String>();
-		for (SearchResult result: searchResults) {
-			files.add(StringHandler.remove(result.getSearchResultURI(), searchScope));
-		}
-		return files;
+//		List<String> files = new ArrayList<String>();
+//		for (SearchResult result: searchResults) {
+//			files.add(StringHandler.remove(result.getSearchResultURI(), searchScope));
+//		}
+//		return files;
 	}
 
 	protected boolean setValuesToColourFiles(Theme theme) {

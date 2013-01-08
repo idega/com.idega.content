@@ -12,7 +12,6 @@ import com.idega.content.themes.business.ThemesService;
 import com.idega.content.themes.helpers.bean.Setting;
 import com.idega.content.themes.helpers.bean.Theme;
 import com.idega.core.builder.data.ICPage;
-import com.idega.core.search.business.SearchResult;
 import com.idega.graphics.image.business.ImageGenerator;
 import com.idega.presentation.IWContext;
 import com.idega.repository.RepositoryService;
@@ -27,8 +26,6 @@ public interface ThemesHelper {
 	public void searchForThemes(Collection<ICPage> templates);
 
 	public List<String> loadSearchResults(Collection<ICPage> searchResults, List<String> filter);
-
-	public List<SearchResult> search(String searchKey, String searchScope);
 
 	public String getFileName(String uri);
 

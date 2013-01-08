@@ -19,7 +19,6 @@ import javax.jcr.security.Privilege;
 import com.idega.business.IBOLookup;
 import com.idega.content.bean.ContentPathBean;
 import com.idega.content.business.WebDAVFilePermissionResource;
-import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.repository.access.RepositoryPrivilege;
 import com.idega.util.CoreConstants;
@@ -349,10 +348,10 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			this.rootFolder = (String) this.getAttributes().get("rootFolder");
 		}
 
-		Map parameters = context.getExternalContext().getRequestParameterMap();
+		Map<String, String> parameters = context.getExternalContext().getRequestParameterMap();
 
-		String action = (String) parameters.get(PARAMETER_ACTION);
-		String resourceURL = (String) parameters.get(PARAMETER_CONTENT_RESOURCE);
+		String action = parameters.get(PARAMETER_ACTION);
+		String resourceURL = parameters.get(PARAMETER_CONTENT_RESOURCE);
 		if(resourceURL!=null){
 			setCurrentResourcePath(resourceURL);
 		}
@@ -385,9 +384,8 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 
 		String tmp = context.getExternalContext().getRequestParameterMap().get(PARAMETER_ROOT_FOLDER);
 		if (tmp != null) {
-			IWUserContext iwuc = IWContext.getInstance();
 			String webDAVServerURI = getRepositoryService().getWebdavServerURL();
-			tmp = tmp.replaceFirst(webDAVServerURI, "");
+			tmp = tmp.replaceFirst(webDAVServerURI, CoreConstants.EMPTY);
 			WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setWebDAVPath", tmp);
 			this.rootFolder = tmp;
 		}
