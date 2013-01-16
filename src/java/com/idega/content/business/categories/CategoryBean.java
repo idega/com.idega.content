@@ -199,7 +199,7 @@ public class CategoryBean {
 		try {
 			RepositoryService repository = ELUtil.getInstance().getBean(RepositoryService.class);
 			String resourcePath = repository.getURI(CATEGORY_PROPERTIES_FILE);
-			stream = repository.getInputStream(resourcePath);
+			stream = repository.getInputStreamAsRoot(resourcePath);
 			if (stream == null)
 				return Collections.emptyMap();
 

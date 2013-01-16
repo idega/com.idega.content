@@ -625,7 +625,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 					uri = uri.replace(webServer, CoreConstants.EMPTY);
 				}
 				try {
-					return getRepositoryService().getInputStream(uri);
+					return getRepositoryService().getInputStreamAsRoot(uri);
 				} catch (Exception e) {
 					if (printError) {
 						LOGGER.log(Level.WARNING, "Error getting InputStream from: " + uri, e);
