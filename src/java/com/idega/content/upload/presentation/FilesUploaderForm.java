@@ -56,7 +56,7 @@ public class FilesUploaderForm extends Block {
 		container.add(folderChooserContainer);
 		folderChooserContainer.setStyleClass("filesUploaderFolderChooserStyle");
 		DropdownMenu folders = getFolderChooser(iwc);
-		Label selectFolder = new Label(getResourceBundle(iwc).getLocalizedString("select_folder_in_repostory", "Select folder in repository"), folders);
+		Label selectFolder = new Label(getResourceBundle(iwc).getLocalizedString("select_folder_in_repository", "Select folder in repository"), folders);
 		folderChooserContainer.add(selectFolder);
 		folderChooserContainer.add(folders);
 
