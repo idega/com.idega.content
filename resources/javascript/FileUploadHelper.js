@@ -309,8 +309,7 @@ FileUploadHelper.uploadFiles = function() {
 		failure: function(o) {
 			FileUploadHelper.properties.failure = true;
 			FileUploadHelper.manageResponse(null, inputs);
-		},
-		timeout: 5000
+		}
 	};
 	
 	var fileItemNumber = FileUploadHelper.getFileElementNumber(FileUploadHelper.properties.formId);
@@ -581,7 +580,6 @@ FileUploadHelper.updateProgressBar = function(progress, progressBarId, actionAft
 		FileUploadHelper.reportUploadStatus(progressBarId, actionAfterCounterReset,
 		FileUploadHelper.properties.localizations.UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT);
 		closeAllLoadingMessages();
-		showLoadingMessage(FileUploadHelper.properties.localizations.MOVING_DATA_INTO_THE_PLACE);
 		if (FileUploadHelper.uploadingWithFrame) {
 			FileUploadHelper.uploadingWithFrame = false;
 			FileUploadHelper.executeActionAfterUploadedToRepository(getInputsForUpload(FileUploadHelper.properties.id));
