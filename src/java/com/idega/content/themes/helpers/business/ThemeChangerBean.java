@@ -190,7 +190,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 
-		Document doc = helper.getXMLDocument(new StringBuffer(helper.getFullWebRoot()).append(skeleton).toString(), true, false, true);
+		Document doc = helper.getXMLDocument(new StringBuffer(helper.getFullWebRoot()).append(skeleton).toString(), true, false, false);
 		if (doc == null) {
 			LOGGER.log(Level.WARNING, "Document was not created from: " + skeleton);
 			return false;
