@@ -70,6 +70,7 @@ import com.idega.servlet.filter.IWBundleResourceFilter;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.IOUtil;
+import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.xml.XmlUtil;
@@ -115,7 +116,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	private Random numberGenerator = null;
 
 	private ThemesHelperImpl() {
-		themes = new HashMap <String, Theme> ();
+		themes = new HashMap<String, Theme>();
 
 		pageSettings = Collections.synchronizedList(new ArrayList<Setting>());
 		themeSettings = Collections.synchronizedList(new ArrayList<Setting>());
@@ -383,17 +384,23 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	@Override
 	public List<Theme> getAvailableThemes() {
 		Iterator<Theme> it = themes.values().iterator();
-		if (it == null) {
+		if (it == null)
 			return null;
-		}
 
-		List<Theme> availableThemes = new ArrayList<Theme>();
 		Theme theme = null;
+		List<Theme> availableThemes = new ArrayList<Theme>();
 		for (Iterator<Theme> i = it; i.hasNext();) {
 			theme = i.next();
 
-			if (!theme.isLoading() && !theme.isLocked() && theme.isPropertiesExtracted()) {
+			if (!theme.isLoading() && !theme.isLocked() && theme.isPropertiesExtracted())
 				availableThemes.add(theme);
+			else {
+				if (theme.isLoading())
+					getLogger().info("Theme " + theme + " is being loaded");
+				else if (theme.isLocked())
+					getLogger().info("Theme " + theme + " is locked");
+				else if (!theme.isPropertiesExtracted())
+					getLogger().info("Properties for theme " + theme + " are not extracted");
 			}
 		}
 
@@ -409,15 +416,10 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	public List<Theme> getSortedThemes() {
 		List<Theme> availableThemes = getAvailableThemes();
 
-		if (availableThemes == null || availableThemes.isEmpty()) {
+		if (ListUtil.isEmpty(availableThemes))
 			return null;
-		}
 
-		Locale locale = null;
-		IWContext iwc = CoreUtil.getIWContext();
-		if (iwc != null) {
-			locale = iwc.getCurrentLocale();
-		}
+		Locale locale = getCurrentLocale();
 		Collections.sort(availableThemes, new ThemesComparator(locale == null ? Locale.ENGLISH : locale));
 
 		return availableThemes;
@@ -1704,9 +1706,8 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		ImageGenerator imageGenerator = getImageGenerator(null);
 
 		List<BufferedImage> images = imageGenerator.generatePreviews(url, dimensions, isJpg, quality);
-		if (images == null) {
+		if (images == null)
 			return false;
-		}
 
 		String extension = imageGenerator.getFileExtension();
 		String mimeType = new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString();

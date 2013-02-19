@@ -53,9 +53,8 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 
 		//	Preparing new theme(s)
 		for (Theme theme: themesToPrepare) {
-			if (!prepareTheme(theme, pLists, configs, predefinedStyles, useThread)) {
+			if (!prepareTheme(theme, pLists, configs, predefinedStyles, useThread))
 				markThemeAsNotPrepared(theme);
-			}
 		}
 	}
 

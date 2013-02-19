@@ -116,25 +116,24 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 		List<String> pLists = new ArrayList<String>();
 		List<String> configs = null;
 		List<String> predefinedThemeStyles = helper.getPredefinedThemeStyles();
-		for (ICPage template: templates) {
+		for (ICPage template: templates)
 			addPropertiesList(template.getWebDavUri(), pLists);
-		}
-		for (Theme theme: themesCollection) {
+		for (Theme theme: themesCollection)
 			addPropertiesList(theme.getLinkToSkeleton(), pLists);
-		}
 
 		//	Exists some themes, preparing for usage
 		try {
 			getThemesPropertiesExtractor().prepareThemes(pLists, configs, new ArrayList<String>(predefinedThemeStyles), false);
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Error preparing theme(s): plists: " + pLists + ", configs: " + configs + ", predefined styles: " + predefinedThemeStyles, e);
+			LOGGER.log(Level.WARNING, "Error preparing theme(s): plists: " + pLists + ", configs: " + configs + ", predefined styles: " +
+					predefinedThemeStyles, e);
 			return null;
 		}
 
 		List<Theme> themes = helper.getSortedThemes();
-		if (themes == null) {
+		if (themes == null)
 			return null;
-		}
+
 		SimplifiedTheme simpleTheme = null;
 		for (Theme theme: themes) {
 			simpleTheme = getSimpleTheme(theme);
