@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 import javax.faces.model.SelectItem;
 
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -96,6 +96,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 	@Autowired
 	private ThemesHelper themesHelper;
 
+	@Override
 	public String getJavaScriptResources() {
 		//	DWR
 		StringBuilder js = new StringBuilder(CoreConstants.DWR_UTIL_SCRIPT).append(CoreConstants.COMMA);
@@ -124,6 +125,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return js.toString();
 	}
 
+	@Override
 	public String getJavaScriptResourcesForThemes() {
 		StringBuilder js = new StringBuilder();
 
@@ -152,10 +154,12 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return js.toString();
 	}
 
+	@Override
 	public String getStyleSheetResources() {
 		return ContentUtil.getBundle().getVirtualPathWithFileNameString("style/content.css");
 	}
 
+	@Override
 	public String getStyleSheetResourcesForThemes() {
 		return new StringBuilder(ContentUtil.getBundle().getVirtualPathWithFileNameString("style/content.css")).append(CoreConstants.COMMA)
 								.append(web2.getBundleUriToMooRainbowStyle()).append(CoreConstants.COMMA)
@@ -195,6 +199,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return resources;
 	}
 
+	@Override
 	public List<String> getPermissionWindowResources() {
 		List<String> resources = getThickBoxResources();
 
@@ -204,6 +209,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return resources;
 	}
 
+	@Override
 	public List<String> getPropertiesWindowResources() {
 		List<String> resources = getThickBoxResources();
 
@@ -217,6 +223,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return resources;
 	}
 
+	@Override
 	public boolean isContentEditor() {
 		if (isSuperAdmin()) {
 			return true;
@@ -231,6 +238,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return false;
 	}
 
+	@Override
 	public boolean isSuperAdmin() {
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
@@ -249,6 +257,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return iwc.isSuperAdmin();
 	}
 
+	@Override
 	public Collection<SelectItem> getAvailableLocales() {
 		List<SelectItem> availableLocales = new ArrayList<SelectItem>();
 
@@ -278,6 +287,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return availableLocales;
 	}
 
+	@Override
 	public boolean setLocale(String locale) {
 		if (StringUtil.isEmpty(locale)) {
 			return false;
@@ -297,6 +307,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return false;
 	}
 
+	@Override
 	public String getCurrentLocaleValue() {
 		IWContext iwc = getThemesEngine().getContextAndCheckRights();
 		if (iwc != null) {
@@ -308,10 +319,11 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return String.valueOf(-1);
 	}
 
+	@Override
 	public String changePageUri(String pageKey, String pageUri, boolean needSetPageTitle) {
 		return changePageUri(pageKey, pageUri, ":method:1:implied:void:setTitle:java.lang.String:", needSetPageTitle);
 	}
-	
+
 	private String changePageUri(String pageKey, String pageUri, String methodName, boolean needSetPageTitle) {
 		if (pageKey == null || pageUri == null) {
 			return null;
@@ -332,7 +344,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		if (needSetPageTitle) {
 			if (!setPageTitle(pageKey, pageUri, methodName))
 				return null;
-			
+
 			IWContext iwc = CoreUtil.getIWContext();
 			Locale currentLocale = iwc.getCurrentLocale();
 			IWMainApplication iwma = iwc.getIWMainApplication();
@@ -371,6 +383,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return null;
 	}
 
+	@Override
 	public boolean setNewLinkInArticleFile(String pageKey, String moduleClass, String pageUri) {
 		if (pageKey == null || moduleClass == null || pageUri == null) {
 			return false;
@@ -417,6 +430,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return result;
 	}
 
+	@Override
 	public String savePageInfo(String pageKey, String[] keywords, String[] values) {
 		if (pageKey == null || keywords == null || values == null) {
 			return null;
@@ -508,6 +522,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return changedPageUri;
 	}
 
+	@Override
 	public String[] getPageInfoValues(String pageKey, String[] keywords) {
 		if (pageKey == null || keywords == null) {
 			return null;
@@ -573,6 +588,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return ArrayUtil.convertListToArray(values);
 	}
 
+	@Override
 	public String[] getPageInfoElements() {
 		Collection<Setting> c = getThemesHelper().getPageSettings();
 		if (c == null) {
@@ -581,6 +597,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return getElements(c);
 	}
 
+	@Override
 	public String[] getSiteInfoElements() {
 		Collection <Setting> c = getThemesHelper().getThemeSettings();
 		if (c == null) {
@@ -589,6 +606,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return getElements(c);
 	}
 
+	@Override
 	public String[] getSiteInfoValues(String[] keywords, String language) {
 		if (keywords == null || language == null) {
 			return null;
@@ -607,6 +625,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return values;
 	}
 
+	@Override
 	public String getSiteInfoValue(String keyword, String language, IWMainApplicationSettings settings, ICDomain domain) {
 		if (keyword == null || language == null || settings == null) {
 			return ThemesConstants.EMPTY;
@@ -719,6 +738,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return true;
 	}
 
+	@Override
 	public boolean saveSiteInfoValue(String keyword, String value) {
 		if (keyword == null || value == null) {
 			return false;
@@ -744,6 +764,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return saveSiteInfoValue(language, keyword, value, appl.getSettings(), null, cachedDomain);
 	}
 
+	@Override
 	public boolean saveSiteInfo(String language, String[] keywords, String[] values) {
 		if (language == null || keywords == null || values == null) {
 			return false;
@@ -765,6 +786,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return true;
 	}
 
+	@Override
 	public List <String> createPage(List<TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, List<String> followingNodes) {
 		List <String> newIds = new ArrayList<String>();
 
@@ -938,10 +960,12 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return id;
 	}
 
+	@Override
 	public boolean deletePage(String pageId, boolean deleteChildren) {
 		return deletePageAndDecrease(pageId, deleteChildren, null);
 	}
 
+	@Override
 	public boolean deletePageAndDecrease(String pageId, boolean deleteChildren, List<String> followingNodes) {
 		if (pageId == null) {
 			return false;
@@ -971,6 +995,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return page.getDeleted();
 	}
 
+	@Override
 	public String getPageIdByUri(String uri) {
 		if (uri == null) {
 			return null;
@@ -984,6 +1009,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return null;
 	}
 
+	@Override
 	public String getPageId() {
 		String id = getThemesHelper().getLastVisitedPage();
 		if (id != null) {
@@ -1006,6 +1032,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return id;
 	}
 
+	@Override
 	public boolean setPageId(String id) {
 		if (id == null) {
 			return false;
@@ -1014,6 +1041,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return true;
 	}
 
+	@Override
 	public boolean movePage(int newParentId, int nodeId, int numberInLevel, List<String> nodesToIncrease, List<String> nodesToDecrease) {
 		IWContext iwc = getThemesEngine().getContextAndCheckRights();
 		boolean result = false;
@@ -1050,10 +1078,12 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return result;
 	}
 
+	@Override
 	public String getPathToImageFolder(){
 		return getPathToImagesFolder();
 	}
 
+	@Override
 	public boolean isStartPage(String pageKey) {
 		if (pageKey == null) {
 			pageKey = getThemesHelper().getLastVisitedPage();
@@ -1077,6 +1107,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return false;
 	}
 
+	@Override
 	public boolean setAsStartPage(String pageKey) {
 		if (pageKey == null) {
 			return false;
@@ -1184,6 +1215,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return true;
 	}
 
+	@Override
 	public String createRootTemplate(ICDomain domain, BuilderService builder, int domainID, String format) {
 		ICPage startTemplate = domain.getStartTemplate();
 		if (startTemplate != null && !startTemplate.getDeleted()) {
@@ -1274,6 +1306,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return -1;
 	}
 
+	@Override
 	public boolean initializeCachedDomain(String domainName, ICDomain domain) {
 		ICDomain cachedDomain = IWMainApplication.getDefaultIWMainApplication().getIWApplicationContext().getDomain();
 		if (cachedDomain.getDomainName() == null) {
@@ -1484,6 +1517,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return true;
 	}
 
+	@Override
 	public boolean canUserActAsBuilderUser() {
 		IWContext iwc = getThemesEngine().getContextAndCheckRights();
 		if (iwc == null) {
@@ -1505,6 +1539,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return iwc.hasRole(StandardRoles.ROLE_KEY_EDITOR) || iwc.hasRole(StandardRoles.ROLE_KEY_AUTHOR);
 	}
 
+	@Override
 	public String getPageUri(String pageKey) {
 		if (pageKey == null || ThemesConstants.MINUS_ONE.equals(pageKey)) {
 			return null;
@@ -1531,6 +1566,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return uri;
 	}
 
+	@Override
 	public boolean changePageName(int id, String newName) {
 		IWContext iwc = getThemesEngine().getContextAndCheckRights();
 		if (iwc == null) {
@@ -1560,6 +1596,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return false;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public boolean deleteArticlesFromDeletedPages(String pageKey) {
 		if (pageKey == null) {
@@ -1635,6 +1672,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return checker.deleteDummyArticles(paths);
 	}
 
+	@Override
 	public boolean deleteArticle(String resourcePath) {
 		if (resourcePath == null) {
 			return false;
@@ -1652,6 +1690,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return checker.deleteContentItem(resourcePath, iwc.getCurrentLocale());
 	}
 
+	@Override
 	public Document getRenderedPageInfo(String pageKey, String id, String styleClass) {
 		PageInfo pageInfo = new PageInfo();
 		pageInfo.setPageKey(pageKey);
@@ -1662,6 +1701,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 				pageInfo, false);
 	}
 
+	@Override
 	public Document getReRenderedSiteInfo(String id, String styleClass) {
 		SiteInfo siteInfo = new SiteInfo();
 		siteInfo.setId(id);
@@ -1671,6 +1711,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 				siteInfo, false);
 	}
 
+	@Override
 	public List<PageAccessibilityProperty> getPageAccessibilityProperties(String pageKey) {
 		if (pageKey == null) {
 			return null;
@@ -1721,6 +1762,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return properties;
 	}
 
+	@Override
 	public boolean setPageAccessibilityProperty(String pageKey, String code, String value, String columnName) {
 		if (pageKey == null || code == null || columnName == null) {
 			return false;
@@ -1767,10 +1809,11 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 
 		if (!changePageName(Integer.valueOf(pageID), title, iwc))
 			return false;
-		
+
 		return getThemesHelper().getThemesService().getBuilderService().setProperty(pageID, ThemesConstants.MINUS_ONE, method, new String[]{title}, appl);
 	}
 
+	@Override
 	public String changePageUriAfterPageWasMoved(String pageKey) {
 		if (pageKey == null) {
 			return null;
@@ -1930,6 +1973,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		return getBuilderLogic().getBuilderService(IWMainApplication.getDefaultIWApplicationContext());
 	}
 
+	@Override
 	public LucidApplicationInfo getStartInfo(Boolean fullInfo) {
 		LucidApplicationInfo info = new LucidApplicationInfo();
 		IWContext iwc = getThemesEngine().getContextAndCheckRights();

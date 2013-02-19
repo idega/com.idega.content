@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.jdom.Document;
+import org.jdom2.Document;
 
 import com.idega.business.SpringBeanName;
 import com.idega.content.themes.business.ThemesService;

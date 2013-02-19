@@ -30,10 +30,10 @@ import java.util.logging.Logger;
 import javax.ejb.FinderException;
 import javax.jcr.RepositoryException;
 
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.rss.business.EntryData;
@@ -557,7 +557,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		loadedPageSettings = true;
 	}
 
-	@SuppressWarnings("unchecked")
 	private void loadSettings(List<Setting> settings, Document doc) {
 		if (doc == null) {
 			return;
@@ -1120,7 +1119,6 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return articleViewers;
 	}
 
-	@SuppressWarnings("unchecked")
 	private Attribute getArticleViewerResourcePathValueAttribute(Element articleViewer) {
 		if (articleViewer == null) {
 			return null;

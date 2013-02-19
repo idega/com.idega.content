@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -348,7 +348,6 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean parsePredefinedStyle(Theme theme, String uri) {
 		if (theme == null || uri == null) {
 			return false;
@@ -430,7 +429,6 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean extractProperties(Theme theme, String link) {
 		Document doc = getHelper().getXMLDocument(link);
 		if (doc == null) {
@@ -446,7 +444,6 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return extractStyles(theme, ThemesConstants.RW_STYLE_VARIATIONS, base.getChildren());
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean extractColourFiles(Theme theme, String tagValue, Element root) {
 		if (theme == null || root == null) {
 			return false;
@@ -524,7 +521,6 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	private String getValueFromNextElement(String parentElementValue, Element baseElement) {
 		String value = ThemesConstants.EMPTY;
 		if (baseElement == null) {
@@ -579,7 +575,6 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean extractStyleVariations(Theme theme, String styleGroupName, List<Element> styleVariations, boolean limitedSelection) {
 		if (styleVariations == null) {
 			return false;
@@ -650,7 +645,6 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return styleGroupsBase.getChildren(ThemesConstants.TAG_DICT);
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<Element> getStyleGroupElements(Element style) {
 		if (style == null) {
 			return null;
@@ -665,7 +659,6 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return styleElements.getChildren();
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean extractStyleVariationFiles(ThemeStyleGroupMember member, Element styleFiles, String linkToBase) {
 		if (styleFiles == null || linkToBase == null) {
 			return false;
@@ -690,7 +683,6 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean extractConfiguration(Theme theme, String link) {
 		Document doc = getHelper().getXMLDocument(link);
 		if (doc == null || theme == null) {
@@ -754,7 +746,6 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<String> getParsedColourFiles(Element parentElement) {
 		if (parentElement == null) {
 			return null;
@@ -773,7 +764,6 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		return parsedFiles;
 	}
 
-	@SuppressWarnings("unchecked")
 	private void loadExtraRegions(Theme theme, Element regions) {
 		if (theme == null || regions == null) {
 			return;

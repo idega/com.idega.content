@@ -14,22 +14,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.jdom.Attribute;
-import org.jdom.Element;
-import org.jdom.Namespace;
-
+import org.jdom2.Attribute;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 
 /**
  * Describes a category
- * 
+ *
  * @author <a href="mailto:gediminas@idega.com">Gediminas Paulauskas</a>
  */
 public class ContentCategory {
-	
+
 	private String id;
 	private boolean disabled = false;
 	private Map<String, String> names;
-	
+
 	private ContentCategory() {
 	}
 
@@ -38,7 +37,7 @@ public class ContentCategory {
 		this.id = id;
 		this.names = new HashMap<String, String>();
 	}
-	
+
 	/**
 	 * @param cat
 	 */
@@ -49,27 +48,27 @@ public class ContentCategory {
 	public String getId() {
 		return this.id;
 	}
-	
+
 	public void setId(String id) {
 		this.id = id;
 	}
-	
+
 	public boolean isDisabled() {
 		return this.disabled;
 	}
-	
+
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
 	}
-	
+
 	public Map<String, String> getNames() {
 		return this.names;
 	}
-	
+
 	public void setNames(Map<String, String> names) {
 		this.names = names;
 	}
-	
+
 	public String getName(String lang) {
 		String name = getNames().get(lang);
 		if (name == null) {
@@ -83,7 +82,7 @@ public class ContentCategory {
 				name = getName(lang.substring(0, i - 1));
 			}
 		}
-		
+
 		if (name == null) {
 			String key = null;
 			for (Iterator<String> it = getNames().keySet().iterator(); (name == null && it.hasNext());) {
@@ -93,7 +92,7 @@ public class ContentCategory {
 				}
 			}
 		}
-		
+
 		if (name == null) {
 			//	Didn't find name by locale, will try to get any localized name
 			Map<String, String> allNames = getNames();
@@ -104,10 +103,10 @@ public class ContentCategory {
 				}
 			}
 		}
-		
+
 		return name;
 	}
-	
+
 	public void addName(String lang, String name) {
 		getNames().put(lang, name);
 	}
@@ -122,7 +121,6 @@ public class ContentCategory {
 			this.disabled = false;
 		}
 		this.names = new HashMap<String, String>();
-		@SuppressWarnings("unchecked")
 		List<Element> namesEl = cat.getChildren("name");
 		for (Iterator<Element> iter = namesEl.iterator(); iter.hasNext(); ) {
 			Element name = iter.next();
@@ -132,7 +130,7 @@ public class ContentCategory {
 		}
 
 	}
-	
+
 	public Element getAsXML() {
 		Element cat = new Element("category");
 		cat.setAttribute("id", getId());
@@ -149,10 +147,10 @@ public class ContentCategory {
 		}
 		return cat;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Category with ID " + getId() + ", names: " + getNames() + ", disabled: " + isDisabled();
 	}
-	
+
 }

@@ -12,8 +12,8 @@ import java.util.TreeMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.content.business.ContentConstants;
@@ -110,7 +110,6 @@ public class TemplatesLoader implements JarLoader {
 	 * A generic way to add page types from an xml Document
 	 * @param pageDocument
 	 */
-	@SuppressWarnings("unchecked")
 	public void addPageTypesFromDocument(Document pageDocument) {
 		Element root = pageDocument.getRootElement();
 		Collection<Element> siteRoot = root.getChildren();
@@ -139,7 +138,6 @@ public class TemplatesLoader implements JarLoader {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public void addSiteTemplatesFromDocument(Document siteTemplateDocument) {
 		SortedMap<String, SiteTemplate> siteMap = null;
 		Map<String, SortedMap<String, SiteTemplate>> siteTemplatesFromCache = IWCacheManager2.getInstance(iwma).getCache(SITE_TEMPLATES_CACHE_KEY);
@@ -162,7 +160,7 @@ public class TemplatesLoader implements JarLoader {
 			SiteTemplate siteStruct = new SiteTemplate();
 			siteTemplate = it.next();
 			String panelName = siteTemplate.getAttributeValue("name");
-			Element structure = (Element) siteTemplate.getChildren().get(0);
+			Element structure = siteTemplate.getChildren().get(0);
 			siteStruct = getNode(structure);
 			siteMap.put(panelName, siteStruct);
 		}

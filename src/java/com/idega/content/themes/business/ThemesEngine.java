@@ -3,7 +3,7 @@ package com.idega.content.themes.business;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import org.jdom.Document;
+import org.jdom2.Document;
 
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.content.themes.helpers.bean.SimplifiedTheme;
@@ -14,14 +14,14 @@ import com.idega.core.builder.business.BuilderService;
 import com.idega.presentation.IWContext;
 
 public interface ThemesEngine {
-	
+
 	public static final String SPRING_BEAN_IDENTIFIER = "themesEngine";
-	
+
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getThemes
 	 */
 	public List<SimplifiedTheme> getThemes();
-	
+
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#getTheme
 	 */
@@ -56,46 +56,46 @@ public interface ThemesEngine {
 	 * @see com.idega.content.themes.business.ThemesEngineBean#applyMultipleChangesToTheme
 	 */
 	public String applyMultipleChangesToTheme(String themeKey, List<ThemeChange> changes, String themeName) throws RemoteException;
-	
+
 	/**
 	 * @see com.idega.content.themes.business.ThemesEngineBean#clearVariationFromCache
 	 */
 	public boolean clearVariationFromCache(String themeKey, IWContext iwc);
-	
+
 	/**
 	 * @see ThemesEngineBean#reloadThemeProperties
 	 */
 	public String reloadThemeProperties(String themeKey);
-	
+
 	public void updateSiteTemplatesTree(boolean sendToAllSessions);
-	
+
 	public String createChildTemplateForThisTemplate(String parentTemplateKey);
-	
+
 	public Document getUpdatedSiteTree();
-	
+
 	public Document getUpdatedSiteTemplatesTree();
-	
+
 	public boolean deleteTheme(String themeId);
-	
+
 	public boolean deleteAllThemes();
-	
+
 	public boolean setBuiltInStyle(String themeId, String builtInStyleId);
-	
+
 	public ThemeChanger getThemeChanger();
-	
+
 	public ThemesPropertiesExtractor getThemesPropertiesExtractor();
-	
+
 	public IWContext getContextAndCheckRights();
-	
+
 	public void updateSiteTree(boolean useThreads);
-	
+
 	public void updateSiteTree(boolean updateAllSessions, boolean useThreads);
-	
+
 	public void setLastUsedTemplate(String pageKey);
-	
+
 	public void setLastUsedTemplate(String pageKey, String templateKey);
-	
+
 	public boolean addExtraRegionToPage(String pageKey, AdvancedProperty region, BuilderService service);
-	
+
 	public boolean clearVariationFromCache(String themeID);
 }

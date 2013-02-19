@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.faces.model.SelectItem;
 
-import org.jdom.Document;
+import org.jdom2.Document;
 
 import com.idega.content.lucid.bean.LucidApplicationInfo;
 import com.idega.content.themes.helpers.bean.PageAccessibilityProperty;
@@ -19,29 +19,29 @@ import com.idega.idegaweb.IWMainApplicationSettings;
 public interface LucidEngine extends Serializable {
 
 	public static final String SPRING_BEAN_IDENTIFIER = "lucidEngine";
-	
+
 	public String getJavaScriptResources();
-	
+
 	public String getStyleSheetResources();
-	
+
 	public String getJavaScriptResourcesForThemes();
-	
+
 	public String getStyleSheetResourcesForThemes();
-	
+
 	public List<String> getPermissionWindowResources();
-	
+
 	public List<String> getPropertiesWindowResources();
-	
+
 	public boolean isContentEditor();
-	
+
 	public boolean isSuperAdmin();
-	
+
 	public boolean setLocale(String locale);
-	
+
 	public Collection<SelectItem> getAvailableLocales();
-	
+
 	public String getCurrentLocaleValue();
-	
+
 	/** From ThemesEngine **/
 	public String changePageUri(String pageKey, String pageTitle, boolean needSetPageTitle) throws RemoteException;
 
@@ -50,9 +50,9 @@ public interface LucidEngine extends Serializable {
 	public String savePageInfo(String pageKey, String[] keywords, String[] values) throws RemoteException;
 
 	public String[] getPageInfoValues(String pageKey, String[] keywords) throws RemoteException;
-	
+
 	public String[] getPageInfoElements() throws RemoteException;
-	
+
 	public String[] getSiteInfoElements() throws RemoteException;
 
 	public String[] getSiteInfoValues(String[] keywords, String language) throws RemoteException;
@@ -60,7 +60,7 @@ public interface LucidEngine extends Serializable {
 	public String getSiteInfoValue(String keyword, String language, IWMainApplicationSettings settings, ICDomain domain);
 
 	public boolean saveSiteInfoValue(String keyword, String value) throws RemoteException;
-	
+
 	public List<String> createPage(List<TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, List<String> followingNodes) throws RemoteException;
 
 	public boolean deletePage(String pageKey, boolean deleteChildren) throws RemoteException;
@@ -74,7 +74,7 @@ public interface LucidEngine extends Serializable {
 	public boolean movePage(int newParentId, int nodeId, int numberInLevel, List<String> nodesToIncrease, List<String> nodesToDecrease) throws RemoteException;
 
 	public String getPathToImageFolder() throws RemoteException;
-	
+
 	public boolean saveSiteInfo(String language, String[] keywords, String[] values);
 
 	public boolean isStartPage(String pageKey) throws RemoteException;
@@ -84,29 +84,29 @@ public interface LucidEngine extends Serializable {
 	public String createRootTemplate(ICDomain domain, BuilderService builder, int domainID, String format);
 
 	public boolean initializeCachedDomain(String domainName, ICDomain domain);
-	
+
 	public boolean canUserActAsBuilderUser();
 
 	public String getPageUri(String pageKey);
-	
+
 	public boolean changePageName(int id, String newName);
-	
+
 	public boolean deleteArticlesFromDeletedPages(String pageKey);
-	
+
 	public boolean deleteArticle(String resourcePath);
-	
+
 	public Document getRenderedPageInfo(String pageKey, String id, String styleClass);
-	
+
 	public String changePageUriAfterPageWasMoved(String pageKey);
-	
+
 	public Document getReRenderedSiteInfo(String id, String styleClass);
-	
+
 	public String getPageIdByUri(String uri);
-	
+
 	public List<PageAccessibilityProperty> getPageAccessibilityProperties(String pageKey);
-	
+
 	public boolean setPageAccessibilityProperty(String pageKey, String code, String value, String columnName);
 	/** END from ThemesEngine **/
-	
+
 	public LucidApplicationInfo getStartInfo(Boolean fullInfo);
 }

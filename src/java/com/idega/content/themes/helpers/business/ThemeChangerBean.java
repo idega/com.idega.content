@@ -18,13 +18,13 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jdom.Attribute;
-import org.jdom.Comment;
-import org.jdom.Content;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.Text;
+import org.jdom2.Attribute;
+import org.jdom2.Comment;
+import org.jdom2.Content;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.Text;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -235,7 +235,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		return e;
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<Element> getChildren(Element parent, String name) {
 		if (parent == null || name == null) {
 			return null;
@@ -266,15 +265,12 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @return boolean
 	 */
 	private boolean proceedHeadContent(String linkToBase, Element head) {
-		if (linkToBase == null || head == null) {
+		if (linkToBase == null || head == null)
 			return false;
-		}
-		@SuppressWarnings("rawtypes")
-		List headElements = head.getContent();
 
-		if (headElements == null) {
+		List<Content> headElements = head.getContent();
+		if (headElements == null)
 			return false;
-		}
 
 		Object o = null;
 		List<Text> textElements = new ArrayList<Text>();
@@ -309,8 +305,7 @@ public class ThemeChangerBean implements ThemeChanger {
 
 		//	Adding fake (comment) element to <script> - to get <script ...></script> in HTML code
 		//	Checking <link> tags in head
-		@SuppressWarnings("rawtypes")
-		List elements = head.getContent();
+		List<Content> elements = head.getContent();
 		o = null;
 		Element element = null;
 		if (elements != null) {
@@ -355,8 +350,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return false;
 		}
 
-		@SuppressWarnings("rawtypes")
-		List links = XmlUtil.getElementsByXPath(root, ThemesConstants.LINK_TAG_INSTRUCTION, root.getNamespace());
+		List<Element> links = XmlUtil.getElementsByXPath(root, ThemesConstants.LINK_TAG_INSTRUCTION, root.getNamespace());
 		if (links == null) {
 			return true;
 		}
@@ -685,7 +679,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param attributeValue
 	 * @return index
 	 */
-	private int getElementIndex(@SuppressWarnings("rawtypes") List contents, String attributeType, String attributeValue) {
+	private int getElementIndex(List<Content> contents, String attributeType, String attributeValue) {
 		int index = 0;
 		if (contents == null) {
 			return index;
@@ -820,8 +814,7 @@ public class ThemeChangerBean implements ThemeChanger {
 			return;
 		}
 
-		@SuppressWarnings("rawtypes")
-		List attributes = e.getAttributes();
+		List<Attribute> attributes = e.getAttributes();
 		if (attributes == null) {
 			return;
 		}
@@ -933,7 +926,6 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @param value
 	 * @return boolean
 	 */
-	@SuppressWarnings("unchecked")
 	private boolean needAddRegion(Element e, List<String> regions, String value) {
 		if (e == null || regions == null || value == null) {
 			return false;
@@ -989,8 +981,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		fixTag(body, ThemesConstants.EMBED_TAG_INSTRUCTION, "src", linkToBase);
 
 		List<Text> needlessText = new ArrayList<Text>();
-		@SuppressWarnings("rawtypes")
-		List content = body.getContent();
+		List<Content> content = body.getContent();
 		if (content == null) {
 			return true;
 		}
@@ -1400,16 +1391,14 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 
 		if (checkContentOnly) {
-			@SuppressWarnings("rawtypes")
-			List content = e.getContent();
+			List<Content> content = e.getContent();
 			if (ListUtil.isEmpty(content)) {
 				return false;
 			}
 			return true;
 		}
 
-		@SuppressWarnings("rawtypes")
-		List children = e.getChildren();
+		List<Element> children = e.getChildren();
 		if (ListUtil.isEmpty(children)) {
 			return false;
 		}
@@ -1417,7 +1406,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean fixSiteRegion(Element e, String heading, String headingKeyword) {
 		if (e == null || heading == null) {
 			return false;
@@ -1429,7 +1417,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 
 		String propKey = new StringBuilder(ThemesConstants.THEMES_PROPERTY_START).append(headingKeyword).append(ThemesConstants.THEMES_PROPERTY_END).toString();
-		Collection<Object> contents = null;
+		List<Content> contents = null;
 		List<Text> oldTexts = null;
 		for (Element headingElement: headings) {
 			String text = headingElement.getTextNormalize();
@@ -2004,7 +1992,6 @@ public class ThemeChangerBean implements ThemeChanger {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean setDefaultStylesToTheme(Theme theme) {
 		if (theme == null) {
 			return false;

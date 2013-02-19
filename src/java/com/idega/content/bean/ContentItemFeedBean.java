@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jdom.Document;
+import org.jdom2.Document;
 
 import com.idega.block.rss.business.EntryData;
 import com.idega.block.rss.business.RSSBusiness;

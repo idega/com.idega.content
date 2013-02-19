@@ -15,7 +15,7 @@ import javax.faces.component.UIComponent;
 
 import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.web2.business.JQuery;

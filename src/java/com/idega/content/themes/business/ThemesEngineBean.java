@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import org.apache.myfaces.custom.tree2.TreeNode;
 import org.directwebremoting.ScriptBuffer;
 import org.directwebremoting.WebContextFactory;
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationEvent;

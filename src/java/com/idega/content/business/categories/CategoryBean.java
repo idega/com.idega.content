@@ -23,10 +23,11 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.filter.Filter;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.ElementFilter;
+import org.jdom2.filter.Filter;
+import org.jdom2.input.SAXBuilder;
 
 import com.idega.content.data.CategoryComparator;
 import com.idega.content.data.ContentCategory;
@@ -206,21 +207,8 @@ public class CategoryBean {
 			SAXBuilder builder = new SAXBuilder();
 			Document document = builder.build(stream);
 			Element root = document.getRootElement();
-			@SuppressWarnings("unchecked")
-			Iterator<Element> cats = root.getDescendants(new Filter() {
-				private static final long serialVersionUID = -770863167981394206L;
-
-				@Override
-				public boolean matches(Object obj) {
-					if (obj instanceof Element) {
-						Element elem = (Element) obj;
-						if ("category".equals(elem.getName())) {
-							return true;
-						}
-					}
-					return false;
-				}
-			});
+			Filter<Element> filter = new ElementFilter("category");
+			Iterator<Element> cats = root.getDescendants(filter);
 			for (Iterator<Element> catIter = cats; catIter.hasNext();) {
 				Element cat = catIter.next();
 				ContentCategory category = new ContentCategory(cat);
