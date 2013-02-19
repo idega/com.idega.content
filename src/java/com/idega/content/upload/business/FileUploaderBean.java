@@ -42,6 +42,7 @@ import com.idega.presentation.text.Lists;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.FileInput;
 import com.idega.repository.bean.RepositoryItem;
+import com.idega.user.data.bean.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.IOUtil;
@@ -515,8 +516,9 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 
 	private RepositoryItem getResource(IWContext iwc, String fileInRepository, boolean fakeFileDeletion) {
 		try {
-			return fakeFileDeletion ?	getRepositoryService().getRepositoryItemAsRootUser(fileInRepository) :
-										getRepositoryService().getRepositoryItem(getCurrentUser(), fileInRepository);
+			User currentUser = getCurrentUser();
+			return currentUser == null && fakeFileDeletion ?	getRepositoryService().getRepositoryItemAsRootUser(fileInRepository) :
+																getRepositoryService().getRepositoryItem(currentUser, fileInRepository);
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error getting file: " + fileInRepository, e);
 		}
