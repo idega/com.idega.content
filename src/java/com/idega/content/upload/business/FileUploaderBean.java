@@ -426,39 +426,39 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 		List<String> results = new ArrayList<String>(files.size() + 1);
 
 		Lists list = new Lists();
-		for (String fileInSlide: files) {
-			if (StringUtil.isEmpty(fileInSlide) || fileInSlide.indexOf(CoreConstants.DOT) == -1)
+		for (String fileInRepository: files) {
+			if (StringUtil.isEmpty(fileInRepository) || fileInRepository.indexOf(CoreConstants.DOT) == -1)
 				continue;
 
 			ListItem listItem = new ListItem();
 
-			int index = fileInSlide.lastIndexOf(File.separator);
+			int index = fileInRepository.lastIndexOf(File.separator);
 			if (index < 0 && iwc.isIE()) {
-				index = fileInSlide.lastIndexOf("\\");
+				index = fileInRepository.lastIndexOf("\\");
 			}
-			String fileName = fileInSlide;
+			String fileName = fileInRepository;
 			if (index > 0) {
-				fileName = fileInSlide.substring(index + 1);
+				fileName = fileInRepository.substring(index + 1);
 			}
 
 			if (!uploadPath.endsWith(CoreConstants.SLASH)) {
 				uploadPath = uploadPath.concat(CoreConstants.SLASH);
 			}
 			fileName = stripNonRomanLetters ? StringHandler.stripNonRomanCharacters(fileName, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS) : fileName;
-			fileInSlide = new StringBuilder(CoreConstants.WEBDAV_SERVLET_URI).append(uploadPath).append(fileName).toString();
-			fileInSlide = stripNonRomanLetters ? StringHandler.stripNonRomanCharacters(fileInSlide, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS) : fileInSlide;
-			String fileInSlideWithoutWebDav = fileInSlide.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
-			results.add(fileInSlideWithoutWebDav);
+			fileInRepository = new StringBuilder(CoreConstants.WEBDAV_SERVLET_URI).append(uploadPath).append(fileName).toString();
+			fileInRepository = stripNonRomanLetters ? StringHandler.stripNonRomanCharacters(fileInRepository, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS) : fileInRepository;
+			String fileInRepositoryWithoutWebDav = fileInRepository.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
+			results.add(fileInRepositoryWithoutWebDav);
 
 			DownloadLink link = new DownloadLink(new Text(fileName));
 			link.setMediaWriterClass(RepositoryItemDownloader.class);
-			link.setParameter(WebDAVListManagedBean.PARAMETER_WEB_DAV_URL, fileInSlide);
+			link.setParameter(WebDAVListManagedBean.PARAMETER_WEB_DAV_URL, fileInRepository);
 			link.setParameter("allowAnonymous", Boolean.TRUE.toString());
 			listItem.add(link);
 
 			Image deleteFile = bundle.getImage("images/remove.png");
 			deleteFile.setOnClick(new StringBuilder("FileUploadHelper.deleteUploadedFile('").append(listItem.getId()).append("', '")
-					.append(fileInSlideWithoutWebDav).append("', ").append(fakeFileDeletion)
+					.append(fileInRepositoryWithoutWebDav).append("', ").append(fakeFileDeletion)
 					.append(");").toString());
 			deleteFile.setTitle(deleteFileTitle);
 			deleteFile.setStyleClass("fileUploaderDeleteFileButtonStyle");
@@ -472,11 +472,11 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	}
 
 	@Override
-	public AdvancedProperty deleteFile(String fileInSlide, Boolean fakeFileDeletion) {
-		return deleteFile(CoreUtil.getIWContext(), fileInSlide, fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion);
+	public AdvancedProperty deleteFile(String fileInRepository, Boolean fakeFileDeletion) {
+		return deleteFile(CoreUtil.getIWContext(), fileInRepository, fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion);
 	}
 
-	private AdvancedProperty deleteFile(IWContext iwc, String fileInSlide, boolean fakeFileDeletion) {
+	private AdvancedProperty deleteFile(IWContext iwc, String fileInRepository, boolean fakeFileDeletion) {
 		String message = fakeFileDeletion ? "File was successfully deleted" : "Sorry, file can not be deleted!" ;
 		AdvancedProperty result = new AdvancedProperty(fakeFileDeletion ? Boolean.TRUE.toString() : Boolean.FALSE.toString(), message);
 
@@ -488,15 +488,15 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 		message = iwrb.getLocalizedString(fakeFileDeletion ? "file_uploader.success_deleting_file" : "file_uploader.unable_delete_file", message);
 		result.setValue(message);
 
-		if (StringUtil.isEmpty(fileInSlide)) {
+		if (StringUtil.isEmpty(fileInRepository)) {
 			return result;
 		}
 
-		if (fileInSlide.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
-			fileInSlide = fileInSlide.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
+		if (fileInRepository.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
+			fileInRepository = fileInRepository.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
 		}
 
-		RepositoryItem resource = getResource(iwc, fileInSlide);
+		RepositoryItem resource = getResource(iwc, fileInRepository, fakeFileDeletion);
 		if (resource == null) {
 			return result;
 		}
@@ -507,17 +507,18 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 				result.setValue(iwrb.getLocalizedString("file_uploader.success_deleting_file", "File was successfully deleted"));
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Error deleting file: " + fileInSlide, e);
+			LOGGER.log(Level.SEVERE, "Error deleting file: " + fileInRepository, e);
 		}
 
 		return result;
 	}
 
-	private RepositoryItem getResource(IWContext iwc, String fileInSlide) {
+	private RepositoryItem getResource(IWContext iwc, String fileInRepository, boolean fakeFileDeletion) {
 		try {
-			return getRepositoryService().getRepositoryItem(getCurrentUser(), fileInSlide);
+			return fakeFileDeletion ?	getRepositoryService().getRepositoryItemAsRootUser(fileInRepository) :
+										getRepositoryService().getRepositoryItem(getCurrentUser(), fileInRepository);
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Error getting file: " + fileInSlide, e);
+			LOGGER.log(Level.SEVERE, "Error getting file: " + fileInRepository, e);
 		}
 
 		return null;
@@ -532,8 +533,8 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	}
 
 	@Override
-	public AdvancedProperty deleteFiles(List<String> filesInSlide, Boolean fakeFileDeletion) {
-		if (ListUtil.isEmpty(filesInSlide)) {
+	public AdvancedProperty deleteFiles(List<String> filesInRepository, Boolean fakeFileDeletion) {
+		if (ListUtil.isEmpty(filesInRepository)) {
 			return null;
 		}
 
@@ -542,8 +543,8 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 		IWContext iwc = CoreUtil.getIWContext();
 
 		AdvancedProperty result = null;
-		for (String fileInSlide: filesInSlide) {
-			result = deleteFile(iwc, fileInSlide, fakeFileDeletion);
+		for (String fileInRepository: filesInRepository) {
+			result = deleteFile(iwc, fileInRepository, fakeFileDeletion);
 		}
 
 		return result;
