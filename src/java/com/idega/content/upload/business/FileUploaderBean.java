@@ -79,8 +79,8 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	}
 
 	@Override
-	public Layer getFileInput(IWContext iwc, String id, boolean addRemoveImage, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput,
-			boolean autoUpload) {
+	public Layer getFileInput(IWContext iwc, String id, boolean addRemoveImage, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput, 
+			boolean allowMultiple, boolean autoUpload) {
 		if (iwc == null) {
 			return null;
 		}
@@ -96,7 +96,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 		input.getId();
 		input.setStyleClass(FILE_UPLOAD_INPUT_STYLE);
 		input.setName(ContentConstants.UPLOAD_FIELD_NAME);
-		input.setMultiple(autoAddFileInput);
+		input.setMultiple(allowMultiple || autoAddFileInput);
 		if (autoUpload) {
 			input.setOnChange(getActionToLoadFilesAndExecuteCustomAction("FileUploadHelper.uploadFiles();", showProgressBar, addjQuery));
 		}
@@ -170,7 +170,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	}
 
 	@Override
-	public Document getRenderedFileInput(String id, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput, boolean autoUpload) {
+	public Document getRenderedFileInput(String id, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput, boolean allowMultipleFiles, boolean autoUpload) {
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return null;
@@ -181,7 +181,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 			return null;
 		}
 
-		return builder.getRenderedComponent(iwc, getFileInput(iwc, id, true, showProgressBar, addjQuery, autoAddFileInput, autoUpload), false);
+		return builder.getRenderedComponent(iwc, getFileInput(iwc, id, true, showProgressBar, addjQuery, autoAddFileInput, allowMultipleFiles, autoUpload), false);
 	}
 
 	@Override

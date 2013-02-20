@@ -36,12 +36,13 @@ public interface FileUploader {
 	 * @see com.idega.content.upload.business.FileUploaderBean#getFileInput
 	 */
 	public Layer getFileInput(IWContext iwc, String id, boolean addRemoveImage, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput,
-			boolean autoUpload);
-
+			boolean allowMultipleFiles, boolean autoUpload);
+	
 	/**
 	 * @see com.idega.content.upload.business.FileUploaderBean#getRenderedFileInput
 	 */
-	public Document getRenderedFileInput(String id, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput, boolean autoUpload);
+	public Document getRenderedFileInput(String id, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput, 
+			boolean allowMultipleFiles, boolean autoUpload);
 
 	public void initializeUploader(IWContext iwc);
 
