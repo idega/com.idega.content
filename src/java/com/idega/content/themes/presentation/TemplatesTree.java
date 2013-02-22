@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
 
 import com.idega.content.business.ContentConstants;
 import com.idega.core.builder.business.BuilderService;
@@ -29,11 +30,11 @@ import com.idega.presentation.text.ListItem;
 import com.idega.presentation.text.Lists;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
 import com.idega.util.ListUtil;
 
 public class TemplatesTree extends Block {
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void main(IWContext iwc) {
 		Layer container = new Layer();
@@ -55,8 +56,7 @@ public class TemplatesTree extends Block {
 			return;
 		}
 
-		@SuppressWarnings("rawtypes")
-		Collection topLevelTemplates = builder.getTopLevelTemplates(iwc);
+		Collection<? extends ICTreeNode> topLevelTemplates = builder.getTopLevelTemplates(iwc);
 		if (ListUtil.isEmpty(topLevelTemplates)) {
 			container.add(new Heading4(iwrb.getLocalizedString("there_are_no_templates", "There are no templates in system")));
 			return;
@@ -79,16 +79,27 @@ public class TemplatesTree extends Block {
 		buttons.add(createTemplate);
 	}
 
-	private List<String> getPrimaryKeys(Collection<ICTreeNode> templates) {
-		if (ListUtil.isEmpty(templates)) {
+	private List<String> getPrimaryKeys(Collection<? extends ICTreeNode> templates) {
+		if (ListUtil.isEmpty(templates))
 			return null;
-		}
 
-		List<String> primaryKeys = new ArrayList<String>(templates.size());
-		for (ICTreeNode template: templates) {
-			primaryKeys.add(template.getId());
+		List<String> primaryKeys = new ArrayList<String>();
+			try {
+				for (ICTreeNode template: templates)
+					primaryKeys.add(template.getId());
+		} catch (Exception e) {
+			getLogger().log(Level.WARNING, "Error getting IDs from " + templates, e);
+			clearAllCaches();
 		}
 		return primaryKeys;
+	}
+
+	private void clearAllCaches() {
+		try {
+			getBuilderService(CoreUtil.getIWContext()).clearAllCaches();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private Map<String, ICPage> getTemplatesObjects(List<String> primaryKeys) {
@@ -114,8 +125,7 @@ public class TemplatesTree extends Block {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-	private void addTemplatesToTree(Lists tree, Collection<ICTreeNode> templates, Locale l, IWBundle iwb, Map<String, ICPage> templatesObjects) {
+	private void addTemplatesToTree(Lists tree, Collection<? extends ICTreeNode> templates, Locale l, IWBundle iwb, Map<String, ICPage> templatesObjects) {
 		if (ListUtil.isEmpty(templates)) {
 			return;
 		}
@@ -124,8 +134,7 @@ public class TemplatesTree extends Block {
 		Collections.sort(topTemplates, new ICTreeNodeComparator(l));
 
 		String name = null;
-		@SuppressWarnings("rawtypes")
-		Collection templateChildren = null;
+		Collection<ICTreeNode> templateChildren = null;
 		String imageUri = iwb.getVirtualPathWithFileNameString("images/template.png");
 		String folderImageUri = iwb.getVirtualPathWithFileNameString("images/folder_template.png");
 		for (ICTreeNode template: topTemplates) {

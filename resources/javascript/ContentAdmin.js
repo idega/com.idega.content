@@ -14,7 +14,7 @@ jQuery(window).load(function() {
 	
 	jQuery('a.streamerLink').each(function() {
 		var link = jQuery(this);
-		link.attr('type', 'ajax');
+		link.attr('data-fancybox-type', 'ajax');
 		link.fancybox({
 			autoScale: false,
 			autoDimensions: false,

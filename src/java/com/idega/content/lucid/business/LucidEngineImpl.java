@@ -1388,8 +1388,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		if (iwc == null || builder == null || newRootPage == null || newRoot == -1) {
 			return false;
 		}
-		@SuppressWarnings("unchecked")
-		Collection<ICTreeNode> topLevelPages = builder.getTopLevelPages(iwc);
+		Collection<? extends ICTreeNode> topLevelPages = builder.getTopLevelPages(iwc);
 		if (topLevelPages == null) {
 			return false;
 		}
@@ -1401,7 +1400,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		if (newRootPage.getParentNode() == null) {
 			//	Top level page
 			List<String> increaseLevelOnTop = new ArrayList<String>();
-			for (Iterator<ICTreeNode> iter = topLevelPages.iterator(); iter.hasNext();) {
+			for (Iterator<? extends ICTreeNode> iter = topLevelPages.iterator(); iter.hasNext();) {
 				element = iter.next();
 				page = getThemesHelper().getThemesService().getICPage(element.getId());
 				newPage = getThemesHelper().getThemesService().getICPage(newRoot);
@@ -1417,7 +1416,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		}
 		else {
 			//	Not top level page
-			for (Iterator<ICTreeNode> iter = topLevelPages.iterator(); iter.hasNext();) {
+			for (Iterator<? extends ICTreeNode> iter = topLevelPages.iterator(); iter.hasNext();) {
 				element = iter.next();
 				page = getThemesHelper().getThemesService().getICPage(element.getId());
 				if (page != null) {
