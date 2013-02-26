@@ -285,7 +285,7 @@ public class ThemeStyleVariations extends Block {
 		}
 
 		for (int i = 0; i < files.size(); i++) {
-			if (!getHelper().existFileInSlide(new StringBuffer(linkToBase).append(files.get(i)).toString())) {
+			if (!getHelper().existFileInRepository(new StringBuffer(linkToBase).append(files.get(i)).toString())) {
 				return false;
 			}
 		}

@@ -1175,7 +1175,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	}
 
 	@Override
-	public String loadPageToSlide(String type, String templateFile, List<String> articlesPaths, int pageID) {
+	public String loadPageToRepository(String type, String templateFile, List<String> articlesPaths, int pageID) {
 		if (type == null || templateFile == null) {
 			return null;
 		}
@@ -1223,7 +1223,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	}
 
 	@Override
-	public String getFixedSlideFileName(String fileName) {
+	public String getFixedRepositoryFileName(String fileName) {
 		if (fileName == null) {
 			return null;
 		}
@@ -1240,7 +1240,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			return null;
 		}
 
-		String fileRoot = getFixedSlideFileName(fileName);
+		String fileRoot = getFixedRepositoryFileName(fileName);
 		String fileType = ThemesConstants.EMPTY;
 		if (fileName.indexOf(CoreConstants.DOT) != -1) {
 			fileRoot = extractValueFromString(fileName, 0, fileName.lastIndexOf(CoreConstants.DOT));
@@ -1259,7 +1259,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			return null;
 		}
 
-		path = getFixedSlideFileName(path);
+		path = getFixedRepositoryFileName(path);
 		StringBuffer tempPath = new StringBuffer(path);
 
 		int i = 1;
@@ -1628,7 +1628,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	}
 
 	@Override
-	public boolean existFileInSlide(String path) {
+	public boolean existFileInRepository(String path) {
 		return existFileInSlide(path, false);
 	}
 
@@ -1684,7 +1684,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	}
 
 	@Override
-	public boolean isCheckedFromSlide() {
+	public boolean isCheckedFromRepository() {
 		return checkedFromSlide;
 	}
 

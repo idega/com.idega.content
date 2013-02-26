@@ -54,7 +54,7 @@ public class ContentItemRssProducer extends RSSAbstractProducer implements RSSPr
 	public void handleRSSRequest(RSSRequest rssRequest) throws IOException {
 		String uri = fixURI(rssRequest);
 
-		if(this.isAFolderInSlide(uri,rssRequest)){
+		if(this.isAFolderInRepository(uri,rssRequest)){
 			try {
 				dispatch(rssRequest.getURI(), rssRequest);
 			} catch (ServletException e) {

@@ -934,7 +934,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 			return false;
 		}
 		List<String> articlesPaths = getThemesHelper().createArticle(templateFile, pageID);
-		String uriToPage = getThemesHelper().loadPageToSlide(pageType, templateFile, articlesPaths, pageID);
+		String uriToPage = getThemesHelper().loadPageToRepository(pageType, templateFile, articlesPaths, pageID);
 		if (uriToPage == null) {
 			return false;
 		}

@@ -669,7 +669,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 		String file = null;
 		String stylePath = null;
 		for (int i = 0; i < files.size(); i++) {
-			file = getHelper().getFixedSlideFileName((files.get(i)).getText());
+			file = getHelper().getFixedRepositoryFileName((files.get(i)).getText());
 
 			//	In Theme.plist sometimes occurs errors, e.g. css file with .png extension
 			if (file.endsWith(PNG_EXTENSION)) {
@@ -851,7 +851,7 @@ public class ThemesPropertiesExtractorBean implements ThemesPropertiesExtractor 
 			linkToBase = new StringBuffer(linkToBase).append(ContentConstants.SLASH).toString();
 		}
 		String searchName = new StringBuffer(CoreConstants.WEBDAV_SERVLET_URI).append(theme.getLinkToBase()).append(fileName).toString();
-		if (getHelper().existFileInSlide(searchName)) {
+		if (getHelper().existFileInRepository(searchName)) {
 			return searchName;
 		}
 		return null;

@@ -42,7 +42,7 @@ import com.idega.util.expression.ELUtil;
 
 /**
  * <p>
- * Class for manipulating Categories that are stored in slide.<br/>
+ * Class for manipulating Categories that are stored in repository.<br/>
  * Includes functions for getting and setting all the available categories
  * </p>
  *  Last modified: $Date: 2009/05/15 07:23:54 $ by $Author: valdas $

@@ -39,7 +39,7 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndFeedImpl;
 
 /**
- * This RSSProducer can produce rss files for folders in slide. Its RSSProducer identifier is by default "content".
+ * This RSSProducer can produce rss files for folders in repository. Its RSSProducer identifier is by default "content".
  * The rss file for a folder is called "content.xml" and is stored in a hidden folder called ".rss" under the folder that was requested.
  * An IWSlideChangeListener see's to it that a cachemap containing which rssfiles are up to date is invalidated.
  *
@@ -78,13 +78,13 @@ public class ContentRSSProducer extends RSSAbstractProducer implements RSSProduc
 		String realURI = CoreConstants.WEBDAV_SERVLET_URI+feedFile;
 		try {
 			//This is an important check since it will also determin if the user can view the folder
-			if(this.isAFolderInSlide(uri,rssRequest)){
+			if(this.isAFolderInRepository(uri,rssRequest)){
 
 				//for testing
 //				if(this.existsInSlide(feedFile,rssRequest) && false ){
 				//Both check if the file has been created and if the uri is cached.
 				//The uri is decached when something in the folder changes so the rss file gets regenerated
-				if(this.existsInSlide(feedFile,rssRequest) && rssFileURIsCacheMap.containsKey(uri)){
+				if(this.existsInRepository(feedFile,rssRequest) && rssFileURIsCacheMap.containsKey(uri)){
 					this.dispatch(realURI, rssRequest);
 				}
 				else{

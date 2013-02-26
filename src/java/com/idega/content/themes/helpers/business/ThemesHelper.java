@@ -128,9 +128,9 @@ public interface ThemesHelper {
 
 	public String getDefaultTheme();
 
-	public String loadPageToSlide(String type, String templateFile, List<String> articlesPaths, int pageID);
+	public String loadPageToRepository(String type, String templateFile, List<String> articlesPaths, int pageID);
 
-	public String getFixedSlideFileName(String fileName);
+	public String getFixedRepositoryFileName(String fileName);
 
 	public String changeFileUploadPath(String path);
 
@@ -146,7 +146,7 @@ public interface ThemesHelper {
 
 	public boolean setNewLinkInArticleFile(IWContext iwc, String link, String language, String baseDirectory, String pageUri);
 
-	public boolean existFileInSlide(String path);
+	public boolean existFileInRepository(String path);
 
 	public String getUniqueIdByNumberAndDate(String path, String scope);
 
@@ -158,7 +158,7 @@ public interface ThemesHelper {
 
 	public int getLoadedThemesCount();
 
-	public boolean isCheckedFromSlide();
+	public boolean isCheckedFromRepository();
 
 	/**
 	 * Generates big and small previews for single theme

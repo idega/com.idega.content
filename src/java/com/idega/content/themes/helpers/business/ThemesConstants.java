@@ -173,8 +173,8 @@ public class ThemesConstants {
 	public static final String THEMES_PROPERTY_START = "theme.";
 	public static final String THEMES_PROPERTY_END = ".def";
 	
-	public static final String THEMES_PATH = ContentConstants.BASE_ROOT_SLIDE + THEMES;
-	public static final String PAGES_PATH_SLIDE = ContentConstants.BASE_ROOT_SLIDE + ContentConstants.PAGES_START_URI + ContentConstants.SLASH;
+	public static final String THEMES_PATH = ContentConstants.BASE_ROOT_REPOSITORY + THEMES;
+	public static final String PAGES_PATH_SLIDE = ContentConstants.BASE_ROOT_REPOSITORY + ContentConstants.PAGES_START_URI + ContentConstants.SLASH;
 	public static final String THEMES_PREVIEW_PATH = THEMES_PATH + "preview/";
 	
 	public static final String AT = "@";

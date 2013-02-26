@@ -15,7 +15,6 @@ import com.idega.servlet.filter.BaseFilter;
 
 public class ContentDispatcher extends BaseFilter implements Filter {
 
-	static final String CONTENT_REPOSITORY_SLIDE="slide";
 	static final String CONTENT_REPOSITORY_JACKRABBIT="jackrabbit";
 
 	static final String CONTENT_REPOSITORY="com.idega.content.repository";
