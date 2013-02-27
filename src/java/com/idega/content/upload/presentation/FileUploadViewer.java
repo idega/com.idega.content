@@ -15,7 +15,6 @@ import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.business.BuilderLogicWrapper;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
-import com.idega.content.themes.helpers.business.ThemesHelper;
 import com.idega.content.upload.business.FileUploader;
 import com.idega.content.upload.servlet.ContentFileUploadServlet;
 import com.idega.core.builder.business.BuilderService;
@@ -60,9 +59,6 @@ public class FileUploadViewer extends IWBaseComponent {
 
 	@Autowired
 	private Web2Business web2;
-
-	@Autowired
-	private ThemesHelper themesHelper;
 
 	@Autowired
 	private BuilderLogicWrapper builderLogic;
@@ -137,6 +133,8 @@ public class FileUploadViewer extends IWBaseComponent {
 
 	@Override
 	public void initializeComponent(FacesContext context) {
+		ELUtil.getInstance().autowire(this);
+
 		IWContext iwc = IWContext.getIWContext(context);
 		try {
 			getFileUploader().initializeUploader(iwc);
@@ -146,7 +144,6 @@ public class FileUploadViewer extends IWBaseComponent {
 		}
 
 		if (themePack) {
-			themesHelper.getSlideService(iwc);
 			zipFile = true;
 			extractContent = true;
 		}
@@ -180,20 +177,20 @@ public class FileUploadViewer extends IWBaseComponent {
 		String id = fileInputs.getId();
 		fileInputs.setStyleClass("fileUploadInputsContainerStyle");
 		// Not adding 'remove' image - at least one file input should remain
-		fileInputs.add(getFileUploader().getFileInput(iwc, id, false, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId), isAutoAddFileInput(),
-				isAutoUpload()));
+		fileInputs.add(getFileUploader().getFileInput(iwc, id, false, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId),
+				isAutoAddFileInput(), isAllowMultipleFiles(), isAutoUpload()));
 		mainContainer.add(fileInputs);
 
 		Layer buttonsContainer = new Layer();
 		buttonsContainer.setStyleClass("fileUploadButtonsContainerStyle");
 
-		if (allowMultipleFiles) {
-			GenericButton addFileInput = new GenericButton(iwrb.getLocalizedString("add_file", "Add file"));
-			addFileInput.setStyleClass("fileUploadAddInputStyle");
-			addFileInput.setOnClick(getFileUploader().getActionToLoadFilesAndExecuteCustomAction(getFileUploader()
-					.getAddFileInputJavaScriptAction(id, iwrb, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId), isAutoAddFileInput(),
-							isAutoUpload()), isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId)));
-			buttonsContainer.add(addFileInput);
+		if (allowMultipleFiles && !iwc.isUserAgentHtml5()) {
+           GenericButton addFileInput = new GenericButton(iwrb.getLocalizedString("add_file", "Add file"));
+           addFileInput.setStyleClass("fileUploadAddInputStyle");
+           addFileInput.setOnClick(getFileUploader().getActionToLoadFilesAndExecuteCustomAction(getFileUploader()
+                           .getAddFileInputJavaScriptAction(id, iwrb, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId),
+                        		   isAutoAddFileInput(), isAutoUpload()), isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId)));
+           buttonsContainer.add(addFileInput);
 		}
 
 		Layer progressBarBox = new Layer();

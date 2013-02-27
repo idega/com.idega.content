@@ -25,8 +25,6 @@ import com.idega.block.web2.business.JQueryPlugin;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.builder.business.BuilderLogicWrapper;
-import com.idega.business.IBOLookup;
-import com.idega.business.IBOLookupException;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentUtil;
 import com.idega.content.business.WebDAVUploadBean;
@@ -34,9 +32,8 @@ import com.idega.content.presentation.WebDAVListManagedBean;
 import com.idega.content.repository.download.RepositoryItemDownloader;
 import com.idega.content.upload.bean.UploadFile;
 import com.idega.core.builder.business.BuilderService;
-import com.idega.idegaweb.IWApplicationContext;
+import com.idega.core.business.DefaultSpringBean;
 import com.idega.idegaweb.IWBundle;
-import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
@@ -58,12 +55,11 @@ import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
-public class FileUploaderBean implements FileUploader {
+public class FileUploaderBean extends DefaultSpringBean implements FileUploader {
 
 	private static final Logger LOGGER = Logger.getLogger(FileUploaderBean.class.getName());
 
 	private BuilderService builder = null;
-	private IWSlideService slide = null;
 
 	@Autowired
 	private BuilderLogicWrapper builderLogicWrapper;
@@ -82,17 +78,17 @@ public class FileUploaderBean implements FileUploader {
 			return;
 		}
 
-		if (builder != null && slide != null) {
-			return;
-		}
+		if (builder == null)
+			getBuilderService(iwc);
+	}
 
-		getBuilderService(iwc);
-		getSlideService(iwc);
+	private IWSlideService getRepositoryService() {
+		return getServiceInstance(IWSlideService.class);
 	}
 
 	@Override
 	public Layer getFileInput(IWContext iwc, String id, boolean addRemoveImage, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput,
-			boolean autoUpload) {
+			boolean allowMultiple, boolean autoUpload) {
 		if (iwc == null) {
 			return null;
 		}
@@ -108,7 +104,7 @@ public class FileUploaderBean implements FileUploader {
 		input.getId();
 		input.setStyleClass(FILE_UPLOAD_INPUT_STYLE);
 		input.setName(ContentConstants.UPLOAD_FIELD_NAME);
-		input.setMultiple(autoAddFileInput);
+		input.setMultiple(allowMultiple || autoAddFileInput);
 		if (autoUpload) {
 			input.setOnChange(getActionToLoadFilesAndExecuteCustomAction("FileUploadHelper.uploadFiles();", showProgressBar, addjQuery));
 		}
@@ -182,7 +178,7 @@ public class FileUploaderBean implements FileUploader {
 	}
 
 	@Override
-	public Document getRenderedFileInput(String id, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput, boolean autoUpload) {
+	public Document getRenderedFileInput(String id, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput, boolean allowMultipleFiles, boolean autoUpload) {
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return null;
@@ -193,7 +189,7 @@ public class FileUploaderBean implements FileUploader {
 			return null;
 		}
 
-		return builder.getRenderedComponent(iwc, getFileInput(iwc, id, true, showProgressBar, addjQuery, autoAddFileInput, autoUpload), false);
+		return builder.getRenderedComponent(iwc, getFileInput(iwc, id, true, showProgressBar, addjQuery, autoAddFileInput, allowMultipleFiles, autoUpload), false);
 	}
 
 	@Override
@@ -213,10 +209,6 @@ public class FileUploaderBean implements FileUploader {
 
 	private boolean doUploading(List<UploadFile> files, String path, boolean zipFile, boolean themePack, boolean extractContent, boolean isIE) {
 		if (files == null || path == null) {
-			return false;
-		}
-
-		if (getSlideService(IWMainApplication.getDefaultIWApplicationContext()) == null) {
 			return false;
 		}
 
@@ -254,9 +246,9 @@ public class FileUploaderBean implements FileUploader {
 
 				WebDAVUploadBean uploadBean = new WebDAVUploadBean();
 				uploadBean.setUploadFilePath(path);
-				return uploadBean.uploadZipFile(themePack, name, stream, slide);
+				return uploadBean.uploadZipFile(themePack, name, stream, getRepositoryService());
 			} else {
-				return slide.uploadFile(path, name, file.getType(), stream);
+				return getRepositoryService().uploadFile(path, name, file.getType(), stream);
 			}
 		} catch (Exception e) {
 			String message = "Error uploading file " + file.getName();
@@ -289,18 +281,6 @@ public class FileUploaderBean implements FileUploader {
 			builder = getBuilderLogicWrapper().getBuilderService(iwc);
 		}
 		return builder;
-	}
-
-	private IWSlideService getSlideService(IWApplicationContext iwac) {
-		if (slide == null) {
-			try {
-				slide = IBOLookup.getServiceInstance(iwac, IWSlideService.class);
-			} catch (IBOLookupException e) {
-				e.printStackTrace();
-				return null;
-			}
-		}
-		return slide;
 	}
 
 	@Override
@@ -447,11 +427,6 @@ public class FileUploaderBean implements FileUploader {
 			return null;
 		}
 
-		IWSlideService slide = getSlideService(iwc);
-		if (slide == null) {
-			return null;
-		}
-
 		IWBundle bundle = ContentUtil.getBundle();
 		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
 		String deleteFileTitle = iwrb.getLocalizedString("files_uploader.delete_uploaded_file", "Delete file");
@@ -459,39 +434,39 @@ public class FileUploaderBean implements FileUploader {
 		List<String> results = new ArrayList<String>(files.size() + 1);
 
 		Lists list = new Lists();
-		for (String fileInSlide: files) {
-			if (StringUtil.isEmpty(fileInSlide) || fileInSlide.indexOf(CoreConstants.DOT) == -1)
+		for (String fileInRepository: files) {
+			if (StringUtil.isEmpty(fileInRepository) || fileInRepository.indexOf(CoreConstants.DOT) == -1)
 				continue;
 
 			ListItem listItem = new ListItem();
 
-			int index = fileInSlide.lastIndexOf(File.separator);
+			int index = fileInRepository.lastIndexOf(File.separator);
 			if (index < 0 && iwc.isIE()) {
-				index = fileInSlide.lastIndexOf("\\");
+				index = fileInRepository.lastIndexOf("\\");
 			}
-			String fileName = fileInSlide;
+			String fileName = fileInRepository;
 			if (index > 0) {
-				fileName = fileInSlide.substring(index + 1);
+				fileName = fileInRepository.substring(index + 1);
 			}
 
 			if (!uploadPath.endsWith(CoreConstants.SLASH)) {
 				uploadPath = uploadPath.concat(CoreConstants.SLASH);
 			}
 			fileName = stripNonRomanLetters ? StringHandler.stripNonRomanCharacters(fileName, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS) : fileName;
-			fileInSlide = new StringBuilder(CoreConstants.WEBDAV_SERVLET_URI).append(uploadPath).append(fileName).toString();
-			fileInSlide = stripNonRomanLetters ? StringHandler.stripNonRomanCharacters(fileInSlide, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS) : fileInSlide;
-			String fileInSlideWithoutWebDav = fileInSlide.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
-			results.add(fileInSlideWithoutWebDav);
+			fileInRepository = new StringBuilder(CoreConstants.WEBDAV_SERVLET_URI).append(uploadPath).append(fileName).toString();
+			fileInRepository = stripNonRomanLetters ? StringHandler.stripNonRomanCharacters(fileInRepository, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS) : fileInRepository;
+			String fileInRepositoryWithoutWebDav = fileInRepository.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
+			results.add(fileInRepositoryWithoutWebDav);
 
 			DownloadLink link = new DownloadLink(new Text(fileName));
 			link.setMediaWriterClass(RepositoryItemDownloader.class);
-			link.setParameter(WebDAVListManagedBean.PARAMETER_WEB_DAV_URL, fileInSlide);
+			link.setParameter(WebDAVListManagedBean.PARAMETER_WEB_DAV_URL, fileInRepository);
 			link.setParameter("allowAnonymous", Boolean.TRUE.toString());
 			listItem.add(link);
 
 			Image deleteFile = bundle.getImage("images/remove.png");
 			deleteFile.setOnClick(new StringBuilder("FileUploadHelper.deleteUploadedFile('").append(listItem.getId()).append("', '")
-					.append(fileInSlideWithoutWebDav).append("', ").append(fakeFileDeletion)
+					.append(fileInRepositoryWithoutWebDav).append("', ").append(fakeFileDeletion)
 					.append(");").toString());
 			deleteFile.setTitle(deleteFileTitle);
 			deleteFile.setStyleClass("fileUploaderDeleteFileButtonStyle");
@@ -505,11 +480,11 @@ public class FileUploaderBean implements FileUploader {
 	}
 
 	@Override
-	public AdvancedProperty deleteFile(String fileInSlide, Boolean fakeFileDeletion) {
-		return deleteFile(CoreUtil.getIWContext(), fileInSlide, fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion);
+	public AdvancedProperty deleteFile(String fileInRepository, Boolean fakeFileDeletion) {
+		return deleteFile(CoreUtil.getIWContext(), fileInRepository, fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion);
 	}
 
-	private AdvancedProperty deleteFile(IWContext iwc, String fileInSlide, boolean fakeFileDeletion) {
+	private AdvancedProperty deleteFile(IWContext iwc, String fileInRepository, boolean fakeFileDeletion) {
 		String message = fakeFileDeletion ? "File was successfully deleted" : "Sorry, file can not be deleted!" ;
 		AdvancedProperty result = new AdvancedProperty(fakeFileDeletion ? Boolean.TRUE.toString() : Boolean.FALSE.toString(), message);
 
@@ -521,18 +496,17 @@ public class FileUploaderBean implements FileUploader {
 		message = iwrb.getLocalizedString(fakeFileDeletion ? "file_uploader.success_deleting_file" : "file_uploader.unable_delete_file", message);
 		result.setValue(message);
 
-		if (StringUtil.isEmpty(fileInSlide)) {
+		if (StringUtil.isEmpty(fileInRepository)) {
 			return result;
 		}
 
-		if (fileInSlide.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
-			fileInSlide = fileInSlide.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
+		if (fileInRepository.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
+			fileInRepository = fileInRepository.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
 		}
 
-		WebdavResource resource = getResource(iwc, fileInSlide);
-		if (resource == null) {
+		WebdavResource resource = getResource(iwc, fileInRepository, fakeFileDeletion);
+		if (resource == null || !resource.exists())
 			return result;
-		}
 
 		try {
 			if (resource.deleteMethod()) {
@@ -540,37 +514,32 @@ public class FileUploaderBean implements FileUploader {
 				result.setValue(iwrb.getLocalizedString("file_uploader.success_deleting_file", "File was successfully deleted"));
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Error deleting file: " + fileInSlide, e);
+			LOGGER.log(Level.SEVERE, "Error deleting file: " + fileInRepository, e);
 		}
 
 		return result;
 	}
 
-	private WebdavResource getResource(IWContext iwc, String fileInSlide) {
-		IWSlideService slide = getSlideService(iwc);
-		if (slide == null) {
-			return null;
-		}
-
-		UsernamePasswordCredentials crediantials = getUserCredentials(iwc, slide, fileInSlide);
-		if (crediantials == null) {
-			return null;
-		}
-
+	private WebdavResource getResource(IWContext iwc, String fileInRepository, boolean fakeFileDeletion) {
 		try {
-			return slide.getWebdavResource(fileInSlide, crediantials);
+			if (fakeFileDeletion || (iwc.isLoggedOn() && iwc.isSuperAdmin()))
+				return getRepositoryService().getWebdavResourceAuthenticatedAsRoot(fileInRepository);
+
+			IWSlideService service = getRepositoryService();
+			UsernamePasswordCredentials credentials = getUserCredentials(iwc, fileInRepository, fakeFileDeletion);
+			service.getWebdavResource(fileInRepository, credentials);
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Error getting file: " + fileInSlide, e);
+			LOGGER.log(Level.SEVERE, "Error getting file: " + fileInRepository, e);
 		}
 
 		return null;
 	}
 
-	private UsernamePasswordCredentials getUserCredentials(IWContext iwc, IWSlideService slide, String fileInSlide) {
-		if (fileInSlide.startsWith(CoreConstants.PUBLIC_PATH)) {
+	private UsernamePasswordCredentials getUserCredentials(IWContext iwc, String fileInSlide, boolean fakeFileDeletion) {
+		if (fileInSlide.startsWith(CoreConstants.PUBLIC_PATH) || fakeFileDeletion || (iwc.isLoggedOn() && iwc.isSuperAdmin())) {
 			//	File is in public folder, accessible for ALL users
 			try {
-				return slide.getRootUserCredentials();
+				return getRepositoryService().getRootUserCredentials();
 			} catch (Exception e) {
 				LOGGER.log(Level.SEVERE, "Error getting credentials for ROOT user", e);
 				return null;
@@ -587,15 +556,9 @@ public class FileUploaderBean implements FileUploader {
 			return null;
 		}
 
-		IWSlideSession slideSession = null;
-		try {
-			slideSession = (IWSlideSession) IBOLookup.getSessionInstance(iwc, IWSlideSession.class);
-		} catch(Exception e) {
-			LOGGER.log(Level.SEVERE, "Error getting " + IWSlideSession.class, e);
-		}
-		if (slideSession == null) {
+		IWSlideSession slideSession = getSessionInstance(iwc, IWSlideSession.class);
+		if (slideSession == null)
 			return null;
-		}
 
 		try {
 			return slideSession.getUserCredentials();
@@ -615,8 +578,8 @@ public class FileUploaderBean implements FileUploader {
 	}
 
 	@Override
-	public AdvancedProperty deleteFiles(List<String> filesInSlide, Boolean fakeFileDeletion) {
-		if (ListUtil.isEmpty(filesInSlide)) {
+	public AdvancedProperty deleteFiles(List<String> filesInRepository, Boolean fakeFileDeletion) {
+		if (ListUtil.isEmpty(filesInRepository)) {
 			return null;
 		}
 
@@ -625,8 +588,8 @@ public class FileUploaderBean implements FileUploader {
 		IWContext iwc = CoreUtil.getIWContext();
 
 		AdvancedProperty result = null;
-		for (String fileInSlide: filesInSlide) {
-			result = deleteFile(iwc, fileInSlide, fakeFileDeletion);
+		for (String fileInRepository: filesInRepository) {
+			result = deleteFile(iwc, fileInRepository, fakeFileDeletion);
 		}
 
 		return result;

@@ -309,8 +309,7 @@ FileUploadHelper.uploadFiles = function() {
 		failure: function(o) {
 			FileUploadHelper.properties.failure = true;
 			FileUploadHelper.manageResponse(null, inputs);
-		},
-		timeout: 5000
+		}
 	};
 	
 	var fileItemNumber = FileUploadHelper.getFileElementNumber(FileUploadHelper.properties.formId);
@@ -482,29 +481,40 @@ FileUploadHelper.showUploadedFiles = function(fakeFileDeletion) {
 	}
 }
 
-FileUploadHelper.deleteUploadedFile = function(id, file, fakeFileDeletion) {
-	FileUploader.deleteFile(file, fakeFileDeletion, {
-		callback: function(result) {
-			if (result == null) {
-				return;
-			}
-			
-			if (result.id == 'false') {
-				humanMsg.displayMsg(result.value);
-				return;
-			}
-			
-			humanMsg.displayMsg(result.value);
-			var container = jQuery('#' + id).parent();
-			jQuery('#' + id).hide('normal', function() {
-				jQuery('#' + id).remove();
-				if (jQuery('li', container).length == 0) {
-					container.parent().remove();
+FileUploadHelper.deleteUploadedFile = function(id, file, fakeFileDeletion, callback) {
+	
+	LazyLoader.loadMultiple(['/dwr/engine.js', '/dwr/interface/FileUploader.js'], function() {
+		FileUploader.deleteFile(file, fakeFileDeletion, {
+			callback: function(result) {
+
+				removeElementFromArray(FileUploadHelper.allUploadedFiles, file);
+
+				if (callback) {
+					callback(result);
+
+				} else {
+					if (result == null) {
+						return;
+					}
+
+					if (result.id == 'false') {
+						humanMsg.displayMsg(result.value);
+						return;
+					}
+
+					humanMsg.displayMsg(result.value);
+					var container = jQuery('#' + id).parent();
+					jQuery('#' + id).hide('normal', function() {
+						jQuery('#' + id).remove();
+						if (jQuery('li', container).length == 0) {
+							container.parent().remove();
+						}
+					});
 				}
-			});
-			
-			removeElementFromArray(FileUploadHelper.allUploadedFiles, file);
-		}
+
+				
+			}
+		});
 	});
 }
 
@@ -581,7 +591,6 @@ FileUploadHelper.updateProgressBar = function(progress, progressBarId, actionAft
 		FileUploadHelper.reportUploadStatus(progressBarId, actionAfterCounterReset,
 		FileUploadHelper.properties.localizations.UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT);
 		closeAllLoadingMessages();
-		showLoadingMessage(FileUploadHelper.properties.localizations.MOVING_DATA_INTO_THE_PLACE);
 		if (FileUploadHelper.uploadingWithFrame) {
 			FileUploadHelper.uploadingWithFrame = false;
 			FileUploadHelper.executeActionAfterUploadedToRepository(getInputsForUpload(FileUploadHelper.properties.id));
