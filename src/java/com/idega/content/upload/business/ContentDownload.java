@@ -1,6 +1,7 @@
 package com.idega.content.upload.business;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.idega.content.presentation.WebDAVListManagedBean;
@@ -12,8 +13,17 @@ import com.idega.util.CoreUtil;
 
 public class ContentDownload {
 
+
 	/**
-	 * Retrieve full URL to uploaded file. 
+	 * Retrieve full url to file.
+	 */
+	public static String getUrl(String file) {
+		return getUrl(Arrays.asList(file)).get(0);
+	}
+	
+
+	/**
+	 * Retrieve full URL to uploaded files. 
 	 */
 	public static List<String> getUrl(List<String> files) {
 
@@ -22,7 +32,7 @@ public class ContentDownload {
 
 			StringBuilder url = new StringBuilder();
 			url.append(CoreUtil.getIWContext().getIWMainApplication().getMediaServletURI());
-		
+
 			url.append("?")
 				.append(WebDAVListManagedBean.PARAMETER_WEB_DAV_URL)
 				.append("=")
@@ -42,5 +52,6 @@ public class ContentDownload {
 
 		return urls;
 	}
+
 
 }
