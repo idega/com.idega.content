@@ -2,7 +2,6 @@ package com.idega.content.themes.business;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -17,24 +16,20 @@ import com.idega.idegaweb.RepositoryStartedEvent;
 
 @Service
 @Scope(BeanDefinition.SCOPE_SINGLETON)
-public class ThemesInstaller implements ApplicationListener {
+public class ThemesInstaller implements ApplicationListener<RepositoryStartedEvent> {
 
 	private ThemesEngine themesEngine = null;
 
 	private boolean processHasStarted = false;
 
 	@Override
-	public void onApplicationEvent(ApplicationEvent event) {
-		if (!(event instanceof RepositoryStartedEvent)) {
-			return;
-		}
-
+	public void onApplicationEvent(RepositoryStartedEvent event) {
 		if (processHasStarted) {
 			return;
 		}
 		processHasStarted = true;
 
-		processHasStarted = installOrActivateThemes((RepositoryStartedEvent) event);
+		processHasStarted = installOrActivateThemes(event);
 	}
 
 	private synchronized boolean installOrActivateThemes(RepositoryStartedEvent event) {
