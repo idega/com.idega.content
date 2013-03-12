@@ -116,13 +116,17 @@ public class ContentFileUploadServlet extends HttpServlet {
 				//	Submitted data is copied from client to server
 				fileItems = fileUploadService.parseRequest(src);
 			} catch (Exception e) {
-				String message = "Error parsing request " + src;
+				String message = "Error parsing request " + src + "\n. Client: " + iwc.getUserAgent();
 				LOGGER.log(Level.WARNING, message, e);
 				CoreUtil.sendExceptionNotification(message, e);
-				return;
 			}
 			if (ListUtil.isEmpty(fileItems)) {
 				LOGGER.log(Level.WARNING, "No files to upload, terminating upload!");
+				IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
+				writeToResponse(response, "error=".concat(iwrb.getLocalizedString("uploader_error_failed_to_upload",
+						"Failed to upload file(s) to the server. Please try again.")));
+				uploadProgressListener.markFailedUpload(uploadId);
+				finishUpUpload(iwac, uploadProgressListener, uploadId, false);
 				return;
 			}
 
