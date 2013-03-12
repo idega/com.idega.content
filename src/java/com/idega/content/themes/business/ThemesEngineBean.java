@@ -16,7 +16,6 @@ import org.directwebremoting.WebContextFactory;
 import org.jdom2.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -58,7 +57,7 @@ import com.idega.webface.WFUtil;
 
 @Scope(BeanDefinition.SCOPE_SINGLETON)
 @Service(ThemesEngine.SPRING_BEAN_IDENTIFIER)
-public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
+public class ThemesEngineBean implements ThemesEngine, ApplicationListener<RepositoryStartedEvent> {
 
 	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(ThemesEngineBean.class.getName());
 
@@ -882,10 +881,8 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 	}
 
 	@Override
-	public void onApplicationEvent(ApplicationEvent event) {
-		if (event instanceof RepositoryStartedEvent) {
-			RepositoryStartedEvent slideStarted = (RepositoryStartedEvent) event;
-			final IWMainApplicationSettings settings = slideStarted.getIWMA().getSettings();
+	public void onApplicationEvent(RepositoryStartedEvent event) {
+			final IWMainApplicationSettings settings = event.getIWMA().getSettings();
 			if (!settings.getBoolean(DEFAULT_THEMES_INSTALLED_KEY, Boolean.FALSE) && settings.getBoolean("auto_load_themes", Boolean.TRUE)) {
 				if (ListUtil.isEmpty(getThemes())) {
 					Thread themesInstaller = new Thread(new Runnable() {
@@ -901,7 +898,6 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener {
 					themesInstaller.start();
 				}
 			}
-		}
 	}
 
 	private boolean installDefaultThemes() {
