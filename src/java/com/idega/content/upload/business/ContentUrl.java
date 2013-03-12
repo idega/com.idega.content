@@ -11,8 +11,7 @@ import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 
 
-public class ContentDownload {
-
+public class ContentUrl {
 
 	/**
 	 * Retrieve full url to file.
@@ -20,12 +19,31 @@ public class ContentDownload {
 	public static String getUrl(String file) {
 		return getUrl(Arrays.asList(file)).get(0);
 	}
+
+	
+	/**
+	 * Retrieve download url to file.
+	 */
+	public static String getDownloadUrl(String file) {
+		return getDownloadUrl(Arrays.asList(file)).get(0);
+	}
+	
+	/**
+	 * Retrieve full url to file.
+	 */
+	public static List<String> getUrl(List<String> files) {
+		List<String> urls = new ArrayList<String>(files.size());
+		for (String file: files) {
+			urls.add(new StringBuilder("/content/").append(file).toString());
+		}
+		return urls;
+	}
 	
 
 	/**
-	 * Retrieve full URL to uploaded files. 
+	 * Retrieve download URL to uploaded files. 
 	 */
-	public static List<String> getUrl(List<String> files) {
+	public static List<String> getDownloadUrl(List<String> files) {
 
 		List<String> urls = new ArrayList<String>(files.size());
 		for (String file: files) {
