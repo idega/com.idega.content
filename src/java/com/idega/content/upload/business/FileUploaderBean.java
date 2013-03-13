@@ -80,7 +80,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	}
 
 	@Override
-	public Layer getFileInput(IWContext iwc, String id, boolean addRemoveImage, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput, 
+	public Layer getFileInput(IWContext iwc, String id, boolean addRemoveImage, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput,
 			boolean allowMultiple, boolean autoUpload) {
 		if (iwc == null) {
 			return null;
@@ -498,9 +498,8 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 		}
 
 		RepositoryItem resource = getResource(iwc, fileInRepository, fakeFileDeletion);
-		if (resource == null) {
+		if (resource == null)
 			return result;
-		}
 
 		try {
 			if (resource.delete()) {

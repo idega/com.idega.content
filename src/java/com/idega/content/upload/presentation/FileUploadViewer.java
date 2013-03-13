@@ -177,18 +177,17 @@ public class FileUploadViewer extends IWBaseComponent {
 		String id = fileInputs.getId();
 		fileInputs.setStyleClass("fileUploadInputsContainerStyle");
 		// Not adding 'remove' image - at least one file input should remain
-		fileInputs.add(getFileUploader().getFileInput(iwc, id, false, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId), 
+		fileInputs.add(getFileUploader().getFileInput(iwc, id, false, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId),
 				isAutoAddFileInput(), isAllowMultipleFiles(), isAutoUpload()));
 		mainContainer.add(fileInputs);
 
 		Layer buttonsContainer = new Layer();
 		buttonsContainer.setStyleClass("fileUploadButtonsContainerStyle");
-		
 		if (allowMultipleFiles && !iwc.isUserAgentHtml5()) {
            GenericButton addFileInput = new GenericButton(iwrb.getLocalizedString("add_file", "Add file"));
            addFileInput.setStyleClass("fileUploadAddInputStyle");
            addFileInput.setOnClick(getFileUploader().getActionToLoadFilesAndExecuteCustomAction(getFileUploader()
-                           .getAddFileInputJavaScriptAction(id, iwrb, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId), 
+                           .getAddFileInputJavaScriptAction(id, iwrb, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId),
                         		   isAutoAddFileInput(), isAutoUpload()), isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId)));
            buttonsContainer.add(addFileInput);
 		}
