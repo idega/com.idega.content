@@ -1663,11 +1663,16 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		if (iwc == null) {
 			return Locale.ENGLISH.getLanguage();
 		}
-		Locale l = iwc.getCurrentLocale();
-		if (l == null) {
+		try {
+			Locale l = iwc.getCurrentLocale();
+			if (l == null) {
+				return Locale.ENGLISH.getLanguage();
+			}
+			return l.getLanguage();
+		}
+		catch (IllegalStateException ise) {
 			return Locale.ENGLISH.getLanguage();
 		}
-		return l.getLanguage();
 	}
 
 	@Override
