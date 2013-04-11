@@ -37,10 +37,15 @@ import com.idega.util.expression.ELUtil;
 
 public class FileUploadViewer extends IWBaseComponent {
 
-	private String actionAfterUpload, actionAfterCounterReset, actionAfterUploadedToRepository = null;
-
-	private String uploadPath = CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
-	private String formId, componentToRerenderId, uploadId, maxUploadSize = String.valueOf(ContentFileUploadServlet.MAX_UPLOAD_SIZE);
+	private String	actionAfterUpload,
+					actionAfterCounterReset,
+					actionAfterUploadedToRepository = null,
+					uploadPath = CoreConstants.PUBLIC_PATH + CoreConstants.SLASH,
+					formId,
+					componentToRerenderId,
+					uploadId,
+					maxUploadSize = String.valueOf(ContentFileUploadServlet.MAX_UPLOAD_SIZE),
+					style;
 
 	private boolean zipFile = false;
 	private boolean extractContent = false;
@@ -178,7 +183,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		fileInputs.setStyleClass("fileUploadInputsContainerStyle");
 		// Not adding 'remove' image - at least one file input should remain
 		fileInputs.add(getFileUploader().getFileInput(iwc, id, false, isShowProgressBar(), !StringUtil.isEmpty(componentToRerenderId),
-				isAutoAddFileInput(), isAllowMultipleFiles(), isAutoUpload()));
+				isAutoAddFileInput(), isAllowMultipleFiles(), isAutoUpload(), getStyle()));
 		mainContainer.add(fileInputs);
 
 		Layer buttonsContainer = new Layer();
@@ -217,9 +222,10 @@ public class FileUploadViewer extends IWBaseComponent {
 				jQuery.getBundleURIToJQueryLib(),
 				web2.getBundleUriToHumanizedMessagesScript()
 		));
-		String initAction = getFileUploader().getPropertiesAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(), isZipFile(),
-				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId(),
-				isFakeFileDeletion(), getActionAfterUploadedToRepository(), isStripNonRomanLetters(), getMaxUploadSize(context)
+		String initAction = getFileUploader().getPropertiesAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(),
+				isZipFile(), getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(),
+				getComponentToRerenderId(), isFakeFileDeletion(), getActionAfterUploadedToRepository(), isStripNonRomanLetters(),
+				getMaxUploadSize(context)
 		);
 
 		StringBuilder initializAtion = new StringBuilder(getFileUploader()
@@ -451,6 +457,14 @@ public class FileUploadViewer extends IWBaseComponent {
 
 	public void setStripNonRomanLetters(boolean stripNonRomanLetters) {
 		this.stripNonRomanLetters = stripNonRomanLetters;
+	}
+
+	public String getStyle() {
+		return style;
+	}
+
+	public void setStyle(String style) {
+		this.style = style;
 	}
 
 	public String getMaxUploadSize(FacesContext context) {

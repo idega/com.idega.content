@@ -291,6 +291,11 @@ version="1.2">
 			<property-class>java.lang.String</property-class>
 		</property>
 		<property>
+			<display-name>Style attribute for file's input</display-name>
+			<property-name>style</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
+		<property>
 			<display-name>JavaScript action after upload counter was reset</display-name>
 			<property-name>actionAfterCounterReset</property-name>
 			<property-class>java.lang.String</property-class>

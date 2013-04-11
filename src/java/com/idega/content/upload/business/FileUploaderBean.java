@@ -81,7 +81,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 
 	@Override
 	public Layer getFileInput(IWContext iwc, String id, boolean addRemoveImage, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput,
-			boolean allowMultiple, boolean autoUpload) {
+			boolean allowMultiple, boolean autoUpload, String style) {
 		if (iwc == null) {
 			return null;
 		}
@@ -101,6 +101,11 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 		if (autoUpload) {
 			input.setOnChange(getActionToLoadFilesAndExecuteCustomAction("FileUploadHelper.uploadFiles();", showProgressBar, addjQuery));
 		}
+		if (!StringUtil.isEmpty(style)) {
+			fileInputContainer.setStyleAttribute(style);
+			input.setStyleAttribute(style);
+		}
+
 		fileInputContainer.add(input);
 
 		if (autoAddFileInput) {
@@ -171,7 +176,8 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	}
 
 	@Override
-	public Document getRenderedFileInput(String id, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput, boolean allowMultipleFiles, boolean autoUpload) {
+	public Document getRenderedFileInput(String id, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput, boolean allowMultipleFiles,
+			boolean autoUpload, String style) {
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return null;
@@ -182,7 +188,8 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 			return null;
 		}
 
-		return builder.getRenderedComponent(iwc, getFileInput(iwc, id, true, showProgressBar, addjQuery, autoAddFileInput, allowMultipleFiles, autoUpload), false);
+		return builder.getRenderedComponent(iwc, getFileInput(iwc, id, true, showProgressBar, addjQuery, autoAddFileInput, allowMultipleFiles,
+				autoUpload, style), false);
 	}
 
 	@Override

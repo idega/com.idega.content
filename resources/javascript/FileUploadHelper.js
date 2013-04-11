@@ -721,7 +721,10 @@ function addFileInputForUpload(id, message, className, showProgressBar, addjQuer
 	if (FileUploadHelper.properties.needFlash)
 		return;
 	
+	var styleAttribute = null;
 	jQuery('input.' + className, jQuery('#' + id)).each(function() {
+		styleAttribute = jQuery(this).attr('style');
+		
 		var valueProperty = this.value;
 		if (valueProperty == null || valueProperty == '')
 			return;
@@ -729,7 +732,7 @@ function addFileInputForUpload(id, message, className, showProgressBar, addjQuer
 	
 	showLoadingMessage(message);
 	
-	FileUploader.getRenderedFileInput(id, showProgressBar, addjQuery, autoAddFileInput, autoUpload, {
+	FileUploader.getRenderedFileInput(id, showProgressBar, addjQuery, autoAddFileInput, autoUpload, styleAttribute, {
 		callback: function(component) {
 			closeAllLoadingMessages();
 			
