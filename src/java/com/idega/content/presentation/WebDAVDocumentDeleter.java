@@ -10,25 +10,33 @@
 package com.idega.content.presentation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
-import javax.faces.component.html.HtmlCommandButton;
-import javax.faces.component.html.HtmlCommandLink;
 import javax.faces.component.html.HtmlForm;
-import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.idega.block.web2.business.JQuery;
+import com.idega.block.web2.business.Web2Business;
 import com.idega.content.bean.ContentPathBean;
+import com.idega.content.business.DocumentsService;
+import com.idega.idegaweb.IWBundle;
+import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.ui.GenericButton;
 import com.idega.repository.bean.RepositoryItem;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFUtil;
 
@@ -51,8 +59,16 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	private List<UIComponent> WFContainerLines = null;
 	private HtmlForm form = null;
 
+	@Autowired
+	private JQuery jQuery;
+
+	@Autowired
+	private Web2Business web2;
+
 	@Override
 	protected void initializeComponent(FacesContext context) {
+		ELUtil.getInstance().autowire(this);
+
 		IWContext iwc = IWContext.getIWContext(context);
 		String pathToUse = iwc.getParameter(PARAMETER_PATH);
 		Boolean deleted = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getDeleted");
@@ -69,39 +85,40 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 			}
 
 			RepositoryItem item = null;
-			try {
-				item = getRepositoryService().getRepositoryItem(iwc.getLoggedInUser(), clickedPath);
-			} catch (Exception e) {
-				e.printStackTrace();
+			if (clickedPath != null) {
+				try {
+					item = getRepositoryService().getRepositoryItem(iwc.getLoggedInUser(), clickedPath);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
+			if (item != null) {
+				String path = item.getPath();
+				path = path.replaceFirst(getRepositoryService().getWebdavServerURL(), CoreConstants.EMPTY);
 
-			String path = item.getPath();
-			path = path.replaceFirst(getRepositoryService().getWebdavServerURL(), CoreConstants.EMPTY);
+				addLineToContainer(new UIComponent[]{WFUtil.getText(path)}, "wf_text", "resource_path");
 
-			addLineToContainer(new UIComponent[]{WFUtil.getText(path)}, "wf_text", "resource_path");
+				if (item.isCollection()) {
+					addLineToContainer(new UIComponent[]{getText("are_you_sure_you_want_to_delete_folder")}, "verify", "verify_question");
+				} else {
+					addLineToContainer(new UIComponent[]{getText("are_you_sure_you_want_to_delete_file")}, "verify", "verify_question");
+				}
 
-			if (item.isCollection()) {
-				addLineToContainer(new UIComponent[]{getText("are_you_sure_you_want_to_delete_folder")}, "verify", "verify_question");
-			} else {
-				addLineToContainer(new UIComponent[]{getText("are_you_sure_you_want_to_delete_file")}, "verify", "verify_question");
+				IWBundle bundle = getBundle();
+				PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
+						jQuery.getBundleURIToJQueryLib(),
+						web2.getBundleUriToHumanizedMessagesScript(),
+						CoreConstants.DWR_ENGINE_SCRIPT,
+						"/dwr/interface/" + DocumentsService.DWR_OBJECT + ".js",
+						bundle.getVirtualPathWithFileNameString("javascript/DocumentsHelper.js")
+				));
+				PresentationUtil.addStyleSheetToHeader(iwc, web2.getBundleUriToHumanizedMessagesStyleSheet());
+				IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
+				GenericButton button = new GenericButton(iwrb.getLocalizedString("yes", "Yes"));
+				button.setOnClick("DocumentsHelper.doDeleteResource('" + iwrb.getLocalizedString("deleting", "Deleting...") + "', '" + path + "');");
+
+				addLineToContainer(new UIComponent[]{button}, "submit", "submit");
 			}
-
-			UICommand button = null;
-			if (useLinkAsSubmit) {
-				button = new HtmlCommandLink();
-				HtmlOutputText text = getBundle().getLocalizedText("yes");
-				text.setStyleClass("forcespan");
-				button.getChildren().add(text);
-			} else {
-				button = new HtmlCommandButton();
-				getBundle().getLocalizedUIComponent("yes", button);
-			}
-			button.getAttributes().put(ACTION, ACTION_YES);
-			button.getAttributes().put(PARAMETER_PATH, item.getPath());
-			button.setActionExpression(WFUtil.getMethodExpression(iwc.getELContext(), "#{contentviewerbean.processAction}", Void.class, new Class[] {ActionEvent.class}));
-
-			addLineToContainer(new UIComponent[]{button}, "submit", "submit");
-
 		} else {
 			Boolean wasFolder = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getWasFolder");
 			if (deleted.booleanValue()) {

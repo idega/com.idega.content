@@ -50,6 +50,7 @@ import com.idega.repository.RepositoryService;
 import com.idega.repository.bean.RepositoryItem;
 import com.idega.util.ArrayUtil;
 import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
@@ -249,7 +250,10 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			}
 		}
 
-		if (v != null) {
+		if (v == null) {
+			v = new ContentViewer();
+			this.webDAVPath = CoreUtil.getIWContext().getParameter(PARAMETER_WEB_DAV_URL);
+		} else {
 			v.maintainPath(true);
 
 			if (comp.getAttributes().get(ContentViewer.PARAMETER_ACTION) != null) {
