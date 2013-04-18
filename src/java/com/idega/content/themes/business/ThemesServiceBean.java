@@ -28,6 +28,7 @@ import com.idega.core.builder.business.BuilderService;
 import com.idega.core.builder.data.ICDomain;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.builder.data.ICPageHome;
+import com.idega.core.data.ICTreeNode;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWApplicationContextFactory;
 import com.idega.idegaweb.IWMainApplication;
@@ -73,8 +74,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService {
 
 		IWContext iwc = CoreUtil.getIWContext();
 
-		@SuppressWarnings("rawtypes")
-		Map tree = null;
+		Map<Integer, ? extends ICTreeNode> tree = null;
 		ICDomain domain = null;
 		int userId = 1;
 
@@ -332,8 +332,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService {
 		IWContext iwc = CoreUtil.getIWContext();
 		IWApplicationContext iwac = iwc == null ? IWMainApplication.getDefaultIWApplicationContext() : iwc;
 
-		@SuppressWarnings("rawtypes")
-		Map tree = getBuilderService().getTree(iwac);
+		Map<Integer, ? extends ICTreeNode> tree = getBuilderService().getTree(iwac);
 		if (tree == null) {
 			return -1;
 		}
@@ -498,12 +497,12 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService {
 	@Override
 	public void onEvent(EventIterator events) {
 		for (; events.hasNext();) {
-			onSlideChange(events.nextEvent());
+			onRepositoryChange(events.nextEvent());
 		}
 	}
 
 	@Override
-	public void onSlideChange(Event event) {
+	public void onRepositoryChange(Event event) {
 		String uri = null;
 		try {
 			uri = event.getPath();

@@ -17,7 +17,7 @@ public interface ThemesService extends IBOService, RepositoryEventListener {
 	/**
 	 * @see com.idega.content.themes.business.ThemesServiceBean#onSlideChange
 	 */
-	public void onSlideChange(Event idegaWebContentEvent);
+	public void onRepositoryChange(Event idegaWebContentEvent);
 
 	/**
 	 * @see com.idega.content.themes.business.ThemesServiceBean#deleteIBPage
