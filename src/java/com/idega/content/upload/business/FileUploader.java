@@ -41,8 +41,9 @@ public interface FileUploader {
 	/**
 	 * @see com.idega.content.upload.business.FileUploaderBean#getRenderedFileInput
 	 */
-	public Document getRenderedFileInput(String id, boolean showProgressBar, boolean addjQuery, boolean autoAddFileInput,
-			boolean allowMultipleFiles, boolean autoUpload, String style);
+	public Document getRenderedFileInput(String id, Boolean showProgressBar, 
+			Boolean addjQuery, Boolean autoAddFileInput,
+			Boolean allowMultipleFiles, Boolean autoUpload, String style);
 
 	public void initializeUploader(IWContext iwc);
 
