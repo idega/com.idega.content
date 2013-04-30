@@ -154,31 +154,33 @@ public class WebDAVMetadataResourceBean extends IBOSessionBean implements WebDAV
 
 			session = item.getSession();
 			for (String type: metaData) {
-				String propName = "DAV:".concat(type);
-				if (!item.hasProperty(propName)) {
-					log(Level.WARNING, "Item " + item + " does not have property " + propName);
-					continue;
-				}
-
-				Property prop = item.getProperty(propName);
-				Value[] values = prop.getValues();
-				if (ArrayUtil.isEmpty(values)) {
-					logWarning("Item " + item + " has property " + propName + " but there are no values assigned!");
-					continue;
-				}
-
-				List<String> metaValues = metaDataValues.get(propName);
-				if (metaValues == null) {
-					metaValues = new ArrayList<String>();
-					metaDataValues.put(propName, metaValues);
-				}
-				for (int i = 0; i < values.length; i++) {
-					String value = values[i].getString();
-					if (StringUtil.isEmpty(value))
+				try {
+					String propName = "DAV:".concat(type);
+					if (!item.hasProperty(propName)) {
+						log(Level.WARNING, "Item " + item + " does not have property " + propName);
 						continue;
+					}
 
-					metaValues.add(value);
-				}
+					Property prop = item.getProperty(propName);
+					Value[] values = prop.getValues();
+					if (ArrayUtil.isEmpty(values)) {
+						logWarning("Item " + item + " has property " + propName + " but there are no values assigned!");
+						continue;
+					}
+
+					List<String> metaValues = metaDataValues.get(propName);
+					if (metaValues == null) {
+						metaValues = new ArrayList<String>();
+						metaDataValues.put(propName, metaValues);
+					}
+					for (int i = 0; i < values.length; i++) {
+						String value = values[i].getString();
+						if (StringUtil.isEmpty(value))
+							continue;
+
+						metaValues.add(value);
+					}
+				} catch (Exception e) {}
 			}
 		} catch (Exception e) {
 			log(Level.WARNING, "Could not load metadata types " + metaData + " for " + filePath, e);

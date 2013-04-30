@@ -9,6 +9,7 @@
  */
 package com.idega.content.business;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,26 +38,27 @@ public class MetadataUtil {
 	 */
 	public static List<String> getMetadataTypes() {
 		//Only read file first time
-		if(metadataType.size() == 0) {
+		if (metadataType.size() == 0) {
 			Properties prop = new Properties();
 			//Path to properties file
 			String path = ContentUtil.getBundle().getBundleBaseRealPath()+METADATA_PATH;
 			try {
-				//read property and store comma separated values into arraylist
-				prop.load(new java.io.FileInputStream(path));
-				String type = prop.getProperty(TYPE_KEY);
-				StringTokenizer st = new StringTokenizer(type,",");
-				while(st.hasMoreTokens()) {
-					metadataType.add(st.nextToken().trim());
+				File tmp = new File(path);
+				if (tmp.exists() && tmp.canRead()) {
+					prop.load(new java.io.FileInputStream(path));
+					String type = prop.getProperty(TYPE_KEY);
+					StringTokenizer st = new StringTokenizer(type,",");
+					while(st.hasMoreTokens()) {
+						metadataType.add(st.nextToken().trim());
+					}
 				}
-			}
-			catch (FileNotFoundException e) {
+			} catch (FileNotFoundException e) {
 				e.printStackTrace();
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		return metadataType;
 	}
+
 }

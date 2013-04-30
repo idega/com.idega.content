@@ -14,9 +14,9 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
-import javax.jcr.RepositoryException;
 
 import com.idega.content.business.ContentUtil;
+import com.idega.content.repository.download.RepositoryItemDownloader;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
@@ -48,114 +48,96 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 	@Override
 	protected void initializeComponent(FacesContext context) {
 		JCRItem resource = getRepositoryItem();
-//		String userName = null;
 
 		if (resource == null)
 			return;
-
-//		try {
-//			// Making sure all properties are set
-//			resource.setProperties();
-//			userName = getIWSlideSession().getUserFullName();
-//		} catch(HttpException he){
-//			if(he.getReasonCode()==WebdavStatus.SC_NOT_FOUND){
-//				//escape out of the processing if the resource is not found
-//				return;
-//			} else{
-//				he.printStackTrace();
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
 
 		String resourceName = resource.getName();
 		int row = 1;
 
 		Table table = new Table();
 		table.setId(this.getId() + "_table");
-//		table.setWidth("100%");
-//		table.setBorder(1);
 
-		DownloadLink link = new DownloadLink(new Text(getBundle().getLocalizedString("download_view", "Download/View")),
-				resource.getPath());
+		DownloadLink link = new DownloadLink(new Text(getBundle().getLocalizedString("download_view", "Download/View")));
+		link.setMediaWriterClass(RepositoryItemDownloader.class);
+		link.setParameter(WebDAVListManagedBean.PARAMETER_WEB_DAV_URL, resource.getPath());
 		link.setStyleClass("wf_listlink");
 		link.setId(getId() + "_dl");
 
-			table.add(getText("document_name"), 1, row);
-			table.add(WFUtil.getText(resourceName,"wf_listtext"), 2, row);
-			table.add(link, 2, ++row);
-			table.add(getText("size"), 1, ++row);
-			table.add(WFUtil.getText(FileUtil.getHumanReadableSize(resource.getLength()),"wf_listtext"), 2, row);
-			table.add(getText("folder"), 1, ++row);
-			HtmlOutputText loc = WFUtil.getTextVB("WebDAVListBean.webDAVPath");
-			loc.setStyleClass("wf_listtext");
-			table.add(loc, 2, row);
-			table.add(getText("content_type"), 1, ++row);
-			table.add(WFUtil.getText(resource.getMimeType(),"wf_listtext"), 2, row);
+		table.add(getText("document_name"), 1, row);
+		table.add(WFUtil.getText(resourceName,"wf_listtext"), 2, row);
+		table.add(link, 2, ++row);
+		table.add(getText("size"), 1, ++row);
+		table.add(WFUtil.getText(FileUtil.getHumanReadableSize(resource.getLength()),"wf_listtext"), 2, row);
+		table.add(getText("folder"), 1, ++row);
+		HtmlOutputText loc = WFUtil.getTextVB("WebDAVListBean.webDAVPath");
+		loc.setStyleClass("wf_listtext");
+		table.add(loc, 2, row);
+		table.add(getText("content_type"), 1, ++row);
+		table.add(WFUtil.getText(resource.getMimeType(),"wf_listtext"), 2, row);
 
-			Locale locale = IWContext.getInstance().getCurrentLocale();
+		Locale locale = IWContext.getInstance().getCurrentLocale();
 
-			table.add(getText("creation_date"), 1, ++row);
-			table.add(WFUtil.getText(new IWTimestamp(resource.getCreationDate()).getLocaleDateAndTime(locale, IWTimestamp.MEDIUM, IWTimestamp.MEDIUM),"wf_listtext"), 2, row);
+		table.add(getText("creation_date"), 1, ++row);
+		table.add(WFUtil.getText(new IWTimestamp(resource.getCreationDate()).getLocaleDateAndTime(locale, IWTimestamp.MEDIUM, IWTimestamp.MEDIUM),"wf_listtext"), 2, row);
 
-			table.add(getText("modification_date"), 1, ++row);
-			table.add(WFUtil.getText(new IWTimestamp(resource.getLastModified()).getLocaleDateAndTime(locale, IWTimestamp.MEDIUM, IWTimestamp.MEDIUM),"wf_listtext"), 2, row);
-			if (this.detailed) {
-
-				if (this.useVersionControl) {
-					// Lock/Unlock
-					table.add(getText("locked_unlocked"), 1, ++row);
-					if (resource.isLocked()) {
-						HtmlGraphicImage lock = new HtmlGraphicImage();
-						lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(ContentUtil.getBundle().getResourcesVirtualPath())+"/images/locked.gif");
-						lock.setId(this.getId()+"_lock");
-						lock.setHeight("16");// sizes that make sense 16/32/64/128
-						lock.setStyle("alignment:bottom");
-						table.add(lock, 2, row);
-						table.add(getText("locked", "wf_listtext"), 2, row);
-					} else {
-						table.add(getText("unlocked", "wf_listtext"), 2, row);
-					}
-					table.add(WFUtil.getText("  - "), 2, row);
-
-					HtmlCommandButton lockToggler = new HtmlCommandButton();
-					lockToggler.setId(getId()+"_lockTogg");
-					lockToggler.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
-					if (resource.isLocked()) {
-						getBundle().getLocalizedUIComponent("unlock", lockToggler);
-					} else {
-						getBundle().getLocalizedUIComponent("lock", lockToggler);
-					}
-
-					lockToggler.setStyleClass("wf_listlink");
-					lockToggler.addActionListener(WFUtil.getActionListener(context.getELContext(), "#{contentviewerbean.processAction}"));
-					lockToggler.getAttributes().put(ACTION, ACTION_TOGGLE_LOCK);
-					table.add(lockToggler, 2, row);
+		table.add(getText("modification_date"), 1, ++row);
+		table.add(WFUtil.getText(new IWTimestamp(resource.getLastModified()).getLocaleDateAndTime(locale, IWTimestamp.MEDIUM, IWTimestamp.MEDIUM),"wf_listtext"), 2, row);
+		if (this.detailed) {
+			if (this.useVersionControl) {
+				// Lock/Unlock
+				table.add(getText("locked_unlocked"), 1, ++row);
+				if (resource.isLocked()) {
+					HtmlGraphicImage lock = new HtmlGraphicImage();
+					lock.setUrl(IWMainApplication.getDefaultIWMainApplication().getURIFromURL(ContentUtil.getBundle().getResourcesVirtualPath())+"/images/locked.gif");
+					lock.setId(this.getId()+"_lock");
+					lock.setHeight("16");// sizes that make sense 16/32/64/128
+					lock.setStyle("alignment:bottom");
+					table.add(lock, 2, row);
+					table.add(getText("locked", "wf_listtext"), 2, row);
+				} else {
+					table.add(getText("unlocked", "wf_listtext"), 2, row);
 				}
 
-				if (this.useVersionControl) {
-					//Checkout/in
-					table.add(getText("checkout_status"), 1, ++row);
-					String checkedOut = resource.getCheckedOut();
-					if (checkedOut == null || "".equals(checkedOut)) {
-						table.add(getText("not_checked_out", "wf_listtext"), 2, row);
-					} else {
-						table.add(getText("checked_out", "wf_listtext"), 2, row);
-						table.add(WFUtil.getText(" ("+checkedOut.substring(checkedOut.lastIndexOf("/")+1)+")","wf_listtext"), 2, row);
-					}
-					table.add(WFUtil.getText("  - "), 2, row);
+				table.add(WFUtil.getText("  - "), 2, row);
+				HtmlCommandButton lockToggler = new HtmlCommandButton();
+				lockToggler.setId(getId()+"_lockTogg");
+				lockToggler.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
+				if (resource.isLocked()) {
+					getBundle().getLocalizedUIComponent("unlock", lockToggler);
+				} else {
+					getBundle().getLocalizedUIComponent("lock", lockToggler);
+				}
 
-					HtmlCommandButton checkOuter = new HtmlCommandButton();
-					checkOuter.setId(getId()+"_check");
-					checkOuter.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
-					checkOuter.setStyleClass("wf_listlink");
-					checkOuter.addActionListener(WFUtil.getActionListener(context.getELContext(), "#{contentviewerbean.processAction}"));
+				lockToggler.setStyleClass("wf_listlink");
+				lockToggler.addActionListener(WFUtil.getActionListener(context.getELContext(), "#{contentviewerbean.processAction}"));
+				lockToggler.getAttributes().put(ACTION, ACTION_TOGGLE_LOCK);
+				table.add(lockToggler, 2, row);
+			}
 
-					if (checkedOut == null || "".equals(checkedOut)) {
-						getBundle().getLocalizedUIComponent("check_out", checkOuter);
-						checkOuter.getAttributes().put(ACTION, ACTION_CHECK_OUT);
-						table.add(checkOuter, 2, row);
-					} else {
+			if (this.useVersionControl) {
+				//Checkout/in
+				table.add(getText("checkout_status"), 1, ++row);
+				String checkedOut = resource.getCheckedOut();
+				if (checkedOut == null || "".equals(checkedOut)) {
+					table.add(getText("not_checked_out", "wf_listtext"), 2, row);
+				} else {
+					table.add(getText("checked_out", "wf_listtext"), 2, row);
+					table.add(WFUtil.getText(" ("+checkedOut.substring(checkedOut.lastIndexOf("/")+1)+")","wf_listtext"), 2, row);
+				}
+				table.add(WFUtil.getText("  - "), 2, row);
+
+				HtmlCommandButton checkOuter = new HtmlCommandButton();
+				checkOuter.setId(getId()+"_check");
+				checkOuter.getAttributes().put(PARAMETER_RESOURCE_PATH, resource.getPath());
+				checkOuter.setStyleClass("wf_listlink");
+				checkOuter.addActionListener(WFUtil.getActionListener(context.getELContext(), "#{contentviewerbean.processAction}"));
+
+				if (checkedOut == null || "".equals(checkedOut)) {
+					getBundle().getLocalizedUIComponent("check_out", checkOuter);
+					checkOuter.getAttributes().put(ACTION, ACTION_CHECK_OUT);
+					table.add(checkOuter, 2, row);
+				} else {
 						//	TODO
 //						if (VersionHelper.hasUserCheckedOutResource(resource, userName)) {
 //
@@ -180,32 +162,32 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 //							comm.setStyleClass("wf_listtext");
 //							table.add(comm, 2, row);
 //						}
-					}
-				}
-
-				//Metadata
-				WebDAVMetadata metadataUI = new WebDAVMetadata(getCurrentResourcePath());
-				++row;
-				table.mergeCells(1, row, 2, row);
-				table.add(metadataUI, 1, row);
-
-				//Categories
-				WebDAVCategories categoriesUI = new WebDAVCategories(getCurrentResourcePath(), IWContext.getIWContext(context).getCurrentLocale().toString());
-				categoriesUI.setId(this.getId()+"_categories");
-				++row;
-				table.mergeCells(1, row, 2, row);
-				table.add(categoriesUI, 1, row);
-
-				if (this.useVersionControl) {
-					//Then add the version table
-					Table vTable = getVersionReportTable(resource);
-
-					++row;
-					table.mergeCells(1, row, 2, row);
-					table.add(vTable, 1, row);
 				}
 			}
-			this.getChildren().add(table);
+
+			//Metadata
+			WebDAVMetadata metadataUI = new WebDAVMetadata(getCurrentResourcePath());
+			++row;
+			table.mergeCells(1, row, 2, row);
+			table.add(metadataUI, 1, row);
+
+			//Categories
+			WebDAVCategories categoriesUI = new WebDAVCategories(getCurrentResourcePath(), IWContext.getIWContext(context).getCurrentLocale().toString());
+			categoriesUI.setId(this.getId()+"_categories");
+			++row;
+			table.mergeCells(1, row, 2, row);
+			table.add(categoriesUI, 1, row);
+
+			if (this.useVersionControl) {
+				//Then add the version table
+				Table vTable = getVersionReportTable(resource);
+
+				++row;
+				table.mergeCells(1, row, 2, row);
+				table.add(vTable, 1, row);
+			}
+		}
+		this.getChildren().add(table);
 	}
 
 	protected Table getVersionReportTable(RepositoryItem resource) {
@@ -216,9 +198,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 		List<RepositoryItemVersionInfo> versions = null;
 		try {
 			versions = getRepositoryService().getVersions(resource.getParentPath(), resource.getName());
-		} catch (RepositoryException e) {
-			e.printStackTrace();
-		}
+		} catch (Exception e) {}
 		if (ListUtil.isEmpty(versions))
 			return new Table();
 
@@ -265,6 +245,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 				String fileName = "v"+versionName.replace('.','_')+"-"+resource.getName();
 				versionPath.setAlternativeFileName(fileName);
 			}
+
 			//versionPath.getChildren().add(WFUtil.getText("Download/View"));
 			vTable.add(versionPath, ++vColumn, vRow);
 			vTable.add(WFUtil.getText(/*version.getCreatorDisplayName()*/"Version creator display name","wf_listtext"), ++vColumn, vRow);	//	TODO
@@ -302,7 +283,6 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 		}
 		super.refreshList();
 	}
-
 
 	@Override
 	public void processAction(ActionEvent event) throws AbortProcessingException {

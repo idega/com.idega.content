@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIInput;
 import javax.faces.component.UISelectItems;
@@ -26,6 +27,7 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import javax.faces.model.SelectItem;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.content.bean.ManagedContentBeans;
@@ -41,16 +43,16 @@ import com.idega.webface.WFResourceUtil;
 import com.idega.webface.WFUtil;
 
 /**
- * 
+ *
  * Last modified: $Date: 2007/01/25 13:52:40 $ by $Author: gediminas $
- * 
+ *
  * Display the UI for adding metadata type - values to a file.
  *
  * @author Joakim Johnson
  * @version $Revision: 1.18 $
  */
 public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBeans, ActionListener{
-	
+
 	private static final String DEFAULT_METADATA_BLOCK_ID = "metadataBlock";
 	/*
 	private static final String NEW_VALUES_ID = "newValueID";
@@ -64,18 +66,19 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	public WebDAVMetadata() {
 		setId(DEFAULT_METADATA_BLOCK_ID);
 	}
-	
+
 	public WebDAVMetadata(String path){
 		this();
 		this.resourcePath = path;
 	}
-	
+
 	public void setResourcePath(String path){
 		this.resourcePath = path;
 	}
-	
+
+	@Override
 	protected void initializeComponent(FacesContext context) {
-		
+
 		if(this.resourcePath!=null){
 //			System.out.println("Initialize. Setting resourcePath to "+resourcePath);
 			//WFUtil.invoke(METADATA_LIST_BEAN, "setResourcePath", resourcePath);
@@ -89,7 +92,7 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 		//add(getMetadataTable(resourcePath));
 		add(getEditContainer());
 	}
-	
+
 	/**
 	 * <p>
 	 * TODO tryggvil describe method getMetadataListBean
@@ -109,41 +112,40 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 
 		return mainContainer;
 	}
-	
+
 	/**
 	 * Creates the metadata UI for the specified resource
-	 * 
+	 *
 	 * @param resourcePath
 	 * @return
 	 */
 	public Table getMetadataTable(String resourcePath) {
 		WFResourceUtil localizer = WFResourceUtil.getResourceUtilContent();
-		
+
 		//Create the table
 		Table metadataTable = new Table(3,2);
 		metadataTable.setId(metadataTable.getId() + "_ver");
 		metadataTable.setRowStyleClass(1,"wf_listheading");
 		metadataTable.setStyleClass("wf_listtable");
-		
+
 		//Add the lines
-		List l = new ArrayList();
-		
+		List<SelectItem> l = new ArrayList<SelectItem>();
+
 		//Type dropdown selector
 		UIInput dropdown = new HtmlSelectOneMenu();
 		dropdown.setId(getDropdownId());
 
 		Locale locale = IWContext.getInstance().getCurrentLocale();
-		
+
 		//First get the list with all metadata types
-		ArrayList tempTypes = new ArrayList(MetadataUtil.getMetadataTypes());
+		List<String> tempTypes = new ArrayList<String>(MetadataUtil.getMetadataTypes());
 		IWContext iwc = IWContext.getInstance();
 		WebDAVMetadataResource resource;
 		try {
-			resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(
-					iwc, WebDAVMetadataResource.class);
+			resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(iwc, WebDAVMetadataResource.class);
 			MetadataValueBean[] ret = resource.getMetadata(resourcePath);
 			//Remove already used types from the dropdown list
-			for(int i=0; i<ret.length;i++) {
+			for (int i=0; i<ret.length;i++) {
 				tempTypes.remove(ret[i].getType());
 			}
 		}
@@ -157,41 +159,38 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 			e.printStackTrace();
 		}
 		int row = 1;
-		
+
 		//Display dropdown if there are any more metadata types left to add
-		if(tempTypes.size()>0) {
-			Iterator iter = tempTypes.iterator();
-			
-	//		Iterator iter = MetadataUtil.getMetadataTypes().iterator();
-			while(iter.hasNext()) {
-				String type = (String)iter.next();
+		if (tempTypes.size()>0) {
+			for(Iterator<String> iter = tempTypes.iterator(); iter.hasNext();) {
+				String type = iter.next();
 				String label = ContentBlock.getBundle().getLocalizedString(type,locale);
-				
+
 				SelectItem item = new SelectItem(type, label, type, false);
 				l.add(item);
 			}
-	
+
 			UISelectItems sItems = new UISelectItems();
 			sItems.setValue(l) ;
 			dropdown.getChildren().add(sItems);
-			
+
 			metadataTable.add(dropdown, 1, row);
-			
+
 			HtmlInputText newValueInput = new HtmlInputText();
 			newValueInput.setSize(40);
 			newValueInput.setId(getNewInputId());
 			metadataTable.add(newValueInput, 2, row++);
 		}
-		
+
 		HtmlCommandButton addButton = localizer.getButtonVB(getAddButtonId(), "save", this);
 		addButton.getAttributes().put(RESOURCE_PATH,resourcePath);
 
 		metadataTable.add(addButton, 2, row);
-		
+
 //		mainContainer.add(metadataTable);
 		return metadataTable;
 	}
-	
+
 	/**
 	 * <p>
 	 * TODO tryggvil describe method getAddButtonId
@@ -225,6 +224,7 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	/**
 	 * Will add the specified type - value metadata as a property to the selected resource.
 	 */
+	@Override
 	public void processAction(ActionEvent actionEvent) throws AbortProcessingException {
 		UIComponent comp = actionEvent.getComponent();
 		this.resourcePath = (String)comp.getAttributes().get(RESOURCE_PATH);
@@ -237,7 +237,7 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 			val = newValueInput.getValue().toString();
 			type = dropdown.getValue().toString();
 		}
-		
+
 		IWContext iwuc = IWContext.getInstance();
 		try {
 			WebDAVMetadataResource resource = (WebDAVMetadataResource) IBOLookup.getSessionInstance(iwuc, WebDAVMetadataResource.class);
@@ -254,6 +254,7 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	/**
 	 * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
 	 */
+	@Override
 	public Object saveState(FacesContext ctx) {
 		Object values[] = new Object[2];
 		values[0] = super.saveState(ctx);
@@ -266,6 +267,7 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 	 * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext,
 	 *      java.lang.Object)
 	 */
+	@Override
 	public void restoreState(FacesContext ctx, Object state) {
 		Object values[] = (Object[]) state;
 		super.restoreState(ctx, values[0]);
@@ -277,7 +279,7 @@ public class WebDAVMetadata extends IWBaseComponent implements ManagedContentBea
 		} else {
 			System.err.println("[WARNING]["+getClass().getName()+"]: resource path can not be restored for managed beans");
 		}
-		
+
 	}
 
 }

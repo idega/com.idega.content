@@ -14,17 +14,16 @@ import java.util.logging.Logger;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
+import javax.jcr.Session;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.jackrabbit.JcrConstants;
 
-import com.idega.business.IBOLookupException;
 import com.idega.content.presentation.WebDAVListManagedBean;
 import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.io.DownloadWriter;
 import com.idega.jackrabbit.bean.JackrabbitRepositoryItem;
 import com.idega.presentation.IWContext;
-import com.idega.repository.RepositoryService;
 import com.idega.repository.bean.RepositoryItem;
 import com.idega.user.data.bean.User;
 import com.idega.util.CoreConstants;
@@ -32,7 +31,6 @@ import com.idega.util.CoreUtil;
 import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
 import com.idega.util.StringUtil;
-import com.idega.util.expression.ELUtil;
 
 public class RepositoryItemDownloader extends DownloadWriter {
 
@@ -91,29 +89,26 @@ public class RepositoryItemDownloader extends DownloadWriter {
 
 	@Override
 	public void writeTo(OutputStream out) throws IOException {
-		RepositoryService repository = getRepository();
-		try {
-			repository = getRepository();
-		} catch (IBOLookupException e) {
-			LOGGER.log(Level.SEVERE, "Error getting repository service!", e);
-		}
-
 		if (folder) {
-			User user = CoreUtil.getIWContext().getLoggedInUser();
-			//	ZIP the contents of the folder and write to the output stream
-			File zippedContents = getZippedContents(repository, user);
 			try {
-				FileUtil.streamToOutputStream(new FileInputStream(zippedContents), out);
-			} finally {
-				if (zippedContents != null) {
-					zippedContents.delete();
+				User user = CoreUtil.getIWContext().getLoggedInUser();
+				//	ZIP the contents of the folder and write to the output stream
+				File zippedContents = getZippedContents(user);
+				try {
+					FileUtil.streamToOutputStream(new FileInputStream(zippedContents), out);
+				} finally {
+					if (zippedContents != null) {
+						zippedContents.delete();
+					}
 				}
+			} catch (RepositoryException e) {
+				e.printStackTrace();
 			}
 		} else {
 			//	Writing the contents of selected file to the output stream
 			InputStream stream = null;
 			try {
-				stream = repository.getInputStream(url);
+				stream = getRepositoryService().getInputStream(url);
 			} catch (RepositoryException e) {
 				e.printStackTrace();
 			}
@@ -158,35 +153,42 @@ public class RepositoryItemDownloader extends DownloadWriter {
 		return fileName;
 	}
 
-	private File getZippedContents(RepositoryService repository, User user) throws IOException {
+	private File getZippedContents(User user) throws IOException, RepositoryException {
 		Node folder = null;
 		try {
-			folder = repository.getNodeAsRootUser(url);
+			folder = getRepositoryService().getNodeAsRootUser(url, false);
 		} catch (RepositoryException e) {
 			e.printStackTrace();
 		}
 		if (folder == null)
 			return null;
 
-		String fileName = getFileName(url).concat(".zip");
-		Collection<RepositoryItem> itemsToZip = new ArrayList<RepositoryItem>();
+		Session session = null;
 		try {
-			addItemsOfFolder(folder, itemsToZip, user);
-		} catch (RepositoryException e) {
-			LOGGER.log(Level.WARNING, "Error adding items of " + folder + " to a ZIP file", e);
-		}
+			session = folder.getSession();
 
-		File zippedContents = FileUtil.getZippedFiles(itemsToZip, fileName, false, true);
-		if (zippedContents == null) {
-			return null;
-		}
+			String fileName = getFileName(url).concat(".zip");
+			Collection<RepositoryItem> itemsToZip = new ArrayList<RepositoryItem>();
+			try {
+				addItemsOfFolder(folder, itemsToZip, user);
+			} catch (RepositoryException e) {
+				LOGGER.log(Level.WARNING, "Error adding items of " + folder + " to a ZIP file", e);
+			}
 
-		IWContext iwc = CoreUtil.getIWContext();
-		if (iwc != null) {
-			setAsDownload(iwc, zippedContents.getName(), Long.valueOf(zippedContents.length()).intValue());
-		}
+			File zippedContents = FileUtil.getZippedFiles(itemsToZip, fileName, false, true);
+			if (zippedContents == null) {
+				return null;
+			}
 
-		return zippedContents;
+			IWContext iwc = CoreUtil.getIWContext();
+			if (iwc != null) {
+				setAsDownload(iwc, zippedContents.getName(), Long.valueOf(zippedContents.length()).intValue());
+			}
+
+			return zippedContents;
+		} finally {
+			getRepositoryService().logout(session);
+		}
 	}
 
 	private void addItemsOfFolder(Node folder, Collection<RepositoryItem> itemsToZip, User user) throws IOException, RepositoryException {
@@ -197,17 +199,14 @@ public class RepositoryItemDownloader extends DownloadWriter {
 		for (; nodeIterator.hasNext();) {
 			Node node = nodeIterator.nextNode();
 
-			if (node.hasProperty(JcrConstants.NT_FOLDER)) {
+			if (node.isNodeType(JcrConstants.NT_FOLDER)) {
 				addItemsOfFolder(node, itemsToZip, user);
-			} else if (node.hasProperty(JcrConstants.NT_FILE)) {
-				itemsToZip.add(new JackrabbitRepositoryItem(url, user));
+			} else if (node.isNodeType(JcrConstants.NT_FILE)) {
+				itemsToZip.add(new JackrabbitRepositoryItem(node.getPath(), user));
 			} else {
-				LOGGER.warning("Node " + node + " is not a folder nor a file");
+				LOGGER.warning(node + " is not a folder nor a file");
 			}
 		}
 	}
 
-	private RepositoryService getRepository() throws IBOLookupException {
-		return ELUtil.getInstance().getBean(RepositoryService.class);
-	}
 }
