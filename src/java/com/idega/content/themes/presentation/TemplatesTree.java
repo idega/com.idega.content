@@ -85,8 +85,12 @@ public class TemplatesTree extends Block {
 
 		List<String> primaryKeys = new ArrayList<String>();
 			try {
-				for (ICTreeNode template: templates)
+				for (ICTreeNode template: templates) {
+					if (template == null)
+						continue;
+
 					primaryKeys.add(template.getId());
+				}
 		} catch (Exception e) {
 			getLogger().log(Level.WARNING, "Error getting IDs from " + templates, e);
 			clearAllCaches();
@@ -138,6 +142,9 @@ public class TemplatesTree extends Block {
 		String imageUri = iwb.getVirtualPathWithFileNameString("images/template.png");
 		String folderImageUri = iwb.getVirtualPathWithFileNameString("images/folder_template.png");
 		for (ICTreeNode template: topTemplates) {
+			if (template == null)
+				continue;
+
 			ICPage templateObject = templatesObjects == null ? null : templatesObjects.get(template.getId());
 			if (templateObject == null) {
 				continue;
