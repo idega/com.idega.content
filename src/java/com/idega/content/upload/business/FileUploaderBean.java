@@ -176,29 +176,29 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	}
 
 	@Override
-	public Document getRenderedFileInput(String id, Boolean showProgressBar, 
+	public Document getRenderedFileInput(String id, Boolean showProgressBar,
 			Boolean addjQuery, Boolean autoAddFileInput, Boolean allowMultipleFiles,
 			Boolean autoUpload, String style) {
 		if (autoUpload == null) {
 			autoUpload = Boolean.FALSE;
 		}
-		
+
 		if (allowMultipleFiles == null) {
 			allowMultipleFiles = Boolean.FALSE;
 		}
-		
+
 		if (showProgressBar == null) {
 			showProgressBar = Boolean.FALSE;
 		}
-		
+
 		if (addjQuery == null) {
 			addjQuery = Boolean.FALSE;
 		}
-		
+
 		if (autoAddFileInput == null) {
 			autoAddFileInput = Boolean.FALSE;
 		}
-		
+
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return null;
