@@ -283,7 +283,7 @@ public class ColourExpressionCalculator {
 			else if (computedCSSValue.length() != 4 && computedCSSValue.length() != 7) {
 				int requiredLength = computedCSSValue.length() > 4 ? 7 : 4;
 				while (computedCSSValue.length() < requiredLength) {
-					computedCSSValue = computedCSSValue.replaceFirst(CoreConstants.NUMBER_SIGN, String.valueOf(CoreConstants.NUMBER_SIGN + 0));
+					computedCSSValue = computedCSSValue.replaceFirst(CoreConstants.HASH, String.valueOf(CoreConstants.HASH + 0));
 				}
 			}
 			
@@ -391,7 +391,7 @@ public class ColourExpressionCalculator {
 		
 		String operand = null;
 		List<String> operands = new ArrayList<String>();
-		while (expression.indexOf(CoreConstants.NUMBER_SIGN) != -1) {
+		while (expression.indexOf(CoreConstants.HASH) != -1) {
 			operand = getHexValueFromExpression(expression);
 			if (operand == null) {
 				return null;
@@ -482,7 +482,7 @@ public class ColourExpressionCalculator {
 			int index = 0;
 			String rightPart = expression.substring(operationIndex + 1);
 			String currentSymbol = rightPart.substring(index, index + 1);
-			boolean firstOccuranceOfNumberSign = CoreConstants.NUMBER_SIGN.equals(currentSymbol);
+			boolean firstOccuranceOfNumberSign = CoreConstants.HASH.equals(currentSymbol);
 			while ((StringHandler.isNaturalNumber(currentSymbol) || CoreConstants.DOT.equals(currentSymbol) || firstOccuranceOfNumberSign ||
 					SEARCH_TERMS.contains(currentSymbol)) && !COLOUR_MATH_OPERATIONS.contains(currentSymbol) && index + 1 < rightPart.length()) {
 				
@@ -511,12 +511,12 @@ public class ColourExpressionCalculator {
 		}
 		
 		String computedValue = null;
-		if (leftOperand.startsWith(CoreConstants.NUMBER_SIGN) && rightOperand.startsWith(CoreConstants.NUMBER_SIGN)) {
+		if (leftOperand.startsWith(CoreConstants.HASH) && rightOperand.startsWith(CoreConstants.HASH)) {
 			//	Both operands - hex numbers
 			computedValue = getExecutedColourOperation(leftOperand, CoreConstants.STAR, rightOperand);
 		}
 		else {
-			if (!leftOperand.startsWith(CoreConstants.NUMBER_SIGN) && !rightOperand.startsWith(CoreConstants.NUMBER_SIGN)) {
+			if (!leftOperand.startsWith(CoreConstants.HASH) && !rightOperand.startsWith(CoreConstants.HASH)) {
 				//	Both operand - decimal numbers
 				Integer computedValueWithoutHexNumber = getComputedValue(expressionToReplace, roundResult);
 				if (computedValueWithoutHexNumber == null) {
@@ -528,7 +528,7 @@ public class ColourExpressionCalculator {
 				//	One of operands is hex and another - decimal
 				String[] splittedHexOperand = null;
 				String decimalOperand = null;
-				if (leftOperand.startsWith(CoreConstants.NUMBER_SIGN)) {
+				if (leftOperand.startsWith(CoreConstants.HASH)) {
 					splittedHexOperand = getHexValueSplitted(leftOperand);
 					decimalOperand = rightOperand;
 				}
@@ -627,7 +627,7 @@ public class ColourExpressionCalculator {
 		}
 		
 		String hexPartInString = null;
-		StringBuffer computedHexValue = new StringBuffer(CoreConstants.NUMBER_SIGN);
+		StringBuffer computedHexValue = new StringBuffer(CoreConstants.HASH);
 		for (Integer hexPart: hexPartsInDecimals) {
 			if (hexPart < 0) {
 				hexPart = 0;
@@ -659,8 +659,8 @@ public class ColourExpressionCalculator {
 	private String getMathOperation(String operand1, String operation, String operand2) {
 		StringBuffer mathOperation = null;
 		try {
-			mathOperation = new StringBuffer().append(operand1.startsWith(CoreConstants.NUMBER_SIGN) ? Integer.decode(operand1) : operand1).append(operation);
-			mathOperation.append(operand2.startsWith(CoreConstants.NUMBER_SIGN) ? Integer.decode(operand2) : operand2);
+			mathOperation = new StringBuffer().append(operand1.startsWith(CoreConstants.HASH) ? Integer.decode(operand1) : operand1).append(operation);
+			mathOperation.append(operand2.startsWith(CoreConstants.HASH) ? Integer.decode(operand2) : operand2);
 		} catch(NumberFormatException e) {
 			logger.log(Level.SEVERE, "Error while converting hex value to decimal", e);
 			return null;
@@ -670,8 +670,8 @@ public class ColourExpressionCalculator {
 	}
 	
 	private String[] getHexValueSplitted(String hexValue) {
-		if (hexValue.startsWith(CoreConstants.NUMBER_SIGN)) {
-			hexValue = StringHandler.replace(hexValue, CoreConstants.NUMBER_SIGN, CoreConstants.EMPTY);
+		if (hexValue.startsWith(CoreConstants.HASH)) {
+			hexValue = StringHandler.replace(hexValue, CoreConstants.HASH, CoreConstants.EMPTY);
 		}
 		
 		hexValue = hexValue.trim();
@@ -691,7 +691,7 @@ public class ColourExpressionCalculator {
 				return null;
 			}
 			
-			hexParts[i] = new StringBuilder(CoreConstants.NUMBER_SIGN).append(hexValue.substring(beginIndex, endIndex)).toString();
+			hexParts[i] = new StringBuilder(CoreConstants.HASH).append(hexValue.substring(beginIndex, endIndex)).toString();
 			beginIndex += stepSize;
 			endIndex += stepSize;
 		}
@@ -700,8 +700,8 @@ public class ColourExpressionCalculator {
 	}
 	
 	private String getHexValueFromExpression(String expression) {
-		int start = getStartIndexForCssVariable(expression, CoreConstants.NUMBER_SIGN, CoreConstants.NUMBER_SIGN);
-		int end = getEndIndexForCssVariable(expression, CoreConstants.NUMBER_SIGN, SEARCH_TERMS, false, false);
+		int start = getStartIndexForCssVariable(expression, CoreConstants.HASH, CoreConstants.HASH);
+		int end = getEndIndexForCssVariable(expression, CoreConstants.HASH, SEARCH_TERMS, false, false);
 		
 		if (!(canSubstring(expression, start, end))) {
 			return null;	//	Error
