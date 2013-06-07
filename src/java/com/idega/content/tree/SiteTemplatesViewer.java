@@ -83,7 +83,7 @@ public class SiteTemplatesViewer extends IWBaseComponent {
 		    tree.setVar("node");
 		    tree.setRendererType("com.idega.webface.IWTree");
 		    HtmlOutputLink linki = new HtmlOutputLink();
-		    linki.setValue("#");
+		    linki.setValue(CoreConstants.HASH);
 		    linki.getAttributes().put("iconURI", "testValue");
 		    HtmlOutputText texti = new HtmlOutputText();
 		    texti.setValueBinding("value",WFUtil.createValueBinding("#{node.description}"));

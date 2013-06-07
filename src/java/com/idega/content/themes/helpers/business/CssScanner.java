@@ -109,8 +109,8 @@ public class CssScanner implements ResourceScanner {
 		}
 
 		// Checking for incorrect hexidecimal values
-		if (line.indexOf(CoreConstants.NUMBER_SIGN) != -1 && line.indexOf(COLOR_STRING) != -1) {
-			String[] colorValue = line.split(CoreConstants.NUMBER_SIGN);
+		if (line.indexOf(CoreConstants.HASH) != -1 && line.indexOf(COLOR_STRING) != -1) {
+			String[] colorValue = line.split(CoreConstants.HASH);
 			if (colorValue == null) {
 				return line;
 			}
@@ -130,7 +130,7 @@ public class CssScanner implements ResourceScanner {
 				}
 				index = StringHandler.getNotHexValueIndexInHexValue(color);
 			}
-			line = new StringBuffer(colorValue[0]).append(CoreConstants.NUMBER_SIGN).append(color).toString();
+			line = new StringBuffer(colorValue[0]).append(CoreConstants.HASH).append(color).toString();
 		}
 
 		//	Checking URL stuff
