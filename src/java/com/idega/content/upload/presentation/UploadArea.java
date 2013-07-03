@@ -32,117 +32,123 @@ import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.webface.WFUtil;
 
-public class UploadArea  extends IWBaseComponent{
-	
-	
-	private String name = "uploaded-files";
+public class UploadArea extends IWBaseComponent {
+
 	private StringBuilder scriptOnLoad = null;
-	
-	private String dropZonesSelectionFunction = null;
-	
-	private String uploadPath = null;
-	
-	private String styleClass = "idega-upload-area";
-	
+
+	private String	name = "uploaded-files",
+					dropZonesSelectionFunction = null,
+					uploadPath = null,
+					styleClass = "idega-upload-area",
+					filesListContainerSelectFunction = null,
+					id;
+
 	private UploadAreaBean uploadAreaBean = null;
-	
-	private boolean autoUpload = false;
-	
+
+	private boolean autoUpload = false,
+					addCancelUploadsButton = false,
+					addDeleteUploadsButton = false,
+					addUploadsProgressLayer = false,
+					multipleFiles = true,
+					useThumbnail = true;
+
 	private Boolean addStartUploadsButton = null;
-	
-	private boolean addCancelUploadsButton = false;
-	
-	private boolean addDeleteUploadsButton = false;
-	
-	private boolean addUploadsProgressLayer = false;
-	
-	private String filesListContainerSelectFunction = null;
-	
-	
-	public UploadAreaBean getUploadAreaBean(){
-		if(uploadAreaBean == null){
+
+	public UploadAreaBean getUploadAreaBean() {
+		if (uploadAreaBean == null) {
 			uploadAreaBean = ELUtil.getInstance().getBean(UploadAreaBean.BEAN_NAME);
 		}
 		return uploadAreaBean;
 	}
-	
+
 	@Override
 	protected void initializeComponent(FacesContext context) {
 		super.initializeComponent(context);
 		IWContext iwc = IWContext.getIWContext(context);
 		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
+
+		id = "id" + UUIDGenerator.getInstance().generateId();
+
 		addFileInput(iwc, iwrb);
 		addScriptOnLoad(iwc);
 		addFiles(iwc);
 	}
-	
-	private UIComponent getAddfilesButton(IWResourceBundle iwrb){
-		Layer addFiles = new Layer("span");
-		addFiles.setStyleClass("btn btn-success fileinput-button");
-		Layer icon = new Layer("span");
-		addFiles.add(icon);
-		icon.setStyleClass("icon-plus icon-white");
-		
-		Span text = new Span();
-		addFiles.add(text);
-		text.add(iwrb.getLocalizedString("add_files", "Add files"));
-		
-		addFiles.add("<input type=\"file\" name=\"files[]\" multiple=\"multiple\" />");
-		
-		
-		
-		return addFiles;
+
+	public boolean isMultipleFiles() {
+		return multipleFiles;
 	}
-	
+
+	public void setMultipleFiles(boolean multipleFiles) {
+		this.multipleFiles = multipleFiles;
+	}
+
+	private UIComponent getAddfilesButton(IWResourceBundle iwrb) {
+		String fileInput = "<input class=\"file-upload-input\" id=\"" + id + "\" type=\"file\"" +
+				(isMultipleFiles() ? " multiple=\"\"" : CoreConstants.EMPTY) + " name=\"files[]\" />";
+
+		Span span = new Span();
+		IWContext iwc = IWContext.getIWContext(getFacesContext());
+		if (!iwc.isIE()) {
+			span.setStyleClass("btn btn-success fileinput-button");
+				span.add("<i class=\"icon-plus icon-white\"></i>");
+				span.add("<span>&nbsp;" + (isMultipleFiles() ?
+										iwrb.getLocalizedString("select_files", "Select files") :
+										iwrb.getLocalizedString("select_file", "Select file")) + "</span>");
+		}
+		span.add(fileInput);
+
+		return span;
+	}
+
 	private UIComponent getStartUploadButton(IWResourceBundle iwrb){
 		Layer startUpload = new Layer("button");
 		startUpload.setStyleClass("btn btn-primary start");
-		
+
 		Span icon = new Span();
 		startUpload.add(icon);
 		icon.setStyleClass("icon-upload icon-white");
-		
+
 		Span text = new Span();
 		startUpload.add(text);
 		text.add(iwrb.getLocalizedString("start_upload", "Start upload"));
-		
+
 		return startUpload;
 	}
-	
+
 	private UIComponent getCanceltUploadButton(IWResourceBundle iwrb){
 		Layer button = new Layer("button");
 		button.setStyleClass("btn btn-warning cancel");
-		
+
 		Span icon = new Span();
 		button.add(icon);
 		icon.setStyleClass("icon-ban-circle icon-white");
-		
+
 		Span text = new Span();
 		button.add(text);
-		text.add(iwrb.getLocalizedString("cancel_upload", "cancel upload"));
-		
+		text.add(iwrb.getLocalizedString("cancel_upload", "Cancel upload"));
+
 		return button;
 	}
-	
+
 	private UIComponent getDeleteButton(IWResourceBundle iwrb){
 		Layer button = new Layer("button");
 		button.setStyleClass("btn btn-danger delete");
-		
+
 		Span icon = new Span();
 		button.add(icon);
 		icon.setStyleClass("icon-trash icon-white");
-		
+
 		Span text = new Span();
 		button.add(text);
-		text.add(iwrb.getLocalizedString("delete", "delete"));
-		
+		text.add("&nbsp;" + iwrb.getLocalizedString("delete", "Delete"));
+
 		return button;
 	}
-	
-	private Layer getProgressLayer(IWResourceBundle iwrb){
+
+	private Layer getProgressLayer(IWResourceBundle iwrb) {
 		Layer container = new Layer();
 		container.setStyleClass("span5 fileupload-progress fade");
-		
+
 		Layer progress = new Layer();
 		container.add(progress);
 		progress.setStyleClass("progress progress-success progress-striped active");
@@ -151,77 +157,83 @@ public class UploadArea  extends IWBaseComponent{
 		markupAttributes.put("aria-valuemin", "0");
 		markupAttributes.put("aria-valuemax", "100");
 		progress.addMarkupAttributes(markupAttributes);
-		
+
 		Layer barr = new Layer();
 		progress.add(barr);
 		barr.setStyleClass("bar");
 		barr.setStyleAttribute("width:0%;");
-		
+
 		Layer progressExtension = new Layer();
 		container.add(progressExtension);
 		progressExtension.setStyleClass("progress-extended");
 		progressExtension.add("&nbsp;");
-		
+
 		progress.setStyleClass("span5 fileupload-progress fade");
 		return container;
 	}
-	
+
 	protected Map<String, Object> getUploaderOptions(IWContext iwc){
 		UploadAreaBean uploadAreaBean = getUploadAreaBean();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		Map<String, Object> options = new HashMap<String, Object>();
 		options.put("maxFileSize", uploadAreaBean.getMaxFileSize(iwc));
 		options.put("url", uploadAreaBean.getServletPath());
 		options.put("autoUpload", isAutoUpload());
 		options.put("paramName", getName());
-		
-		HashMap<String, Object> uploadAreaOptions = new HashMap<String, Object>();
+		options.put("useThumbnail", String.valueOf(isUseThumbnail()));
+		options.put("multipleUploads", isMultipleFiles());
+		options.put("fileInputId", id);
+		uploadAreaBean.setAddThumbnail(isUseThumbnail());
+
+		Map<String, Object> uploadAreaOptions = new HashMap<String, Object>();
 		options.put("uploadAreaOptions", uploadAreaOptions);
 		uploadAreaOptions.put("checkboxNeeded", isCheckboxNeeded());
-		
+
 		String dropZonesSelectFunction = getDropZonesSelectionFunction();
-		if(!StringUtil.isEmpty(dropZonesSelectFunction)){
+		if (!StringUtil.isEmpty(dropZonesSelectFunction)){
 			options.put("dropZone",dropZonesSelectFunction);
 		}
 		String fileListSelectFunction = getFilesListContainerSelectFunction();
-		if(!StringUtil.isEmpty(fileListSelectFunction)){
+		if (!StringUtil.isEmpty(fileListSelectFunction)){
 			options.put("filesContainer", fileListSelectFunction);
 			uploadAreaOptions.put("filesContainerContent",
-					"<table role='presentation' class='table table-striped uploaded-files-table'  ><tbody class='files' data-toggle='modal-gallery' data-target='#modal-gallery'></tbody></table>");
+					"<table role='presentation' class='table table-striped uploaded-files-table'>" +
+						"<tbody class='files' data-toggle='modal-gallery' data-target='#modal-gallery'></tbody></table>");
 		}
-		
-		
+
+
 		String uploadPath = getUploadPath();
-		ArrayList<Object> formData = new ArrayList<Object>();
-		if(!StringUtil.isEmpty(uploadPath)){
-			HashMap<String, String> uploadPathParameter = new HashMap<String, String>(2);
+		List<Object> formData = new ArrayList<Object>();
+		if (!StringUtil.isEmpty(uploadPath)) {
+			Map<String, String> uploadPathParameter = new HashMap<String, String>(2);
 			uploadPathParameter.put("name", BlueimpUploadServlet.PARAMETER_UPLOAD_PATH);
 			uploadPathParameter.put("value", uploadPath);
+			uploadPathParameter.put("useThumbnail", String.valueOf(isUseThumbnail()));
 			formData.add(uploadPathParameter);
 		}
 		options.put("formData", formData);
 		return options;
 	}
-	
+
 	private boolean isCheckboxNeeded(){
 		return isAddStartUploadsButton() || isAddCancelUploadsButton() || isAddDeleteUploadsButton();
 	}
-	
-	
+
+
 	private void addFileInput(IWContext iwc, IWResourceBundle iwrb){
 		setStyleClass(getStyleClass());
 		getScriptOnLoad().append("\n\tjQuery('#").append(getId()).append("').uploadAreaHelper(").append(new Gson().toJson(getUploaderOptions(iwc))).append(");");
 		setStyleAttribute("width:100%");
-		
-		
+
+
 		Layer inputs = new Layer();
 		add(inputs);
 		inputs.setStyleClass("fileupload-buttonbar");
-		
+
 		Layer buttons = new Layer();
 		inputs.add(buttons);
-		
+
 		buttons.add(getAddfilesButton(iwrb));
-		
+
 		if(isAddStartUploadsButton()){
 			buttons.add(getStartUploadButton(iwrb));
 		}
@@ -236,50 +248,50 @@ public class UploadArea  extends IWBaseComponent{
 			buttons.add(checkbox);
 			checkbox.setStyleClass("toggle");
 		}
-		
+
 		if(isAddUploadsProgressLayer()){
 			inputs.add(getProgressLayer(iwrb));
 		}
-		
+
 		Layer loadingLayer = new Layer();
 		add(loadingLayer);
 		loadingLayer.setStyleClass("fileupload-loading");
-		
+
 		Layer presentation = new Layer();
 		presentation.setStyleAttribute("width:100%");
 		add(presentation);
 		if(StringUtil.isEmpty(getFilesListContainerSelectFunction())){
 			presentation.add("<table role='presentation' class='table table-striped uploaded-files-table'  ><tbody class='files' data-toggle='modal-gallery' data-target='#modal-gallery'></tbody></table>");
 		}
-		
-		
-		//Fake templates for script to load I don't know how to remove them		
+
+
+		//Fake templates for script to load I don't know how to remove them
 		Layer fake = new Layer();
 		add(fake);
 		fake.setStyleAttribute("display:none");
 		fake.add("<script id='template-upload' type='text/x-tmpl'>alert('fake');</script>");
 		fake.add("<script id='template-download' type='text/x-tmpl'>alert('fake');</script>");
 	}
-	
+
 	private void addScriptOnLoad(IWContext iwc){
 		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
 		Layer scriptLayer = new Layer();
 		add(scriptLayer);
 		StringBuilder scriptOnLoad = /*new StringBuilder("jQuery(document).ready(function(){");//*/getScriptOnLoad();
-		
+
 		//localize
 		scriptOnLoad.append("\n\tUploadArea.initializeLocale({")
-				.append("'destroy' : '").append(iwrb.getLocalizedString("delete", "Delete")).append("',")
-				.append("'cancel' : '").append(iwrb.getLocalizedString("cancel", "Cancel")).append("',")
-				.append("'errors' :{")
+				.append("'destroy': '").append(iwrb.getLocalizedString("delete", "Delete")).append("',")
+				.append("'cancel': '").append(iwrb.getLocalizedString("cancel", "Cancel")).append("',")
+				.append("'errors':{")
 				.append("'maxFileSize' : '").append(iwrb.getLocalizedString("file_is_too_big", "File is too big"))
 				.append("'}});");
-		
+
 		scriptOnLoad.append("\n});");
 		scriptLayer.add(PresentationUtil.getJavaScriptAction(scriptOnLoad.toString()));
-		
+
 	}
-	
+
 	public List<String> getScriptFiles(IWContext iwc){
 		List<String> scripts = new ArrayList<String>();
 
@@ -287,53 +299,52 @@ public class UploadArea  extends IWBaseComponent{
 		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
 
 		Web2Business web2 = WFUtil.getBeanInstance(iwc, Web2Business.SPRING_BEAN_IDENTIFIER);
-		try{
+		try {
 			if (web2 != null) {
+				scripts.add(web2.getBundleUriToBootstrapMainScriptFile());
+
 				JQuery  jQuery = web2.getJQuery();
 				scripts.add(jQuery.getBundleURIToJQueryLib());
 				scripts.add(jQuery.getBundleURIToJQueryUILib("1.8.17","js/jquery-ui-1.8.17.custom.min.js"));
 				scripts.addAll(web2.getBundleUrisToBlueimpFileUploadScriptFiles("6.9.2"));
-	
-				
-			}else{
+			} else{
 				Logger.getLogger(UploadArea.class.getName()).log(Level.WARNING, "Failed getting Web2Business no jQuery and it's plugins files were added");
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			Logger.getLogger(UploadArea.class.getName()).log(Level.WARNING, "Failed adding scripts no jQuery and it's plugins files were added");
 		}
-		
+
 		IWBundle iwb = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER);
 		scripts.add(iwb.getVirtualPathWithFileNameString("javascript/upload-area-helper.js"));
 
 		return scripts;
 	}
-	
+
 	public List<String> getStyleFiles(IWContext iwc){
 		List<String> styles = new ArrayList<String>();
 
 		Web2Business web2 = WFUtil.getBeanInstance(iwc, Web2Business.SPRING_BEAN_IDENTIFIER);
 		if (web2 != null) {
-			JQuery  jQuery = web2.getJQuery();
+			styles.add(web2.getBundleUriToBootstrapMainStyleFile());
+			JQuery jQuery = web2.getJQuery();
 			styles.add(jQuery.getBundleURIToJQueryUILib("1.8.17","themes/smoothness/ui-1.8.17.custom.css"));
 			styles.addAll(web2.getBundleUrisToBlueimpFileUploadStyleFiles("6.9.2"));
-		}else{
+		} else{
 			Logger.getLogger(UploadArea.class.getName()).log(Level.WARNING, "Failed getting Web2Business no jQuery and it's plugins files were added");
 		}
 		IWBundle iwb = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER);
 		styles.add(iwb.getVirtualPathWithFileNameString("style/upload-area.css"));
-		
+
 		return styles;
 	}
-	
+
 	private void addFiles(IWContext iwc){
 		PresentationUtil.addStyleSheetsToHeader(iwc, getStyleFiles(iwc));
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, getScriptFiles(iwc));
 	}
 
-
 	protected StringBuilder getScriptOnLoad() {
-		if(scriptOnLoad == null){
+		if (scriptOnLoad == null) {
 			scriptOnLoad = new StringBuilder("jQuery(document).ready(function(){");
 		}
 		return scriptOnLoad;
@@ -342,7 +353,6 @@ public class UploadArea  extends IWBaseComponent{
 	protected void setScriptOnLoad(StringBuilder scriptOnLoad) {
 		this.scriptOnLoad = scriptOnLoad;
 	}
-
 
 	public String getUploadPath() {
 		return uploadPath;
@@ -383,25 +393,7 @@ public class UploadArea  extends IWBaseComponent{
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-//	private Layer getMainLayer(){
-//		if(main == null){
-//			
-//		}
-//		return main;
-//	}
-//
-//	public String getIdOfMainLayer() {
-//		if(id == null){
-//			id = getMainLayer().getId(); 
-//		}
-//		return id;
-//	}
-//
-//	public void setIdOfMainLayer(String id) {
-//		getMainLayer().setId(id);
-//	}
-	
+
 	@Override
 	public String getId(){
 		String id = super.getId();
@@ -411,13 +403,12 @@ public class UploadArea  extends IWBaseComponent{
 		}
 		return id;
 	}
-	
-	protected String generateId()
-	{
+
+	protected String generateId() {
 		String UUID = UUIDGenerator.getInstance().generateId();
 		return "iwid" + UUID.substring(UUID.lastIndexOf("-") + 1);
 	}
-	
+
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
 		super.encodeBegin(context);
@@ -434,7 +425,7 @@ public class UploadArea  extends IWBaseComponent{
 	}
 
 	public boolean isAddStartUploadsButton() {
-		if(addStartUploadsButton != null){
+		if (addStartUploadsButton != null) {
 			return addStartUploadsButton;
 		}
 		return false;
@@ -472,10 +463,16 @@ public class UploadArea  extends IWBaseComponent{
 		return filesListContainerSelectFunction;
 	}
 
-	public void setFilesListContainerSelectFunction(
-			String filesListContainerSelectFunction) {
+	public void setFilesListContainerSelectFunction(String filesListContainerSelectFunction) {
 		this.filesListContainerSelectFunction = filesListContainerSelectFunction;
 	}
 
-}
+	public boolean isUseThumbnail() {
+		return useThumbnail;
+	}
 
+	public void setUseThumbnail(boolean useThumbnail) {
+		this.useThumbnail = useThumbnail;
+	}
+
+}

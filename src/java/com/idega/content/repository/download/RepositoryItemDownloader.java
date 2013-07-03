@@ -34,7 +34,8 @@ import com.idega.util.StringUtil;
 
 public class RepositoryItemDownloader extends DownloadWriter {
 
-	public static final String PARAMETER_URL = WebDAVListManagedBean.PARAMETER_WEB_DAV_URL;
+	public static final String	PARAMETER_URL = WebDAVListManagedBean.PARAMETER_WEB_DAV_URL,
+								PARAMETER_ALLOW_ANONYMOUS = "allowAnonymous";
 	private static final Logger LOGGER = Logger.getLogger(RepositoryItemDownloader.class.getName());
 
 	private String url, mimeType;
@@ -76,7 +77,7 @@ public class RepositoryItemDownloader extends DownloadWriter {
 
 	@Override
 	public void init(HttpServletRequest req, IWContext iwc) {
-		allowAnonymous = iwc.isParameterSet("allowAnonymous") ? Boolean.valueOf(iwc.getParameter("allowAnonymous")) : allowAnonymous;
+		allowAnonymous = iwc.isParameterSet(PARAMETER_ALLOW_ANONYMOUS) ? Boolean.valueOf(iwc.getParameter(PARAMETER_ALLOW_ANONYMOUS)) : allowAnonymous;
 
 		if (!allowAnonymous && !iwc.isLoggedOn() && !iwc.isSuperAdmin())
 			return;
@@ -108,7 +109,7 @@ public class RepositoryItemDownloader extends DownloadWriter {
 			//	Writing the contents of selected file to the output stream
 			InputStream stream = null;
 			try {
-				stream = getRepositoryService().getInputStream(url);
+				stream = allowAnonymous ? getRepositoryService().getInputStreamAsRoot(url) : getRepositoryService().getInputStream(url);
 			} catch (RepositoryException e) {
 				e.printStackTrace();
 			}

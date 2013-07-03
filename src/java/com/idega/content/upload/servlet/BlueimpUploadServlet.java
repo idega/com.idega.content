@@ -22,12 +22,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.gson.Gson;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ThumbnailService;
+import com.idega.content.repository.download.RepositoryItemDownloader;
 import com.idega.content.upload.business.UploadAreaBean;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.io.MediaWritable;
 import com.idega.presentation.IWContext;
 import com.idega.repository.RepositoryService;
+import com.idega.repository.bean.RepositoryItem;
 import com.idega.util.CoreConstants;
 import com.idega.util.StringUtil;
+import com.idega.util.URIUtil;
 import com.idega.util.expression.ELUtil;
 
 public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
@@ -60,94 +65,104 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 
 	@Override
 	public Long getMaxFileSize(IWContext iwc) {
-		return getUploadAreaBean().getMaxFileSize(iwc);
+		Long maxSize = getUploadAreaBean().getMaxFileSize(iwc);
+		return maxSize;
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		IWContext iwc = new IWContext(request, response, getServletContext());
-//		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
 		response = iwc.getResponse();
 		response.setContentType("application/json");
 		PrintWriter responseWriter = response.getWriter();
 
-		DiskFileItemFactory  fileItemFactory = new DiskFileItemFactory ();
-		/*
-		 *Set the size threshold, above which content will be stored on disk.
-		 */
-		fileItemFactory.setSizeThreshold(10*1024*1024); //10 MB
-		/*
-		 * Set the temporary directory to store the uploaded files of size above threshold.
-		 */
+		DiskFileItemFactory fileItemFactory = new DiskFileItemFactory();
+		fileItemFactory.setSizeThreshold(getMaxFileSize(iwc).intValue());
 
 		Long maxSize = getMaxFileSize(iwc);
 		ServletFileUpload uploadHandler = new ServletFileUpload(fileItemFactory);
-		if(maxSize != null){
+		if (maxSize != null) {
 			uploadHandler.setFileSizeMax(maxSize);
 		}
-		ArrayList<HashMap<String,Object>> responseMapArray = null;
+		List<Map<String, Object>> responseMapArray = null;
 		try {
-//			Parse the request
 			@SuppressWarnings("unchecked")
 			List<FileItem> items = uploadHandler.parseRequest(request);
 
 			// Parse parameters and files
-			Map <String,String> parameters = new HashMap<String, String>(items.size());
+			Map<String, String> parameters = new HashMap<String, String>(items.size());
 			List<FileItem> files = new ArrayList<FileItem>(items.size());
-			for(FileItem item : items){
-				if(item.isFormField()) {
+			for (FileItem item: items) {
+				if (item.isFormField()) {
 					parameters.put(item.getFieldName(), item.getString());
 				} else {
 					files.add(item);
 				}
 			}
 			String uploadPath = parameters.get(PARAMETER_UPLOAD_PATH);
-			if(StringUtil.isEmpty(uploadPath)){
+			if (StringUtil.isEmpty(uploadPath)) {
 				uploadPath = CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
-			}else{
-				if(!uploadPath.endsWith(CoreConstants.SLASH)){
+			} else {
+				if (!uploadPath.endsWith(CoreConstants.SLASH)) {
 					uploadPath = uploadPath + CoreConstants.SLASH;
 				}
 			}
-			ThumbnailService thumbnailService = ELUtil.getInstance().getBean(ThumbnailService.BEAN_NAME);
-			responseMapArray = new ArrayList<HashMap<String,Object>>(files.size());
-			for(FileItem file : files){
+
+			boolean useThumbnail = getUploadAreaBean().isAddThumbnail();
+			ThumbnailService thumbnailService = null;
+			if (useThumbnail)
+				thumbnailService = ELUtil.getInstance().getBean(ThumbnailService.BEAN_NAME);
+
+			responseMapArray = new ArrayList<Map<String, Object>>();
+			for (FileItem file: files) {
 				String fileName = file.getName();
 				String pathAndName = uploadPath + fileName;
-				getRepositoryService().uploadFile(uploadPath, fileName, file.getContentType(), file.getInputStream());
+				boolean success = getRepositoryService().uploadFile(uploadPath, fileName, file.getContentType(), file.getInputStream());
 
-				HashMap<String,Object> fileData = new HashMap<String, Object>();
+				Map<String, Object> fileData = new HashMap<String, Object>();
 				fileData.put("name", fileName);
 				fileData.put("size", file.getSize());
-				fileData.put("url", "/content" + pathAndName);
-				fileData.put("thumbnail_url", thumbnailService.getThumbnail(pathAndName, ThumbnailService.THUMBNAIL_SMALL));
-				fileData.put("delete_url", getDeleteUrl(iwc, uploadPath, file));
+
+				RepositoryItem item = getRepositoryService().getRepositoryItemAsRootUser(pathAndName);
+				String path = item.getPath();
+				if (!path.startsWith(CoreConstants.WEBDAV_SERVLET_URI))
+					path = CoreConstants.WEBDAV_SERVLET_URI + path;
+				URIUtil downloadPath = new URIUtil(IWMainApplication.MEDIA_SERVLET_URL);
+				downloadPath.setParameter(RepositoryItemDownloader.PARAMETER_URL, path);
+				downloadPath.setParameter(RepositoryItemDownloader.PARAMETER_ALLOW_ANONYMOUS, Boolean.TRUE.toString());
+				downloadPath.setParameter(MediaWritable.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(RepositoryItemDownloader.class));
+				fileData.put("url", downloadPath.getUri());
+
+				if (useThumbnail)
+					fileData.put("thumbnail_url", thumbnailService.getThumbnail(pathAndName, ThumbnailService.THUMBNAIL_SMALL));
+
+				fileData.put("delete_url", getDeleteUrl(iwc, path));
 				fileData.put("delete_type", "DELETE");
 				fileData.put("message", "");
-				fileData.put("status", "OK");
+				fileData.put("status", success ? "OK" : "FAILURE");
 				responseMapArray.add(fileData);
 			}
 			Gson gson = new Gson();
 			String jsonString =  gson.toJson(responseMapArray);
 
 			responseWriter.write(jsonString);
-		return;
-		}catch(FileUploadException ex) {
+			return;
+		} catch (FileUploadException ex) {
 			log("Error encountered while parsing the request",ex);
 			response.sendError(500);
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			log("Error encountered while uploading file",ex);
 			response.sendError(500);
 		}
 	}
 
-	private String getDeleteUrlBase(){
-		if(deleteUrlBase == null){
+	private String getDeleteUrlBase() {
+		if (deleteUrlBase == null) {
 			String servletPath = getServletPath();
-			StringBuilder deleteUrl  = new StringBuilder(servletPath);
-			if(servletPath.contains(CoreConstants.QMARK)){
+			StringBuilder deleteUrl = new StringBuilder(servletPath);
+			if (servletPath.contains(CoreConstants.QMARK)) {
 				deleteUrl.append(CoreConstants.AMP);
-			}else{
+			} else {
 				deleteUrl.append(CoreConstants.QMARK);
 			}
 			deleteUrl.append(PARAMETER_UPLOAD_PATH).append(CoreConstants.EQ);
@@ -156,8 +171,8 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 		return deleteUrlBase;
 	}
 
-	protected String getDeleteUrl(IWContext iwc, String uploadPath, FileItem file) {
-		return getDeleteUrlBase() + uploadPath + file.getName();
+	protected String getDeleteUrl(IWContext iwc, String path) {
+		return getDeleteUrlBase() + path;
 	}
 
 	@Override
@@ -168,10 +183,10 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 		PrintWriter responseWriter = response.getWriter();
 		String filePath = iwc.getParameter(PARAMETER_UPLOAD_PATH);
 
-		ArrayList<HashMap<String,Object>> responseMapArray = new ArrayList<HashMap<String,Object>>(1);
+		List<Map<String, Object>> responseMapArray = new ArrayList<Map<String,Object>>(1);
 		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
-		HashMap<String,Object> fileData = new HashMap<String, Object>();
-		if(StringUtil.isEmpty(filePath)){
+		Map<String,Object> fileData = new HashMap<String, Object>();
+		if (StringUtil.isEmpty(filePath)) {
 			fileData.put("message", iwrb.getLocalizedString("file_path_is_empty", "File path is empty"));
 			fileData.put("status", "Bad Request");
 			Gson gson = new Gson();
@@ -180,9 +195,12 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 			return;
 		}
 		try {
-			getRepositoryService().deleteAsRootUser(filePath);
-			fileData.put("message", iwrb.getLocalizedString("file_deleted", "File deleted"));
-			fileData.put("status", "OK");
+			boolean success = getRepositoryService().deleteAsRootUser(filePath);
+			fileData.put("message", success ?
+										iwrb.getLocalizedString("file_deleted", "File deleted") :
+										iwrb.getLocalizedString("failed_to_delete_file", "Failed to delete file")
+			);
+			fileData.put("status", success ? "OK" : "Failure");
 			Gson gson = new Gson();
 			String jsonString =  gson.toJson(responseMapArray);
 			responseWriter.write(jsonString);
