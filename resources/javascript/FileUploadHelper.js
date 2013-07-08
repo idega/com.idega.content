@@ -103,8 +103,8 @@ FileUploadHelper.initializeFlashUploader = function() {
 					button_placeholder_id: buttonId,
 					button_text: '<span class="upload_button_style">' + FileUploadHelper.properties.localizations.CHOOSE_FILE + '</span>',
 					button_text_style: ".upload_button_style {font-size: 14; text-align: center;}",
-					button_action: SWFUpload.BUTTON_ACTION.SELECT_FILES,
-					button_cursor: SWFUpload.CURSOR.HAND,
+					button_action: SWFUpload == null ? null : SWFUpload.BUTTON_ACTION.SELECT_FILES,
+					button_cursor: SWFUpload == null ? null : SWFUpload.CURSOR.HAND,
 					
 					file_queued_handler: function(file) {
 						if (file == null)
@@ -127,15 +127,18 @@ FileUploadHelper.initializeFlashUploader = function() {
 						
 						var uploadInfo = 'swfupload-info';
 						if (jQuery('div.swfupload-info', jQuery('#' + FileUploadHelper.properties.id)).length == 0)
-							jQuery('.swfupload-control', jQuery('#' + FileUploadHelper.properties.id)).append('<div id=\'' + uploadInfo + '\' class=\'' + uploadInfo + '\'></div>');
+							jQuery('.swfupload-control', jQuery('#' + FileUploadHelper.properties.id)).append('<div id=\'' + uploadInfo +
+							'\' class=\'' + uploadInfo + '\'></div>');
 						else
 							jQuery('div.swfupload-info', jQuery('#' + FileUploadHelper.properties.id)).empty();
 						
 						if (FileUploadHelper.filesToUpload == 1) {
-							jQuery('div.swfupload-info', jQuery('#' + FileUploadHelper.properties.id)).html('<span>' + FileUploadHelper.properties.localizations.SELECTED_FILE +
+							jQuery('div.swfupload-info', jQuery('#' + FileUploadHelper.properties.id)).html('<span>' +
+								FileUploadHelper.properties.localizations.SELECTED_FILE +
 								': ' + FileUploadHelper.selectedFiles[0].name + '</span>');
 						} else if (FileUploadHelper.filesToUpload > 1) {
-							jQuery('div.swfupload-info', jQuery('#' + FileUploadHelper.properties.id)).html('<span>' + FileUploadHelper.filesToUpload + ' ' +
+							jQuery('div.swfupload-info', jQuery('#' + FileUploadHelper.properties.id)).html('<span>' +
+								FileUploadHelper.filesToUpload + ' ' +
 								FileUploadHelper.properties.localizations.FILES_SELECTED + '</span>');
 						}
 						
@@ -189,6 +192,8 @@ FileUploadHelper.initializeFlashUploader = function() {
 										}
 									}
 								});
+								
+								jQuery(this).remove();
 							});
 						});
 					}
@@ -197,6 +202,7 @@ FileUploadHelper.initializeFlashUploader = function() {
 			}
 			closeAllLoadingMessages();
 		} catch (e) {
+			jQuery('input.fileUploadInputStyle').parent().show('fast');
 			FileUploadHelper.swfu = null;
 			closeAllLoadingMessages();
 		}
