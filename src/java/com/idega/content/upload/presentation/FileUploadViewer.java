@@ -247,6 +247,12 @@ public class FileUploadViewer extends IWBaseComponent {
 				jQuery.getBundleURIToJQueryLib(),
 				web2.getBundleUriToHumanizedMessagesScript()
 		));
+		if (iwc.isIE()) {
+			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
+				web2.getSWFUploadObjectScript(),
+				web2.getSWFUploadScript()
+			));
+		}
 		String initAction = getFileUploader().getPropertiesAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(),
 				isZipFile(), getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(),
 				getComponentToRerenderId(), isFakeFileDeletion(), getActionAfterUploadedToRepository(), isStripNonRomanLetters(),
