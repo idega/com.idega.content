@@ -788,5 +788,4 @@ FileUploadHelper.reRenderComponent = function(id) {
 }
 
 function __flash__removeCallback(instance, name) {
-	alert(instance);
 }
