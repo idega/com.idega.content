@@ -34,6 +34,8 @@
 		   			e.preventDefault();
 		   			return false;
 		   		}
+		   		
+		   		showLoadingMessage('');
 		   });
 		   doc.bind('fileuploaddone', function(e, data) {
 		   		var uploadedFiles = jQuery.parseJSON(data.jqXHR.responseText);
@@ -47,6 +49,8 @@
 		   		if (data.singleFileUploads) {
 		   			jQuery('span.fileinput-button', jQuery(e.target)).removeClass('btn-success');
 		   		}
+		   		
+		   		closeAllLoadingMessages();
 		   });
 		   doc.bind('fileuploadadd', function(e, data) {
 		  		if (!opts.multipleUploads && FileUploadHelper.allUploadedFiles.length >= 1) {
