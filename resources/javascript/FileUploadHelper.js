@@ -607,7 +607,6 @@ FileUploadHelper.updateProgressBar = function(progress, progressBarId, actionAft
 		
 		FileUploadHelper.reportUploadStatus(progressBarId, actionAfterCounterReset,
 		FileUploadHelper.properties.localizations.UPLOADING_FILE_PROGRESS_BOX_FILE_UPLOADED_TEXT);
-		closeAllLoadingMessages();
 		if (FileUploadHelper.uploadingWithFrame) {
 			FileUploadHelper.uploadingWithFrame = false;
 			FileUploadHelper.executeActionAfterUploadedToRepository(getInputsForUpload(FileUploadHelper.properties.id));
