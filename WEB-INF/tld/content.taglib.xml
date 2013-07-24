@@ -11,5 +11,11 @@
             <component-type>FileUploadViewer</component-type>
         </component>
 	</tag>
+	<tag>
+		<tag-name>uploadArea</tag-name>
+		<component>
+            <component-type>UploadArea</component-type>
+        </component>
+	</tag>
     
 </facelet-taglib>

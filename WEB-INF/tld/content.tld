@@ -552,6 +552,10 @@
       	</attribute>
 	</tag>
 	<tag>
+		<name>UploadArea</name>
+		<tag-class>com.idega.content.upload.presentation.UploadAreaTag</tag-class>
+	</tag>
+	<tag>
 		<name>FileUploadViewer</name>
 		<tag-class>com.idega.content.upload.presentation.FileUploadViewerTag</tag-class>
 		<attribute>

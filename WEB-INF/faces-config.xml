@@ -283,6 +283,15 @@ version="1.2">
 		<component-class>com.idega.content.themes.presentation.TemplatesTree</component-class>
 	</component>
 	<component>
+		<component-type>UploadArea</component-type>
+		<component-class>com.idega.content.upload.presentation.UploadArea</component-class>
+		<property>
+			<display-name>auto upload</display-name>
+			<property-name>autoUpload</property-name>
+			<property-class>java.lang.Boolean</property-class>
+		</property>
+	</component>
+	<component>
 		<component-type>FileUploadViewer</component-type>
 		<component-class>com.idega.content.upload.presentation.FileUploadViewer</component-class>
 		<property>
