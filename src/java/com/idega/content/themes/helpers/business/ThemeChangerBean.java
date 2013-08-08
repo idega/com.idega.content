@@ -870,10 +870,19 @@ public class ThemeChangerBean implements ThemeChanger {
 		}
 		if (a != null) {
 			String fixedValue = fixValue(a.getValue(), linkToBase);
-			if (!isELExpression(fixedValue) && !fixedValue.startsWith(linkToBase)) {
+
+			if (isGlobalUrl(fixedValue)) {
+				a.setValue(fixedValue);
+
+			} else if (!isELExpression(fixedValue) && !fixedValue.startsWith(linkToBase)) {
 				a.setValue(new StringBuffer(linkToBase).append(fixedValue).toString()); // Fixing attribute's value
 			}
+
 		}
+	}
+	
+	private boolean isGlobalUrl(String url) {
+		return url != null && (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("//"));
 	}
 
 	private boolean isELExpression(String expression) {
