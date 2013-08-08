@@ -3,10 +3,10 @@
 		   
 		   var opts = $.extend({}, $.fn.uploadAreaHelper.defaults, options);
 		   
-		   if((options.dropZone != null) && (options.dropZone != undefined)){
+		   var doc = jQuery(document);
+		   if ((options.dropZone != null) && (options.dropZone != undefined)) {
 			   var dropZones = jQuery(eval(opts.dropZone));
 			   opts.dropZone = dropZones;
-			   var doc = jQuery(document);
 			   dropZones.css({
 				   'border' : 'solid',
 				   'border-width' : '2px',
@@ -23,12 +23,60 @@
 					   'border-color' : 'transparent'
 				   });
 			   });
-			// Disabling default action of droping files
+				// Disabling default action of droping files
 				jQuery(document).bind('drop dragover', function (e) {
 				    e.preventDefault();
 				});
 		   }
-		   if((options.filesContainer != null) && (options.filesContainer != undefined)){
+		   
+		   doc.bind('fileuploadsend', function(e, data) {
+		   		if (data.singleFileUploads && FileUploadHelper.allUploadedFiles.length >= 1) {
+		   			e.preventDefault();
+		   			return false;
+		   		}
+		   		
+		   		showLoadingMessage('');
+		   });
+		   doc.bind('fileuploaddone', function(e, data) {
+		   		var uploadedFiles = jQuery.parseJSON(data.jqXHR.responseText);
+		   		if (uploadedFiles != null) {
+		   			for (var i = 0; i < uploadedFiles.length; i++) {
+		   				var file = uploadedFiles[i];
+		   				FileUploadHelper.allUploadedFiles.push(file.url);
+		   			}
+		   		}
+		   		
+		   		if (data.singleFileUploads) {
+		   			jQuery('span.fileinput-button', jQuery(e.target)).removeClass('btn-success');
+		   		}
+		   		
+		   		closeAllLoadingMessages();
+		   });
+		   doc.bind('fileuploadadd', function(e, data) {
+		  		if (!opts.multipleUploads && FileUploadHelper.allUploadedFiles.length >= 1) {
+		   			e.preventDefault();
+		   			return false;
+		   		}
+		   });
+		   doc.bind('fileuploadfail', function(e, data) {
+		   		if (!opts.multipleUploads && FileUploadHelper.allUploadedFiles.length >= 1) {
+		   			var allUploadRows = jQuery('tr.template-upload', jQuery(e.target));
+		   			if (allUploadRows.length >= 1) {
+		   				jQuery(allUploadRows[allUploadRows.length - 1]).remove();
+		   			}
+		   		}
+		   });
+		   jQuery('.delete-button').live('click', function(e) {
+		   		var container = jQuery(e.target).parent().parent();
+		   		var removedFile = jQuery('input[name="uploaded-files"]', container).val();
+		   		removeElementFromArray(FileUploadHelper.allUploadedFiles, removedFile);
+		   	
+		   		if (!opts.multipleUploads) {
+		   			jQuery('span.fileinput-button', jQuery(opts.dropZone)).addClass('btn-success');
+		   		}
+		   });
+		   
+		   if ((options.filesContainer != null) && (options.filesContainer != undefined)) {
 			   var filesContainerLayer = jQuery(eval(opts.filesContainer));
 			   filesContainerLayer.append(options.uploadAreaOptions.filesContainerContent);
 			   opts.filesContainer = filesContainerLayer.find(".files");
@@ -38,11 +86,8 @@
 
 				opts.uploadAreaHelper = {};
 				opts.uploadAreaHelper.element = uploader;
-				uploader.fileupload( opts);
-				
-		   } ); 
-		   
-	   
+				uploader.fileupload(opts);
+		   } );    
 	   }
 	   
 	   $.fn.uploadAreaHelper.defaults = {
@@ -71,8 +116,12 @@
 		              var rows = $();
 		              $.each(o.files, function (i, file) {
 		                  var row = $('<tr class="template-upload fade"/>');
-		                  var preview = $('<td class="preview"><span class="fade"></span></td>');
-		                  row.append(preview);
+		                  
+		                  if (o.options.useThumbnail == 'true') {
+		                  	var preview = $('<td class="preview"><span class="fade"></span></td>');
+		                  	row.append(preview);
+		                  }
+		                  
 		                  var name = $('<td class="name"></td>');
 		                  row.append(name);
 		                  name.text(file.name);
@@ -93,7 +142,7 @@
 		                  	if(!o.options.autoUpload){
 		                  		var button = $('<button class="btn btn-primary" />');
 		                  		start.append(button);
-		                  		var buttonContent = $('<i class="icon-upload icon-white"/><span>'+locale.fileupload.start+'</span>');
+		                  		var buttonContent = $('<i class="icon-upload icon-white"/><span> '+locale.fileupload.start+'</span>');
 		                  		button.append(buttonContent);
 		                  	}
 		                  }else{
@@ -102,7 +151,7 @@
 		                  var cancel = $('<td class="cancel" />');
 		                  row.append(cancel);
 		                  if(!i){
-		                  	cancel.append('<button class="btn btn-warning"><i class="icon-ban-circle icon-white"></i><span>'+
+		                  	cancel.append('<button class="btn btn-warning"><i class="icon-ban-circle icon-white"></i><span> '+
 		                  			locale.fileupload.cancel + '</span></button>');
 		                  }
 		                  rows = rows.add(row);
@@ -113,12 +162,14 @@
 		              var rows = $();
 		              $.each(o.files, function (index, file) {
 		                  var row = $('<tr class="template-download fade">' +
-		                      (file.error ? '<td></td><td class="name"></td>' +
-		                          '<td class="size"></td><td class="error" colspan="2"></td>' :
-		                              '<td class="preview"></td>' +
+		                      (file.error ?
+		                      		o.options.multipleUploads ?
+		                      			'<td></td><td class="name"></td><td class="size"></td><td class="error" colspan="2"></td>' :
+		                      			'' :
+		                            '<td class="preview"></td>' +
 		                                  '<td class="name"><a></a></td>' +
 		                                  '<td class="size"></td><td colspan="2"></td>'
-		                      ) + '<td class="delete"><button class="btn btn-danger" ><i class="icon-trash icon-white"></i><span>'+
+		                      ) + '<td class="delete"><button class="btn btn-danger delete-button" ><i class="icon-trash icon-white"></i><span> '+
 		                      	locale.fileupload.destroy + '</span></button> '
 		                          + (o.options.uploadAreaOptions.checkboxNeeded ? '<input type="checkbox" name="delete" value="1">' : '' )+
 		                      +'</td></tr>'
@@ -131,10 +182,12 @@
 		                      );
 		                  } else {
 		                      row.find('.name a').text(file.name);
-		                      if (file.thumbnail_url) {
+		                      if (file.thumbnail_url != null && file.thumbnail_url != '') {
 		                          row.find('.preview').append('<a><img></a>')
 		                              .find('img').prop('src', file.thumbnail_url);
 		                          row.find('a').prop('rel', 'gallery');
+		                      } else {
+		                      	row.find('.preview').css('display', 'none');
 		                      }
 		                      row.find('a').prop('href', file.url);
 		                      row.find('.delete button')
@@ -166,3 +219,5 @@ UploadArea.initializeLocale = function(localeObject){
 	window.locale.fileupload = jQuery.extend({}, window.locale.fileupload,localeObject);
 }
 
+if (FileUploadHelper == null) var FileUploadHelper = {};
+FileUploadHelper.allUploadedFiles = [];

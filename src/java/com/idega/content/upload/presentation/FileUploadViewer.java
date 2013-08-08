@@ -45,16 +45,17 @@ public class FileUploadViewer extends IWBaseComponent {
 					componentToRerenderId,
 					uploadId,
 					maxUploadSize = String.valueOf(ContentFileUploadServlet.MAX_UPLOAD_SIZE),
-					style;
+					style,
+					uploadService = "/servlet/ContentFileUploadServlet";
 
-	private boolean zipFile = false;
-	private boolean extractContent = false;
-	private boolean themePack = false;
-	private boolean showProgressBar = true;
-	private boolean showLoadingMessage = false;
-	private boolean allowMultipleFiles = false;
-	private boolean autoAddFileInput = true;
-	private boolean autoUpload, showUploadedFiles, fakeFileDeletion, stripNonRomanLetters;
+	private boolean zipFile = false,
+					extractContent = false,
+					themePack = false,
+					showProgressBar = true,
+					showLoadingMessage = false,
+					allowMultipleFiles = false,
+					autoAddFileInput = true,
+					autoUpload, showUploadedFiles, fakeFileDeletion, stripNonRomanLetters, jQueryUploader;
 
 	@Autowired
 	private FileUploader fileUploader;
@@ -102,11 +103,12 @@ public class FileUploadViewer extends IWBaseComponent {
 		this.actionAfterUploadedToRepository = values[14] == null ? null : values[14].toString();
 
 		this.maxUploadSize = values[17] == null ? null : values[17].toString();
+		this.uploadService = values[18] == null ? null : values[18].toString();
 	}
 
 	@Override
 	public Object saveState(FacesContext context) {
-		Object values[] = new Object[18];
+		Object values[] = new Object[19];
 		values[0] = super.saveState(context);
 
 		values[1] = this.actionAfterUpload;
@@ -132,15 +134,45 @@ public class FileUploadViewer extends IWBaseComponent {
 		values[14] = this.actionAfterUploadedToRepository;
 
 		values[17] = this.maxUploadSize;
+		values[18] = this.uploadService;
 
 		return values;
 	}
 
+	private void addProperties(PresentationObjectContainer container, IWContext iwc) {
+		addProperty(container, ContentConstants.UPLOADER_PATH, getUploadPath(iwc));
+		addProperty(container, ContentConstants.UPLOADER_UPLOAD_ZIP_FILE, String.valueOf(zipFile));
+		addProperty(container, ContentConstants.UPLOADER_UPLOAD_THEME_PACK, String.valueOf(themePack));
+		addProperty(container, ContentConstants.UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE, String.valueOf(extractContent));
+		addProperty(container, ContentConstants.UPLOADER_UPLOAD_IDENTIFIER, uploadId);
+		addProperty(container, ContentConstants.UPLOADER_STRIP_NON_ROMAN_LETTERS, String.valueOf(stripNonRomanLetters));
+	}
+
 	@Override
 	public void initializeComponent(FacesContext context) {
+		IWContext iwc = IWContext.getIWContext(context);
+		Layer container = new Layer();
+		add(container);
+
+		if (isjQueryUploader() && iwc.isIE() && iwc.getBrowserVersion() < 10)
+			jQueryUploader = false;
+
+		if (isjQueryUploader()) {
+			addProperties(container, iwc);
+			UploadArea uploadArea = new UploadArea();
+			uploadArea.setAutoUpload(true);
+			uploadArea.setMultipleFiles(isAllowMultipleFiles());
+			uploadArea.setUploadPath(getUploadPath(iwc));
+			uploadArea.setDropZonesSelectionFunction("jQuery('#" + container.getId() + "');");
+			uploadArea.setUseThumbnail(false);
+			uploadArea.getUploadAreaBean().setMaxFileSize(Long.valueOf(getMaxUploadSize(context)));
+			container.add(uploadArea);
+
+			return;
+		}
+
 		ELUtil.getInstance().autowire(this);
 
-		IWContext iwc = IWContext.getIWContext(context);
 		try {
 			getFileUploader().initializeUploader(iwc);
 		} catch (Exception e) {
@@ -156,27 +188,20 @@ public class FileUploadViewer extends IWBaseComponent {
 		IWBundle bundle = ContentUtil.getBundle();
 		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
 
-		Layer container = new Layer();
-		add(container);
 		container.setStyleClass("fileUploadViewerMainLayerStyle");
 
 		PresentationObjectContainer mainContainer = container;
 		if (formId == null) {
 			Form form = new Form();
 			form.setMultiPart();
-			form.setAction("/servlet/ContentFileUploadServlet");
+			form.setAction(getUploadService());
 			form.setMethod("post");
 			container.add(form);
 			mainContainer = form;
 			formId = form.getId();
 		}
 
-		addProperty(mainContainer, ContentConstants.UPLOADER_PATH, getUploadPath(iwc));
-		addProperty(mainContainer, ContentConstants.UPLOADER_UPLOAD_ZIP_FILE, String.valueOf(zipFile));
-		addProperty(mainContainer, ContentConstants.UPLOADER_UPLOAD_THEME_PACK, String.valueOf(themePack));
-		addProperty(mainContainer, ContentConstants.UPLOADER_UPLOAD_EXTRACT_ARCHIVED_FILE, String.valueOf(extractContent));
-		addProperty(mainContainer, ContentConstants.UPLOADER_UPLOAD_IDENTIFIER, uploadId);
-		addProperty(mainContainer, ContentConstants.UPLOADER_STRIP_NON_ROMAN_LETTERS, String.valueOf(stripNonRomanLetters));
+		addProperties(mainContainer, iwc);
 
 		Layer fileInputs = new Layer();
 		String id = fileInputs.getId();
@@ -222,6 +247,12 @@ public class FileUploadViewer extends IWBaseComponent {
 				jQuery.getBundleURIToJQueryLib(),
 				web2.getBundleUriToHumanizedMessagesScript()
 		));
+		if (iwc.isIE()) {
+			PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
+				web2.getSWFUploadObjectScript(),
+				web2.getSWFUploadScript()
+			));
+		}
 		String initAction = getFileUploader().getPropertiesAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(),
 				isZipFile(), getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(),
 				getComponentToRerenderId(), isFakeFileDeletion(), getActionAfterUploadedToRepository(), isStripNonRomanLetters(),
@@ -280,8 +311,26 @@ public class FileUploadViewer extends IWBaseComponent {
 		return uploadPath;
 	}
 
+	public void setUploadService(String uploadService) {
+		this.uploadService = uploadService;
+	}
+
+	public String getUploadService() {
+		uploadService = "/servlet/blueimp-upload";
+
+		if (uploadService != null)
+			return uploadService;
+
+		uploadService = getProperty(getFacesContext(), "uploadService");
+		return uploadService;
+	}
+
 	private String getProperty(FacesContext context, String methodName) {
 		try {
+			String value = getExpressionValue(context, methodName);
+			if (value != null)
+				return value;
+
 			IWContext iwc = IWContext.getIWContext(context);
 			BuilderService builderService = builderLogic.getBuilderService(iwc);
 			String pageKey = String.valueOf(iwc.getCurrentIBPageID());
@@ -298,9 +347,7 @@ public class FileUploadViewer extends IWBaseComponent {
 	}
 
 	public String getUploadPath(FacesContext ctx) {
-		String uploadPath = getExpressionValue(ctx, "uploadPath");
-		if (uploadPath == null)
-			uploadPath = getProperty(ctx, "uploadPath");
+		String uploadPath = getProperty(ctx, "uploadPath");
 		if (uploadPath != null)
 			this.uploadPath = uploadPath;
 
@@ -468,9 +515,7 @@ public class FileUploadViewer extends IWBaseComponent {
 	}
 
 	public String getMaxUploadSize(FacesContext context) {
-		String maxUploadSize = getExpressionValue(context, "maxUploadSize");
-		if (maxUploadSize == null)
-			maxUploadSize = getProperty(context, "maxUploadSize");
+		String maxUploadSize = getProperty(context, "maxUploadSize");
 		if (maxUploadSize != null) {
 			maxUploadSize = String.valueOf(Long.valueOf(maxUploadSize) * 1024 * 1024);	//	Converting from mega bytes to bytes
 			this.maxUploadSize = maxUploadSize;
@@ -481,4 +526,13 @@ public class FileUploadViewer extends IWBaseComponent {
 	public void setMaxUploadSize(String maxUploadSize) {
 		this.maxUploadSize = maxUploadSize;
 	}
+
+	public boolean isjQueryUploader() {
+		return jQueryUploader;
+	}
+
+	public void setjQueryUploader(boolean jQueryUploader) {
+		this.jQueryUploader = jQueryUploader;
+	}
+
 }

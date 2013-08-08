@@ -111,6 +111,10 @@ public class ContentFileUploadServlet extends HttpServlet {
 				uploadProgressListener.setFileNumberInUploadSequence(fileItemNr);
 			}
 
+			//	TODO
+			long start = System.currentTimeMillis();
+			LOGGER.info("Starting to parse data for upload: " + uploadId);
+
 			List<FileItem> fileItems = null;
 			try {
 				//	Submitted data is copied from client to server
@@ -120,6 +124,10 @@ public class ContentFileUploadServlet extends HttpServlet {
 				LOGGER.log(Level.WARNING, message, e);
 				CoreUtil.sendExceptionNotification(message, e);
 			}
+
+			//	TODO
+			LOGGER.info("Data was parsed in " + (System.currentTimeMillis() - start) + " ms for upload: " + uploadId);
+
 			if (ListUtil.isEmpty(fileItems)) {
 				LOGGER.log(Level.WARNING, "No files to upload, terminating upload!");
 				IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
@@ -181,8 +189,8 @@ public class ContentFileUploadServlet extends HttpServlet {
 		    	}
 
 		        boolean isIE = CoreUtil.isIE(request);
-		        if (!(success = upload(files, uploadPath, zipFile, themePack, isIE, extractContent)))
-		        	success = upload(files, uploadPath, zipFile, themePack, isIE, extractContent);	//	Re-uploading in case of error
+		        if (!(success = upload(files, uploadPath, zipFile, themePack, isIE, extractContent, uploadId)))
+		        	success = upload(files, uploadPath, zipFile, themePack, isIE, extractContent, uploadId);	//	Re-uploading in case of error
 
 		        if (success) {
 		        	StringBuffer responseBuffer = new StringBuffer();
@@ -230,8 +238,18 @@ public class ContentFileUploadServlet extends HttpServlet {
 		result.setName(data.getName());
 		result.setUuid(data.getUuid());
 		result.setSize(data.getBytes().length);
-		result.setSuccess(upload(Arrays.asList(new UploadFile(data.getName(), null, data.getBytes().length, data.getBytes())),
-				data.getDestinationDirectory(), false, false, false, false));
+		boolean uploadedSuccessfully = upload(
+				Arrays.asList(
+					new UploadFile(data.getName(), null, data.getBytes().length, data.getBytes())
+				),
+				data.getDestinationDirectory(),
+				false,
+				false,
+				false,
+				false,
+				null
+		);
+		result.setSuccess(uploadedSuccessfully);
 		writeToResponse(response, result);
 	}
 
@@ -256,23 +274,44 @@ public class ContentFileUploadServlet extends HttpServlet {
     	response.getOutputStream().write(IOUtil.getBytesFromObject(responseObject));
 	}
 
-	private boolean upload(List<UploadFile> files, String uploadPath, boolean zipFile, boolean themePack, boolean isIE, boolean extractContent) {
+	private boolean upload(
+			List<UploadFile> files,
+			String uploadPath,
+			boolean zipFile,
+			boolean themePack,
+			boolean isIE,
+			boolean extractContent,
+			String uploadId
+	) {
+		//	TODO
+		long start = System.currentTimeMillis();
+
+		boolean result = false;
 		try {
 			FileUploader uploader = ELUtil.getInstance().getBean(FileUploader.class);
 			if (zipFile || themePack) {
 	        	if (themePack) {
 	        		uploadPath = ThemesConstants.THEMES_PATH;
-	        		return uploader.uploadThemePack(files, uploadPath, isIE);
+	        		result = uploader.uploadThemePack(files, uploadPath, isIE);
+	        		return result;
 	        	} else {
-	        		return uploader.uploadZipFile(files, uploadPath, extractContent, isIE);
+	        		result = uploader.uploadZipFile(files, uploadPath, extractContent, isIE);
+	        		return result;
 	        	}
 	        } else {
-	        	return uploader.uploadFile(files, uploadPath, isIE);
+	        	result = uploader.uploadFile(files, uploadPath, isIE);
+	        	return result;
 	        }
 		} catch (Exception e) {
-			String message = "Error uploading files (" + files + ") to: " + uploadPath;
+			String message = "Error uploading files (" + files + ") to: " + uploadPath + ". Upload ID: " + uploadId;
 			LOGGER.log(Level.WARNING, message, e);
 			CoreUtil.sendExceptionNotification(message, e);
+		} finally {
+			long duration = System.currentTimeMillis() - start;
+			String message = result ?
+					"Uploaded files " + files + " to " + uploadPath + " in " + duration + " ms. Upload ID: " + uploadId :
+					"Failed to upload files " + files + " to " + uploadPath + ". Spent time: " + duration + " ms. Upload ID: " + uploadId;
+			LOGGER.log(result ? Level.INFO : Level.WARNING, message);
 		}
 		return false;
 	}

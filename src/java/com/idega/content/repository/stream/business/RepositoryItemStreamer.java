@@ -205,7 +205,7 @@ public class RepositoryItemStreamer extends DefaultSpringBean implements DWRAnno
 			connection.setFixedLengthStreamingMode(objectData.length);
 			connection.setRequestProperty("Content-Type", "text/plain;charset=".concat(CoreConstants.ENCODING_UTF8));
 			connection.setRequestProperty("Accept", "text/plain");
-			connection.setRequestProperty("Content-Length", String.valueOf(objectData.length));
+			connection.setRequestProperty(CoreConstants.PARAMETER_CONTENT_LENGTH, String.valueOf(objectData.length));
 			connection.setDoOutput(true);
 			connection.connect();
 
