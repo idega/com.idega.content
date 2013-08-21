@@ -1,7 +1,5 @@
 package com.idega.content.business;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -86,13 +84,16 @@ public class ThumbnailService extends DefaultSpringBean {
 
 	private String generateImageThumbnail(String filePath, String thumbnailPath, int thumbnailSize, String mimeType) throws Exception {
 		int[] dimensions = get2dDimensions(thumbnailSize);
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		InputStream input = getRepositoryService().getInputStreamAsRoot(filePath);
-		byteArrayOutputStream = (ByteArrayOutputStream) ELUtil.getInstance().getBean(ImageResizer.class)
-				.getScaledImage(dimensions[0], dimensions[1], input, getImageType(mimeType), byteArrayOutputStream);
-		InputStream image = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-		getRepositoryService().uploadFile(thumbnailPath.substring(0, thumbnailPath.lastIndexOf(CoreConstants.SLASH) + 1), getFileName(thumbnailPath),
-				mimeType, image);
+
+		ImageResizer resizer = ELUtil.getInstance().getBean(ImageResizer.class);
+		InputStream image = resizer.getScaledImage(dimensions[0], dimensions[1], input, getImageType(mimeType));
+		getRepositoryService().uploadFile(
+				thumbnailPath.substring(0, thumbnailPath.lastIndexOf(CoreConstants.SLASH) + 1),
+				getFileName(thumbnailPath),
+				mimeType,
+				image
+		);
 		return thumbnailPath;
 	}
 
