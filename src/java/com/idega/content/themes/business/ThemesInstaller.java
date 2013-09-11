@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import com.idega.idegaweb.RepositoryStartedEvent;
 
 /**
- * Installs basic themes on Slide startup
+ * Installs basic themes on repository startup
  * @author valdas
  *
  */
@@ -79,11 +79,6 @@ public class ThemesInstaller implements ApplicationListener<RepositoryStartedEve
 				uploadBean = new WebDAVUploadBean();
 			}
 
-			IWSlideService slide = helper.getSlideService(iwma.getIWApplicationContext());
-			if (slide == null) {
-				return;
-			}
-
 			//	TODO: get file from URL
 			IWBundle bundle = iwma.getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER);
 			File themesPackage = IWBundleResourceFilter.copyResourceFromJarToWebapp(iwma, bundle.getVirtualPathWithFileNameString("themes/basic_themes.zip"));
@@ -103,7 +98,7 @@ public class ThemesInstaller implements ApplicationListener<RepositoryStartedEve
 
 			uploadBean.setUploadFilePath(ThemesConstants.THEMES_PATH);
 			try {
-				boolean selfInstallingResult = uploadBean.uploadZipFile(true, "Basic_themes", stream, slide);
+				boolean selfInstallingResult = uploadBean.uploadZipFile(true, "Basic_themes", stream);
 				if (selfInstallingResult) {
 					selfInstallingResult = activateThemes();
 				}

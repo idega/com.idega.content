@@ -234,7 +234,7 @@ public class WebDAVUploadBean implements Serializable {
 	}
 
 	/**
-	 * Uploads zip file's contents to slide. Note: only *.zip file allowed!
+	 * Uploads zip file's contents to repository. Note: only *.zip file allowed!
 	 * @param event: ActionEvent
 	 * @return result: success (true) or failure (false) while uploading file
 	 * @throws IOException

@@ -88,7 +88,7 @@ public class ThemesEngineBean implements ThemesEngine, ApplicationListener<Repos
 	}
 
 	/**
-	 * Returns info about themes in Slide
+	 * Returns info about themes in repository
 	 */
 	@Override
 	public List<SimplifiedTheme> getThemes() {

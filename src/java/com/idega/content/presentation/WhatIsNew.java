@@ -22,7 +22,7 @@ import javax.faces.component.UIComponent;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.block.web2.presentation.Accordion;
 import com.idega.content.business.ContentSearch;
-import com.idega.content.business.IWCacheInvalidatorIWSlideListener;
+import com.idega.content.business.IWCacheInvalidatorRepositoryListener;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.search.business.SearchPlugin;
 import com.idega.core.search.presentation.SearchResults;
@@ -99,7 +99,7 @@ public class WhatIsNew extends SearchResults {
 	}
 
 	protected void startCachingStrategy() {
-		getRepositoryService().addRepositoryChangeListeners(new IWCacheInvalidatorIWSlideListener(getStartingPointURI(), WHAT_IS_NEW_CACHE_KEY));
+		getRepositoryService().addRepositoryChangeListeners(new IWCacheInvalidatorRepositoryListener(getStartingPointURI(), WHAT_IS_NEW_CACHE_KEY));
 	}
 
 	@Override

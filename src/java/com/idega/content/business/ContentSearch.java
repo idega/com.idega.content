@@ -98,7 +98,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 	private boolean showDeleteLink = false;
 	private ICPage deletePage = null;
 
-	/* STUFF FROM WebdavResource to handle better dates from slide */
+	/* STUFF FROM WebdavResource to handle better dates from repository */
 	 /**
     * Date formats using for Date parsing.
     */
@@ -124,7 +124,7 @@ public class ContentSearch extends Object implements SearchPlugin{
        }
    }
 
-	/* STUFF ENDS FROM WebdavResource to handle better dates from slide */
+	/* STUFF ENDS FROM WebdavResource to handle better dates from repository */
 
 	/**
 	 * @return the scopeURI
@@ -894,7 +894,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 	/**
 	 * Does a simple DASL search (only displayname) and returns a collection of SearchResult objects. ContentSearch must have been initialized!
 	 * @param searchString The display name you want to search for
-	 * @param scope from what point in Slide you want to start e.g. /files/public
+	 * @param scope from what point in repository you want to start e.g. /files/public
 	 * @return returns a collection of SearchResult objects
 	 */
 	public Collection<SearchResult> doSimpleDASLSearch(String searchString, String scope){

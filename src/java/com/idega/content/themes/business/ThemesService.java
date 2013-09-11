@@ -14,9 +14,7 @@ import com.idega.core.builder.data.ICPageHome;
 import com.idega.repository.event.RepositoryEventListener;
 
 public interface ThemesService extends IBOService, RepositoryEventListener {
-	/**
-	 * @see com.idega.content.themes.business.ThemesServiceBean#onSlideChange
-	 */
+
 	public void onRepositoryChange(Event idegaWebContentEvent);
 
 	/**

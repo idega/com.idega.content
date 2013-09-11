@@ -40,7 +40,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 
 	public static final String PARAMETER_ACTION = "iw_content_action";
 	public static final String PARAMETER_CONTENT_RESOURCE = "iw_content_rs_url";
-	private static final String PARAMETER_CURRENT_PATH = "current_path_in_slide_for_documents";
+	private static final String PARAMETER_CURRENT_PATH = "current_path_in_repository_for_documents";
 
 	public static final String ACTION_LIST = "ac_list";
 	public static final String ACTION_FILE_DETAILS = "ac_file_details";

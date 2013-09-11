@@ -767,7 +767,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	}
 
 	/**
-	 * Uploads document to slide
+	 * Uploads document to repository
 	 * @param doc
 	 * @param linkToBase
 	 * @param fileName
@@ -880,7 +880,7 @@ public class ThemeChangerBean implements ThemeChanger {
 
 		}
 	}
-	
+
 	private boolean isGlobalUrl(String url) {
 		return url != null && (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("//"));
 	}

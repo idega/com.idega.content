@@ -41,7 +41,7 @@ import com.sun.syndication.feed.synd.SyndFeedImpl;
 /**
  * This RSSProducer can produce rss files for folders in repository. Its RSSProducer identifier is by default "content".
  * The rss file for a folder is called "content.xml" and is stored in a hidden folder called ".rss" under the folder that was requested.
- * An IWSlideChangeListener see's to it that a cachemap containing which rssfiles are up to date is invalidated.
+ * A repository change listener see's to it that a cachemap containing which rssfiles are up to date is invalidated.
  *
  *  Last modified: $Date: 2007/11/13 09:31:48 $ by $Author: laddi $
  *
@@ -65,7 +65,7 @@ public class ContentRSSProducer extends RSSAbstractProducer implements RSSProduc
 	public void handleRSSRequest(RSSRequest rssRequest) throws IOException {
 		//Take the request uri and get the extrauri part of it
 		//the extra part refers to a folder and should end with a "/", add it if missing
-		//Check with slidesession if the folder exists, this will return false if you don't have the right priviledges or the folder does not exist
+		//Check with repository session if the folder exists, this will return false if you don't have the right priviledges or the folder does not exist
 		//If it exists (you there for have the rights) then check if the rss file exists in the hidden folder ".rss/content.xml"
 		//If the feed file exists, dispatch to it
 		//If not, create it and then dispatch to it.
@@ -80,8 +80,6 @@ public class ContentRSSProducer extends RSSAbstractProducer implements RSSProduc
 			//This is an important check since it will also determin if the user can view the folder
 			if(this.isAFolderInRepository(uri,rssRequest)){
 
-				//for testing
-//				if(this.existsInSlide(feedFile,rssRequest) && false ){
 				//Both check if the file has been created and if the uri is cached.
 				//The uri is decached when something in the folder changes so the rss file gets regenerated
 				if(this.existsInRepository(feedFile,rssRequest) && rssFileURIsCacheMap.containsKey(uri)){

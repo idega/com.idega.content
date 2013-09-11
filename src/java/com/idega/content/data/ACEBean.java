@@ -253,8 +253,8 @@ public class ACEBean implements WFEditableListDataBean {
 					try {
 						role = ((ICRoleHome)IDOLookup.getHome(ICRole.class)).create();
 						role.setRoleKey(roleKey);
-						role.setRoleNameLocalizableKey("slide_role_"+roleKey);
-						role.setRoleDescriptionLocalizableKey("slide_role_"+roleKey+"_desc");
+						role.setRoleNameLocalizableKey("repository_role_"+roleKey);
+						role.setRoleDescriptionLocalizableKey("repository_role_"+roleKey+"_desc");
 						role.store();
 					}
 					catch (IDOLookupException e1) {

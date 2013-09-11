@@ -10,16 +10,16 @@ import com.idega.repository.event.RepositoryEventListener;
 import com.idega.util.CoreConstants;
 
 /**
- * A IWSlide listener that listens for a the given starting path and invalidates the given Block cache key when an update to that path happens
+ * Listener that listens for a the given starting path and invalidates the given Block cache key when an update to that path happens
  * @author eiki
  *
  */
-public class IWCacheInvalidatorIWSlideListener implements RepositoryEventListener {
+public class IWCacheInvalidatorRepositoryListener implements RepositoryEventListener {
 
 	private final String startingPath;
 	private final String cacheKey;
 
-	public IWCacheInvalidatorIWSlideListener(String startingPath, String cacheKey){
+	public IWCacheInvalidatorRepositoryListener(String startingPath, String cacheKey){
 		this.startingPath = startingPath.startsWith(CoreConstants.SLASH) ?startingPath : CoreConstants.SLASH.concat(startingPath);
 		this.cacheKey = cacheKey;
 	}

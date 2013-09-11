@@ -31,13 +31,13 @@ import com.idega.util.expression.ELUtil;
 import com.idega.util.xml.XmlUtil;
 
 /**
- * A utility class to find page types and site templates from bundles and slide
+ * An utility class to find page types and site templates from bundles and repository
  * @author Justinas,eiki
  *
  */
 public class TemplatesLoader implements JarLoader {
 
-	public static final String SLIDE_TEMPLATES_FOLDER = CoreConstants.CONTENT_PATH + "/templates/";
+	public static final String REPOSITORY_TEMPLATES_FOLDER = CoreConstants.CONTENT_PATH + "/templates/";
 	public static final String SITE_TEMPLATES_XML_FILE_NAME = "site-templates.xml";
 	public static final String PAGE_TEMPLATES_XML_FILE_NAME = "page-templates.xml";
 	public static final String SITE_TEMPLATES_CACHE_KEY = "IWSiteTemplates";
@@ -214,10 +214,10 @@ public class TemplatesLoader implements JarLoader {
 		return siteTemplates.get(ContentConstants.SITE_MAP_KEY);
 	}
 
-	protected String getSlideTemplatesFolderURI() {
-		String templatesFolder = SLIDE_TEMPLATES_FOLDER;
+	protected String getRepositoryTemplatesFolderURI() {
+		String templatesFolder = REPOSITORY_TEMPLATES_FOLDER;
 		try {
-			templatesFolder = getRepositoryService().getWebdavServerURL()+SLIDE_TEMPLATES_FOLDER;
+			templatesFolder = getRepositoryService().getWebdavServerURL()+REPOSITORY_TEMPLATES_FOLDER;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

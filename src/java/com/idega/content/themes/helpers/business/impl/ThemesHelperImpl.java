@@ -96,7 +96,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	private List<String> loadedThemes = null;
 	private List<String> predefinedThemeStyles = null;
 
-	private boolean checkedFromSlide = false;
+	private boolean checkedFromRepository = false;
 	private boolean loadedThemeSettings = false;
 	private boolean loadedPageSettings = false;
 
@@ -1195,7 +1195,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			return null;
 		}
 
-		String fullUrl = changeUploadFileName(ThemesConstants.PAGES_PATH_SLIDE + templateFile);
+		String fullUrl = changeUploadFileName(ThemesConstants.PAGES_PATH_REPOSITORY + templateFile);
 		String base = extractValueFromString(fullUrl, 0, fullUrl.lastIndexOf(ContentConstants.SLASH));
 		if (!base.endsWith(ContentConstants.SLASH)) {
 			base += ContentConstants.SLASH;
@@ -1213,7 +1213,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return CoreConstants.WEBDAV_SERVLET_URI + base + changedFileName;
 	}
 
-	private boolean existInSlide(String path) {
+	private boolean existInRepository(String path) {
 		try {
 			return getRepositoryService().getExistence(path);
 		} catch (RepositoryException e) {
@@ -1263,7 +1263,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		StringBuffer tempPath = new StringBuffer(path);
 
 		int i = 1;
-		while (existInSlide(tempPath.toString())) {
+		while (existInRepository(tempPath.toString())) {
 			tempPath = new StringBuffer(path).append(i);
 			i++;
 		}
@@ -1612,7 +1612,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		return false;
 	}
 
-	private boolean existFileInSlide(String path, boolean printError) {
+	private boolean existFileInRepository(String path, boolean printError) {
 		if (path == null) {
 			return false;
 		}
@@ -1629,7 +1629,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 
 	@Override
 	public boolean existFileInRepository(String path) {
-		return existFileInSlide(path, false);
+		return existFileInRepository(path, false);
 	}
 
 	@Override
@@ -1690,7 +1690,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 
 	@Override
 	public boolean isCheckedFromRepository() {
-		return checkedFromSlide;
+		return checkedFromRepository;
 	}
 
 	/**
