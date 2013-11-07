@@ -26,6 +26,7 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.util.CoreConstants;
+import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
@@ -105,6 +106,7 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet{
 			responseMapArray = new ArrayList<HashMap<String,Object>>(files.size());
 			for(FileItem file : files){
 				String fileName = file.getName();
+				fileName = StringHandler.stripNonRomanCharacters(fileName, new char[] {'-', '_', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9','.'});
 				String pathAndName = uploadPath + fileName;
 				iwSlideService.uploadFile(uploadPath, fileName, file.getContentType(), file.getInputStream());
 				
