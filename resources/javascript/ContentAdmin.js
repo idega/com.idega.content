@@ -16,6 +16,7 @@ jQuery(window).load(function() {
 		var link = jQuery(this);
 		link.attr('data-fancybox-type', 'ajax');
 		link.fancybox({
+			type: 'ajax',
 			autoScale: false,
 			autoDimensions: false,
 			width: 450,

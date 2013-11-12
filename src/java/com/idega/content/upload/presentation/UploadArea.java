@@ -3,11 +3,14 @@ package com.idega.content.upload.presentation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
@@ -41,7 +44,8 @@ public class UploadArea extends IWBaseComponent {
 					uploadPath = null,
 					styleClass = "idega-upload-area",
 					filesListContainerSelectFunction = null,
-					id;
+					id,
+					afterUpload = null;
 
 	private UploadAreaBean uploadAreaBean = null;
 
@@ -54,8 +58,8 @@ public class UploadArea extends IWBaseComponent {
 
 	private Boolean addStartUploadsButton = null;
 
-	public UploadAreaBean getUploadAreaBean() {
-		if (uploadAreaBean == null) {
+	public UploadAreaBean getUploadAreaBean(){
+		if(uploadAreaBean == null){
 			uploadAreaBean = ELUtil.getInstance().getBean(UploadAreaBean.BEAN_NAME);
 		}
 		return uploadAreaBean;
@@ -172,6 +176,17 @@ public class UploadArea extends IWBaseComponent {
 		return container;
 	}
 
+	private class NotString {
+		private String value = null;
+		public NotString(String string){
+			value = string;
+		}
+		@Override
+		public String toString(){
+			return value;
+		}
+	}
+
 	protected Map<String, Object> getUploaderOptions(IWContext iwc){
 		UploadAreaBean uploadAreaBean = getUploadAreaBean();
 		Map<String, Object> options = new HashMap<String, Object>();
@@ -184,7 +199,10 @@ public class UploadArea extends IWBaseComponent {
 		options.put("fileInputId", id);
 		uploadAreaBean.setAddThumbnail(isUseThumbnail());
 
-		Map<String, Object> uploadAreaOptions = new HashMap<String, Object>();
+		options.put("added", new NotString(getAfterUpload()));
+
+		HashMap<String, Object> uploadAreaOptions = new HashMap<String, Object>();
+
 		options.put("uploadAreaOptions", uploadAreaOptions);
 		uploadAreaOptions.put("checkboxNeeded", isCheckboxNeeded());
 
@@ -218,10 +236,32 @@ public class UploadArea extends IWBaseComponent {
 		return isAddStartUploadsButton() || isAddCancelUploadsButton() || isAddDeleteUploadsButton();
 	}
 
+	private String getOptionsFromMap(Map<String,Object> map){
+		StringBuilder str = new StringBuilder("{");
+		Set<String> keys = map.keySet();
+		Iterator<String> iterator = keys.iterator();
+		Gson gson = new Gson();
+		for(String key = iterator.next();iterator.hasNext();){
+			Object item = map.get(key);
+			String jsonString;
+			if(item instanceof NotString){
+				jsonString = ((NotString)item).toString();
+			}else{
+				jsonString = gson.toJson(map.get(key));
+			}
+			str.append(key).append(CoreConstants.COLON).append(jsonString);
+			if(iterator.hasNext()){
+				str.append(",");
+			}
+			key = iterator.next();
+		}
+		str.append("}");
+		return str.toString();
+	}
 
 	private void addFileInput(IWContext iwc, IWResourceBundle iwrb){
 		setStyleClass(getStyleClass());
-		getScriptOnLoad().append("\n\tjQuery('#").append(getId()).append("').uploadAreaHelper(").append(new Gson().toJson(getUploaderOptions(iwc))).append(");");
+		getScriptOnLoad().append("\n\tjQuery('#").append(getId()).append("').uploadAreaHelper(").append(getOptionsFromMap(getUploaderOptions(iwc))).append(");");
 		setStyleAttribute("width:100%");
 
 
@@ -355,7 +395,10 @@ public class UploadArea extends IWBaseComponent {
 	}
 
 	public String getUploadPath() {
-		return uploadPath;
+		if(uploadPath != null){
+			return uploadPath;
+		}
+		return (String) getValue("uploadPath");
 	}
 
 	public void setUploadPath(String uploadPath) {
@@ -387,7 +430,17 @@ public class UploadArea extends IWBaseComponent {
 	}
 
 	public String getName() {
+		name = (String) getValue("name");
 		return name;
+	}
+
+	private Object getValue(String attribute){
+		ValueExpression valueExpression = getValueExpression(attribute);
+		if(valueExpression == null){
+			return null;
+		}
+		Object value = valueExpression.getValue(getFacesContext().getELContext());
+		return value;
 	}
 
 	public void setName(String name) {
@@ -475,4 +528,11 @@ public class UploadArea extends IWBaseComponent {
 		this.useThumbnail = useThumbnail;
 	}
 
+	public String getAfterUpload() {
+		return afterUpload;
+	}
+
+	public void setAfterUpload(String afterUpload) {
+		this.afterUpload = afterUpload;
+	}
 }
