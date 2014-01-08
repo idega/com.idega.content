@@ -22,18 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.gson.Gson;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ThumbnailService;
-import com.idega.content.repository.download.RepositoryItemDownloader;
 import com.idega.content.upload.business.UploadAreaBean;
-import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
-import com.idega.io.MediaWritable;
 import com.idega.presentation.IWContext;
 import com.idega.repository.RepositoryService;
 import com.idega.repository.bean.RepositoryItem;
 import com.idega.util.CoreConstants;
 import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
-import com.idega.util.URIUtil;
 import com.idega.util.expression.ELUtil;
 
 public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
@@ -129,11 +125,11 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 				String path = item.getPath();
 				if (!path.startsWith(CoreConstants.WEBDAV_SERVLET_URI))
 					path = CoreConstants.WEBDAV_SERVLET_URI + path;
-				URIUtil downloadPath = new URIUtil(IWMainApplication.MEDIA_SERVLET_URL);
-				downloadPath.setParameter(RepositoryItemDownloader.PARAMETER_URL, path);
-				downloadPath.setParameter(RepositoryItemDownloader.PARAMETER_ALLOW_ANONYMOUS, Boolean.TRUE.toString());
-				downloadPath.setParameter(MediaWritable.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(RepositoryItemDownloader.class));
-				fileData.put("url", downloadPath.getUri());
+//				URIUtil downloadPath = new URIUtil(IWMainApplication.MEDIA_SERVLET_URL);
+//				downloadPath.setParameter(RepositoryItemDownloader.PARAMETER_URL, path);
+//				downloadPath.setParameter(RepositoryItemDownloader.PARAMETER_ALLOW_ANONYMOUS, Boolean.TRUE.toString());
+//				downloadPath.setParameter(MediaWritable.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(RepositoryItemDownloader.class));
+				fileData.put("url", path);
 
 				if (useThumbnail)
 					fileData.put("thumbnail_url", thumbnailService.getThumbnail(pathAndName, ThumbnailService.THUMBNAIL_SMALL));
