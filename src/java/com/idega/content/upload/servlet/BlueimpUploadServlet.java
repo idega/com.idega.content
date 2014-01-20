@@ -26,7 +26,6 @@ import com.idega.content.upload.business.UploadAreaBean;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.repository.RepositoryService;
-import com.idega.repository.bean.RepositoryItem;
 import com.idega.util.CoreConstants;
 import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
@@ -117,26 +116,23 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 				String pathAndName = uploadPath + fileName;
 				boolean success = getRepositoryService().uploadFile(uploadPath, fileName, file.getContentType(), file.getInputStream());
 
-				Map<String, Object> fileData = new HashMap<String, Object>();
-				fileData.put("name", fileName);
-				fileData.put("size", file.getSize());
-
-				RepositoryItem item = getRepositoryService().getRepositoryItemAsRootUser(pathAndName);
-				String path = item.getPath();
-				if (!path.startsWith(CoreConstants.WEBDAV_SERVLET_URI))
-					path = CoreConstants.WEBDAV_SERVLET_URI + path;
-//				URIUtil downloadPath = new URIUtil(IWMainApplication.MEDIA_SERVLET_URL);
-//				downloadPath.setParameter(RepositoryItemDownloader.PARAMETER_URL, path);
-//				downloadPath.setParameter(RepositoryItemDownloader.PARAMETER_ALLOW_ANONYMOUS, Boolean.TRUE.toString());
-//				downloadPath.setParameter(MediaWritable.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(RepositoryItemDownloader.class));
-				fileData.put("url", path);
-
-				if (useThumbnail)
-					fileData.put("thumbnail_url", thumbnailService.getThumbnail(pathAndName, ThumbnailService.THUMBNAIL_SMALL));
-
-				fileData.put("delete_url", getDeleteUrl(iwc, path));
-				fileData.put("delete_type", "DELETE");
-				fileData.put("message", "");
+				Map<String, Object> fileData = getUploadAreaBean().getFileResponce(fileName, file.getSize(), pathAndName);
+//					new HashMap<String, Object>();
+//				fileData.put("name", fileName);
+//				fileData.put("size", file.getSize());
+//
+//				RepositoryItem item = getRepositoryService().getRepositoryItemAsRootUser(pathAndName);
+//				String path = item.getPath();
+//				if (!path.startsWith(CoreConstants.WEBDAV_SERVLET_URI))
+//					path = CoreConstants.WEBDAV_SERVLET_URI + path;
+//				fileData.put("url", path);
+//
+//				if (useThumbnail)
+//					fileData.put("thumbnail_url", thumbnailService.getThumbnail(pathAndName, ThumbnailService.THUMBNAIL_SMALL));
+//
+//				fileData.put("delete_url", getDeleteUrl(iwc, path));
+//				fileData.put("delete_type", "DELETE");
+//				fileData.put("message", "");
 				fileData.put("status", success ? "OK" : "FAILURE");
 				responseMapArray.add(fileData);
 			}
