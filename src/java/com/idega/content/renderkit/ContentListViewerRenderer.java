@@ -1,9 +1,9 @@
 /*
  * $Id: ContentListViewerRenderer.java,v 1.13 2008/11/17 18:01:31 valdas Exp $ Created on
  * 27.1.2005
- * 
+ *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
- * 
+ *
  * This software is the proprietary information of Idega hf. Use is subject to
  * license terms.
  */
@@ -13,11 +13,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.faces.component.UIColumn;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIData;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+
 import org.apache.myfaces.shared_tomahawk.renderkit.JSFAttr;
 import org.apache.myfaces.shared_tomahawk.renderkit.RendererUtils;
 import org.apache.myfaces.shared_tomahawk.renderkit.html.HTML;
@@ -33,23 +35,23 @@ import com.idega.webface.WFContainer;
 import com.idega.webface.renderkit.BaseRenderer;
 
 /**
- * 
+ *
  * Last modified: $Date: 2008/11/17 18:01:31 $ by $Author: valdas $
- * 
+ *
  * @author <a href="mailto:gummi@idega.com">Gudmundur Agust Saemundsson </a>
  * @version $Revision: 1.13 $
  */
 public class ContentListViewerRenderer extends BaseRenderer {
-	
+
 	public static final String DIV_ELEM = "div";
-	
+
 	public static final String FACET_ITEM_COMMENTS_CONTROLLER = "comments_controller_in_list";
 
 	/**
 	 * Gets the default Logger. By default it uses the package and the class
 	 * name to get the logger. <br>
 	 * This behaviour can be overridden in subclasses.
-	 * 
+	 *
 	 * @return the default Logger
 	 */
 	protected Logger getLogger() {
@@ -82,7 +84,7 @@ public class ContentListViewerRenderer extends BaseRenderer {
 		renderCustomComponent(facesContext, uiComponent, ContentItemViewer.FACET_FEED_SCRIPT);
 		renderCustomComponent(facesContext, uiComponent, ContentConstants.CONTENT_LIST_ITEMS_IDENTIFIER_NAME);
 	}
-	
+
 	private void renderCustomComponent(FacesContext facesContext, UIComponent list, String facetName) throws IOException {
 		Object component = list.getFacets().get(facetName);
 		if (component instanceof UIComponent) {
@@ -110,14 +112,14 @@ public class ContentListViewerRenderer extends BaseRenderer {
 	}
 
 	@Override
-	public void encodeChildren(FacesContext facesContext, UIComponent component) throws IOException {		
+	public void encodeChildren(FacesContext facesContext, UIComponent component) throws IOException {
 		RendererUtils.checkParamValidity(facesContext, component, UIData.class);
 		UIData uiData = (UIData) component;
 		ResponseWriter writer = facesContext.getResponseWriter();
-		
+
 		String savedArticleItemStyleClass = null;
 		String firstArticleItemStyleClass = null;
-		
+
 		String rowClasses;
 		String columnClasses;
 		if (component instanceof ContentItemListViewer) {
@@ -129,7 +131,7 @@ public class ContentListViewerRenderer extends BaseRenderer {
 			rowClasses = (String) component.getAttributes().get(JSFAttr.ROW_CLASSES_ATTR);
 			columnClasses = (String) component.getAttributes().get(JSFAttr.COLUMN_CLASSES_ATTR);
 		}
-		
+
 		Styles styles = new Styles(rowClasses, columnClasses);
 		int first = uiData.getFirst();
 		int rows = uiData.getRows();
@@ -142,24 +144,24 @@ public class ContentListViewerRenderer extends BaseRenderer {
 			last = rowCount;
 		}
 		for (int i = first; i < last; i++) {
-			uiData.setRowIndex(i);   
-			
+			uiData.setRowIndex(i);
+
 			if (!uiData.isRowAvailable()) {
 				logError("Row is not available. Rowindex = " + i);
 				return;
 			}
 			beforeViewer(facesContext, uiData);
-			
+
 			if (styles.hasRowStyle()) {
 				HtmlRendererUtils.writePrettyLineSeparator(facesContext);
 				writer.startElement(DIV_ELEM, component);
 				String rowStyle = styles.getRowStyle(i);
 				writer.writeAttribute(HTML.CLASS_ATTR, rowStyle, null);
 			}
-			List children = component.getChildren();
+			List<UIComponent> children = component.getChildren();
 			for (int j = 0, size = component.getChildCount(); j < size; j++) {
-				UIComponent child = (UIComponent) children.get(j);				
-				
+				UIComponent child = children.get(j);
+
 				if (child instanceof UIColumn && ((UIColumn) child).isRendered()) {
 					if (styles.hasColumnStyle()) {
 						HtmlRendererUtils.writePrettyLineSeparator(facesContext);
@@ -168,44 +170,44 @@ public class ContentListViewerRenderer extends BaseRenderer {
 						writer.writeAttribute(HTML.CLASS_ATTR, columnStyle, null);
 					}
 					HtmlRendererUtils.writePrettyLineSeparator(facesContext);
-					
+
 					//different style classes to article items are assigned;
-                    //that will help to style articles 
-                    List childrenOfAChild = child.getChildren(); // the same as getting first child...
-                    for (int k = 0; k < child.getChildCount(); k++) { // because there is only one child allways 
+                    //that will help to style articles
+                    List<UIComponent> childrenOfAChild = child.getChildren(); // the same as getting first child...
+                    for (int k = 0; k < child.getChildCount(); k++) { // because there is only one child allways
                         WFContainer article = (WFContainer) childrenOfAChild.get(k);
                         if (i == first) {
-                            savedArticleItemStyleClass = article.getStyleClass();                        
+                            savedArticleItemStyleClass = article.getStyleClass();
                         }
                         StringBuffer buf = new StringBuffer();
-                        
+
                         if (!(firstArticleItemStyleClass == null)) {
-                            if (i == first) { // this is first atricle item                                
-                                buf.append(firstArticleItemStyleClass);  
+                            if (i == first) { // this is first atricle item
+                                buf.append(firstArticleItemStyleClass);
                             } else {
                                 buf.append(savedArticleItemStyleClass);
                             }
                         } else {
                             buf.append(savedArticleItemStyleClass);
                         }
-                        
-                        if (i == first) {                            
+
+                        if (i == first) {
                             buf.append(" ").append(savedArticleItemStyleClass).append("_first");
                         }
-                        if (i == last - 1) { //last                            
+                        if (i == last - 1) { //last
                             buf.append(" ").append(savedArticleItemStyleClass).append("_last");
                         }
-                        
+
                         if ((i % 2) == 0) {
                             buf.append(" ").append(savedArticleItemStyleClass).append("_odd");
                         } else {
                             buf.append(" ").append(savedArticleItemStyleClass).append("_even");
                         }
-                        
+
                         article.setStyleClass(buf.toString());
-                        
+
                     }
-					
+
 					RendererUtils.renderChild(facesContext, child);
 					if (styles.hasColumnStyle()) {
 						writer.endElement(DIV_ELEM);
