@@ -207,7 +207,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		}
 		upload.setOnClick(getFileUploader().getUploadAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(), isZipFile(),
 				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId(),
-				isFakeFileDeletion(), getActionAfterUploadedToRepository(), isStripNonRomanLetters(), getMaxUploadSize(context)
+				isFakeFileDeletion(), getActionAfterUploadedToRepository(context), isStripNonRomanLetters(), getMaxUploadSize(context)
 		));
 		buttonsContainer.add(upload);
 		mainContainer.add(buttonsContainer);
@@ -220,7 +220,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		));
 		String initAction = getFileUploader().getPropertiesAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(), isZipFile(),
 				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId(),
-				isFakeFileDeletion(), getActionAfterUploadedToRepository(), isStripNonRomanLetters(), getMaxUploadSize(context)
+				isFakeFileDeletion(), getActionAfterUploadedToRepository(context), isStripNonRomanLetters(), getMaxUploadSize(context)
 		);
 
 		StringBuilder initializAtion = new StringBuilder(getFileUploader()
@@ -438,7 +438,12 @@ public class FileUploadViewer extends IWBaseComponent {
 		return uploadId;
 	}
 
-	public String getActionAfterUploadedToRepository() {
+	public String getActionAfterUploadedToRepository(FacesContext context) {
+		if(actionAfterUploadedToRepository != null){
+			return actionAfterUploadedToRepository;
+		}
+		actionAfterUploadedToRepository = getExpressionValue(CoreUtil.getIWContext(), "actionAfterUploadedToRepository");
+
 		return actionAfterUploadedToRepository;
 	}
 
