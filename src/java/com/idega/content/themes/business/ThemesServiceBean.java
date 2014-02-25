@@ -74,7 +74,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService {
 
 		IWContext iwc = CoreUtil.getIWContext();
 
-		Map<Integer, ? extends ICTreeNode> tree = null;
+		Map<Integer, ? extends ICTreeNode<?>> tree = null;
 		ICDomain domain = null;
 		int userId = 1;
 
@@ -332,7 +332,7 @@ public class ThemesServiceBean extends IBOServiceBean implements ThemesService {
 		IWContext iwc = CoreUtil.getIWContext();
 		IWApplicationContext iwac = iwc == null ? IWMainApplication.getDefaultIWApplicationContext() : iwc;
 
-		Map<Integer, ? extends ICTreeNode> tree = getBuilderService().getTree(iwac);
+		Map<Integer, ? extends ICTreeNode<?>> tree = getBuilderService().getTree(iwac);
 		if (tree == null) {
 			return -1;
 		}

@@ -255,7 +255,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		}
 		String initAction = getFileUploader().getPropertiesAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(),
 				isZipFile(), getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(),
-				getComponentToRerenderId(), isFakeFileDeletion(), getActionAfterUploadedToRepository(), isStripNonRomanLetters(),
+				getComponentToRerenderId(), isFakeFileDeletion(), getActionAfterUploadedToRepository(iwc), isStripNonRomanLetters(),
 				getMaxUploadSize(context)
 		);
 
@@ -494,7 +494,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		if(actionAfterUploadedToRepository != null){
 			return actionAfterUploadedToRepository;
 		}
-		actionAfterUploadedToRepository = getExpressionValue(CoreUtil.getIWContext(), "actionAfterUploadedToRepository");
+		actionAfterUploadedToRepository = getExpressionValue(context == null ? CoreUtil.getIWContext() : context, "actionAfterUploadedToRepository");
 
 		return actionAfterUploadedToRepository;
 	}

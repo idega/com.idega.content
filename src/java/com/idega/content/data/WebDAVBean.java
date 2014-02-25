@@ -31,7 +31,7 @@ import com.idega.util.expression.ELUtil;
 /**
  * @author Roar
  */
-public class WebDAVBean implements ICTreeNode, Serializable {
+public class WebDAVBean implements ICTreeNode<RepositoryItem>, Serializable {
 
 	private static final long serialVersionUID = -7214381001863096621L;
 
@@ -71,7 +71,7 @@ public class WebDAVBean implements ICTreeNode, Serializable {
     private boolean real = true;
 
     private RepositoryItem me;
-    private ICTreeNode parent;
+//    private WebDAVBean parent;
     private int siblingCount = 0;
     private List<RepositoryItem> children;
     private int childrenCount = -1;
@@ -440,7 +440,7 @@ public class WebDAVBean implements ICTreeNode, Serializable {
 	}
 
 	@Override
-	public ICTreeNode getChildAtIndex(int childIndex) {
+	public RepositoryItem getChildAtIndex(int childIndex) {
 		if (this.children == null) {
 			getChildren();
 		}
@@ -448,7 +448,7 @@ public class WebDAVBean implements ICTreeNode, Serializable {
 			return null;
 		}
 
-		List<ICTreeNode> tmp = new ArrayList<ICTreeNode>();
+		List<RepositoryItem> tmp = new ArrayList<RepositoryItem>();
 		return tmp.get(childIndex);
 	}
 
@@ -487,7 +487,7 @@ public class WebDAVBean implements ICTreeNode, Serializable {
 	 * @see com.idega.core.data.ICTreeNode#getIndex(com.idega.core.data.ICTreeNode)
 	 */
 	@Override
-	public int getIndex(ICTreeNode node) {
+	public int getIndex(RepositoryItem node) {
 		if (this.children == null) {
 			getChildren();
 		}
@@ -497,23 +497,23 @@ public class WebDAVBean implements ICTreeNode, Serializable {
 	/* (non-Javadoc)
 	 * @see com.idega.core.data.ICTreeNode#getParentNode()
 	 */
-	@Override
-	public ICTreeNode getParentNode() {
-		if (this.parent == null) {
+	public RepositoryItem getParentNode() {
+//		if (this.parent == null) {
 			try {
 				if (getMe() != null) {
 					String url = getMe().getParentPath();
 					url = url.replaceFirst(getRepositoryService().getWebdavServerURL(), CoreConstants.EMPTY);
-					RepositoryItem selectedNode = getRepositoryService().getRepositoryItem(url);
-					this.parent = new WebDAVBean(selectedNode);
+					return getRepositoryService().getRepositoryItem(url);
+//					this.parent = new WebDAVBean(selectedNode);
 				} else {
-					this.parent = null;
+//					this.parent = null;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-		return this.parent;
+			return null;
+//		}
+//		return this.parent;
 	}
 
 	@Override
@@ -594,16 +594,16 @@ public class WebDAVBean implements ICTreeNode, Serializable {
 		return this.checkedOutString;
 	}
 
-    /**
-	 * @param checkedOut
-	 */
-	private void setCheckedOutString(String checkedOut) {
-		if(checkedOut!=null && !"".equals(checkedOut)){
-			setCheckedOut(true);
-			this.checkedOutString = checkedOut;
-		}
-
-	}
+//    /**
+//	 * @param checkedOut
+//	 */
+//	private void setCheckedOutString(String checkedOut) {
+//		if(checkedOut!=null && !"".equals(checkedOut)){
+//			setCheckedOut(true);
+//			this.checkedOutString = checkedOut;
+//		}
+//
+//	}
 
 	RepositoryService getRepositoryService() {
 		return ELUtil.getInstance().getBean(RepositoryService.class);
