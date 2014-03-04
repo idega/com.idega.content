@@ -202,7 +202,7 @@ public class CategoryBean {
 			String resourcePath = repository.getURI(CATEGORY_PROPERTIES_FILE);
 			stream = repository.getInputStreamAsRoot(resourcePath);
 			if (stream == null)
-				return Collections.emptyMap();
+				return new HashMap<String, ContentCategory>();
 
 			SAXBuilder builder = new SAXBuilder();
 			Document document = builder.build(stream);
