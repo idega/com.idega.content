@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.gson.Gson;
 import com.idega.content.business.ContentConstants;
-import com.idega.content.business.ThumbnailService;
 import com.idega.content.upload.business.UploadAreaBean;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
@@ -104,10 +103,10 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 				}
 			}
 
-			boolean useThumbnail = getUploadAreaBean().isAddThumbnail();
-			ThumbnailService thumbnailService = null;
-			if (useThumbnail)
-				thumbnailService = ELUtil.getInstance().getBean(ThumbnailService.BEAN_NAME);
+//			boolean useThumbnail = getUploadAreaBean().isAddThumbnail();
+//			ThumbnailService thumbnailService = null;
+//			if (useThumbnail)
+//				thumbnailService = ELUtil.getInstance().getBean(ThumbnailService.BEAN_NAME);
 
 			responseMapArray = new ArrayList<Map<String, Object>>();
 			for (FileItem file: files) {
