@@ -25,10 +25,13 @@ public class FilesUploaderForm extends Block {
 	@Autowired
 	private FileUploader fileUploader;
 
+	private boolean reloadPageAfterUpload = false;
+
 	private String parentPath = null;
 
-	protected static final String PARENT_PATH_FOLDER_CHOOSER_PARAMETER = "parentPathForFolderChooserPrm";
-	protected static final String COMPONENT_TO_RERENDER_ID_PARAMETER = "componentToRerenderIdPrm";
+	protected static final String 	PARENT_PATH_FOLDER_CHOOSER_PARAMETER = "parentPathForFolderChooserPrm",
+									COMPONENT_TO_RERENDER_ID_PARAMETER = "componentToRerenderIdPrm",
+									RELOAD_AFTER_UPLOAD = "reloadAfterUploadPrm";
 
 	@Override
 	public void main(IWContext iwc) {
@@ -40,6 +43,9 @@ public class FilesUploaderForm extends Block {
 
 		if (iwc.isParameterSet(PARENT_PATH_FOLDER_CHOOSER_PARAMETER)) {
 			parentPath = iwc.getParameter(PARENT_PATH_FOLDER_CHOOSER_PARAMETER);
+		}
+		if (iwc.isParameterSet(RELOAD_AFTER_UPLOAD)) {
+			reloadPageAfterUpload = Boolean.valueOf(iwc.getParameter(RELOAD_AFTER_UPLOAD));
 		}
 		if (StringUtil.isEmpty(parentPath)) {
 			container.add(new Heading1(getResourceBundle(iwc).getLocalizedString("unkown_parent_path_in_repository", "Provide parent path in repository!")));
@@ -71,11 +77,23 @@ public class FilesUploaderForm extends Block {
 		uploader.setUploadPath(StringUtil.isEmpty(uploadPath) ? parentPath : uploadPath);
 		uploader.setAutoAddFileInput(true);
 		uploader.setShowLoadingMessage(true);
-		uploader.setActionAfterCounterReset("MOOdalBox.close();");
+		uploader.setActionAfterCounterReset("MOOdalBox.close();" +
+				(isReloadPageAfterUpload() ?
+						"showLoadingMessage('" + getResourceBundle(iwc).getLocalizedString("reloading", "Reloading...") + "');reloadPage();" :
+						CoreConstants.EMPTY)
+		);
 
 		if (iwc.isParameterSet(COMPONENT_TO_RERENDER_ID_PARAMETER)) {
 			uploader.setComponentToRerenderId(iwc.getParameter(COMPONENT_TO_RERENDER_ID_PARAMETER));
 		}
+	}
+
+	public boolean isReloadPageAfterUpload() {
+		return reloadPageAfterUpload;
+	}
+
+	public void setReloadPageAfterUpload(boolean reloadPageAfterUpload) {
+		this.reloadPageAfterUpload = reloadPageAfterUpload;
 	}
 
 	private DropdownMenu getFolderChooser(IWContext iwc) {

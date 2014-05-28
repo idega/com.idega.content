@@ -109,9 +109,9 @@ public class PageCreationManagedBean implements ActionListener {
 		}
 
 		WFTreeNode node = new WFTreeNode();
-		List<ICTreeNode> topLevelPages = null;
+		List<ICTreeNode<?>> topLevelPages = null;
 		try {
-			topLevelPages = new ArrayList<ICTreeNode>(builderService.getTopLevelPages(iwc));
+			topLevelPages = new ArrayList<ICTreeNode<?>>(builderService.getTopLevelPages(iwc));
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -119,8 +119,8 @@ public class PageCreationManagedBean implements ActionListener {
 			return node;
 		}
 
-		ICTreeNode startPage = null;
-		ICTreeNode page = null;
+		ICTreeNode<?> startPage = null;
+		ICTreeNode<?> page = null;
 		for (int i = 0; i < topLevelPages.size(); i++) {
 			startPage = topLevelPages.get(i);
 			if (startPage == null)

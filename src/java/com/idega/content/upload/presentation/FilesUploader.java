@@ -24,7 +24,7 @@ import com.idega.util.expression.ELUtil;
 
 public class FilesUploader extends Block {
 
-	private boolean resolvePathFromUser;
+	private boolean resolvePathFromUser, reloadPageAfterUpload;
 
 	private String parentPath;
 	private String componentToRerenderId;
@@ -97,6 +97,9 @@ public class FilesUploader extends Block {
 		if (!StringUtil.isEmpty(componentToRerenderId)) {
 			parameters.add(new AdvancedProperty(FilesUploaderForm.COMPONENT_TO_RERENDER_ID_PARAMETER, componentToRerenderId));
 		}
+		if (isReloadPageAfterUpload()) {
+			parameters.add(new AdvancedProperty(FilesUploaderForm.RELOAD_AFTER_UPLOAD, Boolean.TRUE.toString()));
+		}
 
 		return builderService.getUriToObject(FilesUploaderForm.class, parameters);
 	}
@@ -139,6 +142,14 @@ public class FilesUploader extends Block {
 	@Override
 	public String getBundleIdentifier() {
 		return ContentConstants.IW_BUNDLE_IDENTIFIER;
+	}
+
+	public boolean isReloadPageAfterUpload() {
+		return reloadPageAfterUpload;
+	}
+
+	public void setReloadPageAfterUpload(boolean reloadPageAfterUpload) {
+		this.reloadPageAfterUpload = reloadPageAfterUpload;
 	}
 
 }
