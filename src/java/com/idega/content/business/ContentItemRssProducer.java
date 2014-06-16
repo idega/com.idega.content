@@ -156,7 +156,7 @@ public class ContentItemRssProducer extends RSSAbstractProducer implements RSSPr
 	 * @throws IOException
 	 * @throws RemoteException
 	 */
-	protected synchronized void createRSSFile(RSSRequest rssRequest, String uri) throws HttpException, IOException, RepositoryException {
+	protected void createRSSFile(RSSRequest rssRequest, String uri) throws HttpException, IOException, RepositoryException {
 		RepositoryItem resource = getRepository().getRepositoryItemAsRootUser(uri);
 
 		SyndFeed feed = new SyndFeedImpl();

@@ -32,7 +32,7 @@ public class ThemesInstaller implements ApplicationListener<RepositoryStartedEve
 		processHasStarted = installOrActivateThemes(event);
 	}
 
-	private synchronized boolean installOrActivateThemes(RepositoryStartedEvent event) {
+	private boolean installOrActivateThemes(RepositoryStartedEvent event) {
 //		IWMainApplication iwma = event.getIWMA();
 //		Thread themesInstaller = new Thread(new ThemesInstallerRunner(getThemesEngine(), iwma));
 //		themesInstaller.start();

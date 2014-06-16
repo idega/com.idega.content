@@ -231,7 +231,7 @@ public class CategoryBean {
 		storeCategories(false);
 	}
 
-	public synchronized boolean storeCategories(boolean useThread) {
+	public boolean storeCategories(boolean useThread) {
 		CategoriesWriter writer = null;
 		try {
 			writer = new CategoriesWriter(this.categories, CATEGORY_PROPERTIES_FILE);

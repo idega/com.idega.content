@@ -881,9 +881,7 @@ public class ContentSearch extends Object implements SearchPlugin{
         if(dateValue!=null){
 	        for (int i = 0; (date == null) && (i < formats.length); i++) {
 	            try {
-	                synchronized (formats[i]) {
-	                    date = formats[i].parse(dateValue);
-	                }
+                    date = formats[i].parse(dateValue);
 	            } catch (ParseException e) {
 	            }
 	        }

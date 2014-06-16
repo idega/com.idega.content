@@ -1857,7 +1857,7 @@ public class ThemeChangerBean implements ThemeChanger {
 	 * @return boolean
 	 */
 	@Override
-	public synchronized boolean saveTheme(String themeKey, String themeName) {
+	public boolean saveTheme(String themeKey, String themeName) {
 		if (themeKey == null || themeName == null) {
 			return false;
 		}
@@ -2256,7 +2256,7 @@ public class ThemeChangerBean implements ThemeChanger {
 		return true;
 	}
 
-	private synchronized boolean createNewTheme(Theme parent, String newName) {
+	private boolean createNewTheme(Theme parent, String newName) {
 		String linkToTheme = parent.getLinkToDraft();
 		if (linkToTheme == null) {
 			linkToTheme = parent.getLinkToSkeleton();

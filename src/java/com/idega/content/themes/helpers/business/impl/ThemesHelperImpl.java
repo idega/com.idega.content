@@ -159,7 +159,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	}
 
 	@Override
-	public synchronized void searchForThemes(Collection<ICPage> templates) {
+	public void searchForThemes(Collection<ICPage> templates) {
 		List<String> themesSkeletons = loadSearchResults(templates, ThemesConstants.THEME_SKELETONS_FILTER);
 		try {
 			ThemesLoader themesLoader = new ThemesLoader();
@@ -426,12 +426,12 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	}
 
 	@Override
-	public synchronized void addUriToTheme(String uri) {
+	public void addUriToTheme(String uri) {
 		urisToThemes.add(uri);
 	}
 
 	@Override
-	public synchronized boolean existTheme(String uri) {
+	public boolean existTheme(String uri) {
 		if (urisToThemes == null) {
 			return false;
 		}
@@ -963,14 +963,14 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	}
 
 	@Override
-	public synchronized void addThemeToQueue(String linkToBase) {
+	public void addThemeToQueue(String linkToBase) {
 		if (!themeQueue.contains(linkToBase)) {
 			themeQueue.add(linkToBase);
 		}
 	}
 
 	@Override
-	public synchronized void removeThemeFromQueue(String linkToBase) {
+	public void removeThemeFromQueue(String linkToBase) {
 		Collection<Theme> themes = getAllThemes();
 		Theme theme = null;
 		for (Iterator<Theme> it = themes.iterator(); it.hasNext();) {
