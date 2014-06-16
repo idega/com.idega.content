@@ -27,6 +27,7 @@ import com.idega.util.CoreConstants;
 import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
+import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.resources.AbstractMinifier;
 import com.idega.util.resources.CSSMinifier;
@@ -280,15 +281,42 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 			return minifiedResource;
 		}
 
-		File resourceInWorkspace = IWBundleResourceFilter.copyResourceFromJarToWebapp(IWMainApplication.getDefaultIWMainApplication(), resource.getUrl());
-		minifiedResource = (resourceInWorkspace == null || !resourceInWorkspace.exists()) ?
-				getMinifiedResourceFromApplication(serverName, resource) :
-				getMinifiedResourceFromWorkspace(resourceInWorkspace, resource);
+		String fileContent = null;
+		File resourceInWebApp = null;
+		String path = resource.getUrl();
+		String repoStart = CoreConstants.WEBDAV_SERVLET_URI + CoreConstants.PATH_FILES_ROOT;
+		if (!StringUtil.isEmpty(path) && path.indexOf(repoStart) != -1) {
+			path = path.substring(path.indexOf(repoStart));
+			resource.setUrl(path);
+			try {
+				fileContent = StringHandler.getContentFromInputStream(getRepositoryService().getInputStreamAsRoot(path));
+				if (StringUtil.isEmpty(fileContent)) {
+					LOGGER.warning("Error getting contents from file from repository: " + path);
+				} else {
+					LOGGER.info("Successfully got contents of file from repository: " + path);
+				}
+			} catch (Exception e) {
+				LOGGER.log(Level.WARNING, "Error getting file from repository: " + path, e);
+			}
+		} else  {
+			LOGGER.info("Proceeding file: " + path);
+			resourceInWebApp = IWBundleResourceFilter.copyResourceFromJarToWebapp(IWMainApplication.getDefaultIWMainApplication(), path);
+		}
+
+		if (fileContent == null) {
+			minifiedResource = (resourceInWebApp == null || !resourceInWebApp.exists()) ?
+					getMinifiedResourceFromApplication(serverName, resource) :
+					getMinifiedResourceFromWorkspace(resourceInWebApp, resource);
+		} else {
+			resource.setContent(fileContent);
+			minifiedResource = getMinifiedResource(resource);
+		}
+
 		if (minifiedResource == null) {
 			return null;
 		}
 
-		setCachedResource(cacheName, resource.getUrl(), minifiedResource);
+		setCachedResource(cacheName, path, minifiedResource);
 		return minifiedResource;
 	}
 
@@ -367,9 +395,10 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		try {
 			fileContent = FileUtil.getStringFromFile(resource);
 		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Error getting content from file: " + resource.getName());
+			LOGGER.log(Level.WARNING, "Error getting content from file: " + resource.getName(), e);
 		}
 		if (StringUtil.isEmpty(fileContent)) {
+			LOGGER.warning("No content in file " + resource.getName());
 			return null;
 		}
 
