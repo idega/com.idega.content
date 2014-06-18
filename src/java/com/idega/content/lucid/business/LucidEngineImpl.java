@@ -897,6 +897,8 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 
 		getThemesEngine().updateSiteTree(false);
 
+		CoreUtil.clearAllCaches();
+
 		return newIds;
 	}
 
