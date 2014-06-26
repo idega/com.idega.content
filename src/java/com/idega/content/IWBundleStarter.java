@@ -78,7 +78,7 @@ public class IWBundleStarter implements IWBundleStartable{
 
 		IWApplicationContext iwac = starterBundle.getApplication().getIWApplicationContext();
 	    try {
-	        getRepositoryService().addRepositoryChangeListeners((ThemesService) IBOLookup.getServiceInstance(iwac, ThemesService.class));
+	        getRepositoryService().addRepositoryChangeListeners(IBOLookup.getServiceInstance(iwac, ThemesService.class));
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	    }
@@ -99,9 +99,7 @@ public class IWBundleStarter implements IWBundleStartable{
 		try {
 			GroupBusiness groupBiz = IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
 
-			@SuppressWarnings("unchecked")
 			Collection<Group> editorGroups = groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_EDITOR);
-			@SuppressWarnings("unchecked")
 			Collection<Group> authorGroups = groupBiz.getGroupsByGroupName(StandardRoles.ROLE_KEY_AUTHOR);
 
 			//	Only generate groups if none exist
