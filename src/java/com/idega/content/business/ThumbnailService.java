@@ -1,7 +1,5 @@
 package com.idega.content.business;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import org.apache.webdav.lib.WebdavResource;
@@ -26,28 +24,23 @@ public class ThumbnailService extends DefaultSpringBean {
 	public static final String BEAN_NAME = "thumbnailService";
 	
 	
-	public static final int THUMBNAIL_SMALL = 5;
-	public static final int THUMBNAIL_MEDIUM = 10;
+	public static final int THUMBNAIL_SMALL = 50;
+	public static final int THUMBNAIL_MEDIUM = 100;
 	
 	private static final String THUMBNAILS_FOLDER_NAME = "idega_thumbnails";
 	
 	private int getSize(int size){
-		if((size > 0) && (size <= THUMBNAIL_MEDIUM)){
+		if(size > 0){
 			return size;
 		}
 		return THUMBNAIL_MEDIUM;
 	}
 	
-	private int[] get2dDimensions(int thumbnailSize){
-		int size = thumbnailSize * 10;
-		int[] dimensions = {size,size};
-		return dimensions;
-	}
 	
 	/**
 	 * Method that gets thumbnail uri if it exists or creates if it does not exists.
 	 * @param filePath - path to file which thumbnail will be displayed
-	 * @param thumbnailSize - size identifier for thumbnail
+	 * @param thumbnailSize - height in pixels
 	 * @param iwc - {@link com.idega.presentation.IWContext}
 	 * @return uri to thunbnail or empty string if file does not exists
 	 * @throws Exception if something goes wrong
@@ -93,11 +86,8 @@ public class ThumbnailService extends DefaultSpringBean {
 	
 	private String generateImageThumbnail(String filePath, String thumbnailPath, int thumbnailSize,IWContext iwc,IWSlideService iwSlideService,String mimeType) throws Exception{
 		WebdavResource file = iwSlideService.getWebdavResourceAuthenticatedAsRoot(filePath);
-		int[] dimensions = get2dDimensions(thumbnailSize);
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		InputStream input = file.getMethodData();
-		byteArrayOutputStream = (ByteArrayOutputStream) ELUtil.getInstance().getBean(ImageResizer.class).getScaledImage(dimensions[0], dimensions[1], input, getImageType(mimeType),byteArrayOutputStream);
-		InputStream image = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+		InputStream image = ELUtil.getInstance().getBean(ImageResizer.class).getScaledImageIfBigger(thumbnailSize, input, getImageType(mimeType));
 		iwSlideService.uploadFile(thumbnailPath.substring(0,thumbnailPath.lastIndexOf(CoreConstants.SLASH)+1), getFileName(thumbnailPath), mimeType, image);
 		return thumbnailPath;
 	}
