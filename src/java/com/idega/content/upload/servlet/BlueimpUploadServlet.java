@@ -103,11 +103,6 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 				}
 			}
 
-//			boolean useThumbnail = getUploadAreaBean().isAddThumbnail();
-//			ThumbnailService thumbnailService = null;
-//			if (useThumbnail)
-//				thumbnailService = ELUtil.getInstance().getBean(ThumbnailService.BEAN_NAME);
-
 			responseMapArray = new ArrayList<Map<String, Object>>();
 			for (FileItem file: files) {
 				String fileName = file.getName();
@@ -116,22 +111,6 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 				boolean success = getRepositoryService().uploadFile(uploadPath, fileName, file.getContentType(), file.getInputStream());
 
 				Map<String, Object> fileData = getUploadAreaBean().getFileResponce(fileName, file.getSize(), pathAndName);
-//					new HashMap<String, Object>();
-//				fileData.put("name", fileName);
-//				fileData.put("size", file.getSize());
-//
-//				RepositoryItem item = getRepositoryService().getRepositoryItemAsRootUser(pathAndName);
-//				String path = item.getPath();
-//				if (!path.startsWith(CoreConstants.WEBDAV_SERVLET_URI))
-//					path = CoreConstants.WEBDAV_SERVLET_URI + path;
-//				fileData.put("url", path);
-//
-//				if (useThumbnail)
-//					fileData.put("thumbnail_url", thumbnailService.getThumbnail(pathAndName, ThumbnailService.THUMBNAIL_SMALL));
-//
-//				fileData.put("delete_url", getDeleteUrl(iwc, path));
-//				fileData.put("delete_type", "DELETE");
-//				fileData.put("message", "");
 				fileData.put("status", success ? "OK" : "FAILURE");
 				responseMapArray.add(fileData);
 			}

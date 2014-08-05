@@ -19,15 +19,15 @@ public class ThumbnailService extends DefaultSpringBean {
 
 	public static final String BEAN_NAME = "thumbnailService";
 
-	public static final int THUMBNAIL_SMALL = 50;
-	public static final int THUMBNAIL_MEDIUM = 100;
+	public static final int THUMBNAIL_SMALL = 50,
+							THUMBNAIL_MEDIUM = 100;
 
 	private static final String THUMBNAILS_FOLDER_NAME = "idega_thumbnails";
 
-	private int getSize(int size){
-		if (size > 0)
+	private int getSize(int size) {
+		if (size > 0) {
 			return size;
-
+		}
 		return THUMBNAIL_MEDIUM;
 	}
 
