@@ -40,6 +40,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 
 	public static final String PARAMETER_ACTION = "iw_content_action";
 	public static final String PARAMETER_CONTENT_RESOURCE = "iw_content_rs_url";
+	public static final String ITEM_FROM_RESOURCE = "item_from_resource"; 
 	private static final String PARAMETER_CURRENT_PATH = "current_path_in_repository_for_documents";
 
 	public static final String ACTION_LIST = "ac_list";
@@ -294,7 +295,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			if(ACTION_PERMISSIONS.equals(action)){
 				IWContext iwc = IWContext.getInstance();
 				try {
-					WebDAVFilePermissionResource resource = (WebDAVFilePermissionResource) IBOLookup.getSessionInstance(iwc, WebDAVFilePermissionResource.class);
+					WebDAVFilePermissionResource resource = IBOLookup.getSessionInstance(iwc, WebDAVFilePermissionResource.class);
 					resource.clear();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -362,7 +363,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 			if(ACTION_PERMISSIONS.equals(action)){
 				IWContext iwc = IWContext.getInstance();
 				try {
-					WebDAVFilePermissionResource resource = (WebDAVFilePermissionResource) IBOLookup.getSessionInstance(iwc, WebDAVFilePermissionResource.class);
+					WebDAVFilePermissionResource resource = IBOLookup.getSessionInstance(iwc, WebDAVFilePermissionResource.class);
 					resource.clear();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -557,7 +558,7 @@ public class ContentViewer extends ContentBlock implements ActionListener{
 				if(ACTION_PERMISSIONS.equals(action)){
 					IWContext iwc = IWContext.getInstance();
 					try {
-						WebDAVFilePermissionResource resource = (WebDAVFilePermissionResource) IBOLookup.getSessionInstance(iwc, WebDAVFilePermissionResource.class);
+						WebDAVFilePermissionResource resource = IBOLookup.getSessionInstance(iwc, WebDAVFilePermissionResource.class);
 						resource.clear();
 					} catch (Exception e) {
 						e.printStackTrace();

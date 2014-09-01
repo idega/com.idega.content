@@ -619,7 +619,7 @@ public class ContentItemListViewer extends UIData implements CacheableUIComponen
 		}
 
 		//	Resource path set in request?
-		String resourcePathFromRequest = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
+		String resourcePathFromRequest = iwc.getParameter(ContentViewer.ITEM_FROM_RESOURCE);
 		if (resourcePathFromRequest != null) {
 			buf.append(UIComponentCacher.UNDERSCORE).append(resourcePathFromRequest);
 		}
