@@ -1172,7 +1172,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		//	Old root page now is a simple top level page
 		builder.createTopLevelPageFromExistingPage(currentRoot, domain, iwc);
 
-		TreeableEntity parent = newRootPage.getParentEntity();
+		TreeableEntity<ICPage> parent = newRootPage.getParentEntity();
 		if (parent instanceof ICPage) {
 			ICPage parentPage = (ICPage) parent;
 			try {
