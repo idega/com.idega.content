@@ -26,4 +26,15 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
 		<url-pattern>/servlet/blueimp-upload</url-pattern>
 	</servlet-mapping>
 	
+	<servlet>
+		<display-name>ICFileUploadServlet</display-name>
+		<servlet-name>ICFileUploadServlet</servlet-name>
+		<servlet-class>com.idega.content.upload.servlet.ICFileUploadServlet</servlet-class>
+		<load-on-startup>7</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ICFileUploadServlet</servlet-name>
+		<url-pattern>/servlet/ic-file-upload</url-pattern>
+	</servlet-mapping>
+	
 </web-app>

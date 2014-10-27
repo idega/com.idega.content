@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -119,7 +120,11 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 
 			responseWriter.write(jsonString);
 			return;
-		} catch (FileUploadException ex) {
+		} catch(FileSizeLimitExceededException e){
+			log("File is too large",e);
+			response.sendError(413);
+		}
+		catch (FileUploadException ex) {
 			log("Error encountered while parsing the request",ex);
 			response.sendError(500);
 		} catch (Exception ex) {
