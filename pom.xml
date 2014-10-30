@@ -6,7 +6,6 @@
     <version>5.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>com.idega.content</artifactId>
-  <version>5.0.0-SNAPSHOT</version>
   <name>idegaWeb Content</name>
   <description>idegaWeb is the new ContentManagement System and Framework</description>
   <inceptionYear>2004</inceptionYear>

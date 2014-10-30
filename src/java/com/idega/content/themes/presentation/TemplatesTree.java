@@ -56,7 +56,7 @@ public class TemplatesTree extends Block {
 			return;
 		}
 
-		Collection<? extends ICTreeNode> topLevelTemplates = builder.getTopLevelTemplates(iwc);
+		Collection<? extends ICTreeNode<?>> topLevelTemplates = builder.getTopLevelTemplates(iwc);
 		if (ListUtil.isEmpty(topLevelTemplates)) {
 			container.add(new Heading4(iwrb.getLocalizedString("there_are_no_templates", "There are no templates in system")));
 			return;
@@ -79,13 +79,13 @@ public class TemplatesTree extends Block {
 		buttons.add(createTemplate);
 	}
 
-	private List<String> getPrimaryKeys(Collection<? extends ICTreeNode> templates) {
+	private List<String> getPrimaryKeys(Collection<? extends ICTreeNode<?>> templates) {
 		if (ListUtil.isEmpty(templates))
 			return null;
 
 		List<String> primaryKeys = new ArrayList<String>();
 			try {
-				for (ICTreeNode template: templates) {
+				for (ICTreeNode<?> template: templates) {
 					if (template == null)
 						continue;
 
@@ -129,19 +129,18 @@ public class TemplatesTree extends Block {
 		return null;
 	}
 
-	private void addTemplatesToTree(Lists tree, Collection<? extends ICTreeNode> templates, Locale l, IWBundle iwb, Map<String, ICPage> templatesObjects) {
+	private void addTemplatesToTree(Lists tree, Collection<? extends ICTreeNode<?>> templates, Locale l, IWBundle iwb, Map<String, ICPage> templatesObjects) {
 		if (ListUtil.isEmpty(templates)) {
 			return;
 		}
 
-		List<ICTreeNode> topTemplates = new ArrayList<ICTreeNode>(templates);
+		List<ICTreeNode<?>> topTemplates = new ArrayList<ICTreeNode<?>>(templates);
 		Collections.sort(topTemplates, new ICTreeNodeComparator(l));
 
 		String name = null;
-		Collection<ICTreeNode> templateChildren = null;
 		String imageUri = iwb.getVirtualPathWithFileNameString("images/template.png");
 		String folderImageUri = iwb.getVirtualPathWithFileNameString("images/folder_template.png");
-		for (ICTreeNode template: topTemplates) {
+		for (ICTreeNode<?> template: topTemplates) {
 			if (template == null)
 				continue;
 
@@ -154,7 +153,6 @@ public class TemplatesTree extends Block {
 			}
 
 			name = null;
-			templateChildren = null;
 
 			name = template.getNodeName(l);
 			if (name == null || CoreConstants.EMPTY.equals(name)) {
@@ -173,7 +171,8 @@ public class TemplatesTree extends Block {
 			item.add(templateName);
 			tree.add(item);
 
-			templateChildren = template.getChildren();
+			@SuppressWarnings("unchecked")
+			Collection<ICTreeNode<?>> templateChildren = (Collection<ICTreeNode<?>>) template.getChildren();
 			if (!ListUtil.isEmpty(templateChildren)) {
 				icon.setURL(folderImageUri);
 
