@@ -1,0 +1,35 @@
+<div class="contentPageEdit"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+   	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:ic="http://xmlns.idega.com/com.idega.core"
+	xmlns:c="http://java.sun.com/jstl/core">
+
+	<form class="smallAdminForm" id="contentPageEditForm" action="#{contentPageBean.currentPage}" method="post">
+		<input type="hidden" name="idegaweb_event_classname" value="#{contentPageBean.eventHandler}" />
+		<input type="hidden" name="prm_content_page_id" value="#{contentPageBean.page.id}" />
+		
+		<fieldset class="formSection">
+			<legend>
+				<t:outputText rendered="#{not empty contentPageBean.page.id}" value="#{localizedStrings['com.idega.content']['change_content_page']}" />
+				<t:outputText rendered="#{empty contentPageBean.page.id}" value="#{localizedStrings['com.idega.content']['create_content_page']}" />
+			</legend>
+			
+			<div class="formItem">
+				<label><h:outputText value="#{localizedStrings['com.idega.content']['headline']}" /></label>
+				<input type="text" name="prm_headline" value="#{contentPageBean.page.headline}" />
+			</div>
+
+			<div class="formItem">
+				<label><h:outputText value="#{localizedStrings['com.idega.content']['text']}" /></label>
+				<textarea class="tinymce" name="prm_text">#{contentPageBean.page.body}</textarea>
+			</div>
+		</fieldset>
+		
+		<div class="submit">
+			<a href="#" class="close"><span><h:outputText value="#{localizedStrings['com.idega.content']['close']}" /></span></a>
+			<a href="#" class="store"><span><h:outputText value="#{localizedStrings['com.idega.content']['store']}" /></span></a>
+		</div>
+	</form>
+</div>

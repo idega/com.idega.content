@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+
+	<defaultCache
+       maxElementsInMemory="1000"
+       timeToIdleSeconds="86400"
+       timeToLiveSeconds="86400"
+       eternal="false"
+       overflowToDisk="false"
+       diskPersistent="false"
+       memoryStoreEvictionPolicy="LRU"
+    />
+    <cache
+        maxElementsInMemory="1000"
+        name="com.idega.content.data.ContentPage"
+        timeToIdleSeconds="86400"
+        timeToLiveSeconds="86400"
+    />
+
+</ehcache>

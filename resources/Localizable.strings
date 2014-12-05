@@ -323,3 +323,9 @@ upload_was_successfully_finished=Upload was successfully finished.
 uploading=Uploading...
 uploading_file=Uploading file
 stream=Stream
+
+store=Store
+create_content_pate=Create content
+change_content_page=Change content
+text=Text
+confirm_delete=Are you sure?

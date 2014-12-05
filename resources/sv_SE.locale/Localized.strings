@@ -322,3 +322,10 @@ undefined=Odefinerad
 upload_was_successfully_finished=H\u00E4mtningen slutf\u00F6rd.
 uploading=H\u00E4mtar...
 uploading_file=H\u00E4mtar fil
+
+headline=Rubrik
+store=Affär
+create_content_pate=Skapa innehåll
+change_content_page=Ändra innehåll
+text=Text
+confirm_delete=Är du säker?

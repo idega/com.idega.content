@@ -1,0 +1,12 @@
+<section class="clubPageContent"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+   	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+	
+	<ui:fragment rendered="#{not empty contentPageBean.page}">
+		<article>
+			<h1><h:outputText value="#{contentPageBean.page.headline}" /></h1>
+			<h:outputText value="#{contentPageBean.page.body}" escape="false" />
+		</article>
+	</ui:fragment>
+</section>

@@ -1,0 +1,44 @@
+<ul class="contentPageMenu"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+   	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+	
+	<ui:repeat value="#{contentPageBean.pages}" var="page">
+		<li class="#{contentPageBean.page.id eq page.id ? 'current' : ''}">
+			<h:outputLink value="#{contentPageBean.currentPage}" styleClass="link content-page-menu-link">
+				<f:param name="prm_content_page_id" value="#{page.id}" />
+				<h:outputText value="#{page.headline}" />
+			</h:outputLink>
+			
+			<ui:fragment rendered="#{contentPageBean.admin}">
+				<ol class="adminLinks">
+					<li>
+						<h:outputLink value="#{contentPageBean.responseAction}" styleClass="edit action fancybox.ajax">
+							<f:param name="prm_content_page_id" value="#{page.id}" />
+							<f:param name="prm_menu_action" value="2" />
+							<span><h:outputText value="#{localizedStrings['com.idega.content']['edit']}" /></span>
+						</h:outputLink>
+					</li>
+					<li>
+						<h:outputLink value="#{contentPageBean.currentPage}" rel="#{localizedStrings['com.idega.content']['confirm_delete']}" styleClass="delete action">
+							<f:param name="idegaweb_event_classname" value="#{contentPageBean.eventHandler}" />
+							<f:param name="prm_content_page_id" value="#{page.id}" />
+							<f:param name="prm_menu_action" value="3" />
+							<span><h:outputText value="#{localizedStrings['com.idega.content']['delete']}" /></span>
+						</h:outputLink>
+					</li>
+				</ol>
+			</ui:fragment>
+		</li>
+	</ui:repeat>
+	
+	<ui:fragment rendered="#{contentPageBean.admin}">
+		<li class="newPage">
+			<h:outputLink value="#{contentPageBean.responseAction}" styleClass="add fancybox.ajax">
+				<f:param name="prm_menu_action" value="2" />
+				<f:param name="prm_new_page" value="true" />
+				<h:outputText value="+ #{localizedStrings['com.idega.content']['new_page']}" />
+			</h:outputLink>
+		</li>
+	</ui:fragment>
+</ul>
