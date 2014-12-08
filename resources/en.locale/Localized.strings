@@ -305,7 +305,7 @@ delete_all_themes=Delete all themes
 stream=Stream
 
 store=Store
-create_content_pate=Create content
+create_content_page=Create content
 change_content_page=Change content
 text=Text
 confirm_delete=Are you sure?
