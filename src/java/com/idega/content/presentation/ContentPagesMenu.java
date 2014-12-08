@@ -53,6 +53,8 @@ public class ContentPagesMenu extends IWBaseComponent implements IWPageEventList
 	@Autowired
 	private Web2Business web2;
 
+	private String menuStyle;
+
 	@Override
 	protected void initializeComponent(FacesContext context) {
 		ELUtil.getInstance().autowire(this);
@@ -67,6 +69,7 @@ public class ContentPagesMenu extends IWBaseComponent implements IWPageEventList
 			bean.setCurrentPage(builder.getBuilderService(iwc).getPageURI(pageId));
 			List<ContentPage> pages = dao.getContentPagesInPage(pageId);
 			bean.setPages(pages);
+			bean.setMenuStyle(getMenuStyle());
 
 			if (iwc.isParameterSet(PARAMETER_CONTENT_PAGE_ID)) {
 				bean.setPage(dao.getContentPage(Long.valueOf(iwc.getParameter(PARAMETER_CONTENT_PAGE_ID))));
@@ -148,6 +151,14 @@ public class ContentPagesMenu extends IWBaseComponent implements IWPageEventList
 		}
 
 		return true;
+	}
+
+	public String getMenuStyle() {
+		return menuStyle;
+	}
+
+	public void setMenuStyle(String menuStyle) {
+		this.menuStyle = menuStyle;
 	}
 
 }

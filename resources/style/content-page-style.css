@@ -58,6 +58,10 @@
 	margin-top: 1em;
 }
 
+.contentPageMenu {
+	list-style: none;
+}
+
 .contentPageMenu li {
 	position: relative;
 }

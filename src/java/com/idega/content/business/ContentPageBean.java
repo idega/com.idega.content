@@ -23,7 +23,7 @@ public class ContentPageBean extends DefaultSpringBean {
 	private ContentPage page;
 	private List<ContentPage> pages;
 
-	private String currentPage, eventHandler, responseAction = CoreConstants.HASH;
+	private String currentPage, eventHandler, responseAction = CoreConstants.HASH, menuStyle;
 
 	public ContentPage getPage() {
 		return page;
@@ -73,6 +73,14 @@ public class ContentPageBean extends DefaultSpringBean {
 
 	public void setResponseAction(String responseAction) {
 		this.responseAction = responseAction;
+	}
+
+	public String getMenuStyle() {
+		return menuStyle;
+	}
+
+	public void setMenuStyle(String menuStyle) {
+		this.menuStyle = menuStyle;
 	}
 
 }
