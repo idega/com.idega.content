@@ -14,10 +14,7 @@ jQuery(window).load(function() {
 			openEffect	: 'none',
 			closeEffect	: 'none',
 			afterShow: function() {
-				tinymce.init({
-	                // Location of TinyMCE script
-	                script_url : '/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/tinymce/4.1.7/tinymce.min.js',
-	                
+				tinymce.init({               
 	                selector: '#contentPageEditFormText',
 	
 	                plugins: [
@@ -30,8 +27,9 @@ jQuery(window).load(function() {
 				    },
 				    toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
 				});
-				
-				return true;
+			},
+			beforeClose: function() {
+				tinymce.remove();
 			}
 		});
 	});
