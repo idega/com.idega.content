@@ -63,8 +63,9 @@ public class ContentFileUploadServlet extends HttpServlet {
 		String uploadId = null;
 		IWApplicationContext iwac = null;
 		FileUploadProgressListener uploadProgressListener = null;
+		IWContext iwc = null;
 		try {
-			IWContext iwc = new IWContext(request, response, getServletContext());
+			iwc = new IWContext(request, response, getServletContext());
 			iwac = iwc.getApplicationContext();
 			ServletRequestContext src = new ServletRequestContext(request);
 			if (!FileUploadBase.isMultipartContent(src)) {
@@ -72,10 +73,11 @@ public class ContentFileUploadServlet extends HttpServlet {
 				return;
 			}
 			String uploadPath = null;
-			boolean zipFile = false;
-			boolean themePack = false;
-			boolean extractContent = false;
-			boolean stripNonRomanLetters = false;
+			boolean zipFile = false,
+					themePack = false,
+					extractContent = false,
+					stripNonRomanLetters = false,
+					tinyMCEUpload = false;
 
 			uploadProgressListener = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
 
@@ -83,9 +85,8 @@ public class ContentFileUploadServlet extends HttpServlet {
 			FileUpload fileUploadService = new FileUpload(factory);
 
 			long maxUploadSize = uploadProgressListener.getMaxSize();
-			maxUploadSize = maxUploadSize <= 0 ? MAX_UPLOAD_SIZE : maxUploadSize;
-																				//	10% reserved for other data when file(s)
-			maxUploadSize = maxUploadSize == MAX_UPLOAD_SIZE ? maxUploadSize : Double.valueOf(maxUploadSize * 1.1).longValue();
+			maxUploadSize = maxUploadSize <= 0 ? iwc.getIWMainApplication().getSettings().getInt("max_content_upload_size", 1024 * 1024 * 1024) : maxUploadSize;
+			maxUploadSize = maxUploadSize == MAX_UPLOAD_SIZE ? maxUploadSize : Double.valueOf(maxUploadSize * 1.1).longValue();	//	10% reserved for other data when file(s)
 			fileUploadService.setSizeMax(maxUploadSize);
 			fileUploadService.setProgressListener(uploadProgressListener);
 
@@ -95,8 +96,12 @@ public class ContentFileUploadServlet extends HttpServlet {
 
 			if (IOUtil.isUploadExceedingLimits(request, maxUploadSize)) {
 				IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
-				writeToResponse(response, "error=".concat(iwrb.getLocalizedString("uploader_error_exceeds_max_size",
-						"The file you are uploading is exceeding the limits")).concat(": ").concat(FileUtil.getHumanReadableSize(maxUploadSize)));
+				writeToResponse(response,
+						"error=".concat(iwrb.getLocalizedString("uploader_error_exceeds_max_size",
+						"The file you are uploading is exceeding the limits")).concat(": ").concat(FileUtil.getHumanReadableSize(maxUploadSize)),
+						null,
+						tinyMCEUpload
+				);
 				uploadProgressListener.markFailedUpload(uploadId);
 				finishUpUpload(iwac, uploadProgressListener, uploadId, false);
 				return;
@@ -131,8 +136,13 @@ public class ContentFileUploadServlet extends HttpServlet {
 			if (ListUtil.isEmpty(fileItems)) {
 				LOGGER.log(Level.WARNING, "No files to upload, terminating upload!");
 				IWResourceBundle iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
-				writeToResponse(response, "error=".concat(iwrb.getLocalizedString("uploader_error_failed_to_upload",
-						"Failed to upload file(s) to the server. Please try again.")));
+				writeToResponse(
+						response,
+						"error=".concat(iwrb.getLocalizedString("uploader_error_failed_to_upload",
+						"Failed to upload file(s) to the server. Please try again.")),
+						null,
+						tinyMCEUpload
+				);
 				uploadProgressListener.markFailedUpload(uploadId);
 				finishUpUpload(iwac, uploadProgressListener, uploadId, false);
 				return;
@@ -159,6 +169,8 @@ public class ContentFileUploadServlet extends HttpServlet {
 	        			uploadId = getValueFromBytes(file.get());
 	        		} else if (fieldName.equals(ContentConstants.UPLOADER_STRIP_NON_ROMAN_LETTERS)) {
 	        			stripNonRomanLetters = getValueFromString(getValueFromBytes(file.get()));
+	        		} else if (fieldName.equals("web2FileUploaderTinyMCEUpload")) {
+	        			tinyMCEUpload = getValueFromString(getValueFromBytes(file.get()));
 	        		}
 	        	}
 	        }
@@ -205,7 +217,12 @@ public class ContentFileUploadServlet extends HttpServlet {
 
 		        	uploadProgressListener.addUploadedFiles(uploadId, files);
 
-		        	writeToResponse(response, responseBuffer.toString());
+		        	writeToResponse(
+		        			response,
+		        			responseBuffer.toString(),
+		        			uploadPath + files.get(0).getName(),
+		        			tinyMCEUpload
+		        	);
 		        } else {
 		        	errorMessage = "Unable to upload files (" + files + ") to: " + uploadPath + ". Upload ID: " + uploadId;
 		        	throw new RuntimeException(errorMessage);
@@ -263,8 +280,19 @@ public class ContentFileUploadServlet extends HttpServlet {
    			iwac.removeApplicationAttribute(uploadId);
 	}
 
-	private void writeToResponse(HttpServletResponse response, String responseText) throws IOException {
-		StringBuffer responseBuffer = new StringBuffer("web2FilesUploaderFilesListStarts").append(responseText);
+	private void writeToResponse(HttpServletResponse response, String responseText, String uploadedFile, boolean tinyMCEUpload) throws IOException {
+		StringBuffer responseBuffer = null;
+		if (tinyMCEUpload) {
+			if (!uploadedFile.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
+				uploadedFile = CoreConstants.WEBDAV_SERVLET_URI + uploadedFile;
+			}
+//			responseBuffer = new StringBuffer("<script>top.jQuery('.mce-btn.mce-open').parent().find('.mce-textbox').val('")
+//								.append(uploadedFile).append("').closest('.mce-window').find('.mce-primary').click();</script>");
+			responseBuffer = new StringBuffer("<script>top.ContentPageMenuHelper.doFinishUpload('").append(uploadedFile).append("');</script>");
+		} else {
+			responseBuffer = new StringBuffer("web2FilesUploaderFilesListStarts").append(responseText);
+		}
+
 		response.setCharacterEncoding(CoreConstants.ENCODING_UTF8);
     	response.getWriter().print(responseBuffer.toString());
 	}

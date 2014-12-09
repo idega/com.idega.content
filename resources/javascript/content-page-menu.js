@@ -1,10 +1,12 @@
+if (ContentPageMenuHelper == null) var ContentPageMenuHelper = {};
+
 jQuery.noConflict();
 
 jQuery(window).load(function() {
 	jQuery('.contentPageMenu a.edit, .contentPageMenu a.add').each(function() {
 		var link = jQuery(this);
 		link.fancybox({
-			maxWidth	: 675,
+			maxWidth	: 1080,
 			fitToView	: false,
 			height		: '100%',
 			autoSize	: false,
@@ -12,22 +14,21 @@ jQuery(window).load(function() {
 			openEffect	: 'none',
 			closeEffect	: 'none',
 			afterShow: function() {
-				jQuery('textarea.tinymce').tinymce({
+				tinymce.init({
 	                // Location of TinyMCE script
-	                script_url : '/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/tinymce/3.5.8/tiny_mce.js',
+	                script_url : '/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/tinymce/4.1.7/tinymce.min.js',
+	                
+	                selector: '#contentPageEditFormText',
 	
-	                // General options
-	                theme : "advanced",
-	                plugins : "pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
-	
-	                // Theme options
-	                theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,styleselect,formatselect,fontselect,fontsizeselect",
-	                theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,image,cleanup,help,code,|,preview,|,forecolor,backcolor",
-	                theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,media,advhr,|,fullscreen",
-	                theme_advanced_toolbar_location : "top",
-	                theme_advanced_toolbar_align : "left",
-	                theme_advanced_statusbar_location : "bottom",
-	                theme_advanced_resizing : true,
+	                plugins: [
+				        "advlist autolink lists link image charmap print preview anchor",
+				        "searchreplace visualblocks code fullscreen",
+				        "insertdatetime media table contextmenu paste"
+				    ],
+				    file_browser_callback: function(field_name, url, type, win) {
+				        ContentPageMenuHelper.doHandleFileUpload(field_name, url, type, win);
+				    },
+				    toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
 				});
 				
 				return true;
@@ -53,4 +54,27 @@ jQuery(window).load(function() {
 		form.submit();
 		jQuery.fancybox.close();
 	});
+	
+	if (IE) {
+		LazyLoader.load('/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/jquery-plugins/jquery.form.js', function() {
+			jQuery('#contentPageImagesForm').ajaxForm(function() {});
+		});
+	}
 });
+
+ContentPageMenuHelper.doFinishUpload = function(uploadedFile) {
+	jQuery('.mce-btn.mce-open').parent().find('.mce-textbox').val(uploadedFile).closest('.mce-window').find('.mce-primary').click();
+}
+
+ContentPageMenuHelper.doStartFileUpload = function(input) {
+	if (IE) {
+		jQuery('#contentPageImagesForm').ajaxSubmit({ success: function(d){eval(d);} });this.value='';
+	} else {
+		jQuery('#contentPageImagesForm').submit();this.value='';
+	}
+}
+
+ContentPageMenuHelper.doHandleFileUpload = function(field_name, url, type, win) {
+	jQuery('input', jQuery('#contentPageImagesForm')).click();
+	return true;
+}

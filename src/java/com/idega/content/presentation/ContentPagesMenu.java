@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.web2.business.JQuery;
 import com.idega.block.web2.business.Web2Business;
+import com.idega.block.web2.business.Web2BusinessBean;
 import com.idega.builder.bean.AdvancedProperty;
 import com.idega.builder.business.BuilderLogicWrapper;
 import com.idega.business.IBORuntimeException;
@@ -81,7 +82,7 @@ public class ContentPagesMenu extends IWBaseComponent implements IWPageEventList
 				bean.setEventHandler(IWMainApplication.getEncryptedClassName(ContentPagesMenu.class));
 
 				PresentationUtil.addJavaScriptSourceLineToHeader(iwc, jQuery.getBundleURIToJQueryLib());
-				PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, web2.getScriptsForTinyMCE());
+				PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, web2.getScriptsForTinyMCE(Web2BusinessBean.TINY_MCE_VERSION_4_1_7));
 				PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, web2.getBundleURIsToFancyBoxScriptFiles());
 				PresentationUtil.addJavaScriptSourceLineToHeader(iwc, bundle.getVirtualPathWithFileNameString("javascript/content-page-menu.js"));
 

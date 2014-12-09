@@ -3,7 +3,6 @@
    	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:t="http://myfaces.apache.org/tomahawk"
-	xmlns:ic="http://xmlns.idega.com/com.idega.core"
 	xmlns:c="http://java.sun.com/jstl/core">
 
 	<form class="smallAdminForm" id="contentPageEditForm" action="#{contentPageBean.currentPage}" method="post">
@@ -23,7 +22,7 @@
 
 			<div class="formItem">
 				<label><h:outputText value="#{localizedStrings['com.idega.content']['text']}" /></label>
-				<textarea class="tinymce" name="prm_text">#{contentPageBean.page.body}</textarea>
+				<textarea id="contentPageEditFormText" class="tinymce" name="prm_text">#{contentPageBean.page.body}</textarea>
 			</div>
 		</fieldset>
 		
@@ -31,5 +30,14 @@
 			<a href="#" class="close"><span><h:outputText value="#{localizedStrings['com.idega.content']['close']}" /></span></a>
 			<a href="#" class="store"><span><h:outputText value="#{localizedStrings['com.idega.content']['store']}" /></span></a>
 		</div>
+	</form>
+	
+	<iframe id="contentPageImages_target" name="contentPageImages_target" style="display:none"></iframe>
+	<form id="contentPageImagesForm" action="/servlet/ContentFileUploadServlet" target="contentPageImages_target" method="post" enctype="multipart/form-data" style="width:0px;height:0;overflow:hidden">
+		<input type="hidden" name="web2FileUploaderPathValue" value="/files/public/" />
+		<input type="hidden" name="web2FileUploaderStripNonRomanLetters" value="true" />
+		<input type="hidden" name="web2FileUploaderTinyMCEUpload" value="true" />
+		
+		<input name="web2FileUploadField" type="file" onchange="ContentPageMenuHelper.doStartFileUpload(this);" />
 	</form>
 </div>
