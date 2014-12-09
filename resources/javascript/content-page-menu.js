@@ -63,10 +63,12 @@ jQuery(window).load(function() {
 });
 
 ContentPageMenuHelper.doFinishUpload = function(uploadedFile) {
+	closeAllLoadingMessages();
 	jQuery('.mce-btn.mce-open').parent().find('.mce-textbox').val(uploadedFile).closest('.mce-window').find('.mce-primary').click();
 }
 
-ContentPageMenuHelper.doStartFileUpload = function(input) {
+ContentPageMenuHelper.doStartFileUpload = function(input, message) {
+	showLoadingMessage(message);
 	if (IE) {
 		jQuery('#contentPageImagesForm').ajaxSubmit({ success: function(d){eval(d);} });this.value='';
 	} else {

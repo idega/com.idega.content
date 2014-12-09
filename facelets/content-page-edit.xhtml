@@ -38,6 +38,6 @@
 		<input type="hidden" name="web2FileUploaderStripNonRomanLetters" value="true" />
 		<input type="hidden" name="web2FileUploaderTinyMCEUpload" value="true" />
 		
-		<input name="web2FileUploadField" type="file" onchange="ContentPageMenuHelper.doStartFileUpload(this);" />
+		<input name="web2FileUploadField" type="file" onchange="ContentPageMenuHelper.doStartFileUpload(this, '#{localizedStrings['com.idega.content']['loading']}');" />
 	</form>
 </div>
