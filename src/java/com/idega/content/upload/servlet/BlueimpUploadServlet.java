@@ -97,10 +97,16 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 			}
 			String uploadPath = parameters.get(PARAMETER_UPLOAD_PATH);
 			if (StringUtil.isEmpty(uploadPath)) {
-				uploadPath = CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
+				uploadPath = CoreConstants.WEBDAV_SERVLET_URI + CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
 			} else {
 				if (!uploadPath.endsWith(CoreConstants.SLASH)) {
 					uploadPath = uploadPath + CoreConstants.SLASH;
+				}
+				if(!uploadPath.startsWith(CoreConstants.SLASH)){
+					uploadPath = CoreConstants.SLASH + uploadPath;
+				}
+				if(!uploadPath.startsWith(CoreConstants.WEBDAV_SERVLET_URI)){
+					uploadPath = CoreConstants.WEBDAV_SERVLET_URI + uploadPath;
 				}
 			}
 
