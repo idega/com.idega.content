@@ -278,7 +278,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		}
 
 		for (Locale locale: locales) {
-			availableLocales.add(new SelectItem(locale.toString(), locale.getDisplayName(currentLocale)));
+			availableLocales.add(new SelectItem(locale.toString(), locale.getDisplayName(locale)));
 		}
 
 		availableLocales.add(new SelectItem(String.valueOf(-1),
