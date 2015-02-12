@@ -76,6 +76,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 
 	private static final String PAGE_URI = "pageUri";
 	private static final String PAGE_TITLE = "pageTitle";
+	private static final String PAGE_DESCRIPTION = "pageDescription";
 	private static final String ARTICLE_VIEWER_NAME = "Article Viewer";
 	private static final String ARTICLE_VIEWER_SUBTYPE = "viewer";
 
@@ -506,6 +507,9 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 						if (s.getCode().equals(PAGE_TITLE)) {
 							changedPageUri = changePageUri(pageKey, currentValue, s.getMethod(), true);	//	Changing uri by new name
 						} else {
+							if(PAGE_DESCRIPTION.equals(s.getCode())){
+								getThemesHelper().getThemesService().getBuilderService().changePageDescription(Integer.valueOf(pageKey), currentValue, iwc);
+							}
 							getThemesHelper().getThemesService().getBuilderService().setProperty(pageKey, ThemesConstants.MINUS_ONE, s.getMethod(), newValues, appl);
 						}
 					}
