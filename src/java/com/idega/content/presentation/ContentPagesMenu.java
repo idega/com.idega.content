@@ -18,6 +18,7 @@ import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ContentPageBean;
 import com.idega.content.data.ContentPage;
 import com.idega.content.data.dao.ContentPageDAO;
+import com.idega.core.builder.business.BuilderService;
 import com.idega.event.IWPageEventListener;
 import com.idega.facelets.ui.FaceletComponent;
 import com.idega.idegaweb.IWBundle;
@@ -25,8 +26,10 @@ import com.idega.idegaweb.IWException;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWBaseComponent;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.Page;
 import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
+import com.idega.util.StringHandler;
 import com.idega.util.expression.ELUtil;
 
 public class ContentPagesMenu extends IWBaseComponent implements IWPageEventListener {
@@ -54,7 +57,9 @@ public class ContentPagesMenu extends IWBaseComponent implements IWPageEventList
 	@Autowired
 	private Web2Business web2;
 
-	private String menuStyle;
+	private String menuStyle, pageId, showOnPageId;
+
+	private boolean loadPagesFromTemplate;
 
 	@Override
 	protected void initializeComponent(FacesContext context) {
@@ -64,24 +69,46 @@ public class ContentPagesMenu extends IWBaseComponent implements IWPageEventList
 		IWBundle bundle = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER);
 
 		try {
-			int pageId = builder.getBuilderService(iwc).getCurrentPageId(iwc);
+			BuilderService builderService = builder.getBuilderService(iwc);
+			int pageId = builderService.getCurrentPageId(iwc);
+			int pageIdForContentPages = StringHandler.isNumeric(getPageId()) ? Integer.valueOf(getPageId()) : pageId;
 
 			ContentPageBean bean = getBeanInstance(ContentPageBean.BEAN_NAME);
-			bean.setCurrentPage(builder.getBuilderService(iwc).getPageURI(pageId));
-			List<ContentPage> pages = dao.getContentPagesInPage(pageId);
+			bean.setCurrentPage(builderService.getPageURI(StringHandler.isNumeric(getShowOnPageId()) ? Integer.valueOf(getShowOnPageId()) : pageId));
+
+			List<ContentPage> pages = dao.getContentPagesInPage(pageIdForContentPages);
+			if (isLoadPagesFromTemplate()) {
+				List<ContentPage> pagesFromTemplate = null;
+				Page page = builderService.getPage(String.valueOf(pageId));
+				if (page != null) {
+					String templateId = page.getTemplateId();
+					if (StringHandler.isNumeric(templateId)) {
+						pagesFromTemplate = dao.getContentPagesInPage(Integer.valueOf(templateId));
+					}
+				}
+				if (!ListUtil.isEmpty(pagesFromTemplate)) {
+					if (ListUtil.isEmpty(pages)) {
+						pages = new ArrayList<ContentPage>(pagesFromTemplate) ;
+					} else {
+						pages = new ArrayList<ContentPage>(pages);
+						pages.addAll(pagesFromTemplate);
+					}
+				}
+			}
+
 			bean.setPages(pages);
 			bean.setMenuStyle(getMenuStyle());
 
 			if (iwc.isParameterSet(PARAMETER_CONTENT_PAGE_ID)) {
 				bean.setPage(dao.getContentPage(Long.valueOf(iwc.getParameter(PARAMETER_CONTENT_PAGE_ID))));
-			} else if (!ListUtil.isEmpty(pages) && iwc.getIWMainApplication().getSettings().getBoolean("content_page_show_first_if_empty", Boolean.TRUE)) {
+			} else if (!ListUtil.isEmpty(pages) && iwc.getIWMainApplication().getSettings().getBoolean("content_page_show_first_if_empty", Boolean.TRUE) && pageId == pageIdForContentPages) {
 				bean.setPage(pages.get(0));
 			}
 
 			if (bean.isAdmin()) {
+				PresentationUtil.addJavaScriptSourceLineToHeader(iwc, jQuery.getBundleURIToJQueryLib());
 				bean.setEventHandler(IWMainApplication.getEncryptedClassName(ContentPagesMenu.class));
 
-				PresentationUtil.addJavaScriptSourceLineToHeader(iwc, jQuery.getBundleURIToJQueryLib());
 				PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, web2.getScriptsForTinyMCE(Web2BusinessBean.TINY_MCE_VERSION_4_1_7));
 				PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, web2.getBundleURIsToFancyBoxScriptFiles());
 				PresentationUtil.addJavaScriptSourceLineToHeader(iwc, bundle.getVirtualPathWithFileNameString("javascript/content-page-menu.js"));
@@ -160,6 +187,30 @@ public class ContentPagesMenu extends IWBaseComponent implements IWPageEventList
 
 	public void setMenuStyle(String menuStyle) {
 		this.menuStyle = menuStyle;
+	}
+
+	public boolean isLoadPagesFromTemplate() {
+		return loadPagesFromTemplate;
+	}
+
+	public void setLoadPagesFromTemplate(boolean loadPagesFromTemplate) {
+		this.loadPagesFromTemplate = loadPagesFromTemplate;
+	}
+
+	public String getPageId() {
+		return pageId;
+	}
+
+	public void setPageId(String pageId) {
+		this.pageId = pageId;
+	}
+
+	public String getShowOnPageId() {
+		return showOnPageId;
+	}
+
+	public void setShowOnPageId(String showOnPageId) {
+		this.showOnPageId = showOnPageId;
 	}
 
 }
