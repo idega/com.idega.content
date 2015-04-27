@@ -21,10 +21,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.Vector;
 
+import javax.faces.component.UIComponent;
 import javax.jcr.RepositoryException;
-import javax.jcr.query.Query;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -50,6 +49,9 @@ import com.idega.presentation.Span;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.repository.RepositoryService;
+import com.idega.repository.bean.RepositoryItem;
+import com.idega.util.CoreConstants;
+import com.idega.util.ListUtil;
 import com.idega.util.expression.ELUtil;
 
 /**
@@ -205,12 +207,79 @@ public class ContentSearch extends Object implements SearchPlugin{
 	}
 
 	//	TODO: implement
-	public Search createSearch(SearchQuery searchQuery, List<Query> searchRequests) {
+	public Search createSearch(SearchQuery searchQuery, List<String> searchRequests) {
 		List<SearchResult> results = new ArrayList<SearchResult>();
 		BasicSearch searcher = new BasicSearch();
 		searcher.setSearchName(getSearchName());
 		searcher.setSearchType(SEARCH_TYPE);
 		searcher.setSearchQuery(searchQuery);
+
+		Collection<String> nodes = null;
+		try {
+			nodes = getRepositoryService().getChildNodesAsRootUserRecursively(getScopeURI());
+		} catch (RepositoryException e) {
+			e.printStackTrace();
+		}
+
+		Map<String, Boolean> addedNodes = new HashMap<String, Boolean>();
+		if (!ListUtil.isEmpty(nodes)) {
+			for (final String node: nodes) {
+				if (addedNodes.containsKey(node)) {
+					continue;
+				}
+
+				for (String request: searchRequests) {
+					if ("*.*".equals(request) || "*".equals(request) || request.indexOf("<D:contains>*.*</D:contains>") != -1) {
+						try {
+							final RepositoryItem item = getRepositoryService().getRepositoryItemAsRootUser(node);
+							if (item.isCollection()) {
+								continue;
+							}
+
+							results.add(new SearchResult() {
+								@Override
+								public String getSearchResultURI() {
+									return CoreConstants.WEBDAV_SERVLET_URI + item.getAbsolutePath();
+								}
+
+								@Override
+								public String getSearchResultType() {
+									// TODO Auto-generated method stub
+									return null;
+								}
+
+								@Override
+								public String getSearchResultName() {
+									return item.getName();
+								}
+
+								@Override
+								public String getSearchResultExtraInformation() {
+									// TODO Auto-generated method stub
+									return null;
+								}
+
+								@Override
+								public Map<String, Object> getSearchResultAttributes() {
+									// TODO Auto-generated method stub
+									return null;
+								}
+
+								@Override
+								public String getSearchResultAbstract() {
+									// TODO Auto-generated method stub
+									return null;
+								}
+							});
+							addedNodes.put(node, Boolean.TRUE);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+
 //		try {
 //			Credentials hostCredentials = null;
 //
@@ -269,15 +338,9 @@ public class ContentSearch extends Object implements SearchPlugin{
 //		} catch (Exception e) {
 //			e.printStackTrace();
 //		}
+
+		searcher.setSearchResults(results);
 		return searcher;
-	}
-
-	public Search createSearch(List<Query> searchRequests) {
-		return createSearch(null, searchRequests);
-	}
-
-	public Search createSearch(Query searchRequest) {
-		return createSearch(null, Arrays.asList(searchRequest));
 	}
 
 	@Override
@@ -299,14 +362,12 @@ public class ContentSearch extends Object implements SearchPlugin{
 				//System.out.println(combinedSearch);
 
 				l.add(combinedSearch);
-
 			}
 		}
 		catch (RepositoryException e) {
 			e.printStackTrace();
 		}
-		return null;	//	TODO
-//		return createSearch(searchQuery, l);
+		return createSearch(searchQuery, l);
 	}
 
 	//	TODO: implement
@@ -698,8 +759,8 @@ public class ContentSearch extends Object implements SearchPlugin{
 	}
 
 	@Override
-	public Collection<Layer> getExtraRowElements(SearchResult result, IWResourceBundle iwrb) {
-		Collection<Layer> coll = new Vector<Layer>();
+	public Collection<UIComponent> getExtraRowElements(SearchResult result, IWResourceBundle iwrb) {
+		Collection<UIComponent> coll = new ArrayList<UIComponent>();
 		if (isSetToShowDeleteLink()) {
 			Layer deleteL = new Layer();
 			deleteL.setStyleClass(SearchResults.DEFAULT_LINK_STYLE_CLASS+"_delete");

@@ -146,7 +146,7 @@ public class WhatIsNew extends SearchResults {
 	 */
 	@Override
 	protected SearchPlugin configureSearchPlugin(SearchPlugin searchPlugin) {
-		if(searchPlugin instanceof ContentSearch){
+		if (searchPlugin instanceof ContentSearch) {
 			//Get a copy of the plugin
 			ContentSearch contentSearch = (ContentSearch) ((ContentSearch)searchPlugin).clone();
 			contentSearch.setScopeURI(getStartingPointURI());
@@ -161,9 +161,8 @@ public class WhatIsNew extends SearchResults {
 			contentSearch.setDeletePage(deletePage);
 			return contentSearch;
 		}
-		else {
-			return super.configureSearchPlugin(searchPlugin);
-		}
+
+		return super.configureSearchPlugin(searchPlugin);
 	}
 
 	private Map<String, List<UIComponent>> groups = null;
