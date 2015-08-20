@@ -431,11 +431,11 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 			uploadedFiles.add(file.getValue());
 		}
 
-		return getUploadedFilesList(uploadedFiles, uploadPath, fakeFileDeletion, stripNonRomanLetters);
+		return getUploadedFilesList(uploadedFiles, uploadPath, fakeFileDeletion, stripNonRomanLetters, uploadId);
 	}
 
 	@Override
-	public List<String> getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters) {
+	public List<String> getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters, String uploadId) {
 		if (ListUtil.isEmpty(files) || StringUtil.isEmpty(uploadPath)) {
 			return null;
 		}
@@ -487,7 +487,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 
 			Image deleteFile = bundle.getImage("images/remove.png");
 			deleteFile.setOnClick(new StringBuilder("FileUploadHelper.deleteUploadedFile('").append(listItem.getId()).append("', '")
-					.append(fileInRepositoryWithoutWebDav).append("', ").append(fakeFileDeletion)
+					.append(fileInRepositoryWithoutWebDav).append("', '").append(uploadId).append("', ").append(fakeFileDeletion)
 					.append(");").toString());
 			deleteFile.setTitle(deleteFileTitle);
 			deleteFile.setStyleClass("fileUploaderDeleteFileButtonStyle");
@@ -501,11 +501,11 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	}
 
 	@Override
-	public AdvancedProperty deleteFile(String fileInRepository, Boolean fakeFileDeletion) {
-		return deleteFile(CoreUtil.getIWContext(), fileInRepository, fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion);
+	public AdvancedProperty deleteFile(String fileInRepository, String uploadId, Boolean fakeFileDeletion) {
+		return deleteFile(CoreUtil.getIWContext(), fileInRepository, uploadId, fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion);
 	}
 
-	private AdvancedProperty deleteFile(IWContext iwc, String fileInRepository, boolean fakeFileDeletion) {
+	private AdvancedProperty deleteFile(IWContext iwc, String fileInRepository, String uploadId, boolean fakeFileDeletion) {
 		String message = fakeFileDeletion ? "File was successfully deleted" : "Sorry, file can not be deleted!" ;
 		AdvancedProperty result = new AdvancedProperty(fakeFileDeletion ? Boolean.TRUE.toString() : Boolean.FALSE.toString(), message);
 
@@ -517,6 +517,13 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 		message = iwrb.getLocalizedString(fakeFileDeletion ? "file_uploader.success_deleting_file" : "file_uploader.unable_delete_file", message);
 		result.setValue(message);
 
+		if (fakeFileDeletion){
+			FileUploadProgressListener fileUploadProgressListener = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
+			ArrayList<String> filesInRepo = new ArrayList<String>();
+			filesInRepo.add(fileInRepository);
+			fileUploadProgressListener.removeUploadedFiles(uploadId, filesInRepo);
+		}
+		
 		if (StringUtil.isEmpty(fileInRepository)) {
 			return result;
 		}
@@ -533,6 +540,11 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 			if (resource.delete()) {
 				result.setId(Boolean.TRUE.toString());
 				result.setValue(iwrb.getLocalizedString("file_uploader.success_deleting_file", "File was successfully deleted"));
+				
+				FileUploadProgressListener fileUploadProgressListener = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
+				ArrayList<String> filesInRepo = new ArrayList<String>();
+				filesInRepo.add(fileInRepository);
+				fileUploadProgressListener.removeUploadedFiles(uploadId, filesInRepo);
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error deleting file: " + fileInRepository, e);
@@ -562,7 +574,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	}
 
 	@Override
-	public AdvancedProperty deleteFiles(List<String> filesInRepository, Boolean fakeFileDeletion) {
+	public AdvancedProperty deleteFiles(List<String> filesInRepository, String uploadId, Boolean fakeFileDeletion) {
 		if (ListUtil.isEmpty(filesInRepository)) {
 			return null;
 		}
@@ -573,10 +585,21 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 
 		AdvancedProperty result = null;
 		for (String fileInRepository: filesInRepository) {
-			result = deleteFile(iwc, fileInRepository, fakeFileDeletion);
+			result = deleteFile(iwc, fileInRepository, uploadId,fakeFileDeletion);
 		}
 
 		return result;
+	}
+
+	@Override
+	public Boolean addPreviouslyUploadedFiles(String uploadId, String oldUploadId) {
+		if ((uploadId==null) || (oldUploadId==null)) {
+			return false;
+		}
+
+		FileUploadProgressListener fileUploadProgressListener = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
+		fileUploadProgressListener.appendFiles(uploadId, oldUploadId);
+		return true;
 	}
 
 }
