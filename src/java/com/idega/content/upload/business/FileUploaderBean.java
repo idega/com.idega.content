@@ -426,12 +426,52 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 		if (ListUtil.isEmpty(files))
 			return null;
 
-		List<String> uploadedFiles = new ArrayList<String>(files.size());
-		for (AdvancedProperty file: files) {
-			uploadedFiles.add(file.getValue());
+		fakeFileDeletion = fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion;
+		stripNonRomanLetters = stripNonRomanLetters == null ? Boolean.FALSE : stripNonRomanLetters;
+
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return null;
 		}
 
-		return getUploadedFilesList(uploadedFiles, uploadPath, fakeFileDeletion, stripNonRomanLetters, uploadId);
+		IWBundle bundle = ContentUtil.getBundle();
+		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
+		String deleteFileTitle = iwrb.getLocalizedString("files_uploader.delete_uploaded_file", "Delete file");
+
+		List<String> results = new ArrayList<String>(files.size() + 1);
+
+		Lists list = new Lists();
+		for (AdvancedProperty file: files) {
+
+			String fileName = file.getValue();
+			
+			ListItem listItem = new ListItem();
+
+			fileName = stripNonRomanLetters ? StringHandler.stripNonRomanCharacters(fileName, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS) : fileName;
+			String fileInRepository = new StringBuilder(CoreConstants.WEBDAV_SERVLET_URI).append(file.getId()).append(fileName).toString();
+			fileInRepository = stripNonRomanLetters ? StringHandler.stripNonRomanCharacters(fileInRepository, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS) : fileInRepository;
+			String fileInRepositoryWithoutWebDav = fileInRepository.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
+			results.add(fileInRepositoryWithoutWebDav);
+
+			DownloadLink link = new DownloadLink(new Text(fileName));
+			link.setMediaWriterClass(RepositoryItemDownloader.class);
+			link.setParameter(WebDAVListManagedBean.PARAMETER_WEB_DAV_URL, fileInRepository);
+			link.setParameter("allowAnonymous", Boolean.TRUE.toString());
+			listItem.add(link);
+
+			Image deleteFile = bundle.getImage("images/remove.png");
+			deleteFile.setOnClick(new StringBuilder("FileUploadHelper.deleteUploadedFile('").append(listItem.getId()).append("', '")
+					.append(fileInRepositoryWithoutWebDav).append("', '").append(uploadId).append("', ").append(fakeFileDeletion)
+					.append(");").toString());
+			deleteFile.setTitle(deleteFileTitle);
+			deleteFile.setStyleClass("fileUploaderDeleteFileButtonStyle");
+			listItem.add(deleteFile);
+
+			list.add(listItem);
+		}
+
+		results.add(getBuilderService(iwc).getRenderedComponent(list, iwc, false));
+		return results;
 	}
 
 	@Override

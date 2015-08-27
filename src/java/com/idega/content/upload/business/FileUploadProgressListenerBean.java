@@ -192,13 +192,25 @@ public class FileUploadProgressListenerBean implements FileUploadProgressListene
 	@Override
 	public void appendFiles(String uploadId, String oldUploadId) {
 		List<UploadFile> files = getUploadedFiles().get(uploadId);
-		List<UploadFile> filesOld = getUploadedFiles().get(uploadId);
-		for (UploadFile file: filesOld){
-			if(!files.contains(file)){
-				files.add(file);
+		List<UploadFile> filesOld = getUploadedFiles().get(oldUploadId);
+		if (files == null){
+			files = new ArrayList<UploadFile>();
+			if (filesOld != null) {
+				files.addAll(filesOld);
+				filesOld.clear();
+			}
+			getUploadedFiles().put(uploadId, files);
+		} else {
+			if (filesOld != null){
+				for (UploadFile file: filesOld){
+					if(!files.contains(file)){
+						files.add(file);
+					}
+				}
+				filesOld.clear();
 			}
 		}
-		filesOld.clear();
+		
 	}
 
 }
