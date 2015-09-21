@@ -267,7 +267,11 @@ public class FileUploadViewer extends IWBaseComponent {
 				.append(initializAtion).append("};").toString();
 		String actionString = PresentationUtil.getJavaScriptAction(initializationFunction.toString());
 		mainContainer.add(actionString);
-		if (!CoreUtil.isSingleComponentRenderingProcess(iwc)) {
+		boolean addOnLoad = !CoreUtil.isSingleComponentRenderingProcess(iwc);
+		if (addOnLoad || (iwc.isParameterSet("uiObject") && Boolean.valueOf(iwc.getParameter("uiObject")))) {
+			addOnLoad = false;
+		}
+		if (addOnLoad) {
 			initAction = new StringBuilder("jQuery(window).load(function() {").append(initAction).append("});").toString();
 		}
 		PresentationUtil.addJavaScriptActionToBody(iwc, initAction);
