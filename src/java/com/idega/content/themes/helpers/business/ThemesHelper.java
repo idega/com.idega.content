@@ -6,8 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.jdom2.Document;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 
 import com.idega.business.SpringBeanName;
+import com.idega.content.lucid.business.LucidEngine;
 import com.idega.content.themes.business.ThemesService;
 import com.idega.content.themes.helpers.bean.Setting;
 import com.idega.content.themes.helpers.bean.Theme;
@@ -16,7 +20,8 @@ import com.idega.graphics.image.business.ImageGenerator;
 import com.idega.presentation.IWContext;
 import com.idega.repository.RepositoryService;
 
-@SpringBeanName("themesHelper")
+@Scope(BeanDefinition.SCOPE_SINGLETON)
+@Service("themesHelper")
 public interface ThemesHelper {
 
 	public ImageGenerator getImageGenerator(IWContext iwc);

@@ -129,5 +129,42 @@ public class ContentViewManager implements Singleton  {
 		searchNode.setKeyboardShortcut(new KeyboardShortcut("s"));
 		searchNode.setName("#{localizedStrings['com.idega.content']['search']}");
 		
+		//trumpam
+		
+		bundle = IWMainApplication.getDefaultIWMainApplication().getBundle("com.idega.block.article");
+		
+		DefaultViewNode articleNode = new DefaultViewNode("article",contentNode);
+		articleNode.setJspUri(bundle.getJSPURI("listarticles.jsp"));
+		articleNode.setKeyboardShortcut(new KeyboardShortcut("a"));
+		articleNode.setName("#{localizedStrings['com.idega.block.article']['article']}");
+
+		DefaultViewNode createNewArticleNode = new DefaultViewNode("create",articleNode);
+		String jspUri = bundle.getJSPURI("createarticle.jsp");
+		createNewArticleNode.setJspUri(jspUri);
+		createNewArticleNode.setVisibleInMenus(false);
+		createNewArticleNode.setName("#{localizedStrings['com.idega.block.article']['create_article']}");
+
+		DefaultViewNode editNewArticleNode = new DefaultViewNode("edit",articleNode);
+		editNewArticleNode.setJspUri(bundle.getJSPURI("editarticle.jsp"));
+		editNewArticleNode.setVisibleInMenus(false);
+		editNewArticleNode.setName("#{localizedStrings['com.idega.block.article']['edit']}");
+
+		DefaultViewNode deleteArticleNode = new DefaultViewNode("delete",articleNode);
+		deleteArticleNode.setJspUri(bundle.getJSPURI("deletearticle.jsp"));
+		deleteArticleNode.setVisibleInMenus(false);
+		deleteArticleNode.setName("#{localizedStrings['com.idega.block.article']['delete']}");
+
+		DefaultViewNode listArticlesNode = new DefaultViewNode("list",articleNode);
+		listArticlesNode.setJspUri(bundle.getJSPURI("listarticles.jsp"));
+		listArticlesNode.setVisibleInMenus(false);
+		listArticlesNode.setName("#{localizedStrings['com.idega.block.article']['list_articles']}");
+
+
+		DefaultViewNode previewArticlesNode = new DefaultViewNode("preview",articleNode);
+		previewArticlesNode.setJspUri(bundle.getJSPURI("previewarticle.jsp"));
+		previewArticlesNode.setVisibleInMenus(false);
+		previewArticlesNode.setName("#{localizedStrings['com.idega.block.article']['preview']}");
+		
+		
 	}
 }
