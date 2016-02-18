@@ -74,15 +74,16 @@ public class ContentViewManager implements Singleton  {
 	
 	public ViewNode initalizeContentNode(IWBundle contentBundle){
 		ViewNode root = getViewManager().getWorkspaceRoot();
-		DefaultViewNode contentNode = new ApplicationViewNode(CoreConstants.CONTENT_VIEW_MANAGER_ID, root);
+		ViewNode contentNode = root.getChild(CoreConstants.CONTENT_VIEW_MANAGER_ID);
+		if (contentNode.equals(root)) contentNode = new ApplicationViewNode(CoreConstants.CONTENT_VIEW_MANAGER_ID, root);
 		Collection<String> roles = new ArrayList<String>();
 		roles.add(StandardRoles.ROLE_KEY_EDITOR);
 		roles.add(StandardRoles.ROLE_KEY_AUTHOR);
-		contentNode.setAuthorizedRoles(roles);
+		((DefaultViewNode)contentNode).setAuthorizedRoles(roles);
 		
-		contentNode.setJspUri(contentBundle.getJSPURI("pages.jsp"));
-		contentNode.setKeyboardShortcut(new KeyboardShortcut("4"));
-		contentNode.setName("#{localizedStrings['com.idega.content']['lucid_application']}");
+		((DefaultViewNode)contentNode).setJspUri(contentBundle.getJSPURI("pages.jsp"));
+		((DefaultViewNode)contentNode).setKeyboardShortcut(new KeyboardShortcut("4"));
+		((DefaultViewNode)contentNode).setName("#{localizedStrings['com.idega.content']['lucid_application']}");
 		
 		this.contentRootNode = contentNode;
 		return this.contentRootNode;
