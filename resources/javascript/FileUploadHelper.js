@@ -538,6 +538,10 @@ FileUploadHelper.getUploadPath = function() {
 	return jQuery('input.web2FileUploaderPathValue[type=\'hidden\'][name=\'web2FileUploaderPathValue\']').attr('value');
 }
 
+FileUploadHelper.setUploadPath = function(path) {
+	jQuery('input.web2FileUploaderPathValue[type=\'hidden\'][name=\'web2FileUploaderPathValue\']').attr('value', path);
+}
+
 FileUploadHelper.getRealUploadedFile = function(file) {
 	var uploadPath = FileUploadHelper.getUploadPath();
 	if (uploadPath.substring(uploadPath.length - 1) != '/') {
