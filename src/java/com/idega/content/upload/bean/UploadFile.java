@@ -1,6 +1,7 @@
 package com.idega.content.upload.bean;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Random;
 
 public class UploadFile implements Serializable {
@@ -18,7 +19,7 @@ public class UploadFile implements Serializable {
 		this.size = size;
 		this.bytes = bytes;
 
-		hash = new Random().nextInt();
+		hash = Arrays.hashCode(bytes);
 	}
 
 	public String getName() {

@@ -146,6 +146,8 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 				.append(iwrb.getLocalizedString("upload_exceeding_limits", "Sorry, the size of selected file(s) is exceeding the max allowed size"))
 			.append("', CHOOSE_FILE: '")
 				.append(iwrb.getLocalizedString("choose_file", "Choose file"))
+			.append("', UPLOAD_FILE: '")
+				.append(iwrb.getLocalizedString("upload_file", "Upload file"))
 			.append("', FILES_SELECTED: '")
 				.append(iwrb.getLocalizedString("web2_uploader.files_selected", "files selected"))
 			.append("', SELECTED_FILE: '")
@@ -426,16 +428,56 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 		if (ListUtil.isEmpty(files))
 			return null;
 
-		List<String> uploadedFiles = new ArrayList<String>(files.size());
-		for (AdvancedProperty file: files) {
-			uploadedFiles.add(file.getValue());
+		fakeFileDeletion = fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion;
+		stripNonRomanLetters = stripNonRomanLetters == null ? Boolean.FALSE : stripNonRomanLetters;
+
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return null;
 		}
 
-		return getUploadedFilesList(uploadedFiles, uploadPath, fakeFileDeletion, stripNonRomanLetters);
+		IWBundle bundle = ContentUtil.getBundle();
+		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
+		String deleteFileTitle = iwrb.getLocalizedString("files_uploader.delete_uploaded_file", "Delete file");
+
+		List<String> results = new ArrayList<String>(files.size() + 1);
+
+		Lists list = new Lists();
+		for (AdvancedProperty file: files) {
+
+			String fileName = file.getValue();
+			
+			ListItem listItem = new ListItem();
+
+			fileName = stripNonRomanLetters ? StringHandler.stripNonRomanCharacters(fileName, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS) : fileName;
+			String fileInRepository = new StringBuilder(CoreConstants.WEBDAV_SERVLET_URI).append(file.getId()).append(fileName).toString();
+			fileInRepository = stripNonRomanLetters ? StringHandler.stripNonRomanCharacters(fileInRepository, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS) : fileInRepository;
+			String fileInRepositoryWithoutWebDav = fileInRepository.replaceFirst(CoreConstants.WEBDAV_SERVLET_URI, CoreConstants.EMPTY);
+			results.add(fileInRepositoryWithoutWebDav);
+
+			DownloadLink link = new DownloadLink(new Text(fileName));
+			link.setMediaWriterClass(RepositoryItemDownloader.class);
+			link.setParameter(WebDAVListManagedBean.PARAMETER_WEB_DAV_URL, fileInRepository);
+			link.setParameter("allowAnonymous", Boolean.TRUE.toString());
+			listItem.add(link);
+
+			Image deleteFile = bundle.getImage("images/remove.png");
+			deleteFile.setOnClick(new StringBuilder("FileUploadHelper.deleteUploadedFile('").append(listItem.getId()).append("', '")
+					.append(fileInRepositoryWithoutWebDav).append("', '").append(uploadId).append("', ").append(fakeFileDeletion)
+					.append(");").toString());
+			deleteFile.setTitle(deleteFileTitle);
+			deleteFile.setStyleClass("fileUploaderDeleteFileButtonStyle");
+			listItem.add(deleteFile);
+
+			list.add(listItem);
+		}
+
+		results.add(getBuilderService(iwc).getRenderedComponent(list, iwc, false));
+		return results;
 	}
 
 	@Override
-	public List<String> getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters) {
+	public List<String> getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters, String uploadId) {
 		if (ListUtil.isEmpty(files) || StringUtil.isEmpty(uploadPath)) {
 			return null;
 		}
@@ -487,7 +529,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 
 			Image deleteFile = bundle.getImage("images/remove.png");
 			deleteFile.setOnClick(new StringBuilder("FileUploadHelper.deleteUploadedFile('").append(listItem.getId()).append("', '")
-					.append(fileInRepositoryWithoutWebDav).append("', ").append(fakeFileDeletion)
+					.append(fileInRepositoryWithoutWebDav).append("', '").append(uploadId).append("', ").append(fakeFileDeletion)
 					.append(");").toString());
 			deleteFile.setTitle(deleteFileTitle);
 			deleteFile.setStyleClass("fileUploaderDeleteFileButtonStyle");
@@ -501,11 +543,11 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	}
 
 	@Override
-	public AdvancedProperty deleteFile(String fileInRepository, Boolean fakeFileDeletion) {
-		return deleteFile(CoreUtil.getIWContext(), fileInRepository, fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion);
+	public AdvancedProperty deleteFile(String fileInRepository, String uploadId, Boolean fakeFileDeletion) {
+		return deleteFile(CoreUtil.getIWContext(), fileInRepository, uploadId, fakeFileDeletion == null ? Boolean.FALSE : fakeFileDeletion);
 	}
 
-	private AdvancedProperty deleteFile(IWContext iwc, String fileInRepository, boolean fakeFileDeletion) {
+	private AdvancedProperty deleteFile(IWContext iwc, String fileInRepository, String uploadId, boolean fakeFileDeletion) {
 		String message = fakeFileDeletion ? "File was successfully deleted" : "Sorry, file can not be deleted!" ;
 		AdvancedProperty result = new AdvancedProperty(fakeFileDeletion ? Boolean.TRUE.toString() : Boolean.FALSE.toString(), message);
 
@@ -517,6 +559,13 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 		message = iwrb.getLocalizedString(fakeFileDeletion ? "file_uploader.success_deleting_file" : "file_uploader.unable_delete_file", message);
 		result.setValue(message);
 
+		if (fakeFileDeletion){
+			FileUploadProgressListener fileUploadProgressListener = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
+			ArrayList<String> filesInRepo = new ArrayList<String>();
+			filesInRepo.add(fileInRepository);
+			fileUploadProgressListener.removeUploadedFiles(uploadId, filesInRepo);
+		}
+		
 		if (StringUtil.isEmpty(fileInRepository)) {
 			return result;
 		}
@@ -533,6 +582,11 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 			if (resource.delete()) {
 				result.setId(Boolean.TRUE.toString());
 				result.setValue(iwrb.getLocalizedString("file_uploader.success_deleting_file", "File was successfully deleted"));
+				
+				FileUploadProgressListener fileUploadProgressListener = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
+				ArrayList<String> filesInRepo = new ArrayList<String>();
+				filesInRepo.add(fileInRepository);
+				fileUploadProgressListener.removeUploadedFiles(uploadId, filesInRepo);
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error deleting file: " + fileInRepository, e);
@@ -562,7 +616,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	}
 
 	@Override
-	public AdvancedProperty deleteFiles(List<String> filesInRepository, Boolean fakeFileDeletion) {
+	public AdvancedProperty deleteFiles(List<String> filesInRepository, String uploadId, Boolean fakeFileDeletion) {
 		if (ListUtil.isEmpty(filesInRepository)) {
 			return null;
 		}
@@ -573,10 +627,21 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 
 		AdvancedProperty result = null;
 		for (String fileInRepository: filesInRepository) {
-			result = deleteFile(iwc, fileInRepository, fakeFileDeletion);
+			result = deleteFile(iwc, fileInRepository, uploadId,fakeFileDeletion);
 		}
 
 		return result;
+	}
+
+	@Override
+	public Boolean addPreviouslyUploadedFiles(String uploadId, String oldUploadId) {
+		if ((uploadId==null) || (oldUploadId==null)) {
+			return false;
+		}
+
+		FileUploadProgressListener fileUploadProgressListener = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
+		fileUploadProgressListener.appendFiles(uploadId, oldUploadId);
+		return true;
 	}
 
 }

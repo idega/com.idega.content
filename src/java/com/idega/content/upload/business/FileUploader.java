@@ -62,11 +62,13 @@ public interface FileUploader {
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
 			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters, String maxUploadSize);
 
-	public List<String> getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters);
+	public List<String> getUploadedFilesList(List<String> files, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters, String uploadId);
 
-	public AdvancedProperty deleteFile(String fileInRepository, Boolean fakeFileDeletion);
+	public AdvancedProperty deleteFile(String fileInRepository, String uploadId, Boolean fakeFileDeletion);
 
-	public AdvancedProperty deleteFiles(List<String> filesInRepository, Boolean fakeFileDeletion);
+	public AdvancedProperty deleteFiles(List<String> filesInRepository, String uploadId, Boolean fakeFileDeletion);
+	
+	public Boolean addPreviouslyUploadedFiles(String uploadId, String oldUploadId);
 
 	public List<String> getUploadedFilesListById(String uploadId, String uploadPath, Boolean fakeFileDeletion, Boolean stripNonRomanLetters);
 

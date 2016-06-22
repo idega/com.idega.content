@@ -20,6 +20,7 @@ FileUploadHelper.properties = {
 		UPLOADING_FILE_FAILED: 'Sorry, some error occurred - unable to upload file(s). Please, try again',
 		UPLOADING_FILE_EXCEEDED_SIZE: 'Sorry, the size of selected file(s) is exceeding the max allowed size',
 		CHOOSE_FILE: 'Choose file',
+		UPLOAD_FILE: 'Upload file',
 		FILES_SELECTED: 'files selected',
 		SELECTED_FILE: 'Selected file',
 		FLASH_IS_MISSING: 'Unable to upload file(s): you need to install Flash plug-in',
@@ -72,6 +73,49 @@ FileUploadHelper.initializeFlashUploader = function() {
 	LazyLoader.loadMultiple([FileUploadHelper.properties.swfObject, FileUploadHelper.properties.swfUploadScript], function() {
 		if (swfobject == null || !swfobject.hasFlashPlayerVersion("9")) {
 			closeAllLoadingMessages();
+			if (jQuery('#uploadSelect').length<1){
+				FileUploadHelper.submitCounter = 0;
+				
+				jQuery('[name="web2FileUploadField"]').each(function(){jQuery(this).remove()});
+				
+				jQuery('<input type="submit" id="uploadSubmit" value="'+FileUploadHelper.properties.localizations.UPLOAD_FILE+'" />').appendTo('.fileUploadInputsContainerStyle');
+				jQuery('#uploadSubmit').click(function(){
+					FileUploadHelper.submitCounter++;
+					if (navigator.userAgent.indexOf('MSIE 9.0') != -1){
+						if (FileUploadHelper.submitCounter>0){
+							FileUploadHelper.prepareProgressBar(function() {
+								showUploadInfoInProgressBar(FileUploadHelper.properties.progressBarId, FileUploadHelper.properties.actionAfterCounterReset);
+							});
+							jQuery('#uploadSelect').show();
+							jQuery('#uploadSelect-label').show();
+							jQuery('#uploadSubmit').hide();
+						}
+					} else {
+						FileUploadHelper.prepareProgressBar(function() {
+							showUploadInfoInProgressBar(FileUploadHelper.properties.progressBarId, FileUploadHelper.properties.actionAfterCounterReset);
+						});
+						jQuery('#uploadSelect').show();
+						jQuery('#uploadSelect-label').show();
+						jQuery('#uploadSubmit').hide();
+					}
+					setTimeout(function(){jQuery('#uploadSelect').val('')},100);
+				}).hide();
+				jQuery('<label id="uploadSelect-label" for="uploadSelect" style="height:40px;color:white">'+FileUploadHelper.properties.localizations.CHOOSE_FILE+'</label>').appendTo('.fileUploadInputsContainerStyle');
+				jQuery('<input type="file" name="web2FileUploadField" id="uploadSelect" class="fileUploadInputStyle" />').appendTo('.fileUploadInputsContainerStyle');
+				jQuery('#uploadSelect').change(function(){
+					FileUploadHelper.uploadFiles();
+					jQuery('#uploadSubmit').show();
+					jQuery('#uploadSelect').hide();
+					jQuery('#uploadSelect-label').hide();
+				});
+				
+				jQuery('label.upload-button').hide();
+				jQuery('.upload-name').hide();
+				
+			}
+			jQuery('#uploadSelect').show();
+			jQuery('#uploadSelect-label').show();
+			jQuery('#uploadSubmit').hide();
 			return false;
 		}
 		
@@ -273,6 +317,7 @@ FileUploadHelper.uploadFiles = function() {
 		return false;
 	}
 	
+	var html5 = true;
 	var totalSize = 0;
 	for (var i = 0; i < inputs.length; i++) {
 		var fileInput = inputs[i];
@@ -282,6 +327,7 @@ FileUploadHelper.uploadFiles = function() {
 		var filesByInput = fileInput.files;
 		if (filesByInput == null || filesByInput.length == 0) {
 			//	Not HTML 5 browser!
+			html5 = false;
 		} else {
 			for (var j = 0; j < filesByInput.length; j++) {
 				var file = filesByInput[j];
@@ -343,12 +389,22 @@ FileUploadHelper.uploadFiles = function() {
 				form.action = '/servlet/ContentFileUploadServlet?fileItem=' + fileItemNumber;
 				form.method = 'post';
 				form.target = 'uploadFrame';
-				form.submit();
+				if (html5){
+					form.submit();
+				} else {
+					closeAllLoadingMessages();
+					FileUploadHelper.submitCounter = 0;
+				}
+				
 			}
 			
-			FileUploadHelper.prepareProgressBar(function() {
-				showUploadInfoInProgressBar(FileUploadHelper.properties.progressBarId, FileUploadHelper.properties.actionAfterCounterReset);
-			});
+			if (html5){
+				FileUploadHelper.prepareProgressBar(function() {
+					showUploadInfoInProgressBar(FileUploadHelper.properties.progressBarId, FileUploadHelper.properties.actionAfterCounterReset);
+				});
+			}
+		}, errorHandler: function(o1, o2) {
+			alert(o1 + ' ' + o2);
 		}
 	});
 }
@@ -482,7 +538,7 @@ FileUploadHelper.showUploadedFiles = function(fakeFileDeletion) {
 	var uploadPath = FileUploadHelper.getUploadPath();
 	if (FileUploadHelper.properties.uploadId == null) {
 		FileUploader.getUploadedFilesList(FileUploadHelper.allUploadedFiles, uploadPath, fakeFileDeletion,
-			FileUploadHelper.properties.stripNonRomanLetters, {
+			FileUploadHelper.properties.stripNonRomanLetters, FileUploadHelper.properties.uploadId, {
 			callback: function(results) {
 				filesListCallback(results);
 			}
@@ -497,10 +553,10 @@ FileUploadHelper.showUploadedFiles = function(fakeFileDeletion) {
 	}
 }
 
-FileUploadHelper.deleteUploadedFile = function(id, file, fakeFileDeletion, callback) {
+FileUploadHelper.deleteUploadedFile = function(id, file, uploadId, fakeFileDeletion, callback) {
 	
 	LazyLoader.loadMultiple(['/dwr/engine.js', '/dwr/interface/FileUploader.js'], function() {
-		FileUploader.deleteFile(file, fakeFileDeletion, {
+		FileUploader.deleteFile(file, uploadId, fakeFileDeletion, {
 			callback: function(result) {
 
 				removeElementFromArray(FileUploadHelper.allUploadedFiles, file);
@@ -529,6 +585,23 @@ FileUploadHelper.deleteUploadedFile = function(id, file, fakeFileDeletion, callb
 				}
 
 				
+			}
+		});
+	});
+}
+
+FileUploadHelper.addPreviouslyUploadedFiles = function(uploadId, oldUploadId, callback) {
+	
+	LazyLoader.loadMultiple(['/dwr/engine.js', '/dwr/interface/FileUploader.js'], function() {
+		FileUploader.addPreviouslyUploadedFiles(uploadId , oldUploadId, {
+			callback: function(result) {
+
+				if (callback) {
+					callback(result);
+
+				} else {
+					FileUploadHelper.showUploadedFiles(FileUploadHelper.properties.fakeFileDeletion);
+				}
 			}
 		});
 	});
@@ -566,7 +639,7 @@ FileUploadHelper.removeAllUploadedFiles = function(fakeFileDeletion) {
 	}
 	
 	LazyLoader.loadMultiple(['/dwr/engine.js', '/dwr/interface/FileUploader.js'], function() {
-		FileUploader.deleteFiles(FileUploadHelper.allUploadedFiles, fakeFileDeletion, {
+		FileUploader.deleteFiles(FileUploadHelper.allUploadedFiles, uploadId, fakeFileDeletion, {
 			callback: function(result) {
 				if (result == null) {
 					return;
