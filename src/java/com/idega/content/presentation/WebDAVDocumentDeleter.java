@@ -9,6 +9,7 @@
  */
 package com.idega.content.presentation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +29,7 @@ import com.idega.block.web2.business.Web2Business;
 import com.idega.content.bean.ContentPathBean;
 import com.idega.content.business.DocumentsService;
 import com.idega.idegaweb.IWBundle;
+import com.idega.idegaweb.IWCacheManager;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.ui.GenericButton;
@@ -42,12 +44,13 @@ import com.idega.webface.WFUtil;
 
 /**
  *
- *  Last modified: $Date: 2009/01/12 14:44:57 $ by $Author: valdas $
+ * Last modified: $Date: 2009/01/12 14:44:57 $ by $Author: valdas $
  *
  * @author <a href="mailto:gimmi@idega.com">gimmi</a>
  * @version $Revision: 1.12 $
  */
-public class WebDAVDocumentDeleter extends ContentBlock implements ActionListener {
+public class WebDAVDocumentDeleter extends ContentBlock implements
+ActionListener {
 
 	private static final String ACTION = "dd_a";
 	private static final String ACTION_YES = "dd_ay";
@@ -58,6 +61,7 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 	private boolean useLinkAsSubmit = false;
 	private List<UIComponent> WFContainerLines = null;
 	private HtmlForm form = null;
+	private boolean showDeletionConfirmContent = true;
 
 	@Autowired
 	private JQuery jQuery;
@@ -73,6 +77,11 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 		String pathToUse = iwc.getParameter(PARAMETER_PATH);
 		Boolean deleted = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getDeleted");
 		WFContainerLines = new ArrayList<UIComponent>();
+		IWBundle bundle = getBundle();
+		if(!isShowDeletionConfirmContent()) {
+			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, bundle.getVirtualPathWithFileNameString("javascript/DocumentsDeleterHelper.js"));
+		}
+		
 		if (deleted == null) {
 			String clickedPath = null;
 			if (pathToUse != null) {
@@ -96,28 +105,40 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 				String path = item.getPath();
 				path = path.replaceFirst(getRepositoryService().getWebdavServerURL(), CoreConstants.EMPTY);
 
-				addLineToContainer(new UIComponent[]{WFUtil.getText(path)}, "wf_text", "resource_path");
+				if(isShowDeletionConfirmContent()) {
+					addLineToContainer(new UIComponent[]{WFUtil.getText(path)}, "wf_text", "resource_path");
 
-				if (item.isCollection()) {
-					addLineToContainer(new UIComponent[]{getText("are_you_sure_you_want_to_delete_folder")}, "verify", "verify_question");
-				} else {
-					addLineToContainer(new UIComponent[]{getText("are_you_sure_you_want_to_delete_file")}, "verify", "verify_question");
+					if (item.isCollection()) {
+						addLineToContainer(new UIComponent[]{getText("are_you_sure_you_want_to_delete_folder")}, "verify", "verify_question");
+					} else {
+						addLineToContainer(new UIComponent[]{getText("are_you_sure_you_want_to_delete_file")}, "verify", "verify_question");
+					}
 				}
 
-				IWBundle bundle = getBundle();
+				//IWBundle bundle = getBundle();
 				PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, Arrays.asList(
 						jQuery.getBundleURIToJQueryLib(),
 						web2.getBundleUriToHumanizedMessagesScript(),
 						CoreConstants.DWR_ENGINE_SCRIPT,
 						"/dwr/interface/" + DocumentsService.DWR_OBJECT + ".js",
 						bundle.getVirtualPathWithFileNameString("javascript/DocumentsHelper.js")
-				));
+						));
 				PresentationUtil.addStyleSheetToHeader(iwc, web2.getBundleUriToHumanizedMessagesStyleSheet());
 				IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
-				GenericButton button = new GenericButton(iwrb.getLocalizedString("yes", "Yes"));
-				button.setOnClick("DocumentsHelper.doDeleteResource('" + iwrb.getLocalizedString("deleting", "Deleting...") + "', '" + path + "');");
-
-				addLineToContainer(new UIComponent[]{button}, "submit", "submit");
+				if(!isShowDeletionConfirmContent()) {
+					DocumentsService documentsServiceBean = getBeanInstance(DocumentsService.BEAN_NAME);
+					documentsServiceBean.doDelete(path);
+					IWCacheManager.getInstance(iwc.getIWMainApplication()).clearAllCaches();
+					try {
+						iwc.getResponse().sendRedirect(iwc.getRequestURI());
+					} catch (IOException e) {
+						getLogger().warning("" + e);
+					}
+				} else {
+					GenericButton button = new GenericButton(iwrb.getLocalizedString("yes", "Yes"));
+					button.setOnClick("DocumentsHelper.doDeleteResource('" + iwrb.getLocalizedString("deleting", "Deleting...") + "', '" + path + "');");
+					addLineToContainer(new UIComponent[]{button}, "submit", "submit");
+				}
 			}
 		} else {
 			Boolean wasFolder = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getWasFolder");
@@ -150,13 +171,14 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 		if (this.form == null) {
 			form = new HtmlForm();
 			form.setStyleClass("wf_webdav_deleter_form");
-			form.setId("webdavdeleterform_"+getId());
+			form.setId("webdavdeleterform_" + getId());
 			form.setEnctype("multipart/form-data");
 		}
 		return form;
 	}
 
-	private void addLineToContainer(UIComponent[] lineElements, String styleClass, String ID) {
+	private void addLineToContainer(UIComponent[] lineElements,
+			String styleClass, String ID) {
 		if (lineElements == null) {
 			return;
 		}
@@ -194,23 +216,31 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 			Boolean deleted = Boolean.FALSE;
 			Boolean wasFolder = Boolean.FALSE;
 			try {
-				RepositoryItem res = getRepositoryService().getRepositoryItem(path);
+				RepositoryItem res = getRepositoryService().getRepositoryItem(
+						path);
 				String parentPath = res.getParentPath();
 				wasFolder = res.isCollection();
 				super.refreshList();
 				if (parentPath != null) {
-					String currentPath = parentPath.replaceFirst(getRepositoryService().getWebdavServerURL(), CoreConstants.EMPTY);
-					WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setWebDAVPath", currentPath);
-					WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath", currentPath);
+					String currentPath = parentPath.replaceFirst(
+							getRepositoryService().getWebdavServerURL(),
+							CoreConstants.EMPTY);
+					WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID,
+							"setWebDAVPath", currentPath);
+					WFUtil.invoke(ContentPathBean.BEAN_ID, "setPath",
+							currentPath);
 				}
-				WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID, "setClickedFilePath", null, String.class);
+				WFUtil.invoke(WebDAVList.WEB_DAV_LIST_BEAN_ID,
+						"setClickedFilePath", null, String.class);
 				deleted = res.delete();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
-			WFUtil.invoke("webdavdocumentdeleterbean", "setDeleted", deleted, Boolean.class);
-			WFUtil.invoke("webdavdocumentdeleterbean", "setWasFolder", wasFolder, Boolean.class);
+			WFUtil.invoke("webdavdocumentdeleterbean", "setDeleted", deleted,
+					Boolean.class);
+			WFUtil.invoke("webdavdocumentdeleterbean", "setWasFolder",
+					wasFolder, Boolean.class);
 			if (deleted && redirectOnSuccessURI != null) {
 				CoreUtil.getIWContext().sendRedirect(redirectOnSuccessURI);
 			}
@@ -260,4 +290,12 @@ public class WebDAVDocumentDeleter extends ContentBlock implements ActionListene
 		this.useLinkAsSubmit = ((Boolean) values[3]).booleanValue();
 	}
 
+	public boolean isShowDeletionConfirmContent() {
+		return showDeletionConfirmContent;
+	}
+
+	public void setShowDeletionConfirmContent(boolean showDeletionConfirmContent) {
+		this.showDeletionConfirmContent = showDeletionConfirmContent;
+	}
+	
 }
