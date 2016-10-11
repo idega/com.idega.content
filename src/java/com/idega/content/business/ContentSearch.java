@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import javax.faces.component.UIComponent;
+import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -72,6 +73,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 
 	//private static final String DASL_WHERE_XML_SNIPPET = "</D:where>";
 	public static final String SEARCH_NAME_LOCALIZABLE_KEY = "content_search.name";
+	public static final String SEARCH_UPLOAD_DATE_LOCALIZABLE_KEY = "content_search.upload_date";
 	public static final String SEARCH_DESCRIPTION_LOCALIZABLE_KEY = "content_search.description";
 	public static final String SEARCH_TYPE = "document";
 	public static final String DOCUMENT_SEARCH_WORD_PARAMETER_NAME = "doc_s_word";
@@ -94,6 +96,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 	protected boolean useRootAccessForSearch = false;
 	protected boolean hideParentFolderPath = false;
 	protected boolean hideFileExtension = false;
+	protected boolean showDateColumn = false;
 
 	protected static final String ORDER_ASCENDING = "ascending";
 	protected static final String ORDER_DESCENDING = "descending";
@@ -214,9 +217,12 @@ public class ContentSearch extends Object implements SearchPlugin{
 		searcher.setSearchType(SEARCH_TYPE);
 		searcher.setSearchQuery(searchQuery);
 
-		Collection<String> nodes = null;
+		Collection<String> nodes = new ArrayList<String>();
 		try {
-			nodes = getRepositoryService().getChildNodesAsRootUserRecursively(getScopeURI());
+			String[] scopeURIs = getScopeURI().split(CoreConstants.COMMA);
+			for(String scopeURI : scopeURIs) {
+				nodes.addAll(getRepositoryService().getChildNodesAsRootUserRecursively(scopeURI));
+			}
 		} catch (RepositoryException e) {
 			e.printStackTrace();
 		}
@@ -759,6 +765,39 @@ public class ContentSearch extends Object implements SearchPlugin{
 	}
 
 	@Override
+	public Collection<UIComponent> getFileCreationDates(SearchResult result, IWResourceBundle iwrb) {
+		Collection<UIComponent> coll = new ArrayList<UIComponent>();
+		if(isSetToShowDateColumn()) {
+			Layer dateLayer = new Layer();
+			dateLayer.setStyleClass(SearchResults.DEFAULT_LINK_STYLE_CLASS+"_file_date");
+			
+			String uri = result.getSearchResultURI();
+			
+			long creationDate = -1;
+			try {
+				creationDate = getRepositoryService().getCreationDate(uri);
+			} catch (RepositoryException e) {
+			}
+			
+			Date date = null;
+			if(creationDate != -1) {
+				date = new Date(creationDate);
+			}
+			
+			String dateToShow = "";
+			if(date != null) {
+				dateToShow = new SimpleDateFormat("dd-MM-yyyy").format(date);
+			}
+			
+			Text dateText = new Text(dateToShow);
+			
+			dateLayer.add(dateText);
+			coll.add(dateLayer);
+		}
+		
+		return coll;
+	}
+	
 	public Collection<UIComponent> getExtraRowElements(SearchResult result, IWResourceBundle iwrb) {
 		Collection<UIComponent> coll = new ArrayList<UIComponent>();
 		if (isSetToShowDeleteLink()) {
@@ -766,6 +805,7 @@ public class ContentSearch extends Object implements SearchPlugin{
 			deleteL.setStyleClass(SearchResults.DEFAULT_LINK_STYLE_CLASS+"_delete");
 			Link dLink = new Link(new Span(new Text(iwrb.getLocalizedString("search_results.delete", "Delete"))));
 			dLink.setToolTip(iwrb.getLocalizedString("search_results.delete", "Delete"));
+			dLink.setMarkupAttribute("rel", iwrb.getLocalizedString("are_you_sure_you_want_to_delete_file", "Are you sure you want to delete file?"));
 			if (deletePage != null) {
 				dLink.setPage(deletePage);
 			}
@@ -828,6 +868,20 @@ public class ContentSearch extends Object implements SearchPlugin{
 	}
 
 	return "Searches the contents of documents in an IdegaWeb file system.";
+	}
+	
+	@Override
+	public String getSearchDateColumnName() {
+		IWBundle bundle = ContentUtil.getBundle();
+
+		try {
+			IWContext iwc = IWContext.getInstance();
+			return bundle.getResourceBundle(iwc).getLocalizedString(
+					SEARCH_UPLOAD_DATE_LOCALIZABLE_KEY, "Upload Date");
+		} catch (UnavailableIWContext e) {
+		}
+
+		return "Upload Date";
 	}
 
 	/**
@@ -982,5 +1036,13 @@ public class ContentSearch extends Object implements SearchPlugin{
 
 	RepositoryService getRepositoryService() {
 		return ELUtil.getInstance().getBean(RepositoryService.class);
+	}
+	
+	public boolean isSetToShowDateColumn() {
+		return showDateColumn;
+	}
+
+	public void setToShowDateColumn(boolean showDateColumn) {
+		this.showDateColumn = showDateColumn;
 	}
 }
