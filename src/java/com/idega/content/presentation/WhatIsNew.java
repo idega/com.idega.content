@@ -23,6 +23,7 @@ import com.idega.block.web2.business.Web2Business;
 import com.idega.block.web2.presentation.Accordion;
 import com.idega.content.business.ContentSearch;
 import com.idega.content.business.IWCacheInvalidatorRepositoryListener;
+import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.search.business.SearchPlugin;
 import com.idega.core.search.presentation.SearchResults;
@@ -30,16 +31,22 @@ import com.idega.idegaweb.IWBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Text;
+import com.idega.user.data.User;
+import com.idega.util.ArrayUtil;
 import com.idega.util.CoreConstants;
 import com.idega.util.PresentationUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
 /**
- * A block that displays the latest or all entries in the file repository ordered by modification date<br>
- * It extends SearchResults block and forces it to only use a DASL search (ContentSearch) with specific settings<br>
- * and the query is by default set to "*" and the path to "files" but that can be changed.
+ * A block that displays the latest or all entries in the file repository
+ * ordered by modification date<br>
+ * It extends SearchResults block and forces it to only use a DASL search
+ * (ContentSearch) with specific settings<br>
+ * and the query is by default set to "*" and the path to "files" but that can
+ * be changed.
  *
- *  Last modified: $Date: 2008/12/11 08:03:58 $ by $Author: laddi $
+ * Last modified: $Date: 2008/12/11 08:03:58 $ by $Author: laddi $
  *
  * @author <a href="mailto:eiki@idega.com">eiki</a>
  * @version $Revision: 1.9 $
@@ -52,6 +59,7 @@ public class WhatIsNew extends SearchResults {
 	protected String startingPointURI = "files/public";
 	protected String orderByProperty = "getlastmodified";
 	protected String groupHeight = null;
+	protected String roles = null;
 
 	protected int numberOfResultItemsToDisplay = -1;
 
@@ -64,10 +72,10 @@ public class WhatIsNew extends SearchResults {
 	protected boolean showDeleteLink = false;
 	protected boolean groupByExtraInfo = false;
 	protected boolean orderGroups = true;
-
+	
 	protected ICPage deletePage = null;
 
-	public WhatIsNew(){
+	public WhatIsNew() {
 		super();
 		this.setCacheable(WHAT_IS_NEW_CACHE_KEY, 0);
 		this.setStyleClass(STYLE_CLASS_WHATISNEW);
@@ -78,54 +86,65 @@ public class WhatIsNew extends SearchResults {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see com.idega.presentation.PresentationObject#main(com.idega.presentation.IWContext)
+	 * @see
+	 * com.idega.presentation.PresentationObject#main(com.idega.presentation
+	 * .IWContext)
 	 */
 	@Override
 	public void main(IWContext iwc) throws Exception {
-		//just listen for changes
+		// just listen for changes
 		startCachingStrategy();
 
-		boolean useGlobalSettings = iwc.getApplicationSettings().getBoolean("whatisnew.use.global.settings", false);
+		boolean useGlobalSettings = iwc.getApplicationSettings().getBoolean(
+				"whatisnew.use.global.settings", false);
 		if (useGlobalSettings) {
-			boolean useDescending = iwc.getApplicationSettings().getBoolean("whatisnew.use.descending", true);
+			boolean useDescending = iwc.getApplicationSettings().getBoolean(
+					"whatisnew.use.descending", true);
 			setToUseDescendingOrder(useDescending);
 
-			String orderByProperty = iwc.getApplicationSettings().getProperty("whatisnew.order.property", "getlastmodified");
+			String orderByProperty = iwc.getApplicationSettings().getProperty(
+					"whatisnew.order.property", "getlastmodified");
 			setOrderByProperty(orderByProperty);
 		}
-
 
 		super.main(iwc);
 	}
 
 	protected void startCachingStrategy() {
-		getRepositoryService().addRepositoryChangeListeners(new IWCacheInvalidatorRepositoryListener(getStartingPointURI(), WHAT_IS_NEW_CACHE_KEY));
+		String[] startingPoints = getStartingPointURI().split(CoreConstants.COMMA);
+		for(String startingPoint : startingPoints) {
+			getRepositoryService().addRepositoryChangeListeners(
+					new IWCacheInvalidatorRepositoryListener(startingPoint,
+							WHAT_IS_NEW_CACHE_KEY));
+		}
 	}
 
 	@Override
 	protected String getCacheState(IWContext iwc, String cacheStatePrefix) {
-		IWBundle iwb = IWContext.getInstance().getIWMainApplication().getCoreBundle();
-		Web2Business business = ELUtil.getInstance().getBean(Web2Business.class);
+		IWBundle iwb = IWContext.getInstance().getIWMainApplication()
+				.getCoreBundle();
+		Web2Business business = ELUtil.getInstance()
+				.getBean(Web2Business.class);
 
 		List<String> actions = new ArrayList<String>();
-		actions.add(business.getActionToLinkLinksWithFiles(STYLE_CLASS_WHATISNEW, true, false));
+		actions.add(business.getActionToLinkLinksWithFiles(
+				STYLE_CLASS_WHATISNEW, true, false));
 
-		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, business.getBundleUriToLinkLinksWithFilesScriptFile());
+		PresentationUtil.addJavaScriptSourceLineToHeader(iwc,
+				business.getBundleUriToLinkLinksWithFilesScriptFile());
 		PresentationUtil.addStyleSheetsToHeader(iwc, Arrays.asList(
 				iwb.getVirtualPathWithFileNameString("style/search.css"),
-				business.getBundleUriToLinkLinksWithFilesStyleFile()
-		));
+				business.getBundleUriToLinkLinksWithFilesStyleFile()));
 		PresentationUtil.addJavaScriptActionsToBody(iwc, actions);
 
 		StringBuffer buffer = new StringBuffer(cacheStatePrefix);
-		buffer.append(getSearchQueryString(iwc))
-		.append(getStartingPointURI())
+		buffer.append(getSearchQueryString(iwc)).append(getStartingPointURI())
 		.append(getNumberOfResultItemsToDisplay())
 		.append(getOrderByProperty())
 		.append(isSetToHideFileExtension())
 		.append(isSetToHideParentFolderPath())
 		.append(isSetToShowAllResultProperties())
-		.append(isSetToShowDeleteLink())
+		.append(isSetToShowDeleteLink(iwc))
 		.append(isUsingDescendingOrder())
 		.append(isUsingRootAccessForSearch())
 		.append(getAbstractTextStyleClass())
@@ -133,32 +152,40 @@ public class WhatIsNew extends SearchResults {
 		.append(getExtraAttributeTextOddStyleClass())
 		.append(getExtraInformationTextStyleClass())
 		.append(getSearchNameStyleClass())
-		.append(getRowEvenStyleClass())
-		.append(getRowOddStyleClass());
+		.append(getRowEvenStyleClass()).append(getRowOddStyleClass());
 
-		//hope I got them all!
+		// hope I got them all!
 
 		return buffer.toString();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.idega.core.search.presentation.SearchResults#configureSearchPlugin(com.idega.core.search.business.SearchPlugin)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * com.idega.core.search.presentation.SearchResults#configureSearchPlugin
+	 * (com.idega.core.search.business.SearchPlugin)
 	 */
 	@Override
 	protected SearchPlugin configureSearchPlugin(SearchPlugin searchPlugin) {
 		if (searchPlugin instanceof ContentSearch) {
-			//Get a copy of the plugin
-			ContentSearch contentSearch = (ContentSearch) ((ContentSearch)searchPlugin).clone();
+			// Get a copy of the plugin
+			ContentSearch contentSearch = (ContentSearch) ((ContentSearch) searchPlugin)
+					.clone();
 			contentSearch.setScopeURI(getStartingPointURI());
 			contentSearch.setPropertyToOrderBy(getOrderByProperty());
 			contentSearch.setToUseDescendingOrder(isUsingDescendingOrder());
-			contentSearch.setNumberOfResultItemsToReturn(getNumberOfResultItemsToDisplay());
+			contentSearch
+			.setNumberOfResultItemsToReturn(getNumberOfResultItemsToDisplay());
 			contentSearch.setToIgnoreFolders(isIgnoreFolders());
-			contentSearch.setToUseRootAccessForSearch(isUsingRootAccessForSearch());
-			contentSearch.setToHideParentFolderPath(isSetToHideParentFolderPath());
+			contentSearch
+			.setToUseRootAccessForSearch(isUsingRootAccessForSearch());
+			contentSearch
+			.setToHideParentFolderPath(isSetToHideParentFolderPath());
 			contentSearch.setToHideFileExtensions(isSetToHideFileExtension());
 			contentSearch.setToShowDeleteLink(showDeleteLink);
 			contentSearch.setDeletePage(deletePage);
+			contentSearch.setToShowDateColumn(isSetToShowDateColumn());
 			return contentSearch;
 		}
 
@@ -168,12 +195,14 @@ public class WhatIsNew extends SearchResults {
 	private Map<String, List<UIComponent>> groups = null;
 
 	@Override
-	protected void addResultRow(Layer container, Layer rowContainer, String rowKey) {
+	protected void addResultRow(Layer container, Layer rowContainer,
+			String rowKey) {
 		if (groupByExtraInfo) {
 			if (rowKey.endsWith(CoreConstants.SLASH)) {
-				rowKey = rowKey.substring(0, rowKey.length()-1);
+				rowKey = rowKey.substring(0, rowKey.length() - 1);
 			}
-			rowKey = rowKey.substring(rowKey.lastIndexOf(CoreConstants.SLASH)+1);
+			rowKey = rowKey
+					.substring(rowKey.lastIndexOf(CoreConstants.SLASH) + 1);
 			if (!groups.containsKey(rowKey)) {
 				groups.put(rowKey, new ArrayList<UIComponent>());
 			}
@@ -192,11 +221,12 @@ public class WhatIsNew extends SearchResults {
 		}
 
 	}
+
 	@Override
 	protected void afterAddingResultRows(Layer container) {
 		if (groupByExtraInfo) {
 			Set<String> keySet = groups.keySet();
-			Accordion acc = new Accordion(getId()+"_acc");
+			Accordion acc = new Accordion(getId() + "_acc");
 			if (groupHeight != null) {
 				acc.setHeight(groupHeight);
 			}
@@ -208,12 +238,12 @@ public class WhatIsNew extends SearchResults {
 				Collections.sort(keyList);
 			}
 
-			for (String key: keyList) {
+			for (String key : keyList) {
 				List<UIComponent> v = groups.get(key);
 				if (v != null) {
 					Layer la = new Layer();
 
-					for (UIComponent component: v) {
+					for (UIComponent component : v) {
 						la.add(component);
 					}
 					acc.addPanel(new Text(key), la);
@@ -222,44 +252,57 @@ public class WhatIsNew extends SearchResults {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.idega.core.search.presentation.SearchResults#isAdvancedSearch(com.idega.presentation.IWContext)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * com.idega.core.search.presentation.SearchResults#isAdvancedSearch(com
+	 * .idega.presentation.IWContext)
 	 */
 	@Override
 	protected boolean isAdvancedSearch(IWContext iwc) {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.idega.core.search.presentation.SearchResults#getQueryString(com.idega.presentation.IWContext)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * com.idega.core.search.presentation.SearchResults#getQueryString(com.idega
+	 * .presentation.IWContext)
 	 */
 	@Override
 	protected String getSearchQueryString(IWContext iwc) {
 		String query = isIgnoreFolders() ? "*.*" : "*";
-		if(super.searchQueryString==null){
+		if (super.searchQueryString == null) {
 			return query;
-		}
-		else{
+		} else {
 			return this.searchQueryString;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.idega.core.search.presentation.SearchResults#isSimpleSearch(com.idega.presentation.IWContext)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * com.idega.core.search.presentation.SearchResults#isSimpleSearch(com.idega
+	 * .presentation.IWContext)
 	 */
 	@Override
 	protected boolean isSimpleSearch(IWContext iwc) {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.idega.core.search.presentation.SearchResults#getSearchPluginsToUse()
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * com.idega.core.search.presentation.SearchResults#getSearchPluginsToUse()
 	 */
 	@Override
 	public String getSearchPluginsToUse() {
 		return "ContentSearch";
 	}
-
 
 	/**
 	 * @return the ignoreFolders
@@ -268,14 +311,13 @@ public class WhatIsNew extends SearchResults {
 		return this.ignoreFolders;
 	}
 
-
 	/**
-	 * @param ignoreFolders the ignoreFolders to set
+	 * @param ignoreFolders
+	 *            the ignoreFolders to set
 	 */
 	public void setIgnoreFolders(boolean ignoreFolders) {
 		this.ignoreFolders = ignoreFolders;
 	}
-
 
 	/**
 	 * @return the numberOfResultItemsToDisplay
@@ -284,14 +326,13 @@ public class WhatIsNew extends SearchResults {
 		return this.numberOfResultItemsToDisplay;
 	}
 
-
 	/**
-	 * @param numberOfResultItemsToDisplay the numberOfResultItemsToDisplay to set
+	 * @param numberOfResultItemsToDisplay
+	 *            the numberOfResultItemsToDisplay to set
 	 */
 	public void setNumberOfResultItemsToDisplay(int numberOfResultItemsToDisplay) {
 		this.numberOfResultItemsToDisplay = numberOfResultItemsToDisplay;
 	}
-
 
 	/**
 	 * @return the orderByProperty
@@ -300,17 +341,18 @@ public class WhatIsNew extends SearchResults {
 		return this.orderByProperty;
 	}
 
-
 	/**
-	 * @param orderByProperty the orderByProperty to set
+	 * @param orderByProperty
+	 *            the orderByProperty to set
 	 */
 	public void setOrderByProperty(String orderByProperty) {
 		this.orderByProperty = orderByProperty;
 	}
 
-
 	/**
-	 * Returns the StartingPointURI, if block is set to use User home folder, that is returned instead
+	 * Returns the StartingPointURI, if block is set to use User home folder,
+	 * that is returned instead
+	 *
 	 * @return the startingPointURI
 	 */
 	public String getStartingPointURI() {
@@ -331,16 +373,17 @@ public class WhatIsNew extends SearchResults {
 				return getStartingPointURI();
 			}
 		} else {
-			if (this.startingPointURI!=null && this.startingPointURI.startsWith("/")) {
+			if (this.startingPointURI != null
+					&& this.startingPointURI.startsWith("/")) {
 				return this.startingPointURI.substring(1);
-			}
-			else return this.startingPointURI;
+			} else
+				return this.startingPointURI;
 		}
 	}
 
-
 	/**
-	 * @param startingPointURI the startingPointURI to set
+	 * @param startingPointURI
+	 *            the startingPointURI to set
 	 */
 	public void setStartingPointURI(String startingPointURI) {
 		this.startingPointURI = startingPointURI;
@@ -349,11 +392,13 @@ public class WhatIsNew extends SearchResults {
 	/**
 	 * Sets the viewer to view the current users home folder content. Overrides
 	 * the setStartingPointURI method
+	 *
 	 * @param useUserHomeFolder
 	 */
 	public void setUseUserHomeFolder(boolean useUserHomeFolder) {
 		this.useUserHomeFolder = useUserHomeFolder;
 	}
+
 	/**
 	 * @return the useDescendingOrder
 	 */
@@ -361,33 +406,31 @@ public class WhatIsNew extends SearchResults {
 		return this.useDescendingOrder;
 	}
 
-
 	/**
-	 * @param useDescendingOrder the useDescendingOrder to set
+	 * @param useDescendingOrder
+	 *            the useDescendingOrder to set
 	 */
 	public void setToUseDescendingOrder(boolean useDescendingOrder) {
 		this.useDescendingOrder = useDescendingOrder;
 	}
 
-
 	/**
 	 * @return the useRootAccessForSearch
 	 */
 	public boolean isUsingRootAccessForSearch() {
-		return this.useRootAccessForSearch ;
+		return this.useRootAccessForSearch;
 	}
 
-
-
 	/**
-	 * Set to true if the content search should use the ROOT access for searching.<br>
+	 * Set to true if the content search should use the ROOT access for
+	 * searching.<br>
 	 * Does not give the user rights to open files beyond his access though.
+	 *
 	 * @param useRootAccessForSearch
 	 */
 	public void setToUseRootAccessForSearch(boolean useRootAccessForSearch) {
 		this.useRootAccessForSearch = useRootAccessForSearch;
 	}
-
 
 	/**
 	 * @return the hideFolderPath
@@ -396,9 +439,10 @@ public class WhatIsNew extends SearchResults {
 		return this.hideParentFolderPath;
 	}
 
-
 	/**
-	 * If set to true the result will only state the parent folder of the result itm and not the full path
+	 * If set to true the result will only state the parent folder of the result
+	 * itm and not the full path
+	 *
 	 * @param hideParentFolderPath
 	 */
 	public void setToHideParentFolderPath(boolean hideParentFolderPath) {
@@ -417,7 +461,10 @@ public class WhatIsNew extends SearchResults {
 		this.showDeleteLink = show;
 	}
 
-	public boolean isSetToShowDeleteLink() {
+	public boolean isSetToShowDeleteLink(IWContext iwc) {
+		if (showDeleteLink && !StringUtil.isEmpty(getRoles())) {
+			showDeleteLink = filesDeleteAllowed(iwc);
+		}
 		return showDeleteLink;
 	}
 
@@ -445,4 +492,46 @@ public class WhatIsNew extends SearchResults {
 		this.orderGroups = orderGroups;
 	}
 
+	public String getRoles() {
+		return roles;
+	}
+
+	public void setRoles(String roles) {
+		this.roles = roles;
+	}
+
+	private boolean filesDeleteAllowed(IWContext iwc) {
+		if (iwc == null || !iwc.isLoggedOn()) {
+			return false;
+		}
+
+		if (!iwc.getIWMainApplication().getSettings()
+				.getBoolean("allow_users_to_delete_files", false)) {
+			return false;
+		}
+
+		User user = iwc.getCurrentUser();
+		if (user == null) {
+			return false;
+		}
+
+		AccessController accessController = iwc.getAccessController();
+		if (accessController == null) {
+			return false;
+		}
+
+		String[] separatedRoles = getRoles().split(CoreConstants.COMMA);
+		if (ArrayUtil.isEmpty(separatedRoles)) {
+			return false;
+		}
+
+		for (String separatedRole : separatedRoles) {
+			if (accessController.hasRole(user, separatedRole)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
 }

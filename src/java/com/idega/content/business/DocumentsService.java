@@ -39,7 +39,8 @@ public class DocumentsService extends DefaultSpringBean implements DWRAnnotation
 			result.setValue(iwrb.getLocalizedString("path_is_not_provided", "Path is not provided"));
 			return result;
 		}
-		if (!iwc.isLoggedOn() || !iwc.isSuperAdmin()) {
+		
+		if ((!iwc.isLoggedOn() || !iwc.isSuperAdmin()) && !iwc.getIWMainApplication().getSettings().getBoolean("allow_users_to_delete_files", false)) {
 			result.setValue(iwrb.getLocalizedString("you_do_not_have_rights", "You do not have rights"));
 			return result;
 		}
