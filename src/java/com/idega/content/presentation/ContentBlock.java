@@ -124,7 +124,7 @@ public abstract class ContentBlock extends IWBaseComponent {
 		}
 		try {
 			JCRItem oldRes = this.resource;
-			JCRItem newRes = getRepositoryService().getRepositoryItem(path);
+			JCRItem newRes = getRepositoryService().getRepositoryItemAsRootUser(path);
 			if (newRes != null && (oldRes == null || oldRes.getName().equals(newRes.getName()))) {
 				if ((!useFolders() && !newRes.isCollection()) || (useFolders() && newRes.isCollection())) {
 					this.resource = newRes;
