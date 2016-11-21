@@ -828,7 +828,7 @@ html * .scrollTable {
 }
 
 .accordionInPages {
-	width: 250px;
+	width: 14%;
 	float: left;
 	background-color: #fff;
 }
@@ -908,13 +908,8 @@ html * .scrollTable {
 }
 
 .mainPagesContentStyle {
-	position: absolute;
-	top: 0px;
-	right: 0px;
-	left: 0px;
-	width: auto;
-	bottom: 0px;
-	overflow: hidden;
+	display: block;
+    width: auto;
 }
 
 body.site_manager .mainPagesContentStyle {
@@ -922,14 +917,7 @@ body.site_manager .mainPagesContentStyle {
 }
 
 .accordionInPages {
-	position: absolute;
-	margin: 0;
-	top: 5px;
-	left: 5px;
-	bottom: 5px;
-	height: auto;
-	width: 268px;
-	overflow: hidden;
+    display: inline-block;
 	border: 1px #cacaca solid;
 }
 
@@ -945,14 +933,9 @@ body.site_manager .mainPagesContentStyle {
 
 .pagePreviewContainer {
 	border: 1px #cacaca solid;
-	position: absolute;
-	margin: 0;
-	padding: 0;
-	top: 5px;
-	right: 5px;
-	bottom: 5px;
-	left: 280px;
-	overflow: hidden;
+    position: relative;
+    margin-left: 1%;
+    width: 84% !important;
 }
 
 .pagePreviewContainer iframe {
@@ -1490,9 +1473,7 @@ div.lucidLocaleChooserContainerStyle {
 }
 
 div.topToolbarContainer {
-	position: absolute;
-	top: -29px;
-	right: 10px;
+	background: #F2F2F2;
 	height: 28px;
 }
 
@@ -1500,7 +1481,7 @@ div.topToolbarContainer a {
 	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
 	color: #1F1F1F;
 	display: block;
-	float: left;
+	float: right;
 	line-height: 16px;
 	padding-left: 8px;
 	margin-top: 7px;
@@ -1525,15 +1506,14 @@ div.topToolbarContainer a.activeButtonInPages span {
 }
 
 div.topToolbarContainer select {
-	float: left;
+	float: right;
 	font-size: 11px;
-	margin: 0;
 	margin-top: 6px;
 }
 
 div#leftButtons {
 	position: absolute;
-	top: 24px;
+	top: 52px;
 	background-color: #fff;
 	border: 1px #cacaca solid;
 	border-left: 0;
@@ -1543,7 +1523,7 @@ div#leftButtons {
 	border-radius-bottomright: 6px;
 	-moz-border-radius-bottomright: 6px;
 	-webkit-border-radius-bottomright: 6px;
-	left: 274px;
+	left: 14%;
 	z-index: 100;
 }
 
