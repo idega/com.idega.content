@@ -15,6 +15,7 @@ public interface UploadAreaBean {
 
 	public void setAddThumbnail(boolean useThumbnail);
 	public boolean isAddThumbnail();
-	
-	public Map<String, Object> getFileResponce(String fileName, long fileSize,String path);
+
+	public Map<String, Object> getFileResponce(String fileName, long fileSize, String path);
+	public Map<String, Object> getFileResponse(String fileName, long fileSize, String path, int thumbnailSize);
 }

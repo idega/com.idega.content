@@ -26,9 +26,9 @@ public class ContentUploadAreaBean implements UploadAreaBean {
 	private String servletPath = SERVLET_PATH;
 
 	private boolean addThumbnail = true;
-	
+
 	private String deleteUrlBase = null;
-	
+
 	@Autowired
 	private ThumbnailService thumbnailService;
 
@@ -64,9 +64,14 @@ public class ContentUploadAreaBean implements UploadAreaBean {
 	public void setAddThumbnail(boolean addThumbnail) {
 		this.addThumbnail = addThumbnail;
 	}
-	
+
 	@Override
-	public Map<String, Object> getFileResponce(String fileName, long fileSize,String path){
+	public Map<String, Object> getFileResponce(String fileName, long fileSize, String path) {
+		return getFileResponse(fileName, fileSize, path, ThumbnailService.THUMBNAIL_SMALL);
+	}
+
+	@Override
+	public Map<String, Object> getFileResponse(String fileName, long fileSize, String path, int thumbnailSize) {
 		Map<String, Object> fileData = new HashMap<String, Object>();
 		fileData.put("name", fileName);
 		fileData.put("size", fileSize);
@@ -74,9 +79,9 @@ public class ContentUploadAreaBean implements UploadAreaBean {
 
 		if (isAddThumbnail()){
 			try{
-				fileData.put("thumbnail_url", thumbnailService.getThumbnail(path, ThumbnailService.THUMBNAIL_SMALL));
+				fileData.put("thumbnail_url", thumbnailService.getThumbnail(path, thumbnailSize));
 			}catch (Exception e) {
-				Logger.getLogger(ContentUploadAreaBean.class.getName()).log(Level.WARNING,"Failed getting thumbnail",e);
+				Logger.getLogger(ContentUploadAreaBean.class.getName()).log(Level.WARNING, "Failed getting thumbnail for " + path, e);
 			}
 		}
 
@@ -85,7 +90,7 @@ public class ContentUploadAreaBean implements UploadAreaBean {
 		fileData.put("message", "");
 		return fileData;
 	}
-	
+
 	private String getDeleteUrlBase() {
 		if (deleteUrlBase == null) {
 			String servletPath = getServletPath();

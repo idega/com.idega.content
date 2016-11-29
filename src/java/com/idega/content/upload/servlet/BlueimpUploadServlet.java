@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.gson.Gson;
 import com.idega.content.business.ContentConstants;
+import com.idega.content.business.ThumbnailService;
 import com.idega.content.upload.business.UploadAreaBean;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
@@ -96,16 +97,18 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 				}
 			}
 			String uploadPath = parameters.get(PARAMETER_UPLOAD_PATH);
+			String thumbnailSizeParam = parameters.get("idega-blueimp-thumbnails-size");
+			int thumbnailSize = StringHandler.isNumeric(thumbnailSizeParam) ? Integer.valueOf(thumbnailSizeParam) : ThumbnailService.THUMBNAIL_SMALL;
 			if (StringUtil.isEmpty(uploadPath)) {
 				uploadPath = CoreConstants.WEBDAV_SERVLET_URI + CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
 			} else {
 				if (!uploadPath.endsWith(CoreConstants.SLASH)) {
 					uploadPath = uploadPath + CoreConstants.SLASH;
 				}
-				if(!uploadPath.startsWith(CoreConstants.SLASH)){
+				if (!uploadPath.startsWith(CoreConstants.SLASH)) {
 					uploadPath = CoreConstants.SLASH + uploadPath;
 				}
-				if(!uploadPath.startsWith(CoreConstants.WEBDAV_SERVLET_URI)){
+				if (!uploadPath.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
 					uploadPath = CoreConstants.WEBDAV_SERVLET_URI + uploadPath;
 				}
 			}
@@ -117,7 +120,7 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 				String pathAndName = uploadPath + fileName;
 				boolean success = getRepositoryService().uploadFile(uploadPath, fileName, file.getContentType(), file.getInputStream());
 
-				Map<String, Object> fileData = getUploadAreaBean().getFileResponce(fileName, file.getSize(), pathAndName);
+				Map<String, Object> fileData = getUploadAreaBean().getFileResponse(fileName, file.getSize(), pathAndName, thumbnailSize);
 				fileData.put("status", success ? "OK" : "FAILURE");
 				responseMapArray.add(fileData);
 			}
@@ -126,11 +129,10 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 
 			responseWriter.write(jsonString);
 			return;
-		} catch(FileSizeLimitExceededException e){
+		} catch (FileSizeLimitExceededException e){
 			log("File is too large",e);
 			response.sendError(413);
-		}
-		catch (FileUploadException ex) {
+		} catch (FileUploadException ex) {
 			log("Error encountered while parsing the request",ex);
 			response.sendError(500);
 		} catch (Exception ex) {
