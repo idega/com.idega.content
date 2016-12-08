@@ -37,5 +37,16 @@
 		<servlet-name>ICFileUploadServlet</servlet-name>
 		<url-pattern>/servlet/ic-file-upload</url-pattern>
 	</servlet-mapping>
+
+	<servlet>
+		<display-name>ICFileDownloadServlet</display-name>
+		<servlet-name>ICFileDownloadServlet</servlet-name>
+		<servlet-class>com.idega.content.upload.servlet.ICFileDownloadServlet</servlet-class>
+		<load-on-startup>7</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ICFileDownloadServlet</servlet-name>
+		<url-pattern>/file</url-pattern>
+	</servlet-mapping>
 	
 </web-app>
