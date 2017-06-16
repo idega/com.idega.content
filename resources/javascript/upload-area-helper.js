@@ -211,6 +211,12 @@
 
 var UploadArea = {};
 
+UploadArea.initialize = function(initFunction) {
+	if (initFunction) {
+		initFunction();
+	}
+}
+
 UploadArea.initializeLocale = function(localeObject){
 	if(typeof(window.locale) == 'undefined'){window.locale = {}; }
 	if(window.locale.fileupload == undefined){

@@ -30,6 +30,7 @@ import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
 import com.idega.presentation.ui.CheckBox;
 import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
@@ -261,9 +262,13 @@ public class UploadArea extends IWBaseComponent {
 
 	private void addFileInput(IWContext iwc, IWResourceBundle iwrb){
 		setStyleClass(getStyleClass());
-		getScriptOnLoad().append("\n\tjQuery('#").append(getId()).append("').uploadAreaHelper(").append(getOptionsFromMap(getUploaderOptions(iwc))).append(");");
+		String action = "jQuery('#".concat(getId()).concat("').uploadAreaHelper(").concat(getOptionsFromMap(getUploaderOptions(iwc))).concat(");");
+		if (CoreUtil.isSingleComponentRenderingProcess(iwc)) {
+			PresentationUtil.addJavaScriptActionToBody(iwc, "UploadArea.initialize(function() {" + action + "});");
+		} else {
+			getScriptOnLoad().append("\n\t").append(action);
+		}
 		setStyleAttribute("width:100%");
-
 
 		Layer inputs = new Layer();
 		add(inputs);
@@ -422,6 +427,12 @@ public class UploadArea extends IWBaseComponent {
 	}
 
 	public boolean isAutoUpload() {
+		if (!autoUpload) {
+			Object value = getValue("autoUpload");
+			if (value != null) {
+				autoUpload = Boolean.valueOf(value.toString());
+			}
+		}
 		return autoUpload;
 	}
 
