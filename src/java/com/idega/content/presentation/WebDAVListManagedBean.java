@@ -383,6 +383,11 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			nameLink.setStyleClass("wf_listlink");
 			nameLink.getChildren().add(WFUtil.getTextVB(var + ".name"));
 			nameLink.setValueExpression(RENDERED, WFUtil.createValueExpression(elContext, "#{"+var+".isFile}", Boolean.class));
+			
+			String folderPath = getCurrentFolderPath(this.startPath, this.rootPath, getWebDAVPath());
+			if (!StringUtil.isEmpty(folderPath)) {
+				nameLink.setRel(CoreConstants.WEBDAV_SERVLET_URI + folderPath);
+			}
 
 			//NameLink for folder
 			HtmlCommandLink nameFolderLink = new HtmlCommandLink();
@@ -817,6 +822,20 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			ELUtil.getInstance().autowire(this);
 		}
 		return jQuery;
+	}
+	
+	private String getCurrentFolderPath(String startFolderPath, String rootFolderPath, String webDAVPath) {
+		if (webDAVPath != null && rootFolderPath != null && startFolderPath != null) {
+			if (webDAVPath.equals(rootFolderPath) && !startFolderPath.equals(rootFolderPath)) {
+				return startFolderPath;
+			} else {
+				return webDAVPath;
+			}
+		} else if (webDAVPath != null && startFolderPath == null) {
+			return webDAVPath;
+		}
+		
+		return CoreConstants.EMPTY;
 	}
 
 }
