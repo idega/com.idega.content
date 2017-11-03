@@ -10,6 +10,7 @@
 package com.idega.content.presentation;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -97,6 +98,12 @@ ActionListener {
 			if (clickedPath != null) {
 				try {
 					item = getRepositoryService().getRepositoryItem(iwc.getLoggedInUser(), clickedPath);
+					
+					if (item == null) {
+						byte[] bytes = clickedPath.getBytes(Charset.forName(CoreConstants.ISO_8859_1));
+						String path = new String(bytes, Charset.forName(CoreConstants.ENCODING_UTF8));
+						item = getRepositoryService().getRepositoryItem(iwc.getLoggedInUser(), path);
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
