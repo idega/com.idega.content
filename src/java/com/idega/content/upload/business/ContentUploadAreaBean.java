@@ -19,7 +19,7 @@ import com.idega.util.CoreConstants;
 public class ContentUploadAreaBean implements UploadAreaBean {
 
 	private static final Long MAX_UPLOAD_SIZE = new Long(1024 * 1024) * 20;	//	20 MBs
-	private static final String SERVLET_PATH = "/servlet/blueimp-upload";
+	public static final String SERVLET_PATH = "/servlet/blueimp-upload";
 
 	private Long maxFileSize = MAX_UPLOAD_SIZE;
 
