@@ -124,11 +124,13 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 				fileData.put("status", success ? "OK" : "FAILURE");
 				responseMapArray.add(fileData);
 			}
+
 			Gson gson = new Gson();
 			String jsonString =  gson.toJson(responseMapArray);
 
-			responseWriter.write(jsonString);
-			return;
+			responseWriter.print(jsonString);
+			response.setStatus(HttpServletResponse.SC_OK);
+			response.flushBuffer();
 		} catch (FileSizeLimitExceededException e){
 			log("File is too large",e);
 			response.sendError(413);
