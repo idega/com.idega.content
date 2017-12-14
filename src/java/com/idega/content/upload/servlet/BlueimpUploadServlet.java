@@ -67,6 +67,11 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 	}
 
 	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doPost(request, response);
+	}
+
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		IWContext iwc = new IWContext(request, response, getServletContext());
 		response = iwc.getResponse();
@@ -131,6 +136,7 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 			responseWriter.print(jsonString);
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.flushBuffer();
+			return;
 		} catch (FileSizeLimitExceededException e){
 			log("File is too large",e);
 			response.sendError(413);
