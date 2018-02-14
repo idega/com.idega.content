@@ -383,7 +383,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 			nameLink.setStyleClass("wf_listlink");
 			nameLink.getChildren().add(WFUtil.getTextVB(var + ".name"));
 			nameLink.setValueExpression(RENDERED, WFUtil.createValueExpression(elContext, "#{"+var+".isFile}", Boolean.class));
-			
+
 			String folderPath = getCurrentFolderPath(this.startPath, this.rootPath, getWebDAVPath());
 			if (!StringUtil.isEmpty(folderPath)) {
 				nameLink.setRel(CoreConstants.WEBDAV_SERVLET_URI + folderPath);
@@ -692,8 +692,9 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 
 	private WebDAVBean[] getDirectoryListing(RepositoryItem headResource, String webDAVServletURL) throws IOException, RepositoryException {
 		Collection<RepositoryItem> children = headResource.getChildResources();
-		if (ListUtil.isEmpty(children))
+		if (ListUtil.isEmpty(children)) {
 			LOGGER.info("No objects found in: " + headResource);
+		}
 
 		List<WebDAVBean> directories = new ArrayList<WebDAVBean>();
 		WebDAVBean upBean = null;
@@ -728,10 +729,12 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 					if (resource.exists() && !StringUtil.isEmpty(name) && !name.startsWith(CoreConstants.DOT)) {
 						boolean collection = resource.isCollection();
 						if (this.showFolders || (!this.showFolders && !collection)) {
-							if (name == null || (name.equalsIgnoreCase("public") && collection && !this.showPublicFolder))
+							if (name == null || (name.equalsIgnoreCase("public") && collection && !this.showPublicFolder)) {
 								continue;
-							if (name.equalsIgnoreCase("dropbox") && collection && !this.showDropboxFolder)
+							}
+							if (name.equalsIgnoreCase("dropbox") && collection && !this.showDropboxFolder) {
 								continue;
+							}
 
 							try {
 								bean = new WebDAVBean(resource);
@@ -740,8 +743,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 								bean.setWebDavHttpURL(url);
 								bean.setIconTheme(this.iconTheme);
 								directories.add(bean);
-							} catch (ClassCastException e) {
-								//	Caused by 403 Forbidden, should not stop the list from being shown
+							} catch (Exception e) {
 								LOGGER.log(Level.WARNING, "Error while creating WebDAVBean from resource: " + resource, e);
 							}
 						}
@@ -753,8 +755,9 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		}
 
 		sortResources(directories);
-		if (upBean != null)
+		if (upBean != null) {
 			directories.add(0, upBean);
+		}
 
 		return ArrayUtil.convertListToArray(directories);
 	}
@@ -823,7 +826,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		}
 		return jQuery;
 	}
-	
+
 	private String getCurrentFolderPath(String startFolderPath, String rootFolderPath, String webDAVPath) {
 		if (webDAVPath != null && rootFolderPath != null && startFolderPath != null) {
 			if (webDAVPath.equals(rootFolderPath) && !startFolderPath.equals(rootFolderPath)) {
@@ -834,7 +837,7 @@ public class WebDAVListManagedBean extends SearchResults implements ActionListen
 		} else if (webDAVPath != null && startFolderPath == null) {
 			return webDAVPath;
 		}
-		
+
 		return CoreConstants.EMPTY;
 	}
 
