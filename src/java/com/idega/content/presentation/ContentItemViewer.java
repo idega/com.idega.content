@@ -824,6 +824,13 @@ public class ContentItemViewer extends WFContainer {
 		this.autoCreateResource = autoCreateResource;
 	}
 
+	protected boolean isEditState(IWContext iwc) {
+		return ContentUtil.hasContentEditorRoles(iwc);
+	}
+
+	protected String getEditState(IWContext iwc) {
+		return isEditState(iwc) ? "edit" : "view";
+	}
 
 	/* (non-Javadoc)
 	 * @see com.idega.core.cache.CacheableUIComponent#getViewState(javax.faces.context.FacesContext)
@@ -832,12 +839,7 @@ public class ContentItemViewer extends WFContainer {
 	public String getViewState(FacesContext context) {
 		IWContext iwc = IWContext.getIWContext(context);
 		StringBuffer state = new StringBuffer();
-		if(ContentUtil.hasContentEditorRoles(iwc)){
-			state.append("edit");
-		}
-		else{
-			state.append("view");
-		}
+		state.append(getEditState(iwc));
 		if (this.showRequestedItem) {
 			String resourceUrl = iwc.getParameter(ContentViewer.PARAMETER_CONTENT_RESOURCE);
 			if (resourceUrl != null) {
