@@ -12,8 +12,8 @@
     <f:view>
     	<ws:page id="categories1"	javascripturls="/idegaweb/bundles/com.idega.block.web2.0.bundle/resources/javascript/mootools/1.11/mootools-all-compressed.js,
     												
-    												/dwr/interface/CategoriesEngine.js,
     												/dwr/engine.js,
+    												/dwr/interface/CategoriesEngine.js,
     												
     												/idegaweb/bundles/com.idega.content.bundle/resources/javascript/CategoriesHelper.js"
     								
