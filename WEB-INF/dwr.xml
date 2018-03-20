@@ -31,11 +31,11 @@
     	<create creator="spring" javascript="CategoriesEngine">
 	    	<param name="beanName" value="content.CategoriesEngineBean" />
 	    	<include method="getInfo"/>
-			<include method="getCategoriesList"/>
-			<include method="manageCategoryUsage"/>
-			<include method="renameCategory"/>
-			<include method="addCategory"/>
-			<include method="deleteCategory"/>
+		<include method="getCategoriesList"/>
+		<include method="manageCategoryUsage"/>
+		<include method="renameCategory"/>
+		<include method="addCategory"/>
+		<include method="deleteCategory"/>
     	</create>
     	
     	<create creator="spring" javascript="FileUploader">
