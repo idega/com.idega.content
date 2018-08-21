@@ -44,14 +44,16 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 	private String deleteUrlBase = null;
 
 	public UploadAreaBean getUploadAreaBean() {
-		if (uploadAreaBean == null)
+		if (uploadAreaBean == null) {
 			uploadAreaBean = ELUtil.getInstance().getBean(UploadAreaBean.BEAN_NAME);
+		}
 		return uploadAreaBean;
 	}
 
 	private RepositoryService getRepositoryService() {
-		if (repository == null)
+		if (repository == null) {
 			ELUtil.getInstance().autowire(this);
+		}
 		return repository;
 	}
 
@@ -118,14 +120,17 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 				}
 			}
 
+			char[] exceptions = new char[] {'-', '_', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9','.'};
 			responseMapArray = new ArrayList<Map<String, Object>>();
 			for (FileItem file: files) {
-				String fileName = file.getName();
-				fileName = StringHandler.stripNonRomanCharacters(fileName, new char[] {'-', '_', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9','.'});
+				String originalName = file.getName();
+				String fileName = originalName;
+				fileName = StringHandler.stripNonRomanCharacters(fileName, exceptions);
 				String pathAndName = uploadPath + fileName;
 				boolean success = getRepositoryService().uploadFile(uploadPath, fileName, file.getContentType(), file.getInputStream());
 
 				Map<String, Object> fileData = getUploadAreaBean().getFileResponse(fileName, file.getSize(), pathAndName, thumbnailSize);
+				fileData.put("originalName", originalName);
 				fileData.put("status", success ? "OK" : "FAILURE");
 				responseMapArray.add(fileData);
 			}
@@ -138,13 +143,13 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 			response.flushBuffer();
 			return;
 		} catch (FileSizeLimitExceededException e){
-			log("File is too large",e);
+			log("File is too large", e);
 			response.sendError(413);
 		} catch (FileUploadException ex) {
-			log("Error encountered while parsing the request",ex);
+			log("Error encountered while parsing the request", ex);
 			response.sendError(500);
 		} catch (Exception ex) {
-			log("Error encountered while uploading file",ex);
+			log("Error encountered while uploading file", ex);
 			response.sendError(500);
 		}
 	}
