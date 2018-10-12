@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.jcr.RepositoryException;
 import javax.servlet.ServletException;
@@ -122,10 +123,14 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 
 			char[] exceptions = new char[] {'-', '_', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9','.'};
 			responseMapArray = new ArrayList<Map<String, Object>>();
+			boolean addPrefix = iwc.getApplicationSettings().getBoolean("blue_imp_upload.add_prefix", false);
 			for (FileItem file: files) {
 				String originalName = file.getName();
 				String fileName = originalName;
 				fileName = StringHandler.stripNonRomanCharacters(fileName, exceptions);
+				if (addPrefix) {
+					fileName = UUID.randomUUID().toString().concat(CoreConstants.UNDER).concat(fileName);
+				}
 				String pathAndName = uploadPath + fileName;
 				boolean success = getRepositoryService().uploadFile(uploadPath, fileName, file.getContentType(), file.getInputStream());
 
