@@ -21,5 +21,6 @@
 	<classpathentry kind="var" path="MAVEN_REPO/jta/jars/jta-spec1_0_1.jar"/>
 	<classpathentry kind="src" path="/com.idega.block.web2.0"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/com.idega.block.rss"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
