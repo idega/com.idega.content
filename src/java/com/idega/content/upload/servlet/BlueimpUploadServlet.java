@@ -106,6 +106,7 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 			}
 			String uploadPath = parameters.get(PARAMETER_UPLOAD_PATH);
 			String thumbnailSizeParam = parameters.get("idega-blueimp-thumbnails-size");
+			String isAddThumbnail = parameters.get(PARAMETER_UPLOAD_ADD_THUMBNAIL);
 			int thumbnailSize = StringHandler.isNumeric(thumbnailSizeParam) ? Integer.valueOf(thumbnailSizeParam) : ThumbnailService.THUMBNAIL_SMALL;
 			if (StringUtil.isEmpty(uploadPath)) {
 				uploadPath = CoreConstants.WEBDAV_SERVLET_URI + CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
@@ -134,7 +135,12 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 				String pathAndName = uploadPath + fileName;
 				boolean success = getRepositoryService().uploadFile(uploadPath, fileName, file.getContentType(), file.getInputStream());
 
-				Map<String, Object> fileData = getUploadAreaBean().getFileResponse(fileName, file.getSize(), pathAndName, thumbnailSize);
+				Map<String, Object> fileData = null;
+				if (!StringUtil.isEmpty(isAddThumbnail) && isAddThumbnail.equalsIgnoreCase(Boolean.FALSE.toString())) {
+					fileData = getUploadAreaBean().getFileResponse(fileName, file.getSize(), pathAndName, thumbnailSize, false);
+				} else {
+					fileData = getUploadAreaBean().getFileResponse(fileName, file.getSize(), pathAndName, thumbnailSize);
+				}
 				fileData.put("originalName", originalName);
 				fileData.put("status", success ? "OK" : "FAILURE");
 				responseMapArray.add(fileData);

@@ -72,12 +72,17 @@ public class ContentUploadAreaBean implements UploadAreaBean {
 
 	@Override
 	public Map<String, Object> getFileResponse(String fileName, long fileSize, String path, int thumbnailSize) {
+		return getFileResponse(fileName, fileSize, path, thumbnailSize, isAddThumbnail());
+	}
+	
+	@Override
+	public Map<String, Object> getFileResponse(String fileName, long fileSize, String path, int thumbnailSize, boolean isAddThumbnail) {
 		Map<String, Object> fileData = new HashMap<String, Object>();
 		fileData.put("name", fileName);
 		fileData.put("size", fileSize);
 		fileData.put("url", path);
 
-		if (isAddThumbnail()){
+		if (isAddThumbnail){
 			try{
 				fileData.put("thumbnail_url", thumbnailService.getThumbnail(path, thumbnailSize));
 			}catch (Exception e) {
