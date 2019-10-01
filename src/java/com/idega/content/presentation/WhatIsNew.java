@@ -72,7 +72,7 @@ public class WhatIsNew extends SearchResults {
 	protected boolean showDeleteLink = false;
 	protected boolean groupByExtraInfo = false;
 	protected boolean orderGroups = true;
-	
+
 	protected ICPage deletePage = null;
 
 	public WhatIsNew() {
@@ -195,8 +195,11 @@ public class WhatIsNew extends SearchResults {
 	private Map<String, List<UIComponent>> groups = null;
 
 	@Override
-	protected void addResultRow(Layer container, Layer rowContainer,
-			String rowKey) {
+	protected void addResultRow(Layer container, Layer rowContainer, String rowKey) {
+		if (StringUtil.isEmpty(rowKey)) {
+			return;
+		}
+
 		if (groupByExtraInfo) {
 			if (rowKey.endsWith(CoreConstants.SLASH)) {
 				rowKey = rowKey.substring(0, rowKey.length() - 1);
@@ -376,8 +379,9 @@ public class WhatIsNew extends SearchResults {
 			if (this.startingPointURI != null
 					&& this.startingPointURI.startsWith("/")) {
 				return this.startingPointURI.substring(1);
-			} else
+			} else {
 				return this.startingPointURI;
+			}
 		}
 	}
 
@@ -533,5 +537,5 @@ public class WhatIsNew extends SearchResults {
 
 		return false;
 	}
-	
+
 }
