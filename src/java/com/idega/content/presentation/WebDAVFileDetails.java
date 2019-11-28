@@ -3,6 +3,10 @@
  */
 package com.idega.content.presentation;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
@@ -25,7 +29,9 @@ import com.idega.presentation.text.Text;
 import com.idega.repository.bean.RepositoryItem;
 import com.idega.repository.bean.RepositoryItemVersionInfo;
 import com.idega.repository.jcr.JCRItem;
+import com.idega.util.CoreConstants;
 import com.idega.util.FileUtil;
+import com.idega.util.IOUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.Timer;
@@ -49,8 +55,9 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 	protected void initializeComponent(FacesContext context) {
 		JCRItem resource = getRepositoryItem();
 
-		if (resource == null)
+		if (resource == null) {
 			return;
+		}
 
 		String resourceName = resource.getName();
 		int row = 1;
@@ -195,12 +202,14 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 		Timer timer = new Timer();
 		timer.start();
 
+		String resourceName = resource.getName();
 		List<RepositoryItemVersionInfo> versions = null;
 		try {
-			versions = getRepositoryService().getVersions(resource.getParentPath(), resource.getName());
+			versions = getRepositoryService().getVersions(resource.getParentPath(), resourceName);
 		} catch (Exception e) {}
-		if (ListUtil.isEmpty(versions))
+		if (ListUtil.isEmpty(versions)) {
 			return new Table();
+		}
 
 		Table vTable = new Table(8,versions.size()+1);
 		vTable.setId(vTable.getId() + "_ver");
@@ -217,6 +226,7 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 		vTable.add(getBundle().getLocalizedText("checkin"), ++vColumn, vRow);
 		vTable.add(getBundle().getLocalizedText("last_modified"), ++vColumn, vRow);
 
+		String tmpDir = System.getProperty("java.io.tmpdir");
 		for (RepositoryItemVersionInfo version: versions) {
 			vColumn = 0;
 			++vRow;
@@ -228,21 +238,31 @@ public class WebDAVFileDetails extends ContentBlock implements ActionListener {
 				vTable.setRowStyleClass(vRow,"wf_listoddrow");
 			}
 
-
-			String versionName = version.getName();
+			byte[] bytes = version.getBytes();
+			long size = bytes == null ? 0 : Long.valueOf(bytes.length);
+			String versionTmp = version.getName();
+			String versionName = versionTmp.concat(CoreConstants.SPACE).concat(FileUtil.getHumanReadableSize(size));
 			vTable.add(WFUtil.getText(versionName,"wf_listtext"), ++vColumn, vRow);
 
 			DownloadLink versionPath = new DownloadLink(getBundle().getLocalizedString("download"));
+			if (bytes != null) {
+				String name = resourceName.concat(CoreConstants.UNDER).concat(versionTmp);
+				InputStream input = new ByteArrayInputStream(bytes);
+				try {
+					File tmp = File.createTempFile(tmpDir, name);
+					FileUtil.streamToFile(input, tmp);
+					versionPath.setAbsoluteFilePath(tmp.getAbsolutePath());
+				} catch (IOException e) {
+				} finally {
+					IOUtil.close(input);
+				}
+			}
 			versionPath.setId("dl_"+vRow);
 			versionPath.setStyleClass("wf_listlink");
-			if (versionName != null) {
-				String url = version.getPath();
-				versionPath.setRelativeFilePath(url);
-			}
 
 			//so we have a sensable name for the file!
 			if(versionName!=null){
-				String fileName = "v"+versionName.replace('.','_')+"-"+resource.getName();
+				String fileName = "v"+versionName.replace('.','_')+"-"+resourceName;
 				versionPath.setAlternativeFileName(fileName);
 			}
 
