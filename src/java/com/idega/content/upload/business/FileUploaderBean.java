@@ -126,7 +126,8 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	@Override
 	public String getPropertiesAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters, String maxUploadSize) {
+			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters, String maxUploadSize,
+			String onFail) {
 
 		IWBundle bundle = ContentUtil.getBundle();
 		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
@@ -172,6 +173,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 			.append(", swfUploadScript: '").append(web2.getSWFUploadScript()).append("'")
 			.append(", swfUploadPlugin: '").append(web2.getSWFUploadPlugin()).append("'")
 			.append(", needFlash: false")
+			.append(", onFail: function(){").append(onFail == null ? "" : onFail).append("}")
 			.append(", initializeScriptsAction: function() {").append(getActionToLoadFilesAndExecuteCustomAction("FileUploadHelper.initializeFlashUploader();",
 					showProgressBar, true)).append("}")
 		.append("});").toString();
@@ -369,11 +371,12 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 	@Override
 	public String getUploadAction(IWContext iwc, String id, String progressBarId, String uploadId, boolean showProgressBar, boolean showLoadingMessage,
 			boolean zipFile, String formId, String actionAfterUpload, String actionAfterCounterReset, boolean autoUpload, boolean showUploadedFiles,
-			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters, String maxUploadSize) {
+			String componentToRerenderId, boolean fakeFileDeletion, String actionAfterUploadedToRepository, boolean stripNonRomanLetters, String maxUploadSize,
+			String onFail) {
 
 		StringBuilder action = new StringBuilder(getPropertiesAction(iwc, id, progressBarId, uploadId, showProgressBar, showLoadingMessage, zipFile, formId,
 				actionAfterUpload, actionAfterCounterReset, autoUpload, showUploadedFiles, componentToRerenderId, fakeFileDeletion, actionAfterUploadedToRepository,
-				stripNonRomanLetters, maxUploadSize)).append("FileUploadHelper.uploadFiles();");
+				stripNonRomanLetters, maxUploadSize, onFail)).append("FileUploadHelper.uploadFiles();");
 		return getActionToLoadFilesAndExecuteCustomAction(action.toString(), showProgressBar, !StringUtil.isEmpty(componentToRerenderId));
 	}
 

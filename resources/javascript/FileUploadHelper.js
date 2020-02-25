@@ -333,6 +333,8 @@ FileUploadHelper.uploadFiles = function() {
 				var file = filesByInput[j];
 				totalSize += file.size;
 				if (totalSize >= FileUploadHelper.properties.maxSize) {
+					fileInput.value = null;
+					FileUploadHelper.properties.onFail();
 					humanMsg.displayMsg(FileUploadHelper.properties.localizations.UPLOADING_FILE_EXCEEDED_SIZE, {timeOut: 3000});
 					return false;
 				}
@@ -866,3 +868,4 @@ FileUploadHelper.reRenderComponent = function(id) {
 
 function __flash__removeCallback(instance, name) {
 }
+

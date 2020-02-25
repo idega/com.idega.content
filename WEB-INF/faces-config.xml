@@ -398,6 +398,11 @@ version="1.2">
 			<property-name>maxUploadSize</property-name>
 			<property-class>java.lang.String</property-class>
 		</property>
+		<property>
+			<display-name>JavaScript action after failure</display-name>
+			<property-name>onFail</property-name>
+			<property-class>java.lang.String</property-class>
+		</property>
 		<component-extension>
 			<idegaweb-info>
 				<builder-visible>true</builder-visible>

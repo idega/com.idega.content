@@ -12,6 +12,7 @@ public class FileUploadViewerTag extends UIComponentELTag {
 	private String actionAfterUpload, actionAfterCounterReset, actionAfterUploadedToRepository = null;
 	private String uploadPath = CoreConstants.PUBLIC_PATH;
 	private String formId, componentToRerenderId, maxUploadSize = String.valueOf(ContentFileUploadServlet.MAX_UPLOAD_SIZE);
+	private String onFail;
 	
 	private boolean zipFile = false;
 	private boolean extractContent = false;
@@ -53,6 +54,7 @@ public class FileUploadViewerTag extends UIComponentELTag {
 			uploadViewer.setFakeFileDeletion(fakeFileDeletion);
 			uploadViewer.setStripNonRomanLetters(stripNonRomanLetters);
 			uploadViewer.setMaxUploadSize(maxUploadSize);
+			uploadViewer.setOnFail(onFail);
 		}
 	}
 
@@ -76,11 +78,13 @@ public class FileUploadViewerTag extends UIComponentELTag {
 		this.showUploadedFiles = false;
 		this.fakeFileDeletion = false;
 		this.stripNonRomanLetters = false;
+		this.onFail = null;
 	}
 	
 	public String getActionAfterUpload() {
 		return actionAfterUpload;
 	}
+
 
 	public void setActionAfterUpload(String actionAfterUpload) {
 		this.actionAfterUpload = actionAfterUpload;
@@ -88,6 +92,14 @@ public class FileUploadViewerTag extends UIComponentELTag {
 
 	public String getUploadPath() {
 		return uploadPath;
+	}
+	
+	public String getOnFail() {
+		return onFail;
+	}
+
+	public void setOnFail(String onFail) {
+		this.onFail = onFail;
 	}
 
 	public void setUploadPath(String uploadPath) {

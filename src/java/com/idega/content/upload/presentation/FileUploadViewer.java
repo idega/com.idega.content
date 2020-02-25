@@ -46,7 +46,8 @@ public class FileUploadViewer extends IWBaseComponent {
 					uploadId,
 					maxUploadSize = String.valueOf(ContentFileUploadServlet.MAX_UPLOAD_SIZE),
 					style,
-					uploadService = "/servlet/ContentFileUploadServlet";
+					uploadService = "/servlet/ContentFileUploadServlet",
+					onFail = null;
 
 	private boolean zipFile = false,
 					extractContent = false,
@@ -104,11 +105,12 @@ public class FileUploadViewer extends IWBaseComponent {
 
 		this.maxUploadSize = values[17] == null ? null : values[17].toString();
 		this.uploadService = values[18] == null ? null : values[18].toString();
+		this.onFail = values[19] == null ? null : values[19].toString();
 	}
 
 	@Override
 	public Object saveState(FacesContext context) {
-		Object values[] = new Object[19];
+		Object values[] = new Object[20];
 		values[0] = super.saveState(context);
 
 		values[1] = this.actionAfterUpload;
@@ -135,6 +137,7 @@ public class FileUploadViewer extends IWBaseComponent {
 
 		values[17] = this.maxUploadSize;
 		values[18] = this.uploadService;
+		values[19] = this.onFail;
 
 		return values;
 	}
@@ -236,7 +239,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		}
 		upload.setOnClick(getFileUploader().getUploadAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(), isZipFile(),
 				getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(), getComponentToRerenderId(),
-				isFakeFileDeletion(), getActionAfterUploadedToRepository(context), isStripNonRomanLetters(), getMaxUploadSize(context)
+				isFakeFileDeletion(), getActionAfterUploadedToRepository(context), isStripNonRomanLetters(), getMaxUploadSize(context), getOnFail(context)
 		));
 		buttonsContainer.add(upload);
 		mainContainer.add(buttonsContainer);
@@ -256,7 +259,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		String initAction = getFileUploader().getPropertiesAction(iwc, id, progressBarId, uploadId, isShowProgressBar(), isShowLoadingMessage(),
 				isZipFile(), getFormId(), getActionAfterUpload(), getActionAfterCounterReset(), isAutoUpload(), isShowUploadedFiles(),
 				getComponentToRerenderId(), isFakeFileDeletion(), getActionAfterUploadedToRepository(iwc), isStripNonRomanLetters(),
-				getMaxUploadSize(context)
+				getMaxUploadSize(context), getOnFail(context)
 		);
 
 		StringBuilder initializAtion = new StringBuilder(getFileUploader()
@@ -279,6 +282,7 @@ public class FileUploadViewer extends IWBaseComponent {
 		//	CSS
 		PresentationUtil.addStyleSheetToHeader(iwc, web2.getBundleUriToHumanizedMessagesStyleSheet());
 	}
+
 
 	private void addProperty(PresentationObjectContainer container, String name, String value) {
 		HiddenInput property = new HiddenInput(name, value);
@@ -505,6 +509,18 @@ public class FileUploadViewer extends IWBaseComponent {
 
 	public void setActionAfterUploadedToRepository(String actionAfterUploadedToRepository) {
 		this.actionAfterUploadedToRepository = actionAfterUploadedToRepository;
+	}
+	
+	public String getOnFail(FacesContext context) {
+		if(onFail != null){
+			return onFail;
+		}
+		onFail = getExpressionValue(context == null ? CoreUtil.getIWContext() : context, "onFail");
+		return actionAfterUploadedToRepository;
+	}
+
+	public void setOnFail(String onFail) {
+		this.onFail = onFail;
 	}
 
 	public boolean isStripNonRomanLetters() {
