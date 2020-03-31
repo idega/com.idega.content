@@ -104,47 +104,8 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 					files.add(item);
 				}
 			}
-			String uploadPath = parameters.get(PARAMETER_UPLOAD_PATH);
-			String thumbnailSizeParam = parameters.get("idega-blueimp-thumbnails-size");
-			String isAddThumbnail = parameters.get(PARAMETER_UPLOAD_ADD_THUMBNAIL);
-			int thumbnailSize = StringHandler.isNumeric(thumbnailSizeParam) ? Integer.valueOf(thumbnailSizeParam) : ThumbnailService.THUMBNAIL_SMALL;
-			if (StringUtil.isEmpty(uploadPath)) {
-				uploadPath = CoreConstants.WEBDAV_SERVLET_URI + CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
-			} else {
-				if (!uploadPath.endsWith(CoreConstants.SLASH)) {
-					uploadPath = uploadPath + CoreConstants.SLASH;
-				}
-				if (!uploadPath.startsWith(CoreConstants.SLASH)) {
-					uploadPath = CoreConstants.SLASH + uploadPath;
-				}
-				if (!uploadPath.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
-					uploadPath = CoreConstants.WEBDAV_SERVLET_URI + uploadPath;
-				}
-			}
 
-			char[] exceptions = new char[] {'-', '_', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9','.'};
-			responseMapArray = new ArrayList<Map<String, Object>>();
-			boolean addPrefix = iwc.getApplicationSettings().getBoolean("blue_imp_upload.add_prefix", false);
-			for (FileItem file: files) {
-				String originalName = file.getName();
-				String fileName = originalName;
-				fileName = StringHandler.stripNonRomanCharacters(fileName, exceptions);
-				if (addPrefix) {
-					fileName = UUID.randomUUID().toString().concat(CoreConstants.UNDER).concat(fileName);
-				}
-				String pathAndName = uploadPath + fileName;
-				boolean success = getRepositoryService().uploadFile(uploadPath, fileName, file.getContentType(), file.getInputStream());
-
-				Map<String, Object> fileData = null;
-				if (!StringUtil.isEmpty(isAddThumbnail) && isAddThumbnail.equalsIgnoreCase(Boolean.FALSE.toString())) {
-					fileData = getUploadAreaBean().getFileResponse(fileName, file.getSize(), pathAndName, thumbnailSize, false);
-				} else {
-					fileData = getUploadAreaBean().getFileResponse(fileName, file.getSize(), pathAndName, thumbnailSize);
-				}
-				fileData.put("originalName", originalName);
-				fileData.put("status", success ? "OK" : "FAILURE");
-				responseMapArray.add(fileData);
-			}
+			responseMapArray = uploadFiles(files, parameters, iwc);
 
 			Gson gson = new Gson();
 			String jsonString =  gson.toJson(responseMapArray);
@@ -163,6 +124,53 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 			log("Error encountered while uploading file", ex);
 			response.sendError(500);
 		}
+	}
+
+	protected List<Map<String, Object>> uploadFiles(List<FileItem> files, Map<String, String> parameters, IWContext iwc) throws Exception {
+		List<Map<String, Object>> responseMapArray = null;
+		String uploadPath = parameters.get(PARAMETER_UPLOAD_PATH);
+		String thumbnailSizeParam = parameters.get("idega-blueimp-thumbnails-size");
+		String isAddThumbnail = parameters.get(PARAMETER_UPLOAD_ADD_THUMBNAIL);
+		int thumbnailSize = StringHandler.isNumeric(thumbnailSizeParam) ? Integer.valueOf(thumbnailSizeParam) : ThumbnailService.THUMBNAIL_SMALL;
+		if (StringUtil.isEmpty(uploadPath)) {
+			uploadPath = CoreConstants.WEBDAV_SERVLET_URI + CoreConstants.PUBLIC_PATH + CoreConstants.SLASH;
+		} else {
+			if (!uploadPath.endsWith(CoreConstants.SLASH)) {
+				uploadPath = uploadPath + CoreConstants.SLASH;
+			}
+			if (!uploadPath.startsWith(CoreConstants.SLASH)) {
+				uploadPath = CoreConstants.SLASH + uploadPath;
+			}
+			if (!uploadPath.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
+				uploadPath = CoreConstants.WEBDAV_SERVLET_URI + uploadPath;
+			}
+		}
+
+		char[] exceptions = new char[] {'-', '_', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9','.'};
+		responseMapArray = new ArrayList<Map<String, Object>>();
+		boolean addPrefix = iwc.getApplicationSettings().getBoolean("blue_imp_upload.add_prefix", false);
+		for (FileItem file: files) {
+			String originalName = file.getName();
+			String fileName = originalName;
+			fileName = StringHandler.stripNonRomanCharacters(fileName, exceptions);
+			if (addPrefix) {
+				fileName = UUID.randomUUID().toString().concat(CoreConstants.UNDER).concat(fileName);
+			}
+			String pathAndName = uploadPath + fileName;
+			boolean success = getRepositoryService().uploadFile(uploadPath, fileName, file.getContentType(), file.getInputStream());
+
+			Map<String, Object> fileData = null;
+			if (!StringUtil.isEmpty(isAddThumbnail) && isAddThumbnail.equalsIgnoreCase(Boolean.FALSE.toString())) {
+				fileData = getUploadAreaBean().getFileResponse(fileName, file.getSize(), pathAndName, thumbnailSize, false);
+			} else {
+				fileData = getUploadAreaBean().getFileResponse(fileName, file.getSize(), pathAndName, thumbnailSize);
+			}
+			fileData.put("originalName", originalName);
+			fileData.put("status", success ? "OK" : "FAILURE");
+			responseMapArray.add(fileData);
+		}
+		return responseMapArray;
+
 	}
 
 	private String getDeleteUrlBase() {
