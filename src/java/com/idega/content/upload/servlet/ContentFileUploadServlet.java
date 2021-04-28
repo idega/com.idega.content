@@ -85,7 +85,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 			FileUpload fileUploadService = new FileUpload(factory);
 
 			long maxUploadSize = uploadProgressListener.getMaxSize();
-			maxUploadSize = maxUploadSize <= 0 ? iwc.getIWMainApplication().getSettings().getInt("max_content_upload_size", 1024 * 1024 * 1024) : maxUploadSize;
+			maxUploadSize = maxUploadSize <= 0 ? iwc.getIWMainApplication().getSettings().getInt(ContentConstants.MAX_UPLOAD_SIZE, 1024 * 1024 * 1024) : maxUploadSize;
 			maxUploadSize = maxUploadSize == MAX_UPLOAD_SIZE ? maxUploadSize : Double.valueOf(maxUploadSize * 1.1).longValue();	//	10% reserved for other data when file(s)
 			fileUploadService.setSizeMax(maxUploadSize);
 			fileUploadService.setProgressListener(uploadProgressListener);
@@ -151,7 +151,7 @@ public class ContentFileUploadServlet extends HttpServlet {
 			LOGGER.info("Data was copied to the server (ID: " + uploadId + "), now will upload to the repository");
 
 			String fieldName = null;
-			List<UploadFile> files = new ArrayList<UploadFile>();
+			List<UploadFile> files = new ArrayList<>();
 			for (FileItem file: fileItems) {
 				fieldName = file.getFieldName();
 				if (!StringUtil.isEmpty(fieldName)) {

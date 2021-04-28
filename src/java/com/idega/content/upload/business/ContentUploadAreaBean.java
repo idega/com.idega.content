@@ -9,10 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ThumbnailService;
 import com.idega.content.upload.servlet.BlueimpUploadServlet;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
 import com.idega.util.CoreConstants;
+import com.idega.util.StringHandler;
 
 @Scope("session")
 @Service(UploadAreaBean.BEAN_NAME)
@@ -34,7 +37,9 @@ public class ContentUploadAreaBean implements UploadAreaBean {
 
 	@Override
 	public Long getMaxFileSize(IWContext iwc) {
-		return maxFileSize;
+		IWMainApplication iwma = iwc == null ? IWMainApplication.getDefaultIWMainApplication() : iwc.getIWMainApplication();
+		String maxSize = iwma.getSettings().getProperty(ContentConstants.MAX_UPLOAD_SIZE, String.valueOf(MAX_UPLOAD_SIZE));
+		return StringHandler.isNumeric(maxSize) ? Long.valueOf(maxSize) : this.maxFileSize;
 	}
 
 	@Override
@@ -74,10 +79,10 @@ public class ContentUploadAreaBean implements UploadAreaBean {
 	public Map<String, Object> getFileResponse(String fileName, long fileSize, String path, int thumbnailSize) {
 		return getFileResponse(fileName, fileSize, path, thumbnailSize, isAddThumbnail());
 	}
-	
+
 	@Override
 	public Map<String, Object> getFileResponse(String fileName, long fileSize, String path, int thumbnailSize, boolean isAddThumbnail) {
-		Map<String, Object> fileData = new HashMap<String, Object>();
+		Map<String, Object> fileData = new HashMap<>();
 		fileData.put("name", fileName);
 		fileData.put("size", fileSize);
 		fileData.put("url", path);
