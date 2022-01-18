@@ -29,6 +29,7 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.repository.RepositoryService;
 import com.idega.util.CoreConstants;
+import com.idega.util.IWTimestamp;
 import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
@@ -95,8 +96,8 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 			List<FileItem> items = uploadHandler.parseRequest(request);
 
 			// Parse parameters and files
-			Map<String, String> parameters = new HashMap<String, String>(items.size());
-			List<FileItem> files = new ArrayList<FileItem>(items.size());
+			Map<String, String> parameters = new HashMap<>(items.size());
+			List<FileItem> files = new ArrayList<>(items.size());
 			for (FileItem item: items) {
 				if (item.isFormField()) {
 					parameters.put(item.getFieldName(), item.getString());
@@ -129,6 +130,11 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 	protected List<Map<String, Object>> uploadFiles(List<FileItem> files, Map<String, String> parameters, IWContext iwc) throws Exception {
 		List<Map<String, Object>> responseMapArray = null;
 		String uploadPath = parameters.get(PARAMETER_UPLOAD_PATH);
+		if (StringUtil.isEmpty(uploadPath)) {
+			IWTimestamp now = IWTimestamp.RightNow();
+			uploadPath = CoreConstants.WEBDAV_SERVLET_URI + CoreConstants.PUBLIC_PATH + CoreConstants.SLASH + "images/" +
+					now.getDateString(IWTimestamp.DATE_PATTERN) + CoreConstants.SLASH + now.getDateString("HHmmssS") + CoreConstants.SLASH;
+		}
 		String thumbnailSizeParam = parameters.get("idega-blueimp-thumbnails-size");
 		String isAddThumbnail = parameters.get(PARAMETER_UPLOAD_ADD_THUMBNAIL);
 		int thumbnailSize = StringHandler.isNumeric(thumbnailSizeParam) ? Integer.valueOf(thumbnailSizeParam) : ThumbnailService.THUMBNAIL_SMALL;
@@ -147,7 +153,7 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 		}
 
 		char[] exceptions = new char[] {'-', '_', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9','.'};
-		responseMapArray = new ArrayList<Map<String, Object>>();
+		responseMapArray = new ArrayList<>();
 		boolean addPrefix = iwc.getApplicationSettings().getBoolean("blue_imp_upload.add_prefix", false);
 		for (FileItem file: files) {
 			String originalName = file.getName();
@@ -200,9 +206,9 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 		PrintWriter responseWriter = response.getWriter();
 		String filePath = iwc.getParameter(PARAMETER_UPLOAD_PATH);
 
-		List<Map<String, Object>> responseMapArray = new ArrayList<Map<String,Object>>(1);
+		List<Map<String, Object>> responseMapArray = new ArrayList<>(1);
 		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
-		Map<String,Object> fileData = new HashMap<String, Object>();
+		Map<String,Object> fileData = new HashMap<>();
 		if (StringUtil.isEmpty(filePath)) {
 			fileData.put("message", iwrb.getLocalizedString("file_path_is_empty", "File path is empty"));
 			fileData.put("status", "Bad Request");
