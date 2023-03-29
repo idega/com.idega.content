@@ -40,6 +40,7 @@ import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 import com.sun.syndication.io.impl.DateParser;
 
@@ -131,7 +132,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	public void setLocale(Locale locale) {
 		this._locale = locale;
 		if (this._locales == null) {
-			this._locales = new HashMap<String, Locale>();
+			this._locales = new HashMap<>();
 		}
 		this._locales.put(locale.getLanguage(), locale);
 	}
@@ -168,7 +169,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	 */
 	public ContentItemField getItemField(String key) {
 		if (this._itemFields == null) {
-			this._itemFields = new HashMap<String, List<ContentItemField>>();
+			this._itemFields = new HashMap<>();
 		}
 		List<ContentItemField> fields = this._itemFields.get(key + getLanguage());
 		return ListUtil.isEmpty(fields) ? null : fields.get(0);
@@ -209,13 +210,13 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	 */
 	public void setItemField(String key, ContentItemField field) {
 		if (this._itemFields == null) {
-			this._itemFields = new HashMap<String, List<ContentItemField>>();
+			this._itemFields = new HashMap<>();
 		}
 
 		key = key + getLanguage();
 		List<ContentItemField> items = _itemFields.get(key);
 		if (items == null) {
-			items = new ArrayList<ContentItemField>();
+			items = new ArrayList<>();
 			this._itemFields.put(key, items);
 		}
 		items.add(field);
@@ -236,7 +237,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	 */
 	public void setItemFields(String key, List<ContentItemField> fields) {
 		if (this._itemFields == null) {
-			this._itemFields = new HashMap<String, List<ContentItemField>>();
+			this._itemFields = new HashMap<>();
 		}
 		this._itemFields.put(key + getLanguage(), fields);
 	}
@@ -246,7 +247,7 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	 */
 	public void setItemFieldValue(String key, Object value) {
 		if (this._itemFields == null) {
-			this._itemFields = new HashMap<String, List<ContentItemField>>();
+			this._itemFields = new HashMap<>();
 		}
 		ContentItemField field = getItemField(key);
 		if (field == null) {
@@ -726,6 +727,10 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 	@SuppressWarnings("finally")
 	public Timestamp getParsedDateFromFeed(String dateValue) {
 		Timestamp t = null;
+		if (StringUtil.isEmpty(dateValue)) {
+			return t;
+		}
+
 		try {
 			t = new Timestamp(DateParser.parseW3CDateTime(dateValue).getTime());
 		} catch(Exception e) {
