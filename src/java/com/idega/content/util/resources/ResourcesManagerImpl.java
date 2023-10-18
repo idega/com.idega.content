@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -22,13 +23,17 @@ import com.idega.idegaweb.include.ExternalLink;
 import com.idega.idegaweb.include.JavaScriptLink;
 import com.idega.idegaweb.include.RSSLink;
 import com.idega.idegaweb.include.StyleSheetLink;
+import com.idega.jackrabbit.security.RepositoryAccessManager;
+import com.idega.presentation.IWContext;
 import com.idega.servlet.filter.IWBundleResourceFilter;
 import com.idega.util.CoreConstants;
+import com.idega.util.CoreUtil;
 import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
 import com.idega.util.resources.AbstractMinifier;
 import com.idega.util.resources.CSSMinifier;
 import com.idega.util.resources.JavaScriptMinifier;
@@ -45,6 +50,9 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 	private static final String WEB_PAGE_RESOURCES = "idegaCoreWebPageResources";
 	static final String CONCATENATED_RESOURCES = "idegaCoreConcatenatedRecources";
 
+	@Autowired
+	private RepositoryAccessManager repositoryAccessManager;
+
 	private List<JavaScriptLink> javaScriptActions;
 	private List<JavaScriptLink> javaScriptResources;
 	private List<StyleSheetLink> cssFiles;
@@ -52,10 +60,17 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 
 	private Map<String, String> mediaMap;
 
+	private RepositoryAccessManager getRepositoryAccessManager() {
+		if (repositoryAccessManager == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		return repositoryAccessManager;
+	}
+
 	@Override
 	public List<JavaScriptLink> getJavaScriptResources() {
 		if (javaScriptResources == null) {
-			javaScriptResources = new ArrayList<JavaScriptLink>();
+			javaScriptResources = new ArrayList<>();
 		}
 		return javaScriptResources;
 	}
@@ -63,7 +78,7 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 	@Override
 	public List<JavaScriptLink> getJavaScriptActions() {
 		if (javaScriptActions == null) {
-			javaScriptActions = new ArrayList<JavaScriptLink>();
+			javaScriptActions = new ArrayList<>();
 		}
 		return javaScriptActions;
 	}
@@ -71,7 +86,7 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 	@Override
 	public List<StyleSheetLink> getCSSFiles() {
 		if (cssFiles == null) {
-			cssFiles = new ArrayList<StyleSheetLink>();
+			cssFiles = new ArrayList<>();
 		}
 		return cssFiles;
 	}
@@ -79,7 +94,7 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 	@Override
 	public Map<String, String> getMediaMap() {
 		if (mediaMap == null) {
-			mediaMap = new HashMap<String, String>();
+			mediaMap = new HashMap<>();
 		}
 		return mediaMap;
 	}
@@ -128,10 +143,11 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 
 		//	Didn't find concatenated file for ALL resources, will check every resource separately if it's available to be minified
 		String resourceContent = null;
-		List<ExternalLink> resourcesToLoad = new ArrayList<ExternalLink>();
-		Map<String, String> addedResources = new HashMap<String, String>();
+		List<ExternalLink> resourcesToLoad = new ArrayList<>();
+		Map<String, String> addedResources = new HashMap<>();
+		IWContext iwc = CoreUtil.getIWContext();
 		for (ExternalLink resource: resources) {
-			resourceContent = getResource(WEB_PAGE_RESOURCES, resource, serverName);
+			resourceContent = getResource(iwc, WEB_PAGE_RESOURCES, resource, serverName);
 			if (StringUtil.isEmpty(resourceContent)) {
 				if (resourceContent == null) {
 					LOGGER.warning(new StringBuilder("Impossible to concatenate file: ").append(resource.getUrl()).toString());
@@ -275,7 +291,7 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		return CoreConstants.EMPTY;
 	}
 
-	private String getResource(String cacheName, ExternalLink resource, String serverName) {
+	private String getResource(IWContext iwc, String cacheName, ExternalLink resource, String serverName) {
 		String minifiedResource = getCachedResource(cacheName, resource.getUrl());
 		if (!StringUtil.isEmpty(minifiedResource)) {
 			return minifiedResource;
@@ -289,7 +305,9 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 			path = path.substring(path.indexOf(repoStart));
 			resource.setUrl(path);
 			try {
-				fileContent = StringHandler.getContentFromInputStream(getRepositoryService().getInputStreamAsRoot(path));
+				if (getRepositoryAccessManager().hasPermission(iwc, path)) {
+					fileContent = StringHandler.getContentFromInputStream(getRepositoryService().getInputStreamAsRoot(path));
+				}
 				if (StringUtil.isEmpty(fileContent)) {
 					LOGGER.warning("Error getting contents from file from repository: " + path);
 				} else {
@@ -305,7 +323,7 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 
 		if (fileContent == null) {
 			minifiedResource = (resourceInWebApp == null || !resourceInWebApp.exists()) ?
-					getMinifiedResourceFromApplication(serverName, resource) :
+					getMinifiedResourceFromApplication(iwc, serverName, resource) :
 					getMinifiedResourceFromWorkspace(resourceInWebApp, resource);
 		} else {
 			resource.setContent(fileContent);
@@ -320,14 +338,16 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		return minifiedResource;
 	}
 
-	private InputStream getStreamFromRepository(String path) {
+	private InputStream getStreamFromRepository(IWContext iwc, String path) {
 		if (StringUtil.isEmpty(path)) {
 			return null;
 		}
 
 		if (path.startsWith(CoreConstants.WEBDAV_SERVLET_URI) || path.startsWith(CoreConstants.PATH_FILES_ROOT)) {
 			try {
-				return getRepositoryService().getInputStreamAsRoot(path);
+				if (getRepositoryAccessManager().hasPermission(iwc, path)) {
+					return getRepositoryService().getInputStreamAsRoot(path);
+				}
 			} catch (Exception e) {
 				LOGGER.log(Level.WARNING, "Error getting input stream from repository: " + path, e);
 			}
@@ -336,10 +356,10 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 		return null;	//	Object not in repository or error occurred
 	}
 
-	private String getMinifiedResourceFromApplication(String serverURL, ExternalLink resource) {
+	private String getMinifiedResourceFromApplication(IWContext iwc, String serverURL, ExternalLink resource) {
 		String resourceURI = resource.getUrl();
 
-		InputStream input = getStreamFromRepository(resourceURI);
+		InputStream input = getStreamFromRepository(iwc, resourceURI);
 		if (input == null) {
 			IWMainApplication iwma = IWMainApplication.getDefaultIWMainApplication();
 			input = iwma.getResourceAsStream(resourceURI);
@@ -427,7 +447,7 @@ public class ResourcesManagerImpl extends DefaultSpringBean implements Resources
 	@Override
 	public List<RSSLink> getFeedLinks() {
 		if (feedLinks == null) {
-			feedLinks = new ArrayList<RSSLink>();
+			feedLinks = new ArrayList<>();
 		}
 		return feedLinks;
 	}

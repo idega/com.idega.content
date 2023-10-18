@@ -27,7 +27,6 @@ import com.idega.presentation.IWContext;
 import com.idega.repository.bean.RepositoryItem;
 import com.idega.user.data.bean.User;
 import com.idega.util.CoreConstants;
-import com.idega.util.CoreUtil;
 import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
 import com.idega.util.StringUtil;
@@ -89,12 +88,12 @@ public class RepositoryItemDownloader extends DownloadWriter {
 	}
 
 	@Override
-	public void writeTo(OutputStream out) throws IOException {
+	public void writeTo(IWContext iwc, OutputStream out) throws IOException {
 		if (folder) {
 			try {
-				User user = CoreUtil.getIWContext().getLoggedInUser();
+				User user = iwc.getLoggedInUser();
 				//	ZIP the contents of the folder and write to the output stream
-				File zippedContents = getZippedContents(user);
+				File zippedContents = getZippedContents(iwc, user);
 				try {
 					FileUtil.streamToOutputStream(new FileInputStream(zippedContents), out);
 				} finally {
@@ -102,22 +101,23 @@ public class RepositoryItemDownloader extends DownloadWriter {
 						zippedContents.delete();
 					}
 				}
-			} catch (RepositoryException e) {
-				e.printStackTrace();
+			} catch (Exception e) {
+				getLogger().log(Level.WARNING, "Error getting content from folder " + url, e);
 			}
 		} else {
 			//	Writing the contents of selected file to the output stream
 			InputStream stream = null;
 			try {
-				stream = allowAnonymous ? getRepositoryService().getInputStreamAsRoot(url) : getRepositoryService().getInputStream(url);
-			} catch (RepositoryException e) {
+				if (hasPermission(iwc, url)) {
+					stream = allowAnonymous ? getRepositoryService().getInputStreamAsRoot(url) : getRepositoryService().getInputStream(url);
+				}
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			if (stream == null)
 				return;
 
 			Boolean success = Boolean.TRUE;
-			IWContext iwc = CoreUtil.getIWContext();
 			try {
 				String fileName = getFileName(url);
 				byte[] bytes = IOUtil.getBytesFromInputStream(stream);
@@ -136,7 +136,7 @@ public class RepositoryItemDownloader extends DownloadWriter {
 				return;
 			}
 
-			super.writeTo(out);
+			super.writeTo(iwc, out);
 		}
 	}
 
@@ -154,7 +154,11 @@ public class RepositoryItemDownloader extends DownloadWriter {
 		return fileName;
 	}
 
-	private File getZippedContents(User user) throws IOException, RepositoryException {
+	private File getZippedContents(IWContext iwc, User user) throws Exception {
+		if (!hasPermission(iwc, url)) {
+			return null;
+		}
+
 		Node folder = null;
 		try {
 			folder = getRepositoryService().getNodeAsRootUser(url, false);
@@ -169,7 +173,7 @@ public class RepositoryItemDownloader extends DownloadWriter {
 			session = folder.getSession();
 
 			String fileName = getFileName(url).concat(".zip");
-			Collection<RepositoryItem> itemsToZip = new ArrayList<RepositoryItem>();
+			Collection<RepositoryItem> itemsToZip = new ArrayList<>();
 			try {
 				addItemsOfFolder(folder, itemsToZip, user);
 			} catch (RepositoryException e) {
@@ -181,7 +185,6 @@ public class RepositoryItemDownloader extends DownloadWriter {
 				return null;
 			}
 
-			IWContext iwc = CoreUtil.getIWContext();
 			if (iwc != null) {
 				setAsDownload(iwc, zippedContents.getName(), Long.valueOf(zippedContents.length()).intValue());
 			}

@@ -85,21 +85,29 @@ package com.idega.content.upload.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.core.file.data.ICFileHome;
 import com.idega.core.file.data.bean.ICFile;
 import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
+import com.idega.file.security.FileAccessService;
+import com.idega.io.DownloadWriter;
+import com.idega.presentation.IWContext;
 import com.idega.util.FileUtil;
 import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
 
 /**
  * <p>Servlet for downloading {@link ICFile} content</p>
@@ -113,46 +121,63 @@ public class ICFileDownloadServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 3238936901196322902L;
 
+	private static final Logger LOGGER = Logger.getLogger(ICFileDownloadServlet.class.getName());
+
+	@Autowired
+	private FileAccessService fileAccessService;
+
+	private FileAccessService getFileAccessService() {
+		if (fileAccessService == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		return fileAccessService;
+	}
+
 	private ICFileHome getICFileHome() {
 		try {
 			return (ICFileHome) IDOLookup.getHome(com.idega.core.file.data.ICFile.class);
 		} catch (IDOLookupException e) {
-			java.util.logging.Logger.getLogger(getClass().getName()).log(Level.WARNING,
-					"Failed to get " + ICFileHome.class + " cause of: ", e);
+			LOGGER.log(Level.WARNING, "Failed to get " + ICFileHome.class, e);
 		}
 
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.http.HttpServlet#service(javax.servlet.ServletRequest, javax.servlet.ServletResponse)
-	 */
 	@Override
 	public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {
-		String value = request.getParameter("id");
-		if (!StringUtil.isEmpty(value)) {
-			com.idega.core.file.data.ICFile file = getICFileHome().findByUUID(value);
-			if (file != null) {
+		String fileUniqueId = request.getParameter("id");
+		String fileToken = request.getParameter(DownloadWriter.PRM_FILE_TOKEN);
+		if (!StringUtil.isEmpty(fileUniqueId) && !StringUtil.isEmpty(fileToken)) {
+			try {
+				com.idega.core.file.data.ICFile file = getICFileHome().findByUUID(fileUniqueId);
+				HttpServletRequest req = (HttpServletRequest) request;
+				HttpServletResponse resp = (HttpServletResponse) response;
+				IWContext iwc = new IWContext(req, resp, req.getServletContext());
+				if (getFileAccessService().isAvailable(iwc, file, fileUniqueId, fileToken)) {
 
-				((HttpServletResponse) response).setHeader("Content-disposition","attachment; filename=" + file.getName() + ";");
+					resp.setHeader("Content-disposition","attachment; filename=" + file.getName() + ";");
 
-				String mimeType = file.getMimeType();
-				if (StringUtil.isEmpty(mimeType)) {
-					mimeType = MimeTypeUtil.resolveMimeTypeFromFileName(file.getName());
+					String mimeType = file.getMimeType();
+					if (StringUtil.isEmpty(mimeType)) {
+						mimeType = MimeTypeUtil.resolveMimeTypeFromFileName(file.getName());
+					}
+					if (!StringUtil.isEmpty(mimeType)) {
+						response.setContentType(mimeType);
+					}
+
+					InputStream fileValue = file.getFileValue();
+					if (fileValue != null) {
+						ServletOutputStream responseOutputStream = response.getOutputStream();
+						FileUtil.streamToOutputStream(fileValue, responseOutputStream);
+
+						response.setContentLength(file.getFileSize());
+					}
 				}
-				if (!StringUtil.isEmpty(mimeType)) {
-					response.setContentType(mimeType);
-				}
-
-				InputStream fileValue = file.getFileValue();
-				if (fileValue != null) {
-					ServletOutputStream responseOutputStream = response.getOutputStream();
-					FileUtil.streamToOutputStream(fileValue, responseOutputStream);
-
-					response.setContentLength(file.getFileSize());
-				}
+			} catch (Exception e) {
+				LOGGER.log(Level.WARNING, "Error while checking if file (" + fileUniqueId + ") is available", e);
 			}
+		} else {
+			LOGGER.warning("File's ID (" + fileUniqueId + ") or token (" + fileToken + ") not provided or file not available");
 		}
 	}
 

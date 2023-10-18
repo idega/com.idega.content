@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -77,8 +78,8 @@ public class ICFileUploadServlet extends HttpServlet {
 			List<FileItem> items = uploadHandler.parseRequest(request);
 
 			// Parse parameters and files
-			Map<String, String> parameters = new HashMap<String, String>(items.size());
-			List<FileItem> files = new ArrayList<FileItem>(items.size());
+			Map<String, String> parameters = new HashMap<>(items.size());
+			List<FileItem> files = new ArrayList<>(items.size());
 			for (FileItem item: items) {
 				if (item.isFormField()) {
 					parameters.put(item.getFieldName(), item.getString());
@@ -86,7 +87,7 @@ public class ICFileUploadServlet extends HttpServlet {
 					files.add(item);
 				}
 			}
-			responseMapArray = new ArrayList<Map<String, Object>>();
+			responseMapArray = new ArrayList<>();
 			ICFileHome icFileHome = (ICFileHome) IDOLookup.getHome(ICFile.class);
 			InputStream stream = null;
 			boolean saveInDB = IWMainApplication.getDefaultIWMainApplication().getSettings().getBoolean("ic_file_uploader.save_in_db", true);
@@ -96,7 +97,8 @@ public class ICFileUploadServlet extends HttpServlet {
 								.concat(String.valueOf(now.getYear())).concat(CoreConstants.SLASH)
 								.concat(String.valueOf(now.getMonth())).concat(CoreConstants.SLASH)
 								.concat(String.valueOf(now.getDay())).concat(CoreConstants.SLASH)
-								.concat(String.valueOf(now.getHour())).concat(CoreConstants.MINUS).concat(String.valueOf(now.getMinute())).concat(CoreConstants.SLASH);
+								.concat(String.valueOf(now.getHour())).concat(CoreConstants.MINUS).concat(String.valueOf(now.getMinute())).concat(CoreConstants.SLASH)
+								.concat(UUID.randomUUID().toString()).concat(CoreConstants.SLASH);
 			for (FileItem file: files) {
 				String fileName = file.getName();
 				ICFile icFile = icFileHome.create();
@@ -149,10 +151,12 @@ public class ICFileUploadServlet extends HttpServlet {
 	}
 
 	public static Map<String, Object> getFileResponce(ICFile file){
-		Map<String, Object> fileData = new HashMap<String, Object>();
+		Map<String, Object> fileData = new HashMap<>();
 		fileData.put("name", file.getName());
 		fileData.put("size", file.getFileSize());
-		fileData.put("id", file.getPrimaryKey());
+		fileData.put("id", file.getUniqueId());
+		fileData.put("token", file.getToken());
 		return fileData;
 	}
+
 }
