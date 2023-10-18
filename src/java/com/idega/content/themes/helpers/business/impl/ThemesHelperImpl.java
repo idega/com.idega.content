@@ -73,6 +73,7 @@ import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
 import com.idega.util.xml.XmlUtil;
 import com.idega.webface.WFUtil;
 
@@ -80,7 +81,7 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 
 	private static Logger LOGGER = Logger.getLogger(ThemesHelperImpl.class.getName());
 
-	@Autowired
+	@Autowired(required = false)
 	private RepositoryService repositoryService;
 
 	private volatile ImageGenerator generator = null;
@@ -148,6 +149,9 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 
 	@Override
 	public RepositoryService getRepositoryService() {
+		if (repositoryService == null) {
+			repositoryService = ELUtil.getInstance().getBean(RepositoryService.BEAN_NAME);
+		}
 		return repositoryService;
 	}
 
@@ -172,8 +176,9 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	@Override
 	public List<String> loadSearchResults(Collection<ICPage> searchResults, List<String> filter) {
 		List<String> loadedResults = new ArrayList<String>();
-		if (searchResults == null)
+		if (searchResults == null) {
 			return loadedResults;
+		}
 
 		for (ICPage template: searchResults) {
 			String uri = template.getWebDavUri();
@@ -384,23 +389,25 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	@Override
 	public List<Theme> getAvailableThemes() {
 		Iterator<Theme> it = themes.values().iterator();
-		if (it == null)
+		if (it == null) {
 			return null;
+		}
 
 		Theme theme = null;
 		List<Theme> availableThemes = new ArrayList<Theme>();
 		for (Iterator<Theme> i = it; i.hasNext();) {
 			theme = i.next();
 
-			if (!theme.isLoading() && !theme.isLocked() && theme.isPropertiesExtracted())
+			if (!theme.isLoading() && !theme.isLocked() && theme.isPropertiesExtracted()) {
 				availableThemes.add(theme);
-			else {
-				if (theme.isLoading())
+			} else {
+				if (theme.isLoading()) {
 					getLogger().info("Theme " + theme + " is being loaded");
-				else if (theme.isLocked())
+				} else if (theme.isLocked()) {
 					getLogger().info("Theme " + theme + " is locked");
-				else if (!theme.isPropertiesExtracted())
+				} else if (!theme.isPropertiesExtracted()) {
 					getLogger().info("Properties for theme " + theme + " are not extracted");
+				}
 			}
 		}
 
@@ -416,8 +423,9 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 	public List<Theme> getSortedThemes() {
 		List<Theme> availableThemes = getAvailableThemes();
 
-		if (ListUtil.isEmpty(availableThemes))
+		if (ListUtil.isEmpty(availableThemes)) {
 			return null;
+		}
 
 		Locale locale = getCurrentLocale();
 		Collections.sort(availableThemes, new ThemesComparator(locale == null ? Locale.ENGLISH : locale));
@@ -1203,8 +1211,9 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		String changedFileName = extractValueFromString(fullUrl, fullUrl.lastIndexOf(ContentConstants.SLASH) + 1, fullUrl.length());
 
 		try {
-			if (!getRepositoryService().uploadFileAndCreateFoldersFromStringAsRoot(base, changedFileName, docContent, ContentConstants.XML_MIME_TYPE))
+			if (!getRepositoryService().uploadFileAndCreateFoldersFromStringAsRoot(base, changedFileName, docContent, ContentConstants.XML_MIME_TYPE)) {
 				return null;
+			}
 		} catch (Exception e) {
 			LOGGER.log(Level.WARNING, "Error uploading to " + base + changedFileName, e);
 			return null;
@@ -1355,8 +1364,9 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 
 			base.append(CoreConstants.SLASH);
 			try {
-				if (getRepositoryService().uploadFileAndCreateFoldersFromStringAsRoot(base.toString(), file.toString(), article, ContentConstants.XML_MIME_TYPE))
+				if (getRepositoryService().uploadFileAndCreateFoldersFromStringAsRoot(base.toString(), file.toString(), article, ContentConstants.XML_MIME_TYPE)) {
 					paths.add(base.toString());
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
@@ -1711,8 +1721,9 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 		ImageGenerator imageGenerator = getImageGenerator(null);
 
 		List<BufferedImage> images = imageGenerator.generatePreviews(url, dimensions, isJpg, quality);
-		if (images == null)
+		if (images == null) {
 			return false;
+		}
 
 		String extension = imageGenerator.getFileExtension();
 		String mimeType = new StringBuffer(ThemesConstants.DEFAULT_MIME_TYPE).append(extension).toString();
@@ -1724,8 +1735,9 @@ public class ThemesHelperImpl extends DefaultSpringBean implements ThemesHelper 
 			image = images.get(i);
 			stream = imageGenerator.getImageInputStream(image, extension);
 			try {
-				if (getRepositoryService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), smallPreviewName, stream, mimeType))
+				if (getRepositoryService().uploadFileAndCreateFoldersFromStringAsRoot(theme.getLinkToBaseAsItIs(), smallPreviewName, stream, mimeType)) {
 					theme.setLinkToSmallPreview(smallPreviewName);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				return false;
