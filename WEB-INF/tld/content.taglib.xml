@@ -17,5 +17,47 @@
             <component-type>UploadArea</component-type>
         </component>
 	</tag>
+	<tag>
+		<tag-name>block_with_toolbar</tag-name>
+		<component>
+			<component-type>WFBlockWithToolbar</component-type>
+		</component>
+	</tag>
+	<tag>
+		<tag-name>TemplatesTree</tag-name>
+		<component>
+			<component-type>TemplatesTree</component-type>
+		</component>
+	</tag>
+	<tag>
+		<tag-name>PageInfo</tag-name>
+		<component>
+			<component-type>PageInfo</component-type>
+		</component>
+	</tag>
+	<tag>
+		<tag-name>SiteInfo</tag-name>
+		<component>
+			<component-type>SiteInfo</component-type>
+		</component>
+	</tag>
+	<tag>
+		<tag-name>ThemesSliderViewer</tag-name>
+		<component>
+			<component-type>ThemesSliderViewer</component-type>
+		</component>
+	</tag>
+	<tag>
+		<tag-name>siteTemplatesViewer</tag-name>
+		<component>
+			<component-type>siteTemplatesViewer</component-type>
+		</component>
+	</tag>
+	<tag>
+		<tag-name>siteTreeViewer</tag-name>
+		<component>
+			<component-type>SiteTreeViewer</component-type>
+		</component>
+	</tag>
     
 </facelet-taglib>
