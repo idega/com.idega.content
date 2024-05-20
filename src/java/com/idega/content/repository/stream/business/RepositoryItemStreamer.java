@@ -88,7 +88,7 @@ public class RepositoryItemStreamer extends DefaultSpringBean implements DWRAnno
 		if (ListUtil.isEmpty(streamResults)) {
 			results.add(new Heading3(iwrb.getLocalizedString("no_information_about_streaming", "There is no information about the streaming results yet")));
 		} else {
-			streamResults = new ArrayList<StreamResult>(streamResults);
+			streamResults = new ArrayList<>(streamResults);
 			String success = iwrb.getLocalizedString("succeeded", "Succeeded");
 			String failure = iwrb.getLocalizedString("failed", "Failed");
 			String seconds = iwrb.getLocalizedString("seconds", "seconds");
@@ -150,9 +150,12 @@ public class RepositoryItemStreamer extends DefaultSpringBean implements DWRAnno
 			if (writeItems(resource, url, toFolder, reCreateStructure, uuid)) {
 				result.setId(Boolean.TRUE.toString());
 				result.setValue(iwrb.getLocalizedString("success_streaming", "Data were succussefully streamed to").concat(CoreConstants.SPACE).concat(originalServer));
+
+				getLogger().info("Item " + repositoryItem + " was succussefully streamed to".concat(CoreConstants.SPACE).concat(originalServer));
 			} else
-				result.setValue(iwrb.getLocalizedString("error_streaming", "Sorry, some error occurred while streaming data to").concat(CoreConstants.SPACE)
-						.concat(originalServer));
+				result.setValue(iwrb.getLocalizedString("error_streaming", "Sorry, some error occurred while streaming data to").concat(CoreConstants.SPACE).concat(originalServer));
+
+				getLogger().warning("Failed to stream item " + repositoryItem + " to".concat(CoreConstants.SPACE).concat(originalServer));
 		} catch (Exception e) {
 			getLogger().log(Level.WARNING, "Error streaming " + repositoryItem + " to server " + uri.getUri(), e);
 		}
@@ -161,17 +164,22 @@ public class RepositoryItemStreamer extends DefaultSpringBean implements DWRAnno
 	}
 
 	private boolean writeItems(RepositoryItem resource, String uri, String toFolder, boolean reCreateStructure, String uuid) throws IOException {
-		if (resource == null || !resource.exists())
+		if (resource == null || !resource.exists()) {
+			getLogger().warning("Resource " + resource + " does not exist");
 			return false;
+		}
 
 		if (resource.isCollection()) {
 			Collection<RepositoryItem> childResources = resource.getChildResources();
-			if (ListUtil.isEmpty(childResources))
+			if (ListUtil.isEmpty(childResources)) {
 				return true;
+			}
 
 			for (RepositoryItem childResource: childResources) {
-				if (!writeItems(childResource, uri, toFolder, reCreateStructure, uuid))
+				if (!writeItems(childResource, uri, toFolder, reCreateStructure, uuid)) {
+					getLogger().warning("Failed to write child resource " + childResource);
 					return false;
+				}
 			}
 		} else {
 			return writeItem(resource, uri, toFolder, reCreateStructure, uuid);
@@ -224,7 +232,7 @@ public class RepositoryItemStreamer extends DefaultSpringBean implements DWRAnno
 			Map<String, List<StreamResult>> history = getStreamHistory();
 			List<StreamResult> results = history.get(uuid);
 			if (results == null) {
-				results = new ArrayList<StreamResult>();
+				results = new ArrayList<>();
 				history.put(uuid, results);
 			}
 			results.add(result);
