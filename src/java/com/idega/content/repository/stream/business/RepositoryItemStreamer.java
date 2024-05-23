@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.jackrabbit.tools.importexport.JcrImportExportTool;
 import org.directwebremoting.annotations.Param;
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
@@ -31,6 +36,7 @@ import com.idega.core.business.DefaultSpringBean;
 import com.idega.core.component.bean.RenderedComponent;
 import com.idega.dwr.business.DWRAnnotationPersistance;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Table2;
 import com.idega.presentation.TableBodyRowGroup;
@@ -64,6 +70,40 @@ public class RepositoryItemStreamer extends DefaultSpringBean implements DWRAnno
 	private Map<String, List<StreamResult>> getStreamHistory() {
 		Map<String, List<StreamResult>> history = getCache(BEAN_NAME + "Cache");
 		return history;
+	}
+
+	@RemoteMethod
+	public boolean doExport(
+			String config,
+			String home,
+			String fileToExport,
+			boolean printNodes,
+			HttpServletRequest request,
+			HttpServletResponse response,
+			ServletContext context
+	) {
+		try {
+			IWContext iwc = new IWContext(request, response, context);
+			if (!iwc.isSuperAdmin()) {
+				return false;
+			}
+
+			config = StringUtil.isEmpty(config) ? "/Applications/Developing/tomcats/akureyri_parking/apache-tomcat-7.0.88/store_copy/workspaces/default/workspace_copy.xml" : config;
+			home = StringUtil.isEmpty(home) ? "/Applications/Developing/tomcats/akureyri_parking/apache-tomcat-7.0.88/store_copy" : home;
+			fileToExport = StringUtil.isEmpty(fileToExport) ? "/content/files/public/parking_logo.png" : fileToExport;
+
+			JcrImportExportTool jcrTool = new JcrImportExportTool(
+					config,
+					home,
+					fileToExport.substring(fileToExport.lastIndexOf(CoreConstants.SLASH) + 1, fileToExport.indexOf(CoreConstants.DOT)) + ".zip"
+			);
+			jcrTool.doExport(new String[] {fileToExport}, false, false, printNodes);
+
+			return true;
+		} catch (Exception e) {
+			getLogger().log(Level.WARNING, "Error exporting " + fileToExport + " from " + home + ". Config file: " + config, e);
+		}
+		return false;
 	}
 
 	@RemoteMethod
