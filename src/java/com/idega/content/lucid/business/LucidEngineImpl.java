@@ -185,7 +185,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 	}
 
 	private List<String> getThickBoxResources() {
-		List<String> resources = new ArrayList<String>();
+		List<String> resources = new ArrayList<>();
 		try {
 			resources.add(web2.getThickboxStyleFilePath());
 		} catch (RemoteException e) {
@@ -260,7 +260,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 
 	@Override
 	public Collection<SelectItem> getAvailableLocales() {
-		List<SelectItem> availableLocales = new ArrayList<SelectItem>();
+		List<SelectItem> availableLocales = new ArrayList<>();
 
 		List<Locale> locales = ICLocaleBusiness.getListOfLocalesJAVA();
 		if (ListUtil.isEmpty(locales)) {
@@ -300,7 +300,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		}
 
 		Locale newLocale = LocaleUtil.getLocale(locale);
-		if (newLocale != null && !newLocale.equals(locale)) {
+		if (newLocale != null && !newLocale.toString().equals(locale.toString())) {
 			iwc.setCurrentLocale(newLocale);
 			return true;
 		}
@@ -547,7 +547,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 			return null;
 		}
 
-		List<String> values = new ArrayList<String>(keywords.length);
+		List<String> values = new ArrayList<>(keywords.length);
 		String[] propValues = null;
 		StringBuffer value = null;
 		ICPage page = getThemesHelper().getThemesService().getICPage(pageKey);
@@ -670,7 +670,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		}
 		try {
 			String[] elements = null;
-			List <Setting> settings = new ArrayList<Setting>(c);
+			List <Setting> settings = new ArrayList<>(c);
 			elements = new String[settings.size()];
 			for (int i = 0; i < settings.size(); i++) {
 				elements[i] = settings.get(i).getCode();
@@ -792,7 +792,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 
 	@Override
 	public List <String> createPage(List<TreeNodeStructure> struct, Boolean isTopLevelPage, String numberInLevel, List<String> followingNodes) {
-		List <String> newIds = new ArrayList<String>();
+		List <String> newIds = new ArrayList<>();
 
 		if (struct == null || numberInLevel == null) {
 			return newIds;
@@ -827,7 +827,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		String format = builder.getIBXMLFormat();
 		String pageKey = null;
 
-		List<String> createdPages = new ArrayList<String>();
+		List<String> createdPages = new ArrayList<>();
 
 		TreeNodeStructure node = null;
 		for (int i = 0; i < struct.size(); i++) {
@@ -1368,7 +1368,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 	}
 
 	private List <TreeNodeStructure> getOrderInLevel(List <TreeNodeStructure> struct){
-		Map<String, Integer> children = new HashMap<String, Integer>();
+		Map<String, Integer> children = new HashMap<>();
 		String ONE = "1";
 		String parentId = null;
 		Integer number = null;
@@ -1405,7 +1405,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		ICPage newPage = null;
 		if (newRootPage.getParentNode() == null) {
 			//	Top level page
-			List<String> increaseLevelOnTop = new ArrayList<String>();
+			List<String> increaseLevelOnTop = new ArrayList<>();
 			for (Iterator<? extends ICTreeNode> iter = topLevelPages.iterator(); iter.hasNext();) {
 				element = iter.next();
 				page = getThemesHelper().getThemesService().getICPage(element.getId());
@@ -1431,7 +1431,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 				}
 			}
 
-			List<String> decreaseLevelOnTop = new ArrayList<String>();
+			List<String> decreaseLevelOnTop = new ArrayList<>();
 			Collection<? extends ICTreeNode> siblings = newRootPage.getParentNode().getChildren();
 			if (siblings == null) {
 				return false;
@@ -1454,7 +1454,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 	}
 
 	private List<String> getLocalizedText(IWContext iwc) {
-		List<String> texts = new ArrayList<String>();
+		List<String> texts = new ArrayList<>();
 		IWResourceBundle iwrb = null;
 		try {
 			iwrb = ContentUtil.getBundle().getResourceBundle(iwc);
@@ -1657,7 +1657,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 			return true;
 		}
 
-		List<String> paths = new ArrayList<String>();
+		List<String> paths = new ArrayList<>();
 		String path = null;
 		for (int i = 0; i < ids.size(); i++) {
 			path = builder.getProperty(pageKey, ids.get(i), CoreConstants.ARTICLE_RESOURCE_PATH_PROPERTY_NAME);
@@ -1738,7 +1738,7 @@ public class LucidEngineImpl extends DefaultSpringBean implements LucidEngine {
 		}
 		IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(ContentConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
 
-		List<PageAccessibilityProperty> properties = new ArrayList<PageAccessibilityProperty>();
+		List<PageAccessibilityProperty> properties = new ArrayList<>();
 
 		boolean published = page.isPublished();
 		String localization = published ? iwrb.getLocalizedString("unpublish_page", "Unpublish page") : iwrb.getLocalizedString("publish_page", "Publish page");
