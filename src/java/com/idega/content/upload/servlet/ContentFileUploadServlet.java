@@ -116,7 +116,6 @@ public class ContentFileUploadServlet extends HttpServlet {
 				uploadProgressListener.setFileNumberInUploadSequence(fileItemNr);
 			}
 
-			//	TODO
 			long start = System.currentTimeMillis();
 			LOGGER.info("Starting to parse data for upload: " + uploadId);
 
@@ -130,7 +129,6 @@ public class ContentFileUploadServlet extends HttpServlet {
 				CoreUtil.sendExceptionNotification(message, e);
 			}
 
-			//	TODO
 			LOGGER.info("Data was parsed in " + (System.currentTimeMillis() - start) + " ms for upload: " + uploadId);
 
 			if (ListUtil.isEmpty(fileItems)) {
@@ -286,8 +284,6 @@ public class ContentFileUploadServlet extends HttpServlet {
 			if (!uploadedFile.startsWith(CoreConstants.WEBDAV_SERVLET_URI)) {
 				uploadedFile = CoreConstants.WEBDAV_SERVLET_URI + uploadedFile;
 			}
-//			responseBuffer = new StringBuffer("<script>top.jQuery('.mce-btn.mce-open').parent().find('.mce-textbox').val('")
-//								.append(uploadedFile).append("').closest('.mce-window').find('.mce-primary').click();</script>");
 			responseBuffer = new StringBuffer("<script>top.ContentPageMenuHelper.doFinishUpload('").append(uploadedFile).append("');</script>");
 		} else {
 			responseBuffer = new StringBuffer("web2FilesUploaderFilesListStarts").append(responseText);
@@ -311,7 +307,6 @@ public class ContentFileUploadServlet extends HttpServlet {
 			boolean extractContent,
 			String uploadId
 	) {
-		//	TODO
 		long start = System.currentTimeMillis();
 
 		boolean result = false;

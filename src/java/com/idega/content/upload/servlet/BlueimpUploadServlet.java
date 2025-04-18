@@ -1,14 +1,19 @@
 package com.idega.content.upload.servlet;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.jcr.RepositoryException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -21,14 +26,17 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.gson.Gson;
 import com.idega.content.business.ContentConstants;
 import com.idega.content.business.ThumbnailService;
 import com.idega.content.upload.business.UploadAreaBean;
+import com.idega.content.util.UploadUtil;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.repository.RepositoryService;
+import com.idega.repository.access.RepositoryAccessManager;
 import com.idega.util.CoreConstants;
+import com.idega.util.FileUtil;
+import com.idega.util.IOUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
@@ -38,10 +46,15 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 
 	private static final long serialVersionUID = 3816385155256905555L;
 
+	private static final Logger LOGGER = Logger.getLogger(BlueimpUploadServlet.class.getName());
+
 	private UploadAreaBean uploadAreaBean = null;
 
 	@Autowired
 	private RepositoryService repository;
+
+	@Autowired
+	private RepositoryAccessManager repositoryAccessManager;
 
 	private String deleteUrlBase = null;
 
@@ -57,6 +70,13 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 			ELUtil.getInstance().autowire(this);
 		}
 		return repository;
+	}
+
+	private RepositoryAccessManager getRepositoryAccessManager() {
+		if (repositoryAccessManager == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		return repositoryAccessManager;
 	}
 
 	@Override
@@ -108,21 +128,20 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 
 			responseMapArray = uploadFiles(files, parameters, iwc);
 
-			Gson gson = new Gson();
-			String jsonString =  gson.toJson(responseMapArray);
+			String jsonString = CoreConstants.GSON.toJson(responseMapArray);
 
 			responseWriter.print(jsonString);
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.flushBuffer();
 			return;
 		} catch (FileSizeLimitExceededException e){
-			log("File is too large", e);
+			LOGGER.log(Level.WARNING, "File is too large", e);
 			response.sendError(413);
 		} catch (FileUploadException ex) {
-			log("Error encountered while parsing the request", ex);
+			LOGGER.log(Level.WARNING, "Error encountered while parsing the request", ex);
 			response.sendError(500);
 		} catch (Exception ex) {
-			log("Error encountered while uploading file", ex);
+			LOGGER.log(Level.WARNING, "Error encountered while uploading file", ex);
 			response.sendError(500);
 		}
 	}
@@ -156,14 +175,48 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 		responseMapArray = new ArrayList<>();
 		boolean addPrefix = iwc.getApplicationSettings().getBoolean("blue_imp_upload.add_prefix", false);
 		for (FileItem file: files) {
+			boolean success = false;
+
 			String originalName = file.getName();
 			String fileName = originalName;
 			fileName = StringHandler.stripNonRomanCharacters(fileName, exceptions);
 			if (addPrefix) {
 				fileName = UUID.randomUUID().toString().concat(CoreConstants.UNDER).concat(fileName);
 			}
+
+			//	Sanitizing
+			uploadPath = UploadUtil.getInstance().getSanitized(uploadPath);
+			fileName = Paths.get(fileName).getFileName().toString();
+			fileName = UploadUtil.getInstance().getSanitized(fileName);
+
+			//	Loading file's content into memory
+			InputStream stream = file.getInputStream();
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			FileUtil.streamToOutputStream(stream, out);
+			byte[] bytes = out.toByteArray();
+			IOUtil.close(out);
+			IOUtil.close(stream);
+
+			boolean canUpload = true;
+
+			//	Checking mime type
+			String mimeType = UploadUtil.getInstance().getMimeType(bytes);
+			if (StringUtil.isEmpty(mimeType) || !UploadUtil.getInstance().getAllowedMediaTypes(iwc.getApplicationSettings()).contains(mimeType)) {
+				LOGGER.warning("Media type " + mimeType + " is not allowed");
+				canUpload = false;
+			}
+
+			//	Checking for suspicious content
+			if (canUpload && UploadUtil.getInstance().isContentSuspicious(bytes)) {
+				LOGGER.warning("Suspicious content detected in " + fileName);
+				canUpload = false;
+			}
+
 			String pathAndName = uploadPath + fileName;
-			boolean success = getRepositoryService().uploadFile(uploadPath, fileName, file.getContentType(), file.getInputStream());
+			if (canUpload) {
+				stream = new ByteArrayInputStream(bytes);
+				success = getRepositoryService().uploadFile(uploadPath, fileName, file.getContentType(), stream);
+			}
 
 			Map<String, Object> fileData = null;
 			if (!StringUtil.isEmpty(isAddThumbnail) && isAddThumbnail.equalsIgnoreCase(Boolean.FALSE.toString())) {
@@ -176,7 +229,6 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 			responseMapArray.add(fileData);
 		}
 		return responseMapArray;
-
 	}
 
 	private String getDeleteUrlBase() {
@@ -212,36 +264,26 @@ public class BlueimpUploadServlet extends HttpServlet implements UploadServlet {
 		if (StringUtil.isEmpty(filePath)) {
 			fileData.put("message", iwrb.getLocalizedString("file_path_is_empty", "File path is empty"));
 			fileData.put("status", "Bad Request");
-			Gson gson = new Gson();
-			String jsonString =  gson.toJson(responseMapArray);
+			String jsonString = CoreConstants.GSON.toJson(responseMapArray);
 			responseWriter.write(jsonString);
 			return;
 		}
 		try {
-			boolean success = getRepositoryService().deleteAsRootUser(filePath);
+			boolean success = false;
+			if (getRepositoryAccessManager().hasPermission(iwc, filePath)) {
+				success = getRepositoryService().deleteAsRootUser(filePath);
+			}
 			fileData.put("message", success ?
 										iwrb.getLocalizedString("file_deleted", "File deleted") :
 										iwrb.getLocalizedString("failed_to_delete_file", "Failed to delete file")
 			);
 			fileData.put("status", success ? "OK" : "Failure");
-			Gson gson = new Gson();
-			String jsonString =  gson.toJson(responseMapArray);
+			String jsonString = CoreConstants.GSON.toJson(responseMapArray);
 			responseWriter.write(jsonString);
 			return;
 		} catch (Exception e) {
-			log("Failed to delete file '" + filePath + "'",e);
+			LOGGER.log(Level.WARNING, "Failed to delete file '" + filePath + "'", e);
 		}
-		try {
-			getRepositoryService().deleteAsRootUser(filePath);
-		} catch (RepositoryException e) {
-			e.printStackTrace();
-		}
-		fileData.put("message", iwrb.getLocalizedString("error", "error"));
-		fileData.put("status", "Internal Server Error");
-		Gson gson = new Gson();
-		String jsonString =  gson.toJson(responseMapArray);
-		responseWriter.write(jsonString);
-		return;
 	}
 
 }

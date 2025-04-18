@@ -1,8 +1,11 @@
 package com.idega.content.upload.servlet;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,18 +26,18 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.gson.Gson;
+import com.idega.content.util.UploadUtil;
 import com.idega.core.file.data.ICFile;
 import com.idega.core.file.data.ICFileHome;
-import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.data.IDOLookup;
-import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
 import com.idega.repository.RepositoryService;
 import com.idega.util.CoreConstants;
+import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.StringHandler;
+import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
 public class ICFileUploadServlet extends HttpServlet {
@@ -90,7 +93,7 @@ public class ICFileUploadServlet extends HttpServlet {
 			responseMapArray = new ArrayList<>();
 			ICFileHome icFileHome = (ICFileHome) IDOLookup.getHome(ICFile.class);
 			InputStream stream = null;
-			boolean saveInDB = IWMainApplication.getDefaultIWMainApplication().getSettings().getBoolean("ic_file_uploader.save_in_db", true);
+			boolean saveInDB = iwc.getApplicationSettings().getBoolean("ic_file_uploader.save_in_db", true);
 			char[] exceptions = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-', '_'};
 			IWTimestamp now = IWTimestamp.RightNow();
 			String basePath = CoreConstants.PUBLIC_PATH.concat("/uploads/")
@@ -104,12 +107,37 @@ public class ICFileUploadServlet extends HttpServlet {
 				ICFile icFile = icFileHome.create();
 				stream = file.getInputStream();
 
+				//	Sanitizing
+				basePath = UploadUtil.getInstance().getSanitized(basePath);
+				fileName = Paths.get(fileName).getFileName().toString();
+				fileName = UploadUtil.getInstance().getSanitized(fileName);
+
+				//	Loading file's content into memory
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				FileUtil.streamToOutputStream(stream, out);
+				byte[] bytes = out.toByteArray();
+				IOUtil.close(out);
+				IOUtil.close(stream);
+
+				//	Checking mime type
+				String mimeType = UploadUtil.getInstance().getMimeType(bytes);
+				if (StringUtil.isEmpty(mimeType) || !UploadUtil.getInstance().getAllowedMediaTypes(iwc.getApplicationSettings()).contains(mimeType)) {
+					LOGGER.warning("Media type " + mimeType + " is not allowed");
+					continue;
+				}
+
+				//	Checking for suspicious content
+				if (UploadUtil.getInstance().isContentSuspicious(bytes)) {
+					LOGGER.warning("Suspicious content detected in " + fileName);
+					continue;
+				}
+
 				boolean result = false;
 				if (!saveInDB) {
 					fileName = StringHandler.stripNonRomanCharacters(fileName, exceptions);
-					String mimeType = MimeTypeUtil.resolveMimeTypeFromFileName(fileName);
 					result = false;
 					try {
+						stream = new ByteArrayInputStream(bytes);
 						result = getRepositoryService().uploadFile(basePath, fileName, mimeType, stream);
 					} catch (Exception e) {
 						result = false;
@@ -133,8 +161,7 @@ public class ICFileUploadServlet extends HttpServlet {
 
 				IOUtil.close(stream);
 			}
-			Gson gson = new Gson();
-			String jsonString =  gson.toJson(responseMapArray);
+			String jsonString = CoreConstants.GSON.toJson(responseMapArray);
 			responseWriter.write(jsonString);
 			return;
 		} catch (FileSizeLimitExceededException e) {

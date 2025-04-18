@@ -2,14 +2,16 @@ package com.idega.content.upload.business;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.faces.component.UIComponent;
 
@@ -29,6 +31,7 @@ import com.idega.content.business.WebDAVUploadBean;
 import com.idega.content.presentation.WebDAVListManagedBean;
 import com.idega.content.repository.download.RepositoryItemDownloader;
 import com.idega.content.upload.bean.UploadFile;
+import com.idega.content.util.UploadUtil;
 import com.idega.core.builder.business.BuilderService;
 import com.idega.core.business.DefaultSpringBean;
 import com.idega.idegaweb.IWBundle;
@@ -45,6 +48,7 @@ import com.idega.repository.bean.RepositoryItem;
 import com.idega.user.data.bean.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.FileUtil;
 import com.idega.util.IOUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.PresentationUtil;
@@ -53,8 +57,6 @@ import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
 public class FileUploaderBean extends DefaultSpringBean implements FileUploader {
-
-	private static final Logger LOGGER = Logger.getLogger(FileUploaderBean.class.getName());
 
 	private BuilderService builder = null;
 
@@ -239,12 +241,18 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 
 		boolean uploadedSuccessfully = true;
 		for (Iterator<UploadFile> filesIter = files.iterator(); (filesIter.hasNext() && uploadedSuccessfully);) {
-			uploadedSuccessfully = uploadFile(filesIter.next(), path, zipFile, themePack, extractContent, isIE);
+			UploadFile file = null;
+			try {
+				file = filesIter.next();
+				uploadedSuccessfully = uploadFile(file, path, zipFile, themePack, extractContent, isIE);
+			} catch (Exception e) {
+				getLogger().log(Level.WARNING, "Failed to upload " + file + " to " + path, e);
+			}
 		}
 		return uploadedSuccessfully;
 	}
 
-	private boolean uploadFile(UploadFile file, String path, boolean zipFile, boolean themePack, boolean extractContent, boolean isIE) {
+	private boolean uploadFile(UploadFile file, String path, boolean zipFile, boolean themePack, boolean extractContent, boolean isIE) throws IOException {
 		if (file == null || path == null) {
 			return false;
 		}
@@ -254,16 +262,44 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 			return false;
 		}
 
+		String name = file.getName();
+
+		//	Sanitizing
+		path = UploadUtil.getInstance().getSanitized(path);
+		name = Paths.get(name).getFileName().toString();
+		name = UploadUtil.getInstance().getSanitized(name);
+
+		//	Loading file's content into memory
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		FileUtil.streamToOutputStream(stream, out);
+		byte[] bytes = out.toByteArray();
+		IOUtil.close(out);
+		IOUtil.close(stream);
+
+		//	Checking mime type
+		String mimeType = UploadUtil.getInstance().getMimeType(bytes);
+		if (StringUtil.isEmpty(mimeType) || !UploadUtil.getInstance().getAllowedMediaTypes(getSettings()).contains(mimeType)) {
+			getLogger().warning("Media type " + mimeType + " is not allowed");
+			return false;
+		}
+
+		//	Checking for suspicious content
+		if (UploadUtil.getInstance().isContentSuspicious(bytes)) {
+			getLogger().warning("Suspicious content detected in " + name);
+			return false;
+		}
+
+
 		if (!path.endsWith(CoreConstants.SLASH)) {
 			path = new StringBuffer(path).append(CoreConstants.SLASH).toString();
 		}
 
-		String name = file.getName();
 		if (name.indexOf(CoreConstants.BACK_SLASH) != -1 && isIE) {
 			name = name.substring(name.lastIndexOf(CoreConstants.BACK_SLASH) + 1);
 		}
 
 		try {
+			stream = new ByteArrayInputStream(bytes);
 			if (zipFile && extractContent) {
 				if (name.indexOf(CoreConstants.DOT) != -1) {
 					name = name.substring(0, name.lastIndexOf(CoreConstants.DOT));
@@ -277,7 +313,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 			}
 		} catch (Exception e) {
 			String message = "Error uploading file " + file.getName();
-			LOGGER.log(Level.SEVERE, message, e);
+			getLogger().log(Level.SEVERE, message, e);
 			CoreUtil.sendExceptionNotification(message, e);
 		} finally {
 			IOUtil.close(stream);
@@ -294,7 +330,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 		try {
 			stream = new BufferedInputStream(new ByteArrayInputStream(bytes));
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Error getting InputStream", e);
+			getLogger().log(Level.SEVERE, "Error getting InputStream", e);
 			return null;
 		}
 
@@ -351,7 +387,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 
 	@Override
 	public String getActionToLoadFilesAndExecuteCustomAction(String customAction, boolean showProgressBar, boolean addjQuery) {
-		List<String> scripts = new ArrayList<String>();
+		List<String> scripts = new ArrayList<>();
 		scripts.add(ContentUtil.getBundle().getVirtualPathWithFileNameString("javascript/FileUploadHelper.js"));
 		scripts.add(getWeb2().getBundleURIToYUIScript());
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
@@ -443,13 +479,13 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
 		String deleteFileTitle = iwrb.getLocalizedString("files_uploader.delete_uploaded_file", "Delete file");
 
-		List<String> results = new ArrayList<String>(files.size() + 1);
+		List<String> results = new ArrayList<>(files.size() + 1);
 
 		Lists list = new Lists();
 		for (AdvancedProperty file: files) {
 
 			String fileName = file.getValue();
-			
+
 			ListItem listItem = new ListItem();
 
 			fileName = stripNonRomanLetters ? StringHandler.stripNonRomanCharacters(fileName, ContentConstants.UPLOADER_EXCEPTIONS_FOR_LETTERS) : fileName;
@@ -497,7 +533,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 		IWResourceBundle iwrb = bundle.getResourceBundle(iwc);
 		String deleteFileTitle = iwrb.getLocalizedString("files_uploader.delete_uploaded_file", "Delete file");
 
-		List<String> results = new ArrayList<String>(files.size() + 1);
+		List<String> results = new ArrayList<>(files.size() + 1);
 
 		Lists list = new Lists();
 		for (String fileInRepository: files) {
@@ -564,11 +600,11 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 
 		if (fakeFileDeletion){
 			FileUploadProgressListener fileUploadProgressListener = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
-			ArrayList<String> filesInRepo = new ArrayList<String>();
+			ArrayList<String> filesInRepo = new ArrayList<>();
 			filesInRepo.add(fileInRepository);
 			fileUploadProgressListener.removeUploadedFiles(uploadId, filesInRepo);
 		}
-		
+
 		if (StringUtil.isEmpty(fileInRepository)) {
 			return result;
 		}
@@ -585,14 +621,14 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 			if (resource.delete()) {
 				result.setId(Boolean.TRUE.toString());
 				result.setValue(iwrb.getLocalizedString("file_uploader.success_deleting_file", "File was successfully deleted"));
-				
+
 				FileUploadProgressListener fileUploadProgressListener = ELUtil.getInstance().getBean(FileUploadProgressListener.class);
-				ArrayList<String> filesInRepo = new ArrayList<String>();
+				ArrayList<String> filesInRepo = new ArrayList<>();
 				filesInRepo.add(fileInRepository);
 				fileUploadProgressListener.removeUploadedFiles(uploadId, filesInRepo);
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Error deleting file: " + fileInRepository, e);
+			getLogger().log(Level.SEVERE, "Error deleting file: " + fileInRepository, e);
 		}
 
 		return result;
@@ -604,7 +640,7 @@ public class FileUploaderBean extends DefaultSpringBean implements FileUploader 
 			return currentUser == null && fakeFileDeletion ?	getRepositoryService().getRepositoryItemAsRootUser(fileInRepository) :
 																getRepositoryService().getRepositoryItem(currentUser, fileInRepository);
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Error getting file: " + fileInRepository, e);
+			getLogger().log(Level.SEVERE, "Error getting file: " + fileInRepository, e);
 		}
 
 		return null;
