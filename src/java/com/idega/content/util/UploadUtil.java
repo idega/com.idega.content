@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
@@ -25,32 +26,6 @@ public class UploadUtil {
 	private static final Logger LOGGER = Logger.getLogger(UploadUtil.class.getName());
 
 	private static final UploadUtil instance = new UploadUtil();
-
-	private static final Pattern[] DANGEROUS_PATTERNS = new Pattern[] {
-			Pattern.compile("<script.*?>", Pattern.CASE_INSENSITIVE),
-	        Pattern.compile("</script>", Pattern.CASE_INSENSITIVE),
-	        Pattern.compile("<iframe.*?>", Pattern.CASE_INSENSITIVE),
-	        Pattern.compile("<img\\s+[^>]*src=['\"]?https?://", Pattern.CASE_INSENSITIVE),
-	        Pattern.compile("<img\\s+[^>]*src=['\"]?http?://", Pattern.CASE_INSENSITIVE),
-	        Pattern.compile("document\\.cookie", Pattern.CASE_INSENSITIVE),
-	        Pattern.compile("fetch\\(", Pattern.CASE_INSENSITIVE),
-	        Pattern.compile("XMLHttpRequest", Pattern.CASE_INSENSITIVE),
-	        Pattern.compile("<marquee", Pattern.CASE_INSENSITIVE),
-	        Pattern.compile("localStorage\\.getItem", Pattern.CASE_INSENSITIVE),
-	        Pattern.compile("sessionStorage\\.getItem", Pattern.CASE_INSENSITIVE),
-	        Pattern.compile("<script", Pattern.CASE_INSENSITIVE),
-	        Pattern.compile("new\\s+Image\\(\\)", Pattern.CASE_INSENSITIVE),
-
-	        Pattern.compile("(?i)<script.*?>"),
-	        Pattern.compile("(?i)</script>"),
-	        Pattern.compile("(?i)document\\.cookie"),
-	        Pattern.compile("(?i)fetch\\("),
-	        Pattern.compile("(?i)XMLHttpRequest"),
-	        Pattern.compile("(?i)onerror\\s*="),
-	        Pattern.compile("(?i)javascript:"),
-	        Pattern.compile("(?i)file:\\/\\/"),
-	        Pattern.compile("(?i)macro", Pattern.CASE_INSENSITIVE)
-	};
 
 	private static final Tika TIKA = new Tika();
 
@@ -86,6 +61,55 @@ public class UploadUtil {
 		);
 	}
 
+	private List<Pattern> getDangerousPatterns() {
+		IWMainApplicationSettings settings = IWMainApplication.getDefaultIWMainApplication().getSettings();
+		List<String> patterns = StringUtil.getValuesFromString(
+				settings.getProperty(
+						"content.dangerous_patterns",
+						ListUtil.convertListToCommaseparatedString(
+								Arrays.asList(
+										"<script.*?>",
+										"</script>",
+										"<iframe.*?>",
+										"<img\\s+[^>]*src=['\"]?https?://",
+										"<img\\s+[^>]*src=['\"]?http?://",
+										"document\\.cookie",
+										"fetch\\(",
+										"XMLHttpRequest",
+										"<marquee",
+										"localStorage\\.getItem",
+										"sessionStorage\\.getItem",
+										"<script",
+										"new\\s+Image\\(\\)",
+										"(?i)<script.*?>",
+										"(?i)</script>",
+										"(?i)document\\.cookie",
+										"(?i)fetch\\(",
+										"(?i)XMLHttpRequest",
+										"(?i)onerror\\s*=",
+										"(?i)javascript:",
+										"(?i)file:\\/\\/",
+										"(?i)macro"
+								)
+						)
+				),
+				CoreConstants.COMMA
+		);
+		if (ListUtil.isEmpty(patterns)) {
+			return null;
+		}
+
+		List<Pattern> dangerousPatterns = new ArrayList<>();
+		for (String pattern: patterns) {
+			if (StringUtil.isEmpty(pattern)) {
+				continue;
+			}
+
+			dangerousPatterns.add(Pattern.compile(pattern, Pattern.CASE_INSENSITIVE));
+		}
+		return dangerousPatterns;
+	}
+
 	public boolean isContentSuspicious(byte[] content) {
 		if (content == null) {
 			return false;
@@ -109,7 +133,12 @@ public class UploadUtil {
         	return true;
         }
 
-        for (Pattern pattern: DANGEROUS_PATTERNS) {
+        List<Pattern> patterns = getDangerousPatterns();
+        if (ListUtil.isEmpty(patterns)) {
+        	return false;
+        }
+
+        for (Pattern pattern: patterns) {
             if (pattern.matcher(extractedText).find()) {
             	LOGGER.warning("Suspicious content detected: " + pattern);
                 return true;
@@ -123,7 +152,12 @@ public class UploadUtil {
 			return content;
 		}
 
-		return content.replaceAll("[^a-zA-Z0-9._-]", CoreConstants.UNDER);
+		String sanitationPattern = IWMainApplication.getDefaultIWMainApplication().getSettings().getProperty("content.sanitation_pattern", "[^a-zA-Z0-9._/\\\\-]");
+		if (StringUtil.isEmpty(sanitationPattern)) {
+			return content;
+		}
+
+		return content.replaceAll(sanitationPattern, CoreConstants.UNDER);
 	}
 
 	public String getMimeType(byte[] bytes) {
