@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,8 @@ import java.util.logging.Logger;
 
 import javax.faces.context.FacesContext;
 import javax.jcr.RepositoryException;
+
+import org.apache.xmlbeans.XmlException;
 
 import com.idega.block.rss.business.EntryData;
 import com.idega.content.business.ContentConstants;
@@ -732,7 +735,12 @@ public abstract class ContentItemBean implements Serializable, ContentItem {
 		}
 
 		try {
-			t = new Timestamp(DateParser.parseW3CDateTime(dateValue).getTime());
+			Date date = DateParser.parseW3CDateTime(dateValue);
+			if (date == null) {
+				return null;
+			}
+
+			t = new Timestamp(date.getTime());
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
