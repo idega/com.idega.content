@@ -45,16 +45,14 @@ public class UploadUtil {
 						"content.allowed_media_types",
 						ListUtil.convertListToCommaseparatedString(
 								Arrays.asList(
-										"image/png", "image/jpeg", "image/gif", "image/webp",
-										"video/mp4", "video/webm", "video/ogg",
-										"text/plain",
+										"image/png", "image/jpeg",
 									    MimeTypeUtil.MIME_TYPE_PDF_1,
 									    MimeTypeUtil.MIME_TYPE_PDF_2,
 									    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",		// .docx
 									    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",			// .xlsx
-									    "application/vnd.openxmlformats-officedocument.presentationml.presentation",	// .pptx
 									    "application/msword",															// .doc
-									    "application/vnd.ms-excel"														// .xls
+									    "application/vnd.ms-excel",														// .xls
+									    "application/x-tika-ooxml"														// .xlsx
 								)
 						)
 				),
