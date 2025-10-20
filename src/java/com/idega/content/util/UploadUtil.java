@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -62,52 +63,57 @@ public class UploadUtil {
 	}
 
 	private List<Pattern> getDangerousPatterns() {
-		IWMainApplicationSettings settings = IWMainApplication.getDefaultIWMainApplication().getSettings();
-		List<String> patterns = StringUtil.getValuesFromString(
-				settings.getProperty(
-						"content.dangerous_patterns",
-						ListUtil.convertListToCommaseparatedString(
-								Arrays.asList(
-										"<script.*?>",
-										"</script>",
-										"<iframe.*?>",
-										"<img\\s+[^>]*src=['\"]?https?://",
-										"<img\\s+[^>]*src=['\"]?http?://",
-										"document\\.cookie",
-										"fetch\\(",
-										"XMLHttpRequest",
-										"<marquee",
-										"localStorage\\.getItem",
-										"sessionStorage\\.getItem",
-										"<script",
-										"new\\s+Image\\(\\)",
-										"(?i)<script.*?>",
-										"(?i)</script>",
-										"(?i)document\\.cookie",
-										"(?i)fetch\\(",
-										"(?i)XMLHttpRequest",
-										"(?i)onerror\\s*=",
-										"(?i)javascript:",
-										"(?i)file:\\/\\/",
-										"(?i)macro"
-								)
-						)
-				),
-				CoreConstants.COMMA
-		);
-		if (ListUtil.isEmpty(patterns)) {
-			return null;
-		}
-
-		List<Pattern> dangerousPatterns = new ArrayList<>();
-		for (String pattern: patterns) {
-			if (StringUtil.isEmpty(pattern)) {
-				continue;
+		try {
+			IWMainApplicationSettings settings = IWMainApplication.getDefaultIWMainApplication().getSettings();
+			List<String> patterns = StringUtil.getValuesFromString(
+					settings.getProperty(
+							"content.dangerous_patterns",
+							ListUtil.convertListToCommaseparatedString(
+									Arrays.asList(
+											"<script.*?>",
+											"</script>",
+											"<iframe.*?>",
+											"<img\\s+[^>]*src=['\"]?https?://",
+											"<img\\s+[^>]*src=['\"]?http?://",
+											"document\\.cookie",
+											"fetch\\(",
+											"XMLHttpRequest",
+											"<marquee",
+											"localStorage\\.getItem",
+											"sessionStorage\\.getItem",
+											"<script",
+											"new\\s+Image\\(\\)",
+											"(?i)<script.*?>",
+											"(?i)</script>",
+											"(?i)document\\.cookie",
+											"(?i)fetch\\(",
+											"(?i)XMLHttpRequest",
+											"(?i)onerror\\s*=",
+											"(?i)javascript:",
+											"(?i)file:\\/\\/",
+											"(?i)macro"
+									)
+							)
+					),
+					CoreConstants.COMMA
+			);
+			if (ListUtil.isEmpty(patterns)) {
+				return null;
 			}
 
-			dangerousPatterns.add(Pattern.compile(pattern, Pattern.CASE_INSENSITIVE));
+			List<Pattern> dangerousPatterns = new ArrayList<>();
+			for (String pattern: patterns) {
+				if (StringUtil.isEmpty(pattern)) {
+					continue;
+				}
+
+				dangerousPatterns.add(Pattern.compile(pattern, Pattern.CASE_INSENSITIVE));
+			}
+			return dangerousPatterns;
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Error getting dangerous patterns", e);
 		}
-		return dangerousPatterns;
+		return null;
 	}
 
 	public boolean isContentSuspicious(byte[] content) {
@@ -115,35 +121,39 @@ public class UploadUtil {
 			return false;
 		}
 
-		String extractedText = null;
-		InputStream input = null;
-        try {
-        	input = new ByteArrayInputStream(content);
-            extractedText = TIKA.parseToString(input);
-        } catch (IOException | TikaException e) {
-        } finally {
-        	IOUtil.close(input);
-        }
+		try {
+			String extractedText = null;
+			InputStream input = null;
+	        try {
+	        	input = new ByteArrayInputStream(content);
+	            extractedText = TIKA.parseToString(input);
+	        } catch (IOException | TikaException e) {
+	        } finally {
+	        	IOUtil.close(input);
+	        }
 
-        if (StringUtil.isEmpty(extractedText)) {
-        	extractedText = new String(content, StandardCharsets.UTF_8);
-        }
+	        if (StringUtil.isEmpty(extractedText)) {
+	        	extractedText = new String(content, StandardCharsets.UTF_8);
+	        }
 
-        if (StringUtil.isEmpty(extractedText)) {
-        	return true;
-        }
+	        if (StringUtil.isEmpty(extractedText)) {
+	        	return true;
+	        }
 
-        List<Pattern> patterns = getDangerousPatterns();
-        if (ListUtil.isEmpty(patterns)) {
-        	return false;
-        }
+	        List<Pattern> patterns = getDangerousPatterns();
+	        if (ListUtil.isEmpty(patterns)) {
+	        	return false;
+	        }
 
-        for (Pattern pattern: patterns) {
-            if (pattern.matcher(extractedText).find()) {
-            	LOGGER.warning("Suspicious content detected: " + pattern);
-                return true;
-            }
-        }
+	        for (Pattern pattern: patterns) {
+	            if (pattern.matcher(extractedText).find()) {
+	            	LOGGER.warning("Suspicious content detected: " + pattern);
+	                return true;
+	            }
+	        }
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Error while checink if content is suspicious", e);
+		}
         return false;
 	}
 
