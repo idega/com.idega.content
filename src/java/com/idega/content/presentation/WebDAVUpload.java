@@ -29,6 +29,7 @@ import org.apache.myfaces.custom.fileupload.HtmlInputFileUpload;
 import org.apache.myfaces.custom.savestate.UISaveState;
 
 import com.idega.content.business.WebDAVUploadBean;
+import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.webface.WFContainer;
 import com.idega.webface.WFUtil;
 
@@ -115,7 +116,7 @@ public class WebDAVUpload extends ContentBlock {
 	@Override
 	protected void initializeComponent(FacesContext context) {
 		WebDAVUploadBean bean = (WebDAVUploadBean) WFUtil.getBeanInstance(BEAN_ID);
-		WFContainerLines = new ArrayList<WFContainer>();
+		WFContainerLines = new ArrayList<>();
 
 		if (showStatusAfterUploadAttempt && bean.wasUploadAttemped()) {
 			String message = bean.getUploadMessage();
@@ -283,7 +284,7 @@ public class WebDAVUpload extends ContentBlock {
 		if (form == null) {
 			form = new HtmlForm();
 			form.setId("webdavuploadform_"+getId());
-			form.setEnctype("multipart/form-data");
+			form.setEnctype(MimeTypeUtil.MIME_TYPE_FORM_DATA);
 		}
 		return form;
 	}
