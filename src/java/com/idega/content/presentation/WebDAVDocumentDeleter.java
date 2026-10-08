@@ -29,6 +29,7 @@ import com.idega.block.web2.business.JQuery;
 import com.idega.block.web2.business.Web2Business;
 import com.idega.content.bean.ContentPathBean;
 import com.idega.content.business.DocumentsService;
+import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWCacheManager;
 import com.idega.idegaweb.IWResourceBundle;
@@ -77,12 +78,12 @@ ActionListener {
 		IWContext iwc = IWContext.getIWContext(context);
 		String pathToUse = iwc.getParameter(PARAMETER_PATH);
 		Boolean deleted = (Boolean) WFUtil.invoke("webdavdocumentdeleterbean", "getDeleted");
-		WFContainerLines = new ArrayList<UIComponent>();
+		WFContainerLines = new ArrayList<>();
 		IWBundle bundle = getBundle();
 		if(!isShowDeletionConfirmContent()) {
 			PresentationUtil.addJavaScriptSourceLineToHeader(iwc, bundle.getVirtualPathWithFileNameString("javascript/DocumentsDeleterHelper.js"));
 		}
-		
+
 		if (deleted == null) {
 			String clickedPath = null;
 			if (pathToUse != null) {
@@ -98,7 +99,7 @@ ActionListener {
 			if (clickedPath != null) {
 				try {
 					item = getRepositoryService().getRepositoryItem(iwc.getLoggedInUser(), clickedPath);
-					
+
 					if (item == null) {
 						byte[] bytes = clickedPath.getBytes(Charset.forName(CoreConstants.ISO_8859_1));
 						String path = new String(bytes, Charset.forName(CoreConstants.ENCODING_UTF8));
@@ -179,7 +180,7 @@ ActionListener {
 			form = new HtmlForm();
 			form.setStyleClass("wf_webdav_deleter_form");
 			form.setId("webdavdeleterform_" + getId());
-			form.setEnctype("multipart/form-data");
+			form.setEnctype(MimeTypeUtil.MIME_TYPE_FORM_DATA);
 		}
 		return form;
 	}
@@ -304,5 +305,5 @@ ActionListener {
 	public void setShowDeletionConfirmContent(boolean showDeletionConfirmContent) {
 		this.showDeletionConfirmContent = showDeletionConfirmContent;
 	}
-	
+
 }
